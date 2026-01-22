@@ -32,8 +32,8 @@ def get_ado_config() -> AdoConfig:
       - ADO_PAT
 
     Optionnel :
-      - ADO_ORG (défaut: 'messqc')
-      - ADO_PROJECT (défaut: 'Projet-700')
+      - ADO_ORG 
+      - ADO_PROJECT 
 
     Defaults (optionnel) :
       - ADO_DEFAULT_TEAM
@@ -43,7 +43,7 @@ def get_ado_config() -> AdoConfig:
       - ADO_TEAM
       - ADO_AREA_PATH
     """
-    org = os.getenv("ADO_ORG", "messqc").strip()
+    org = os.getenv("ADO_ORG", "").strip()
     project = os.getenv("ADO_PROJECT", "Projet-700").strip()
     pat = os.getenv("ADO_PAT", "").strip()
 
