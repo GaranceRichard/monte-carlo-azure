@@ -1,0 +1,50 @@
+# ---- Secrets / env ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+
+# Virtual env
+.venv/
+venv/
+ENV/
+
+# ---- OS / IDE ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.suo
+
+# ---- Build / packaging ----
+build/
+dist/
+*.spec.bak
+*.log
+
+# Windows artifacts
+*.exe
+*.msi
+*.lnk
+
+# ---- Frontend (au cas où) ----
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/

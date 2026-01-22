@@ -1,0 +1,69 @@
+:root {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  /* Theme (Light by default) */
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #d1d5db;
+  --softBorder: #e5e7eb;
+  --dangerBg: #ffecec;
+  --dangerBorder: #ffb3b3;
+  --btnBg: #111;
+  --btnText: #fff;
+  --inputBg: #fff;
+
+  color: var(--text);
+  background: var(--bg);
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b0f19;
+  --panel: #111827;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --border: #374151;
+  --softBorder: #1f2937;
+  --dangerBg: rgba(255, 76, 76, 0.12);
+  --dangerBorder: rgba(255, 76, 76, 0.35);
+  --btnBg: #e5e7eb;
+  --btnText: #111;
+  --inputBg: #0f172a;
+}
+
+/* box sizing: prevents overflow */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+}
+
+input, select, button {
+  max-width: 100%;
+  font: inherit;
+}
+
+input, select {
+  background: var(--inputBg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+}
+
+input:focus, select:focus {
+  border-color: var(--text);
+}
+
+button {
+  border-radius: 10px;
+}
+
+a { color: inherit; }
