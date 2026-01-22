@@ -1,11 +1,18 @@
+# Scripts/ado_team_settings.py
 import os
 
 from backend.ado_config import get_ado_config
 from backend.ado_client import ado_session
-from backend.ado_core import get_project_id, team_settings_areas, team_settings_iterations, list_teams
+from backend.ado_core import (
+    get_project_id,
+    team_settings_areas,
+    team_settings_iterations,
+    list_teams,
+)
 
 cfg = get_ado_config()
 s = ado_session()
+
 
 def resolve_team(team_name: str) -> dict:
     teams = list_teams()
@@ -13,6 +20,7 @@ def resolve_team(team_name: str) -> dict:
         if t.get("name") == team_name:
             return t
     raise RuntimeError(f"Team introuvable: {team_name}")
+
 
 if __name__ == "__main__":
     team_name = os.getenv("ADO_TEAM", "").strip()

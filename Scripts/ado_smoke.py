@@ -1,10 +1,16 @@
+# Scripts/ado_smoke.py
+from __future__ import annotations
+
 from backend.ado_config import get_ado_config
 from backend.ado_client import ado_session
 
 API_VERSION = "7.1"
 
 
-def smoke_projects():
+def smoke_projects() -> None:
+    """
+    Smoke test minimal : vérifie que le PAT fonctionne en listant les projets.
+    """
     cfg = get_ado_config()
     s = ado_session()
 
