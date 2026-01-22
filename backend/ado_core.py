@@ -6,16 +6,23 @@ import pandas as pd
 from .ado_config import get_ado_config
 from .ado_client import ado_session
 
-cfg = get_ado_config()
-s = ado_session()
-
 API_VERSION = "7.1"
+
+
+def _cfg():
+    return get_ado_config()
+
+
+def _session():
+    return ado_session()
 
 
 # -----------------------------
 # Projects / Teams
 # -----------------------------
 def list_projects() -> List[Dict[str, Any]]:
+    cfg = _cfg()
+    s = _session()
     url = f"https://dev.azure.com/{cfg.org}/_apis/projects?api-version={API_VERSION}"
     r = s.get(url)
     r.raise_for_status()
@@ -30,6 +37,8 @@ def get_project_id(project_name: str) -> str:
 
 
 def list_teams() -> List[Dict[str, Any]]:
+    cfg = _cfg()
+    s = _session()
     project_id = get_project_id(cfg.project)
     url = f"https://dev.azure.com/{cfg.org}/_apis/projects/{project_id}/teams?api-version={API_VERSION}"
     r = s.get(url)
@@ -38,9 +47,8 @@ def list_teams() -> List[Dict[str, Any]]:
 
 
 def team_settings_areas(team_name: str) -> Dict[str, Any]:
-    """
-    Retourne Team Field Values (areas) : defaultValue + values[] (includeChildren).
-    """
+    cfg = _cfg()
+    s = _session()
     url = f"https://dev.azure.com/{cfg.org}/{cfg.project}/{team_name}/_apis/work/teamsettings/teamfieldvalues?api-version={API_VERSION}"
     r = s.get(url)
     r.raise_for_status()
@@ -48,9 +56,8 @@ def team_settings_areas(team_name: str) -> Dict[str, Any]:
 
 
 def team_settings_iterations(team_name: str) -> Dict[str, Any]:
-    """
-    Retourne les iterations (sprints) associées à la team.
-    """
+    cfg = _cfg()
+    s = _session()
     url = f"https://dev.azure.com/{cfg.org}/{cfg.project}/{team_name}/_apis/work/teamsettings/iterations?api-version={API_VERSION}"
     r = s.get(url)
     r.raise_for_status()
@@ -61,6 +68,8 @@ def team_settings_iterations(team_name: str) -> Dict[str, Any]:
 # Work Items (WIQL + batch)
 # -----------------------------
 def wiql_query_ids(query: str) -> List[int]:
+    cfg = _cfg()
+    s = _session()
     url = f"https://dev.azure.com/{cfg.org}/{cfg.project}/_apis/wit/wiql?api-version={API_VERSION}"
     r = s.post(url, json={"query": query})
     r.raise_for_status()
@@ -69,6 +78,8 @@ def wiql_query_ids(query: str) -> List[int]:
 
 
 def fetch_work_items_batch(ids: Iterable[int], fields: List[str]) -> List[Dict[str, Any]]:
+    cfg = _cfg()
+    s = _session()
     ids = list(ids)
     if not ids:
         return []
@@ -91,10 +102,8 @@ def done_ids_by_area_and_closed_date(
     done_states: Set[str],
     work_item_types: Set[str],
 ) -> List[int]:
-    """
-    Récupère les IDs des work items "Done" dans un AreaPath donné,
-    fermés entre start_date et end_date (YYYY-MM-DD).
-    """
+    cfg = _cfg()
+
     states_sql = ", ".join([f"'{x}'" for x in done_states])
     types_sql = ", ".join([f"'{x}'" for x in work_item_types])
 
@@ -123,9 +132,6 @@ def weekly_throughput(
     done_states: Set[str],
     work_item_types: Set[str],
 ) -> pd.DataFrame:
-    """
-    Retourne un DataFrame: week (datetime start-of-week), throughput (count).
-    """
     ids = done_ids_by_area_and_closed_date(
         area_path=area_path,
         start_date=start_date,
@@ -154,7 +160,6 @@ def weekly_throughput(
     df["closed_date"] = pd.to_datetime(df["closed_date"], utc=True, errors="coerce")
     df = df.dropna(subset=["closed_date"])
 
-    # Semaine (début de semaine)
     df["week"] = df["closed_date"].dt.to_period("W").apply(lambda p: p.start_time)
 
     weekly = (

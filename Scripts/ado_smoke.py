@@ -1,12 +1,13 @@
 from backend.ado_config import get_ado_config
 from backend.ado_client import ado_session
 
-cfg = get_ado_config()
-s = ado_session()
-
 API_VERSION = "7.1"
 
+
 def smoke_projects():
+    cfg = get_ado_config()
+    s = ado_session()
+
     url = f"https://dev.azure.com/{cfg.org}/_apis/projects?api-version={API_VERSION}"
     r = s.get(url)
 
@@ -19,6 +20,7 @@ def smoke_projects():
     print("Projects found:", data.get("count"))
     if data.get("value"):
         print("First project:", data["value"][0].get("name"))
+
 
 if __name__ == "__main__":
     smoke_projects()
