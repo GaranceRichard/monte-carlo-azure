@@ -47,6 +47,37 @@ def mc_finish_weeks(
     return weeks_needed
 
 
+def mc_items_done_for_weeks(
+    weeks: int,
+    throughput_samples: np.ndarray,
+    n_sims: int = 20000,
+    seed: int = 42,
+) -> np.ndarray:
+    """
+    Monte Carlo "Combien d'items seront livrés en N semaines ?"
+
+    - weeks: horizon de simulation en semaines
+    - throughput_samples: array des throughputs (items/semaine) observés historiquement
+    - n_sims: nombre de simulations
+    - seed: graine RNG pour reproductibilité
+
+    Retour: array du nombre d'items terminés sur N semaines (taille = n_sims)
+    """
+    if weeks <= 0:
+        raise ValueError("weeks doit être > 0")
+    if throughput_samples is None or len(throughput_samples) == 0:
+        raise ValueError("throughput_samples est vide")
+
+    samples = np.asarray(throughput_samples, dtype=int)
+    samples = samples[samples > 0]
+    if len(samples) == 0:
+        raise ValueError("throughput_samples ne contient aucune valeur > 0")
+
+    rng = np.random.default_rng(seed)
+    draws = rng.choice(samples, size=(n_sims, weeks), replace=True)
+    return draws.sum(axis=1).astype(int)
+
+
 def percentiles(arr: np.ndarray, ps: Tuple[int, ...] = (50, 80, 90)) -> Dict[str, int]:
     """
     Calcule des percentiles (P50/P80/P90...) sur un array.

@@ -4,19 +4,12 @@ from typing import Optional
 
 from .ado_config import get_ado_config
 
-_session: Optional[requests.Session] = None
-
-
-def ado_session() -> requests.Session:
+def ado_session(pat_override: Optional[str] = None) -> requests.Session:
     """
-    Crée (ou retourne) une session HTTP authentifiée pour Azure DevOps.
-    Lazy init + cache : évite toute dépendance à l'environnement à l'import.
+    Crée une session HTTP authentifiée pour Azure DevOps.
+    Session éphémère construite avec le PAT reçu (pas de persistance disque).
     """
-    global _session
-    if _session is not None:
-        return _session
-
-    cfg = get_ado_config()
+    cfg = get_ado_config(pat_override=pat_override)
     token = base64.b64encode(f":{cfg.pat}".encode()).decode()
 
     s = requests.Session()
@@ -26,13 +19,4 @@ def ado_session() -> requests.Session:
             "Content-Type": "application/json",
         }
     )
-    _session = s
     return s
-
-
-def reset_session() -> None:
-    """
-    Utile pour les tests : force la reconstruction de la session.
-    """
-    global _session
-    _session = None

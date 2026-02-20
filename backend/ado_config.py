@@ -3,10 +3,6 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from typing import Optional
-from dotenv import load_dotenv
-
-# Charge les variables depuis .env (à la racine du projet)
-load_dotenv()
 
 @dataclass(frozen=True)
 class AdoConfig:
@@ -24,16 +20,12 @@ def _clean(v: Optional[str]) -> Optional[str]:
     v = v.strip()
     return v or None
 
-def get_ado_config() -> AdoConfig:
+def get_ado_config(pat_override: Optional[str] = None) -> AdoConfig:
     """
-    Lit la configuration Azure DevOps depuis l'environnement (.env inclus).
+    Lit la configuration Azure DevOps depuis l'environnement.
 
     Obligatoire :
-      - ADO_PAT
-
-    Optionnel :
-      - ADO_ORG 
-      - ADO_PROJECT 
+      - PAT fourni par le front (x-ado-pat) ou ADO_PAT en fallback
 
     Defaults (optionnel) :
       - ADO_DEFAULT_TEAM
@@ -43,19 +35,18 @@ def get_ado_config() -> AdoConfig:
       - ADO_TEAM
       - ADO_AREA_PATH
     """
-    org = os.getenv("ADO_ORG", "").strip()
+    org = os.getenv("ADO_ORG", "messqc").strip()
     project = os.getenv("ADO_PROJECT", "Projet-700").strip()
-    pat = os.getenv("ADO_PAT", "").strip()
+    pat = _clean(pat_override) or os.getenv("ADO_PAT", "").strip()
 
     if not pat:
         raise RuntimeError(
-            "ADO_PAT manquant. Ajoutez dans .env :\n"
-            "ADO_PAT=...\nADO_ORG=messqc\nADO_PROJECT=Projet-700"
+            "PAT Azure DevOps manquant. Fournissez x-ado-pat (UI) ou ADO_PAT en variable d'environnement."
         )
     if not org:
-        raise RuntimeError("ADO_ORG est vide (vérifiez .env).")
+        raise RuntimeError("ADO_ORG est vide (variable d'environnement).")
     if not project:
-        raise RuntimeError("ADO_PROJECT est vide (vérifiez .env).")
+        raise RuntimeError("ADO_PROJECT est vide (variable d'environnement).")
 
     # Valeurs actives (ADO_TEAM/ADO_AREA_PATH) priment
     default_team = _clean(os.getenv("ADO_TEAM")) or _clean(os.getenv("ADO_DEFAULT_TEAM"))

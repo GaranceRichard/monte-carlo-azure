@@ -1,17 +1,17 @@
-# Monte Carlo Azure
+﻿# Monte Carlo Azure
 
-Outil de prévision (forecast) basé sur une simulation de Monte Carlo, alimenté par l’historique de throughput Azure DevOps (Work Items fermés).  
-Le projet expose une API (FastAPI) et une UI (React/Vite). En mode “bundle”, l’API sert directement le front compilé.
+Outil de prÃ©vision (forecast) basÃ© sur une simulation de Monte Carlo, alimentÃ© par lâ€™historique de throughput Azure DevOps (Work Items fermÃ©s).  
+Le projet expose une API (FastAPI) et une UI (React/Vite). En mode â€œbundleâ€, lâ€™API sert directement le front compilÃ©.
 
 ---
 
-## Fonctionnalités
+## FonctionnalitÃ©s
 
-- Liste des équipes ADO et lecture d’une configuration par équipe
-- Extraction d’historique (Work Items fermés) et calcul du throughput hebdomadaire
-- Simulation Monte Carlo (N itérations) pour estimer une distribution de dates/semaines de complétion
+- Liste des Ã©quipes ADO et lecture dâ€™une configuration par Ã©quipe
+- Extraction dâ€™historique (Work Items fermÃ©s) et calcul du throughput hebdomadaire
+- Simulation Monte Carlo (N itÃ©rations) pour estimer une distribution de dates/semaines de complÃ©tion
 - API REST + UI web
-- Tests automatisés (pytest + mocks)
+- Tests automatisÃ©s (pytest + mocks)
 
 ---
 
@@ -21,52 +21,46 @@ Le projet expose une API (FastAPI) et une UI (React/Vite). En mode “bundle”,
 backend/
   api.py            # FastAPI (endpoints + static frontend in bundle)
   ado_client.py     # client ADO
-  ado_core.py       # requêtes ADO / récupération des items
+  ado_core.py       # requÃªtes ADO / rÃ©cupÃ©ration des items
   ado_config.py     # config (env + settings)
   mc_core.py        # calcul throughput + Monte Carlo
 frontend/           # UI React/Vite
 Scripts/            # scripts utilitaires (smoke, list teams, etc.)
 tests/              # tests pytest
-run_app.py          # lance l’API (dev)
+run_app.py          # lance lâ€™API (dev)
 ```
 
 ---
 
-## Prérequis
+## PrÃ©requis
 
-- Python 3.10+ (recommandé)
+- Python 3.10+ (recommandÃ©)
 - Node.js 18+ (pour le front)
-- Accès Azure DevOps + PAT (Personal Access Token) avec droits minimum (Work Items read)
+- AccÃ¨s Azure DevOps + PAT (Personal Access Token) avec droits minimum (Work Items read)
 
 ---
 
 ## Configuration
 
-### Variables d’environnement
+### Authentification PAT
 
-Crée un fichier `.env` **local** (non versionné) à partir de `.env.example`.
+Au demarrage, l'application affiche un ecran de connexion et demande le PAT Azure DevOps.
 
-Exemple :
+- Le PAT est utilise en memoire pendant la session en cours.
+- Le PAT n'est pas sauvegarde sur disque (pas de `.env` pour le token).
+- Validation immediate via `GET /auth/check`.
 
-```env
-ADO_ORG=messqc
-ADO_PROJECT=Projet-700
-ADO_PAT=
-
-# Optionnel
-ADO_DEFAULT_TEAM=CEA-CentreExcellenceAgilite Team
-ADO_DEFAULT_AREA_PATH=Projet-700\DGPRITN Team\DGINST Team\DCEN Team\Efficience
-```
-
-> ⚠️ Sécurité : ne commite jamais de `.env` ni de token. Un hook de contrôle est fourni : `Scripts/check_no_secrets.py`.
+Variables d'environnement encore utilisees (optionnel selon votre environnement) :
+- `ADO_ORG` (defaut: `messqc`)
+- `ADO_PROJECT` (defaut: `Projet-700`)
 
 ---
 
-## Lancer en développement
+## Lancer en dÃ©veloppement
 
 ### Backend (API)
 
-1) Créer un environnement virtuel + installer les dépendances (exemple) :
+1) CrÃ©er un environnement virtuel + installer les dÃ©pendances (exemple) :
 ```bash
 python -m venv .venv
 # Windows PowerShell
@@ -74,12 +68,12 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-2) Lancer l’API :
+2) Lancer lâ€™API :
 ```bash
 python run_app.py
 ```
 
-API dispo (par défaut) : `http://127.0.0.1:8000`
+API dispo (par dÃ©faut) : `http://127.0.0.1:8000`
 
 ### Frontend (UI)
 
@@ -95,18 +89,20 @@ UI dispo : `http://localhost:5173`
 
 ## Endpoints principaux
 
-- `GET /health` : check de santé
-- `GET /teams` : liste des équipes
-- `GET /teams/{team}/settings` : settings d’équipe (si applicable)
-- `POST /forecast` : calcule un forecast (paramètres : team, area path, backlog, nb simulations, etc.)
+- `GET /health` : check de santÃ©
+- `GET /auth/check` : valide le PAT (header `x-ado-pat`)
+- `GET /auth/orgs` : liste les organisations accessibles avec le PAT
+- `GET /teams` : liste des Ã©quipes
+- `GET /teams/{team}/settings` : settings dâ€™Ã©quipe (si applicable)
+- `POST /forecast` : calcule un forecast (paramÃ¨tres : team, area path, backlog, nb simulations, etc.)
 
-> Les paramètres exacts sont visibles via la doc interactive FastAPI (Swagger) : `/docs`.
+> Les paramÃ¨tres exacts sont visibles via la doc interactive FastAPI (Swagger) : `/docs`.
 
 ---
 
 ## Tests
 
-À la racine :
+Ã€ la racine :
 ```bash
 pytest
 ```
@@ -116,7 +112,7 @@ pytest
 ## Packaging (PyInstaller)
 
 Le projet inclut un spec PyInstaller : `MonteCarloADO.spec`.  
-Objectif : produire un exécutable qui embarque l’API et sert le `frontend/dist`.
+Objectif : produire un exÃ©cutable qui embarque lâ€™API et sert le `frontend/dist`.
 
 1) Build du frontend :
 ```bash
@@ -131,40 +127,40 @@ cd ..
 pyinstaller MonteCarloADO.spec
 ```
 
-L’exécutable se retrouve dans `dist/`.
+Lâ€™exÃ©cutable se retrouve dans `dist/`.
 
-> Bonnes pratiques : `dist/` et `build/` ne doivent pas être versionnés (cf. `.gitignore`).
-
----
-
-## Hypothèses et limites
-
-- Le throughput est calculé sur la base de la date de clôture (ClosedDate) et d’états “terminés” (selon le workflow ADO).
-- Les semaines à throughput nul peuvent être exclues (selon la logique retenue) pour éviter de “polluer” la distribution.
-- Les résultats Monte Carlo dépendent fortement :
-  - de la qualité de l’historique (stabilité du flux, changements de process),
-  - du périmètre retenu (Area Path / Team),
-  - de la définition de “Done” dans ADO.
+> Bonnes pratiques : `dist/` et `build/` ne doivent pas Ãªtre versionnÃ©s (cf. `.gitignore`).
 
 ---
 
-## Sécurité
+## HypothÃ¨ses et limites
 
-- Ne pas commiter de secrets (`.env`, PAT, clés privées).
-- Script de vérification avant commit : `Scripts/check_no_secrets.py`.
+- Le throughput est calculÃ© sur la base de la date de clÃ´ture (ClosedDate) et dâ€™Ã©tats â€œterminÃ©sâ€ (selon le workflow ADO).
+- Les semaines Ã  throughput nul peuvent Ãªtre exclues (selon la logique retenue) pour Ã©viter de â€œpolluerâ€ la distribution.
+- Les rÃ©sultats Monte Carlo dÃ©pendent fortement :
+  - de la qualitÃ© de lâ€™historique (stabilitÃ© du flux, changements de process),
+  - du pÃ©rimÃ¨tre retenu (Area Path / Team),
+  - de la dÃ©finition de â€œDoneâ€ dans ADO.
+
+---
+
+## SÃ©curitÃ©
+
+- Ne pas commiter de secrets (PAT, clÃ©s privÃ©es).
+- Script de vÃ©rification avant commit : `Scripts/check_no_secrets.py`.
 
 ---
 
 ## Roadmap (suggestion)
 
-- Stabiliser la reproductibilité (fichier de dépendances Python + scripts de build)
-- Ajouter des percentiles (P50/P80/P90) et conversion en dates estimées
-- Ajouter un écran “diagnostic” (périmètre, nombre de semaines, zéros exclus)
+- Stabiliser la reproductibilitÃ© (fichier de dÃ©pendances Python + scripts de build)
+- Ajouter des percentiles (P50/P80/P90) et conversion en dates estimÃ©es
+- Ajouter un Ã©cran â€œdiagnosticâ€ (pÃ©rimÃ¨tre, nombre de semaines, zÃ©ros exclus)
 - CI GitHub Actions : tests + build + release
 
 ---
 
 ## Licence
 
-À définir.
-Si le dépôt est destiné à un usage interne (ADO + contexte organisation), dépôt privé recommandé.
+Ã€ dÃ©finir.
+Si le dÃ©pÃ´t est destinÃ© Ã  un usage interne (ADO + contexte organisation), dÃ©pÃ´t privÃ© recommandÃ©.
