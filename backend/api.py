@@ -1,11 +1,9 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException, Header
+from typing import Any, Dict
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any, Literal
-import numpy as np
-import requests
 
 from .ado_core import (
     get_current_user,
@@ -17,13 +15,25 @@ from .ado_core import (
     team_settings_areas,
     weekly_throughput,
 )
-from .ado_client import ado_session
+from .api_helpers import pick_profile_name, require_pat, validate_pat
+from .api_routes_auth import build_auth_router
+from .api_routes_forecast import build_forecast_router
+from .api_routes_teams import build_teams_router
+from .api_static import mount_frontend
 from .mc_core import mc_finish_weeks, mc_items_done_for_weeks, percentiles
+
+
+# Backward-compatible helper names used by tests.
+def _require_pat(x_ado_pat: str | None) -> str:
+    return require_pat(x_ado_pat)
+
+
+def _pick_profile_name(profile: Dict[str, Any]) -> str:
+    return pick_profile_name(profile)
 
 
 app = FastAPI(title="ADO Monte Carlo API", version="0.1")
 
-# CORS pour un front local (Vite/React par dÃ©faut sur 5173)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -32,421 +42,39 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-class ForecastRequest(BaseModel):
-    org: str = Field(..., description="Organisation Azure DevOps")
-    project: str = Field(..., description="Projet Azure DevOps")
-    team_name: str = Field(..., description="Nom exact de la team")
-    start_date: str = Field(..., description="YYYY-MM-DD")
-    end_date: str = Field(..., description="YYYY-MM-DD")
-    mode: Literal["backlog_to_weeks", "weeks_to_items"] = Field(
-        default="backlog_to_weeks",
-        description="Mode de simulation: backlog_to_weeks ou weeks_to_items",
+app.include_router(
+    build_auth_router(
+        require_pat=lambda v: _require_pat(v),
+        pick_profile_name=lambda p: _pick_profile_name(p),
+        get_current_user=lambda pat: get_current_user(pat=pat),
+        list_accessible_orgs=lambda pat: list_accessible_orgs(pat=pat),
+        list_projects_for_org=lambda org, pat: list_projects_for_org(org=org, pat=pat),
+        list_teams_for_org_project=lambda org, project, pat: list_teams_for_org_project(
+            org=org, project=project, pat=pat
+        ),
+        list_team_work_item_options=lambda org, project, team, pat: list_team_work_item_options(
+            org=org, project=project, team=team, pat=pat
+        ),
     )
-    backlog_size: Optional[int] = Field(default=None, ge=1)
-    target_weeks: Optional[int] = Field(default=None, ge=1)
+)
 
-    done_states: List[str] = ["Done", "Closed", "Resolved"]
-    work_item_types: List[str] = ["User Story", "Product Backlog Item", "Bug"]
-
-    n_sims: int = Field(20000, ge=1000, le=200000)
-    area_path: Optional[str] = Field(
-        default=None,
-        description="AreaPath Ã  utiliser. Si absent, on prend defaultValue des settings de team."
+app.include_router(
+    build_teams_router(
+        require_pat=lambda v: _require_pat(v),
+        list_teams=lambda pat: list_teams(pat=pat),
+        team_settings_areas=lambda team_name, **kwargs: team_settings_areas(team_name, **kwargs),
     )
+)
 
-
-class OrgRequest(BaseModel):
-    org: str = Field(..., description="Nom de l'organisation Azure DevOps")
-
-
-class OrgProjectRequest(BaseModel):
-    org: str = Field(..., description="Nom de l'organisation Azure DevOps")
-    project: str = Field(..., description="Nom du projet Azure DevOps")
-
-
-class TeamOptionsRequest(BaseModel):
-    org: str = Field(..., description="Nom de l'organisation Azure DevOps")
-    project: str = Field(..., description="Nom du projet Azure DevOps")
-    team: str = Field(..., description="Nom de l'equipe Azure DevOps")
-
-
-def _require_pat(x_ado_pat: str | None) -> str:
-    pat = (x_ado_pat or "").strip()
-    if not pat:
-        raise HTTPException(
-            status_code=400,
-            detail="PAT Azure DevOps requis via header x-ado-pat. Il est utilise en memoire uniquement et n'est pas sauvegarde.",
-        )
-    # Validation locale minimale pour Ã©viter un appel rÃ©seau inutile
-    # sur des tokens manifestement invalides (ex: "aaa").
-    if len(pat) < 20 or any(ch.isspace() for ch in pat):
-        raise HTTPException(
-            status_code=401,
-            detail="PAT invalide ou non autorisÃ© sur Azure DevOps.",
-        )
-    return pat
-
-
-def validate_pat(pat: str) -> None:
-    """
-    Verifie la validite du PAT via des endpoints globaux ADO.
-    """
-    auth_error: Exception | None = None
-    infra_error: Exception | None = None
-
-    s = ado_session(pat_override=pat)
-    for url in (
-        "https://dev.azure.com/_apis/projects?api-version=7.1",
-        "https://app.vssps.visualstudio.com/_apis/profile/profiles/me?api-version=7.1-preview.3",
-    ):
-        try:
-            r = s.get(url)
-            r.raise_for_status()
-            return
-        except requests.HTTPError as exc:
-            status = exc.response.status_code if exc.response is not None else None
-            if status in (400, 401, 403):
-                auth_error = exc
-            else:
-                infra_error = exc
-        except Exception as exc:
-            infra_error = exc
-
-    if auth_error is not None:
-        raise HTTPException(
-            status_code=401,
-            detail="PAT invalide ou non autorise sur Azure DevOps.",
-        ) from auth_error
-
-    raise HTTPException(
-        status_code=502,
-        detail="Impossible de verifier le PAT pour le moment (reseau/proxy Azure DevOps indisponible).",
-    ) from infra_error
-def _pick_profile_name(profile: Dict[str, Any]) -> str:
-    # Champs directs possibles selon endpoint/tenant
-    direct_candidates = [
-        profile.get("fullName"),
-        profile.get("displayName"),
-        profile.get("publicAlias"),
-        profile.get("emailAddress"),
-    ]
-    for value in direct_candidates:
-        if isinstance(value, str) and value.strip():
-            return value.strip()
-
-    # Certains profils exposent le nom dans coreAttributes.*.value
-    core = profile.get("coreAttributes")
-    if isinstance(core, dict):
-        for key in ("DisplayName", "displayName", "FullName", "fullName", "PublicAlias", "publicAlias"):
-            node = core.get(key)
-            if isinstance(node, dict):
-                value = node.get("value")
-                if isinstance(value, str) and value.strip():
-                    return value.strip()
-
-    return "Utilisateur"
-
-
-@app.get("/health")
-def health() -> Dict[str, str]:
-    return {"status": "ok"}
-
-
-@app.get("/auth/check")
-def auth_check(x_ado_pat: str | None = Header(default=None)) -> Dict[str, str]:
-    pat = _require_pat(x_ado_pat)
-    user_name = "Utilisateur"
-    try:
-        profile = get_current_user(pat=pat)
-        user_name = _pick_profile_name(profile)
-    except Exception:
-        pass
-    return {
-        "status": "ok",
-        "message": "PAT valide (non sauvegarde).",
-        "user_name": user_name,
-    }
-
-
-@app.get("/auth/orgs")
-def auth_orgs(x_ado_pat: str | None = Header(default=None)) -> Dict[str, Any]:
-    pat = _require_pat(x_ado_pat)
-    try:
-        orgs = list_accessible_orgs(pat=pat)
-    except requests.HTTPError as exc:
-        status = exc.response.status_code if exc.response is not None else None
-        if status in (401, 403):
-            raise HTTPException(
-                status_code=401,
-                detail="PAT invalide ou non autorisé sur Azure DevOps.",
-            ) from exc
-        raise HTTPException(
-            status_code=502,
-            detail="Erreur Azure DevOps pendant la découverte des organisations.",
-        ) from exc
-    except Exception:
-        raise HTTPException(
-            status_code=502,
-            detail="Impossible de lister les organisations Azure DevOps pour le moment.",
-        )
-    if not orgs:
-        return {
-            "status": "ok",
-            "orgs": [],
-            "detail": "PAT non global et organisation non decouverte automatiquement.",
-        }
-    return {
-        "status": "ok",
-        "orgs": orgs,
-    }
-
-
-@app.post("/auth/projects")
-def auth_projects(req: OrgRequest, x_ado_pat: str | None = Header(default=None)) -> Dict[str, Any]:
-    pat = _require_pat(x_ado_pat)
-    org_clean = (req.org or "").strip()
-    if not org_clean:
-        raise HTTPException(status_code=400, detail="Champ org requis.")
-    try:
-        projects = list_projects_for_org(org=org_clean, pat=pat)
-    except requests.HTTPError as exc:
-        status = exc.response.status_code if exc.response is not None else None
-        if status in (401, 403, 404):
-            raise HTTPException(
-                status_code=403,
-                detail="Organisation inaccessible avec ce PAT.",
-            ) from exc
-        raise HTTPException(
-            status_code=502,
-            detail="Erreur Azure DevOps pendant la lecture des projets.",
-        ) from exc
-    return {
-        "status": "ok",
-        "org": org_clean,
-        "projects": [{"id": p.get("id"), "name": p.get("name")} for p in projects],
-    }
-
-
-@app.post("/auth/teams")
-def auth_teams(req: OrgProjectRequest, x_ado_pat: str | None = Header(default=None)) -> Dict[str, Any]:
-    pat = _require_pat(x_ado_pat)
-    org_clean = (req.org or "").strip()
-    project_clean = (req.project or "").strip()
-    if not org_clean:
-        raise HTTPException(status_code=400, detail="Champ org requis.")
-    if not project_clean:
-        raise HTTPException(status_code=400, detail="Champ project requis.")
-    try:
-        teams = list_teams_for_org_project(org=org_clean, project=project_clean, pat=pat)
-    except requests.HTTPError as exc:
-        status = exc.response.status_code if exc.response is not None else None
-        if status in (401, 403, 404):
-            raise HTTPException(
-                status_code=403,
-                detail="Projet inaccessible avec ce PAT.",
-            ) from exc
-        raise HTTPException(
-            status_code=502,
-            detail="Erreur Azure DevOps pendant la lecture des equipes.",
-        ) from exc
-    return {
-        "status": "ok",
-        "org": org_clean,
-        "project": project_clean,
-        "teams": [{"id": t.get("id"), "name": t.get("name")} for t in teams],
-    }
-
-
-@app.post("/auth/team-options")
-def auth_team_options(
-    req: TeamOptionsRequest,
-    x_ado_pat: str | None = Header(default=None),
-) -> Dict[str, Any]:
-    pat = _require_pat(x_ado_pat)
-    org_clean = (req.org or "").strip()
-    project_clean = (req.project or "").strip()
-    team_clean = (req.team or "").strip()
-    if not org_clean:
-        raise HTTPException(status_code=400, detail="Champ org requis.")
-    if not project_clean:
-        raise HTTPException(status_code=400, detail="Champ project requis.")
-    if not team_clean:
-        raise HTTPException(status_code=400, detail="Champ team requis.")
-    try:
-        options = list_team_work_item_options(
-            org=org_clean,
-            project=project_clean,
-            team=team_clean,
-            pat=pat,
-        )
-    except requests.HTTPError as exc:
-        status = exc.response.status_code if exc.response is not None else None
-        if status in (401, 403, 404):
-            raise HTTPException(
-                status_code=403,
-                detail="Equipe inaccessible avec ce PAT.",
-            ) from exc
-        raise HTTPException(
-            status_code=502,
-            detail="Erreur Azure DevOps pendant la lecture des options d'equipe.",
-        ) from exc
-    return {
-        "status": "ok",
-        "org": org_clean,
-        "project": project_clean,
-        "team": team_clean,
-        "done_states": options.get("states", []),
-        "work_item_types": options.get("types", []),
-        "states_by_type": options.get("states_by_type", {}),
-    }
-
-
-@app.get("/teams")
-def teams(x_ado_pat: str | None = Header(default=None)) -> List[Dict[str, Any]]:
-    pat = _require_pat(x_ado_pat)
-    t = list_teams(pat=pat)
-    return [{"name": x.get("name"), "id": x.get("id")} for x in t]
-
-
-@app.get("/teams/{team_name}/settings")
-def team_settings(team_name: str, x_ado_pat: str | None = Header(default=None)) -> Dict[str, Any]:
-    pat = _require_pat(x_ado_pat)
-    areas = team_settings_areas(team_name, pat=pat)
-    return {
-        "team": team_name,
-        "default_area_path": areas.get("defaultValue"),
-        "area_paths": [
-            {"value": v.get("value"), "includeChildren": v.get("includeChildren")}
-            for v in (areas.get("values") or [])
-        ],
-    }
-
-
-@app.post("/forecast")
-def forecast(req: ForecastRequest, x_ado_pat: str | None = Header(default=None)) -> Dict[str, Any]:
-    pat = _require_pat(x_ado_pat)
-    org_clean = (req.org or "").strip()
-    project_clean = (req.project or "").strip()
-    if not org_clean:
-        raise HTTPException(status_code=400, detail="org requis.")
-    if not project_clean:
-        raise HTTPException(status_code=400, detail="project requis.")
-    # 1) RÃ©soudre l'AreaPath Ã  partir de la team si non fourni
-    area_path = req.area_path
-    if not area_path:
-        areas = team_settings_areas(req.team_name, org=org_clean, project=project_clean, pat=pat)
-        area_path = areas.get("defaultValue")
-
-    if not area_path:
-        raise HTTPException(
-            status_code=400,
-            detail="Impossible de dÃ©terminer l'AreaPath (team settings sans defaultValue).",
-        )
-
-    # 2) Throughput hebdo sur l'AreaPath
-    weekly = weekly_throughput(
-        org=org_clean,
-        project=project_clean,
-        area_path=area_path,
-        start_date=req.start_date,
-        end_date=req.end_date,
-        done_states=set(req.done_states),
-        work_item_types=set(req.work_item_types),
-        pat=pat,
+app.include_router(
+    build_forecast_router(
+        require_pat=lambda v: _require_pat(v),
+        team_settings_areas=lambda team_name, **kwargs: team_settings_areas(team_name, **kwargs),
+        weekly_throughput=lambda **kwargs: weekly_throughput(**kwargs),
+        mc_items_done_for_weeks=lambda **kwargs: mc_items_done_for_weeks(**kwargs),
+        mc_finish_weeks=lambda **kwargs: mc_finish_weeks(**kwargs),
+        percentiles=lambda arr, ps=(50, 70, 90): percentiles(arr, ps=ps),
     )
+)
 
-    if weekly.empty:
-        raise HTTPException(
-            status_code=404,
-            detail="Aucun item trouvÃ© avec ces filtres (area/states/types/dates).",
-        )
-
-    # 3) PrÃ©parer lâ€™Ã©chantillon de throughput
-    samples = weekly["throughput"].to_numpy()
-    samples = samples[samples > 0]
-    if len(samples) < 6:
-        raise HTTPException(
-            status_code=422,
-            detail="Historique insuffisant (peu de semaines non-nulles). Ã‰largissez la pÃ©riode.",
-        )
-
-    # 4) Monte Carlo selon mode
-    result_percentiles: Dict[str, int]
-    result_distribution: list[int]
-    result_kind: str
-
-    if req.mode == "weeks_to_items":
-        if not req.target_weeks:
-            raise HTTPException(
-                status_code=400,
-                detail="target_weeks requis pour le mode weeks_to_items.",
-            )
-        items_done = mc_items_done_for_weeks(
-            weeks=req.target_weeks,
-            throughput_samples=samples,
-            n_sims=req.n_sims,
-        )
-        result_percentiles = percentiles(items_done, ps=(50, 70, 90))
-        result_distribution = items_done.tolist()
-        result_kind = "items"
-    else:
-        if not req.backlog_size:
-            raise HTTPException(
-                status_code=400,
-                detail="backlog_size requis pour le mode backlog_to_weeks.",
-            )
-        weeks_needed = mc_finish_weeks(
-            backlog_size=req.backlog_size,
-            throughput_samples=samples,
-            n_sims=req.n_sims,
-        )
-        result_percentiles = percentiles(weeks_needed, ps=(50, 70, 90))
-        result_distribution = weeks_needed.tolist()
-        result_kind = "weeks"
-
-    # 5) RÃ©ponse JSON (front-friendly)
-    body: Dict[str, Any] = {
-        "team": req.team_name,
-        "area_path": area_path,
-        "mode": req.mode,
-        "result_kind": result_kind,
-        "samples_count": int(len(samples)),
-        "result_percentiles": result_percentiles,
-        "result_distribution": result_distribution,
-        "weekly_throughput": weekly.assign(
-            week=weekly["week"].astype(str)  # JSON sÃ©rialisable
-        ).to_dict(orient="records"),
-    }
-
-    # CompatibilitÃ© historique frontend/tests
-    if result_kind == "weeks":
-        body["backlog_size"] = req.backlog_size
-        body["weeks_percentiles"] = result_percentiles
-        body["weeks_distribution"] = result_distribution
-    else:
-        body["target_weeks"] = req.target_weeks
-        body["items_percentiles"] = result_percentiles
-        body["items_distribution"] = result_distribution
-
-    return body
-
-
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-from pathlib import Path
-import sys
-
-def _front_dist_dir() -> Path:
-    base = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent.parent))
-    return base / "frontend" / "dist"
-
-FRONT_DIR = _front_dist_dir()
-
-if FRONT_DIR.exists():
-    app.mount("/", StaticFiles(directory=str(FRONT_DIR), html=True), name="front")
-
-    @app.get("/")
-    def index():
-        return FileResponse(str(FRONT_DIR / "index.html"))
-
+mount_frontend(app)
