@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,7 +10,6 @@ import requests
 from .ado_core import (
     get_current_user,
     list_accessible_orgs,
-    list_projects,
     list_projects_for_org,
     list_team_work_item_options,
     list_teams_for_org_project,
@@ -18,13 +17,13 @@ from .ado_core import (
     team_settings_areas,
     weekly_throughput,
 )
-from .ado_config import get_ado_config
+from .ado_client import ado_session
 from .mc_core import mc_finish_weeks, mc_items_done_for_weeks, percentiles
 
 
 app = FastAPI(title="ADO Monte Carlo API", version="0.1")
 
-# CORS pour un front local (Vite/React par défaut sur 5173)
+# CORS pour un front local (Vite/React par dÃ©faut sur 5173)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -35,7 +34,9 @@ app.add_middleware(
 
 
 class ForecastRequest(BaseModel):
-    team_name: str = Field(..., description="Nom exact de la team (ex: 'CEA-... Team')")
+    org: str = Field(..., description="Organisation Azure DevOps")
+    project: str = Field(..., description="Projet Azure DevOps")
+    team_name: str = Field(..., description="Nom exact de la team")
     start_date: str = Field(..., description="YYYY-MM-DD")
     end_date: str = Field(..., description="YYYY-MM-DD")
     mode: Literal["backlog_to_weeks", "weeks_to_items"] = Field(
@@ -51,7 +52,7 @@ class ForecastRequest(BaseModel):
     n_sims: int = Field(20000, ge=1000, le=200000)
     area_path: Optional[str] = Field(
         default=None,
-        description="AreaPath à utiliser. Si absent, on prend defaultValue des settings de team."
+        description="AreaPath Ã  utiliser. Si absent, on prend defaultValue des settings de team."
     )
 
 
@@ -77,45 +78,51 @@ def _require_pat(x_ado_pat: str | None) -> str:
             status_code=400,
             detail="PAT Azure DevOps requis via header x-ado-pat. Il est utilise en memoire uniquement et n'est pas sauvegarde.",
         )
-    # Validation locale minimale pour éviter un appel réseau inutile
+    # Validation locale minimale pour Ã©viter un appel rÃ©seau inutile
     # sur des tokens manifestement invalides (ex: "aaa").
     if len(pat) < 20 or any(ch.isspace() for ch in pat):
         raise HTTPException(
             status_code=401,
-            detail="PAT invalide ou non autorisé sur Azure DevOps.",
+            detail="PAT invalide ou non autorisÃ© sur Azure DevOps.",
         )
     return pat
 
 
 def validate_pat(pat: str) -> None:
     """
-    Vérifie la validité du PAT via un appel ADO léger.
+    Verifie la validite du PAT via des endpoints globaux ADO.
     """
-    try:
-        list_projects(pat=pat)
-    except requests.HTTPError as exc:
-        status = exc.response.status_code if exc.response is not None else None
-        if status in (400, 401, 403):
-            raise HTTPException(
-                status_code=401,
-                detail="PAT invalide ou non autorisé sur Azure DevOps.",
-            ) from exc
-        raise HTTPException(
-            status_code=502,
-            detail="Erreur Azure DevOps pendant la verification du PAT.",
-        ) from exc
-    except ValueError as exc:
+    auth_error: Exception | None = None
+    infra_error: Exception | None = None
+
+    s = ado_session(pat_override=pat)
+    for url in (
+        "https://dev.azure.com/_apis/projects?api-version=7.1",
+        "https://app.vssps.visualstudio.com/_apis/profile/profiles/me?api-version=7.1-preview.3",
+    ):
+        try:
+            r = s.get(url)
+            r.raise_for_status()
+            return
+        except requests.HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else None
+            if status in (400, 401, 403):
+                auth_error = exc
+            else:
+                infra_error = exc
+        except Exception as exc:
+            infra_error = exc
+
+    if auth_error is not None:
         raise HTTPException(
             status_code=401,
-            detail="PAT invalide ou non autorisé sur Azure DevOps.",
-        ) from exc
-    except Exception as exc:
-        raise HTTPException(
-            status_code=502,
-            detail="Impossible de verifier le PAT pour le moment.",
-        ) from exc
+            detail="PAT invalide ou non autorise sur Azure DevOps.",
+        ) from auth_error
 
-
+    raise HTTPException(
+        status_code=502,
+        detail="Impossible de verifier le PAT pour le moment (reseau/proxy Azure DevOps indisponible).",
+    ) from infra_error
 def _pick_profile_name(profile: Dict[str, Any]) -> str:
     # Champs directs possibles selon endpoint/tenant
     direct_candidates = [
@@ -149,7 +156,6 @@ def health() -> Dict[str, str]:
 @app.get("/auth/check")
 def auth_check(x_ado_pat: str | None = Header(default=None)) -> Dict[str, str]:
     pat = _require_pat(x_ado_pat)
-    validate_pat(pat)
     user_name = "Utilisateur"
     try:
         profile = get_current_user(pat=pat)
@@ -166,20 +172,30 @@ def auth_check(x_ado_pat: str | None = Header(default=None)) -> Dict[str, str]:
 @app.get("/auth/orgs")
 def auth_orgs(x_ado_pat: str | None = Header(default=None)) -> Dict[str, Any]:
     pat = _require_pat(x_ado_pat)
-    validate_pat(pat)
     try:
         orgs = list_accessible_orgs(pat=pat)
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else None
+        if status in (401, 403):
+            raise HTTPException(
+                status_code=401,
+                detail="PAT invalide ou non autorisé sur Azure DevOps.",
+            ) from exc
+        raise HTTPException(
+            status_code=502,
+            detail="Erreur Azure DevOps pendant la découverte des organisations.",
+        ) from exc
     except Exception:
-        # Certains PAT valides pour dev.azure.com ne permettent pas toujours
-        # l'endpoint global de découverte d'organisations.
-        cfg = get_ado_config(pat_override=pat)
-        orgs = [
-            {
-                "id": None,
-                "name": cfg.org,
-                "account_uri": f"https://dev.azure.com/{cfg.org}",
-            }
-        ]
+        raise HTTPException(
+            status_code=502,
+            detail="Impossible de lister les organisations Azure DevOps pour le moment.",
+        )
+    if not orgs:
+        return {
+            "status": "ok",
+            "orgs": [],
+            "detail": "PAT non global et organisation non decouverte automatiquement.",
+        }
     return {
         "status": "ok",
         "orgs": orgs,
@@ -192,7 +208,6 @@ def auth_projects(req: OrgRequest, x_ado_pat: str | None = Header(default=None))
     org_clean = (req.org or "").strip()
     if not org_clean:
         raise HTTPException(status_code=400, detail="Champ org requis.")
-    validate_pat(pat)
     try:
         projects = list_projects_for_org(org=org_clean, pat=pat)
     except requests.HTTPError as exc:
@@ -222,7 +237,6 @@ def auth_teams(req: OrgProjectRequest, x_ado_pat: str | None = Header(default=No
         raise HTTPException(status_code=400, detail="Champ org requis.")
     if not project_clean:
         raise HTTPException(status_code=400, detail="Champ project requis.")
-    validate_pat(pat)
     try:
         teams = list_teams_for_org_project(org=org_clean, project=project_clean, pat=pat)
     except requests.HTTPError as exc:
@@ -259,7 +273,6 @@ def auth_team_options(
         raise HTTPException(status_code=400, detail="Champ project requis.")
     if not team_clean:
         raise HTTPException(status_code=400, detail="Champ team requis.")
-    validate_pat(pat)
     try:
         options = list_team_work_item_options(
             org=org_clean,
@@ -313,20 +326,28 @@ def team_settings(team_name: str, x_ado_pat: str | None = Header(default=None)) 
 @app.post("/forecast")
 def forecast(req: ForecastRequest, x_ado_pat: str | None = Header(default=None)) -> Dict[str, Any]:
     pat = _require_pat(x_ado_pat)
-    # 1) Résoudre l'AreaPath à partir de la team si non fourni
+    org_clean = (req.org or "").strip()
+    project_clean = (req.project or "").strip()
+    if not org_clean:
+        raise HTTPException(status_code=400, detail="org requis.")
+    if not project_clean:
+        raise HTTPException(status_code=400, detail="project requis.")
+    # 1) RÃ©soudre l'AreaPath Ã  partir de la team si non fourni
     area_path = req.area_path
     if not area_path:
-        areas = team_settings_areas(req.team_name, pat=pat)
+        areas = team_settings_areas(req.team_name, org=org_clean, project=project_clean, pat=pat)
         area_path = areas.get("defaultValue")
 
     if not area_path:
         raise HTTPException(
             status_code=400,
-            detail="Impossible de déterminer l'AreaPath (team settings sans defaultValue).",
+            detail="Impossible de dÃ©terminer l'AreaPath (team settings sans defaultValue).",
         )
 
     # 2) Throughput hebdo sur l'AreaPath
     weekly = weekly_throughput(
+        org=org_clean,
+        project=project_clean,
         area_path=area_path,
         start_date=req.start_date,
         end_date=req.end_date,
@@ -338,16 +359,16 @@ def forecast(req: ForecastRequest, x_ado_pat: str | None = Header(default=None))
     if weekly.empty:
         raise HTTPException(
             status_code=404,
-            detail="Aucun item trouvé avec ces filtres (area/states/types/dates).",
+            detail="Aucun item trouvÃ© avec ces filtres (area/states/types/dates).",
         )
 
-    # 3) Préparer l’échantillon de throughput
+    # 3) PrÃ©parer lâ€™Ã©chantillon de throughput
     samples = weekly["throughput"].to_numpy()
     samples = samples[samples > 0]
     if len(samples) < 6:
         raise HTTPException(
             status_code=422,
-            detail="Historique insuffisant (peu de semaines non-nulles). Élargissez la période.",
+            detail="Historique insuffisant (peu de semaines non-nulles). Ã‰largissez la pÃ©riode.",
         )
 
     # 4) Monte Carlo selon mode
@@ -365,7 +386,6 @@ def forecast(req: ForecastRequest, x_ado_pat: str | None = Header(default=None))
             weeks=req.target_weeks,
             throughput_samples=samples,
             n_sims=req.n_sims,
-            seed=42,
         )
         result_percentiles = percentiles(items_done, ps=(50, 70, 90))
         result_distribution = items_done.tolist()
@@ -380,13 +400,12 @@ def forecast(req: ForecastRequest, x_ado_pat: str | None = Header(default=None))
             backlog_size=req.backlog_size,
             throughput_samples=samples,
             n_sims=req.n_sims,
-            seed=42,
         )
         result_percentiles = percentiles(weeks_needed, ps=(50, 70, 90))
         result_distribution = weeks_needed.tolist()
         result_kind = "weeks"
 
-    # 5) Réponse JSON (front-friendly)
+    # 5) RÃ©ponse JSON (front-friendly)
     body: Dict[str, Any] = {
         "team": req.team_name,
         "area_path": area_path,
@@ -396,11 +415,11 @@ def forecast(req: ForecastRequest, x_ado_pat: str | None = Header(default=None))
         "result_percentiles": result_percentiles,
         "result_distribution": result_distribution,
         "weekly_throughput": weekly.assign(
-            week=weekly["week"].astype(str)  # JSON sérialisable
+            week=weekly["week"].astype(str)  # JSON sÃ©rialisable
         ).to_dict(orient="records"),
     }
 
-    # Compatibilité historique frontend/tests
+    # CompatibilitÃ© historique frontend/tests
     if result_kind == "weeks":
         body["backlog_size"] = req.backlog_size
         body["weeks_percentiles"] = result_percentiles
@@ -430,3 +449,4 @@ if FRONT_DIR.exists():
     @app.get("/")
     def index():
         return FileResponse(str(FRONT_DIR / "index.html"))
+

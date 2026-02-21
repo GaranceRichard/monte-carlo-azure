@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import numpy as np
-from typing import Iterable, Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 def mc_finish_weeks(
     backlog_size: int,
     throughput_samples: np.ndarray,
     n_sims: int = 20000,
-    seed: int = 42,
+    seed: Optional[int] = None,
 ) -> np.ndarray:
     """
     Monte Carlo "Quand finira-t-on un backlog de N items ?"
@@ -31,19 +31,21 @@ def mc_finish_weeks(
         raise ValueError("throughput_samples ne contient aucune valeur > 0")
 
     rng = np.random.default_rng(seed)
-    weeks_needed = np.zeros(n_sims, dtype=int)
 
-    for i in range(n_sims):
-        remaining = backlog_size
-        w = 0
-        while remaining > 0:
-            t = int(rng.choice(samples))
-            remaining -= t
-            w += 1
-            if w > 520:  # garde-fou (10 ans)
-                break
-        weeks_needed[i] = w
+    # Garde-fou historique: la version boucle stoppait au plus tard a 521 semaines.
+    max_weeks = 521
 
+    # Vectorisation: tirages hebdomadaires en matrice, puis cumul pour trouver
+    # la premiere semaine ou le backlog est atteint.
+    draws = rng.choice(samples, size=(n_sims, max_weeks), replace=True)
+    cumulative = np.cumsum(draws, axis=1)
+    reached = cumulative >= backlog_size
+
+    first_hit_idx = reached.argmax(axis=1)  # 0-based
+    has_hit = reached.any(axis=1)
+
+    weeks_needed = np.full(n_sims, max_weeks, dtype=int)
+    weeks_needed[has_hit] = first_hit_idx[has_hit] + 1  # 1-based
     return weeks_needed
 
 
@@ -51,7 +53,7 @@ def mc_items_done_for_weeks(
     weeks: int,
     throughput_samples: np.ndarray,
     n_sims: int = 20000,
-    seed: int = 42,
+    seed: Optional[int] = None,
 ) -> np.ndarray:
     """
     Monte Carlo "Combien d'items seront livrés en N semaines ?"

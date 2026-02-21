@@ -14,7 +14,9 @@ def test_forecast_ok():
     })
 
     req = {
-        "team_name": "CEA Team",
+        "org": "org-a",
+        "project": "projet",
+        "team_name": "Team",
         "start_date": "2025-10-01",
         "end_date": "2026-01-19",
         "backlog_size": 20,
@@ -23,14 +25,14 @@ def test_forecast_ok():
         "n_sims": 2000
     }
 
-    with patch("backend.api.team_settings_areas", return_value={"defaultValue": "Projet-700\\X"}):
+    with patch("backend.api.team_settings_areas", return_value={"defaultValue": "Projet\\X"}):
         with patch("backend.api.weekly_throughput", return_value=weekly):
             r = client.post("/forecast", json=req, headers={"x-ado-pat": TEST_PAT})
 
     assert r.status_code == 200
     body = r.json()
-    assert body["team"] == "CEA Team"
-    assert body["area_path"] == "Projet-700\\X"
+    assert body["team"] == "Team"
+    assert body["area_path"] == "Projet\\X"
     assert body["backlog_size"] == 20
     assert "weeks_percentiles" in body
     assert "weekly_throughput" in body
@@ -46,8 +48,10 @@ def test_forecast_weeks_to_items_ok():
     })
 
     req = {
+        "org": "org-a",
+        "project": "Projet",
         "mode": "weeks_to_items",
-        "team_name": "CEA Team",
+        "team_name": "Team",
         "start_date": "2025-10-01",
         "end_date": "2026-01-19",
         "target_weeks": 10,
@@ -56,7 +60,7 @@ def test_forecast_weeks_to_items_ok():
         "n_sims": 2000
     }
 
-    with patch("backend.api.team_settings_areas", return_value={"defaultValue": "Projet-700\\X"}):
+    with patch("backend.api.team_settings_areas", return_value={"defaultValue": "Projet\\X"}):
         with patch("backend.api.weekly_throughput", return_value=weekly):
             r = client.post("/forecast", json=req, headers={"x-ado-pat": TEST_PAT})
 

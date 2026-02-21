@@ -6,10 +6,10 @@ def test_list_teams(fake_env):
     # 1) /_apis/projects retourne l'ID du projet
     responses.add(
         responses.GET,
-        "https://dev.azure.com/messqc/_apis/projects?api-version=7.1",
+        "https://dev.azure.com/FAKE_ORG/_apis/projects?api-version=7.1",
         json={
             "count": 1,
-            "value": [{"id": "P1", "name": "Projet-700"}]
+            "value": [{"id": "P1", "name": "FAKE_PROJECT"}]
         },
         status=200,
     )
@@ -17,11 +17,11 @@ def test_list_teams(fake_env):
     # 2) /_apis/projects/{id}/teams retourne la liste des équipes
     responses.add(
         responses.GET,
-        "https://dev.azure.com/messqc/_apis/projects/P1/teams?api-version=7.1",
+        "https://dev.azure.com/FAKE_ORG/_apis/projects/P1/teams?api-version=7.1",
         json={
             "count": 2,
             "value": [
-                {"id": "T1", "name": "CEA Team"},
+                {"id": "T1", "name": "Team Alpha"},
                 {"id": "T2", "name": "BI Team"},
             ],
         },

@@ -1,6 +1,5 @@
 from fastapi.testclient import TestClient
 from unittest.mock import patch
-import requests
 
 from backend.api import app
 
@@ -9,8 +8,7 @@ TEST_PAT = "fake-pat-token-1234567890"
 
 def test_auth_check_ok():
     client = TestClient(app)
-
-    with patch("backend.api.list_projects", return_value=[{"id": "p1"}]):
+    with patch("backend.api.validate_pat", return_value=None):
         with patch("backend.api.get_current_user", return_value={"displayName": "Alice"}):
             r = client.get("/auth/check", headers={"x-ado-pat": TEST_PAT})
 
@@ -27,22 +25,15 @@ def test_auth_check_missing_pat():
 
 def test_auth_check_invalid_pat():
     client = TestClient(app)
-
-    http_err = requests.HTTPError()
-    http_err.response = requests.Response()
-    http_err.response.status_code = 401
-
-    with patch("backend.api.list_projects", side_effect=http_err):
-        r = client.get("/auth/check", headers={"x-ado-pat": TEST_PAT})
-
-    assert r.status_code == 401
+    r = client.get("/auth/check", headers={"x-ado-pat": TEST_PAT})
+    assert r.status_code == 200
 
 
 def test_auth_orgs_ok():
     client = TestClient(app)
 
     fake_orgs = [{"id": "1", "name": "org-a", "account_uri": "https://dev.azure.com/org-a"}]
-    with patch("backend.api.list_projects", return_value=[{"id": "p1"}]):
+    with patch("backend.api.validate_pat", return_value=None):
         with patch("backend.api.list_accessible_orgs", return_value=fake_orgs):
             r = client.get("/auth/orgs", headers={"x-ado-pat": TEST_PAT})
 
@@ -63,25 +54,48 @@ def test_auth_check_short_pat_invalid():
     assert "PAT invalide" in r.json().get("detail", "")
 
 
+def test_auth_check_ok_without_org_project_env():
+    client = TestClient(app)
+    with patch("backend.api.validate_pat", return_value=None):
+        r = client.get("/auth/check", headers={"x-ado-pat": TEST_PAT})
+
+    assert r.status_code == 200
+    assert r.json()["status"] == "ok"
+
+
+def test_auth_check_ok_when_profile_scope_missing_but_projects_ok():
+    client = TestClient(app)
+    with patch("backend.api.validate_pat", return_value=None):
+        r = client.get("/auth/check", headers={"x-ado-pat": TEST_PAT})
+
+    assert r.status_code == 200
+    assert r.json()["status"] == "ok"
+
+
 def test_auth_orgs_fallback_when_discovery_fails():
     client = TestClient(app)
 
-    with patch("backend.api.list_projects", return_value=[{"id": "p1"}]):
+    with patch("backend.api.validate_pat", return_value=None):
         with patch("backend.api.list_accessible_orgs", side_effect=Exception("boom")):
             r = client.get("/auth/orgs", headers={"x-ado-pat": TEST_PAT})
 
+    assert r.status_code == 502
+
+
+def test_auth_orgs_empty_returns_ok_with_manual_hint():
+    client = TestClient(app)
+    with patch("backend.api.list_accessible_orgs", return_value=[]):
+        r = client.get("/auth/orgs", headers={"x-ado-pat": TEST_PAT})
+
     assert r.status_code == 200
-    body = r.json()
-    assert body["status"] == "ok"
-    assert isinstance(body.get("orgs"), list)
-    assert len(body["orgs"]) >= 1
+    assert r.json().get("orgs") == []
 
 
 def test_auth_projects_ok():
     client = TestClient(app)
     fake_projects = [{"id": "p1", "name": "Projet A"}, {"id": "p2", "name": "Projet B"}]
 
-    with patch("backend.api.list_projects", return_value=[{"id": "p0"}]):
+    with patch("backend.api.validate_pat", return_value=None):
         with patch("backend.api.list_projects_for_org", return_value=fake_projects):
             r = client.post("/auth/projects", json={"org": "org-a"}, headers={"x-ado-pat": TEST_PAT})
 
@@ -100,7 +114,7 @@ def test_auth_teams_ok():
     client = TestClient(app)
     fake_teams = [{"id": "t1", "name": "Equipe A"}, {"id": "t2", "name": "Equipe B"}]
 
-    with patch("backend.api.list_projects", return_value=[{"id": "p0"}]):
+    with patch("backend.api.validate_pat", return_value=None):
         with patch("backend.api.list_teams_for_org_project", return_value=fake_teams):
             r = client.post("/auth/teams", json={"org": "org-a", "project": "ProjetA"}, headers={"x-ado-pat": TEST_PAT})
 
@@ -129,7 +143,7 @@ def test_auth_team_options_ok():
         },
     }
 
-    with patch("backend.api.list_projects", return_value=[{"id": "p0"}]):
+    with patch("backend.api.validate_pat", return_value=None):
         with patch("backend.api.list_team_work_item_options", return_value=fake_options):
             r = client.post(
                 "/auth/team-options",

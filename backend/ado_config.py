@@ -6,8 +6,8 @@ from typing import Optional
 
 @dataclass(frozen=True)
 class AdoConfig:
-    org: str
-    project: str
+    org: Optional[str]
+    project: Optional[str]
     pat: str
 
     # Optionnel : defaults (pour scripts / UI)
@@ -35,19 +35,14 @@ def get_ado_config(pat_override: Optional[str] = None) -> AdoConfig:
       - ADO_TEAM
       - ADO_AREA_PATH
     """
-    org = os.getenv("ADO_ORG", "messqc").strip()
-    project = os.getenv("ADO_PROJECT", "Projet-700").strip()
+    org = _clean(os.getenv("ADO_ORG"))
+    project = _clean(os.getenv("ADO_PROJECT"))
     pat = _clean(pat_override) or os.getenv("ADO_PAT", "").strip()
 
     if not pat:
         raise RuntimeError(
             "PAT Azure DevOps manquant. Fournissez x-ado-pat (UI) ou ADO_PAT en variable d'environnement."
         )
-    if not org:
-        raise RuntimeError("ADO_ORG est vide (variable d'environnement).")
-    if not project:
-        raise RuntimeError("ADO_PROJECT est vide (variable d'environnement).")
-
     # Valeurs actives (ADO_TEAM/ADO_AREA_PATH) priment
     default_team = _clean(os.getenv("ADO_TEAM")) or _clean(os.getenv("ADO_DEFAULT_TEAM"))
     default_area_path = _clean(os.getenv("ADO_AREA_PATH")) or _clean(os.getenv("ADO_DEFAULT_AREA_PATH"))

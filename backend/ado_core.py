@@ -122,10 +122,19 @@ def list_teams(pat: str | None = None) -> List[Dict[str, Any]]:
     return r.json().get("value", [])
 
 
-def team_settings_areas(team_name: str, pat: str | None = None) -> Dict[str, Any]:
+def team_settings_areas(
+    team_name: str,
+    org: str | None = None,
+    project: str | None = None,
+    pat: str | None = None,
+) -> Dict[str, Any]:
     cfg = _cfg(pat=pat)
     s = _session(pat=pat)
-    url = f"https://dev.azure.com/{cfg.org}/{cfg.project}/{team_name}/_apis/work/teamsettings/teamfieldvalues?api-version={API_VERSION}"
+    org_name = (org or cfg.org or "").strip()
+    project_name = (project or cfg.project or "").strip()
+    if not org_name or not project_name:
+        raise RuntimeError("org et project requis pour lire les settings de team.")
+    url = f"https://dev.azure.com/{org_name}/{project_name}/{team_name}/_apis/work/teamsettings/teamfieldvalues?api-version={API_VERSION}"
     r = s.get(url)
     r.raise_for_status()
     return r.json()
@@ -143,23 +152,21 @@ def team_settings_iterations(team_name: str, pat: str | None = None) -> Dict[str
 # -----------------------------
 # Work Items (WIQL + batch)
 # -----------------------------
-def wiql_query_ids(query: str, pat: str | None = None) -> List[int]:
-    cfg = _cfg(pat=pat)
+def wiql_query_ids(query: str, org: str, project: str, pat: str | None = None) -> List[int]:
     s = _session(pat=pat)
-    url = f"https://dev.azure.com/{cfg.org}/{cfg.project}/_apis/wit/wiql?api-version={API_VERSION}"
+    url = f"https://dev.azure.com/{org}/{project}/_apis/wit/wiql?api-version={API_VERSION}"
     r = s.post(url, json={"query": query})
     r.raise_for_status()
     data = r.json()
     return [w["id"] for w in data.get("workItems", [])]
 
 
-def fetch_work_items_batch(ids: Iterable[int], fields: List[str], pat: str | None = None) -> List[Dict[str, Any]]:
-    cfg = _cfg(pat=pat)
+def fetch_work_items_batch(ids: Iterable[int], fields: List[str], org: str, pat: str | None = None) -> List[Dict[str, Any]]:
     s = _session(pat=pat)
     ids = list(ids)
     if not ids:
         return []
-    url = f"https://dev.azure.com/{cfg.org}/_apis/wit/workitemsbatch?api-version={API_VERSION}"
+    url = f"https://dev.azure.com/{org}/_apis/wit/workitemsbatch?api-version={API_VERSION}"
 
     out: List[Dict[str, Any]] = []
     chunk_size = 200
@@ -172,6 +179,8 @@ def fetch_work_items_batch(ids: Iterable[int], fields: List[str], pat: str | Non
 
 
 def done_ids_by_area_and_closed_date(
+    org: str,
+    project: str,
     area_path: str,
     start_date: str,
     end_date: str,
@@ -179,8 +188,6 @@ def done_ids_by_area_and_closed_date(
     work_item_types: Set[str],
     pat: str | None = None,
 ) -> List[int]:
-    cfg = _cfg(pat=pat)
-
     states_sql = ", ".join([f"'{x}'" for x in done_states])
     types_sql = ", ".join([f"'{x}'" for x in work_item_types])
 
@@ -188,7 +195,7 @@ def done_ids_by_area_and_closed_date(
     SELECT [System.Id]
     FROM WorkItems
     WHERE
-        [System.TeamProject] = '{cfg.project}'
+        [System.TeamProject] = '{project}'
         AND [System.AreaPath] = '{area_path}'
         AND [System.WorkItemType] IN ({types_sql})
         AND [System.State] IN ({states_sql})
@@ -196,13 +203,15 @@ def done_ids_by_area_and_closed_date(
         AND [Microsoft.VSTS.Common.ClosedDate] <= '{end_date}'
     ORDER BY [Microsoft.VSTS.Common.ClosedDate] ASC
     """
-    return wiql_query_ids(query, pat=pat)
+    return wiql_query_ids(query, org=org, project=project, pat=pat)
 
 
 # -----------------------------
 # Throughput
 # -----------------------------
 def weekly_throughput(
+    org: str,
+    project: str,
     area_path: str,
     start_date: str,
     end_date: str,
@@ -211,6 +220,8 @@ def weekly_throughput(
     pat: str | None = None,
 ) -> pd.DataFrame:
     ids = done_ids_by_area_and_closed_date(
+        org=org,
+        project=project,
         area_path=area_path,
         start_date=start_date,
         end_date=end_date,
@@ -222,7 +233,7 @@ def weekly_throughput(
     if not ids:
         return pd.DataFrame(columns=["week", "throughput"])
 
-    items = fetch_work_items_batch(ids, ["System.Id", "Microsoft.VSTS.Common.ClosedDate"], pat=pat)
+    items = fetch_work_items_batch(ids, ["System.Id", "Microsoft.VSTS.Common.ClosedDate"], org=org, pat=pat)
 
     rows = []
     for it in items:
@@ -262,19 +273,55 @@ def list_accessible_orgs(pat: str) -> List[Dict[str, Any]]:
     Liste les organisations Azure DevOps accessibles avec le PAT.
     """
     s = _session(pat=pat)
+    member_ids: List[str] = []
 
-    profile_url = "https://app.vssps.visualstudio.com/_apis/profile/profiles/me?api-version=7.1-preview.3"
-    profile_resp = s.get(profile_url)
-    profile_resp.raise_for_status()
-    profile = profile_resp.json()
-    member_id = profile.get("id")
-    if not member_id:
-        return []
+    # Tentative 1: profile global.
+    try:
+        profile_url = "https://app.vssps.visualstudio.com/_apis/profile/profiles/me?api-version=7.1-preview.3"
+        profile_resp = s.get(profile_url)
+        profile_resp.raise_for_status()
+        profile = profile_resp.json()
+        member_id = profile.get("id")
+        if isinstance(member_id, str) and member_id.strip():
+            member_ids.append(member_id.strip())
+    except Exception:
+        pass
 
-    accounts_url = f"https://app.vssps.visualstudio.com/_apis/accounts?memberId={member_id}&api-version=7.1-preview.1"
-    accounts_resp = s.get(accounts_url)
-    accounts_resp.raise_for_status()
-    accounts = accounts_resp.json().get("value", [])
+    # Tentative 2: connectionData global (souvent plus permissif que profile).
+    try:
+        conn_url = "https://dev.azure.com/_apis/connectionData?connectOptions=none&lastChangeId=-1&lastChangeId64=-1"
+        conn_resp = s.get(conn_url)
+        conn_resp.raise_for_status()
+        conn = conn_resp.json()
+        auth_user = conn.get("authenticatedUser") or {}
+        member_id = auth_user.get("id")
+        if isinstance(member_id, str) and member_id.strip():
+            member_ids.append(member_id.strip())
+    except Exception:
+        pass
+
+    accounts: List[Dict[str, Any]] = []
+    # Tentative 3: endpoint accounts sans memberId (si supporté côté tenant).
+    try:
+        accounts_url = "https://app.vssps.visualstudio.com/_apis/accounts?api-version=7.1-preview.1"
+        accounts_resp = s.get(accounts_url)
+        if accounts_resp.ok:
+            accounts = accounts_resp.json().get("value", []) or []
+    except Exception:
+        pass
+
+    # Tentative 4: endpoint accounts avec memberId(s) découverts.
+    if not accounts:
+        for mid in dict.fromkeys(member_ids):
+            try:
+                accounts_url = f"https://app.vssps.visualstudio.com/_apis/accounts?memberId={mid}&api-version=7.1-preview.1"
+                accounts_resp = s.get(accounts_url)
+                accounts_resp.raise_for_status()
+                accounts = accounts_resp.json().get("value", []) or []
+                if accounts:
+                    break
+            except Exception:
+                continue
 
     out: List[Dict[str, Any]] = []
     for a in accounts:

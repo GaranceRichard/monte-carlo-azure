@@ -3,20 +3,20 @@ import Scripts.ado_smoke as smoke
 
 
 class FakeCfg:
-    org = "messqc"
-    project = "Projet-700"
+    org = "org-demo"
+    project = "Project-Alpha"
     pat = "FAKE_PAT"
 
 
 class FakeResp:
     status_code = 200
-    text = '{"count":1,"value":[{"name":"Projet-700"}]}'
+    text = '{"count":1,"value":[{"name":"Project-Alpha"}]}'
 
     def raise_for_status(self):
         return None
 
     def json(self):
-        return {"count": 1, "value": [{"name": "Projet-700"}]}
+        return {"count": 1, "value": [{"name": "Project-Alpha"}]}
 
 
 class FakeSession:

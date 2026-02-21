@@ -7,7 +7,13 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:unit:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:coverage": "npm run test:e2e:coverage:console",
+    "test:e2e:coverage:console": "playwright test --reporter=line"
   },
   "dependencies": {
     "react": "^19.2.0",
@@ -19,10 +25,18 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "@playwright/test": "^1.55.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@vitest/coverage-v8": "^4.0.7",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "istanbul-lib-coverage": "^3.2.2",
+    "jsdom": "^27.0.1",
+    "v8-to-istanbul": "^9.3.0",
+    "vitest": "^4.0.7",
     "vite": "^7.2.4"
   }
 }

@@ -1,7 +1,7 @@
 ﻿# Monte Carlo Azure
 
 Outil de prÃ©vision (forecast) basÃ© sur une simulation de Monte Carlo, alimentÃ© par lâ€™historique de throughput Azure DevOps (Work Items fermÃ©s).  
-Le projet expose une API (FastAPI) et une UI (React/Vite). En mode â€œbundleâ€, lâ€™API sert directement le front compilÃ©.
+Le projet expose une API (FastAPI) et une UI (React/Vite). En mode bundle, lâ€™API sert directement le front compilÃ©.
 
 ---
 
@@ -17,7 +17,7 @@ Le projet expose une API (FastAPI) et une UI (React/Vite). En mode â€œbundle
 
 ## Architecture
 
-```
+```text
 backend/
   api.py            # FastAPI (endpoints + static frontend in bundle)
   ado_client.py     # client ADO
@@ -44,15 +44,17 @@ run_app.py          # lance lâ€™API (dev)
 
 ### Authentification PAT
 
-Au demarrage, l'application affiche un ecran de connexion et demande le PAT Azure DevOps.
+Au dÃ©marrage, lâ€™application affiche un Ã©cran de connexion et demande le PAT Azure DevOps.
 
-- Le PAT est utilise en memoire pendant la session en cours.
-- Le PAT n'est pas sauvegarde sur disque (pas de `.env` pour le token).
-- Validation immediate via `GET /auth/check`.
+- Le PAT est utilisÃ© en mÃ©moire pendant la session en cours.
+- Le PAT nâ€™est pas sauvegardÃ© sur disque.
+- Validation immÃ©diate via `GET /auth/check`.
 
-Variables d'environnement encore utilisees (optionnel selon votre environnement) :
-- `ADO_ORG` (defaut: `messqc`)
-- `ADO_PROJECT` (defaut: `Projet-700`)
+Variable dâ€™environnement optionnelle :
+- `ADO_PAT` (fallback si pas de PAT fourni par header)
+
+Lâ€™organisation et le projet sont dÃ©sormais sÃ©lectionnÃ©s dans lâ€™interface
+et transmis Ã  lâ€™API, sans dÃ©pendre de `ADO_ORG` / `ADO_PROJECT`.
 
 ---
 
@@ -60,7 +62,7 @@ Variables d'environnement encore utilisees (optionnel selon votre environnement)
 
 ### Backend (API)
 
-1) CrÃ©er un environnement virtuel + installer les dÃ©pendances (exemple) :
+1) CrÃ©er un environnement virtuel + installer les dÃ©pendances :
 ```bash
 python -m venv .venv
 # Windows PowerShell
@@ -91,12 +93,15 @@ UI dispo : `http://localhost:5173`
 
 - `GET /health` : check de santÃ©
 - `GET /auth/check` : valide le PAT (header `x-ado-pat`)
-- `GET /auth/orgs` : liste les organisations accessibles avec le PAT
-- `GET /teams` : liste des Ã©quipes
+- `GET /auth/orgs` : liste les organisations accessibles
+- `POST /auth/projects` : projets accessibles dâ€™une organisation
+- `POST /auth/teams` : Ã©quipes accessibles dâ€™un projet
+- `POST /auth/team-options` : types/Ã©tats disponibles pour une Ã©quipe
+- `GET /teams` : liste des Ã©quipes (mode historique)
 - `GET /teams/{team}/settings` : settings dâ€™Ã©quipe (si applicable)
-- `POST /forecast` : calcule un forecast (paramÃ¨tres : team, area path, backlog, nb simulations, etc.)
+- `POST /forecast` : calcul de simulation
 
-> Les paramÃ¨tres exacts sont visibles via la doc interactive FastAPI (Swagger) : `/docs`.
+Les paramÃ¨tres exacts sont visibles dans Swagger : `/docs`.
 
 ---
 
@@ -106,6 +111,33 @@ UI dispo : `http://localhost:5173`
 ```bash
 pytest
 ```
+
+### Coverage back (console)
+
+```bash
+python -m pytest --cov=backend --cov-report=term-missing -q
+```
+
+### Coverage front unit (console + html)
+
+Dans `frontend/` :
+```bash
+npm install
+npm run test:unit:coverage
+```
+
+Le resume de couverture est affiche dans le terminal.
+Le rapport HTML est genere dans `frontend/coverage/`.
+
+### Coverage E2E (front only, console)
+
+```bash
+npm --prefix frontend run test:e2e:coverage:console
+```
+
+Note: la task VS Code `Coverage E2E (Playwright)` utilise un script PowerShell dedie
+(`.vscode/scripts/run-e2e-coverage.ps1`) pour eviter les problemes de quoting Windows
+sur les chemins contenant des espaces.
 
 ---
 
@@ -122,25 +154,12 @@ npm run build
 cd ..
 ```
 
-2) Build PyInstaller (exemple) :
+2) Build PyInstaller :
 ```bash
 pyinstaller MonteCarloADO.spec
 ```
 
 Lâ€™exÃ©cutable se retrouve dans `dist/`.
-
-> Bonnes pratiques : `dist/` et `build/` ne doivent pas Ãªtre versionnÃ©s (cf. `.gitignore`).
-
----
-
-## HypothÃ¨ses et limites
-
-- Le throughput est calculÃ© sur la base de la date de clÃ´ture (ClosedDate) et dâ€™Ã©tats â€œterminÃ©sâ€ (selon le workflow ADO).
-- Les semaines Ã  throughput nul peuvent Ãªtre exclues (selon la logique retenue) pour Ã©viter de â€œpolluerâ€ la distribution.
-- Les rÃ©sultats Monte Carlo dÃ©pendent fortement :
-  - de la qualitÃ© de lâ€™historique (stabilitÃ© du flux, changements de process),
-  - du pÃ©rimÃ¨tre retenu (Area Path / Team),
-  - de la dÃ©finition de â€œDoneâ€ dans ADO.
 
 ---
 
@@ -149,18 +168,4 @@ Lâ€™exÃ©cutable se retrouve dans `dist/`.
 - Ne pas commiter de secrets (PAT, clÃ©s privÃ©es).
 - Script de vÃ©rification avant commit : `Scripts/check_no_secrets.py`.
 
----
 
-## Roadmap (suggestion)
-
-- Stabiliser la reproductibilitÃ© (fichier de dÃ©pendances Python + scripts de build)
-- Ajouter des percentiles (P50/P80/P90) et conversion en dates estimÃ©es
-- Ajouter un Ã©cran â€œdiagnosticâ€ (pÃ©rimÃ¨tre, nombre de semaines, zÃ©ros exclus)
-- CI GitHub Actions : tests + build + release
-
----
-
-## Licence
-
-Ã€ dÃ©finir.
-Si le dÃ©pÃ´t est destinÃ© Ã  un usage interne (ADO + contexte organisation), dÃ©pÃ´t privÃ© recommandÃ©.
