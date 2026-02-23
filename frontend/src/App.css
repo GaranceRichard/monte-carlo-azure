@@ -45,6 +45,21 @@
   margin-top: 6px;
 }
 
+.sim-mode-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.sim-mode-select-wrap {
+  flex: 1;
+}
+
+.sim-mode-zero-toggle {
+  margin-bottom: 10px;
+  white-space: nowrap;
+}
+
 .sim-checklist {
   margin-top: 6px;
   border: 1px solid var(--border);
@@ -98,6 +113,12 @@
   color: var(--muted);
   font-size: 13px;
   font-weight: 600;
+}
+
+.sim-sample-info {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .sim-kpis {
@@ -177,5 +198,14 @@
 @media (max-width: 980px) {
   .sim-layout {
     grid-template-columns: 1fr;
+  }
+
+  .sim-mode-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sim-mode-zero-toggle {
+    margin-bottom: 0;
   }
 }

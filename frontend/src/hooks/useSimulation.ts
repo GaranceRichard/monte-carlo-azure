@@ -24,6 +24,12 @@ type TooltipBaseProps = {
   itemStyle: Record<string, string | number>;
 };
 
+type SampleStats = {
+  totalWeeks: number;
+  zeroWeeks: number;
+  usedWeeks: number;
+};
+
 export type SimulationViewModel = {
   loading: boolean;
   loadingStageMessage: string;
@@ -34,6 +40,9 @@ export type SimulationViewModel = {
   setEndDate: (value: string) => void;
   simulationMode: ForecastMode;
   setSimulationMode: (value: ForecastMode) => void;
+  includeZeroWeeks: boolean;
+  setIncludeZeroWeeks: (value: boolean) => void;
+  sampleStats: SampleStats | null;
   backlogSize: number | string;
   setBacklogSize: (value: number | string) => void;
   targetWeeks: number | string;
@@ -75,10 +84,22 @@ function nWeeksAgo(weeks: number): string {
   return formatDateLocal(date);
 }
 
-function normalPdf(x: number, mean: number, std: number): number {
-  if (!std || std <= 0) return 0;
-  const z = (x - mean) / std;
-  return (1 / (std * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * z * z);
+function smoothHistogramCounts(points: Array<{ x: number; count: number }>): number[] {
+  if (!points.length) return [];
+  const weights = [1, 2, 3, 2, 1];
+  const radius = 2;
+  return points.map((_, i) => {
+    let weightedSum = 0;
+    let weightTotal = 0;
+    for (let offset = -radius; offset <= radius; offset += 1) {
+      const idx = i + offset;
+      if (idx < 0 || idx >= points.length) continue;
+      const w = weights[offset + radius];
+      weightedSum += points[idx].count * w;
+      weightTotal += w;
+    }
+    return weightTotal > 0 ? weightedSum / weightTotal : points[i].count;
+  });
 }
 
 export function useSimulation({
@@ -100,6 +121,8 @@ export function useSimulation({
   const [startDate, setStartDate] = useState(() => nWeeksAgo(52));
   const [endDate, setEndDate] = useState(() => today());
   const [simulationMode, setSimulationMode] = useState<ForecastMode>("backlog_to_weeks");
+  const [includeZeroWeeks, setIncludeZeroWeeks] = useState(false);
+  const [sampleStats, setSampleStats] = useState<SampleStats | null>(null);
   const [backlogSize, setBacklogSize] = useState<number | string>(120);
   const [targetWeeks, setTargetWeeks] = useState<number | string>(12);
   const [nSims, setNSims] = useState<number | string>(20000);
@@ -124,11 +147,12 @@ export function useSimulation({
   };
 
   const throughputData = useMemo((): ThroughputPoint[] => {
-    return weeklyThroughput.map((row) => ({
+    const rows = includeZeroWeeks ? weeklyThroughput : weeklyThroughput.filter((row) => row.throughput > 0);
+    return rows.map((row) => ({
       week: String(row.week).slice(0, 10),
       throughput: row.throughput,
     }));
-  }, [weeklyThroughput]);
+  }, [weeklyThroughput, includeZeroWeeks]);
 
   const mcHistData = useMemo((): ChartPoint[] => {
     const buckets = result?.result_distribution;
@@ -140,15 +164,12 @@ export function useSimulation({
       .sort((a, b) => a.x - b.x);
     if (!points.length) return [];
 
-    const n = points.reduce((acc, p) => acc + p.count, 0);
-    const mean = points.reduce((acc, p) => acc + p.x * p.count, 0) / n;
-    const variance = points.reduce((acc, p) => acc + ((p.x - mean) ** 2) * p.count, 0) / n;
-    const std = Math.sqrt(variance);
+    const smoothed = smoothHistogramCounts(points);
 
-    return points.map((p) => ({
+    return points.map((p, idx) => ({
       x: p.x,
       count: p.count,
-      gauss: normalPdf(p.x, mean, std) * n,
+      gauss: smoothed[idx],
     }));
   }, [result]);
 
@@ -220,6 +241,7 @@ export function useSimulation({
     setErr("");
     setResult(null);
     setWeeklyThroughput([]);
+    setSampleStats(null);
     setActiveChartTab("throughput");
   }
 
@@ -229,6 +251,7 @@ export function useSimulation({
     setLoadingStageMessage("");
     setResult(null);
     setWeeklyThroughput([]);
+    setSampleStats(null);
     setActiveChartTab("throughput");
     setWorkItemTypeOptions(DEFAULT_WORK_ITEM_TYPE_OPTIONS);
     setStatesByType({});
@@ -251,6 +274,7 @@ export function useSimulation({
     setLoadingStageMessage("Recuperation des donnees...");
     setResult(null);
     setWeeklyThroughput([]);
+    setSampleStats(null);
     setActiveChartTab("throughput");
     const phaseTimer = window.setTimeout(() => {
       setLoadingStageMessage("Simulation en cours...");
@@ -268,9 +292,21 @@ export function useSimulation({
         types,
       );
 
-      const throughputSamples = weekly.map((r) => r.throughput).filter((n) => n > 0);
+      const throughputSamples = weekly
+        .map((r) => r.throughput)
+        .filter((n) => (includeZeroWeeks ? n >= 0 : n > 0));
+      const zeroWeeks = weekly.filter((r) => r.throughput === 0).length;
+      setSampleStats({
+        totalWeeks: weekly.length,
+        zeroWeeks,
+        usedWeeks: throughputSamples.length,
+      });
       if (throughputSamples.length < 6) {
-        throw new Error("Historique insuffisant (moins de 6 semaines non nulles).");
+        throw new Error(
+          includeZeroWeeks
+            ? "Historique insuffisant (moins de 6 semaines)."
+            : "Historique insuffisant (moins de 6 semaines non nulles).",
+        );
       }
 
       setWeeklyThroughput(weekly);
@@ -310,6 +346,9 @@ export function useSimulation({
     setEndDate,
     simulationMode,
     setSimulationMode,
+    includeZeroWeeks,
+    setIncludeZeroWeeks,
+    sampleStats,
     backlogSize,
     setBacklogSize,
     targetWeeks,

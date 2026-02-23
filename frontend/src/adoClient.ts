@@ -19,6 +19,52 @@ const API = "api-version=7.1";
 type AdoOrg = { name: string };
 type AdoProject = { id: string; name: string };
 type AdoTeam = { id: string; name: string };
+type TeamFieldValue = { value?: string; includeChildren?: boolean };
+
+function escWiql(value: string): string {
+  return value.replace(/'/g, "''");
+}
+
+async function getTeamAreaPathFilterClause(
+  org: string,
+  project: string,
+  team: string,
+  pat: string,
+): Promise<string> {
+  const fallbackPath = `${project}\\${team}`;
+
+  try {
+    const teamEncoded = encodeURIComponent(team);
+    const r = await fetch(
+      `${ADO}/${org}/${project}/${teamEncoded}/_apis/work/teamsettings/teamfieldvalues?${API}`,
+      { headers: adoHeaders(pat) },
+    );
+    if (!r.ok) {
+      return `AND [System.AreaPath] UNDER '${escWiql(fallbackPath)}'`;
+    }
+
+    const data = await r.json();
+    const values: TeamFieldValue[] = data?.values ?? [];
+    const clauses = values
+      .map((entry) => {
+        const path = (entry.value || "").trim();
+        if (!path) return "";
+        if (entry.includeChildren === false) {
+          return `[System.AreaPath] = '${escWiql(path)}'`;
+        }
+        return `[System.AreaPath] UNDER '${escWiql(path)}'`;
+      })
+      .filter(Boolean);
+
+    if (!clauses.length) {
+      return `AND [System.AreaPath] UNDER '${escWiql(fallbackPath)}'`;
+    }
+
+    return `AND (${clauses.join(" OR ")})`;
+  } catch {
+    return `AND [System.AreaPath] UNDER '${escWiql(fallbackPath)}'`;
+  }
+}
 
 export async function checkPatDirect(pat: string): Promise<{ displayName: string; id: string }> {
   const r = await fetch(`${VSSPS}/_apis/profile/profiles/me?${API}`, {
@@ -95,27 +141,29 @@ export async function getTeamOptionsDirect(
 export async function getWeeklyThroughputDirect(
   org: string,
   project: string,
-  _team: string,
+  team: string,
   pat: string,
   startDate: string,
   endDate: string,
   doneStates: string[],
   workItemTypes: string[],
 ): Promise<{ week: string; throughput: number }[]> {
+  const teamAreaFilter = await getTeamAreaPathFilterClause(org, project, team, pat);
   const typeFilter = workItemTypes.length
-    ? `AND [System.WorkItemType] IN (${workItemTypes.map((t) => `'${t.replace(/'/g, "''")}'`).join(",")})`
+    ? `AND [System.WorkItemType] IN (${workItemTypes.map((t) => `'${escWiql(t)}'`).join(",")})`
     : "";
   const stateFilter = doneStates.length
-    ? `AND [System.State] IN (${doneStates.map((s) => `'${s.replace(/'/g, "''")}'`).join(",")})`
+    ? `AND [System.State] IN (${doneStates.map((s) => `'${escWiql(s)}'`).join(",")})`
     : "";
 
   const wiql = {
     query: `
       SELECT [System.Id], [Microsoft.VSTS.Common.ClosedDate]
       FROM WorkItems
-      WHERE [System.TeamProject] = '${project.replace(/'/g, "''")}'
+      WHERE [System.TeamProject] = '${escWiql(project)}'
       AND [Microsoft.VSTS.Common.ClosedDate] >= '${startDate}'
       AND [Microsoft.VSTS.Common.ClosedDate] <= '${endDate}'
+      ${teamAreaFilter}
       ${typeFilter}
       ${stateFilter}
       ORDER BY [Microsoft.VSTS.Common.ClosedDate]

@@ -25,6 +25,9 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
     setEndDate,
     simulationMode,
     setSimulationMode,
+    includeZeroWeeks,
+    setIncludeZeroWeeks,
+    sampleStats,
     backlogSize,
     setBacklogSize,
     targetWeeks,
@@ -82,18 +85,30 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
             </div>
           </div>
 
-          <label className="sim-label sim-mt-10">Type de simulation</label>
-          <select
-            value={simulationMode}
-            onChange={(e) => {
-              setSimulationMode(e.target.value as "backlog_to_weeks" | "weeks_to_items");
-              setActiveChartTab("throughput");
-            }}
-            className="sim-input"
-          >
-            <option value="backlog_to_weeks">Nombre d&apos;items de backlog vers semaines</option>
-            <option value="weeks_to_items">Nombre de semaines vers items livres</option>
-          </select>
+          <div className="sim-mode-row sim-mt-10">
+            <div className="sim-mode-select-wrap">
+              <label className="sim-label">Type de simulation</label>
+              <select
+                value={simulationMode}
+                onChange={(e) => {
+                  setSimulationMode(e.target.value as "backlog_to_weeks" | "weeks_to_items");
+                  setActiveChartTab("throughput");
+                }}
+                className="sim-input"
+              >
+                <option value="backlog_to_weeks">Nombre d&apos;items de backlog vers semaines</option>
+                <option value="weeks_to_items">Nombre de semaines vers items livres</option>
+              </select>
+            </div>
+            <label className="sim-check-row sim-mode-zero-toggle">
+              <input
+                type="checkbox"
+                checked={includeZeroWeeks}
+                onChange={(e) => setIncludeZeroWeeks(e.target.checked)}
+              />
+              <span>Inclure les semaines a 0</span>
+            </label>
+          </div>
 
           <div className="sim-grid-2 sim-mt-10">
             <div>
@@ -180,6 +195,15 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
             {loading ? "Calcul..." : "Lancer la simulation"}
           </button>
           {loading && <div className="sim-loading-stage">{loadingStageMessage}</div>}
+          {sampleStats && (
+            <div className="sim-sample-info">
+              Semaines utilisees: {sampleStats.usedWeeks}/{sampleStats.totalWeeks}
+              {" - "}
+              Semaines a 0: {sampleStats.zeroWeeks}
+              {" - "}
+              Mode: {includeZeroWeeks ? "inclues" : "exclues"}
+            </div>
+          )}
 
           {result && (
             <div className="sim-kpis">
