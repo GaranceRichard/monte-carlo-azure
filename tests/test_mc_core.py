@@ -28,6 +28,25 @@ def test_mc_finish_weeks_reproducible_for_seed():
     assert np.array_equal(a, b)
 
 
+def test_mc_finish_weeks_backlog_size_one():
+    samples = np.array([1, 2, 3], dtype=int)
+    out = mc_finish_weeks(backlog_size=1, throughput_samples=samples, n_sims=200, seed=1)
+    assert out.shape == (200,)
+    assert np.all(out == 1)
+
+
+def test_mc_finish_weeks_single_value_samples():
+    samples = np.array([2], dtype=int)
+    out = mc_finish_weeks(backlog_size=11, throughput_samples=samples, n_sims=100, seed=1)
+    assert np.all(out == 6)
+
+
+def test_mc_finish_weeks_large_backlog_hits_cap():
+    samples = np.array([1], dtype=int)
+    out = mc_finish_weeks(backlog_size=10_000, throughput_samples=samples, n_sims=50, seed=1)
+    assert np.all(out == 521)
+
+
 def test_mc_finish_weeks_invalid_inputs():
     with pytest.raises(ValueError):
         mc_finish_weeks(backlog_size=0, throughput_samples=np.array([1, 2], dtype=int))
@@ -44,6 +63,12 @@ def test_mc_items_done_for_weeks_shape_and_reproducible():
     assert a.shape == (3000,)
     assert np.array_equal(a, b)
     assert int(a.min()) >= 8
+
+
+def test_mc_items_done_for_weeks_single_sample_value():
+    samples = np.array([3], dtype=int)
+    out = mc_items_done_for_weeks(weeks=7, throughput_samples=samples, n_sims=25, seed=5)
+    assert np.all(out == 21)
 
 
 def test_mc_items_done_for_weeks_invalid_inputs():

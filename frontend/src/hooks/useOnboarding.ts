@@ -1,21 +1,52 @@
 import { useMemo, useState } from "react";
 import { checkPat, clearAdoPat, getAccessibleOrgs, getProjectsByOrg, getTeamsByProject, setAdoPat } from "../api";
+import type { AppStep, NamedEntity } from "../types";
 
-export function useOnboarding() {
+type OnboardingState = {
+  patInput: string;
+  step: AppStep;
+  loading: boolean;
+  err: string;
+  userName: string;
+  orgHint: string;
+  orgs: NamedEntity[];
+  selectedOrg: string;
+  projects: NamedEntity[];
+  selectedProject: string;
+  teams: NamedEntity[];
+  selectedTeam: string;
+  backLabel: string;
+};
+
+type OnboardingActions = {
+  setPatInput: (value: string) => void;
+  setSelectedOrg: (value: string) => void;
+  setSelectedProject: (value: string) => void;
+  setSelectedTeam: (value: string) => void;
+  submitPat: () => Promise<void>;
+  goToProjects: () => Promise<boolean>;
+  goToTeams: () => Promise<boolean>;
+  goToSimulation: () => boolean;
+  goBack: () => void;
+  disconnect: () => void;
+  setErr: (value: string) => void;
+};
+
+export function useOnboarding(): { state: OnboardingState; actions: OnboardingActions } {
   const [patInput, setPatInput] = useState("");
-  const [step, setStep] = useState("pat");
+  const [step, setStep] = useState<AppStep>("pat");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [userName, setUserName] = useState("Utilisateur");
   const [orgHint, setOrgHint] = useState("");
-  const [orgs, setOrgs] = useState([]);
+  const [orgs, setOrgs] = useState<NamedEntity[]>([]);
   const [selectedOrg, setSelectedOrg] = useState("");
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<NamedEntity[]>([]);
   const [selectedProject, setSelectedProject] = useState("");
-  const [teams, setTeams] = useState([]);
+  const [teams, setTeams] = useState<NamedEntity[]>([]);
   const [selectedTeam, setSelectedTeam] = useState("");
 
-  async function submitPat() {
+  async function submitPat(): Promise<void> {
     const clean = patInput.trim();
     if (!clean) {
       setErr("PAT requis pour continuer.");
@@ -38,8 +69,8 @@ export function useOnboarding() {
         setOrgHint("PAT non global: indiquez manuellement votre organisation.");
       }
       setStep("org");
-    } catch (e) {
-      const msg = e.message || String(e);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes("Aucune organisation Azure DevOps accessible")) {
         setOrgs([]);
         setSelectedOrg("");
@@ -55,7 +86,7 @@ export function useOnboarding() {
     }
   }
 
-  async function goToProjects() {
+  async function goToProjects(): Promise<boolean> {
     const org = selectedOrg.trim();
     if (!org) {
       setErr("Selectionnez une organisation.");
@@ -70,15 +101,15 @@ export function useOnboarding() {
       setSelectedProject(list.length > 0 ? (list[0].name || "") : "");
       setStep("projects");
       return true;
-    } catch (e) {
-      setErr(e.message || String(e));
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : String(e));
       return false;
     } finally {
       setLoading(false);
     }
   }
 
-  async function goToTeams() {
+  async function goToTeams(): Promise<boolean> {
     const org = selectedOrg.trim();
     const project = selectedProject.trim();
     if (!org || !project) {
@@ -95,15 +126,15 @@ export function useOnboarding() {
       setSelectedTeam(list.length > 0 ? (list[0].name || "") : "");
       setStep("teams");
       return true;
-    } catch (e) {
-      setErr(e.message || String(e));
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : String(e));
       return false;
     } finally {
       setLoading(false);
     }
   }
 
-  function goToSimulation() {
+  function goToSimulation(): boolean {
     if (!selectedTeam) {
       setErr("Selectionnez une equipe.");
       return false;
@@ -113,14 +144,14 @@ export function useOnboarding() {
     return true;
   }
 
-  function goBack() {
+  function goBack(): void {
     if (step === "org") setStep("pat");
     else if (step === "projects") setStep("org");
     else if (step === "teams") setStep("projects");
     else if (step === "simulation") setStep("teams");
   }
 
-  function disconnect() {
+  function disconnect(): void {
     clearAdoPat();
     setPatInput("");
     setErr("");
@@ -136,7 +167,7 @@ export function useOnboarding() {
     setLoading(false);
   }
 
-  const backLabel = useMemo(() => {
+  const backLabel = useMemo((): string => {
     if (step === "org") return "Changer PAT";
     if (step === "projects") return "Changer ORG";
     if (step === "teams") return "Changer projet";

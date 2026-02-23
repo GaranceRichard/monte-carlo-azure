@@ -1,3 +1,12 @@
+type AppHeaderProps = {
+  theme: "light" | "dark";
+  toggleTheme: () => void;
+  showDisconnect?: boolean;
+  onDisconnect: () => void;
+  backLabel?: string;
+  onBack?: (() => void) | null;
+};
+
 export default function AppHeader({
   theme,
   toggleTheme,
@@ -5,7 +14,7 @@ export default function AppHeader({
   onDisconnect,
   backLabel = "",
   onBack = null,
-}) {
+}: AppHeaderProps) {
   return (
     <div
       style={{

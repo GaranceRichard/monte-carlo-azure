@@ -1,3 +1,15 @@
+import type { NamedEntity } from "../../types";
+
+type ProjectStepProps = {
+  err: string;
+  selectedOrg: string;
+  projects: NamedEntity[];
+  selectedProject: string;
+  setSelectedProject: (value: string) => void;
+  loading: boolean;
+  onContinue: () => void | Promise<boolean>;
+};
+
 export default function ProjectStep({
   err,
   selectedOrg,
@@ -6,12 +18,12 @@ export default function ProjectStep({
   setSelectedProject,
   loading,
   onContinue,
-}) {
+}: ProjectStepProps) {
   return (
     <>
       <h2 style={{ marginTop: 0 }}>Choix du projet</h2>
       <p style={{ color: "var(--muted)" }}>
-        Organisation sélectionnée: <b>{selectedOrg}</b>
+        Organisation selectionnee: <b>{selectedOrg}</b>
       </p>
       {err && (
         <div style={{ background: "var(--dangerBg)", border: "1px solid var(--dangerBorder)", padding: 12, borderRadius: 10, marginTop: 14 }}>
@@ -28,7 +40,7 @@ export default function ProjectStep({
         ))}
       </select>
       <button
-        onClick={onContinue}
+        onClick={() => void onContinue()}
         disabled={loading || !selectedProject}
         style={{ width: "100%", marginTop: 16, padding: 12, borderRadius: 12, border: "1px solid var(--border)", background: loading ? "var(--softBorder)" : "var(--btnBg)", color: loading ? "var(--text)" : "var(--btnText)", cursor: loading || !selectedProject ? "not-allowed" : "pointer", fontWeight: 700 }}
       >

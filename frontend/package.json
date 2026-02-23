@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "typecheck": "tsc -b",
     "lint": "eslint .",
     "preview": "vite preview",
     "test:unit": "vitest run",
@@ -36,6 +37,7 @@
     "istanbul-lib-coverage": "^3.2.2",
     "jsdom": "^27.0.1",
     "v8-to-istanbul": "^9.3.0",
+    "typescript": "^5.8.3",
     "vitest": "^4.0.7",
     "vite": "^7.2.4"
   }

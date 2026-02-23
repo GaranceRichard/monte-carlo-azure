@@ -1,3 +1,16 @@
+import type { NamedEntity } from "../../types";
+
+type OrgStepProps = {
+  err: string;
+  userName: string;
+  orgs: NamedEntity[];
+  orgHint: string;
+  selectedOrg: string;
+  setSelectedOrg: (value: string) => void;
+  loading: boolean;
+  onContinue: () => void | Promise<boolean>;
+};
+
 export default function OrgStep({
   err,
   userName,
@@ -7,7 +20,7 @@ export default function OrgStep({
   setSelectedOrg,
   loading,
   onContinue,
-}) {
+}: OrgStepProps) {
   return (
     <>
       <h2 style={{ marginTop: 0 }}>Bienvenue {userName}</h2>
@@ -46,7 +59,7 @@ export default function OrgStep({
         </>
       )}
       <button
-        onClick={onContinue}
+        onClick={() => void onContinue()}
         disabled={loading || !selectedOrg.trim()}
         style={{ width: "100%", marginTop: 16, padding: 12, borderRadius: 12, border: "1px solid var(--border)", background: loading ? "var(--softBorder)" : "var(--btnBg)", color: loading ? "var(--text)" : "var(--btnText)", cursor: loading || !selectedOrg.trim() ? "not-allowed" : "pointer", fontWeight: 700 }}
       >

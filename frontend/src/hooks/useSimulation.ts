@@ -1,48 +1,110 @@
 import { useEffect, useMemo, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { getTeamOptions, postForecast } from "../api";
+import type {
+  AppStep,
+  ForecastMode,
+  ForecastRequestPayload,
+  ForecastResponse,
+  WeeklyThroughputRow,
+} from "../types";
 
 const DEFAULT_WORK_ITEM_TYPE_OPTIONS = ["User Story", "Product Backlog Item", "Bug"];
 
-function formatDateLocal(date) {
+type ChartPoint = { x: number; count: number; gauss: number };
+type ProbabilityPoint = { x: number; probability: number };
+type ThroughputPoint = { week: string; throughput: number };
+
+type TooltipBaseProps = {
+  cursor: boolean;
+  contentStyle: Record<string, string | number>;
+  labelStyle: Record<string, string | number>;
+  itemStyle: Record<string, string | number>;
+};
+
+export type SimulationViewModel = {
+  loading: boolean;
+  err: string;
+  startDate: string;
+  setStartDate: (value: string) => void;
+  endDate: string;
+  setEndDate: (value: string) => void;
+  simulationMode: ForecastMode;
+  setSimulationMode: (value: ForecastMode) => void;
+  backlogSize: number | string;
+  setBacklogSize: (value: number | string) => void;
+  targetWeeks: number | string;
+  setTargetWeeks: (value: number | string) => void;
+  nSims: number | string;
+  setNSims: (value: number | string) => void;
+  workItemTypeOptions: string[];
+  types: string[];
+  setTypes: Dispatch<SetStateAction<string[]>>;
+  filteredDoneStateOptions: string[];
+  doneStates: string[];
+  setDoneStates: Dispatch<SetStateAction<string[]>>;
+  result: ForecastResponse | null;
+  activeChartTab: "throughput" | "distribution" | "probability";
+  setActiveChartTab: (value: "throughput" | "distribution" | "probability") => void;
+  throughputData: ThroughputPoint[];
+  mcHistData: ChartPoint[];
+  probabilityCurveData: ProbabilityPoint[];
+  tooltipBaseProps: TooltipBaseProps;
+  runForecast: () => Promise<void>;
+  resetForTeamSelection: () => void;
+  resetAll: () => void;
+};
+
+function formatDateLocal(date: Date): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
 
-function today() {
+function today(): string {
   return formatDateLocal(new Date());
 }
 
-function nWeeksAgo(weeks) {
+function nWeeksAgo(weeks: number): string {
   const date = new Date();
   date.setDate(date.getDate() - weeks * 7);
   return formatDateLocal(date);
 }
 
-function normalPdf(x, mean, std) {
+function normalPdf(x: number, mean: number, std: number): number {
   if (!std || std <= 0) return 0;
   const z = (x - mean) / std;
   return (1 / (std * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * z * z);
 }
 
-export function useSimulation({ step, selectedOrg, selectedProject, selectedTeam }) {
+export function useSimulation({
+  step,
+  selectedOrg,
+  selectedProject,
+  selectedTeam,
+}: {
+  step: AppStep;
+  selectedOrg: string;
+  selectedProject: string;
+  selectedTeam: string;
+}): SimulationViewModel {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [startDate, setStartDate] = useState(() => nWeeksAgo(52));
   const [endDate, setEndDate] = useState(() => today());
-  const [simulationMode, setSimulationMode] = useState("backlog_to_weeks");
-  const [backlogSize, setBacklogSize] = useState(120);
-  const [targetWeeks, setTargetWeeks] = useState(12);
-  const [nSims, setNSims] = useState(20000);
-  const [workItemTypeOptions, setWorkItemTypeOptions] = useState(DEFAULT_WORK_ITEM_TYPE_OPTIONS);
-  const [statesByType, setStatesByType] = useState({});
-  const [doneStates, setDoneStates] = useState([]);
-  const [types, setTypes] = useState([]);
-  const [result, setResult] = useState(null);
-  const [activeChartTab, setActiveChartTab] = useState("throughput");
+  const [simulationMode, setSimulationMode] = useState<ForecastMode>("backlog_to_weeks");
+  const [backlogSize, setBacklogSize] = useState<number | string>(120);
+  const [targetWeeks, setTargetWeeks] = useState<number | string>(12);
+  const [nSims, setNSims] = useState<number | string>(20000);
+  const [workItemTypeOptions, setWorkItemTypeOptions] = useState<string[]>(DEFAULT_WORK_ITEM_TYPE_OPTIONS);
+  const [statesByType, setStatesByType] = useState<Record<string, string[]>>({});
+  const [doneStates, setDoneStates] = useState<string[]>([]);
+  const [types, setTypes] = useState<string[]>([]);
+  const [result, setResult] = useState<ForecastResponse | null>(null);
+  const [activeChartTab, setActiveChartTab] = useState<"throughput" | "distribution" | "probability">("throughput");
 
-  const tooltipBaseProps = {
+  const tooltipBaseProps: TooltipBaseProps = {
     cursor: false,
     contentStyle: {
       background: "var(--panel)",
@@ -54,15 +116,15 @@ export function useSimulation({ step, selectedOrg, selectedProject, selectedTeam
     itemStyle: { color: "var(--text)", fontWeight: 700 },
   };
 
-  const throughputData = useMemo(() => {
+  const throughputData = useMemo((): ThroughputPoint[] => {
     if (!result?.weekly_throughput) return [];
-    return result.weekly_throughput.map((row) => ({
+    return result.weekly_throughput.map((row: WeeklyThroughputRow) => ({
       week: String(row.week).slice(0, 10),
       throughput: row.throughput,
     }));
   }, [result]);
 
-  const mcHistData = useMemo(() => {
+  const mcHistData = useMemo((): ChartPoint[] => {
     const buckets = result?.result_histogram;
     if (!buckets?.length) return [];
 
@@ -84,7 +146,7 @@ export function useSimulation({ step, selectedOrg, selectedProject, selectedTeam
     }));
   }, [result]);
 
-  const probabilityCurveData = useMemo(() => {
+  const probabilityCurveData = useMemo((): ProbabilityPoint[] => {
     const buckets = result?.result_histogram;
     if (!buckets?.length) return [];
 
@@ -103,9 +165,9 @@ export function useSimulation({ step, selectedOrg, selectedProject, selectedTeam
     });
   }, [result]);
 
-  const filteredDoneStateOptions = useMemo(() => {
+  const filteredDoneStateOptions = useMemo((): string[] => {
     if (!types.length) return [];
-    const out = new Set();
+    const out = new Set<string>();
     for (const type of types) {
       const states = statesByType?.[type] || [];
       for (const state of states) out.add(state);
@@ -148,13 +210,13 @@ export function useSimulation({ step, selectedOrg, selectedProject, selectedTeam
     };
   }, [step, selectedOrg, selectedProject, selectedTeam]);
 
-  function resetForTeamSelection() {
+  function resetForTeamSelection(): void {
     setErr("");
     setResult(null);
     setActiveChartTab("throughput");
   }
 
-  function resetAll() {
+  function resetAll(): void {
     setErr("");
     setLoading(false);
     setResult(null);
@@ -165,7 +227,7 @@ export function useSimulation({ step, selectedOrg, selectedProject, selectedTeam
     setTypes([]);
   }
 
-  async function runForecast() {
+  async function runForecast(): Promise<void> {
     if (!selectedTeam) {
       setErr("Selectionnez une equipe.");
       return;
@@ -175,7 +237,7 @@ export function useSimulation({ step, selectedOrg, selectedProject, selectedTeam
     setResult(null);
     setActiveChartTab("throughput");
     try {
-      const payload = {
+      const payload: ForecastRequestPayload = {
         org: selectedOrg,
         project: selectedProject,
         mode: simulationMode,
@@ -191,8 +253,8 @@ export function useSimulation({ step, selectedOrg, selectedProject, selectedTeam
       };
       const response = await postForecast(payload);
       setResult(response);
-    } catch (e) {
-      setErr(e.message || String(e));
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
     }

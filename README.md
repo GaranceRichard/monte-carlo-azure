@@ -32,10 +32,10 @@ backend/
   ...
 frontend/
   src/
-    App.jsx
+    App.tsx
     hooks/
-      useOnboarding.js
-      useSimulation.js
+      useOnboarding.ts
+      useSimulation.ts
 tests/
 run_app.py
 ```
@@ -151,6 +151,12 @@ Coverage frontend unit :
 
 ```bash
 npm --prefix frontend run test:unit:coverage
+```
+
+Type checking frontend (TypeScript) :
+
+```bash
+npm --prefix frontend run typecheck
 ```
 
 Coverage frontend E2E :

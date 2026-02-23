@@ -1,3 +1,15 @@
+import type { NamedEntity } from "../../types";
+
+type TeamStepProps = {
+  err: string;
+  selectedProject: string;
+  teams: NamedEntity[];
+  selectedTeam: string;
+  setSelectedTeam: (value: string) => void;
+  loading: boolean;
+  onContinue: () => void | Promise<void>;
+};
+
 export default function TeamStep({
   err,
   selectedProject,
@@ -6,12 +18,12 @@ export default function TeamStep({
   setSelectedTeam,
   loading,
   onContinue,
-}) {
+}: TeamStepProps) {
   return (
     <>
       <h2 style={{ marginTop: 0 }}>Choix de l&apos;équipe</h2>
       <p style={{ color: "var(--muted)" }}>
-        Projet sélectionné: <b>{selectedProject}</b>
+        Projet selectionne: <b>{selectedProject}</b>
       </p>
       {err && (
         <div style={{ background: "var(--dangerBg)", border: "1px solid var(--dangerBorder)", padding: 12, borderRadius: 10, marginTop: 14 }}>
@@ -28,7 +40,7 @@ export default function TeamStep({
         ))}
       </select>
       <button
-        onClick={onContinue}
+        onClick={() => void onContinue()}
         disabled={loading || !selectedTeam}
         style={{ width: "100%", marginTop: 16, padding: 12, borderRadius: 12, border: "1px solid var(--border)", background: loading ? "var(--softBorder)" : "var(--btnBg)", color: loading ? "var(--text)" : "var(--btnText)", cursor: loading || !selectedTeam ? "not-allowed" : "pointer", fontWeight: 700 }}
       >
