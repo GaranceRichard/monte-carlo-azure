@@ -57,11 +57,14 @@ test("coverage: flux complet front", async ({ page }) => {
   await page.getByRole("button", { name: "Lancer la simulation" }).click();
   await expect(page.getByText("Erreur simulation temporaire")).toBeVisible();
 
+  await page.getByLabel("Inclure les semaines a 0").check();
   await page.getByLabel("Bug").check();
   await page.locator("select").first().selectOption("weeks_to_items");
   await page.locator('input[type="number"]').first().fill("12");
   await page.getByRole("button", { name: "Lancer la simulation" }).click();
   await expect(page.getByText("38 items")).toBeVisible();
+  await expect(page.getByText(/Mode: inclues/i)).toBeVisible();
+  await page.getByLabel("Inclure les semaines a 0").uncheck();
   await page.getByRole("button", { name: "Distribution" }).click();
   await page.getByRole("button", { name: /Courbe/i }).click();
   await page.getByRole("button", { name: "Throughput" }).click();
@@ -97,6 +100,10 @@ test("coverage: flux complet front", async ({ page }) => {
   await page.getByLabel("Bug").check();
   await page.getByLabel("User Story").check();
   await page.getByLabel("User Story").uncheck();
+  await page.getByRole("button", { name: /Changer equipe/i }).click();
+  await page.locator("select").first().selectOption("Equipe Beta");
+  await page.getByRole("button", { name: /Choisir cette/i }).click();
+  await expect(page.getByText("Equipe: Equipe Beta")).toBeVisible();
   await page.getByRole("button", { name: "Lancer la simulation" }).click();
   await expect(page.getByText("10 semaines")).toBeVisible();
 
