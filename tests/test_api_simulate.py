@@ -1,5 +1,6 @@
-﻿from fastapi.testclient import TestClient
+from fastapi.testclient import TestClient
 
+from backend import api_routes_simulate
 from backend.api import app
 
 
@@ -102,3 +103,23 @@ def test_simulate_rejects_short_raw_samples_list():
     )
 
     assert r.status_code == 422
+
+
+def test_simulate_rate_limit_returns_429(monkeypatch):
+    monkeypatch.setattr(
+        api_routes_simulate,
+        "_rate_limiter",
+        api_routes_simulate.SlidingWindowRateLimiter(max_requests=1, window_seconds=60.0),
+    )
+    payload = {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 2000,
+    }
+
+    first = client.post("/simulate", json=payload)
+    second = client.post("/simulate", json=payload)
+
+    assert first.status_code == 200
+    assert second.status_code == 429

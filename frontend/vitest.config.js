@@ -13,6 +13,7 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "html"],
       reportsDirectory: "./coverage",
+      all: false,
       perFile: true,
       thresholds: {
         statements: 80,

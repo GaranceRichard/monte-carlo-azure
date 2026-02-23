@@ -1,6 +1,6 @@
 # Monte Carlo Azure
 
-Outil de prevision base sur une simulation Monte Carlo.
+Outil de prevision base sur une simulation Monte Carlo. Il répond au Use Case suivant : l'utilisateur se connecte et peut effectuer facilement une simulation sur un site avec peu d'informations, sans laisser de trâce ou compromettre Azure avec son Token.
 
 Architecture V2:
 - Le frontend appelle Azure DevOps directement depuis le navigateur.
@@ -28,6 +28,10 @@ Le PAT Azure DevOps:
 Le backend ne recoit que:
 - `throughput_samples` (liste d'entiers)
 - les parametres de simulation (`mode`, `backlog_size`/`target_weeks`, `n_sims`)
+
+Garde-fous serveur:
+- rate limiting sur `POST /simulate` (limite par client/IP sur fenetre glissante)
+- niveau de logs applicatifs reduit (`warning`) et logs d'acces HTTP desactives
 
 ---
 
@@ -89,6 +93,7 @@ UI: `http://localhost:5173`
 
 - `GET /health`
 - `POST /simulate`
+- CORS autorise: `GET`, `POST`, `OPTIONS`
 
 Swagger: `/docs`
 
@@ -124,6 +129,19 @@ ou
   "samples_count": 30
 }
 ```
+
+`result_distribution` contient des buckets `{ x, count }`:
+- `x`: valeur simulee (semaines ou items selon le mode)
+- `count`: frequence observee dans les simulations
+
+### Interpretation metier
+
+- mode `backlog_to_weeks`:
+  - question: "en combien de semaines terminer le backlog ?"
+  - lecture des probabilites: `P(X <= semaines)`
+- mode `weeks_to_items`:
+  - question: "combien d'items livrer en N semaines ?"
+  - en UI, la courbe de probabilite est affichee en `P(X >= items)` (probabilite d'atteindre au moins X items)
 
 ---
 

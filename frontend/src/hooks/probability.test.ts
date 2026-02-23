@@ -1,7 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { buildAtLeastPercentiles, buildProbabilityCurve } from "./useSimulation";
+import { buildAtLeastPercentiles, buildProbabilityCurve } from "./probability";
 
 describe("buildProbabilityCurve", () => {
+  it("returns empty array for empty points", () => {
+    expect(buildProbabilityCurve([], "weeks")).toEqual([]);
+    expect(buildProbabilityCurve([], "items")).toEqual([]);
+  });
+
+  it("returns empty array when total count is not positive", () => {
+    const points = [
+      { x: 10, count: 0 },
+      { x: 12, count: 0 },
+    ];
+    expect(buildProbabilityCurve(points, "weeks")).toEqual([]);
+    expect(buildProbabilityCurve(points, "items")).toEqual([]);
+  });
+
   it("returns increasing cumulative probabilities for weeks", () => {
     const points = [
       { x: 10, count: 2 },
@@ -36,6 +50,18 @@ describe("buildProbabilityCurve", () => {
 });
 
 describe("buildAtLeastPercentiles", () => {
+  it("returns empty object for empty points", () => {
+    expect(buildAtLeastPercentiles([], [50, 70, 90])).toEqual({});
+  });
+
+  it("returns empty object when total count is not positive", () => {
+    const points = [
+      { x: 49, count: 0 },
+      { x: 56, count: 0 },
+    ];
+    expect(buildAtLeastPercentiles(points, [50, 70, 90])).toEqual({});
+  });
+
   it("computes at-least percentiles from histogram buckets", () => {
     const points = [
       { x: 49, count: 2 },

@@ -21,6 +21,8 @@ export async function setupAppRoutes(page, options = {}) {
     projectsFirstError: false,
     teamsFirstError: false,
     teamOptionsFirstError: false,
+    teamFieldValuesFirstError: false,
+    wiqlFirstEmpty: false,
     simulateFirstError: false,
     ...options,
   };
@@ -31,6 +33,7 @@ export async function setupAppRoutes(page, options = {}) {
     projectsCalls: 0,
     teamsCalls: 0,
     teamOptionsCalls: 0,
+    teamFieldValuesCalls: 0,
     wiqlCalls: 0,
     workItemsCalls: 0,
     simulateCalls: 0,
@@ -154,6 +157,29 @@ export async function setupAppRoutes(page, options = {}) {
     });
   });
 
+  await page.route(/https:\/\/dev\.azure\.com\/.*\/_apis\/work\/teamsettings\/teamfieldvalues\?.*/, async (route) => {
+    counters.teamFieldValuesCalls += 1;
+    if (cfg.teamFieldValuesFirstError && counters.teamFieldValuesCalls === 1) {
+      await route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: JSON.stringify({ message: "Erreur temporaire teamfieldvalues" }),
+      });
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        values: [
+          { value: "Projet A\\Equipe Alpha", includeChildren: false },
+          { value: "Projet A\\Equipe Alpha\\Sous-zone", includeChildren: true },
+          { value: "   ", includeChildren: true },
+        ],
+      }),
+    });
+  });
+
   await page.route(/https:\/\/dev\.azure\.com\/.*\/_apis\/wit\/workitemtypes\/.*\/states\?.*/, async (route) => {
     const decoded = decodeURIComponent(route.request().url());
     const type = decoded.includes("User Story") ? "User Story" : "Bug";
@@ -163,6 +189,14 @@ export async function setupAppRoutes(page, options = {}) {
 
   await page.route(/https:\/\/dev\.azure\.com\/.*\/_apis\/wit\/wiql\?.*/, async (route) => {
     counters.wiqlCalls += 1;
+    if (cfg.wiqlFirstEmpty && counters.wiqlCalls === 1) {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ workItems: [] }),
+      });
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",

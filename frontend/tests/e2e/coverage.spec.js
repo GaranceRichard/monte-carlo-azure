@@ -10,6 +10,8 @@ test("coverage: flux complet front", async ({ page }) => {
     projectsFirstError: true,
     teamsFirstError: true,
     teamOptionsFirstError: true,
+    teamFieldValuesFirstError: true,
+    wiqlFirstEmpty: true,
     simulateFirstError: true,
   });
 
@@ -54,6 +56,8 @@ test("coverage: flux complet front", async ({ page }) => {
   await page.locator('input[type="date"]').first().fill(closedDates[closedDates.length - 1].slice(0, 10));
   await page.locator('input[type="date"]').nth(1).fill(closedDates[0].slice(0, 10));
 
+  await page.getByRole("button", { name: "Lancer la simulation" }).click();
+  await expect(page.getByText(/Historique insuffisant/i)).toBeVisible();
   await page.getByRole("button", { name: "Lancer la simulation" }).click();
   await expect(page.getByText("Erreur simulation temporaire")).toBeVisible();
 
@@ -108,6 +112,13 @@ test("coverage: flux complet front", async ({ page }) => {
   await expect(page.getByText("10 semaines")).toBeVisible();
 
   await page.locator("button[title*='Passer en mode']").click();
+  await page.evaluate(async () => {
+    const mod = await import("/src/hooks/probability.ts");
+    mod.buildProbabilityCurve([], "weeks");
+    mod.buildProbabilityCurve([{ x: 1, count: 0 }], "items");
+    mod.buildAtLeastPercentiles([], [50, 70, 90]);
+    mod.buildAtLeastPercentiles([{ x: 1, count: 0 }], [50, 70, 90]);
+  });
 
   const coverageEntries = await page.coverage.stopJSCoverage();
   const appEntries = coverageEntries.filter((e) => e?.url && e.url.includes("127.0.0.1:4173/src/"));

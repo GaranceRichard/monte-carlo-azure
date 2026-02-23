@@ -33,7 +33,7 @@ def main():
         webbrowser.open(url)
 
     # On passe l'objet app (pas une string), donc pas d'import dynamique
-    uvicorn.run(app, host=host, port=port, reload=False, log_level="info")
+    uvicorn.run(app, host=host, port=port, reload=False, log_level="warning", access_log=False)
 
 
 if __name__ == "__main__":

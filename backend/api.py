@@ -12,8 +12,8 @@ cfg = get_api_config()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cfg.cors_origins,
-    allow_credentials=False,
-    allow_methods=["POST"],
+    allow_credentials=cfg.cors_allow_credentials,
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type"],
 )
 
