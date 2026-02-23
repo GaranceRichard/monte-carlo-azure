@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { getTeamOptions, postForecast } from "../api";
+import { getTeamOptionsDirect, getWeeklyThroughputDirect } from "../adoClient";
+import { postSimulate } from "../api";
 import type {
   AppStep,
+  ForecastHistogramBucket,
   ForecastMode,
   ForecastRequestPayload,
   ForecastResponse,
@@ -84,11 +86,13 @@ export function useSimulation({
   selectedOrg,
   selectedProject,
   selectedTeam,
+  pat,
 }: {
   step: AppStep;
   selectedOrg: string;
   selectedProject: string;
   selectedTeam: string;
+  pat: string;
 }): SimulationViewModel {
   const [loading, setLoading] = useState(false);
   const [loadingStageMessage, setLoadingStageMessage] = useState("");
@@ -104,6 +108,7 @@ export function useSimulation({
   const [doneStates, setDoneStates] = useState<string[]>([]);
   const [types, setTypes] = useState<string[]>([]);
   const [result, setResult] = useState<ForecastResponse | null>(null);
+  const [weeklyThroughput, setWeeklyThroughput] = useState<WeeklyThroughputRow[]>([]);
   const [activeChartTab, setActiveChartTab] = useState<"throughput" | "distribution" | "probability">("throughput");
 
   const tooltipBaseProps: TooltipBaseProps = {
@@ -119,15 +124,14 @@ export function useSimulation({
   };
 
   const throughputData = useMemo((): ThroughputPoint[] => {
-    if (!result?.weekly_throughput) return [];
-    return result.weekly_throughput.map((row: WeeklyThroughputRow) => ({
+    return weeklyThroughput.map((row) => ({
       week: String(row.week).slice(0, 10),
       throughput: row.throughput,
     }));
-  }, [result]);
+  }, [weeklyThroughput]);
 
   const mcHistData = useMemo((): ChartPoint[] => {
-    const buckets = result?.result_distribution ?? result?.result_histogram;
+    const buckets = result?.result_distribution;
     if (!buckets?.length) return [];
 
     const points = buckets
@@ -149,7 +153,7 @@ export function useSimulation({
   }, [result]);
 
   const probabilityCurveData = useMemo((): ProbabilityPoint[] => {
-    const buckets = result?.result_distribution ?? result?.result_histogram;
+    const buckets = result?.result_distribution;
     if (!buckets?.length) return [];
 
     const points = buckets
@@ -182,12 +186,12 @@ export function useSimulation({
   }, [filteredDoneStateOptions]);
 
   useEffect(() => {
-    if (step !== "simulation" || !selectedOrg || !selectedProject || !selectedTeam) return;
+    if (step !== "simulation" || !selectedOrg || !selectedProject || !selectedTeam || !pat) return;
     let active = true;
 
     (async () => {
       try {
-        const options = await getTeamOptions(selectedOrg, selectedProject, selectedTeam);
+        const options = await getTeamOptionsDirect(selectedOrg, selectedProject, selectedTeam, pat);
         if (!active) return;
         const nextTypes = (
           options.workItemTypes?.length ? options.workItemTypes : DEFAULT_WORK_ITEM_TYPE_OPTIONS
@@ -210,11 +214,12 @@ export function useSimulation({
     return () => {
       active = false;
     };
-  }, [step, selectedOrg, selectedProject, selectedTeam]);
+  }, [step, selectedOrg, selectedProject, selectedTeam, pat]);
 
   function resetForTeamSelection(): void {
     setErr("");
     setResult(null);
+    setWeeklyThroughput([]);
     setActiveChartTab("throughput");
   }
 
@@ -223,6 +228,7 @@ export function useSimulation({
     setLoading(false);
     setLoadingStageMessage("");
     setResult(null);
+    setWeeklyThroughput([]);
     setActiveChartTab("throughput");
     setWorkItemTypeOptions(DEFAULT_WORK_ITEM_TYPE_OPTIONS);
     setStatesByType({});
@@ -235,31 +241,56 @@ export function useSimulation({
       setErr("Selectionnez une equipe.");
       return;
     }
+    if (!pat) {
+      setErr("PAT manquant. Reconnectez-vous.");
+      return;
+    }
+
     setErr("");
     setLoading(true);
     setLoadingStageMessage("Recuperation des donnees...");
     setResult(null);
+    setWeeklyThroughput([]);
     setActiveChartTab("throughput");
     const phaseTimer = window.setTimeout(() => {
       setLoadingStageMessage("Simulation en cours...");
     }, 1200);
+
     try {
+      const weekly = await getWeeklyThroughputDirect(
+        selectedOrg,
+        selectedProject,
+        selectedTeam,
+        pat,
+        startDate,
+        endDate,
+        doneStates,
+        types,
+      );
+
+      const throughputSamples = weekly.map((r) => r.throughput).filter((n) => n > 0);
+      if (throughputSamples.length < 6) {
+        throw new Error("Historique insuffisant (moins de 6 semaines non nulles).");
+      }
+
+      setWeeklyThroughput(weekly);
+
       const payload: ForecastRequestPayload = {
-        org: selectedOrg,
-        project: selectedProject,
+        throughput_samples: throughputSamples,
         mode: simulationMode,
-        team_name: selectedTeam,
-        area_path: null,
-        start_date: startDate,
-        end_date: endDate,
         backlog_size: simulationMode === "backlog_to_weeks" ? Number(backlogSize) : undefined,
         target_weeks: simulationMode === "weeks_to_items" ? Number(targetWeeks) : undefined,
-        done_states: doneStates,
-        work_item_types: types,
         n_sims: Number(nSims),
       };
-      const response = await postForecast(payload);
-      setResult(response);
+
+      const response = await postSimulate(payload);
+      const normalized: ForecastResponse = {
+        result_kind: response.result_kind,
+        samples_count: response.samples_count,
+        result_percentiles: response.result_percentiles,
+        result_distribution: (response.result_distribution ?? []) as ForecastHistogramBucket[],
+      };
+      setResult(normalized);
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : String(e));
     } finally {

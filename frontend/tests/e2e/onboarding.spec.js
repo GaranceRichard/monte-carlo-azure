@@ -1,0 +1,32 @@
+import { test, expect } from "@playwright/test";
+import { setupAppRoutes } from "./helpers/mocks";
+
+test("onboarding: validation PAT + navigation retour", async ({ page }) => {
+  await setupAppRoutes(page, {
+    profileFirstUnauthorized: true,
+    emptyAccountsBefore: 2,
+  });
+
+  await page.goto("/");
+
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page.getByText("PAT requis pour continuer.")).toBeVisible();
+
+  await page.locator('input[type="password"]').fill("bad-token");
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page.getByText(/PAT invalide/i)).toBeVisible();
+
+  await page.locator('input[type="password"]').fill("token-value-at-least-20-chars");
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page.getByText("Bienvenue Garance Richard")).toBeVisible();
+  await expect(page.getByText(/PAT non global/i)).toBeVisible();
+
+  await page.getByPlaceholder("Nom de l'organisation").fill("org-demo");
+  await page.getByRole("button", { name: "Choisir cette organisation" }).click();
+  await expect(page.getByRole("heading", { name: /Choix du projet/i })).toBeVisible();
+
+  await page.getByRole("button", { name: "Changer ORG" }).click();
+  await expect(page.getByText("Bienvenue Garance Richard")).toBeVisible();
+  await page.getByRole("button", { name: "Changer PAT" }).click();
+  await expect(page.getByText("Connexion Azure DevOps")).toBeVisible();
+});

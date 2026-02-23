@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
-import { checkPat, clearAdoPat, getAccessibleOrgs, getProjectsByOrg, getTeamsByProject, setAdoPat } from "../api";
+﻿import { useMemo, useState } from "react";
+import { checkPatDirect, listOrgsDirect, listProjectsDirect, listTeamsDirect } from "../adoClient";
 import type { AppStep, NamedEntity } from "../types";
 
 type OnboardingState = {
   patInput: string;
+  sessionPat: string;
   step: AppStep;
   loading: boolean;
   err: string;
@@ -34,6 +35,7 @@ type OnboardingActions = {
 
 export function useOnboarding(): { state: OnboardingState; actions: OnboardingActions } {
   const [patInput, setPatInput] = useState("");
+  const [sessionPat, setSessionPat] = useState("");
   const [step, setStep] = useState<AppStep>("pat");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
@@ -55,11 +57,12 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
 
     setErr("");
     setLoading(true);
-    setAdoPat(clean);
     try {
-      const check = await checkPat();
-      setUserName(check?.user_name || "Utilisateur");
-      const orgList = await getAccessibleOrgs();
+      const profile = await checkPatDirect(clean);
+      setUserName(profile?.displayName || "Utilisateur");
+      setSessionPat(clean);
+
+      const orgList = await listOrgsDirect(clean);
       setOrgs(orgList);
       if (orgList.length > 0) {
         setSelectedOrg(orgList[0].name || "");
@@ -71,14 +74,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
       setStep("org");
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      if (msg.includes("Aucune organisation Azure DevOps accessible")) {
-        setOrgs([]);
-        setSelectedOrg("");
-        setOrgHint("PAT non global: indiquez manuellement votre organisation.");
-        setStep("org");
-        return;
-      }
-      clearAdoPat();
+      setSessionPat("");
       setStep("pat");
       setErr(msg);
     } finally {
@@ -92,10 +88,16 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
       setErr("Selectionnez une organisation.");
       return false;
     }
+    if (!sessionPat) {
+      setErr("PAT manquant. Reconnectez-vous.");
+      setStep("pat");
+      return false;
+    }
+
     setErr("");
     setLoading(true);
     try {
-      const list = await getProjectsByOrg(org);
+      const list = await listProjectsDirect(org, sessionPat);
       setSelectedOrg(org);
       setProjects(list);
       setSelectedProject(list.length > 0 ? (list[0].name || "") : "");
@@ -116,10 +118,16 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
       setErr("Selectionnez un projet.");
       return false;
     }
+    if (!sessionPat) {
+      setErr("PAT manquant. Reconnectez-vous.");
+      setStep("pat");
+      return false;
+    }
+
     setErr("");
     setLoading(true);
     try {
-      const list = await getTeamsByProject(org, project);
+      const list = await listTeamsDirect(org, project, sessionPat);
       setSelectedOrg(org);
       setSelectedProject(project);
       setTeams(list);
@@ -152,7 +160,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   }
 
   function disconnect(): void {
-    clearAdoPat();
+    setSessionPat("");
     setPatInput("");
     setErr("");
     setUserName("Utilisateur");
@@ -178,6 +186,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   return {
     state: {
       patInput,
+      sessionPat,
       step,
       loading,
       err,

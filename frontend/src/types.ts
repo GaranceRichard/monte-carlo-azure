@@ -1,4 +1,4 @@
-export type AppStep = "pat" | "org" | "projects" | "teams" | "simulation";
+﻿export type AppStep = "pat" | "org" | "projects" | "teams" | "simulation";
 
 export type NamedEntity = {
   id?: string;
@@ -25,30 +25,16 @@ export type WeeklyThroughputRow = {
 };
 
 export type ForecastResponse = {
-  team: string;
-  area_path: string;
-  mode: ForecastMode;
   result_kind: ForecastKind;
   samples_count: number;
   result_percentiles: Record<string, number>;
-  result_distribution?: ForecastHistogramBucket[];
-  result_histogram: ForecastHistogramBucket[];
-  weekly_throughput: WeeklyThroughputRow[];
-  backlog_size?: number;
-  target_weeks?: number;
+  result_distribution: ForecastHistogramBucket[];
 };
 
 export type ForecastRequestPayload = {
-  org: string;
-  project: string;
+  throughput_samples: number[];
   mode: ForecastMode;
-  team_name: string;
-  area_path: string | null;
-  start_date: string;
-  end_date: string;
   backlog_size?: number;
   target_weeks?: number;
-  done_states: string[];
-  work_item_types: string[];
   n_sims: number;
 };

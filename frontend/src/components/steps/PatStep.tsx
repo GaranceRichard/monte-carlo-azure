@@ -1,4 +1,4 @@
-type PatStepProps = {
+﻿type PatStepProps = {
   err: string;
   patInput: string;
   setPatInput: (value: string) => void;
@@ -11,7 +11,7 @@ export default function PatStep({ err, patInput, setPatInput, loading, onSubmit 
     <>
       <h2 style={{ marginTop: 0 }}>Connexion Azure DevOps</h2>
       <p style={{ color: "var(--muted)" }}>
-        Entrez votre PAT pour cette session. Il est utilise uniquement en memoire et n&apos;est pas sauvegarde.
+        Votre PAT Azure DevOps est utilise uniquement dans votre navigateur pour interroger directement Microsoft. Il ne transite jamais par nos serveurs. Nous ne recevons que des chiffres anonymes (throughput hebdomadaire) pour calculer la simulation.
       </p>
       {err && (
         <div style={{ background: "var(--dangerBg)", border: "1px solid var(--dangerBorder)", padding: 12, borderRadius: 10, marginTop: 14 }}>

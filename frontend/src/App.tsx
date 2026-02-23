@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import AppHeader from "./components/AppHeader";
 import OrgStep from "./components/steps/OrgStep";
 import PatStep from "./components/steps/PatStep";
@@ -19,6 +19,7 @@ export default function App() {
     selectedOrg: onboardingState.selectedOrg,
     selectedProject: onboardingState.selectedProject,
     selectedTeam: onboardingState.selectedTeam,
+    pat: onboardingState.sessionPat,
   });
 
   const [theme, setTheme] = useState<ThemeMode>(() => {
