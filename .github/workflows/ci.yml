@@ -30,4 +30,4 @@ jobs:
           ADO_ORG: "messqc"
           ADO_PROJECT: "Projet-700"
         run: |
-          pytest -q
+          python -m pytest -q
