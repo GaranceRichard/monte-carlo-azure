@@ -1,20 +1,20 @@
 # Monte Carlo Azure
 
-Outil de prévision basé sur une simulation de Monte Carlo, alimenté par l'historique de throughput Azure DevOps (Work Items fermés).  
+Outil de prevision base sur une simulation de Monte Carlo, alimente par l'historique de throughput Azure DevOps (Work Items fermes).
 Le projet expose une API (FastAPI) et une UI (React/Vite).
 
 ---
 
-## Fonctionnalités
+## Fonctionnalites
 
 - Authentification Azure DevOps par PAT (header `x-ado-pat`)
-- Sélection organisation -> projet -> équipe depuis l'UI
+- Selection organisation -> projet -> equipe depuis l'UI
 - Extraction de throughput hebdomadaire
 - Simulation Monte Carlo
-- Résultats de simulation unifiés :
+- Resultats de simulation unifies :
   - `result_kind` (`weeks` ou `items`)
   - `result_percentiles`
-  - `result_distribution`
+  - `result_histogram` (distribution agregee en buckets)
 
 ---
 
@@ -23,10 +23,12 @@ Le projet expose une API (FastAPI) et une UI (React/Vite).
 ```text
 backend/
   api.py
+  api_config.py
   api_dependencies.py
   api_routes_auth.py
   api_routes_teams.py
   api_routes_forecast.py
+  mc_core.py
   ...
 frontend/
   src/
@@ -40,26 +42,34 @@ run_app.py
 
 ---
 
-## Prérequis
+## Prerequis
 
 - Python 3.10+
 - Node.js 18+
-- Accès Azure DevOps + PAT (minimum Work Items read)
+- Acces Azure DevOps + PAT (minimum Work Items read)
 
 ---
 
 ## Configuration PAT
 
-Au démarrage, l'application demande le PAT Azure DevOps.
+Au demarrage, l'application demande le PAT Azure DevOps.
 
-- Le PAT est utilisé en mémoire pendant la session.
-- Le PAT n'est pas sauvegardé sur disque.
-- Validation immédiate via `GET /auth/check`.
-- Fallback possible côté serveur via variable d'environnement `ADO_PAT`.
+- Le PAT est utilise en memoire pendant la session.
+- Le PAT n'est pas sauvegarde sur disque.
+- Validation immediate via `GET /auth/check`.
+- Fallback possible cote serveur via variable d'environnement `ADO_PAT`.
+
+### Configuration CORS
+
+Le backend lit les origines CORS depuis l'environnement :
+
+- `APP_CORS_ORIGINS` : liste CSV des origines autorisees  
+  Exemple : `APP_CORS_ORIGINS=https://mon-site.azurewebsites.net,https://staging.mondomaine.com`
+- `APP_CORS_ALLOW_CREDENTIALS` : `true` / `false` (defaut `true`)
 
 ---
 
-## Lancer en développement
+## Lancer en developpement
 
 ### Backend
 
@@ -115,6 +125,12 @@ Coverage backend :
 python -m pytest --cov=backend --cov-report=term-missing -q
 ```
 
+Coverage backend ciblee `mc_core` :
+
+```bash
+python -m pytest tests/test_mc_core.py --cov=backend.mc_core --cov-report=term-missing -q
+```
+
 Coverage frontend unit :
 
 ```bash
@@ -129,7 +145,7 @@ npm --prefix frontend run test:e2e:coverage:console
 
 Notes :
 - La task VS Code principale est `Coverage: 5 terminaux`.
-- Elle lance en parallèle :
+- Elle lance en parallele :
   - unit coverage front
   - coverage back
   - coverage E2E
@@ -148,10 +164,10 @@ Le bundling Vite utilise un split manuel (`vendor-react`, `vendor-recharts`) pou
 
 ---
 
-## Sécurité
+## Securite
 
-- Ne pas commiter de secrets (PAT, clés privées, tokens).
-- Utiliser le script de vérification avant commit :
+- Ne pas commiter de secrets (PAT, cles privees, tokens).
+- Utiliser le script de verification avant commit :
 
 ```bash
 python Scripts/check_no_secrets.py
