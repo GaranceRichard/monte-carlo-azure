@@ -10,8 +10,13 @@ class SimulateRequest(BaseModel):
     n_sims: int = Field(default=20000, ge=1000, le=200000)
 
 
+class DistributionBucket(BaseModel):
+    x: int
+    count: int
+
+
 class SimulateResponse(BaseModel):
     result_kind: Literal["weeks", "items"]
     result_percentiles: Dict[str, int]
-    result_distribution: list
+    result_distribution: List[DistributionBucket]
     samples_count: int

@@ -24,6 +24,10 @@ def test_simulate_backlog_to_weeks_success():
     assert set(body["result_percentiles"].keys()) == {"P50", "P70", "P90"}
     assert isinstance(body["result_distribution"], list)
     assert len(body["result_distribution"]) > 0
+    first_bucket = body["result_distribution"][0]
+    assert set(first_bucket.keys()) == {"x", "count"}
+    assert isinstance(first_bucket["x"], int)
+    assert isinstance(first_bucket["count"], int)
 
 
 def test_simulate_weeks_to_items_success():
