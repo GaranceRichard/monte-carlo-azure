@@ -44,6 +44,7 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
     loadingStageMessage,
     runForecast,
     result,
+    displayPercentiles,
     activeChartTab,
     setActiveChartTab,
     throughputData,
@@ -211,7 +212,7 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
                 <div key={k} className="sim-kpi-card">
                   <span className="sim-kpi-label">{k}</span>
                   <span className="sim-kpi-value">
-                    {result?.result_percentiles?.[k]} {result?.result_kind === "items" ? "items" : "semaines"}
+                    {displayPercentiles?.[k]} {result?.result_kind === "items" ? "items (au moins)" : "semaines (au plus)"}
                   </span>
                 </div>
               ))}
@@ -287,14 +288,24 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
 
               {activeChartTab === "probability" && (
                 <>
-                  <h4 className="sim-chart-title">Courbe de probabilite cumulee</h4>
+                  <h4 className="sim-chart-title">
+                    {result?.result_kind === "items"
+                      ? "Probabilite d'atteindre au moins X items"
+                      : "Probabilite de terminer en au plus X semaines"}
+                  </h4>
                   <div className="sim-chart-wrap">
                     <ResponsiveContainer>
                       <LineChart data={probabilityCurveData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="x" />
                         <YAxis domain={[0, 100]} />
-                        <Tooltip {...tooltipBaseProps} formatter={(v) => [`${Number(v).toFixed(1)}%`, "Probabilite cumulee"]} />
+                        <Tooltip
+                          {...tooltipBaseProps}
+                          formatter={(v) => [
+                            `${Number(v).toFixed(1)}%`,
+                            result?.result_kind === "items" ? "P(X >= valeur)" : "P(X <= valeur)",
+                          ]}
+                        />
                         <Line type="monotone" dataKey="probability" dot={false} strokeWidth={2} />
                       </LineChart>
                     </ResponsiveContainer>

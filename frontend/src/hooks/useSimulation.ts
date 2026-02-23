@@ -5,6 +5,7 @@ import { postSimulate } from "../api";
 import type {
   AppStep,
   ForecastHistogramBucket,
+  ForecastKind,
   ForecastMode,
   ForecastRequestPayload,
   ForecastResponse,
@@ -56,6 +57,7 @@ export type SimulationViewModel = {
   doneStates: string[];
   setDoneStates: Dispatch<SetStateAction<string[]>>;
   result: ForecastResponse | null;
+  displayPercentiles: Record<string, number>;
   activeChartTab: "throughput" | "distribution" | "probability";
   setActiveChartTab: (value: "throughput" | "distribution" | "probability") => void;
   throughputData: ThroughputPoint[];
@@ -100,6 +102,56 @@ function smoothHistogramCounts(points: Array<{ x: number; count: number }>): num
     }
     return weightTotal > 0 ? weightedSum / weightTotal : points[i].count;
   });
+}
+
+export function buildProbabilityCurve(
+  points: Array<{ x: number; count: number }>,
+  resultKind: ForecastKind,
+): ProbabilityPoint[] {
+  if (!points.length) return [];
+  const n = points.reduce((acc, p) => acc + p.count, 0);
+  if (n <= 0) return [];
+
+  if (resultKind === "items") {
+    let remaining = n;
+    return points.map((p) => {
+      const probability = (remaining / n) * 100;
+      remaining -= p.count;
+      return { x: p.x, probability };
+    });
+  }
+
+  let cumulative = 0;
+  return points.map((p) => {
+    cumulative += p.count;
+    return { x: p.x, probability: (cumulative / n) * 100 };
+  });
+}
+
+export function buildAtLeastPercentiles(
+  points: Array<{ x: number; count: number }>,
+  levels: number[] = [50, 70, 90],
+): Record<string, number> {
+  if (!points.length) return {};
+  const total = points.reduce((acc, p) => acc + p.count, 0);
+  if (total <= 0) return {};
+
+  const descending = [...points].sort((a, b) => b.x - a.x);
+  const out: Record<string, number> = {};
+
+  for (const level of levels) {
+    const target = (total * level) / 100;
+    let cumulative = 0;
+    let chosen = descending[descending.length - 1].x;
+    for (const p of descending) {
+      cumulative += p.count;
+      chosen = p.x;
+      if (cumulative >= target) break;
+    }
+    out[`P${level}`] = chosen;
+  }
+
+  return out;
 }
 
 export function useSimulation({
@@ -174,22 +226,28 @@ export function useSimulation({
   }, [result]);
 
   const probabilityCurveData = useMemo((): ProbabilityPoint[] => {
-    const buckets = result?.result_distribution;
-    if (!buckets?.length) return [];
+    if (!result?.result_distribution?.length) return [];
 
-    const points = buckets
+    const points = result.result_distribution
       .map((b) => ({ x: Number(b.x), count: Number(b.count) }))
       .filter((b) => Number.isFinite(b.x) && Number.isFinite(b.count) && b.count > 0)
       .sort((a, b) => a.x - b.x);
     if (!points.length) return [];
 
-    const n = points.reduce((acc, p) => acc + p.count, 0);
-    let cumulative = 0;
+    return buildProbabilityCurve(points, result.result_kind);
+  }, [result]);
 
-    return points.map((p) => {
-      cumulative += p.count;
-      return { x: p.x, probability: (cumulative / n) * 100 };
-    });
+  const displayPercentiles = useMemo((): Record<string, number> => {
+    if (!result) return {};
+    if (result.result_kind !== "items") return result.result_percentiles;
+
+    const points = result.result_distribution
+      .map((b) => ({ x: Number(b.x), count: Number(b.count) }))
+      .filter((b) => Number.isFinite(b.x) && Number.isFinite(b.count) && b.count > 0)
+      .sort((a, b) => a.x - b.x);
+    if (!points.length) return result.result_percentiles;
+
+    return buildAtLeastPercentiles(points, [50, 70, 90]);
   }, [result]);
 
   const filteredDoneStateOptions = useMemo((): string[] => {
@@ -362,6 +420,7 @@ export function useSimulation({
     doneStates,
     setDoneStates,
     result,
+    displayPercentiles,
     activeChartTab,
     setActiveChartTab,
     throughputData,
