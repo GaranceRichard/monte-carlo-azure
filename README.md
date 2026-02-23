@@ -1,17 +1,20 @@
-﻿# Monte Carlo Azure
+# Monte Carlo Azure
 
-Outil de prÃ©vision (forecast) basÃ© sur une simulation de Monte Carlo, alimentÃ© par lâ€™historique de throughput Azure DevOps (Work Items fermÃ©s).  
-Le projet expose une API (FastAPI) et une UI (React/Vite). En mode bundle, lâ€™API sert directement le front compilÃ©.
+Outil de prevision base sur une simulation de Monte Carlo, alimente par l'historique de throughput Azure DevOps (Work Items fermes).
+Le projet expose une API (FastAPI) et une UI (React/Vite).
 
 ---
 
-## FonctionnalitÃ©s
+## Fonctionnalites
 
-- Liste des Ã©quipes ADO et lecture dâ€™une configuration par Ã©quipe
-- Extraction dâ€™historique (Work Items fermÃ©s) et calcul du throughput hebdomadaire
-- Simulation Monte Carlo (N itÃ©rations) pour estimer une distribution de dates/semaines de complÃ©tion
-- API REST + UI web
-- Tests automatisÃ©s (pytest + mocks)
+- Authentification Azure DevOps par PAT (header `x-ado-pat`)
+- Selection organisation -> projet -> equipe depuis l'UI
+- Extraction de throughput hebdomadaire
+- Simulation Monte Carlo
+- Resultats de simulation unifies:
+  - `result_kind` (`weeks` ou `items`)
+  - `result_percentiles`
+  - `result_distribution`
 
 ---
 
@@ -19,153 +22,137 @@ Le projet expose une API (FastAPI) et une UI (React/Vite). En mode bundle, lâ�
 
 ```text
 backend/
-  api.py            # FastAPI (endpoints + static frontend in bundle)
-  ado_client.py     # client ADO
-  ado_core.py       # requÃªtes ADO / rÃ©cupÃ©ration des items
-  ado_config.py     # config (env + settings)
-  mc_core.py        # calcul throughput + Monte Carlo
-frontend/           # UI React/Vite
-Scripts/            # scripts utilitaires (smoke, list teams, etc.)
-tests/              # tests pytest
-run_app.py          # lance lâ€™API (dev)
+  api.py
+  api_dependencies.py
+  api_routes_auth.py
+  api_routes_teams.py
+  api_routes_forecast.py
+  ...
+frontend/
+  src/
+    App.jsx
+    hooks/
+      useOnboarding.js
+      useSimulation.js
+tests/
+run_app.py
 ```
 
 ---
 
-## PrÃ©requis
+## Prerequis
 
-- Python 3.10+ (recommandÃ©)
-- Node.js 18+ (pour le front)
-- AccÃ¨s Azure DevOps + PAT (Personal Access Token) avec droits minimum (Work Items read)
-
----
-
-## Configuration
-
-### Authentification PAT
-
-Au dÃ©marrage, lâ€™application affiche un Ã©cran de connexion et demande le PAT Azure DevOps.
-
-- Le PAT est utilisÃ© en mÃ©moire pendant la session en cours.
-- Le PAT nâ€™est pas sauvegardÃ© sur disque.
-- Validation immÃ©diate via `GET /auth/check`.
-
-Variable dâ€™environnement optionnelle :
-- `ADO_PAT` (fallback si pas de PAT fourni par header)
-
-Lâ€™organisation et le projet sont dÃ©sormais sÃ©lectionnÃ©s dans lâ€™interface
-et transmis Ã  lâ€™API, sans dÃ©pendre de `ADO_ORG` / `ADO_PROJECT`.
+- Python 3.10+
+- Node.js 18+
+- Acces Azure DevOps + PAT (minimum Work Items read)
 
 ---
 
-## Lancer en dÃ©veloppement
+## Configuration PAT
 
-### Backend (API)
+Au demarrage, l'application demande le PAT Azure DevOps.
 
-1) CrÃ©er un environnement virtuel + installer les dÃ©pendances :
+- Le PAT est utilise en memoire pendant la session.
+- Le PAT n'est pas sauvegarde sur disque.
+- Validation immediate via `GET /auth/check`.
+- Fallback possible cote serveur via variable d'environnement `ADO_PAT`.
+
+---
+
+## Lancer en developpement
+
+### Backend
+
 ```bash
 python -m venv .venv
-# Windows PowerShell
+# PowerShell
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-```
-
-2) Lancer lâ€™API :
-```bash
 python run_app.py
 ```
 
-API dispo (par dÃ©faut) : `http://127.0.0.1:8000`
+API: `http://127.0.0.1:8000`
 
-### Frontend (UI)
+### Frontend
 
-Dans `frontend/` :
 ```bash
+cd frontend
 npm install
 npm run dev
 ```
 
-UI dispo : `http://localhost:5173`
+UI: `http://localhost:5173`
 
 ---
 
 ## Endpoints principaux
 
-- `GET /health` : check de santÃ©
-- `GET /auth/check` : valide le PAT (header `x-ado-pat`)
-- `GET /auth/orgs` : liste les organisations accessibles
-- `POST /auth/projects` : projets accessibles dâ€™une organisation
-- `POST /auth/teams` : Ã©quipes accessibles dâ€™un projet
-- `POST /auth/team-options` : types/Ã©tats disponibles pour une Ã©quipe
-- `GET /teams` : liste des Ã©quipes (mode historique)
-- `GET /teams/{team}/settings` : settings dâ€™Ã©quipe (si applicable)
-- `POST /forecast` : calcul de simulation
+- `GET /health`
+- `GET /auth/check`
+- `GET /auth/orgs`
+- `POST /auth/projects`
+- `POST /auth/teams`
+- `POST /auth/team-options`
+- `GET /teams`
+- `GET /teams/{team}/settings`
+- `POST /forecast`
 
-Les paramÃ¨tres exacts sont visibles dans Swagger : `/docs`.
+Swagger: `/docs`
 
 ---
 
-## Tests
+## Tests et coverage
 
-Ã€ la racine :
+Depuis la racine:
+
 ```bash
 pytest
 ```
 
-### Coverage back (console)
+Coverage backend:
 
 ```bash
 python -m pytest --cov=backend --cov-report=term-missing -q
 ```
 
-### Coverage front unit (console + html)
+Coverage frontend unit:
 
-Dans `frontend/` :
 ```bash
-npm install
-npm run test:unit:coverage
+npm --prefix frontend run test:unit:coverage
 ```
 
-Le resume de couverture est affiche dans le terminal.
-Le rapport HTML est genere dans `frontend/coverage/`.
-
-### Coverage E2E (front only, console)
+Coverage frontend E2E:
 
 ```bash
 npm --prefix frontend run test:e2e:coverage:console
 ```
 
-Note: la task VS Code `Coverage E2E (Playwright)` utilise un script PowerShell dedie
-(`.vscode/scripts/run-e2e-coverage.ps1`) pour eviter les problemes de quoting Windows
-sur les chemins contenant des espaces.
+Notes:
+- La task VS Code principale est `Coverage: 5 terminaux`.
+- Elle lance en parallele:
+  - unit coverage front
+  - coverage back
+  - coverage E2E
+  - lint front
+  - build front
 
 ---
 
-## Packaging (PyInstaller)
+## Build frontend
 
-Le projet inclut un spec PyInstaller : `MonteCarloADO.spec`.  
-Objectif : produire un exÃ©cutable qui embarque lâ€™API et sert le `frontend/dist`.
-
-1) Build du frontend :
 ```bash
-cd frontend
-npm install
-npm run build
-cd ..
+npm --prefix frontend run build
 ```
 
-2) Build PyInstaller :
-```bash
-pyinstaller MonteCarloADO.spec
-```
-
-Lâ€™exÃ©cutable se retrouve dans `dist/`.
+Le bundling Vite utilise un split manuel (`vendor-react`, `vendor-recharts`) pour limiter la taille du chunk principal.
 
 ---
 
-## SÃ©curitÃ©
+## Securite
 
-- Ne pas commiter de secrets (PAT, clÃ©s privÃ©es).
-- Script de vÃ©rification avant commit : `Scripts/check_no_secrets.py`.
+- Ne pas commiter de secrets (PAT, cles privees, tokens).
+- Utiliser le script de verification avant commit:
 
-
+```bash
+python Scripts/check_no_secrets.py
+```
