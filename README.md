@@ -14,7 +14,12 @@ Le projet expose une API (FastAPI) et une UI (React/Vite).
 - Resultats de simulation unifies :
   - `result_kind` (`weeks` ou `items`)
   - `result_percentiles`
-  - `result_histogram` (distribution agregee en buckets)
+  - `result_distribution` (distribution agregee en buckets, champ recommande)
+  - `result_histogram` (alias legacy conserve pour compatibilite)
+  - Retour `POST /forecast` type via Pydantic (`response_model=ForecastResponse`)
+- Feedback de progression UI pendant le calcul forecast :
+  - `Recuperation des donnees...`
+  - `Simulation en cours...`
 
 ---
 
@@ -118,6 +123,30 @@ UI : `http://localhost:5173`
 - `POST /forecast`
 
 Swagger : `/docs`
+
+### Contrat `POST /forecast`
+
+La requete est documentee dans OpenAPI via `ForecastRequest` (descriptions, exemples et contraintes).
+
+Principaux champs de requete :
+- `org`, `project`, `team_name`
+- `start_date`, `end_date` (format `YYYY-MM-DD`)
+- `mode` : `backlog_to_weeks` | `weeks_to_items`
+- `backlog_size` (requis si `mode=backlog_to_weeks`)
+- `target_weeks` (requis si `mode=weeks_to_items`)
+- `done_states`, `work_item_types`, `n_sims`, `area_path`
+
+La reponse est documentee via `ForecastResponse`.
+
+Principaux champs de reponse :
+- `result_kind` : `weeks` | `items`
+- `result_percentiles` : P50 / P70 / P90
+- `result_distribution` : buckets `{ x, count }`
+- `result_histogram` : alias legacy de `result_distribution`
+
+Semantique de `result_distribution` selon `result_kind` :
+- si `result_kind=weeks`, `x` represente des semaines
+- si `result_kind=items`, `x` represente des items
 
 ---
 

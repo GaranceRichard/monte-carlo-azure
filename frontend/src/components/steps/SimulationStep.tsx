@@ -38,6 +38,7 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
     doneStates,
     setDoneStates,
     loading,
+    loadingStageMessage,
     runForecast,
     result,
     activeChartTab,
@@ -178,6 +179,7 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
           >
             {loading ? "Calcul..." : "Lancer la simulation"}
           </button>
+          {loading && <div className="sim-loading-stage">{loadingStageMessage}</div>}
 
           {result && (
             <div className="sim-kpis">

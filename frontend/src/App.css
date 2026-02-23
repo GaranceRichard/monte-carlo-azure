@@ -93,6 +93,13 @@
   cursor: not-allowed;
 }
 
+.sim-loading-stage {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .sim-kpis {
   margin-top: 16px;
   display: grid;

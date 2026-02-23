@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict
 from fastapi import APIRouter, Header, HTTPException
 import numpy as np
 
-from .api_models import ForecastRequest
+from .api_models import ForecastRequest, ForecastResponse
 
 
 def build_forecast_router(
@@ -74,7 +74,7 @@ def build_forecast_router(
         area_path: str,
         samples: np.ndarray,
         weekly_records: list[Dict[str, Any]],
-    ) -> Dict[str, Any]:
+    ) -> ForecastResponse:
         result_percentiles: Dict[str, int]
         result_histogram: list[Dict[str, int]]
         result_kind: str
@@ -115,6 +115,7 @@ def build_forecast_router(
             "result_kind": result_kind,
             "samples_count": int(len(samples)),
             "result_percentiles": result_percentiles,
+            "result_distribution": result_histogram,
             "result_histogram": result_histogram,
             "weekly_throughput": weekly_records,
         }
@@ -124,9 +125,9 @@ def build_forecast_router(
         else:
             body["target_weeks"] = req.target_weeks
 
-        return body
+        return ForecastResponse.model_validate(body)
 
-    def _compute_forecast(req: ForecastRequest, pat: str) -> Dict[str, Any]:
+    def _compute_forecast(req: ForecastRequest, pat: str) -> ForecastResponse:
         org_clean = (req.org or "").strip()
         project_clean = (req.project or "").strip()
         if not org_clean:
@@ -138,8 +139,8 @@ def build_forecast_router(
         samples, weekly_records = _get_samples(req, area_path, pat)
         return _build_response(req, area_path, samples, weekly_records)
 
-    @router.post("/forecast")
-    async def forecast(req: ForecastRequest, x_ado_pat: str | None = Header(default=None)) -> Dict[str, Any]:
+    @router.post("/forecast", response_model=ForecastResponse)
+    async def forecast(req: ForecastRequest, x_ado_pat: str | None = Header(default=None)) -> ForecastResponse:
         pat = require_pat(x_ado_pat)
         timeout_seconds = (
             float(request_timeout_seconds()) if callable(request_timeout_seconds) else float(request_timeout_seconds)

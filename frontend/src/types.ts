@@ -31,6 +31,7 @@ export type ForecastResponse = {
   result_kind: ForecastKind;
   samples_count: number;
   result_percentiles: Record<string, number>;
+  result_distribution?: ForecastHistogramBucket[];
   result_histogram: ForecastHistogramBucket[];
   weekly_throughput: WeeklyThroughputRow[];
   backlog_size?: number;

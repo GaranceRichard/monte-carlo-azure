@@ -24,6 +24,7 @@ type TooltipBaseProps = {
 
 export type SimulationViewModel = {
   loading: boolean;
+  loadingStageMessage: string;
   err: string;
   startDate: string;
   setStartDate: (value: string) => void;
@@ -90,6 +91,7 @@ export function useSimulation({
   selectedTeam: string;
 }): SimulationViewModel {
   const [loading, setLoading] = useState(false);
+  const [loadingStageMessage, setLoadingStageMessage] = useState("");
   const [err, setErr] = useState("");
   const [startDate, setStartDate] = useState(() => nWeeksAgo(52));
   const [endDate, setEndDate] = useState(() => today());
@@ -125,7 +127,7 @@ export function useSimulation({
   }, [result]);
 
   const mcHistData = useMemo((): ChartPoint[] => {
-    const buckets = result?.result_histogram;
+    const buckets = result?.result_distribution ?? result?.result_histogram;
     if (!buckets?.length) return [];
 
     const points = buckets
@@ -147,7 +149,7 @@ export function useSimulation({
   }, [result]);
 
   const probabilityCurveData = useMemo((): ProbabilityPoint[] => {
-    const buckets = result?.result_histogram;
+    const buckets = result?.result_distribution ?? result?.result_histogram;
     if (!buckets?.length) return [];
 
     const points = buckets
@@ -219,6 +221,7 @@ export function useSimulation({
   function resetAll(): void {
     setErr("");
     setLoading(false);
+    setLoadingStageMessage("");
     setResult(null);
     setActiveChartTab("throughput");
     setWorkItemTypeOptions(DEFAULT_WORK_ITEM_TYPE_OPTIONS);
@@ -234,8 +237,12 @@ export function useSimulation({
     }
     setErr("");
     setLoading(true);
+    setLoadingStageMessage("Recuperation des donnees...");
     setResult(null);
     setActiveChartTab("throughput");
+    const phaseTimer = window.setTimeout(() => {
+      setLoadingStageMessage("Simulation en cours...");
+    }, 1200);
     try {
       const payload: ForecastRequestPayload = {
         org: selectedOrg,
@@ -256,12 +263,15 @@ export function useSimulation({
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : String(e));
     } finally {
+      window.clearTimeout(phaseTimer);
       setLoading(false);
+      setLoadingStageMessage("");
     }
   }
 
   return {
     loading,
+    loadingStageMessage,
     err,
     startDate,
     setStartDate,
