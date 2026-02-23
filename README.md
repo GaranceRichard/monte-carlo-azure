@@ -1,17 +1,17 @@
 # Monte Carlo Azure
 
-Outil de prevision base sur une simulation de Monte Carlo, alimente par l'historique de throughput Azure DevOps (Work Items fermes).
+Outil de prévision basé sur une simulation de Monte Carlo, alimenté par l'historique de throughput Azure DevOps (Work Items fermés).  
 Le projet expose une API (FastAPI) et une UI (React/Vite).
 
 ---
 
-## Fonctionnalites
+## Fonctionnalités
 
 - Authentification Azure DevOps par PAT (header `x-ado-pat`)
-- Selection organisation -> projet -> equipe depuis l'UI
+- Sélection organisation -> projet -> équipe depuis l'UI
 - Extraction de throughput hebdomadaire
 - Simulation Monte Carlo
-- Resultats de simulation unifies:
+- Résultats de simulation unifiés :
   - `result_kind` (`weeks` ou `items`)
   - `result_percentiles`
   - `result_distribution`
@@ -40,26 +40,26 @@ run_app.py
 
 ---
 
-## Prerequis
+## Prérequis
 
 - Python 3.10+
 - Node.js 18+
-- Acces Azure DevOps + PAT (minimum Work Items read)
+- Accès Azure DevOps + PAT (minimum Work Items read)
 
 ---
 
 ## Configuration PAT
 
-Au demarrage, l'application demande le PAT Azure DevOps.
+Au démarrage, l'application demande le PAT Azure DevOps.
 
-- Le PAT est utilise en memoire pendant la session.
-- Le PAT n'est pas sauvegarde sur disque.
-- Validation immediate via `GET /auth/check`.
-- Fallback possible cote serveur via variable d'environnement `ADO_PAT`.
+- Le PAT est utilisé en mémoire pendant la session.
+- Le PAT n'est pas sauvegardé sur disque.
+- Validation immédiate via `GET /auth/check`.
+- Fallback possible côté serveur via variable d'environnement `ADO_PAT`.
 
 ---
 
-## Lancer en developpement
+## Lancer en développement
 
 ### Backend
 
@@ -71,7 +71,7 @@ pip install -r requirements.txt
 python run_app.py
 ```
 
-API: `http://127.0.0.1:8000`
+API : `http://127.0.0.1:8000`
 
 ### Frontend
 
@@ -81,7 +81,7 @@ npm install
 npm run dev
 ```
 
-UI: `http://localhost:5173`
+UI : `http://localhost:5173`
 
 ---
 
@@ -97,39 +97,39 @@ UI: `http://localhost:5173`
 - `GET /teams/{team}/settings`
 - `POST /forecast`
 
-Swagger: `/docs`
+Swagger : `/docs`
 
 ---
 
 ## Tests et coverage
 
-Depuis la racine:
+Depuis la racine :
 
 ```bash
 pytest
 ```
 
-Coverage backend:
+Coverage backend :
 
 ```bash
 python -m pytest --cov=backend --cov-report=term-missing -q
 ```
 
-Coverage frontend unit:
+Coverage frontend unit :
 
 ```bash
 npm --prefix frontend run test:unit:coverage
 ```
 
-Coverage frontend E2E:
+Coverage frontend E2E :
 
 ```bash
 npm --prefix frontend run test:e2e:coverage:console
 ```
 
-Notes:
+Notes :
 - La task VS Code principale est `Coverage: 5 terminaux`.
-- Elle lance en parallele:
+- Elle lance en parallèle :
   - unit coverage front
   - coverage back
   - coverage E2E
@@ -148,10 +148,10 @@ Le bundling Vite utilise un split manuel (`vendor-react`, `vendor-recharts`) pou
 
 ---
 
-## Securite
+## Sécurité
 
-- Ne pas commiter de secrets (PAT, cles privees, tokens).
-- Utiliser le script de verification avant commit:
+- Ne pas commiter de secrets (PAT, clés privées, tokens).
+- Utiliser le script de vérification avant commit :
 
 ```bash
 python Scripts/check_no_secrets.py
