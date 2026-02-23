@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from datetime import date
+from pydantic import BaseModel, Field, model_validator
 from typing import Optional, List, Literal
 
 
@@ -8,8 +9,8 @@ class ForecastRequest(BaseModel):
     org: str = Field(..., description="Organisation Azure DevOps")
     project: str = Field(..., description="Projet Azure DevOps")
     team_name: str = Field(..., description="Nom exact de la team")
-    start_date: str = Field(..., description="YYYY-MM-DD")
-    end_date: str = Field(..., description="YYYY-MM-DD")
+    start_date: date = Field(..., description="YYYY-MM-DD")
+    end_date: date = Field(..., description="YYYY-MM-DD")
     mode: Literal["backlog_to_weeks", "weeks_to_items"] = Field(
         default="backlog_to_weeks",
         description="Mode de simulation: backlog_to_weeks ou weeks_to_items",
@@ -27,6 +28,12 @@ class ForecastRequest(BaseModel):
         default=None,
         description="AreaPath a utiliser. Si absent, on prend defaultValue des settings de team.",
     )
+
+    @model_validator(mode="after")
+    def validate_date_range(self) -> "ForecastRequest":
+        if self.start_date >= self.end_date:
+            raise ValueError("start_date doit etre strictement avant end_date.")
+        return self
 
 
 class OrgRequest(BaseModel):

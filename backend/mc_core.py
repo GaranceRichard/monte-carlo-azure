@@ -3,6 +3,36 @@ from __future__ import annotations
 import numpy as np
 from typing import Dict, Optional, Tuple
 
+
+def histogram_buckets(arr: np.ndarray, max_buckets: int = 100) -> list[Dict[str, int]]:
+    """
+    Agrège une distribution discrète en buckets {x, count}.
+
+    - Si le nombre de valeurs distinctes est <= max_buckets: histogramme exact.
+    - Sinon: agrégation en max_buckets bins.
+    """
+    values = np.asarray(arr, dtype=int)
+    if values.size == 0:
+        return []
+
+    uniq, counts = np.unique(values, return_counts=True)
+    if uniq.size <= max_buckets:
+        return [{"x": int(x), "count": int(c)} for x, c in zip(uniq, counts)]
+
+    min_v = int(values.min())
+    max_v = int(values.max())
+    hist, edges = np.histogram(values, bins=max_buckets, range=(min_v, max_v + 1))
+
+    buckets: list[Dict[str, int]] = []
+    for i, count in enumerate(hist):
+        if count <= 0:
+            continue
+        left = edges[i]
+        right = edges[i + 1]
+        center = int(round((left + right) / 2))
+        buckets.append({"x": center, "count": int(count)})
+    return buckets
+
 def mc_finish_weeks(
     backlog_size: int,
     throughput_samples: np.ndarray,

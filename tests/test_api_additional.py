@@ -3,9 +3,11 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 import requests
+import time
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from unittest.mock import patch
+import numpy as np
 
 import backend.api as api
 
@@ -198,6 +200,74 @@ def test_forecast_error_branches():
         with patch("backend.api.weekly_throughput", return_value=ok_weekly):
             r = client.post("/forecast", json=base, headers={"x-ado-pat": TEST_PAT})
     assert r.status_code == 400
+
+
+def test_forecast_date_validation_errors():
+    client = TestClient(api.app)
+    base = {
+        "org": "org-a",
+        "project": "proj-a",
+        "team_name": "Team A",
+        "start_date": "2026-02-01",
+        "end_date": "2026-01-01",
+        "backlog_size": 20,
+        "done_states": ["Done"],
+        "work_item_types": ["Bug"],
+        "n_sims": 2000,
+    }
+    r = client.post("/forecast", json=base, headers={"x-ado-pat": TEST_PAT})
+    assert r.status_code == 422
+
+    bad_format = dict(base)
+    bad_format["start_date"] = "01-02-2026"
+    bad_format["end_date"] = "2026-03-01"
+    r2 = client.post("/forecast", json=bad_format, headers={"x-ado-pat": TEST_PAT})
+    assert r2.status_code == 422
+
+
+def test_forecast_timeout_returns_504():
+    client = TestClient(api.app)
+    base = {
+        "org": "org-a",
+        "project": "proj-a",
+        "team_name": "Team A",
+        "start_date": "2026-01-01",
+        "end_date": "2026-02-28",
+        "backlog_size": 20,
+        "done_states": ["Done"],
+        "work_item_types": ["Bug"],
+        "n_sims": 2000,
+    }
+
+    weekly = pd.DataFrame(
+        {
+            "week": ["2026-01-01", "2026-01-08", "2026-01-15", "2026-01-22", "2026-01-29", "2026-02-05"],
+            "throughput": [1, 2, 3, 2, 1, 2],
+        }
+    )
+
+    original_timeout = api.API_CONFIG.forecast_timeout_seconds
+    api.API_CONFIG = api.API_CONFIG.__class__(
+        cors_origins=api.API_CONFIG.cors_origins,
+        cors_allow_credentials=api.API_CONFIG.cors_allow_credentials,
+        forecast_timeout_seconds=0.001,
+    )
+    try:
+        def _slow_finish_weeks(**_kwargs):
+            time.sleep(0.05)
+            return np.array([10], dtype=int)
+
+        with patch("backend.api.team_settings_areas", return_value={"defaultValue": "Area A"}):
+            with patch("backend.api.weekly_throughput", return_value=weekly):
+                with patch("backend.api.mc_finish_weeks", side_effect=_slow_finish_weeks):
+                    r = client.post("/forecast", json=base, headers={"x-ado-pat": TEST_PAT})
+        assert r.status_code == 504
+    finally:
+        api.API_CONFIG = api.API_CONFIG.__class__(
+            cors_origins=api.API_CONFIG.cors_origins,
+            cors_allow_credentials=api.API_CONFIG.cors_allow_credentials,
+            forecast_timeout_seconds=original_timeout,
+        )
 
 
 def test_root_index_if_available():

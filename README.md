@@ -67,6 +67,16 @@ Le backend lit les origines CORS depuis l'environnement :
   Exemple : `APP_CORS_ORIGINS=https://mon-site.azurewebsites.net,https://staging.mondomaine.com`
 - `APP_CORS_ALLOW_CREDENTIALS` : `true` / `false` (defaut `true`)
 
+### Timeout forecast
+
+- `APP_FORECAST_TIMEOUT_SECONDS` : timeout de la route `POST /forecast` (defaut `30` secondes)
+- En cas de depassement, l'API retourne `504` avec un message explicite.
+
+### Validation des dates
+
+- `start_date` et `end_date` sont valides au format `YYYY-MM-DD`
+- `start_date` doit etre strictement inferieure a `end_date` (sinon `422`)
+
 ---
 
 ## Lancer en developpement
@@ -129,6 +139,12 @@ Coverage backend ciblee `mc_core` :
 
 ```bash
 python -m pytest tests/test_mc_core.py --cov=backend.mc_core --cov-report=term-missing -q
+```
+
+Coverage backend ciblee `api_config` :
+
+```bash
+python -m pytest tests/test_api_config.py --cov=backend.api_config --cov-report=term-missing -q
 ```
 
 Coverage frontend unit :

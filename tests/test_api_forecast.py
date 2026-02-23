@@ -36,7 +36,7 @@ def test_forecast_ok():
     assert body["backlog_size"] == 20
     assert "result_percentiles" in body
     assert "weekly_throughput" in body
-    assert "result_distribution" in body
+    assert "result_histogram" in body
     assert "weeks_percentiles" not in body
     assert "weeks_distribution" not in body
 
@@ -71,6 +71,6 @@ def test_forecast_weeks_to_items_ok():
     assert body["mode"] == "weeks_to_items"
     assert body["result_kind"] == "items"
     assert "result_percentiles" in body
-    assert "result_distribution" in body
+    assert "result_histogram" in body
     assert "items_percentiles" not in body
     assert "items_distribution" not in body

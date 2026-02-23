@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from typing import Any, Callable, Dict
 
 from fastapi import APIRouter, Header, HTTPException
@@ -15,6 +16,8 @@ def build_forecast_router(
     mc_items_done_for_weeks: Callable[..., np.ndarray],
     mc_finish_weeks: Callable[..., np.ndarray],
     percentiles: Callable[..., Dict[str, int]],
+    histogram_buckets: Callable[..., list[Dict[str, int]]],
+    request_timeout_seconds: float | Callable[[], float] = 30.0,
 ) -> APIRouter:
     router = APIRouter()
 
@@ -42,8 +45,8 @@ def build_forecast_router(
             org=org_clean,
             project=project_clean,
             area_path=area_path,
-            start_date=req.start_date,
-            end_date=req.end_date,
+            start_date=req.start_date.isoformat(),
+            end_date=req.end_date.isoformat(),
             done_states=set(req.done_states),
             work_item_types=set(req.work_item_types),
             pat=pat,
@@ -73,7 +76,7 @@ def build_forecast_router(
         weekly_records: list[Dict[str, Any]],
     ) -> Dict[str, Any]:
         result_percentiles: Dict[str, int]
-        result_distribution: list[int]
+        result_histogram: list[Dict[str, int]]
         result_kind: str
 
         if req.mode == "weeks_to_items":
@@ -88,7 +91,7 @@ def build_forecast_router(
                 n_sims=req.n_sims,
             )
             result_percentiles = percentiles(items_done, ps=(50, 70, 90))
-            result_distribution = items_done.tolist()
+            result_histogram = histogram_buckets(items_done, max_buckets=100)
             result_kind = "items"
         else:
             if not req.backlog_size:
@@ -102,7 +105,7 @@ def build_forecast_router(
                 n_sims=req.n_sims,
             )
             result_percentiles = percentiles(weeks_needed, ps=(50, 70, 90))
-            result_distribution = weeks_needed.tolist()
+            result_histogram = histogram_buckets(weeks_needed, max_buckets=100)
             result_kind = "weeks"
 
         body: Dict[str, Any] = {
@@ -112,7 +115,7 @@ def build_forecast_router(
             "result_kind": result_kind,
             "samples_count": int(len(samples)),
             "result_percentiles": result_percentiles,
-            "result_distribution": result_distribution,
+            "result_histogram": result_histogram,
             "weekly_throughput": weekly_records,
         }
 
@@ -123,9 +126,7 @@ def build_forecast_router(
 
         return body
 
-    @router.post("/forecast")
-    def forecast(req: ForecastRequest, x_ado_pat: str | None = Header(default=None)) -> Dict[str, Any]:
-        pat = require_pat(x_ado_pat)
+    def _compute_forecast(req: ForecastRequest, pat: str) -> Dict[str, Any]:
         org_clean = (req.org or "").strip()
         project_clean = (req.project or "").strip()
         if not org_clean:
@@ -136,5 +137,22 @@ def build_forecast_router(
         area_path = _resolve_area_path(req, pat)
         samples, weekly_records = _get_samples(req, area_path, pat)
         return _build_response(req, area_path, samples, weekly_records)
+
+    @router.post("/forecast")
+    async def forecast(req: ForecastRequest, x_ado_pat: str | None = Header(default=None)) -> Dict[str, Any]:
+        pat = require_pat(x_ado_pat)
+        timeout_seconds = (
+            float(request_timeout_seconds()) if callable(request_timeout_seconds) else float(request_timeout_seconds)
+        )
+        try:
+            return await asyncio.wait_for(
+                asyncio.to_thread(_compute_forecast, req, pat),
+                timeout=timeout_seconds,
+            )
+        except TimeoutError:
+            raise HTTPException(
+                status_code=504,
+                detail=f"Timeout /forecast apres {timeout_seconds:.0f}s. Reessayez avec une plage plus courte.",
+            )
 
     return router

@@ -63,39 +63,43 @@ export function useSimulation({ step, selectedOrg, selectedProject, selectedTeam
   }, [result]);
 
   const mcHistData = useMemo(() => {
-    const dist = result?.result_distribution;
-    if (!dist?.length) return [];
+    const buckets = result?.result_histogram;
+    if (!buckets?.length) return [];
 
-    const counts = new Map();
-    for (const weekCount of dist) counts.set(weekCount, (counts.get(weekCount) || 0) + 1);
+    const points = buckets
+      .map((b) => ({ x: Number(b.x), count: Number(b.count) }))
+      .filter((b) => Number.isFinite(b.x) && Number.isFinite(b.count) && b.count > 0)
+      .sort((a, b) => a.x - b.x);
+    if (!points.length) return [];
 
-    const xs = Array.from(counts.keys()).sort((a, b) => a - b);
-    const n = dist.length;
-    const mean = dist.reduce((a, b) => a + b, 0) / n;
-    const variance = dist.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
+    const n = points.reduce((acc, p) => acc + p.count, 0);
+    const mean = points.reduce((acc, p) => acc + p.x * p.count, 0) / n;
+    const variance = points.reduce((acc, p) => acc + ((p.x - mean) ** 2) * p.count, 0) / n;
     const std = Math.sqrt(variance);
 
-    return xs.map((x) => ({
-      x,
-      count: counts.get(x) || 0,
-      gauss: normalPdf(x, mean, std) * n,
+    return points.map((p) => ({
+      x: p.x,
+      count: p.count,
+      gauss: normalPdf(p.x, mean, std) * n,
     }));
   }, [result]);
 
   const probabilityCurveData = useMemo(() => {
-    const dist = result?.result_distribution;
-    if (!dist?.length) return [];
+    const buckets = result?.result_histogram;
+    if (!buckets?.length) return [];
 
-    const counts = new Map();
-    for (const weekCount of dist) counts.set(weekCount, (counts.get(weekCount) || 0) + 1);
+    const points = buckets
+      .map((b) => ({ x: Number(b.x), count: Number(b.count) }))
+      .filter((b) => Number.isFinite(b.x) && Number.isFinite(b.count) && b.count > 0)
+      .sort((a, b) => a.x - b.x);
+    if (!points.length) return [];
 
-    const xs = Array.from(counts.keys()).sort((a, b) => a - b);
-    const n = dist.length;
+    const n = points.reduce((acc, p) => acc + p.count, 0);
     let cumulative = 0;
 
-    return xs.map((x) => {
-      cumulative += counts.get(x) || 0;
-      return { x, probability: (cumulative / n) * 100 };
+    return points.map((p) => {
+      cumulative += p.count;
+      return { x: p.x, probability: (cumulative / n) * 100 };
     });
   }, [result]);
 

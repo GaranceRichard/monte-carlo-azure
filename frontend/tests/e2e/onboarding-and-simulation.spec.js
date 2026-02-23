@@ -248,7 +248,19 @@ test("E2E flow avec couverture JS front", async ({ page }) => {
         mode: isWeeksToItems ? "weeks_to_items" : "backlog_to_weeks",
         result_kind: isWeeksToItems ? "items" : "weeks",
         result_percentiles: isWeeksToItems ? { P50: 38, P70: 44, P90: 52 } : { P50: 10, P70: 12, P90: 15 },
-        result_distribution: isWeeksToItems ? [35, 38, 44, 52] : [9, 10, 12, 15],
+        result_histogram: isWeeksToItems
+          ? [
+              { x: 35, count: 1 },
+              { x: 38, count: 1 },
+              { x: 44, count: 1 },
+              { x: 52, count: 1 },
+            ]
+          : [
+              { x: 9, count: 1 },
+              { x: 10, count: 1 },
+              { x: 12, count: 1 },
+              { x: 15, count: 1 },
+            ],
         weekly_throughput: [
           { week: "2026-01-05", throughput: 3 },
           { week: "2026-01-12", throughput: 4 },
