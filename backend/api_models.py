@@ -16,8 +16,12 @@ class ForecastRequest(BaseModel):
     )
     backlog_size: Optional[int] = Field(default=None, ge=1)
     target_weeks: Optional[int] = Field(default=None, ge=1)
-    done_states: List[str] = ["Done", "Closed", "Resolved"]
-    work_item_types: List[str] = ["User Story", "Product Backlog Item", "Bug"]
+    done_states: List[str] = Field(
+        default_factory=lambda: ["Done", "Closed", "Resolved"]
+    )
+    work_item_types: List[str] = Field(
+        default_factory=lambda: ["User Story", "Product Backlog Item", "Bug"]
+    )
     n_sims: int = Field(20000, ge=1000, le=200000)
     area_path: Optional[str] = Field(
         default=None,

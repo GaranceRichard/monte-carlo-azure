@@ -18,15 +18,9 @@ def build_forecast_router(
 ) -> APIRouter:
     router = APIRouter()
 
-    @router.post("/forecast")
-    def forecast(req: ForecastRequest, x_ado_pat: str | None = Header(default=None)) -> Dict[str, Any]:
-        pat = require_pat(x_ado_pat)
+    def _resolve_area_path(req: ForecastRequest, pat: str) -> str:
         org_clean = (req.org or "").strip()
         project_clean = (req.project or "").strip()
-        if not org_clean:
-            raise HTTPException(status_code=400, detail="org requis.")
-        if not project_clean:
-            raise HTTPException(status_code=400, detail="project requis.")
 
         area_path = req.area_path
         if not area_path:
@@ -38,6 +32,11 @@ def build_forecast_router(
                 status_code=400,
                 detail="Impossible de determiner l'AreaPath (team settings sans defaultValue).",
             )
+        return area_path
+
+    def _get_samples(req: ForecastRequest, area_path: str, pat: str) -> tuple[np.ndarray, list[Dict[str, Any]]]:
+        org_clean = (req.org or "").strip()
+        project_clean = (req.project or "").strip()
 
         weekly = weekly_throughput(
             org=org_clean,
@@ -64,6 +63,15 @@ def build_forecast_router(
                 detail="Historique insuffisant (peu de semaines non-nulles). Elargissez la periode.",
             )
 
+        weekly_records = weekly.assign(week=weekly["week"].astype(str)).to_dict(orient="records")
+        return samples, weekly_records
+
+    def _build_response(
+        req: ForecastRequest,
+        area_path: str,
+        samples: np.ndarray,
+        weekly_records: list[Dict[str, Any]],
+    ) -> Dict[str, Any]:
         result_percentiles: Dict[str, int]
         result_distribution: list[int]
         result_kind: str
@@ -105,20 +113,28 @@ def build_forecast_router(
             "samples_count": int(len(samples)),
             "result_percentiles": result_percentiles,
             "result_distribution": result_distribution,
-            "weekly_throughput": weekly.assign(
-                week=weekly["week"].astype(str)
-            ).to_dict(orient="records"),
+            "weekly_throughput": weekly_records,
         }
 
         if result_kind == "weeks":
             body["backlog_size"] = req.backlog_size
-            body["weeks_percentiles"] = result_percentiles
-            body["weeks_distribution"] = result_distribution
         else:
             body["target_weeks"] = req.target_weeks
-            body["items_percentiles"] = result_percentiles
-            body["items_distribution"] = result_distribution
 
         return body
+
+    @router.post("/forecast")
+    def forecast(req: ForecastRequest, x_ado_pat: str | None = Header(default=None)) -> Dict[str, Any]:
+        pat = require_pat(x_ado_pat)
+        org_clean = (req.org or "").strip()
+        project_clean = (req.project or "").strip()
+        if not org_clean:
+            raise HTTPException(status_code=400, detail="org requis.")
+        if not project_clean:
+            raise HTTPException(status_code=400, detail="project requis.")
+
+        area_path = _resolve_area_path(req, pat)
+        samples, weekly_records = _get_samples(req, area_path, pat)
+        return _build_response(req, area_path, samples, weekly_records)
 
     return router

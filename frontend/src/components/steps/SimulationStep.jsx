@@ -10,37 +10,38 @@ import {
   Bar,
 } from "recharts";
 
-export default function SimulationStep({
-  err,
-  selectedTeam,
-  startDate,
-  setStartDate,
-  endDate,
-  setEndDate,
-  simulationMode,
-  setSimulationMode,
-  backlogSize,
-  setBacklogSize,
-  targetWeeks,
-  setTargetWeeks,
-  nSims,
-  setNSims,
-  workItemTypeOptions,
-  types,
-  setTypes,
-  filteredDoneStateOptions,
-  doneStates,
-  setDoneStates,
-  loading,
-  onRunForecast,
-  result,
-  activeChartTab,
-  setActiveChartTab,
-  throughputData,
-  mcHistData,
-  probabilityCurveData,
-  tooltipBaseProps,
-}) {
+export default function SimulationStep({ selectedTeam, simulation }) {
+  const {
+    err,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    simulationMode,
+    setSimulationMode,
+    backlogSize,
+    setBacklogSize,
+    targetWeeks,
+    setTargetWeeks,
+    nSims,
+    setNSims,
+    workItemTypeOptions,
+    types,
+    setTypes,
+    filteredDoneStateOptions,
+    doneStates,
+    setDoneStates,
+    loading,
+    runForecast,
+    result,
+    activeChartTab,
+    setActiveChartTab,
+    throughputData,
+    mcHistData,
+    probabilityCurveData,
+    tooltipBaseProps,
+  } = simulation;
+
   return (
     <>
       <div style={{ fontSize: 24, fontWeight: 800, marginTop: 6 }}>Equipe: {selectedTeam}</div>
@@ -168,7 +169,7 @@ export default function SimulationStep({
           </div>
 
           <button
-            onClick={onRunForecast}
+            onClick={runForecast}
             disabled={loading || !selectedTeam}
             style={{ width: "100%", marginTop: 16, padding: 12, borderRadius: 12, border: "1px solid var(--border)", background: loading ? "var(--softBorder)" : "var(--btnBg)", color: loading ? "var(--text)" : "var(--btnText)", cursor: loading ? "not-allowed" : "pointer", fontWeight: 700 }}
           >

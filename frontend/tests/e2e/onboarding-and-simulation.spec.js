@@ -67,7 +67,24 @@ async function summarizeCoverageIstanbul(entries) {
 }
 
 test("E2E flow avec couverture JS front", async ({ page }) => {
+  test.setTimeout(90_000);
+  let authCheckCalls = 0;
+  let authOrgsCalls = 0;
+  let projectsCalls = 0;
+  let teamsCalls = 0;
+  let teamOptionsCalls = 0;
+  let forecastCalls = 0;
+
   await page.route("**/auth/check", async (route) => {
+    authCheckCalls += 1;
+    if (authCheckCalls === 1) {
+      await route.fulfill({
+        status: 401,
+        contentType: "application/json",
+        body: JSON.stringify({ detail: "PAT invalide ou non autorise sur Azure DevOps." }),
+      });
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -80,29 +97,95 @@ test("E2E flow avec couverture JS front", async ({ page }) => {
   });
 
   await page.route("**/auth/orgs", async (route) => {
+    authOrgsCalls += 1;
+    if (authOrgsCalls >= 3) {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          status: "ok",
+          orgs: [
+            { id: "o1", name: "org-demo", account_uri: "https://dev.azure.com/org-demo" },
+            { id: "o2", name: "org-empty", account_uri: "https://dev.azure.com/org-empty" },
+          ],
+        }),
+      });
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
         status: "ok",
-        orgs: [{ id: "o1", name: "org-demo", account_uri: "https://dev.azure.com/org-demo" }],
+        orgs: [],
       }),
     });
   });
 
   await page.route("**/auth/projects", async (route) => {
+    const body = route.request().postDataJSON();
+    const org = body?.org;
+    if (org === "org-empty") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          status: "ok",
+          org: "org-empty",
+          projects: [],
+        }),
+      });
+      return;
+    }
+
+    projectsCalls += 1;
+    if (projectsCalls === 1) {
+      await route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: JSON.stringify({ detail: "Erreur temporaire projets" }),
+      });
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
         status: "ok",
         org: "org-demo",
-        projects: [{ id: "p1", name: "Projet A" }],
+        projects: [
+          { id: "p1", name: "Projet A" },
+          { id: "p2", name: "Projet Vide" },
+        ],
       }),
     });
   });
 
   await page.route("**/auth/teams", async (route) => {
+    const body = route.request().postDataJSON();
+    if (body?.project === "Projet Vide") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          status: "ok",
+          org: "org-demo",
+          project: "Projet Vide",
+          teams: [],
+        }),
+      });
+      return;
+    }
+
+    teamsCalls += 1;
+    if (teamsCalls === 1) {
+      await route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: JSON.stringify({ detail: "Erreur temporaire equipes" }),
+      });
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -110,12 +193,24 @@ test("E2E flow avec couverture JS front", async ({ page }) => {
         status: "ok",
         org: "org-demo",
         project: "Projet A",
-        teams: [{ id: "t1", name: "Equipe Alpha" }],
+        teams: [
+          { id: "t1", name: "Equipe Alpha" },
+          { id: "t2", name: "Equipe Beta" },
+        ],
       }),
     });
   });
 
   await page.route("**/auth/team-options", async (route) => {
+    teamOptionsCalls += 1;
+    if (teamOptionsCalls === 1) {
+      await route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: JSON.stringify({ detail: "Erreur options equipe" }),
+      });
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -132,23 +227,33 @@ test("E2E flow avec couverture JS front", async ({ page }) => {
   });
 
   await page.route("**/forecast", async (route) => {
+    forecastCalls += 1;
+    if (forecastCalls === 1) {
+      await route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: JSON.stringify({ detail: "Erreur forecast temporaire" }),
+      });
+      return;
+    }
+
+    const payload = route.request().postDataJSON();
+    const isWeeksToItems = payload?.mode === "weeks_to_items";
     await route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
         team: "Equipe Alpha",
         area_path: "Projet A\\Equipe Alpha",
-        mode: "backlog_to_weeks",
-        result_kind: "weeks",
-        result_percentiles: { P50: 10, P70: 12, P90: 15 },
-        result_distribution: [9, 10, 12, 15],
+        mode: isWeeksToItems ? "weeks_to_items" : "backlog_to_weeks",
+        result_kind: isWeeksToItems ? "items" : "weeks",
+        result_percentiles: isWeeksToItems ? { P50: 38, P70: 44, P90: 52 } : { P50: 10, P70: 12, P90: 15 },
+        result_distribution: isWeeksToItems ? [35, 38, 44, 52] : [9, 10, 12, 15],
         weekly_throughput: [
           { week: "2026-01-05", throughput: 3 },
           { week: "2026-01-12", throughput: 4 },
         ],
-        backlog_size: 120,
-        weeks_percentiles: { P50: 10, P70: 12, P90: 15 },
-        weeks_distribution: [9, 10, 12, 15],
+        backlog_size: isWeeksToItems ? undefined : 120,
       }),
     });
   });
@@ -159,28 +264,125 @@ test("E2E flow avec couverture JS front", async ({ page }) => {
   });
   await page.goto("/");
 
+  // Local validation: PAT vide.
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page.getByText("PAT requis pour continuer.")).toBeVisible();
+
+  // API validation error then success.
+  await page.locator('input[type="password"]').fill("bad-token");
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page.getByText(/PAT invalide/i)).toBeVisible();
+
   await page.locator('input[type="password"]').fill("token-value-at-least-20-chars");
   await page.getByRole("button", { name: "Se connecter" }).click();
 
   await expect(page.getByText("Bienvenue Garance Richard")).toBeVisible();
+  await expect(page.getByText(/PAT non global/i)).toBeVisible();
+  await page.getByPlaceholder("Nom de l'organisation").fill("org-demo");
+
+  // Projects error branch then retry.
+  await page.getByRole("button", { name: "Choisir cette organisation" }).click();
+  await expect(page.getByText("Erreur temporaire projets")).toBeVisible();
+
+  // Back to PAT then reconnect to cover back branch.
+  await page.getByRole("button", { name: "Changer PAT" }).click();
+  await expect(page.getByText("Connexion Azure DevOps")).toBeVisible();
+  await page.locator('input[type="password"]').fill("token-value-at-least-20-chars");
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await page.getByPlaceholder("Nom de l'organisation").fill("org-demo");
   await page.getByRole("button", { name: "Choisir cette organisation" }).click();
 
-  await expect(page.getByText("Choix du projet")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Choix du projet/i })).toBeVisible();
+  await page.getByRole("button", { name: "Choisir ce Projet" }).click();
+  await expect(page.getByText("Erreur temporaire equipes")).toBeVisible();
+
+  // Back to org from project, then continue again.
+  await page.getByRole("button", { name: "Changer ORG" }).click();
+  await page.getByRole("button", { name: "Choisir cette organisation" }).click();
   await page.getByRole("button", { name: "Choisir ce Projet" }).click();
 
-  await expect(page.getByText("Choix de l'équipe")).toBeVisible();
-  await page.getByRole("button", { name: "Choisir cette équipe" }).click();
+  await expect(page.getByRole("heading", { name: /Choix de/i })).toBeVisible();
+  await page.locator("select").first().selectOption("Equipe Beta");
+  await page.locator("select").first().selectOption("Equipe Alpha");
+  await page.getByRole("button", { name: /Choisir cette/i }).click();
 
   await expect(page.getByText("Equipe: Equipe Alpha")).toBeVisible();
+
+  // First simulation: forecast error branch.
+  await page.getByRole("button", { name: "Lancer la simulation" }).click();
+  await expect(page.getByText("Erreur forecast temporaire")).toBeVisible();
+
+  // Toggle work item type on/off to hit both checkbox branches.
   await page.getByLabel("Bug").check();
-  await page.getByLabel("Done").check();
+  await page.getByLabel("Bug").uncheck();
+  await page.locator("select").first().selectOption("weeks_to_items");
+  await page.locator('input[type="number"]').first().fill("12");
+  await page.getByLabel("Bug").check();
   await page.getByRole("button", { name: "Lancer la simulation" }).click();
 
   await expect(page.getByText("P50")).toBeVisible();
+  await expect(page.getByText("38 items")).toBeVisible();
+  await page.locator("svg").first().hover({ position: { x: 80, y: 80 } });
+  await page.getByRole("button", { name: "Distribution" }).click();
+  await page.locator("svg").first().hover({ position: { x: 80, y: 80 } });
+  await page.getByRole("button", { name: /Courbe/i }).click();
+  await page.locator("svg").first().hover({ position: { x: 80, y: 80 } });
+  await page.getByRole("button", { name: "Throughput" }).click();
+  await page.locator("svg").first().hover({ position: { x: 80, y: 80 } });
+
+  // Re-enter simulation to trigger team-options success branch after initial failure.
+  await page.getByRole("button", { name: /Changer equipe|Changer/i }).click();
+  await expect(page.getByRole("heading", { name: /Choix de/i })).toBeVisible();
+  await page.getByRole("button", { name: /Choisir cette/i }).click();
+  await expect(page.getByText("Equipe: Equipe Alpha")).toBeVisible();
+
+  // Second simulation mode to cover backlog_to_weeks branch.
+  await page.locator("select").first().selectOption("backlog_to_weeks");
+  await page.locator('input[type="number"]').first().fill("120");
+  await page.getByLabel("Bug").check();
+  await page.getByRole("button", { name: "Lancer la simulation" }).click();
   await expect(page.getByText("10 semaines")).toBeVisible();
 
+  // Back from simulation and disconnect.
+  await page.getByRole("button", { name: /Changer equipe|Changer/i }).click();
+  await expect(page.getByRole("heading", { name: /Choix de/i })).toBeVisible();
+  await page.getByRole("button", { name: /Se d.*connecter/i }).click();
+  await expect(page.getByText("Connexion Azure DevOps")).toBeVisible();
+
+  // Second pass: org list branch + PAT submit with Enter.
+  await page.locator('input[type="password"]').fill("token-value-at-least-20-chars");
+  await page.locator('input[type="password"]').press("Enter");
+  await expect(page.getByText("Bienvenue Garance Richard")).toBeVisible();
+  await expect(page.getByText(/Organisations accessibles/i)).toBeVisible();
+  await page.locator("select").first().selectOption("org-empty");
+  await page.getByRole("button", { name: "Choisir cette organisation" }).click();
+  await expect(page.getByRole("button", { name: "Choisir ce Projet" })).toBeDisabled();
+  await page.getByRole("button", { name: "Changer ORG" }).click();
+  await page.locator("select").first().selectOption("org-demo");
+  await page.getByRole("button", { name: "Choisir cette organisation" }).click();
+  await page.locator("select").first().selectOption("Projet Vide");
+  await page.getByRole("button", { name: "Choisir ce Projet" }).click();
+  await expect(page.getByRole("button", { name: /Choisir cette/i })).toBeDisabled();
+  await page.getByRole("button", { name: /Changer projet/i }).click();
+  await page.locator("select").first().selectOption("Projet A");
+  await page.getByRole("button", { name: "Choisir ce Projet" }).click();
+  await page.locator("select").first().selectOption("Equipe Beta");
+  await page.locator("select").first().selectOption("Equipe Alpha");
+  await page.getByRole("button", { name: /Choisir cette/i }).click();
+  await page.getByLabel("Bug").check();
+  await page.getByLabel("User Story").check();
+  await page.getByLabel("User Story").uncheck();
+  await page.getByRole("button", { name: "Lancer la simulation" }).click();
+  await expect(page.getByText("10 semaines")).toBeVisible();
+
+  // Theme toggle branch.
+  await page.locator("button[title*='Passer en mode']").click();
+
   const coverageEntries = await page.coverage.stopJSCoverage();
-  const appEntries = coverageEntries.filter((e) => e.url.includes("127.0.0.1:4173"));
+  const appEntries = coverageEntries.filter((e) => {
+    if (!e?.url) return false;
+    return e.url.includes("127.0.0.1:4173/src/");
+  });
   const summary = await summarizeCoverageIstanbul(appEntries);
 
   console.log(
@@ -189,4 +391,8 @@ test("E2E flow avec couverture JS front", async ({ page }) => {
 
   expect(summary.files).toBeGreaterThan(0);
   expect(summary.statements.total).toBeGreaterThan(0);
+  expect(summary.statements.pct).toBeGreaterThanOrEqual(80);
+  expect(summary.branches.pct).toBeGreaterThanOrEqual(80);
+  expect(summary.functions.pct).toBeGreaterThanOrEqual(80);
+  expect(summary.lines.pct).toBeGreaterThanOrEqual(80);
 });
