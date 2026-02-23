@@ -55,7 +55,9 @@ export default function SimulationModeAndParametersControls({ simulation }: Simu
             checked={includeZeroWeeks}
             onChange={(e) => setIncludeZeroWeeks(e.target.checked)}
           />
-          <span>Inclure les semaines a 0</span>
+          <span title="Inclure les semaines sans ticket ferme rend la prevision plus prudente.">
+            Inclure les semaines a 0
+          </span>
         </label>
       </div>
 
@@ -83,7 +85,15 @@ export default function SimulationModeAndParametersControls({ simulation }: Simu
           )}
         </div>
         <div>
-          <label className="sim-label">Simulations</label>
+          <label className="sim-label">
+            Simulations
+            <span
+              className="sim-help-inline"
+              title="Plus de simulations = courbe plus stable, mais calcul un peu plus long."
+            >
+              (i)
+            </span>
+          </label>
           <input
             type="number"
             min="1000"

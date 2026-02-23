@@ -3,7 +3,13 @@ import type { SimulationViewModel } from "../../hooks/useSimulation";
 type SimulationFilterControlsProps = {
   simulation: Pick<
     SimulationViewModel,
-    "workItemTypeOptions" | "types" | "setTypes" | "filteredDoneStateOptions" | "doneStates" | "setDoneStates"
+    | "workItemTypeOptions"
+    | "types"
+    | "setTypes"
+    | "filteredDoneStateOptions"
+    | "doneStates"
+    | "setDoneStates"
+    | "loadingTeamOptions"
   >;
 };
 
@@ -15,12 +21,16 @@ export default function SimulationFilterControls({ simulation }: SimulationFilte
     filteredDoneStateOptions,
     doneStates,
     setDoneStates,
+    loadingTeamOptions,
   } = simulation;
 
   return (
     <>
       <label className="sim-label sim-mt-10">Types de tickets pris en compte</label>
       <div className="sim-checklist">
+        {loadingTeamOptions && (
+          <div className="sim-empty-tip">Chargement des types de tickets...</div>
+        )}
         {workItemTypeOptions.map((ticketType) => (
           <label key={ticketType} className="sim-check-row">
             <input
@@ -40,6 +50,9 @@ export default function SimulationFilterControls({ simulation }: SimulationFilte
 
       <label className="sim-label sim-mt-10">Etats de resolution</label>
       <div className="sim-checklist sim-checklist--states">
+        {loadingTeamOptions && (
+          <div className="sim-empty-tip">Chargement des etats de resolution...</div>
+        )}
         {filteredDoneStateOptions.map((state) => (
           <label key={state} className="sim-check-row">
             <input

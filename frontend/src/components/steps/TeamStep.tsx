@@ -21,17 +21,17 @@ export default function TeamStep({
 }: TeamStepProps) {
   return (
     <>
-      <h2 style={{ marginTop: 0 }}>Choix de l&apos;équipe</h2>
-      <p style={{ color: "var(--muted)" }}>
+      <h2 className="flow-title">Choix de l&apos;equipe</h2>
+      <p className="flow-text">
         Projet selectionne: <b>{selectedProject}</b>
       </p>
       {err && (
-        <div style={{ background: "var(--dangerBg)", border: "1px solid var(--dangerBorder)", padding: 12, borderRadius: 10, marginTop: 14 }}>
+        <div className="ui-alert ui-alert--danger">
           <b>Erreur :</b> {err}
         </div>
       )}
-      <label style={{ display: "block", marginTop: 12, color: "var(--muted)" }}>Equipes disponibles</label>
-      <select value={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)} style={{ width: "100%", padding: 10, marginTop: 6 }}>
+      <label className="flow-label">Equipes disponibles</label>
+      <select value={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)} className="flow-input">
         {teams.length === 0 && <option value="">Aucune equipe disponible</option>}
         {teams.map((team) => (
           <option key={team.id || team.name} value={team.name || ""}>
@@ -42,7 +42,7 @@ export default function TeamStep({
       <button
         onClick={() => void onContinue()}
         disabled={loading || !selectedTeam}
-        style={{ width: "100%", marginTop: 16, padding: 12, borderRadius: 12, border: "1px solid var(--border)", background: loading ? "var(--softBorder)" : "var(--btnBg)", color: loading ? "var(--text)" : "var(--btnText)", cursor: loading || !selectedTeam ? "not-allowed" : "pointer", fontWeight: 700 }}
+        className="ui-primary-btn"
       >
         Choisir cette équipe
       </button>

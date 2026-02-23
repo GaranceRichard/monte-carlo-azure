@@ -13,6 +13,7 @@ import type {
 import { buildAtLeastPercentiles, buildProbabilityCurve } from "./probability";
 
 const DEFAULT_WORK_ITEM_TYPE_OPTIONS = ["User Story", "Product Backlog Item", "Bug"];
+const SIM_PREFS_KEY = "mc_simulation_prefs_v1";
 
 type ChartPoint = { x: number; count: number; gauss: number };
 type ProbabilityPoint = { x: number; probability: number };
@@ -31,8 +32,19 @@ type SampleStats = {
   usedWeeks: number;
 };
 
+type StoredSimulationPrefs = {
+  startDate?: string;
+  endDate?: string;
+  simulationMode?: ForecastMode;
+  includeZeroWeeks?: boolean;
+  backlogSize?: number;
+  targetWeeks?: number;
+  nSims?: number;
+};
+
 export type SimulationViewModel = {
   loading: boolean;
+  loadingTeamOptions: boolean;
   loadingStageMessage: string;
   err: string;
   startDate: string;
@@ -104,6 +116,18 @@ function smoothHistogramCounts(points: Array<{ x: number; count: number }>): num
   });
 }
 
+function readStoredSimulationPrefs(): StoredSimulationPrefs {
+  try {
+    const raw = localStorage.getItem(SIM_PREFS_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as StoredSimulationPrefs;
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed;
+  } catch {
+    return {};
+  }
+}
+
 export function useSimulation({
   step,
   selectedOrg,
@@ -117,17 +141,21 @@ export function useSimulation({
   selectedTeam: string;
   pat: string;
 }): SimulationViewModel {
+  const prefs = readStoredSimulationPrefs();
   const [loading, setLoading] = useState(false);
+  const [loadingTeamOptions, setLoadingTeamOptions] = useState(false);
   const [loadingStageMessage, setLoadingStageMessage] = useState("");
   const [err, setErr] = useState("");
-  const [startDate, setStartDate] = useState(() => nWeeksAgo(52));
-  const [endDate, setEndDate] = useState(() => today());
-  const [simulationMode, setSimulationMode] = useState<ForecastMode>("backlog_to_weeks");
-  const [includeZeroWeeks, setIncludeZeroWeeks] = useState(false);
+  const [startDate, setStartDate] = useState(() => prefs.startDate || nWeeksAgo(52));
+  const [endDate, setEndDate] = useState(() => prefs.endDate || today());
+  const [simulationMode, setSimulationMode] = useState<ForecastMode>(
+    () => prefs.simulationMode || "backlog_to_weeks",
+  );
+  const [includeZeroWeeks, setIncludeZeroWeeks] = useState(() => Boolean(prefs.includeZeroWeeks));
   const [sampleStats, setSampleStats] = useState<SampleStats | null>(null);
-  const [backlogSize, setBacklogSize] = useState<number | string>(120);
-  const [targetWeeks, setTargetWeeks] = useState<number | string>(12);
-  const [nSims, setNSims] = useState<number | string>(20000);
+  const [backlogSize, setBacklogSize] = useState<number | string>(prefs.backlogSize ?? 120);
+  const [targetWeeks, setTargetWeeks] = useState<number | string>(prefs.targetWeeks ?? 12);
+  const [nSims, setNSims] = useState<number | string>(prefs.nSims ?? 20000);
   const [workItemTypeOptions, setWorkItemTypeOptions] = useState<string[]>(DEFAULT_WORK_ITEM_TYPE_OPTIONS);
   const [statesByType, setStatesByType] = useState<Record<string, string[]>>({});
   const [doneStates, setDoneStates] = useState<string[]>([]);
@@ -215,11 +243,31 @@ export function useSimulation({
   }, [filteredDoneStateOptions]);
 
   useEffect(() => {
+    try {
+      localStorage.setItem(
+        SIM_PREFS_KEY,
+        JSON.stringify({
+          startDate,
+          endDate,
+          simulationMode,
+          includeZeroWeeks,
+          backlogSize: Number(backlogSize) || 0,
+          targetWeeks: Number(targetWeeks) || 0,
+          nSims: Number(nSims) || 0,
+        } satisfies StoredSimulationPrefs),
+      );
+    } catch {
+      // Local storage can be unavailable in private contexts.
+    }
+  }, [startDate, endDate, simulationMode, includeZeroWeeks, backlogSize, targetWeeks, nSims]);
+
+  useEffect(() => {
     if (step !== "simulation" || !selectedOrg || !selectedProject || !selectedTeam || !pat) return;
     let active = true;
 
     (async () => {
       try {
+        setLoadingTeamOptions(true);
         const options = await getTeamOptionsDirect(selectedOrg, selectedProject, selectedTeam, pat);
         if (!active) return;
         const nextTypes = (
@@ -237,6 +285,8 @@ export function useSimulation({
         setStatesByType({});
         setDoneStates([]);
         setTypes([]);
+      } finally {
+        if (active) setLoadingTeamOptions(false);
       }
     })();
 
@@ -251,11 +301,13 @@ export function useSimulation({
     setWeeklyThroughput([]);
     setSampleStats(null);
     setActiveChartTab("throughput");
+    setLoadingTeamOptions(false);
   }
 
   function resetAll(): void {
     setErr("");
     setLoading(false);
+    setLoadingTeamOptions(false);
     setLoadingStageMessage("");
     setResult(null);
     setWeeklyThroughput([]);
@@ -311,9 +363,7 @@ export function useSimulation({
       });
       if (throughputSamples.length < 6) {
         throw new Error(
-          includeZeroWeeks
-            ? "Historique insuffisant (moins de 6 semaines)."
-            : "Historique insuffisant (moins de 6 semaines non nulles).",
+          "Historique insuffisant pour une simulation fiable. Elargissez la periode selectionnee, ou verifiez les types et etats de resolution choisis.",
         );
       }
 
@@ -346,6 +396,7 @@ export function useSimulation({
 
   return {
     loading,
+    loadingTeamOptions,
     loadingStageMessage,
     err,
     startDate,

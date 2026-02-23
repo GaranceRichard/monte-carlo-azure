@@ -27,6 +27,7 @@ type SimulationControlPanelProps = {
     | "filteredDoneStateOptions"
     | "doneStates"
     | "setDoneStates"
+    | "loadingTeamOptions"
     | "loading"
     | "runForecast"
     | "setActiveChartTab"
@@ -38,14 +39,23 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
 
   return (
     <>
-      <SimulationHistoryRangeControls simulation={simulation} />
-      <SimulationModeAndParametersControls simulation={simulation} />
-      <SimulationFilterControls simulation={simulation} />
+      <section className="sim-control-section">
+        <h3 className="sim-control-heading">Periode historique</h3>
+        <SimulationHistoryRangeControls simulation={simulation} />
+      </section>
+      <section className="sim-control-section">
+        <h3 className="sim-control-heading">Mode de simulation</h3>
+        <SimulationModeAndParametersControls simulation={simulation} />
+      </section>
+      <section className="sim-control-section">
+        <h3 className="sim-control-heading">Filtres de tickets</h3>
+        <SimulationFilterControls simulation={simulation} />
+      </section>
 
       <button
         onClick={() => void runForecast()}
         disabled={loading || !selectedTeam}
-        className={`sim-primary-btn ${loading || !selectedTeam ? "sim-primary-btn--disabled" : ""}`}
+        className={`ui-primary-btn ${loading || !selectedTeam ? "ui-primary-btn--disabled" : ""}`}
       >
         {loading ? "Calcul..." : "Lancer la simulation"}
       </button>

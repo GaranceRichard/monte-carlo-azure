@@ -46,8 +46,17 @@ export default function App() {
     simulation.resetAll();
   }
 
+  const onboardingOrder = ["pat", "org", "projects", "teams"] as const;
+  const onboardingLabels: Record<(typeof onboardingOrder)[number], string> = {
+    pat: "Connexion",
+    org: "Organisation",
+    projects: "Projet",
+    teams: "Equipe",
+  };
+  const currentOnboardingIndex = onboardingOrder.findIndex((step) => step === onboardingState.step);
+
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: 24 }}>
+    <div className="app-shell">
       <AppHeader
         theme={theme}
         toggleTheme={toggleTheme}
@@ -57,55 +66,83 @@ export default function App() {
         onBack={onboardingActions.goBack}
       />
 
+      {currentOnboardingIndex >= 0 && (
+        <div className="flow-stepper">
+          <div className="flow-stepper-row">
+            {onboardingOrder.map((step, idx) => (
+              <div
+                key={step}
+                className={`flow-step ${idx === currentOnboardingIndex ? "flow-step--active" : ""}`}
+              >
+                {idx + 1}. {onboardingLabels[step]}
+              </div>
+            ))}
+          </div>
+          <div className="flow-stepper-caption">
+            Etape {currentOnboardingIndex + 1} / {onboardingOrder.length}
+          </div>
+        </div>
+      )}
+
       {onboardingState.step === "pat" && (
-        <PatStep
-          err={onboardingState.err}
-          patInput={onboardingState.patInput}
-          setPatInput={onboardingActions.setPatInput}
-          loading={onboardingState.loading}
-          onSubmit={onboardingActions.submitPat}
-        />
+        <div className="flow-card flow-card--animated">
+          <PatStep
+            err={onboardingState.err}
+            patInput={onboardingState.patInput}
+            setPatInput={onboardingActions.setPatInput}
+            loading={onboardingState.loading}
+            onSubmit={onboardingActions.submitPat}
+          />
+        </div>
       )}
 
       {onboardingState.step === "org" && (
-        <OrgStep
-          err={onboardingState.err}
-          userName={onboardingState.userName}
-          orgs={onboardingState.orgs}
-          orgHint={onboardingState.orgHint}
-          selectedOrg={onboardingState.selectedOrg}
-          setSelectedOrg={onboardingActions.setSelectedOrg}
-          loading={onboardingState.loading}
-          onContinue={onboardingActions.goToProjects}
-        />
+        <div className="flow-card flow-card--animated">
+          <OrgStep
+            err={onboardingState.err}
+            userName={onboardingState.userName}
+            orgs={onboardingState.orgs}
+            orgHint={onboardingState.orgHint}
+            selectedOrg={onboardingState.selectedOrg}
+            setSelectedOrg={onboardingActions.setSelectedOrg}
+            loading={onboardingState.loading}
+            onContinue={onboardingActions.goToProjects}
+          />
+        </div>
       )}
 
       {onboardingState.step === "projects" && (
-        <ProjectStep
-          err={onboardingState.err}
-          selectedOrg={onboardingState.selectedOrg}
-          projects={onboardingState.projects}
-          selectedProject={onboardingState.selectedProject}
-          setSelectedProject={onboardingActions.setSelectedProject}
-          loading={onboardingState.loading}
-          onContinue={onboardingActions.goToTeams}
-        />
+        <div className="flow-card flow-card--animated">
+          <ProjectStep
+            err={onboardingState.err}
+            selectedOrg={onboardingState.selectedOrg}
+            projects={onboardingState.projects}
+            selectedProject={onboardingState.selectedProject}
+            setSelectedProject={onboardingActions.setSelectedProject}
+            loading={onboardingState.loading}
+            onContinue={onboardingActions.goToTeams}
+          />
+        </div>
       )}
 
       {onboardingState.step === "teams" && (
-        <TeamStep
-          err={onboardingState.err}
-          selectedProject={onboardingState.selectedProject}
-          teams={onboardingState.teams}
-          selectedTeam={onboardingState.selectedTeam}
-          setSelectedTeam={onboardingActions.setSelectedTeam}
-          loading={onboardingState.loading}
-          onContinue={handleGoToSimulation}
-        />
+        <div className="flow-card flow-card--animated">
+          <TeamStep
+            err={onboardingState.err}
+            selectedProject={onboardingState.selectedProject}
+            teams={onboardingState.teams}
+            selectedTeam={onboardingState.selectedTeam}
+            setSelectedTeam={onboardingActions.setSelectedTeam}
+            loading={onboardingState.loading}
+            onContinue={handleGoToSimulation}
+          />
+        </div>
       )}
 
       {onboardingState.step === "simulation" && (
-        <SimulationStep selectedTeam={onboardingState.selectedTeam} simulation={simulation} />
+        <div className="flow-card flow-card--animated">
+          <SimulationStep selectedTeam={onboardingState.selectedTeam} simulation={simulation} />
+        </div>
       )}
     </div>
   );

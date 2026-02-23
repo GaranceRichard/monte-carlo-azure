@@ -63,6 +63,9 @@ export default function SimulationChartTabs({ simulation }: SimulationChartTabsP
           {activeChartTab === "throughput" && (
             <>
               <h4 className="sim-chart-title">Throughput hebdomadaire</h4>
+              <p className="sim-chart-subtitle">
+                Chaque point represente le nombre d&apos;items termines sur une semaine historique.
+              </p>
               <div className="sim-chart-wrap">
                 <ResponsiveContainer>
                   <LineChart data={throughputData}>
@@ -80,6 +83,9 @@ export default function SimulationChartTabs({ simulation }: SimulationChartTabsP
           {activeChartTab === "distribution" && (
             <>
               <h4 className="sim-chart-title">Distribution Monte Carlo</h4>
+              <p className="sim-chart-subtitle">
+                Chaque barre represente la frequence d&apos;une duree simulee sur l&apos;ensemble des runs.
+              </p>
               <div className="sim-chart-wrap">
                 <ResponsiveContainer>
                   <ComposedChart data={mcHistData}>
@@ -109,6 +115,9 @@ export default function SimulationChartTabs({ simulation }: SimulationChartTabsP
                   ? "Probabilite d'atteindre au moins X items"
                   : "Probabilite de terminer en au plus X semaines"}
               </h4>
+              <p className="sim-chart-subtitle">
+                Cette courbe indique la probabilite cumulee pour chaque valeur possible.
+              </p>
               <div className="sim-chart-wrap">
                 <ResponsiveContainer>
                   <LineChart data={probabilityCurveData}>

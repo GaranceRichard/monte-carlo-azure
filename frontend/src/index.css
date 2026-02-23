@@ -1,6 +1,26 @@
 :root {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Radius scale */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+
+  /* Type scale */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+
   /* Theme (Light by default) */
   --bg: #f6f7f9;
   --panel: #ffffff;
@@ -13,6 +33,13 @@
   --btnBg: #111;
   --btnText: #fff;
   --inputBg: #fff;
+  --focusRing: rgba(17, 24, 39, 0.2);
+  --successBg: #e7f8ee;
+  --successBorder: #8fd9ac;
+  --warningBg: #fff7e6;
+  --warningBorder: #ffd28a;
+  --infoBg: #e8f2ff;
+  --infoBorder: #9fc1ff;
 
   color: var(--text);
   background: var(--bg);
@@ -30,6 +57,13 @@
   --btnBg: #e5e7eb;
   --btnText: #111;
   --inputBg: #0f172a;
+  --focusRing: rgba(229, 231, 235, 0.22);
+  --successBg: rgba(37, 175, 96, 0.18);
+  --successBorder: rgba(93, 222, 151, 0.42);
+  --warningBg: rgba(255, 171, 0, 0.18);
+  --warningBorder: rgba(255, 196, 94, 0.42);
+  --infoBg: rgba(63, 136, 255, 0.2);
+  --infoBorder: rgba(131, 180, 255, 0.42);
 }
 
 /* box sizing: prevents overflow */
@@ -43,6 +77,7 @@ html, body {
   overflow-x: hidden;
   background: var(--bg);
   color: var(--text);
+  font-size: var(--text-base);
 }
 
 input, select, button {
@@ -54,16 +89,17 @@ input, select {
   background: var(--inputBg);
   color: var(--text);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   outline: none;
 }
 
 input:focus, select:focus {
   border-color: var(--text);
+  box-shadow: 0 0 0 3px var(--focusRing);
 }
 
 button {
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 
 a { color: inherit; }
