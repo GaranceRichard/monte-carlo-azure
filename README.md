@@ -1,51 +1,51 @@
-# Monte Carlo Azure
+﻿# Monte Carlo Azure
 
-Outil de prevision base sur une simulation Monte Carlo. Il répond au Use Case suivant : l'utilisateur se connecte et peut effectuer facilement une simulation sur un site avec peu d'informations, sans laisser de trâce ou compromettre Azure avec son Token.
+Outil de prévision basé sur une simulation Monte Carlo. Il répond au Use Case suivant : l'utilisateur se connecte et peut effectuer facilement une simulation sur un site avec peu d'informations, sans laisser de trace ou compromettre Azure avec son Token.
 
 Architecture V2:
 - Le frontend appelle Azure DevOps directement depuis le navigateur.
-- Le backend OVH ne recoit que des donnees anonymes de throughput (`throughput_samples`) pour calculer la simulation.
+- Le backend OVH ne reçoit que des données anonymes de throughput (`throughput_samples`) pour calculer la simulation.
 
 ---
 
-## Fonctionnalites
+## Fonctionnalités
 
-- Connexion Azure DevOps avec PAT cote navigateur (non transmis au backend)
-- Selection organisation -> projet -> equipe
-- Recuperation du throughput hebdomadaire cote client
-- Simulation Monte Carlo cote backend (`POST /simulate`)
+- Connexion Azure DevOps avec PAT côté navigateur (non transmis au backend)
+- Sélection organisation -> projet -> équipe
+- Récupération du throughput hebdomadaire côté client
+- Simulation Monte Carlo côté backend (`POST /simulate`)
 - Visualisation des percentiles et distributions
 
 ---
 
-## Securite
+## Sécurité
 
 Le PAT Azure DevOps:
-- est utilise uniquement dans le navigateur de l'utilisateur
+- est utilisé uniquement dans le navigateur de l'utilisateur
 - ne transite jamais par le backend
-- n'est pas sauvegarde par le serveur
+- n'est pas sauvegardé par le serveur
 
-### SLA Identite (Non Negociable)
+### SLA Identité (Non Négociable)
 
-Regle fondamentale:
-- 0 donnee d'identification (PAT, UUID, ORG, Team) ne doit transiter par un serveur applicatif (local ou distant).
+Règle fondamentale:
+- 0 donnée d'identification (PAT, UUID, ORG, Team) ne doit transiter par un serveur applicatif (local ou distant).
 - Les appels Azure DevOps doivent partir directement du navigateur vers:
   - `https://dev.azure.com`
   - `https://app.vssps.visualstudio.com`
 
-Toute transgression de cette regle est consideree comme une faute majeure.
+Toute transgression de cette règle est considérée comme une faute majeure.
 
-Controle automatique:
-- CI execute `python Scripts/check_identity_boundary.py`
-- Si une proxyfication serveur (`/ado`, `/vssps`) ou un endpoint local de resolution PAT est detecte, la CI echoue.
+Contrôle automatique:
+- CI exécute `python Scripts/check_identity_boundary.py`
+- Si une proxyfication serveur (`/ado`, `/vssps`) ou un endpoint local de résolution PAT est détecté, la CI échoue.
 
-Le backend ne recoit que:
+Le backend ne reçoit que:
 - `throughput_samples` (liste d'entiers)
-- les parametres de simulation (`mode`, `backlog_size`/`target_weeks`, `n_sims`)
+- les paramètres de simulation (`mode`, `backlog_size`/`target_weeks`, `n_sims`)
 
 Garde-fous serveur:
-- rate limiting sur `POST /simulate` (limite par client/IP sur fenetre glissante)
-- niveau de logs applicatifs reduit (`warning`) et logs d'acces HTTP desactives
+- rate limiting sur `POST /simulate` (limite par client/IP sur fenêtre glissante)
+- niveau de logs applicatifs réduit (`warning`) et logs d'accès HTTP désactivés
 
 ---
 
@@ -69,15 +69,15 @@ backend/
 
 ---
 
-## Prerequis
+## Prérequis
 
 - Python 3.10+
 - Node.js 20+
-- Acces Azure DevOps + PAT
+- Accès Azure DevOps + PAT
 
 ---
 
-## Lancer en developpement
+## Lancer en développement
 
 ### Backend
 
@@ -107,11 +107,11 @@ UI: `http://localhost:5173`
 
 - `GET /health`
 - `POST /simulate`
-- CORS autorise: `GET`, `POST`, `OPTIONS`
+- CORS autorisé: `GET`, `POST`, `OPTIONS`
 
 Swagger: `/docs`
 
-### Requete `POST /simulate`
+### Requête `POST /simulate`
 
 ```json
 {
@@ -133,7 +133,7 @@ ou
 }
 ```
 
-### Reponse `POST /simulate`
+### Réponse `POST /simulate`
 
 ```json
 {
@@ -145,17 +145,17 @@ ou
 ```
 
 `result_distribution` contient des buckets `{ x, count }`:
-- `x`: valeur simulee (semaines ou items selon le mode)
-- `count`: frequence observee dans les simulations
+- `x`: valeur simulée (semaines ou items selon le mode)
+- `count`: fréquence observée dans les simulations
 
-### Interpretation metier
+### Interprétation métier
 
 - mode `backlog_to_weeks`:
   - question: "en combien de semaines terminer le backlog ?"
-  - lecture des probabilites: `P(X <= semaines)`
+  - lecture des probabilités: `P(X <= semaines)`
 - mode `weeks_to_items`:
   - question: "combien d'items livrer en N semaines ?"
-  - en UI, la courbe de probabilite est affichee en `P(X >= items)` (probabilite d'atteindre au moins X items)
+  - en UI, la courbe de probabilité est affichée en `P(X >= items)` (probabilité d'atteindre au moins X items)
 
 ---
 
@@ -177,11 +177,11 @@ npm --prefix frontend run test:e2e
 npm --prefix frontend run test:e2e:coverage:console
 ```
 
-Suite E2E decoupee:
+Suite E2E découpée:
 - `frontend/tests/e2e/onboarding.spec.js`
 - `frontend/tests/e2e/selection.spec.js`
 - `frontend/tests/e2e/simulation.spec.js`
-- `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul agreges, incluant branches >= 80%)
+- `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul agrégés, incluant branches >= 80%)
 
 ---
 
@@ -191,8 +191,8 @@ Workflow: `.github/workflows/ci.yml`
 
 - Job `backend-tests`
   - Setup Python 3.12
-  - Installation des dependances backend
-  - Controle SLA identite: `python Scripts/check_identity_boundary.py`
+  - Installation des dépendances backend
+  - Contrôle SLA identité: `python Scripts/check_identity_boundary.py`
   - Tests backend: `python -m pytest -q`
 
 - Job `frontend-tests`
@@ -206,8 +206,8 @@ Workflow: `.github/workflows/ci.yml`
 
 ## Bonnes pratiques
 
-- Ne pas commiter de secrets (PAT, tokens, cles privees)
-- Verifier avant commit:
+- Ne pas commiter de secrets (PAT, tokens, clés privées)
+- Vérifier avant commit:
 
 ```bash
 python Scripts/check_no_secrets.py
