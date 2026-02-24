@@ -17,11 +17,14 @@
     "test:e2e:coverage:console": "playwright test --reporter=line"
   },
   "dependencies": {
+    "@radix-ui/react-progress": "^1.1.7",
+    "@radix-ui/react-tabs": "^1.1.13",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "recharts": "^3.6.0"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.13",
     "@eslint/js": "^9.39.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
@@ -37,6 +40,7 @@
     "istanbul-lib-coverage": "^3.2.2",
     "jsdom": "^27.0.1",
     "v8-to-istanbul": "^9.3.0",
+    "tailwindcss": "^4.1.13",
     "typescript": "^5.8.3",
     "vitest": "^4.0.7",
     "vite": "^7.2.4"

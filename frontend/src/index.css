@@ -1,5 +1,7 @@
+@import "tailwindcss";
+
 :root {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
 
   /* Spacing scale */
   --space-1: 4px;
@@ -40,6 +42,18 @@
   --warningBorder: #ffd28a;
   --infoBg: #e8f2ff;
   --infoBorder: #9fc1ff;
+  --surface-1: #ffffff;
+  --surface-2: #f9fafc;
+  --chart-grid: #d8dee8;
+  --chart-axis: #7d8897;
+  --brand: #0f3d5e;
+  --brand-strong: #0a2f49;
+  --p50: #1f7a6b;
+  --p70: #b7791f;
+  --p90: #1f5aa6;
+  --p50-soft: #e8f5f2;
+  --p70-soft: #fff6e8;
+  --p90-soft: #e9f0fb;
 
   color: var(--text);
   background: var(--bg);
@@ -64,6 +78,33 @@
   --warningBorder: rgba(255, 196, 94, 0.42);
   --infoBg: rgba(63, 136, 255, 0.2);
   --infoBorder: rgba(131, 180, 255, 0.42);
+  --surface-1: #111827;
+  --surface-2: #0f172a;
+  --chart-grid: #334155;
+  --chart-axis: #a0aec0;
+  --brand: #b6d4ea;
+  --brand-strong: #e2edf7;
+  --p50: #68d5c0;
+  --p70: #f5c46b;
+  --p90: #7db4ff;
+  --p50-soft: rgba(104, 213, 192, 0.15);
+  --p70-soft: rgba(245, 196, 107, 0.15);
+  --p90-soft: rgba(125, 180, 255, 0.15);
+}
+
+@theme {
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-panel: var(--panel);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-border-subtle: var(--softBorder);
+  --color-p50: var(--p50);
+  --color-p70: var(--p70);
+  --color-p90: var(--p90);
+  --color-p50-soft: var(--p50-soft);
+  --color-p70-soft: var(--p70-soft);
+  --color-p90-soft: var(--p90-soft);
 }
 
 /* box sizing: prevents overflow */

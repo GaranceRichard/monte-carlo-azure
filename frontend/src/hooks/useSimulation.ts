@@ -75,6 +75,7 @@ type SimulationHistoryEntry = {
 
 export type SimulationViewModel = {
   loading: boolean;
+  hasLaunchedOnce: boolean;
   loadingTeamOptions: boolean;
   loadingStageMessage: string;
   err: string;
@@ -693,6 +694,7 @@ export function useSimulation({
 
   return {
     loading,
+    hasLaunchedOnce,
     loadingTeamOptions,
     loadingStageMessage,
     err,

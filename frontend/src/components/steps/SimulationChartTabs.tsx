@@ -3,6 +3,7 @@ import {
   Bar,
   CartesianGrid,
   ComposedChart,
+  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -11,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import type { SimulationViewModel } from "../../hooks/useSimulation";
+import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "../ui/tabs";
 
 type SimulationChartTabsProps = {
   selectedTeam: string;
@@ -54,9 +56,7 @@ function buildLinearTicks(minValue: number, maxValue: number, tickCount: number)
   if (minValue === maxValue) return [minValue];
   const ticks: number[] = [];
   const step = (maxValue - minValue) / (tickCount - 1);
-  for (let i = 0; i < tickCount; i += 1) {
-    ticks.push(minValue + step * i);
-  }
+  for (let i = 0; i < tickCount; i += 1) ticks.push(minValue + step * i);
   return ticks;
 }
 
@@ -84,6 +84,7 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
     capacityPercent,
     reducedCapacityWeeks,
   } = simulation;
+
   const throughputWithMovingAverage = useMemo(() => {
     const windowSize = 4;
     return throughputData.map((point, idx, arr) => {
@@ -93,7 +94,16 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
       return { ...point, movingAverage: Number(average.toFixed(2)) };
     });
   }, [throughputData]);
-  const renderThroughputTooltip = ({ active, payload, label }: { active?: boolean; payload?: ReadonlyArray<{ dataKey?: string; value?: number }>; label?: string | number }) => {
+
+  const renderThroughputTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
+    active?: boolean;
+    payload?: ReadonlyArray<{ dataKey?: string; value?: number }>;
+    label?: string | number;
+  }) => {
     if (!active || !payload?.length) return null;
     const throughputPoint = payload.find((p) => p.dataKey === "throughput");
     const movingAvgPoint = payload.find((p) => p.dataKey === "movingAverage");
@@ -113,23 +123,15 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
     const margin = { top: 18, right: 20, bottom: 40, left: 54 };
     const plotW = width - margin.left - margin.right;
     const plotH = height - margin.top - margin.bottom;
-    const maxY = Math.max(
-      1,
-      ...throughputWithMovingAverage.map((point) => Math.max(point.throughput, point.movingAverage)),
-    );
+    const maxY = Math.max(1, ...throughputWithMovingAverage.map((p) => Math.max(p.throughput, p.movingAverage)));
     const yMax = Math.ceil(maxY);
     const yScale = (value: number) => margin.top + plotH - (value / yMax) * plotH;
-    const pointX = (idx: number) =>
-      margin.left + (throughputWithMovingAverage.length === 1 ? plotW / 2 : (idx / (throughputWithMovingAverage.length - 1)) * plotW);
+    const pointX = (idx: number) => margin.left + (throughputWithMovingAverage.length === 1 ? plotW / 2 : (idx / (throughputWithMovingAverage.length - 1)) * plotW);
     const barW = Math.max(3, Math.min(20, plotW / Math.max(throughputWithMovingAverage.length * 1.6, 1)));
     const yTicks = buildLinearTicks(0, yMax, 6);
     const xLabelStep = Math.max(1, Math.ceil(throughputWithMovingAverage.length / 10));
-    const throughputLine = throughputWithMovingAverage
-      .map((point, idx) => `${pointX(idx).toFixed(1)},${yScale(point.throughput).toFixed(1)}`)
-      .join(" ");
-    const movingAverageLine = throughputWithMovingAverage
-      .map((point, idx) => `${pointX(idx).toFixed(1)},${yScale(point.movingAverage).toFixed(1)}`)
-      .join(" ");
+    const throughputLine = throughputWithMovingAverage.map((point, idx) => `${pointX(idx).toFixed(1)},${yScale(point.throughput).toFixed(1)}`).join(" ");
+    const movingAverageLine = throughputWithMovingAverage.map((point, idx) => `${pointX(idx).toFixed(1)},${yScale(point.movingAverage).toFixed(1)}`).join(" ");
 
     const gridLines = yTicks
       .map((tick) => {
@@ -240,13 +242,10 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
     const plotW = width - margin.left - margin.right;
     const plotH = height - margin.top - margin.bottom;
     const yScale = (value: number) => margin.top + plotH - (value / 100) * plotH;
-    const pointX = (idx: number) =>
-      margin.left + (probabilityCurveData.length === 1 ? plotW / 2 : (idx / (probabilityCurveData.length - 1)) * plotW);
+    const pointX = (idx: number) => margin.left + (probabilityCurveData.length === 1 ? plotW / 2 : (idx / (probabilityCurveData.length - 1)) * plotW);
     const yTicks = buildLinearTicks(0, 100, 6);
     const xLabelStep = Math.max(1, Math.ceil(probabilityCurveData.length / 10));
-    const line = probabilityCurveData
-      .map((point, idx) => `${pointX(idx).toFixed(1)},${yScale(point.probability).toFixed(1)}`)
-      .join(" ");
+    const line = probabilityCurveData.map((point, idx) => `${pointX(idx).toFixed(1)},${yScale(point.probability).toFixed(1)}`).join(" ");
     const gridLines = yTicks
       .map((tick) => {
         const y = yScale(tick);
@@ -267,7 +266,7 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
       .join("");
 
     return `
-      <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Graphique probabilité">
+      <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Graphique probabilite">
         <rect x="0" y="0" width="${width}" height="${height}" fill="#ffffff" />
         ${gridLines}
         <line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}" stroke="#9ca3af" stroke-width="1" />
@@ -323,12 +322,12 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
         <header class="header">
           <h1 class="title">Simulation Monte Carlo - ${escapeHtml(selectedTeam)}</h1>
           <div class="meta">
-            <div class="meta-row"><b>Période:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
+            <div class="meta-row"><b>Periode:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
             <div class="meta-row"><b>Mode:</b> ${escapeHtml(modeSummary)}</div>
             <div class="meta-row"><b>Tickets:</b> ${escapeHtml(typeSummary)}</div>
-            <div class="meta-row"><b>États:</b> ${escapeHtml(stateSummary)}</div>
-            <div class="meta-row"><b>Échantillon:</b> ${escapeHtml(modeZeroLabel)}</div>
-            <div class="meta-row"><b>Capacité réduite:</b> ${escapeHtml(`${String(capacityPercent)}% pendant ${String(reducedCapacityWeeks)} semaines`)}</div>
+            <div class="meta-row"><b>Etats:</b> ${escapeHtml(stateSummary)}</div>
+            <div class="meta-row"><b>Echantillon:</b> ${escapeHtml(modeZeroLabel)}</div>
+            <div class="meta-row"><b>Capacite reduite:</b> ${escapeHtml(`${String(capacityPercent)}% pendant ${String(reducedCapacityWeeks)} semaines`)}</div>
             <div class="meta-row"><b>Simulations:</b> ${escapeHtml(String(nSims))}</div>
           </div>
         </header>
@@ -350,7 +349,7 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
         </section>
 
         <section class="section">
-          <h2>Courbe de probabilité</h2>
+          <h2>Courbe de probabilite</h2>
           <div class="chart-wrap">${probabilitySvg}</div>
         </section>
       </body>
@@ -367,153 +366,130 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
   }
 
   return (
-    <div className="sim-charts">
+    <div className="flex h-full min-h-0 flex-col">
       {result ? (
-        <>
-          <div className="sim-tabs">
-            <button
-              onClick={() => setActiveChartTab("throughput")}
-              className={`sim-tab-btn ${activeChartTab === "throughput" ? "sim-tab-btn--active" : ""}`}
-            >
-              Throughput
-            </button>
-            <button
-              onClick={() => setActiveChartTab("distribution")}
-              className={`sim-tab-btn ${activeChartTab === "distribution" ? "sim-tab-btn--active" : ""}`}
-            >
-              Distribution
-            </button>
-            <button
-              onClick={() => setActiveChartTab("probability")}
-              className={`sim-tab-btn ${activeChartTab === "probability" ? "sim-tab-btn--active" : ""}`}
-            >
-              Courbe de probabilité
-            </button>
-            <div className="sim-tab-actions">
+        <TabsRoot value={activeChartTab} onValueChange={(value) => setActiveChartTab(value as typeof activeChartTab)}>
+          <div className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+            <TabsList>
+              <TabsTrigger value="throughput">Throughput</TabsTrigger>
+              <TabsTrigger value="distribution">Distribution</TabsTrigger>
+              <TabsTrigger value="probability">Probabilités</TabsTrigger>
+            </TabsList>
+            <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
               <button
                 type="button"
                 onClick={handleExportPdf}
-                className="sim-tab-export-btn"
+                className="whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm font-semibold text-[var(--text)]"
                 title="Ouvrir le document imprimable pour export PDF"
               >
-                Exporter PDF
+                PDF
               </button>
               <button
                 type="button"
                 onClick={exportThroughputCsv}
-                className="sim-tab-export-btn"
+                className="whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm font-semibold text-[var(--text)]"
                 title="Exporter le throughput hebdomadaire en CSV"
               >
-                Exporter CSV
+                CSV
               </button>
               <button
                 type="button"
                 onClick={resetForTeamSelection}
-                className="sim-tab-reset-btn"
-                title="Revenir à l'état initial (simulation non lancée)"
+                className="whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm font-semibold text-[var(--text)]"
+                title="Revenir a l'etat initial (simulation non lancee)"
               >
                 Réinitialiser
               </button>
             </div>
           </div>
 
-          {activeChartTab === "throughput" && (
-            <>
-              <h4 className="sim-chart-title">Throughput hebdomadaire</h4>
-              <p className="sim-chart-subtitle">
-                Chaque point représente le nombre d&apos;items terminés sur une semaine historique.
-              </p>
-              <div className="sim-chart-wrap">
-                <ResponsiveContainer>
-                  <ComposedChart data={throughputWithMovingAverage}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="week" />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip {...tooltipBaseProps} content={renderThroughputTooltip} />
-                    <Bar dataKey="throughput" name="Throughput" />
-                    <Line
-                      type="monotone"
-                      dataKey="throughput"
-                      dot={false}
-                      strokeWidth={2}
-                      stroke="#2563eb"
-                      name="Courbe"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="movingAverage"
-                      dot={false}
-                      strokeWidth={2.5}
-                      stroke="#f97316"
-                      strokeDasharray="8 4"
-                      name="Moyenne mobile"
-                    />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              </div>
-            </>
-          )}
+          <TabsContent value="throughput">
+            <h4 className="m-0 text-base font-bold">Throughput hebdomadaire</h4>
+            <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
+              Chaque point represente le nombre d&apos;items termines sur une semaine historique.
+            </p>
+            <div className="h-[52vh] min-h-[320px] w-full">
+              <ResponsiveContainer>
+                <ComposedChart data={throughputWithMovingAverage} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
+                  <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
+                  <XAxis dataKey="week" tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
+                  <YAxis allowDecimals={false} tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
+                  <Tooltip {...tooltipBaseProps} content={renderThroughputTooltip} />
+                  <Legend />
+                  <Bar dataKey="throughput" name="Throughput" fill="var(--p90)" radius={[5, 5, 0, 0]} />
+                  <Line type="monotone" dataKey="throughput" dot={false} strokeWidth={2} stroke="var(--brand)" name="Courbe" />
+                  <Line
+                    type="monotone"
+                    dataKey="movingAverage"
+                    dot={false}
+                    strokeWidth={2.5}
+                    stroke="var(--p70)"
+                    strokeDasharray="8 4"
+                    name="Moyenne mobile"
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </TabsContent>
 
-          {activeChartTab === "distribution" && (
-            <>
-              <h4 className="sim-chart-title">Distribution Monte Carlo</h4>
-              <p className="sim-chart-subtitle">
-                Chaque barre représente la fréquence d&apos;une durée simulée sur l&apos;ensemble des runs.
-              </p>
-              <div className="sim-chart-wrap">
-                <ResponsiveContainer>
-                  <ComposedChart data={mcHistData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="x" />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip
-                      {...tooltipBaseProps}
-                      formatter={(v, name) => {
-                        if (name === "count") return [Number(v).toFixed(0), "Fréquence"];
-                        if (name === "gauss") return [Number(v).toFixed(1), "Courbe lissée"];
-                        return [Number(v).toFixed(1), name];
-                      }}
-                    />
-                    <Bar dataKey="count" />
-                    <Line type="monotone" dataKey="gauss" dot={false} strokeWidth={2} />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              </div>
-            </>
-          )}
+          <TabsContent value="distribution">
+            <h4 className="m-0 text-base font-bold">Distribution Monte Carlo</h4>
+            <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
+              Chaque barre represente la frequence d&apos;une duree simulee sur l&apos;ensemble des runs.
+            </p>
+            <div className="h-[52vh] min-h-[320px] w-full">
+              <ResponsiveContainer>
+                <ComposedChart data={mcHistData} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
+                  <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
+                  <XAxis dataKey="x" tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
+                  <YAxis allowDecimals={false} tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
+                  <Tooltip
+                    {...tooltipBaseProps}
+                    formatter={(v, name) => {
+                      if (name === "count") return [Number(v).toFixed(0), "Frequence"];
+                      if (name === "gauss") return [Number(v).toFixed(1), "Courbe lissee"];
+                      return [Number(v).toFixed(1), name];
+                    }}
+                  />
+                  <Legend />
+                  <Bar dataKey="count" fill="var(--p90)" radius={[5, 5, 0, 0]} />
+                  <Line type="monotone" dataKey="gauss" dot={false} strokeWidth={2.5} stroke="var(--brand)" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </TabsContent>
 
-          {activeChartTab === "probability" && (
-            <>
-              <h4 className="sim-chart-title">
-                {result?.result_kind === "items"
-                  ? "Probabilite d'atteindre au moins X items"
-                  : "Probabilite de terminer en au plus X semaines"}
-              </h4>
-              <p className="sim-chart-subtitle">
-                Cette courbe indique la probabilité cumulée pour chaque valeur possible.
-              </p>
-              <div className="sim-chart-wrap">
-                <ResponsiveContainer>
-                  <LineChart data={probabilityCurveData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="x" />
-                    <YAxis domain={[0, 100]} />
-                    <Tooltip
-                      {...tooltipBaseProps}
-                      formatter={(v) => [
-                        `${Number(v).toFixed(1)}%`,
-                        result?.result_kind === "items" ? "P(X >= valeur)" : "P(X <= valeur)",
-                      ]}
-                    />
-                    <Line type="monotone" dataKey="probability" dot={false} strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </>
-          )}
-        </>
+          <TabsContent value="probability">
+            <h4 className="m-0 text-base font-bold">
+              {result?.result_kind === "items"
+                ? "Probabilite d'atteindre au moins X items"
+                : "Probabilite de terminer en au plus X semaines"}
+            </h4>
+            <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
+              Cette courbe indique la probabilite cumulee pour chaque valeur possible.
+            </p>
+            <div className="h-[52vh] min-h-[320px] w-full">
+              <ResponsiveContainer>
+                <LineChart data={probabilityCurveData} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
+                  <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
+                  <XAxis dataKey="x" tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
+                  <YAxis domain={[0, 100]} tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
+                  <Tooltip
+                    {...tooltipBaseProps}
+                    formatter={(v) => [
+                      `${Number(v).toFixed(1)}%`,
+                      result?.result_kind === "items" ? "P(X >= valeur)" : "P(X <= valeur)",
+                    ]}
+                  />
+                  <Legend />
+                  <Line type="monotone" dataKey="probability" dot={false} strokeWidth={2.5} stroke="var(--brand)" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </TabsContent>
+        </TabsRoot>
       ) : (
-        <div className="sim-empty-panel">
+        <div className="grid h-full place-items-center rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface-2)] p-6 text-[var(--muted)]">
           Lancez une simulation pour afficher les graphiques.
         </div>
       )}

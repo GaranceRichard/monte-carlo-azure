@@ -16,10 +16,6 @@ type SimulationControlPanelProps = {
     | "setSimulationMode"
     | "includeZeroWeeks"
     | "setIncludeZeroWeeks"
-    | "capacityPercent"
-    | "setCapacityPercent"
-    | "reducedCapacityWeeks"
-    | "setReducedCapacityWeeks"
     | "backlogSize"
     | "setBacklogSize"
     | "targetWeeks"
@@ -34,6 +30,7 @@ type SimulationControlPanelProps = {
     | "setDoneStates"
     | "loadingTeamOptions"
     | "loading"
+    | "hasLaunchedOnce"
     | "runForecast"
     | "setActiveChartTab"
   >;
@@ -42,6 +39,7 @@ type SimulationControlPanelProps = {
 export default function SimulationControlPanel({ selectedTeam, simulation }: SimulationControlPanelProps) {
   const {
     loading,
+    hasLaunchedOnce,
     runForecast,
     types,
     doneStates,
@@ -51,8 +49,6 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
     backlogSize,
     targetWeeks,
     includeZeroWeeks,
-    capacityPercent,
-    reducedCapacityWeeks,
     nSims,
   } = simulation;
   const [showPeriod, setShowPeriod] = useState(false);
@@ -63,7 +59,6 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
   const modeKind = simulationMode === "backlog_to_weeks" ? "item" : "semaine";
   const modeValue = simulationMode === "backlog_to_weeks" ? backlogSize : targetWeeks;
   const modeZeroText = includeZeroWeeks ? "incluses" : "non incluses";
-  const capacitySummary = `${String(capacityPercent)}% pendant ${String(reducedCapacityWeeks)} sem.`;
   const typeListText = types.length ? types.join(", ") : "aucun";
   const stateListText = doneStates.length ? doneStates.join(", ") : "aucun";
   const hasRequiredFilters = types.length > 0 && doneStates.length > 0;
@@ -98,7 +93,7 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
 
   async function handleRunForecast(): Promise<void> {
     if (!hasRequiredFilters) {
-      setValidationMessage("Ticket et État obligatoires.");
+      setValidationMessage("Ticket et Etat obligatoires.");
       return;
     }
     setValidationMessage("");
@@ -118,14 +113,14 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
     <>
       <section className="sim-control-section sim-control-section--compact">
         <div className="sim-advanced-header">
-          <h3 className="sim-control-heading">Période historique</h3>
+          <h3 className="sim-control-heading">Periode historique</h3>
           <button
             type="button"
             className="sim-advanced-toggle"
             onClick={() => toggleSection("period")}
             aria-expanded={showPeriod}
           >
-            {showPeriod ? "Réduire" : "Développer"}
+            {showPeriod ? "Reduire" : "Developper"}
           </button>
         </div>
         <div className="sim-advanced-summary">du {startDate} au {endDate}</div>
@@ -140,11 +135,11 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
             onClick={() => toggleSection("mode")}
             aria-expanded={showMode}
           >
-            {showMode ? "Réduire" : "Développer"}
+            {showMode ? "Reduire" : "Developper"}
           </button>
         </div>
         <div className="sim-advanced-summary">
-          Type {modeKind} : {String(modeValue)} 0 {modeZeroText} sur {String(nSims)} simulations ; capacité {capacitySummary}
+          Type {modeKind} : {String(modeValue)} 0 {modeZeroText} sur {String(nSims)} simulations
         </div>
         {showMode && <SimulationModeAndParametersControls simulation={simulation} />}
       </section>
@@ -157,25 +152,25 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
             onClick={() => toggleSection("filters")}
             aria-expanded={showFilters}
           >
-            {showFilters ? "Réduire" : "Développer"}
+            {showFilters ? "Reduire" : "Developper"}
           </button>
         </div>
         <div className="sim-advanced-summary">
-          type {typeListText} ; états {stateListText}
+          type {typeListText} ; etats {stateListText}
         </div>
         {showFilters && <SimulationFilterControls simulation={simulation} />}
       </section>
 
-      <button
-        onClick={() => void handleRunForecast()}
-        disabled={loading || !selectedTeam}
-        className={`ui-primary-btn ${!canRunSimulation ? "ui-primary-btn--disabled" : ""}`}
-      >
-        {loading ? "Calcul..." : "Lancer la simulation"}
-      </button>
-      {validationMessage && (
-        <div className="sim-validation-error">{validationMessage}</div>
+      {!hasLaunchedOnce && (
+        <button
+          onClick={() => void handleRunForecast()}
+          disabled={loading || !selectedTeam}
+          className={`ui-primary-btn ${!canRunSimulation ? "ui-primary-btn--disabled" : ""}`}
+        >
+          {loading ? "Calcul..." : "Lancer la simulation"}
+        </button>
       )}
+      {validationMessage && <div className="sim-validation-error">{validationMessage}</div>}
     </>
   );
 }

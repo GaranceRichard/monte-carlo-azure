@@ -1,4 +1,4 @@
-﻿type AppHeaderProps = {
+type AppHeaderProps = {
   theme: "light" | "dark";
   toggleTheme: () => void;
   showDisconnect?: boolean;
@@ -16,70 +16,40 @@ export default function AppHeader({
   onBack = null,
 }: AppHeaderProps) {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 12,
-        marginBottom: 8,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+    <div className="mb-2 flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] px-4 py-3">
+      <div className="flex items-center gap-3">
         <button
+          type="button"
           onClick={toggleTheme}
           title={theme === "dark" ? "Passer en mode jour" : "Passer en mode nuit"}
-          style={{
-            width: 42,
-            height: 42,
-            borderRadius: 12,
-            border: "1px solid var(--border)",
-            background: "var(--panel)",
-            cursor: "pointer",
-            display: "grid",
-            placeItems: "center",
-            fontSize: 18,
-          }}
+          className="grid h-10 w-10 place-items-center rounded-lg border border-[var(--border)] bg-[var(--surface-2)] text-sm font-bold text-[var(--brand)]"
         >
-          {theme === "dark" ? "🌙" : "☀️"}
+          {theme === "dark" ? "Nuit" : "Jour"}
         </button>
-        <h2 style={{ margin: 0 }}>Simulation Monte Carlo</h2>
+        <div>
+          <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Monte Carlo Studio</div>
+          <h2 className="m-0 text-lg font-extrabold text-[var(--brand-strong)]">Simulation Delivery Forecast</h2>
+        </div>
       </div>
 
       {(backLabel || showDisconnect) && (
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div className="flex items-center gap-2">
           {backLabel && onBack && (
             <button
+              type="button"
               onClick={onBack}
-              style={{
-                padding: "10px 14px",
-                borderRadius: 12,
-                border: "1px solid var(--border)",
-                background: "var(--panel)",
-                color: "var(--text)",
-                cursor: "pointer",
-                fontWeight: 700,
-                whiteSpace: "nowrap",
-              }}
+              className="rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm font-semibold text-[var(--text)]"
             >
               {backLabel}
             </button>
           )}
           {showDisconnect && (
             <button
+              type="button"
               onClick={onDisconnect}
-              style={{
-                padding: "10px 14px",
-                borderRadius: 12,
-                border: "1px solid var(--border)",
-                background: "var(--btnBg)",
-                color: "var(--btnText)",
-                cursor: "pointer",
-                fontWeight: 700,
-                whiteSpace: "nowrap",
-              }}
+              className="rounded-lg border border-[var(--border)] bg-[var(--brand)] px-3 py-2 text-sm font-semibold text-white"
             >
-              Se déconnecter
+              Se deconnecter
             </button>
           )}
         </div>
