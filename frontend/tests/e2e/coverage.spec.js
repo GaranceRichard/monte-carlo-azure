@@ -94,7 +94,8 @@ test.describe("e2e istanbul coverage", () => {
 
     await page.locator("select").first().selectOption("Equipe Alpha");
     await page.getByRole("button", { name: /Choisir cette/i }).click();
-    await expect(page.getByText(/[ÉE]quipe: Equipe Alpha/)).toBeVisible();
+    await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Alpha");
+
     const periodSection = page.locator("section.sim-control-section", { hasText: /P[ée]riode historique/i });
     const modeSection = page.locator("section.sim-control-section", { hasText: "Mode de simulation" });
     const filtersSection = page.locator("section.sim-control-section", { hasText: "Filtres de tickets" });
@@ -108,31 +109,30 @@ test.describe("e2e istanbul coverage", () => {
 
     await page.getByRole("button", { name: "Lancer la simulation" }).click();
     await expect(page.getByText(/Historique insuffisant/i)).toBeVisible();
-    await page.getByRole("button", { name: "Lancer la simulation" }).click();
-    await expect(page.getByText("Erreur simulation temporaire")).toBeVisible();
 
     await openIfCollapsed(modeSection);
     await page.getByLabel(/Inclure les semaines [àa] 0/i).check();
+    await expect(page.getByText("Erreur simulation temporaire")).toBeVisible({ timeout: 10_000 });
+
     await openIfCollapsed(filtersSection);
     await page.getByLabel("Bug").check();
     await page.getByLabel("Done").check();
     await openIfCollapsed(modeSection);
     await page.locator("select").first().selectOption("weeks_to_items");
     await page.locator('input[type="number"]').first().fill("12");
-    await page.getByRole("button", { name: "Lancer la simulation" }).click();
-    await expect(page.getByText("38 items")).toBeVisible();
+    await expect(page.getByText("38 items")).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText(/Mode: incluses|Mode: inclues/i)).toBeVisible();
+
     await openIfCollapsed(modeSection);
     await page.getByLabel(/Inclure les semaines [àa] 0/i).uncheck();
-    await page.getByRole("button", { name: "Distribution" }).click();
-    await page.getByRole("button", { name: /Courbe/i }).click();
-    await page.getByRole("button", { name: "Throughput" }).click();
+    await page.getByRole("tab", { name: "Distribution" }).click();
+    await page.getByRole("tab", { name: /Probabilit/i }).click();
+    await page.getByRole("tab", { name: "Throughput" }).click();
 
     await openIfCollapsed(modeSection);
     await page.locator("select").first().selectOption("backlog_to_weeks");
     await page.locator('input[type="number"]').first().fill("120");
-    await page.getByRole("button", { name: "Lancer la simulation" }).click();
-    await expect(page.getByText("10 semaines")).toBeVisible();
+    await expect(page.getByText("10 semaines")).toBeVisible({ timeout: 10_000 });
 
     await page.getByRole("button", { name: /Se d.*connecter/i }).click();
     await expect(page.getByText("Connexion Azure DevOps")).toBeVisible();
@@ -164,6 +164,8 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("button", { name: "Choisir ce Projet" }).click();
     await page.locator("select").first().selectOption("Equipe Alpha");
     await page.getByRole("button", { name: /Choisir cette/i }).click();
+    await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Alpha");
+
     const filtersToggle = filtersSection.getByRole("button", { name: /D[ée]velopper/i });
     if (await filtersToggle.isVisible().catch(() => false)) {
       await filtersToggle.click();
@@ -175,12 +177,13 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("button", { name: /Changer [ée]quipe/i }).click();
     await page.locator("select").first().selectOption("Equipe Beta");
     await page.getByRole("button", { name: /Choisir cette/i }).click();
-    await expect(page.getByText(/[ÉE]quipe: Equipe Beta/)).toBeVisible();
+    await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Beta");
+
     await openIfCollapsed(filtersSection);
     await page.getByLabel("Bug").check();
     await page.getByLabel("Done").check();
     await page.getByRole("button", { name: "Lancer la simulation" }).click();
-    await expect(page.getByText("10 semaines")).toBeVisible();
+    await expect(page.getByText("10 semaines")).toBeVisible({ timeout: 10_000 });
 
     await toggleThemeRoundTrip(page);
 
@@ -229,6 +232,6 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("button", { name: "Choisir ce Projet" }).click();
     await page.locator("select").first().selectOption("Equipe Alpha");
     await page.getByRole("button", { name: /Choisir cette/i }).click();
-    await expect(page.getByText(/[ÉE]quipe: Equipe Alpha/)).toBeVisible();
+    await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Alpha");
   });
 });

@@ -272,5 +272,5 @@ export async function completeOnboardingToSimulation(page, { org = "org-demo", p
   await page.getByRole("button", { name: "Choisir ce Projet" }).click();
   await page.locator("select").first().selectOption(team);
   await page.getByRole("button", { name: /Choisir cette/i }).click();
-  await expect(page.getByText(new RegExp(`[ÉE]quipe: ${team}`))).toBeVisible();
+  await expect(page.getByTestId("selected-team-name")).toHaveText(team);
 }

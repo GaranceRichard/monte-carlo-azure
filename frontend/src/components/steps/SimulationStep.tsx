@@ -13,9 +13,14 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="mb-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3">
+      <div
+        className="mb-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3"
+        data-testid="selected-team-card"
+      >
         <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Equipe active</div>
-        <div className="mt-1 text-xl font-extrabold text-[var(--brand)]">{selectedTeam}</div>
+        <div className="mt-1 text-xl font-extrabold text-[var(--brand)]" data-testid="selected-team-name">
+          {selectedTeam}
+        </div>
       </div>
 
       {err && (

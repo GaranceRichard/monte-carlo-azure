@@ -49,7 +49,7 @@ export default function AppHeader({
               onClick={onDisconnect}
               className="rounded-lg border border-[var(--border)] bg-[var(--brand)] px-3 py-2 text-sm font-semibold text-white"
             >
-              Se deconnecter
+              Se déconnecter
             </button>
           )}
         </div>
