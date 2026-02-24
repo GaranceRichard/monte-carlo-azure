@@ -15,7 +15,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 README_PATH = REPO_ROOT / "README.md"
 SECRET_CHECK_PATH = REPO_ROOT / "Scripts" / "check_no_secrets.py"
@@ -93,7 +92,9 @@ def check_readme_staged(paths: list[str]) -> int:
         )
         print("Staged paths triggering this rule:", file=sys.stderr)
         for p in paths:
-            if p in README_REQUIRED_FILES or any(p.startswith(prefix) for prefix in README_REQUIRED_PREFIXES):
+            if p in README_REQUIRED_FILES or any(
+                p.startswith(prefix) for prefix in README_REQUIRED_PREFIXES
+            ):
                 print(f"  - {p}", file=sys.stderr)
         print("\nAction: update README.md, then run `git add README.md`.", file=sys.stderr)
         return 1

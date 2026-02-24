@@ -1,5 +1,4 @@
 import numpy as np
-
 import pytest
 
 from backend.mc_core import (
@@ -82,7 +81,13 @@ def test_mc_items_done_for_weeks_invalid_inputs():
 
 def test_mc_items_done_for_weeks_accepts_zero_samples_when_enabled():
     samples = np.array([0, 0, 1, 2], dtype=int)
-    out = mc_items_done_for_weeks(weeks=4, throughput_samples=samples, n_sims=1000, include_zero_weeks=True, seed=7)
+    out = mc_items_done_for_weeks(
+        weeks=4,
+        throughput_samples=samples,
+        n_sims=1000,
+        include_zero_weeks=True,
+        seed=7,
+    )
     assert out.shape == (1000,)
     assert int(out.min()) >= 0
 

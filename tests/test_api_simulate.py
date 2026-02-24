@@ -1,8 +1,7 @@
 from fastapi.testclient import TestClient
 
-from backend import api_routes_simulate
+import backend.api_routes_simulate as api_routes_simulate
 from backend.api import app
-
 
 client = TestClient(app)
 

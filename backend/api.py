@@ -5,7 +5,6 @@ from .api_config import get_api_config
 from .api_routes_simulate import router
 from .api_static import mount_frontend
 
-
 app = FastAPI(title="Monte Carlo Simulate API", version="2.0")
 cfg = get_api_config()
 

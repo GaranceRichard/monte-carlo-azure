@@ -6,8 +6,12 @@ import numpy as np
 from fastapi import APIRouter, HTTPException, Request
 
 from .api_models import SimulateRequest, SimulateResponse
-from .mc_core import histogram_buckets, mc_finish_weeks, mc_items_done_for_weeks, percentiles
-
+from .mc_core import (
+    histogram_buckets,
+    mc_finish_weeks,
+    mc_items_done_for_weeks,
+    percentiles,
+)
 
 router = APIRouter()
 
@@ -53,7 +57,10 @@ def _client_key(request: Request) -> str:
 @router.post("/simulate", response_model=SimulateResponse)
 def simulate(req: SimulateRequest, request: Request) -> SimulateResponse:
     if not _rate_limiter.allow(_client_key(request)):
-        raise HTTPException(429, "Trop de requetes sur /simulate. Reessayez dans quelques instants.")
+        raise HTTPException(
+            429,
+            "Trop de requetes sur /simulate. Reessayez dans quelques instants.",
+        )
 
     samples = np.array(req.throughput_samples)
     if req.include_zero_weeks:

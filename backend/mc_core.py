@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import numpy as np
 from typing import Dict, Optional, Tuple
+
+import numpy as np
 
 
 def histogram_buckets(arr: np.ndarray, max_buckets: int = 100) -> list[Dict[str, int]]:
@@ -32,6 +33,7 @@ def histogram_buckets(arr: np.ndarray, max_buckets: int = 100) -> list[Dict[str,
         center = int(round((left + right) / 2))
         buckets.append({"x": center, "count": int(count)})
     return buckets
+
 
 def mc_finish_weeks(
     backlog_size: int,

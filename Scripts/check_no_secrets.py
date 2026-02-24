@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 check_no_secrets.py
@@ -13,14 +13,12 @@ Recommended integration: .git/hooks/pre-commit
 
 from __future__ import annotations
 
-import os
 import re
 import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, List, Optional, Tuple
-
+from typing import List, Optional, Tuple
 
 # --- Tuning knobs ---
 MAX_FILE_BYTES = 1_000_000  # 1 MB max per file (avoid scanning big blobs)
@@ -116,11 +114,21 @@ def compile_rules() -> List[Tuple[str, re.Pattern]]:
     """
     rules: List[Tuple[str, str]] = [
         # Azure DevOps PAT: only if ADO_PAT is set to a non-empty non-placeholder value
-        ("ADO_PAT set", r"(?i)^\s*ADO_PAT\s*=\s*['\"]?(?!\s*$)(?!<SET_ME>|SET_ME|CHANGEME|CHANGE_ME|YOUR_TOKEN|PASTE|PASTE_YOUR_TOKEN_HERE)[^'\"\s]{8,}"),
+        (
+            "ADO_PAT set",
+            (
+                r"(?i)^\s*ADO_PAT\s*=\s*['\"]?(?!\s*$)"
+                r"(?!<SET_ME>|SET_ME|CHANGEME|CHANGE_ME|YOUR_TOKEN|PASTE|PASTE_YOUR_TOKEN_HERE)"
+                r"[^'\"\s]{8,}"
+            ),
+        ),
 
         # Generic token assignment: require a quoted literal or long-looking value
         # Avoid matching normal code like .decode(), token variables, etc.
-        ("Generic token assignment", r"(?i)\b(token|api[_-]?key|secret|password)\s*[:=]\s*['\"][^'\"]{8,}['\"]"),
+        (
+            "Generic token assignment",
+            r"(?i)\b(token|api[_-]?key|secret|password)\s*[:=]\s*['\"][^'\"]{8,}['\"]",
+        ),
 
         # GitHub tokens (classic + fine-grained formats)
         ("GitHub token", r"\bgh[pousr]_[A-Za-z0-9]{20,}\b"),
@@ -143,7 +151,7 @@ def mask_excerpt(line: str) -> str:
     s = line.rstrip("\n")
     if len(s) <= 24:
         return "***REDACTED***"
-    return s[:12] + "…" + s[-8:]
+    return s[:12] + "â€¦" + s[-8:]
 
 
 def scan_text(path: str, text: str, rules: List[Tuple[str, re.Pattern]]) -> List[Finding]:
@@ -202,7 +210,7 @@ def main() -> int:
         all_findings.extend(scan_text(path, text, rules))
 
     if all_findings:
-        print("\n❌ Potential secrets detected in staged files. Commit blocked.\n", file=sys.stderr)
+        print("\nPotential secrets detected in staged files.\n", file=sys.stderr)
         for f in all_findings:
             print(f"- {f.path}:{f.line_no} | {f.rule} | {f.excerpt}", file=sys.stderr)
 

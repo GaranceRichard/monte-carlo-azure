@@ -1,10 +1,11 @@
-import argparse
+﻿import argparse
 import os
 import socket
 import webbrowser
+
 import uvicorn
 
-# IMPORTANT: import réel pour que PyInstaller embarque le package backend
+# IMPORTANT: import reel pour que PyInstaller embarque le package backend
 from backend.api import app
 
 
@@ -25,7 +26,8 @@ def main():
 
     if not is_port_free(host, port):
         raise SystemExit(
-            f"Port {port} déjà utilisé sur {host}. Essayez: --port {port+1} (ex: 3001) ou --port 8000."
+            f"Port {port} deja utilise sur {host}. "
+            f"Essayez: --port {port + 1} (ex: 3001) ou --port 8000."
         )
 
     url = f"http://{host}:{port}/"
