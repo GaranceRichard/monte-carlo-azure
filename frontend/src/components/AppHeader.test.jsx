@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+﻿import { fireEvent, render, screen } from "@testing-library/react";
 import AppHeader from "./AppHeader";
 
 describe("AppHeader", () => {
@@ -29,7 +29,7 @@ describe("AppHeader", () => {
   });
 
   it("does not render right-side actions when hidden", () => {
-    render(<AppHeader theme="light" toggleTheme={vi.fn()} />);
+    render(<AppHeader theme="light" toggleTheme={vi.fn()} onDisconnect={vi.fn()} />);
 
     expect(screen.getByTitle("Passer en mode nuit")).toBeInTheDocument();
     expect(screen.queryByText("Se déconnecter")).not.toBeInTheDocument();

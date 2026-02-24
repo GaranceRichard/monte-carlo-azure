@@ -80,7 +80,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
           setOrgHint("");
         } else if (resolved.organizations.length === 1) {
           setSelectedOrg(resolved.organizations[0].name || "");
-          setOrgHint("PAT local detecte: organisation preselectionnee.");
+          setOrgHint("PAT local détecté: organisation présélectionnée.");
         } else {
           setSelectedOrg("");
           setOrgHint("PAT local: saisissez votre organisation manuellement.");
@@ -108,7 +108,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   async function goToProjects(): Promise<boolean> {
     const org = selectedOrg.trim();
     if (!org) {
-      setErr("Selectionnez une organisation.");
+      setErr("Sélectionnez une organisation.");
       return false;
     }
     if (!sessionPat) {
@@ -138,7 +138,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     const org = selectedOrg.trim();
     const project = selectedProject.trim();
     if (!org || !project) {
-      setErr("Selectionnez un projet.");
+      setErr("Sélectionnez un projet.");
       return false;
     }
     if (!sessionPat) {
@@ -167,7 +167,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
 
   function goToSimulation(): boolean {
     if (!selectedTeam) {
-      setErr("Selectionnez une equipe.");
+      setErr("Sélectionnez une équipe.");
       return false;
     }
     setErr("");
@@ -207,7 +207,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     if (step === "org") return "Changer PAT";
     if (step === "projects") return "Changer ORG";
     if (step === "teams") return "Changer projet";
-    if (step === "simulation") return "Changer equipe";
+    if (step === "simulation") return "Changer équipe";
     return "";
   }, [step]);
 

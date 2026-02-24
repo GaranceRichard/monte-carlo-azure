@@ -48,10 +48,10 @@ export default function SimulationFilterControls({ simulation }: SimulationFilte
         ))}
       </div>
 
-      <label className="sim-label sim-mt-10">Etats de resolution</label>
+      <label className="sim-label sim-mt-10">États de résolution</label>
       <div className="sim-checklist sim-checklist--states">
         {loadingTeamOptions && (
-          <div className="sim-empty-tip">Chargement des etats de resolution...</div>
+          <div className="sim-empty-tip">Chargement des états de résolution...</div>
         )}
         {filteredDoneStateOptions.map((state) => (
           <label key={state} className="sim-check-row">
@@ -68,7 +68,7 @@ export default function SimulationFilterControls({ simulation }: SimulationFilte
         ))}
         {!types.length && (
           <div className="sim-empty-tip">
-            Selectionnez d&apos;abord un ou plusieurs tickets.
+            Sélectionnez d&apos;abord un ou plusieurs tickets.
           </div>
         )}
       </div>

@@ -331,6 +331,20 @@
   font-size: var(--text-xs);
 }
 
+.sim-history-row {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  display: grid;
+  gap: 6px;
+  background: var(--panel);
+}
+
+.sim-history-meta {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
 .sim-loading-stage {
   margin-top: var(--space-2);
   color: var(--muted);

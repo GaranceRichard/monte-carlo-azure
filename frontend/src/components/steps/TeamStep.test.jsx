@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+﻿import { fireEvent, render, screen } from "@testing-library/react";
 import TeamStep from "./TeamStep";
 
 describe("TeamStep", () => {
@@ -38,7 +38,7 @@ describe("TeamStep", () => {
     );
 
     expect(screen.getByText("Erreur team")).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "Aucune equipe disponible" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Aucune équipe disponible" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Choisir cette équipe" })).toBeDisabled();
   });
 

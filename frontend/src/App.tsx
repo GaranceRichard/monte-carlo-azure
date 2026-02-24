@@ -51,7 +51,7 @@ export default function App() {
     pat: "Connexion",
     org: "Organisation",
     projects: "Projet",
-    teams: "Equipe",
+    teams: "Équipe",
   };
   const currentOnboardingIndex = onboardingOrder.findIndex((step) => step === onboardingState.step);
   const isSimulationStep = onboardingState.step === "simulation";
@@ -89,7 +89,7 @@ export default function App() {
                   type="button"
                   className="flow-step flow-step-btn"
                   onClick={() => handleStepperBack(step)}
-                  title={step === "pat" ? "Revenir au debut (deconnexion)" : "Revenir a cette etape"}
+                  title={step === "pat" ? "Revenir au début (déconnexion)" : "Revenir à cette étape"}
                 >
                   {idx + 1}. {onboardingLabels[step]}
                 </button>
@@ -104,7 +104,7 @@ export default function App() {
             ))}
           </div>
           <div className="flow-stepper-caption">
-            Etape {currentOnboardingIndex + 1} / {onboardingOrder.length}
+            Étape {currentOnboardingIndex + 1} / {onboardingOrder.length}
           </div>
         </div>
       )}

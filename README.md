@@ -15,6 +15,9 @@ Architecture V2:
 - Récupération du throughput hebdomadaire côté client
 - Simulation Monte Carlo côté backend (`POST /simulate`)
 - Visualisation des percentiles et distributions
+- Export CSV du throughput hebdomadaire
+- Historique local des dernières simulations (localStorage, sans compte)
+- Paramètre de capacité réduite (ex: équipe à 70% pendant N semaines)
 
 ---
 
@@ -201,6 +204,18 @@ Workflow: `.github/workflows/ci.yml`
   - Tests unitaires: `npm run test:unit` (Vitest)
   - Installation Playwright: `npx playwright install --with-deps chromium`
   - Tests e2e: `npm run test:e2e`
+
+---
+
+## Déploiement production
+
+Guide complet:
+- [`docs/deployment.md`](docs/deployment.md)
+
+Le guide couvre:
+- option Docker Compose (recommandée)
+- option Nginx + systemd
+- checks post-déploiement et points sécurité
 
 ---
 

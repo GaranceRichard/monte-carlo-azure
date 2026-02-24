@@ -1,4 +1,4 @@
-import type { NamedEntity } from "../../types";
+﻿import type { NamedEntity } from "../../types";
 
 type TeamStepProps = {
   err: string;
@@ -21,22 +21,22 @@ export default function TeamStep({
 }: TeamStepProps) {
   return (
     <>
-      <h2 className="flow-title">Choix de l&apos;equipe</h2>
+      <h2 className="flow-title">Choix de l&apos;équipe</h2>
       <p className="flow-text">
-        Projet selectionne: <b>{selectedProject}</b>
+        Projet sélectionné: <b>{selectedProject}</b>
       </p>
       {err && (
         <div className="ui-alert ui-alert--danger">
           <b>Erreur :</b> {err}
         </div>
       )}
-      <label className="flow-label">Equipes disponibles</label>
+      <label className="flow-label">Équipes disponibles</label>
       <select
         value={selectedTeam}
         onChange={(e) => setSelectedTeam(e.target.value)}
         className="flow-input flow-input--team-compact"
       >
-        {teams.length === 0 && <option value="">Aucune equipe disponible</option>}
+        {teams.length === 0 && <option value="">Aucune équipe disponible</option>}
         {teams.map((team) => (
           <option key={team.id || team.name} value={team.name || ""}>
             {team.name}

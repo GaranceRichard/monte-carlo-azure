@@ -19,6 +19,8 @@ const DEFAULT_STATES_BY_TYPE: Record<string, string[]> = {
   Bug: ["Done", "Closed", "Resolved"],
 };
 const SIM_PREFS_KEY = "mc_simulation_prefs_v1";
+const SIM_HISTORY_KEY = "mc_simulation_history_v1";
+const MAX_SIM_HISTORY = 10;
 
 type ChartPoint = { x: number; count: number; gauss: number };
 type ProbabilityPoint = { x: number; probability: number };
@@ -45,6 +47,30 @@ type StoredSimulationPrefs = {
   backlogSize?: number;
   targetWeeks?: number;
   nSims?: number;
+  capacityPercent?: number;
+  reducedCapacityWeeks?: number;
+};
+
+type SimulationHistoryEntry = {
+  id: string;
+  createdAt: string;
+  selectedOrg: string;
+  selectedProject: string;
+  selectedTeam: string;
+  startDate: string;
+  endDate: string;
+  simulationMode: ForecastMode;
+  includeZeroWeeks: boolean;
+  backlogSize: number;
+  targetWeeks: number;
+  nSims: number;
+  capacityPercent: number;
+  reducedCapacityWeeks: number;
+  types: string[];
+  doneStates: string[];
+  sampleStats: SampleStats | null;
+  weeklyThroughput: WeeklyThroughputRow[];
+  result: ForecastResponse;
 };
 
 export type SimulationViewModel = {
@@ -60,6 +86,10 @@ export type SimulationViewModel = {
   setSimulationMode: (value: ForecastMode) => void;
   includeZeroWeeks: boolean;
   setIncludeZeroWeeks: (value: boolean) => void;
+  capacityPercent: number | string;
+  setCapacityPercent: (value: number | string) => void;
+  reducedCapacityWeeks: number | string;
+  setReducedCapacityWeeks: (value: number | string) => void;
   sampleStats: SampleStats | null;
   backlogSize: number | string;
   setBacklogSize: (value: number | string) => void;
@@ -81,6 +111,10 @@ export type SimulationViewModel = {
   mcHistData: ChartPoint[];
   probabilityCurveData: ProbabilityPoint[];
   tooltipBaseProps: TooltipBaseProps;
+  simulationHistory: SimulationHistoryEntry[];
+  applyHistoryEntry: (entry: SimulationHistoryEntry) => void;
+  clearSimulationHistory: () => void;
+  exportThroughputCsv: () => void;
   runForecast: () => Promise<void>;
   resetForTeamSelection: () => void;
   resetAll: () => void;
@@ -133,6 +167,67 @@ function readStoredSimulationPrefs(): StoredSimulationPrefs {
   }
 }
 
+function readSimulationHistory(): SimulationHistoryEntry[] {
+  try {
+    const raw = localStorage.getItem(SIM_HISTORY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((entry) => entry && typeof entry === "object");
+  } catch {
+    return [];
+  }
+}
+
+function toSafeNumber(value: number | string, fallback: number): number {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+function applyCapacityReductionToResult(
+  response: ForecastResponse,
+  mode: ForecastMode,
+  targetWeeksValue: number,
+  capacityPercentValue: number,
+  reducedWeeksValue: number,
+): ForecastResponse {
+  const capacity = clamp(capacityPercentValue, 1, 100) / 100;
+  const reducedWeeks = clamp(reducedWeeksValue, 0, 260);
+  if (capacity >= 1 || reducedWeeks <= 0) return response;
+
+  const lostWeeks = reducedWeeks * (1 - capacity);
+
+  if (response.result_kind === "weeks") {
+    return {
+      ...response,
+      result_percentiles: Object.fromEntries(
+        Object.entries(response.result_percentiles).map(([key, value]) => [key, Number(value) + lostWeeks]),
+      ),
+      result_distribution: response.result_distribution.map((bucket) => ({
+        ...bucket,
+        x: Number(bucket.x) + lostWeeks,
+      })),
+    };
+  }
+
+  const horizon = Math.max(1, targetWeeksValue);
+  const itemFactor = clamp((horizon - lostWeeks) / horizon, 0, 1);
+  return {
+    ...response,
+    result_percentiles: Object.fromEntries(
+      Object.entries(response.result_percentiles).map(([key, value]) => [key, Number(value) * itemFactor]),
+    ),
+    result_distribution: response.result_distribution.map((bucket) => ({
+      ...bucket,
+      x: Number(bucket.x) * itemFactor,
+    })),
+  };
+}
+
 export function useSimulation({
   step,
   selectedOrg,
@@ -157,6 +252,8 @@ export function useSimulation({
     () => prefs.simulationMode || "backlog_to_weeks",
   );
   const [includeZeroWeeks, setIncludeZeroWeeks] = useState(() => Boolean(prefs.includeZeroWeeks));
+  const [capacityPercent, setCapacityPercent] = useState<number | string>(prefs.capacityPercent ?? 100);
+  const [reducedCapacityWeeks, setReducedCapacityWeeks] = useState<number | string>(prefs.reducedCapacityWeeks ?? 0);
   const [sampleStats, setSampleStats] = useState<SampleStats | null>(null);
   const [backlogSize, setBacklogSize] = useState<number | string>(prefs.backlogSize ?? 120);
   const [targetWeeks, setTargetWeeks] = useState<number | string>(prefs.targetWeeks ?? 12);
@@ -167,6 +264,7 @@ export function useSimulation({
   const [types, setTypes] = useState<string[]>([]);
   const [result, setResult] = useState<ForecastResponse | null>(null);
   const [weeklyThroughput, setWeeklyThroughput] = useState<WeeklyThroughputRow[]>([]);
+  const [simulationHistory, setSimulationHistory] = useState<SimulationHistoryEntry[]>(() => readSimulationHistory());
   const [activeChartTab, setActiveChartTab] = useState<"throughput" | "distribution" | "probability">("throughput");
   const [hasLaunchedOnce, setHasLaunchedOnce] = useState(false);
   const autoRunKeyRef = useRef("");
@@ -258,6 +356,8 @@ export function useSimulation({
       endDate,
       simulationMode,
       includeZeroWeeks ? "1" : "0",
+      String(capacityPercent),
+      String(reducedCapacityWeeks),
       String(backlogSize),
       String(targetWeeks),
       String(nSims),
@@ -275,7 +375,7 @@ export function useSimulation({
     if (!hasLaunchedOnce || step !== "simulation") return;
 
     if (!types.length || !doneStates.length) {
-      setErr("Ticket et Etat obligatoires.");
+      setErr("Ticket et État obligatoires.");
       setResult(null);
       setWeeklyThroughput([]);
       setSampleStats(null);
@@ -301,6 +401,8 @@ export function useSimulation({
     endDate,
     simulationMode,
     includeZeroWeeks,
+    capacityPercent,
+    reducedCapacityWeeks,
     backlogSize,
     targetWeeks,
     nSims,
@@ -326,6 +428,8 @@ export function useSimulation({
           endDate,
           simulationMode,
           includeZeroWeeks,
+          capacityPercent: Number(capacityPercent) || 100,
+          reducedCapacityWeeks: Number(reducedCapacityWeeks) || 0,
           backlogSize: Number(backlogSize) || 0,
           targetWeeks: Number(targetWeeks) || 0,
           nSims: Number(nSims) || 0,
@@ -334,7 +438,25 @@ export function useSimulation({
     } catch {
       // Local storage can be unavailable in private contexts.
     }
-  }, [startDate, endDate, simulationMode, includeZeroWeeks, backlogSize, targetWeeks, nSims]);
+  }, [
+    startDate,
+    endDate,
+    simulationMode,
+    includeZeroWeeks,
+    capacityPercent,
+    reducedCapacityWeeks,
+    backlogSize,
+    targetWeeks,
+    nSims,
+  ]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIM_HISTORY_KEY, JSON.stringify(simulationHistory));
+    } catch {
+      // Best effort only.
+    }
+  }, [simulationHistory]);
 
   useEffect(() => {
     if (step !== "simulation" || !selectedOrg || !selectedProject || !selectedTeam || !pat) return;
@@ -400,10 +522,58 @@ export function useSimulation({
     pendingAutoRunRef.current = false;
   }
 
+  function applyHistoryEntry(entry: SimulationHistoryEntry): void {
+    setErr("");
+    setStartDate(entry.startDate);
+    setEndDate(entry.endDate);
+    setSimulationMode(entry.simulationMode);
+    setIncludeZeroWeeks(entry.includeZeroWeeks);
+    setCapacityPercent(entry.capacityPercent);
+    setReducedCapacityWeeks(entry.reducedCapacityWeeks);
+    setBacklogSize(entry.backlogSize);
+    setTargetWeeks(entry.targetWeeks);
+    setNSims(entry.nSims);
+    setTypes(entry.types);
+    setDoneStates(entry.doneStates);
+    setSampleStats(entry.sampleStats);
+    setWeeklyThroughput(entry.weeklyThroughput);
+    setResult(entry.result);
+    setActiveChartTab("throughput");
+    setHasLaunchedOnce(false);
+    autoRunKeyRef.current = "";
+    pendingAutoRunRef.current = false;
+  }
+
+  function clearSimulationHistory(): void {
+    setSimulationHistory([]);
+    try {
+      localStorage.removeItem(SIM_HISTORY_KEY);
+    } catch {
+      // Ignore storage errors.
+    }
+  }
+
+  function exportThroughputCsv(): void {
+    if (!weeklyThroughput.length) return;
+    const header = "week,throughput";
+    const rows = weeklyThroughput.map((row) => `${String(row.week).slice(0, 10)},${row.throughput}`);
+    const csv = [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const now = new Date().toISOString().replace(/[:.]/g, "-");
+    a.download = `throughput-${selectedTeam || "team"}-${now}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
   async function runForecast(): Promise<void> {
     if (loading) return;
     if (!selectedTeam) {
-      setErr("Selectionnez une equipe.");
+      setErr("Sélectionnez une équipe.");
       return;
     }
     if (!pat) {
@@ -411,7 +581,7 @@ export function useSimulation({
       return;
     }
     if (!types.length || !doneStates.length) {
-      setErr("Ticket et Etat obligatoires.");
+      setErr("Ticket et État obligatoires.");
       setResult(null);
       setWeeklyThroughput([]);
       setSampleStats(null);
@@ -423,7 +593,7 @@ export function useSimulation({
 
     setErr("");
     setLoading(true);
-    setLoadingStageMessage("Recuperation des donnees...");
+    setLoadingStageMessage("Récupération des données...");
     setResult(null);
     setWeeklyThroughput([]);
     setSampleStats(null);
@@ -455,7 +625,7 @@ export function useSimulation({
       });
       if (throughputSamples.length < 6) {
         throw new Error(
-          "Historique insuffisant pour une simulation fiable. Elargissez la periode selectionnee, ou verifiez les types et etats de resolution choisis.",
+          "Historique insuffisant pour une simulation fiable. Élargissez la période sélectionnée, ou vérifiez les types et états de résolution choisis.",
         );
       }
 
@@ -477,7 +647,41 @@ export function useSimulation({
         result_percentiles: response.result_percentiles,
         result_distribution: (response.result_distribution ?? []) as ForecastHistogramBucket[],
       };
-      setResult(normalized);
+      const adjusted = applyCapacityReductionToResult(
+        normalized,
+        simulationMode,
+        toSafeNumber(targetWeeks, 12),
+        toSafeNumber(capacityPercent, 100),
+        toSafeNumber(reducedCapacityWeeks, 0),
+      );
+      setResult(adjusted);
+
+      const newHistoryEntry: SimulationHistoryEntry = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        createdAt: new Date().toISOString(),
+        selectedOrg,
+        selectedProject,
+        selectedTeam,
+        startDate,
+        endDate,
+        simulationMode,
+        includeZeroWeeks,
+        backlogSize: toSafeNumber(backlogSize, 120),
+        targetWeeks: toSafeNumber(targetWeeks, 12),
+        nSims: toSafeNumber(nSims, 20_000),
+        capacityPercent: clamp(toSafeNumber(capacityPercent, 100), 1, 100),
+        reducedCapacityWeeks: clamp(toSafeNumber(reducedCapacityWeeks, 0), 0, 260),
+        types: [...types],
+        doneStates: [...doneStates],
+        sampleStats: {
+          totalWeeks: weekly.length,
+          zeroWeeks,
+          usedWeeks: throughputSamples.length,
+        },
+        weeklyThroughput: weekly,
+        result: adjusted,
+      };
+      setSimulationHistory((prev) => [newHistoryEntry, ...prev].slice(0, MAX_SIM_HISTORY));
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : String(e));
     } finally {
@@ -500,6 +704,10 @@ export function useSimulation({
     setSimulationMode,
     includeZeroWeeks,
     setIncludeZeroWeeks,
+    capacityPercent,
+    setCapacityPercent,
+    reducedCapacityWeeks,
+    setReducedCapacityWeeks,
     sampleStats,
     backlogSize,
     setBacklogSize,
@@ -521,6 +729,10 @@ export function useSimulation({
     mcHistData,
     probabilityCurveData,
     tooltipBaseProps,
+    simulationHistory,
+    applyHistoryEntry,
+    clearSimulationHistory,
+    exportThroughputCsv,
     runForecast,
     resetForTeamSelection,
     resetAll,

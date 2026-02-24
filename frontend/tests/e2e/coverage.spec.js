@@ -8,7 +8,7 @@ test.describe("e2e istanbul coverage", () => {
   const allCoverageEntries = [];
 
   const openIfCollapsed = async (section) => {
-    const button = section.getByRole("button", { name: "Developper" });
+    const button = section.getByRole("button", { name: /D[ée]velopper/i });
     if (await button.isVisible().catch(() => false)) {
       await button.click();
     }
@@ -89,13 +89,13 @@ test.describe("e2e istanbul coverage", () => {
 
     await expect(page.getByRole("heading", { name: /Choix du projet/i })).toBeVisible();
     await page.getByRole("button", { name: "Choisir ce Projet" }).click();
-    await expect(page.getByText(/Impossible de lister les equipes/i)).toBeVisible();
+    await expect(page.getByText(/Impossible de lister les [ée]quipes/i)).toBeVisible();
     await page.getByRole("button", { name: "Choisir ce Projet" }).click();
 
     await page.locator("select").first().selectOption("Equipe Alpha");
     await page.getByRole("button", { name: /Choisir cette/i }).click();
-    await expect(page.getByText("Equipe: Equipe Alpha")).toBeVisible();
-    const periodSection = page.locator("section.sim-control-section", { hasText: "Periode historique" });
+    await expect(page.getByText(/[ÉE]quipe: Equipe Alpha/)).toBeVisible();
+    const periodSection = page.locator("section.sim-control-section", { hasText: /P[ée]riode historique/i });
     const modeSection = page.locator("section.sim-control-section", { hasText: "Mode de simulation" });
     const filtersSection = page.locator("section.sim-control-section", { hasText: "Filtres de tickets" });
 
@@ -112,7 +112,7 @@ test.describe("e2e istanbul coverage", () => {
     await expect(page.getByText("Erreur simulation temporaire")).toBeVisible();
 
     await openIfCollapsed(modeSection);
-    await page.getByLabel("Inclure les semaines a 0").check();
+    await page.getByLabel(/Inclure les semaines [àa] 0/i).check();
     await openIfCollapsed(filtersSection);
     await page.getByLabel("Bug").check();
     await page.getByLabel("Done").check();
@@ -121,9 +121,9 @@ test.describe("e2e istanbul coverage", () => {
     await page.locator('input[type="number"]').first().fill("12");
     await page.getByRole("button", { name: "Lancer la simulation" }).click();
     await expect(page.getByText("38 items")).toBeVisible();
-    await expect(page.getByText(/Mode: inclues/i)).toBeVisible();
+    await expect(page.getByText(/Mode: incluses|Mode: inclues/i)).toBeVisible();
     await openIfCollapsed(modeSection);
-    await page.getByLabel("Inclure les semaines a 0").uncheck();
+    await page.getByLabel(/Inclure les semaines [àa] 0/i).uncheck();
     await page.getByRole("button", { name: "Distribution" }).click();
     await page.getByRole("button", { name: /Courbe/i }).click();
     await page.getByRole("button", { name: "Throughput" }).click();
@@ -164,7 +164,7 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("button", { name: "Choisir ce Projet" }).click();
     await page.locator("select").first().selectOption("Equipe Alpha");
     await page.getByRole("button", { name: /Choisir cette/i }).click();
-    const filtersToggle = filtersSection.getByRole("button", { name: "Developper" });
+    const filtersToggle = filtersSection.getByRole("button", { name: /D[ée]velopper/i });
     if (await filtersToggle.isVisible().catch(() => false)) {
       await filtersToggle.click();
     }
@@ -172,10 +172,10 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByLabel("Done").check();
     await page.getByLabel("User Story").check();
     await page.getByLabel("User Story").uncheck();
-    await page.getByRole("button", { name: /Changer equipe/i }).click();
+    await page.getByRole("button", { name: /Changer [ée]quipe/i }).click();
     await page.locator("select").first().selectOption("Equipe Beta");
     await page.getByRole("button", { name: /Choisir cette/i }).click();
-    await expect(page.getByText("Equipe: Equipe Beta")).toBeVisible();
+    await expect(page.getByText(/[ÉE]quipe: Equipe Beta/)).toBeVisible();
     await openIfCollapsed(filtersSection);
     await page.getByLabel("Bug").check();
     await page.getByLabel("Done").check();
@@ -229,6 +229,6 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("button", { name: "Choisir ce Projet" }).click();
     await page.locator("select").first().selectOption("Equipe Alpha");
     await page.getByRole("button", { name: /Choisir cette/i }).click();
-    await expect(page.getByText("Equipe: Equipe Alpha")).toBeVisible();
+    await expect(page.getByText(/[ÉE]quipe: Equipe Alpha/)).toBeVisible();
   });
 });

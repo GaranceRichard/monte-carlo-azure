@@ -23,7 +23,7 @@ export default function ProjectStep({
     <>
       <h2 className="flow-title">Choix du projet</h2>
       <p className="flow-text">
-        Organisation selectionnee: <b>{selectedOrg}</b>
+        Organisation sélectionnée: <b>{selectedOrg}</b>
       </p>
       {err && (
         <div className="ui-alert ui-alert--danger">

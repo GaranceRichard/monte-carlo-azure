@@ -11,7 +11,7 @@ export default function PatStep({ err, patInput, setPatInput, loading, onSubmit 
     <>
       <h2 className="flow-title">Connexion Azure DevOps</h2>
       <p className="flow-text">
-        Votre PAT Azure DevOps est utilise uniquement dans votre navigateur pour interroger directement Microsoft. Il ne transite jamais par nos serveurs. Nous ne recevons que des chiffres anonymes (throughput hebdomadaire) pour calculer la simulation.
+        Votre PAT Azure DevOps est utilisé uniquement dans votre navigateur pour interroger directement Microsoft. Il ne transite jamais par nos serveurs. Nous ne recevons que des chiffres anonymes (throughput hebdomadaire) pour calculer la simulation.
       </p>
       {err && (
         <div className="ui-alert ui-alert--danger">

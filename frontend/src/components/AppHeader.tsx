@@ -1,4 +1,4 @@
-type AppHeaderProps = {
+﻿type AppHeaderProps = {
   theme: "light" | "dark";
   toggleTheme: () => void;
   showDisconnect?: boolean;

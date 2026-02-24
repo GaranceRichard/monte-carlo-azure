@@ -10,7 +10,7 @@ export default function SimulationHistoryRangeControls({ simulation }: Simulatio
   return (
     <div className="sim-grid-2 sim-grid-2--compact">
       <div>
-        <label className="sim-label sim-label--compact">Debut historique</label>
+        <label className="sim-label sim-label--compact">Début historique</label>
         <input
           type="date"
           value={startDate}

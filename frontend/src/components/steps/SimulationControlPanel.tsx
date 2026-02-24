@@ -16,6 +16,10 @@ type SimulationControlPanelProps = {
     | "setSimulationMode"
     | "includeZeroWeeks"
     | "setIncludeZeroWeeks"
+    | "capacityPercent"
+    | "setCapacityPercent"
+    | "reducedCapacityWeeks"
+    | "setReducedCapacityWeeks"
     | "backlogSize"
     | "setBacklogSize"
     | "targetWeeks"
@@ -47,6 +51,8 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
     backlogSize,
     targetWeeks,
     includeZeroWeeks,
+    capacityPercent,
+    reducedCapacityWeeks,
     nSims,
   } = simulation;
   const [showPeriod, setShowPeriod] = useState(false);
@@ -56,7 +62,8 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
 
   const modeKind = simulationMode === "backlog_to_weeks" ? "item" : "semaine";
   const modeValue = simulationMode === "backlog_to_weeks" ? backlogSize : targetWeeks;
-  const modeZeroText = includeZeroWeeks ? "inclus" : "non inclus";
+  const modeZeroText = includeZeroWeeks ? "incluses" : "non incluses";
+  const capacitySummary = `${String(capacityPercent)}% pendant ${String(reducedCapacityWeeks)} sem.`;
   const typeListText = types.length ? types.join(", ") : "aucun";
   const stateListText = doneStates.length ? doneStates.join(", ") : "aucun";
   const hasRequiredFilters = types.length > 0 && doneStates.length > 0;
@@ -91,7 +98,7 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
 
   async function handleRunForecast(): Promise<void> {
     if (!hasRequiredFilters) {
-      setValidationMessage("Ticket et Etat obligatoires.");
+      setValidationMessage("Ticket et État obligatoires.");
       return;
     }
     setValidationMessage("");
@@ -111,17 +118,17 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
     <>
       <section className="sim-control-section sim-control-section--compact">
         <div className="sim-advanced-header">
-          <h3 className="sim-control-heading">Periode historique</h3>
+          <h3 className="sim-control-heading">Période historique</h3>
           <button
             type="button"
             className="sim-advanced-toggle"
             onClick={() => toggleSection("period")}
             aria-expanded={showPeriod}
           >
-            {showPeriod ? "Reduire" : "Developper"}
+            {showPeriod ? "Réduire" : "Développer"}
           </button>
         </div>
-        <div className="sim-advanced-summary">du {startDate} a {endDate}</div>
+        <div className="sim-advanced-summary">du {startDate} au {endDate}</div>
         {showPeriod && <SimulationHistoryRangeControls simulation={simulation} />}
       </section>
       <section className="sim-control-section sim-control-section--compact">
@@ -133,11 +140,11 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
             onClick={() => toggleSection("mode")}
             aria-expanded={showMode}
           >
-            {showMode ? "Reduire" : "Developper"}
+            {showMode ? "Réduire" : "Développer"}
           </button>
         </div>
         <div className="sim-advanced-summary">
-          Type {modeKind} : {String(modeValue)} 0 {modeZeroText} sur {String(nSims)} simulations
+          Type {modeKind} : {String(modeValue)} 0 {modeZeroText} sur {String(nSims)} simulations ; capacité {capacitySummary}
         </div>
         {showMode && <SimulationModeAndParametersControls simulation={simulation} />}
       </section>
@@ -150,11 +157,11 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
             onClick={() => toggleSection("filters")}
             aria-expanded={showFilters}
           >
-            {showFilters ? "Reduire" : "Developper"}
+            {showFilters ? "Réduire" : "Développer"}
           </button>
         </div>
         <div className="sim-advanced-summary">
-          type {typeListText} ; Etats {stateListText}
+          type {typeListText} ; états {stateListText}
         </div>
         {showFilters && <SimulationFilterControls simulation={simulation} />}
       </section>

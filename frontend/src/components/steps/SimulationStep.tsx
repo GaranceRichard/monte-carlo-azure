@@ -13,7 +13,7 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
 
   return (
     <div className="sim-page">
-      <div className="sim-title">Equipe: {selectedTeam}</div>
+      <div className="sim-title">Équipe: {selectedTeam}</div>
 
       {err && (
         <div className="sim-error">

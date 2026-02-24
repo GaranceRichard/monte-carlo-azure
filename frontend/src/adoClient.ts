@@ -181,7 +181,7 @@ export async function listTeamsDirect(org: string, project: string, pat: string)
   const r = await fetch(`${ADO}/${org}/_apis/projects/${proj.id}/teams?${API}`, {
     headers: adoHeaders(pat),
   });
-  if (!r.ok) throw new Error("Impossible de lister les equipes.");
+  if (!r.ok) throw new Error("Impossible de lister les équipes.");
   const data = await r.json();
   return data.value ?? [];
 }

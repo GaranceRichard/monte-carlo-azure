@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { setupAppRoutes } from "./helpers/mocks";
 
-test("selection: erreurs projets/equipes + listes vides", async ({ page }) => {
+test("selection: erreurs projets/équipes + listes vides", async ({ page }) => {
   await setupAppRoutes(page, {
     profileFirstUnauthorized: false,
     emptyAccountsBefore: 0,
@@ -20,7 +20,7 @@ test("selection: erreurs projets/equipes + listes vides", async ({ page }) => {
   await page.getByRole("button", { name: "Choisir cette organisation" }).click();
   await expect(page.getByRole("heading", { name: /Choix du projet/i })).toBeVisible();
   await page.getByRole("button", { name: "Choisir ce Projet" }).click();
-  await expect(page.getByText(/Impossible de lister les equipes/i)).toBeVisible();
+  await expect(page.getByText(/Impossible de lister les [ée]quipes/i)).toBeVisible();
 
   await page.getByRole("button", { name: "Choisir ce Projet" }).click();
   await expect(page.getByRole("heading", { name: /Choix de/i })).toBeVisible();

@@ -24,6 +24,7 @@ type SimulationChartTabsProps = {
     | "probabilityCurveData"
     | "tooltipBaseProps"
     | "resetForTeamSelection"
+    | "exportThroughputCsv"
     | "displayPercentiles"
     | "startDate"
     | "endDate"
@@ -34,6 +35,8 @@ type SimulationChartTabsProps = {
     | "backlogSize"
     | "targetWeeks"
     | "nSims"
+    | "capacityPercent"
+    | "reducedCapacityWeeks"
   >;
 };
 
@@ -67,6 +70,7 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
     probabilityCurveData,
     tooltipBaseProps,
     resetForTeamSelection,
+    exportThroughputCsv,
     displayPercentiles,
     startDate,
     endDate,
@@ -77,6 +81,8 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
     backlogSize,
     targetWeeks,
     nSims,
+    capacityPercent,
+    reducedCapacityWeeks,
   } = simulation;
   const throughputWithMovingAverage = useMemo(() => {
     const windowSize = 4;
@@ -94,7 +100,7 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
     return (
       <div style={{ background: "var(--panel)", border: "1px solid var(--border)", borderRadius: 10, padding: "8px 10px" }}>
         <div style={{ color: "var(--muted)", fontWeight: 700, marginBottom: 4 }}>{label}</div>
-        <div style={{ color: "var(--text)", fontWeight: 700 }}>troughput: {Number(throughputPoint?.value ?? 0).toFixed(0)}</div>
+        <div style={{ color: "var(--text)", fontWeight: 700 }}>throughput: {Number(throughputPoint?.value ?? 0).toFixed(0)}</div>
         <div style={{ color: "var(--text)", fontWeight: 700 }}>moyenne mobile: {Number(movingAvgPoint?.value ?? 0).toFixed(2)}</div>
       </div>
     );
@@ -261,7 +267,7 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
       .join("");
 
     return `
-      <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Graphique probabilite">
+      <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Graphique probabilité">
         <rect x="0" y="0" width="${width}" height="${height}" fill="#ffffff" />
         ${gridLines}
         <line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}" stroke="#9ca3af" stroke-width="1" />
@@ -284,7 +290,7 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
         : `Semaines vers items - cible: ${String(targetWeeks)} semaines`;
     const typeSummary = types.length ? types.join(", ") : "Aucun";
     const stateSummary = doneStates.length ? doneStates.join(", ") : "Aucun";
-    const modeZeroLabel = includeZeroWeeks ? "Semaines 0 inclues" : "Semaines 0 exclues";
+    const modeZeroLabel = includeZeroWeeks ? "Semaines 0 incluses" : "Semaines 0 exclues";
     const resultLabel = result.result_kind === "items" ? "items (au moins)" : "semaines (au plus)";
 
     const html = `
@@ -317,11 +323,12 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
         <header class="header">
           <h1 class="title">Simulation Monte Carlo - ${escapeHtml(selectedTeam)}</h1>
           <div class="meta">
-            <div class="meta-row"><b>Periode:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
+            <div class="meta-row"><b>Période:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
             <div class="meta-row"><b>Mode:</b> ${escapeHtml(modeSummary)}</div>
             <div class="meta-row"><b>Tickets:</b> ${escapeHtml(typeSummary)}</div>
-            <div class="meta-row"><b>Etats:</b> ${escapeHtml(stateSummary)}</div>
-            <div class="meta-row"><b>Echantillon:</b> ${escapeHtml(modeZeroLabel)}</div>
+            <div class="meta-row"><b>États:</b> ${escapeHtml(stateSummary)}</div>
+            <div class="meta-row"><b>Échantillon:</b> ${escapeHtml(modeZeroLabel)}</div>
+            <div class="meta-row"><b>Capacité réduite:</b> ${escapeHtml(`${String(capacityPercent)}% pendant ${String(reducedCapacityWeeks)} semaines`)}</div>
             <div class="meta-row"><b>Simulations:</b> ${escapeHtml(String(nSims))}</div>
           </div>
         </header>
@@ -343,7 +350,7 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
         </section>
 
         <section class="section">
-          <h2>Courbe de probabilite</h2>
+          <h2>Courbe de probabilité</h2>
           <div class="chart-wrap">${probabilitySvg}</div>
         </section>
       </body>
@@ -380,7 +387,7 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
               onClick={() => setActiveChartTab("probability")}
               className={`sim-tab-btn ${activeChartTab === "probability" ? "sim-tab-btn--active" : ""}`}
             >
-              Courbe de probabilite
+              Courbe de probabilité
             </button>
             <div className="sim-tab-actions">
               <button
@@ -393,11 +400,19 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
               </button>
               <button
                 type="button"
+                onClick={exportThroughputCsv}
+                className="sim-tab-export-btn"
+                title="Exporter le throughput hebdomadaire en CSV"
+              >
+                Exporter CSV
+              </button>
+              <button
+                type="button"
                 onClick={resetForTeamSelection}
                 className="sim-tab-reset-btn"
-                title="Revenir a l'etat initial (simulation non lancee)"
+                title="Revenir à l'état initial (simulation non lancée)"
               >
-                Reinitialiser
+                Réinitialiser
               </button>
             </div>
           </div>
@@ -406,7 +421,7 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
             <>
               <h4 className="sim-chart-title">Throughput hebdomadaire</h4>
               <p className="sim-chart-subtitle">
-                Chaque point represente le nombre d&apos;items termines sur une semaine historique.
+                Chaque point représente le nombre d&apos;items terminés sur une semaine historique.
               </p>
               <div className="sim-chart-wrap">
                 <ResponsiveContainer>
@@ -443,7 +458,7 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
             <>
               <h4 className="sim-chart-title">Distribution Monte Carlo</h4>
               <p className="sim-chart-subtitle">
-                Chaque barre represente la frequence d&apos;une duree simulee sur l&apos;ensemble des runs.
+                Chaque barre représente la fréquence d&apos;une durée simulée sur l&apos;ensemble des runs.
               </p>
               <div className="sim-chart-wrap">
                 <ResponsiveContainer>
@@ -454,8 +469,8 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
                     <Tooltip
                       {...tooltipBaseProps}
                       formatter={(v, name) => {
-                        if (name === "count") return [Number(v).toFixed(0), "Frequence"];
-                        if (name === "gauss") return [Number(v).toFixed(1), "Courbe lissee"];
+                        if (name === "count") return [Number(v).toFixed(0), "Fréquence"];
+                        if (name === "gauss") return [Number(v).toFixed(1), "Courbe lissée"];
                         return [Number(v).toFixed(1), name];
                       }}
                     />
@@ -475,7 +490,7 @@ export default function SimulationChartTabs({ selectedTeam, simulation }: Simula
                   : "Probabilite de terminer en au plus X semaines"}
               </h4>
               <p className="sim-chart-subtitle">
-                Cette courbe indique la probabilite cumulee pour chaque valeur possible.
+                Cette courbe indique la probabilité cumulée pour chaque valeur possible.
               </p>
               <div className="sim-chart-wrap">
                 <ResponsiveContainer>
