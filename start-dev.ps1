@@ -4,7 +4,9 @@ param(
     [int]$BackendPort = 8000,
     [string]$FrontendHost = "127.0.0.1",
     [int]$FrontendPort = 5173,
-    [switch]$InstallDeps
+    [switch]$InstallDeps,
+    [switch]$ThreeTerminals,
+    [int]$HealthIntervalSeconds = 5
 )
 
 $ErrorActionPreference = "Stop"
@@ -38,6 +40,36 @@ if ($InstallDeps) {
     finally {
         Pop-Location
     }
+}
+
+if ($HealthIntervalSeconds -lt 1) {
+    throw "HealthIntervalSeconds doit etre >= 1."
+}
+
+if ($ThreeTerminals) {
+    Write-Step "Mode 3 terminaux active (backend + frontend + health monitor)."
+
+    $backendCmd = "& '$pythonExe' run_app.py --host $BackendHost --port $BackendPort --no-browser"
+    $frontendCmd = "npm run dev -- --host $FrontendHost --port $FrontendPort"
+    $healthCmd = @"
+while (`$true) {
+    try {
+        `$response = Invoke-RestMethod -Uri 'http://$BackendHost`:$BackendPort/health' -TimeoutSec 2
+        Write-Host ("[{0}] health=OK status={1}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), `$response.status) -ForegroundColor Green
+    }
+    catch {
+        Write-Host ("[{0}] health=KO {1}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), `$_.Exception.Message) -ForegroundColor Red
+    }
+    Start-Sleep -Seconds $HealthIntervalSeconds
+}
+"@
+
+    Start-Process -FilePath "powershell" -ArgumentList @("-NoExit", "-Command", $backendCmd) -WorkingDirectory $root | Out-Null
+    Start-Process -FilePath "powershell" -ArgumentList @("-NoExit", "-Command", $frontendCmd) -WorkingDirectory (Join-Path $root "frontend") | Out-Null
+    Start-Process -FilePath "powershell" -ArgumentList @("-NoExit", "-Command", $healthCmd) -WorkingDirectory $root | Out-Null
+
+    Write-Step "3 terminaux lances."
+    exit 0
 }
 
 Write-Step "Demarrage backend sur http://$BackendHost`:$BackendPort"

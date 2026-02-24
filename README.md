@@ -98,6 +98,15 @@ L'application (frontend servi par FastAPI) est ensuite disponible sur:
 
 ## Lancer en développement
 
+Option rapide (Windows PowerShell, 3 terminaux: backend + frontend + health):
+
+```powershell
+.\start-dev.ps1 -ThreeTerminals
+```
+
+Le terminal health verifie `http://127.0.0.1:8000/health` en boucle (intervalle par defaut: 5s).
+Dans VS Code, `Ctrl+Shift+B` lance aussi la tache par defaut `Dev: 3 terminaux`.
+
 ### Backend
 
 ```bash
@@ -119,6 +128,26 @@ npm run dev
 ```
 
 UI: `http://localhost:5173`
+
+### Mode manuel en 3 terminaux
+
+Terminal 1 (backend):
+
+```powershell
+python run_app.py --no-browser
+```
+
+Terminal 2 (frontend):
+
+```powershell
+npm --prefix frontend run dev
+```
+
+Terminal 3 (check recurrent health):
+
+```powershell
+while ($true) { try { Invoke-RestMethod http://127.0.0.1:8000/health -TimeoutSec 2 | ConvertTo-Json -Compress } catch { Write-Host $_.Exception.Message }; Start-Sleep -Seconds 5 }
+```
 
 ---
 
