@@ -212,3 +212,16 @@ Workflow: `.github/workflows/ci.yml`
 ```bash
 python Scripts/check_no_secrets.py
 ```
+
+### Pré-commit local (recommandé)
+
+Activer les hooks versionnés du repo:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Le hook `pre-commit` exécute:
+- validation de mise à jour du `README.md` si des fichiers code/config sont commités
+- validation que `README.md` ne contient pas de mojibake (accents cassés)
+- `python Scripts/check_no_secrets.py`
