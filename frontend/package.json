@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prepare": "python ../Scripts/setup_git_hooks.py",
+    "prepare": "node -e \"const fs=require('fs');const cp=require('child_process');if(!fs.existsSync('../.git'))process.exit(0);try{cp.execSync('git -C .. config --local core.hooksPath .githooks',{stdio:'inherit'})}catch(_){process.exit(0)}\"",
     "build": "vite build",
     "typecheck": "tsc -b",
     "lint": "eslint .",

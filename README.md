@@ -288,7 +288,7 @@ python Scripts/check_no_secrets.py
 ### Pré-commit local (activé automatiquement)
 
 Le hook versionné est activé automatiquement après installation frontend via:
-- `npm --prefix frontend install` (script `prepare` -> `python Scripts/setup_git_hooks.py`)
+- `npm --prefix frontend install` (script `prepare` -> `git -C .. config --local core.hooksPath .githooks`)
 
 Vérification manuelle (si nécessaire):
 
