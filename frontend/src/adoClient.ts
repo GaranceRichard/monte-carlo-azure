@@ -12,8 +12,14 @@ function formatDateLocal(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-const ADO = "https://dev.azure.com";
-const VSSPS = "https://app.vssps.visualstudio.com";
+const useLocalProxy =
+  import.meta.env.DEV &&
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
+  window.location.port === "5173";
+
+const ADO = useLocalProxy ? "/ado" : "https://dev.azure.com";
+const VSSPS = useLocalProxy ? "/vssps" : "https://app.vssps.visualstudio.com";
 const API = "api-version=7.1";
 
 type AdoOrg = { name: string };

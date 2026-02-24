@@ -54,15 +54,28 @@ export default function App() {
     teams: "Equipe",
   };
   const currentOnboardingIndex = onboardingOrder.findIndex((step) => step === onboardingState.step);
+  const isSimulationStep = onboardingState.step === "simulation";
+  const backLabel =
+    onboardingState.step === "org" || onboardingState.step === "projects" || onboardingState.step === "teams"
+      ? ""
+      : onboardingState.backLabel;
+
+  function handleStepperBack(target: (typeof onboardingOrder)[number]): void {
+    if (target === "pat") {
+      handleDisconnect();
+      return;
+    }
+    onboardingActions.goToStep(target);
+  }
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${isSimulationStep ? "app-shell--simulation" : ""}`}>
       <AppHeader
         theme={theme}
         toggleTheme={toggleTheme}
         showDisconnect={onboardingState.step !== "pat"}
         onDisconnect={handleDisconnect}
-        backLabel={onboardingState.backLabel}
+        backLabel={backLabel}
         onBack={onboardingActions.goBack}
       />
 
@@ -70,12 +83,24 @@ export default function App() {
         <div className="flow-stepper">
           <div className="flow-stepper-row">
             {onboardingOrder.map((step, idx) => (
-              <div
-                key={step}
-                className={`flow-step ${idx === currentOnboardingIndex ? "flow-step--active" : ""}`}
-              >
-                {idx + 1}. {onboardingLabels[step]}
-              </div>
+              idx < currentOnboardingIndex ? (
+                <button
+                  key={step}
+                  type="button"
+                  className="flow-step flow-step-btn"
+                  onClick={() => handleStepperBack(step)}
+                  title={step === "pat" ? "Revenir au debut (deconnexion)" : "Revenir a cette etape"}
+                >
+                  {idx + 1}. {onboardingLabels[step]}
+                </button>
+              ) : (
+                <div
+                  key={step}
+                  className={`flow-step ${idx === currentOnboardingIndex ? "flow-step--active" : ""}`}
+                >
+                  {idx + 1}. {onboardingLabels[step]}
+                </div>
+              )
             ))}
           </div>
           <div className="flow-stepper-caption">
@@ -140,7 +165,7 @@ export default function App() {
       )}
 
       {onboardingState.step === "simulation" && (
-        <div className="flow-card flow-card--animated">
+        <div className="flow-card flow-card--animated flow-card--simulation">
           <SimulationStep selectedTeam={onboardingState.selectedTeam} simulation={simulation} />
         </div>
       )}

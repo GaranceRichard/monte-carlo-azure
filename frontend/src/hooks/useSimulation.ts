@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { getTeamOptionsDirect, getWeeklyThroughputDirect } from "../adoClient";
 import { postSimulate } from "../api";
@@ -13,6 +13,11 @@ import type {
 import { buildAtLeastPercentiles, buildProbabilityCurve } from "./probability";
 
 const DEFAULT_WORK_ITEM_TYPE_OPTIONS = ["User Story", "Product Backlog Item", "Bug"];
+const DEFAULT_STATES_BY_TYPE: Record<string, string[]> = {
+  "User Story": ["Done", "Closed", "Resolved"],
+  "Product Backlog Item": ["Done", "Closed", "Resolved"],
+  Bug: ["Done", "Closed", "Resolved"],
+};
 const SIM_PREFS_KEY = "mc_simulation_prefs_v1";
 
 type ChartPoint = { x: number; count: number; gauss: number };
@@ -163,6 +168,9 @@ export function useSimulation({
   const [result, setResult] = useState<ForecastResponse | null>(null);
   const [weeklyThroughput, setWeeklyThroughput] = useState<WeeklyThroughputRow[]>([]);
   const [activeChartTab, setActiveChartTab] = useState<"throughput" | "distribution" | "probability">("throughput");
+  const [hasLaunchedOnce, setHasLaunchedOnce] = useState(false);
+  const autoRunKeyRef = useRef("");
+  const pendingAutoRunRef = useRef(false);
 
   const tooltipBaseProps: TooltipBaseProps = {
     cursor: false,
@@ -243,6 +251,73 @@ export function useSimulation({
   }, [filteredDoneStateOptions]);
 
   useEffect(() => {
+    const autoRunKey = [
+      step,
+      selectedTeam,
+      startDate,
+      endDate,
+      simulationMode,
+      includeZeroWeeks ? "1" : "0",
+      String(backlogSize),
+      String(targetWeeks),
+      String(nSims),
+      types.join("|"),
+      doneStates.join("|"),
+    ].join("::");
+
+    if (!autoRunKeyRef.current) {
+      autoRunKeyRef.current = autoRunKey;
+      return;
+    }
+    if (autoRunKeyRef.current === autoRunKey) return;
+    autoRunKeyRef.current = autoRunKey;
+
+    if (!hasLaunchedOnce || step !== "simulation") return;
+
+    if (!types.length || !doneStates.length) {
+      setErr("Ticket et Etat obligatoires.");
+      setResult(null);
+      setWeeklyThroughput([]);
+      setSampleStats(null);
+      setActiveChartTab("throughput");
+      return;
+    }
+
+    if (loading) {
+      pendingAutoRunRef.current = true;
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      void runForecast();
+    }, 300);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [
+    step,
+    selectedTeam,
+    startDate,
+    endDate,
+    simulationMode,
+    includeZeroWeeks,
+    backlogSize,
+    targetWeeks,
+    nSims,
+    types,
+    doneStates,
+    hasLaunchedOnce,
+    loading,
+  ]);
+
+  useEffect(() => {
+    if (loading || !pendingAutoRunRef.current) return;
+    pendingAutoRunRef.current = false;
+    if (!types.length || !doneStates.length) return;
+    void runForecast();
+  }, [loading, types, doneStates]);
+
+  useEffect(() => {
     try {
       localStorage.setItem(
         SIM_PREFS_KEY,
@@ -282,7 +357,7 @@ export function useSimulation({
       } catch {
         if (!active) return;
         setWorkItemTypeOptions(DEFAULT_WORK_ITEM_TYPE_OPTIONS);
-        setStatesByType({});
+        setStatesByType(DEFAULT_STATES_BY_TYPE);
         setDoneStates([]);
         setTypes([]);
       } finally {
@@ -302,6 +377,9 @@ export function useSimulation({
     setSampleStats(null);
     setActiveChartTab("throughput");
     setLoadingTeamOptions(false);
+    setHasLaunchedOnce(false);
+    autoRunKeyRef.current = "";
+    pendingAutoRunRef.current = false;
   }
 
   function resetAll(): void {
@@ -317,9 +395,13 @@ export function useSimulation({
     setStatesByType({});
     setDoneStates([]);
     setTypes([]);
+    setHasLaunchedOnce(false);
+    autoRunKeyRef.current = "";
+    pendingAutoRunRef.current = false;
   }
 
   async function runForecast(): Promise<void> {
+    if (loading) return;
     if (!selectedTeam) {
       setErr("Selectionnez une equipe.");
       return;
@@ -328,6 +410,16 @@ export function useSimulation({
       setErr("PAT manquant. Reconnectez-vous.");
       return;
     }
+    if (!types.length || !doneStates.length) {
+      setErr("Ticket et Etat obligatoires.");
+      setResult(null);
+      setWeeklyThroughput([]);
+      setSampleStats(null);
+      setActiveChartTab("throughput");
+      return;
+    }
+
+    setHasLaunchedOnce(true);
 
     setErr("");
     setLoading(true);
@@ -371,6 +463,7 @@ export function useSimulation({
 
       const payload: ForecastRequestPayload = {
         throughput_samples: throughputSamples,
+        include_zero_weeks: includeZeroWeeks,
         mode: simulationMode,
         backlog_size: simulationMode === "backlog_to_weeks" ? Number(backlogSize) : undefined,
         target_weeks: simulationMode === "weeks_to_items" ? Number(targetWeeks) : undefined,
@@ -433,3 +526,4 @@ export function useSimulation({
     resetAll,
   };
 }
+

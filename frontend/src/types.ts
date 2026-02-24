@@ -33,6 +33,7 @@ export type ForecastResponse = {
 
 export type ForecastRequestPayload = {
   throughput_samples: number[];
+  include_zero_weeks?: boolean;
   mode: ForecastMode;
   backlog_size?: number;
   target_weeks?: number;

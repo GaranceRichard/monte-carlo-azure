@@ -37,6 +37,7 @@ def mc_finish_weeks(
     backlog_size: int,
     throughput_samples: np.ndarray,
     n_sims: int = 20000,
+    include_zero_weeks: bool = False,
     seed: Optional[int] = None,
 ) -> np.ndarray:
     """
@@ -54,11 +55,15 @@ def mc_finish_weeks(
     if throughput_samples is None or len(throughput_samples) == 0:
         raise ValueError("throughput_samples est vide")
 
-    # On élimine les semaines à 0 (sinon risque de boucle infinie / résultat absurde)
     samples = np.asarray(throughput_samples, dtype=int)
-    samples = samples[samples > 0]
-    if len(samples) == 0:
-        raise ValueError("throughput_samples ne contient aucune valeur > 0")
+    if include_zero_weeks:
+        samples = samples[samples >= 0]
+        if len(samples) == 0:
+            raise ValueError("throughput_samples ne contient aucune valeur >= 0")
+    else:
+        samples = samples[samples > 0]
+        if len(samples) == 0:
+            raise ValueError("throughput_samples ne contient aucune valeur > 0")
 
     rng = np.random.default_rng(seed)
 
@@ -83,6 +88,7 @@ def mc_items_done_for_weeks(
     weeks: int,
     throughput_samples: np.ndarray,
     n_sims: int = 20000,
+    include_zero_weeks: bool = False,
     seed: Optional[int] = None,
 ) -> np.ndarray:
     """
@@ -101,9 +107,14 @@ def mc_items_done_for_weeks(
         raise ValueError("throughput_samples est vide")
 
     samples = np.asarray(throughput_samples, dtype=int)
-    samples = samples[samples > 0]
-    if len(samples) == 0:
-        raise ValueError("throughput_samples ne contient aucune valeur > 0")
+    if include_zero_weeks:
+        samples = samples[samples >= 0]
+        if len(samples) == 0:
+            raise ValueError("throughput_samples ne contient aucune valeur >= 0")
+    else:
+        samples = samples[samples > 0]
+        if len(samples) == 0:
+            raise ValueError("throughput_samples ne contient aucune valeur > 0")
 
     rng = np.random.default_rng(seed)
     draws = rng.choice(samples, size=(n_sims, weeks), replace=True)

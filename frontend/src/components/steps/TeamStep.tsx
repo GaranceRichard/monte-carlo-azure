@@ -31,7 +31,11 @@ export default function TeamStep({
         </div>
       )}
       <label className="flow-label">Equipes disponibles</label>
-      <select value={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)} className="flow-input">
+      <select
+        value={selectedTeam}
+        onChange={(e) => setSelectedTeam(e.target.value)}
+        className="flow-input flow-input--team-compact"
+      >
         {teams.length === 0 && <option value="">Aucune equipe disponible</option>}
         {teams.map((team) => (
           <option key={team.id || team.name} value={team.name || ""}>

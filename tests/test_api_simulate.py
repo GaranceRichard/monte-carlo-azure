@@ -48,6 +48,23 @@ def test_simulate_weeks_to_items_success():
     assert body["samples_count"] == 6
 
 
+def test_simulate_include_zero_weeks_keeps_zero_samples():
+    r = client.post(
+        "/simulate",
+        json={
+            "throughput_samples": [0, 1, 2, 3, 4, 5, 6, 0],
+            "include_zero_weeks": True,
+            "mode": "backlog_to_weeks",
+            "backlog_size": 30,
+            "n_sims": 2000,
+        },
+    )
+
+    assert r.status_code == 200
+    body = r.json()
+    assert body["samples_count"] == 8
+
+
 def test_simulate_requires_backlog_size_for_backlog_mode():
     r = client.post(
         "/simulate",

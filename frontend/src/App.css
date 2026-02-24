@@ -4,12 +4,28 @@
   padding: var(--space-5);
 }
 
+.app-shell--simulation {
+  max-width: 1240px;
+  height: 100vh;
+  padding: var(--space-3) var(--space-4);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 .flow-card {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.08);
+}
+
+.flow-card--simulation {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: var(--space-4);
 }
 
 .flow-card--animated {
@@ -40,6 +56,12 @@
   width: 100%;
   padding: 10px;
   margin-top: var(--space-2);
+}
+
+.flow-input--team-compact {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  min-height: 36px;
 }
 
 .flow-help {
@@ -107,6 +129,16 @@
   text-align: center;
 }
 
+.flow-step-btn {
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.flow-step-btn:hover {
+  border-color: var(--text);
+}
+
 .flow-step--active {
   color: var(--btnText);
   background: var(--btnBg);
@@ -127,6 +159,13 @@
   margin-top: 0;
 }
 
+.sim-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
 .sim-error {
   background: var(--dangerBg);
   border: 1px solid var(--dangerBorder);
@@ -141,12 +180,17 @@
   gap: var(--space-4);
   align-items: stretch;
   margin-top: var(--space-3);
+  flex: 1;
+  min-height: 0;
 }
 
 .sim-controls {
   min-width: 0;
   display: grid;
   gap: var(--space-3);
+  min-height: 0;
+  overflow: visible;
+  padding-right: 0;
 }
 
 .sim-control-section {
@@ -154,6 +198,10 @@
   border-radius: var(--radius-md);
   padding: var(--space-3);
   background: color-mix(in srgb, var(--panel) 90%, var(--softBorder));
+}
+
+.sim-control-section--compact {
+  padding: var(--space-2);
 }
 
 .sim-control-heading {
@@ -164,10 +212,37 @@
   letter-spacing: 0.04em;
 }
 
+.sim-advanced-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.sim-advanced-toggle {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sim-advanced-summary {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
 .sim-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
+}
+
+.sim-grid-2--compact {
+  gap: var(--space-2);
 }
 
 .sim-mt-10 {
@@ -181,16 +256,29 @@
   font-weight: 600;
 }
 
+.sim-label--compact {
+  font-size: var(--text-xs);
+}
+
 .sim-input {
   width: 100%;
   padding: 10px;
   margin-top: var(--space-2);
 }
 
+.sim-input--compact {
+  padding: 8px;
+  margin-top: 6px;
+}
+
 .sim-mode-row {
   display: flex;
   gap: var(--space-3);
   align-items: flex-end;
+}
+
+.sim-mode-row--compact {
+  gap: var(--space-2);
 }
 
 .sim-mode-select-wrap {
@@ -200,6 +288,10 @@
 .sim-mode-zero-toggle {
   margin-bottom: 10px;
   white-space: nowrap;
+}
+
+.sim-mode-zero-toggle--compact {
+  margin-bottom: 8px;
 }
 
 .sim-help-inline {
@@ -214,7 +306,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 6px;
-  max-height: 88px;
+  max-height: 76px;
   overflow-y: auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -223,7 +315,7 @@
 
 .sim-checklist--states {
   padding: var(--space-2);
-  max-height: 96px;
+  max-height: 84px;
 }
 
 .sim-check-row {
@@ -244,6 +336,13 @@
   color: var(--muted);
   font-size: var(--text-xs);
   font-weight: 600;
+}
+
+.sim-validation-error {
+  margin-top: 6px;
+  color: #b91c1c;
+  font-size: var(--text-xs);
+  font-weight: 700;
 }
 
 .sim-loading-bar {
@@ -325,6 +424,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
 }
 
 .sim-tabs {
@@ -349,6 +449,17 @@
   color: var(--btnText);
 }
 
+.sim-tab-reset-btn {
+  margin-left: auto;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 700;
+}
+
 .sim-chart-title {
   margin-top: 0;
   margin-bottom: 0;
@@ -365,6 +476,41 @@
   width: 100%;
   flex: 1;
   min-height: 0;
+}
+
+.app-shell--simulation .sim-title {
+  font-size: var(--text-lg);
+}
+
+.app-shell--simulation .sim-layout {
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.app-shell--simulation .sim-controls {
+  gap: var(--space-2);
+}
+
+.app-shell--simulation .sim-control-section {
+  padding: var(--space-2);
+}
+
+.app-shell--simulation .sim-advanced-summary {
+  margin-top: 2px;
+}
+
+.app-shell--simulation .sim-chart-subtitle {
+  margin-top: 4px;
+  margin-bottom: 6px;
+  font-size: var(--text-xs);
+}
+
+.app-shell--simulation .sim-tabs {
+  margin-bottom: 6px;
+}
+
+.app-shell--simulation .sim-kpis {
+  margin-top: var(--space-3);
 }
 
 .sim-empty-panel {
@@ -399,8 +545,25 @@
     padding: var(--space-4);
   }
 
+  .app-shell--simulation {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    padding: var(--space-3);
+  }
+
+  .flow-card--simulation {
+    overflow: visible;
+    padding: var(--space-3);
+  }
+
   .sim-layout {
     grid-template-columns: 1fr;
+  }
+
+  .sim-controls {
+    overflow: visible;
+    padding-right: 0;
   }
 
   .sim-mode-row {

@@ -53,6 +53,12 @@ export default function OrgStep({
             type="text"
             value={selectedOrg}
             onChange={(e) => setSelectedOrg(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !loading && selectedOrg.trim()) {
+                e.preventDefault();
+                void onContinue();
+              }
+            }}
             placeholder="Nom de l'organisation"
             className="flow-input"
           />

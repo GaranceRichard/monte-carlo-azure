@@ -4,6 +4,7 @@ from typing import Dict, List, Literal, Optional
 
 class SimulateRequest(BaseModel):
     throughput_samples: List[int] = Field(..., min_length=6)
+    include_zero_weeks: bool = False
     mode: Literal["backlog_to_weeks", "weeks_to_items"]
     backlog_size: Optional[int] = Field(default=None, ge=1)
     target_weeks: Optional[int] = Field(default=None, ge=1)

@@ -25,7 +25,7 @@ test("selection: erreurs projets/equipes + listes vides", async ({ page }) => {
   await page.getByRole("button", { name: "Choisir ce Projet" }).click();
   await expect(page.getByRole("heading", { name: /Choix de/i })).toBeVisible();
 
-  await page.getByRole("button", { name: /Changer projet/i }).click();
+  await page.getByRole("button", { name: /3\.\s+Projet/i }).click();
   await page.locator("select").first().selectOption("Projet Vide");
   await page.getByRole("button", { name: "Choisir ce Projet" }).click();
   await expect(page.getByRole("button", { name: /Choisir cette/i })).toBeDisabled();

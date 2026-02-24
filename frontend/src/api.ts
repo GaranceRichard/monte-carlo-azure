@@ -2,6 +2,7 @@
 
 export type SimulateRequest = {
   throughput_samples: number[];
+  include_zero_weeks?: boolean;
   mode: "backlog_to_weeks" | "weeks_to_items";
   backlog_size?: number;
   target_weeks?: number;

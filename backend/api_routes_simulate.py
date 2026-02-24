@@ -56,19 +56,37 @@ def simulate(req: SimulateRequest, request: Request) -> SimulateResponse:
         raise HTTPException(429, "Trop de requetes sur /simulate. Reessayez dans quelques instants.")
 
     samples = np.array(req.throughput_samples)
-    samples = samples[samples > 0]
+    if req.include_zero_weeks:
+        samples = samples[samples >= 0]
+    else:
+        samples = samples[samples > 0]
     if len(samples) < 6:
-        raise HTTPException(422, "Historique insuffisant (moins de 6 semaines non nulles).")
+        detail = (
+            "Historique insuffisant (moins de 6 semaines)."
+            if req.include_zero_weeks
+            else "Historique insuffisant (moins de 6 semaines non nulles)."
+        )
+        raise HTTPException(422, detail)
 
     if req.mode == "backlog_to_weeks":
         if not req.backlog_size:
             raise HTTPException(400, "backlog_size requis.")
-        result = mc_finish_weeks(req.backlog_size, samples, req.n_sims)
+        result = mc_finish_weeks(
+            req.backlog_size,
+            samples,
+            req.n_sims,
+            include_zero_weeks=req.include_zero_weeks,
+        )
         kind = "weeks"
     else:
         if not req.target_weeks:
             raise HTTPException(400, "target_weeks requis.")
-        result = mc_items_done_for_weeks(req.target_weeks, samples, req.n_sims)
+        result = mc_items_done_for_weeks(
+            req.target_weeks,
+            samples,
+            req.n_sims,
+            include_zero_weeks=req.include_zero_weeks,
+        )
         kind = "items"
 
     return SimulateResponse(

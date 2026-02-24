@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   Bar,
   CartesianGrid,
@@ -21,6 +22,7 @@ type SimulationChartTabsProps = {
     | "mcHistData"
     | "probabilityCurveData"
     | "tooltipBaseProps"
+    | "resetForTeamSelection"
   >;
 };
 
@@ -33,7 +35,29 @@ export default function SimulationChartTabs({ simulation }: SimulationChartTabsP
     mcHistData,
     probabilityCurveData,
     tooltipBaseProps,
+    resetForTeamSelection,
   } = simulation;
+  const throughputWithMovingAverage = useMemo(() => {
+    const windowSize = 4;
+    return throughputData.map((point, idx, arr) => {
+      const start = Math.max(0, idx - windowSize + 1);
+      const slice = arr.slice(start, idx + 1);
+      const average = slice.reduce((sum, p) => sum + p.throughput, 0) / slice.length;
+      return { ...point, movingAverage: Number(average.toFixed(2)) };
+    });
+  }, [throughputData]);
+  const renderThroughputTooltip = ({ active, payload, label }: { active?: boolean; payload?: ReadonlyArray<{ dataKey?: string; value?: number }>; label?: string | number }) => {
+    if (!active || !payload?.length) return null;
+    const throughputPoint = payload.find((p) => p.dataKey === "throughput");
+    const movingAvgPoint = payload.find((p) => p.dataKey === "movingAverage");
+    return (
+      <div style={{ background: "var(--panel)", border: "1px solid var(--border)", borderRadius: 10, padding: "8px 10px" }}>
+        <div style={{ color: "var(--muted)", fontWeight: 700, marginBottom: 4 }}>{label}</div>
+        <div style={{ color: "var(--text)", fontWeight: 700 }}>troughput: {Number(throughputPoint?.value ?? 0).toFixed(0)}</div>
+        <div style={{ color: "var(--text)", fontWeight: 700 }}>moyenne mobile: {Number(movingAvgPoint?.value ?? 0).toFixed(2)}</div>
+      </div>
+    );
+  };
 
   return (
     <div className="sim-charts">
@@ -58,6 +82,14 @@ export default function SimulationChartTabs({ simulation }: SimulationChartTabsP
             >
               Courbe de probabilite
             </button>
+            <button
+              type="button"
+              onClick={resetForTeamSelection}
+              className="sim-tab-reset-btn"
+              title="Revenir a l'etat initial (simulation non lancee)"
+            >
+              Reinitialiser
+            </button>
           </div>
 
           {activeChartTab === "throughput" && (
@@ -68,13 +100,30 @@ export default function SimulationChartTabs({ simulation }: SimulationChartTabsP
               </p>
               <div className="sim-chart-wrap">
                 <ResponsiveContainer>
-                  <LineChart data={throughputData}>
+                  <ComposedChart data={throughputWithMovingAverage}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="week" />
                     <YAxis allowDecimals={false} />
-                    <Tooltip {...tooltipBaseProps} formatter={(v) => [Number(v).toFixed(0), "Throughput"]} />
-                    <Line type="monotone" dataKey="throughput" dot={false} strokeWidth={2} />
-                  </LineChart>
+                    <Tooltip {...tooltipBaseProps} content={renderThroughputTooltip} />
+                    <Bar dataKey="throughput" name="Throughput" />
+                    <Line
+                      type="monotone"
+                      dataKey="throughput"
+                      dot={false}
+                      strokeWidth={2}
+                      stroke="#2563eb"
+                      name="Courbe"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="movingAverage"
+                      dot={false}
+                      strokeWidth={2.5}
+                      stroke="#f97316"
+                      strokeDasharray="8 4"
+                      name="Moyenne mobile"
+                    />
+                  </ComposedChart>
                 </ResponsiveContainer>
               </div>
             </>

@@ -12,7 +12,7 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
   const { err } = simulation;
 
   return (
-    <>
+    <div className="sim-page">
       <div className="sim-title">Equipe: {selectedTeam}</div>
 
       {err && (
@@ -28,6 +28,6 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
         </div>
         <SimulationChartTabs simulation={simulation} />
       </div>
-    </>
+    </div>
   );
 }

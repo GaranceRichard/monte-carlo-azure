@@ -28,6 +28,7 @@ type OnboardingActions = {
   goToProjects: () => Promise<boolean>;
   goToTeams: () => Promise<boolean>;
   goToSimulation: () => boolean;
+  goToStep: (target: "pat" | "org" | "projects" | "teams") => void;
   goBack: () => void;
   disconnect: () => void;
   setErr: (value: string) => void;
@@ -58,18 +59,33 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     setErr("");
     setLoading(true);
     try {
-      const profile = await checkPatDirect(clean);
-      setUserName(profile?.displayName || "Utilisateur");
       setSessionPat(clean);
+      try {
+        const profile = await checkPatDirect(clean);
+        setUserName(profile?.displayName || "Utilisateur");
 
-      const orgList = await listOrgsDirect(clean);
-      setOrgs(orgList);
-      if (orgList.length > 0) {
-        setSelectedOrg(orgList[0].name || "");
-        setOrgHint("");
-      } else {
+        const orgList = await listOrgsDirect(clean);
+        setOrgs(orgList);
+        if (orgList.length > 0) {
+          setSelectedOrg(orgList[0].name || "");
+          setOrgHint("");
+        } else {
+          setSelectedOrg("");
+          setOrgHint("PAT non global: indiquez manuellement votre organisation.");
+        }
+      } catch {
+        if (clean.length < 20) {
+          setSessionPat("");
+          setStep("pat");
+          setErr("PAT invalide ou insuffisant.");
+          return;
+        }
+        // Some PATs can access a specific org/project but not profile endpoints.
+        // Let the user continue with manual org input and validate on next step.
+        setUserName("Utilisateur");
+        setOrgs([]);
         setSelectedOrg("");
-        setOrgHint("PAT non global: indiquez manuellement votre organisation.");
+        setOrgHint("Validation du profil impossible (scope restreint). Saisissez votre organisation manuellement.");
       }
       setStep("org");
     } catch (e: unknown) {
@@ -159,6 +175,11 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     else if (step === "simulation") setStep("teams");
   }
 
+  function goToStep(target: "pat" | "org" | "projects" | "teams"): void {
+    setErr("");
+    setStep(target);
+  }
+
   function disconnect(): void {
     setSessionPat("");
     setPatInput("");
@@ -209,6 +230,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
       goToProjects,
       goToTeams,
       goToSimulation,
+      goToStep,
       goBack,
       disconnect,
       setErr,

@@ -51,4 +51,62 @@ describe("OrgStep", () => {
     expect(setSelectedOrg).toHaveBeenCalledWith("org-demo");
     expect(screen.getByRole("button", { name: "Chargement..." })).toBeDisabled();
   });
+
+  it("submits on Enter in manual org input when valid and not loading", () => {
+    const onContinue = vi.fn();
+
+    render(
+      <OrgStep
+        err=""
+        userName="User"
+        orgs={[]}
+        orgHint=""
+        selectedOrg="org-demo"
+        setSelectedOrg={vi.fn()}
+        loading={false}
+        onContinue={onContinue}
+      />,
+    );
+
+    const input = screen.getByPlaceholderText("Nom de l'organisation");
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onContinue).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not submit on Enter in manual org input when loading or empty", () => {
+    const onContinueLoading = vi.fn();
+    const onContinueEmpty = vi.fn();
+
+    const { rerender } = render(
+      <OrgStep
+        err=""
+        userName="User"
+        orgs={[]}
+        orgHint=""
+        selectedOrg="org-demo"
+        setSelectedOrg={vi.fn()}
+        loading
+        onContinue={onContinueLoading}
+      />,
+    );
+
+    fireEvent.keyDown(screen.getByPlaceholderText("Nom de l'organisation"), { key: "Enter" });
+    expect(onContinueLoading).not.toHaveBeenCalled();
+
+    rerender(
+      <OrgStep
+        err=""
+        userName="User"
+        orgs={[]}
+        orgHint=""
+        selectedOrg="   "
+        setSelectedOrg={vi.fn()}
+        loading={false}
+        onContinue={onContinueEmpty}
+      />,
+    );
+
+    fireEvent.keyDown(screen.getByPlaceholderText("Nom de l'organisation"), { key: "Enter" });
+    expect(onContinueEmpty).not.toHaveBeenCalled();
+  });
 });
