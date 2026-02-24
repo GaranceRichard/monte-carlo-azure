@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prepare": "python ../Scripts/setup_git_hooks.py",
     "build": "vite build",
     "typecheck": "tsc -b",
     "lint": "eslint .",

@@ -1,5 +1,7 @@
 ﻿# Monte Carlo Azure
 
+[![CI](https://github.com/GaranceRichard/monte-carlo-azure/actions/workflows/ci.yml/badge.svg)](https://github.com/GaranceRichard/monte-carlo-azure/actions/workflows/ci.yml)
+
 Outil de prévision basé sur une simulation Monte Carlo. Il répond au Use Case suivant : l'utilisateur se connecte et peut effectuer facilement une simulation sur un site avec peu d'informations, sans laisser de trace ou compromettre Azure avec son Token.
 
 Architecture V2:
@@ -212,6 +214,8 @@ ou
 Depuis la racine:
 
 ```bash
+.venv\Scripts\python.exe -m ruff check .
+.venv\Scripts\python.exe -m ruff format --check .
 .venv\Scripts\python.exe -m pytest --cov=backend --cov-report=term-missing -q
 ```
 
@@ -219,6 +223,7 @@ Frontend:
 
 ```bash
 npm --prefix frontend run typecheck
+npm --prefix frontend run lint -- --max-warnings 0
 npm --prefix frontend run test:unit
 npm --prefix frontend run test:unit:coverage
 npm --prefix frontend run test:e2e
@@ -240,12 +245,14 @@ Workflow: `.github/workflows/ci.yml`
 - Job `backend-tests`
   - Setup Python 3.12
   - Installation des dépendances backend
+  - Lint backend: `python -m ruff check .`
   - Contrôle SLA identité: `python Scripts/check_identity_boundary.py`
   - Tests backend: `python -m pytest -q`
 
 - Job `frontend-tests`
   - Setup Node.js 22
   - Installation frontend: `npm ci` (dans `frontend`)
+  - Lint frontend: `npm run lint -- --max-warnings 0`
   - Tests unitaires: `npm run test:unit` (Vitest)
   - Installation Playwright: `npx playwright install --with-deps chromium`
   - Tests e2e: `npm run test:e2e`
@@ -278,9 +285,12 @@ Le guide couvre:
 python Scripts/check_no_secrets.py
 ```
 
-### Pré-commit local (recommandé)
+### Pré-commit local (activé automatiquement)
 
-Activer les hooks versionnés du repo:
+Le hook versionné est activé automatiquement après installation frontend via:
+- `npm --prefix frontend install` (script `prepare` -> `python Scripts/setup_git_hooks.py`)
+
+Vérification manuelle (si nécessaire):
 
 ```bash
 git config core.hooksPath .githooks
