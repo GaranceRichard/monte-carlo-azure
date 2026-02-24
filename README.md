@@ -72,7 +72,7 @@ backend/
 ## Prerequis
 
 - Python 3.10+
-- Node.js 18+
+- Node.js 20+
 - Acces Azure DevOps + PAT
 
 ---
@@ -171,7 +171,9 @@ Frontend:
 
 ```bash
 npm --prefix frontend run typecheck
+npm --prefix frontend run test:unit
 npm --prefix frontend run test:unit:coverage
+npm --prefix frontend run test:e2e
 npm --prefix frontend run test:e2e:coverage:console
 ```
 
@@ -179,7 +181,26 @@ Suite E2E decoupee:
 - `frontend/tests/e2e/onboarding.spec.js`
 - `frontend/tests/e2e/selection.spec.js`
 - `frontend/tests/e2e/simulation.spec.js`
-- `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul)
+- `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul agreges, incluant branches >= 80%)
+
+---
+
+## CI (GitHub Actions)
+
+Workflow: `.github/workflows/ci.yml`
+
+- Job `backend-tests`
+  - Setup Python 3.12
+  - Installation des dependances backend
+  - Controle SLA identite: `python Scripts/check_identity_boundary.py`
+  - Tests backend: `python -m pytest -q`
+
+- Job `frontend-tests`
+  - Setup Node.js 22
+  - Installation frontend: `npm ci` (dans `frontend`)
+  - Tests unitaires: `npm run test:unit` (Vitest)
+  - Installation Playwright: `npx playwright install --with-deps chromium`
+  - Tests e2e: `npm run test:e2e`
 
 ---
 
