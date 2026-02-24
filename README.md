@@ -25,6 +25,20 @@ Le PAT Azure DevOps:
 - ne transite jamais par le backend
 - n'est pas sauvegarde par le serveur
 
+### SLA Identite (Non Negociable)
+
+Regle fondamentale:
+- 0 donnee d'identification (PAT, UUID, ORG, Team) ne doit transiter par un serveur applicatif (local ou distant).
+- Les appels Azure DevOps doivent partir directement du navigateur vers:
+  - `https://dev.azure.com`
+  - `https://app.vssps.visualstudio.com`
+
+Toute transgression de cette regle est consideree comme une faute majeure.
+
+Controle automatique:
+- CI execute `python Scripts/check_identity_boundary.py`
+- Si une proxyfication serveur (`/ado`, `/vssps`) ou un endpoint local de resolution PAT est detecte, la CI echoue.
+
 Le backend ne recoit que:
 - `throughput_samples` (liste d'entiers)
 - les parametres de simulation (`mode`, `backlog_size`/`target_weeks`, `n_sims`)

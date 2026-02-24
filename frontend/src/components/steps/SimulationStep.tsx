@@ -26,7 +26,7 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
           <SimulationControlPanel selectedTeam={selectedTeam} simulation={simulation} />
           <SimulationResultsPanel simulation={simulation} />
         </div>
-        <SimulationChartTabs simulation={simulation} />
+        <SimulationChartTabs selectedTeam={selectedTeam} simulation={simulation} />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-﻿type PatStepProps = {
+type PatStepProps = {
   err: string;
   patInput: string;
   setPatInput: (value: string) => void;

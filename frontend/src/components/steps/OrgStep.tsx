@@ -21,9 +21,11 @@ export default function OrgStep({
   loading,
   onContinue,
 }: OrgStepProps) {
+  const welcomeTitle = userName && userName !== "Utilisateur" ? `Bienvenue ${userName}` : "Bienvenue";
+
   return (
     <>
-      <h2 className="flow-title">Bienvenue {userName}</h2>
+      <h2 className="flow-title">{welcomeTitle}</h2>
       <p className="flow-text">Selectionnez l&apos;organisation Azure DevOps a utiliser.</p>
       {err && (
         <div className="ui-alert ui-alert--danger">

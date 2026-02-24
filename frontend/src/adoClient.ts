@@ -12,20 +12,22 @@ function formatDateLocal(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-const useLocalProxy =
-  import.meta.env.DEV &&
-  typeof window !== "undefined" &&
-  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-  window.location.port === "5173";
-
-const ADO = useLocalProxy ? "/ado" : "https://dev.azure.com";
-const VSSPS = useLocalProxy ? "/vssps" : "https://app.vssps.visualstudio.com";
+const ADO = "https://dev.azure.com";
+const VSSPS = "https://app.vssps.visualstudio.com";
 const API = "api-version=7.1";
 
 type AdoOrg = { name: string };
 type AdoProject = { id: string; name: string };
 type AdoTeam = { id: string; name: string };
 type TeamFieldValue = { value?: string; includeChildren?: boolean };
+type ProfileMe = { id?: string; publicAlias?: string; displayName?: string };
+type ResolvedPatProfile = {
+  displayName: string;
+  id: string;
+  publicAlias?: string;
+  restrictedProfile?: boolean;
+};
+const profileLookupInFlight = new Map<string, Promise<ResolvedPatProfile>>();
 
 function escWiql(value: string): string {
   return value.replace(/'/g, "''");
@@ -72,24 +74,94 @@ async function getTeamAreaPathFilterClause(
   }
 }
 
-export async function checkPatDirect(pat: string): Promise<{ displayName: string; id: string }> {
+export async function checkPatDirect(pat: string): Promise<ResolvedPatProfile> {
+  const existing = profileLookupInFlight.get(pat);
+  if (existing) return existing;
+
+  const task = (async (): Promise<ResolvedPatProfile> => {
   const r = await fetch(`${VSSPS}/_apis/profile/profiles/me?${API}`, {
     headers: adoHeaders(pat),
   });
-  if (!r.ok) throw new Error("PAT invalide ou insuffisant.");
-  return r.json();
+  if (r.ok) {
+    const profile = await r.json() as ProfileMe;
+    return {
+      displayName: profile.displayName || "Utilisateur",
+      id: profile.id || "",
+      publicAlias: profile.publicAlias || "",
+      restrictedProfile: false,
+    };
+  }
+
+  // For some org-scoped PATs, profile endpoint answers 401 but still exposes identity metadata.
+  const userData = r.headers.get("x-vss-userdata") || "";
+  const sepIdx = userData.indexOf(":");
+  if (r.status === 401 && sepIdx > -1) {
+    const rawId = userData.slice(0, sepIdx).trim();
+    const rawName = userData.slice(sepIdx + 1).trim();
+    if (rawName) {
+      return {
+        id: rawId.replace(/^aad\./i, ""),
+        displayName: rawName,
+        publicAlias: "",
+        restrictedProfile: true,
+      };
+    }
+  }
+
+  throw new Error("PAT invalide ou insuffisant.");
+  })();
+
+  profileLookupInFlight.set(pat, task);
+  try {
+    return await task;
+  } finally {
+    profileLookupInFlight.delete(pat);
+  }
 }
 
-export async function listOrgsDirect(pat: string): Promise<AdoOrg[]> {
-  const me = await checkPatDirect(pat);
-  const memberId = me.id;
-
-  const r = await fetch(`${VSSPS}/_apis/accounts?memberId=${memberId}&${API}`, {
+async function listOrgsByMemberId(memberId: string, pat: string): Promise<AdoOrg[]> {
+  if (!memberId) return [];
+  const r = await fetch(`${VSSPS}/_apis/accounts?memberId=${encodeURIComponent(memberId)}&${API}`, {
     headers: adoHeaders(pat),
   });
   if (!r.ok) return [];
   const data = await r.json();
   return (data.value ?? []).map((a: { accountName?: string }) => ({ name: a.accountName ?? "" }));
+}
+
+export async function listOrgsDirect(pat: string): Promise<AdoOrg[]> {
+  const me = await checkPatDirect(pat);
+  const memberId = me.id || me.publicAlias || "";
+  return listOrgsByMemberId(memberId, pat);
+}
+
+export async function resolvePatOrganizationScopeDirect(pat: string): Promise<{
+  displayName: string;
+  memberId: string;
+  organizations: AdoOrg[];
+  scope: "none" | "local" | "global";
+}> {
+  const me = await checkPatDirect(pat);
+  if (me.restrictedProfile) {
+    return {
+      displayName: me.displayName || "Utilisateur",
+      memberId: me.id || "",
+      organizations: [],
+      scope: "none",
+    };
+  }
+  const memberId = me.id || me.publicAlias || "";
+  if (!memberId) {
+    return { displayName: me.displayName || "Utilisateur", memberId: "", organizations: [], scope: "none" };
+  }
+  const organizations = await listOrgsByMemberId(memberId, pat);
+  const scope = organizations.length > 1 ? "global" : organizations.length === 1 ? "local" : "none";
+  return {
+    displayName: me.displayName || "Utilisateur",
+    memberId,
+    organizations,
+    scope,
+  };
 }
 
 export async function listProjectsDirect(org: string, pat: string): Promise<AdoProject[]> {

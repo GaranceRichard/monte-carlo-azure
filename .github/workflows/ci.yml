@@ -23,9 +23,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Enforce Identity Boundary SLA
+        run: |
+          python Scripts/check_identity_boundary.py
+
       - name: Run tests
         env:
-          # Evite toute dépendance à un .env inexistant côté CI
+          # Evite toute dependance a un .env inexistant cote CI
           ADO_PAT: "FAKE_PAT"
           ADO_ORG: "messqc"
           ADO_PROJECT: "Projet-700"

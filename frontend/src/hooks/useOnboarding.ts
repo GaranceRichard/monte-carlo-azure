@@ -1,5 +1,5 @@
-﻿import { useMemo, useState } from "react";
-import { checkPatDirect, listOrgsDirect, listProjectsDirect, listTeamsDirect } from "../adoClient";
+import { useMemo, useRef, useState } from "react";
+import { listProjectsDirect, listTeamsDirect, resolvePatOrganizationScopeDirect } from "../adoClient";
 import type { AppStep, NamedEntity } from "../types";
 
 type OnboardingState = {
@@ -48,44 +48,50 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   const [selectedProject, setSelectedProject] = useState("");
   const [teams, setTeams] = useState<NamedEntity[]>([]);
   const [selectedTeam, setSelectedTeam] = useState("");
+  const submitInFlightRef = useRef(false);
 
   async function submitPat(): Promise<void> {
+    if (submitInFlightRef.current) return;
     const clean = patInput.trim();
     if (!clean) {
       setErr("PAT requis pour continuer.");
       return;
     }
+    if (/\s/.test(clean)) {
+      setErr("Format PAT invalide (espaces ou retours a la ligne interdits).");
+      return;
+    }
+    if (clean.length < 20) {
+      setErr("PAT invalide ou insuffisant.");
+      return;
+    }
 
     setErr("");
     setLoading(true);
+    submitInFlightRef.current = true;
     try {
       setSessionPat(clean);
       try {
-        const profile = await checkPatDirect(clean);
-        setUserName(profile?.displayName || "Utilisateur");
-
-        const orgList = await listOrgsDirect(clean);
-        setOrgs(orgList);
-        if (orgList.length > 0) {
-          setSelectedOrg(orgList[0].name || "");
+        const resolved = await resolvePatOrganizationScopeDirect(clean);
+        setUserName(resolved.displayName || "Utilisateur");
+        setOrgs(resolved.organizations);
+        if (resolved.organizations.length > 1) {
+          setSelectedOrg(resolved.organizations[0].name || "");
           setOrgHint("");
+        } else if (resolved.organizations.length === 1) {
+          setSelectedOrg(resolved.organizations[0].name || "");
+          setOrgHint("PAT local detecte: organisation preselectionnee.");
         } else {
           setSelectedOrg("");
-          setOrgHint("PAT non global: indiquez manuellement votre organisation.");
+          setOrgHint("PAT local: saisissez votre organisation manuellement.");
         }
       } catch {
-        if (clean.length < 20) {
-          setSessionPat("");
-          setStep("pat");
-          setErr("PAT invalide ou insuffisant.");
-          return;
-        }
-        // Some PATs can access a specific org/project but not profile endpoints.
-        // Let the user continue with manual org input and validate on next step.
+        // Some org-scoped PATs cannot access profile discovery endpoints.
+        // Keep the flow unblocked and validate with org/project calls next.
         setUserName("Utilisateur");
         setOrgs([]);
         setSelectedOrg("");
-        setOrgHint("Validation du profil impossible (scope restreint). Saisissez votre organisation manuellement.");
+        setOrgHint("Verification automatique impossible. Saisissez votre organisation manuellement.");
       }
       setStep("org");
     } catch (e: unknown) {
@@ -95,6 +101,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
       setErr(msg);
     } finally {
       setLoading(false);
+      submitInFlightRef.current = false;
     }
   }
 
