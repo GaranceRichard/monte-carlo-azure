@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  tests:
+  backend-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -35,3 +35,37 @@ jobs:
           ADO_PROJECT: "Projet-700"
         run: |
           python -m pytest -q
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Run unit tests (Vitest)
+        run: |
+          npm run test:unit
+
+      - name: Install Playwright browsers
+        run: |
+          npx playwright install --with-deps chromium
+
+      - name: Run e2e tests (Playwright)
+        run: |
+          npm run test:e2e

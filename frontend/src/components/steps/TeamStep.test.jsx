@@ -57,4 +57,24 @@ describe("TeamStep", () => {
 
     expect(screen.getByRole("button", { name: "Choisir cette équipe" })).toBeDisabled();
   });
+
+  it("supports teams without id using name fallback", () => {
+    const setSelectedTeam = vi.fn();
+
+    render(
+      <TeamStep
+        err=""
+        selectedProject="Projet A"
+        teams={[{ name: "Equipe Sans Id" }]}
+        selectedTeam="Equipe Sans Id"
+        setSelectedTeam={setSelectedTeam}
+        loading={false}
+        onContinue={vi.fn()}
+      />,
+    );
+
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "Equipe Sans Id" } });
+    expect(setSelectedTeam).toHaveBeenCalledWith("Equipe Sans Id");
+    expect(screen.getByRole("option", { name: "Equipe Sans Id" })).toBeInTheDocument();
+  });
 });
