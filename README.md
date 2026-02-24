@@ -77,6 +77,22 @@ backend/
 - Python 3.10+
 - Node.js 20+
 - Accès Azure DevOps + PAT
+- Docker (optionnel, recommandé pour un déploiement rapide)
+
+---
+
+## Quick Start (Docker)
+
+En 3 commandes:
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+curl -sS http://127.0.0.1:8000/health
+```
+
+L'application (frontend servi par FastAPI) est ensuite disponible sur:
+- `http://127.0.0.1:8000`
 
 ---
 
@@ -204,6 +220,11 @@ Workflow: `.github/workflows/ci.yml`
   - Tests unitaires: `npm run test:unit` (Vitest)
   - Installation Playwright: `npx playwright install --with-deps chromium`
   - Tests e2e: `npm run test:e2e`
+
+- Job `docker-smoke`
+  - Build de l'image Docker à chaque push/PR
+  - Démarrage via `docker compose up -d --build`
+  - Smoke test santé: `GET /health`
 
 ---
 

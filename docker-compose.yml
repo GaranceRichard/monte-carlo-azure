@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: montecarlo-backend
+    env_file:
+      - .env
+    environment:
+      APP_CORS_ORIGINS: ${APP_CORS_ORIGINS}
+      APP_CORS_ALLOW_CREDENTIALS: ${APP_CORS_ALLOW_CREDENTIALS}
+      APP_FORECAST_TIMEOUT_SECONDS: ${APP_FORECAST_TIMEOUT_SECONDS}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - montecarlo-runtime:/tmp/montecarlo
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  montecarlo-runtime:

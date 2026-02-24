@@ -1,91 +1,57 @@
-# Déploiement Production
+# Deploiement Production
 
-Ce document décrit deux options de déploiement pour le backend (`FastAPI`) sur un serveur Linux (ex: OVH).
+Ce guide privilegie un deploiement simple et reproductible via Docker Compose.
+L'objectif est de lancer une instance complete (backend + frontend statique servi par FastAPI)
+sans configuration manuelle de `nginx` ou `systemd`.
 
-## Option A: Docker Compose (recommandée)
+## Option A: Docker Compose (recommandee)
 
-### 1) Pré-requis serveur
-- Docker Engine + plugin `docker compose`
-- Ports ouverts:
-  - `80` / `443` (Nginx reverse proxy)
-  - backend exposé en interne uniquement
+### 1) Pre-requis
 
-### 2) Structure minimale
+- Docker Engine
+- Plugin `docker compose`
 
-```text
-/opt/montecarlo/
-  backend/
-  requirements.txt
-  docker-compose.yml
-  nginx/
-    montecarlo.conf
-```
-
-### 3) `docker-compose.yml`
-
-```yaml
-services:
-  api:
-    image: python:3.12-slim
-    container_name: montecarlo-api
-    working_dir: /app
-    volumes:
-      - ./backend:/app/backend:ro
-      - ./requirements.txt:/app/requirements.txt:ro
-    command: >
-      sh -c "pip install --no-cache-dir -r /app/requirements.txt &&
-             uvicorn backend.api:app --host 0.0.0.0 --port 8000 --workers 2 --proxy-headers"
-    restart: unless-stopped
-    expose:
-      - "8000"
-
-  nginx:
-    image: nginx:1.27-alpine
-    container_name: montecarlo-nginx
-    depends_on:
-      - api
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/montecarlo.conf:/etc/nginx/conf.d/default.conf:ro
-      # Décommentez si vous gérez TLS localement:
-      # - ./certs:/etc/nginx/certs:ro
-    restart: unless-stopped
-```
-
-### 4) `nginx/montecarlo.conf`
-
-```nginx
-server {
-  listen 80;
-  server_name api.example.com;
-
-  location / {
-    proxy_pass http://api:8000;
-    proxy_http_version 1.1;
-    proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Real-IP $remote_addr;
-  }
-}
-```
-
-### 5) Lancer / mettre à jour
+### 2) Depuis la racine du repo
 
 ```bash
-cd /opt/montecarlo
-docker compose up -d
-docker compose logs -f api
+cp .env.example .env
+docker compose up -d --build
+curl -sS http://127.0.0.1:8000/health
+```
+
+Si le endpoint retourne `{"status":"ok"}`, l'application est disponible sur:
+
+- `http://127.0.0.1:8000`
+
+### 3) Variables d'environnement
+
+Le fichier `.env` est charge par `docker-compose.yml`.
+Base recommandee:
+
+```dotenv
+APP_PORT=8000
+APP_CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+APP_CORS_ALLOW_CREDENTIALS=true
+APP_FORECAST_TIMEOUT_SECONDS=30
+```
+
+### 4) Commandes utiles
+
+```bash
+docker compose logs -f backend
+docker compose restart backend
+docker compose down -v
 ```
 
 ## Option B: Nginx + systemd (sans Docker)
 
-### 1) Pré-requis
-- Python 3.12 installé sur le serveur
+Cette option reste valide pour des environnements qui imposent un runtime natif Linux.
+
+### 1) Pre-requis
+
+- Python 3.12
 - Nginx
-- utilisateur système dédié, par exemple `montecarlo`
+- Utilisateur systeme dedie (ex: `montecarlo`)
 
 ### 2) Installation backend
 
@@ -93,7 +59,6 @@ docker compose logs -f api
 sudo mkdir -p /opt/montecarlo
 sudo chown -R montecarlo:montecarlo /opt/montecarlo
 
-# en tant que montecarlo
 cd /opt/montecarlo
 python3 -m venv .venv
 . .venv/bin/activate
@@ -130,7 +95,7 @@ sudo systemctl enable --now montecarlo-api
 sudo systemctl status montecarlo-api
 ```
 
-### 4) Nginx reverse proxy
+### 4) Reverse proxy Nginx
 
 Fichier `/etc/nginx/sites-available/montecarlo-api`:
 
@@ -158,15 +123,8 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-## Vérifications post-déploiement
+## Notes securite
 
-```bash
-curl -sS https://api.example.com/health
-```
-
-Doit renvoyer un statut `200`.
-
-## Notes sécurité
-- Ne jamais exposer de PAT côté serveur.
+- Ne jamais exposer de PAT cote serveur.
 - Garder uniquement `POST /simulate` et `GET /health`.
-- Conserver le contrôle `Scripts/check_identity_boundary.py` en CI.
+- Conserver `python Scripts/check_identity_boundary.py` en CI.

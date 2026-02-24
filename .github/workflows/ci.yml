@@ -69,3 +69,43 @@ jobs:
       - name: Run e2e tests (Playwright)
         run: |
           npm run test:e2e
+
+  docker-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - backend-tests
+      - frontend-tests
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare env file
+        run: |
+          cp .env.example .env
+
+      - name: Build image
+        run: |
+          docker compose build
+
+      - name: Start services
+        run: |
+          docker compose up -d
+
+      - name: Smoke test /health
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8000/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Health endpoint did not become ready in time"
+          docker compose logs backend || true
+          exit 1
+
+      - name: Stop services
+        if: always()
+        run: |
+          docker compose down -v
