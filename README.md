@@ -63,11 +63,19 @@ frontend/
     api.ts              # appel backend /simulate uniquement
     hooks/
       useOnboarding.ts  # PAT en state local
-      useSimulation.ts  # throughput client + simulation serveur
+      useSimulation.ts             # orchestrateur simulation
+      useSimulationPrefs.ts        # persistance localStorage des préférences
+      useSimulationHistory.ts      # historique local (10 dernières simulations)
+      useSimulationChartData.ts    # mapping/useMemo des données graphiques
+      useSimulationAutoRun.ts      # auto-run avec debounce
+    components/steps/
+      SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
+      simulationPdfExport.tsx      # export PDF via rendu statique Recharts
 
 backend/
   api.py                # FastAPI + CORS + route /simulate + /health
-  api_routes_simulate.py
+  api_routes_simulate.py # endpoint /simulate
+  rate_limiter.py       # rate limiter glissant + clé client
   api_models.py         # SimulateRequest / SimulateResponse
   mc_core.py            # coeur Monte Carlo
 ```
