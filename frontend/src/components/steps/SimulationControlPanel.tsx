@@ -2,41 +2,10 @@ import { useEffect, useState } from "react";
 import SimulationFilterControls from "./SimulationFilterControls";
 import SimulationHistoryRangeControls from "./SimulationHistoryRangeControls";
 import SimulationModeAndParametersControls from "./SimulationModeAndParametersControls";
-import type { SimulationViewModel } from "../../hooks/useSimulation";
+import { useSimulationContext } from "./SimulationContext";
 
-type SimulationControlPanelProps = {
-  selectedTeam: string;
-  simulation: Pick<
-    SimulationViewModel,
-    | "startDate"
-    | "setStartDate"
-    | "endDate"
-    | "setEndDate"
-    | "simulationMode"
-    | "setSimulationMode"
-    | "includeZeroWeeks"
-    | "setIncludeZeroWeeks"
-    | "backlogSize"
-    | "setBacklogSize"
-    | "targetWeeks"
-    | "setTargetWeeks"
-    | "nSims"
-    | "setNSims"
-    | "workItemTypeOptions"
-    | "types"
-    | "setTypes"
-    | "filteredDoneStateOptions"
-    | "doneStates"
-    | "setDoneStates"
-    | "loadingTeamOptions"
-    | "loading"
-    | "hasLaunchedOnce"
-    | "runForecast"
-    | "setActiveChartTab"
-  >;
-};
-
-export default function SimulationControlPanel({ selectedTeam, simulation }: SimulationControlPanelProps) {
+export default function SimulationControlPanel() {
+  const { selectedTeam, simulation } = useSimulationContext();
   const {
     loading,
     hasLaunchedOnce,
@@ -124,7 +93,7 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
           </button>
         </div>
         <div className="sim-advanced-summary">du {startDate} au {endDate}</div>
-        {showPeriod && <SimulationHistoryRangeControls simulation={simulation} />}
+        {showPeriod && <SimulationHistoryRangeControls />}
       </section>
       <section className="sim-control-section sim-control-section--compact">
         <div className="sim-advanced-header">
@@ -141,7 +110,7 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
         <div className="sim-advanced-summary">
           Type {modeKind} : {String(modeValue)} 0 {modeZeroText} sur {String(nSims)} simulations
         </div>
-        {showMode && <SimulationModeAndParametersControls simulation={simulation} />}
+        {showMode && <SimulationModeAndParametersControls />}
       </section>
       <section className="sim-control-section">
         <div className="sim-advanced-header">
@@ -158,7 +127,7 @@ export default function SimulationControlPanel({ selectedTeam, simulation }: Sim
         <div className="sim-advanced-summary">
           type {typeListText} ; etats {stateListText}
         </div>
-        {showFilters && <SimulationFilterControls simulation={simulation} />}
+        {showFilters && <SimulationFilterControls />}
       </section>
 
       {!hasLaunchedOnce && (

@@ -7,6 +7,7 @@ import SimulationStep from "./components/steps/SimulationStep";
 import TeamStep from "./components/steps/TeamStep";
 import { useOnboarding } from "./hooks/useOnboarding";
 import { useSimulation } from "./hooks/useSimulation";
+import { storageGetItem, storageSetItem } from "./storage";
 import "./App.css";
 
 type ThemeMode = "light" | "dark";
@@ -23,7 +24,7 @@ export default function App() {
   });
 
   const [theme, setTheme] = useState<ThemeMode>(() => {
-    const saved = localStorage.getItem("theme");
+    const saved = storageGetItem("theme");
     const initial: ThemeMode = saved === "light" || saved === "dark" ? saved : "dark";
     document.documentElement.setAttribute("data-theme", initial);
     return initial;
@@ -32,7 +33,7 @@ export default function App() {
   function toggleTheme() {
     const next: ThemeMode = theme === "dark" ? "light" : "dark";
     setTheme(next);
-    localStorage.setItem("theme", next);
+    storageSetItem("theme", next);
     document.documentElement.setAttribute("data-theme", next);
   }
 

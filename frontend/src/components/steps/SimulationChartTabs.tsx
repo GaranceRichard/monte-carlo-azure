@@ -11,39 +11,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { SimulationViewModel } from "../../hooks/useSimulation";
 import { exportSimulationPdf } from "./simulationPdfExport";
+import { useSimulationContext } from "./SimulationContext";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "../ui/tabs";
 
-type SimulationChartTabsProps = {
-  selectedTeam: string;
-  simulation: Pick<
-    SimulationViewModel,
-    | "result"
-    | "activeChartTab"
-    | "setActiveChartTab"
-    | "throughputData"
-    | "mcHistData"
-    | "probabilityCurveData"
-    | "tooltipBaseProps"
-    | "resetForTeamSelection"
-    | "exportThroughputCsv"
-    | "displayPercentiles"
-    | "startDate"
-    | "endDate"
-    | "simulationMode"
-    | "includeZeroWeeks"
-    | "types"
-    | "doneStates"
-    | "backlogSize"
-    | "targetWeeks"
-    | "nSims"
-    | "capacityPercent"
-    | "reducedCapacityWeeks"
-  >;
-};
-
-export default function SimulationChartTabs({ selectedTeam, simulation }: SimulationChartTabsProps) {
+export default function SimulationChartTabs() {
+  const { selectedTeam, simulation } = useSimulationContext();
   const {
     result,
     activeChartTab,

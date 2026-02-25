@@ -1,10 +1,7 @@
-import type { SimulationViewModel } from "../../hooks/useSimulation";
+import { useSimulationContext } from "./SimulationContext";
 
-type SimulationHistoryRangeControlsProps = {
-  simulation: Pick<SimulationViewModel, "startDate" | "setStartDate" | "endDate" | "setEndDate">;
-};
-
-export default function SimulationHistoryRangeControls({ simulation }: SimulationHistoryRangeControlsProps) {
+export default function SimulationHistoryRangeControls() {
+  const { simulation } = useSimulationContext();
   const { startDate, setStartDate, endDate, setEndDate } = simulation;
 
   return (

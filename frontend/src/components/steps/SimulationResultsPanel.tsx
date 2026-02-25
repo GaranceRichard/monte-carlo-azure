@@ -1,22 +1,8 @@
-import type { SimulationViewModel } from "../../hooks/useSimulation";
 import ProgressBar from "../ui/progress";
+import { useSimulationContext } from "./SimulationContext";
 
-type SimulationResultsPanelProps = {
-  simulation: Pick<
-    SimulationViewModel,
-    | "loading"
-    | "loadingStageMessage"
-    | "sampleStats"
-    | "includeZeroWeeks"
-    | "result"
-    | "displayPercentiles"
-    | "simulationHistory"
-    | "applyHistoryEntry"
-    | "clearSimulationHistory"
-  >;
-};
-
-export default function SimulationResultsPanel({ simulation }: SimulationResultsPanelProps) {
+export default function SimulationResultsPanel() {
+  const { simulation } = useSimulationContext();
   const {
     loading,
     loadingStageMessage,

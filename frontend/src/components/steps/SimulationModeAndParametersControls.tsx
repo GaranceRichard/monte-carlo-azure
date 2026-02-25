@@ -1,23 +1,7 @@
-import type { SimulationViewModel } from "../../hooks/useSimulation";
+import { useSimulationContext } from "./SimulationContext";
 
-type SimulationModeAndParametersControlsProps = {
-  simulation: Pick<
-    SimulationViewModel,
-    | "simulationMode"
-    | "setSimulationMode"
-    | "includeZeroWeeks"
-    | "setIncludeZeroWeeks"
-    | "backlogSize"
-    | "setBacklogSize"
-    | "targetWeeks"
-    | "setTargetWeeks"
-    | "nSims"
-    | "setNSims"
-    | "setActiveChartTab"
-  >;
-};
-
-export default function SimulationModeAndParametersControls({ simulation }: SimulationModeAndParametersControlsProps) {
+export default function SimulationModeAndParametersControls() {
+  const { simulation } = useSimulationContext();
   const {
     simulationMode,
     setSimulationMode,

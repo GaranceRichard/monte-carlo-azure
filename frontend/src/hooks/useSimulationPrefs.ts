@@ -1,15 +1,10 @@
 import { useEffect, useState } from "react";
 import type { ForecastMode } from "../types";
+import { formatDateLocal } from "../date";
+import { storageGetItem, storageSetItem } from "../storage";
 import type { StoredSimulationPrefs } from "./simulationTypes";
 
 const SIM_PREFS_KEY = "mc_simulation_prefs_v1";
-
-function formatDateLocal(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
 
 function today(): string {
   return formatDateLocal(new Date());
@@ -22,9 +17,9 @@ function nWeeksAgo(weeks: number): string {
 }
 
 function readStoredSimulationPrefs(): StoredSimulationPrefs {
+  const raw = storageGetItem(SIM_PREFS_KEY);
+  if (!raw) return {};
   try {
-    const raw = localStorage.getItem(SIM_PREFS_KEY);
-    if (!raw) return {};
     const parsed = JSON.parse(raw) as StoredSimulationPrefs;
     if (!parsed || typeof parsed !== "object") return {};
     return parsed;
@@ -67,24 +62,20 @@ export function useSimulationPrefs(): SimulationPrefsState {
   const [nSims, setNSims] = useState<number | string>(prefs.nSims ?? 20000);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        SIM_PREFS_KEY,
-        JSON.stringify({
-          startDate,
-          endDate,
-          simulationMode,
-          includeZeroWeeks,
-          capacityPercent: Number(capacityPercent) || 100,
-          reducedCapacityWeeks: Number(reducedCapacityWeeks) || 0,
-          backlogSize: Number(backlogSize) || 0,
-          targetWeeks: Number(targetWeeks) || 0,
-          nSims: Number(nSims) || 0,
-        } satisfies StoredSimulationPrefs),
-      );
-    } catch {
-      // Local storage can be unavailable in private contexts.
-    }
+    storageSetItem(
+      SIM_PREFS_KEY,
+      JSON.stringify({
+        startDate,
+        endDate,
+        simulationMode,
+        includeZeroWeeks,
+        capacityPercent: Number(capacityPercent) || 100,
+        reducedCapacityWeeks: Number(reducedCapacityWeeks) || 0,
+        backlogSize: Number(backlogSize) || 0,
+        targetWeeks: Number(targetWeeks) || 0,
+        nSims: Number(nSims) || 0,
+      } satisfies StoredSimulationPrefs),
+    );
   }, [
     startDate,
     endDate,

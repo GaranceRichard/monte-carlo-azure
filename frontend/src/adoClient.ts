@@ -1,15 +1,10 @@
-﻿function adoHeaders(pat: string): Record<string, string> {
+﻿import { formatDateLocal } from "./date";
+
+function adoHeaders(pat: string): Record<string, string> {
   return {
     Authorization: `Basic ${btoa(`:${pat}`)}`,
     "Content-Type": "application/json",
   };
-}
-
-function formatDateLocal(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
 }
 
 const ADO = "https://dev.azure.com";
@@ -300,3 +295,4 @@ export async function getWeeklyThroughputDirect(
   }
   return result;
 }
+

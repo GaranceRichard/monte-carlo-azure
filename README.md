@@ -8,6 +8,11 @@ Architecture V2:
 - Le frontend appelle Azure DevOps directement depuis le navigateur.
 - Le backend OVH ne reçoit que des données anonymes de throughput (`throughput_samples`) pour calculer la simulation.
 
+Refactors récents (frontend):
+- utilitaires centralisés `src/date.ts`, `src/storage.ts`, `src/utils/math.ts`, `src/utils/simulation.ts`
+- introduction d'un contexte React `src/components/steps/SimulationContext.tsx` pour éviter le prop-drilling de `SimulationViewModel`
+- centralisation des accès `localStorage` via `storage.ts`
+
 ---
 
 ## Fonctionnalités

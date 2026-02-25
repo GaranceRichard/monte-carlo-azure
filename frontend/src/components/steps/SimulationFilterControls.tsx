@@ -1,19 +1,7 @@
-import type { SimulationViewModel } from "../../hooks/useSimulation";
+import { useSimulationContext } from "./SimulationContext";
 
-type SimulationFilterControlsProps = {
-  simulation: Pick<
-    SimulationViewModel,
-    | "workItemTypeOptions"
-    | "types"
-    | "setTypes"
-    | "filteredDoneStateOptions"
-    | "doneStates"
-    | "setDoneStates"
-    | "loadingTeamOptions"
-  >;
-};
-
-export default function SimulationFilterControls({ simulation }: SimulationFilterControlsProps) {
+export default function SimulationFilterControls() {
+  const { simulation } = useSimulationContext();
   const {
     workItemTypeOptions,
     types,
