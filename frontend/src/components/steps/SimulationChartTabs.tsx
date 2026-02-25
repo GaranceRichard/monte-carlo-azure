@@ -12,13 +12,20 @@ import {
   YAxis,
 } from "recharts";
 import { exportSimulationPdf } from "./simulationPdfExport";
-import { useSimulationContext } from "./SimulationContext";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "../ui/tabs";
+import {
+  useSimulationChartsContext as useChartsContext,
+  useSimulationDateRangeContext as useDateRangeContext,
+  useSimulationFiltersContext as useFiltersContext,
+  useSimulationForecastControlsContext as useForecastControlsContext,
+  useSimulationMetaContext as useMetaContext,
+  useSimulationResultContext as useResultContext,
+} from "./SimulationContext";
 
 export default function SimulationChartTabs() {
-  const { selectedTeam, simulation } = useSimulationContext();
+  const { selectedTeam } = useMetaContext();
+  const { result, displayPercentiles } = useResultContext();
   const {
-    result,
     activeChartTab,
     setActiveChartTab,
     throughputData,
@@ -27,19 +34,11 @@ export default function SimulationChartTabs() {
     tooltipBaseProps,
     resetForTeamSelection,
     exportThroughputCsv,
-    displayPercentiles,
-    startDate,
-    endDate,
-    simulationMode,
-    includeZeroWeeks,
-    types,
-    doneStates,
-    backlogSize,
-    targetWeeks,
-    nSims,
-    capacityPercent,
-    reducedCapacityWeeks,
-  } = simulation;
+  } = useChartsContext();
+  const { startDate, endDate } = useDateRangeContext();
+  const { simulationMode, includeZeroWeeks, backlogSize, targetWeeks, nSims, capacityPercent, reducedCapacityWeeks } =
+    useForecastControlsContext();
+  const { types, doneStates } = useFiltersContext();
 
   const throughputWithMovingAverage = useMemo(() => {
     const windowSize = 4;

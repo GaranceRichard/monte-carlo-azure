@@ -12,6 +12,10 @@ Refactors récents (frontend):
 - utilitaires centralisés `src/date.ts`, `src/storage.ts`, `src/utils/math.ts`, `src/utils/simulation.ts`
 - introduction d'un contexte React `src/components/steps/SimulationContext.tsx` pour éviter le prop-drilling de `SimulationViewModel`
 - centralisation des accès `localStorage` via `storage.ts`
+- extraction de l'export CSV throughput vers `src/utils/export.ts`
+- extraction de la logique de calcul forecast vers `src/hooks/simulationForecastService.ts`
+- typages simulation segmentés (`SimulationForecastControls`, `SimulationDateRange`, `SimulationResult`, `ChartTab`)
+- découpage du contexte simulation en hooks ciblés (meta, run, filtres, dates, contrôles, résultats, historique, charts)
 
 ---
 

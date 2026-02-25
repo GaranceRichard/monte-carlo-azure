@@ -1,7 +1,7 @@
-import { useSimulationContext } from "./SimulationContext";
+import { useSimulationChartsContext, useSimulationForecastControlsContext } from "./SimulationContext";
 
 export default function SimulationModeAndParametersControls() {
-  const { simulation } = useSimulationContext();
+  const { setActiveChartTab } = useSimulationChartsContext();
   const {
     simulationMode,
     setSimulationMode,
@@ -13,8 +13,7 @@ export default function SimulationModeAndParametersControls() {
     setTargetWeeks,
     nSims,
     setNSims,
-    setActiveChartTab,
-  } = simulation;
+  } = useSimulationForecastControlsContext();
 
   return (
     <>

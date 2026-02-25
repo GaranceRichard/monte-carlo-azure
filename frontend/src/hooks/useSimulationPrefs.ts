@@ -1,20 +1,10 @@
 import { useEffect, useState } from "react";
 import type { ForecastMode } from "../types";
-import { formatDateLocal } from "../date";
+import { nWeeksAgo, today } from "../date";
 import { storageGetItem, storageSetItem } from "../storage";
 import type { StoredSimulationPrefs } from "./simulationTypes";
 
 const SIM_PREFS_KEY = "mc_simulation_prefs_v1";
-
-function today(): string {
-  return formatDateLocal(new Date());
-}
-
-function nWeeksAgo(weeks: number): string {
-  const date = new Date();
-  date.setDate(date.getDate() - weeks * 7);
-  return formatDateLocal(date);
-}
 
 function readStoredSimulationPrefs(): StoredSimulationPrefs {
   const raw = storageGetItem(SIM_PREFS_KEY);

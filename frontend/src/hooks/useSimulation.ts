@@ -1,27 +1,24 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { getTeamOptionsDirect, getWeeklyThroughputDirect } from "../adoClient";
-import { postSimulate } from "../api";
+import { getTeamOptionsDirect } from "../adoClient";
 import type {
   AppStep,
-  ForecastHistogramBucket,
-  ForecastMode,
-  ForecastRequestPayload,
   ForecastResponse,
   WeeklyThroughputRow,
 } from "../types";
 import type {
-  ChartPoint,
-  ProbabilityPoint,
+  ChartTab,
   SampleStats,
+  SimulationDateRange,
+  SimulationForecastControls,
   SimulationHistoryEntry,
-  ThroughputPoint,
+  SimulationResult,
   TooltipBaseProps,
 } from "./simulationTypes";
-import { clamp, toSafeNumber } from "../utils/math";
-import { applyCapacityReductionToResult } from "../utils/simulation";
+import { exportThroughputCsv as exportCsv } from "../utils/export";
 import { useSimulationAutoRun } from "./useSimulationAutoRun";
 import { useSimulationChartData } from "./useSimulationChartData";
+import { runSimulationForecast } from "./simulationForecastService";
 import { useSimulationHistory } from "./useSimulationHistory";
 import { useSimulationPrefs } from "./useSimulationPrefs";
 
@@ -32,44 +29,22 @@ const DEFAULT_STATES_BY_TYPE: Record<string, string[]> = {
   Bug: ["Done", "Closed", "Resolved"],
 };
 
-export type SimulationViewModel = {
+export type SimulationViewModel = SimulationForecastControls &
+  SimulationDateRange &
+  SimulationResult & {
   loading: boolean;
   hasLaunchedOnce: boolean;
   loadingTeamOptions: boolean;
   loadingStageMessage: string;
   err: string;
-  startDate: string;
-  setStartDate: (value: string) => void;
-  endDate: string;
-  setEndDate: (value: string) => void;
-  simulationMode: ForecastMode;
-  setSimulationMode: (value: ForecastMode) => void;
-  includeZeroWeeks: boolean;
-  setIncludeZeroWeeks: (value: boolean) => void;
-  capacityPercent: number | string;
-  setCapacityPercent: (value: number | string) => void;
-  reducedCapacityWeeks: number | string;
-  setReducedCapacityWeeks: (value: number | string) => void;
-  sampleStats: SampleStats | null;
-  backlogSize: number | string;
-  setBacklogSize: (value: number | string) => void;
-  targetWeeks: number | string;
-  setTargetWeeks: (value: number | string) => void;
-  nSims: number | string;
-  setNSims: (value: number | string) => void;
   workItemTypeOptions: string[];
   types: string[];
   setTypes: Dispatch<SetStateAction<string[]>>;
   filteredDoneStateOptions: string[];
   doneStates: string[];
   setDoneStates: Dispatch<SetStateAction<string[]>>;
-  result: ForecastResponse | null;
-  displayPercentiles: Record<string, number>;
-  activeChartTab: "throughput" | "distribution" | "probability";
-  setActiveChartTab: (value: "throughput" | "distribution" | "probability") => void;
-  throughputData: ThroughputPoint[];
-  mcHistData: ChartPoint[];
-  probabilityCurveData: ProbabilityPoint[];
+  activeChartTab: ChartTab;
+  setActiveChartTab: (value: ChartTab) => void;
   tooltipBaseProps: TooltipBaseProps;
   simulationHistory: SimulationHistoryEntry[];
   applyHistoryEntry: (entry: SimulationHistoryEntry) => void;
@@ -126,7 +101,7 @@ export function useSimulation({
   const [types, setTypes] = useState<string[]>([]);
   const [result, setResult] = useState<ForecastResponse | null>(null);
   const [weeklyThroughput, setWeeklyThroughput] = useState<WeeklyThroughputRow[]>([]);
-  const [activeChartTab, setActiveChartTab] = useState<"throughput" | "distribution" | "probability">("throughput");
+  const [activeChartTab, setActiveChartTab] = useState<ChartTab>("throughput");
   const [hasLaunchedOnce, setHasLaunchedOnce] = useState(false);
 
   const tooltipBaseProps: TooltipBaseProps = {
@@ -198,7 +173,7 @@ export function useSimulation({
     }, 1200);
 
     try {
-      const weekly = await getWeeklyThroughputDirect(
+      const forecast = await runSimulationForecast({
         selectedOrg,
         selectedProject,
         selectedTeam,
@@ -207,74 +182,18 @@ export function useSimulation({
         endDate,
         doneStates,
         types,
-      );
-
-      const throughputSamples = weekly.map((r) => r.throughput).filter((n) => (includeZeroWeeks ? n >= 0 : n > 0));
-      const zeroWeeks = weekly.filter((r) => r.throughput === 0).length;
-      setSampleStats({
-        totalWeeks: weekly.length,
-        zeroWeeks,
-        usedWeeks: throughputSamples.length,
-      });
-      if (throughputSamples.length < 6) {
-        throw new Error(
-          "Historique insuffisant pour une simulation fiable. Élargissez la période sélectionnée, ou vérifiez les types et états de résolution choisis.",
-        );
-      }
-
-      setWeeklyThroughput(weekly);
-
-      const payload: ForecastRequestPayload = {
-        throughput_samples: throughputSamples,
-        include_zero_weeks: includeZeroWeeks,
-        mode: simulationMode,
-        backlog_size: simulationMode === "backlog_to_weeks" ? Number(backlogSize) : undefined,
-        target_weeks: simulationMode === "weeks_to_items" ? Number(targetWeeks) : undefined,
-        n_sims: Number(nSims),
-      };
-
-      const response = await postSimulate(payload);
-      const normalized: ForecastResponse = {
-        result_kind: response.result_kind,
-        samples_count: response.samples_count,
-        result_percentiles: response.result_percentiles,
-        result_distribution: (response.result_distribution ?? []) as ForecastHistogramBucket[],
-      };
-      const adjusted = applyCapacityReductionToResult(
-        normalized,
-        simulationMode,
-        toSafeNumber(targetWeeks, 12),
-        toSafeNumber(capacityPercent, 100),
-        toSafeNumber(reducedCapacityWeeks, 0),
-      );
-      setResult(adjusted);
-
-      const newHistoryEntry: SimulationHistoryEntry = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        createdAt: new Date().toISOString(),
-        selectedOrg,
-        selectedProject,
-        selectedTeam,
-        startDate,
-        endDate,
-        simulationMode,
         includeZeroWeeks,
-        backlogSize: toSafeNumber(backlogSize, 120),
-        targetWeeks: toSafeNumber(targetWeeks, 12),
-        nSims: toSafeNumber(nSims, 20_000),
-        capacityPercent: clamp(toSafeNumber(capacityPercent, 100), 1, 100),
-        reducedCapacityWeeks: clamp(toSafeNumber(reducedCapacityWeeks, 0), 0, 260),
-        types: [...types],
-        doneStates: [...doneStates],
-        sampleStats: {
-          totalWeeks: weekly.length,
-          zeroWeeks,
-          usedWeeks: throughputSamples.length,
-        },
-        weeklyThroughput: weekly,
-        result: adjusted,
-      };
-      pushSimulationHistory(newHistoryEntry);
+        simulationMode,
+        backlogSize,
+        targetWeeks,
+        nSims,
+        capacityPercent,
+        reducedCapacityWeeks,
+      });
+      setSampleStats(forecast.sampleStats);
+      setWeeklyThroughput(forecast.weeklyThroughput);
+      setResult(forecast.result);
+      pushSimulationHistory(forecast.historyEntry);
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : String(e));
     } finally {
@@ -399,23 +318,6 @@ export function useSimulation({
     resetAutoRunState();
   }
 
-  function exportThroughputCsv(): void {
-    if (!weeklyThroughput.length) return;
-    const header = "week,throughput";
-    const rows = weeklyThroughput.map((row) => `${String(row.week).slice(0, 10)},${row.throughput}`);
-    const csv = [header, ...rows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    const now = new Date().toISOString().replace(/[:.]/g, "-");
-    a.download = `throughput-${selectedTeam || "team"}-${now}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
-
   return {
     loading,
     hasLaunchedOnce,
@@ -458,7 +360,7 @@ export function useSimulation({
     simulationHistory,
     applyHistoryEntry,
     clearSimulationHistory,
-    exportThroughputCsv,
+    exportThroughputCsv: () => exportCsv(weeklyThroughput, selectedTeam),
     runForecast,
     resetForTeamSelection,
     resetAll,

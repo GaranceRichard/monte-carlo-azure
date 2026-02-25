@@ -1,19 +1,20 @@
 import ProgressBar from "../ui/progress";
-import { useSimulationContext } from "./SimulationContext";
+import {
+  useSimulationForecastControlsContext,
+  useSimulationHistoryContext,
+  useSimulationResultContext,
+  useSimulationRunContext,
+} from "./SimulationContext";
 
 export default function SimulationResultsPanel() {
-  const { simulation } = useSimulationContext();
+  const { loading, loadingStageMessage } = useSimulationRunContext();
+  const { includeZeroWeeks } = useSimulationForecastControlsContext();
+  const { sampleStats, result, displayPercentiles } = useSimulationResultContext();
   const {
-    loading,
-    loadingStageMessage,
-    sampleStats,
-    includeZeroWeeks,
-    result,
-    displayPercentiles,
     simulationHistory,
     applyHistoryEntry,
     clearSimulationHistory,
-  } = simulation;
+  } = useSimulationHistoryContext();
 
   const kpiToneByLabel: Record<string, string> = {
     P50: "border-[var(--p50)] bg-[var(--p50-soft)]",

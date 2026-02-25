@@ -50,3 +50,38 @@ export type SimulationHistoryEntry = {
   weeklyThroughput: WeeklyThroughputRow[];
   result: ForecastResponse;
 };
+
+export type SimulationForecastControls = {
+  backlogSize: number | string;
+  setBacklogSize: (value: number | string) => void;
+  targetWeeks: number | string;
+  setTargetWeeks: (value: number | string) => void;
+  nSims: number | string;
+  setNSims: (value: number | string) => void;
+  simulationMode: ForecastMode;
+  setSimulationMode: (value: ForecastMode) => void;
+  includeZeroWeeks: boolean;
+  setIncludeZeroWeeks: (value: boolean) => void;
+  capacityPercent: number | string;
+  setCapacityPercent: (value: number | string) => void;
+  reducedCapacityWeeks: number | string;
+  setReducedCapacityWeeks: (value: number | string) => void;
+};
+
+export type SimulationDateRange = {
+  startDate: string;
+  setStartDate: (value: string) => void;
+  endDate: string;
+  setEndDate: (value: string) => void;
+};
+
+export type SimulationResult = {
+  result: ForecastResponse | null;
+  displayPercentiles: Record<string, number>;
+  throughputData: ThroughputPoint[];
+  mcHistData: ChartPoint[];
+  probabilityCurveData: ProbabilityPoint[];
+  sampleStats: SampleStats | null;
+};
+
+export type ChartTab = "throughput" | "distribution" | "probability";

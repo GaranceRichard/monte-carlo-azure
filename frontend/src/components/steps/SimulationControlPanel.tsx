@@ -2,24 +2,26 @@ import { useEffect, useState } from "react";
 import SimulationFilterControls from "./SimulationFilterControls";
 import SimulationHistoryRangeControls from "./SimulationHistoryRangeControls";
 import SimulationModeAndParametersControls from "./SimulationModeAndParametersControls";
-import { useSimulationContext } from "./SimulationContext";
+import {
+  useSimulationDateRangeContext,
+  useSimulationFiltersContext,
+  useSimulationForecastControlsContext,
+  useSimulationMetaContext,
+  useSimulationRunContext,
+} from "./SimulationContext";
 
 export default function SimulationControlPanel() {
-  const { selectedTeam, simulation } = useSimulationContext();
+  const { selectedTeam } = useSimulationMetaContext();
+  const { loading, hasLaunchedOnce, runForecast } = useSimulationRunContext();
+  const { types, doneStates } = useSimulationFiltersContext();
+  const { startDate, endDate } = useSimulationDateRangeContext();
   const {
-    loading,
-    hasLaunchedOnce,
-    runForecast,
-    types,
-    doneStates,
-    startDate,
-    endDate,
     simulationMode,
     backlogSize,
     targetWeeks,
     includeZeroWeeks,
     nSims,
-  } = simulation;
+  } = useSimulationForecastControlsContext();
   const [showPeriod, setShowPeriod] = useState(false);
   const [showMode, setShowMode] = useState(false);
   const [showFilters, setShowFilters] = useState(false);

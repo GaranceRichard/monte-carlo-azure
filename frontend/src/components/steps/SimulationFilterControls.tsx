@@ -1,7 +1,6 @@
-import { useSimulationContext } from "./SimulationContext";
+import { useSimulationFiltersContext } from "./SimulationContext";
 
 export default function SimulationFilterControls() {
-  const { simulation } = useSimulationContext();
   const {
     workItemTypeOptions,
     types,
@@ -10,7 +9,7 @@ export default function SimulationFilterControls() {
     doneStates,
     setDoneStates,
     loadingTeamOptions,
-  } = simulation;
+  } = useSimulationFiltersContext();
 
   return (
     <>

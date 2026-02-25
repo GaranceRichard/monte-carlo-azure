@@ -1,8 +1,7 @@
-import { useSimulationContext } from "./SimulationContext";
+import { useSimulationDateRangeContext } from "./SimulationContext";
 
 export default function SimulationHistoryRangeControls() {
-  const { simulation } = useSimulationContext();
-  const { startDate, setStartDate, endDate, setEndDate } = simulation;
+  const { startDate, setStartDate, endDate, setEndDate } = useSimulationDateRangeContext();
 
   return (
     <div className="sim-grid-2 sim-grid-2--compact">
