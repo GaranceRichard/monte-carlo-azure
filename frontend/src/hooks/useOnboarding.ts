@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { listProjectsDirect, listTeamsDirect, resolvePatOrganizationScopeDirect } from "../adoClient";
 import type { AppStep, NamedEntity } from "../types";
+import { sortTeams } from "../utils/teamSort";
 
 type OnboardingState = {
   patInput: string;
@@ -49,20 +50,24 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   const [teams, setTeams] = useState<NamedEntity[]>([]);
   const [selectedTeam, setSelectedTeam] = useState("");
   const submitInFlightRef = useRef(false);
+  const failPatValidation = (message: string) => {
+    setPatInput("");
+    setErr(message);
+  };
 
   async function submitPat(): Promise<void> {
     if (submitInFlightRef.current) return;
     const clean = patInput.trim();
     if (!clean) {
-      setErr("PAT requis pour continuer.");
+      failPatValidation("PAT requis pour continuer.");
       return;
     }
     if (/\s/.test(clean)) {
-      setErr("Format PAT invalide (espaces ou retours a la ligne interdits).");
+      failPatValidation("Format PAT invalide (espaces ou retours a la ligne interdits).");
       return;
     }
     if (clean.length < 20) {
-      setErr("PAT invalide ou insuffisant.");
+      failPatValidation("PAT invalide ou insuffisant.");
       return;
     }
 
@@ -147,10 +152,11 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     setLoading(true);
     try {
       const list = await listTeamsDirect(org, project, sessionPat);
+      const sortedList = sortTeams(list);
       setSelectedOrg(org);
       setSelectedProject(project);
       setTeams(list);
-      setSelectedTeam(list.length > 0 ? (list[0].name || "") : "");
+      setSelectedTeam(sortedList.length > 0 ? (sortedList[0].name || "") : "");
       setStep("teams");
       return true;
     } catch (e: unknown) {

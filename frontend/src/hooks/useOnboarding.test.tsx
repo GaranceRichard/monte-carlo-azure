@@ -30,6 +30,7 @@ describe("useOnboarding", () => {
       await result.current.actions.submitPat();
     });
     expect(result.current.state.err).toContain("PAT requis");
+    expect(result.current.state.patInput).toBe("");
 
     await act(async () => {
       result.current.actions.setPatInput("abcd efgh");
@@ -38,6 +39,7 @@ describe("useOnboarding", () => {
       await result.current.actions.submitPat();
     });
     expect(result.current.state.err).toContain("Format PAT invalide");
+    expect(result.current.state.patInput).toBe("");
 
     await act(async () => {
       result.current.actions.setPatInput("short-pat");
@@ -46,6 +48,7 @@ describe("useOnboarding", () => {
       await result.current.actions.submitPat();
     });
     expect(result.current.state.err).toContain("PAT invalide");
+    expect(result.current.state.patInput).toBe("");
     expect(resolvePatOrganizationScopeDirect).not.toHaveBeenCalled();
   });
 
@@ -180,8 +183,8 @@ describe("useOnboarding", () => {
     });
     vi.mocked(listProjectsDirect).mockResolvedValue([{ id: "p1", name: "Projet A" }]);
     vi.mocked(listTeamsDirect).mockResolvedValue([
-      { id: "t1", name: "Equipe Alpha" },
-      { id: "t2", name: "Equipe Beta" },
+      { id: "t1", name: "Zulu-Team" },
+      { id: "t2", name: "Alpha-Core" },
     ]);
 
     const { result } = renderHook(() => useOnboarding());
@@ -198,7 +201,36 @@ describe("useOnboarding", () => {
 
     expect(result.current.state.step).toBe("teams");
     expect(result.current.state.teams).toHaveLength(2);
-    expect(result.current.state.selectedTeam).toBe("Equipe Alpha");
+    expect(result.current.state.selectedTeam).toBe("Alpha-Core");
+  });
+
+  it("preselects the first alphabetic team shown in team step", async () => {
+    vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
+      displayName: "User",
+      memberId: "id-1",
+      organizations: [{ id: "1", name: "org-a" }],
+      scope: "global",
+    });
+    vi.mocked(listProjectsDirect).mockResolvedValue([{ id: "p1", name: "Projet A" }]);
+    vi.mocked(listTeamsDirect).mockResolvedValue([
+      { id: "t1", name: "Zulu-Team" },
+      { id: "t2", name: "Beta-Dev" },
+      { id: "t3", name: "Alpha-Core" },
+    ]);
+
+    const { result } = renderHook(() => useOnboarding());
+
+    await setPatAndSubmit(result);
+    await act(async () => {
+      await result.current.actions.goToProjects();
+    });
+    await act(async () => {
+      const moved = await result.current.actions.goToTeams();
+      expect(moved).toBe(true);
+    });
+
+    expect(result.current.state.step).toBe("teams");
+    expect(result.current.state.selectedTeam).toBe("Alpha-Core");
   });
 
   it("maps non-Error failures in project/team listing to string messages", async () => {

@@ -38,7 +38,7 @@ jobs:
           ADO_ORG: "messqc"
           ADO_PROJECT: "Projet-700"
         run: |
-          python -m pytest -q
+          python -m pytest --cov=backend --cov-fail-under=80 -q
 
   frontend-tests:
     runs-on: ubuntu-latest
@@ -77,6 +77,10 @@ jobs:
       - name: Run e2e tests (Playwright)
         run: |
           npm run test:e2e
+
+      - name: Build frontend
+        run: |
+          npm run build
 
   docker-smoke:
     runs-on: ubuntu-latest

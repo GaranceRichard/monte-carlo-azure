@@ -1,5 +1,7 @@
-﻿import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { NamedEntity } from "../../types";
+import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
+import { sortTeams } from "../../utils/teamSort";
 
 type TeamStepProps = {
   err: string;
@@ -21,20 +23,7 @@ export default function TeamStep({
   onContinue,
 }: TeamStepProps) {
   const teamSelectRef = useRef<HTMLSelectElement | null>(null);
-  const sortedTeams = useMemo(() => {
-    const normalize = (value: string) =>
-      value
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
-    const prefix = (value: string) => (value.split("-")[0] || value).trim();
-    return [...teams].sort((a, b) => {
-      const keyA = normalize(prefix(a.name || ""));
-      const keyB = normalize(prefix(b.name || ""));
-      if (keyA !== keyB) return keyA.localeCompare(keyB, "fr", { sensitivity: "base" });
-      return normalize(a.name || "").localeCompare(normalize(b.name || ""), "fr", { sensitivity: "base" });
-    });
-  }, [teams]);
+  const sortedTeams = useMemo(() => sortTeams(teams), [teams]);
 
   useEffect(() => {
     const rafId = window.requestAnimationFrame(() => {
@@ -59,6 +48,8 @@ export default function TeamStep({
         ref={teamSelectRef}
         value={selectedTeam}
         onChange={(e) => setSelectedTeam(e.target.value)}
+        onFocus={keepSelectDropdownAtTop}
+        onMouseDown={keepSelectDropdownAtTop}
         onKeyDown={(e) => {
           if (e.key === "Enter" && !loading && !!selectedTeam) {
             e.preventDefault();

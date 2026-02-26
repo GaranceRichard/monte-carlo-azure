@@ -76,6 +76,7 @@ describe("simulationChartsSvg", () => {
     expect(svg).toContain("Throughput hebdomadaire");
     expect(svg).toContain("&lt;unsafe&gt;&amp;");
     expect(svg).toContain("stroke-dasharray=\"8 4\"");
+    expect(svg).toContain("x1=\"44\" y1=\"16\" x2=\"44\" y2=\"324\"");
   });
 
   it("renders distribution/probability charts with sorted x values and sparse labels", () => {
@@ -113,12 +114,12 @@ describe("simulationPdfDownload", () => {
     await downloadSimulationPdf(reportDoc, "***");
     const pdf = pdfMocks.instances[0];
 
-    expect(pdf.text).toHaveBeenCalledWith("Simulation Monte Carlo", 12, 12);
+    expect(pdf.text).toHaveBeenCalledWith("Simulation Monte Carlo", 8, 8);
     expect(pdf.svg).toHaveBeenCalledTimes(4);
     expect(pdf.save).toHaveBeenCalledWith(expect.stringMatching(/^simulation-equipe-\d{2}_\d{2}_\d{4}\.pdf$/));
   });
 
-  it("adds a page when chart requires more space", async () => {
+  it("keeps charts on the same page by shrinking render size", async () => {
     const reportDoc = document.implementation.createHTMLDocument("report");
     reportDoc.body.innerHTML = `
       <h1>Simulation Monte Carlo</h1>
@@ -128,6 +129,20 @@ describe("simulationPdfDownload", () => {
 
     await downloadSimulationPdf(reportDoc, "Equipe A");
     const pdf = pdfMocks.instances[0];
+    expect(pdf.addPage).not.toHaveBeenCalled();
+  });
+
+  it("adds a page when metadata overflows available height", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    const metaRows = Array.from({ length: 90 }, (_, i) => `<div class="meta-row">Meta ${i + 1}</div>`).join("");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo</h1>
+      ${metaRows}
+      <div class="chart-wrap"><svg viewBox="0 0 960 360"></svg></div>
+    `;
+
+    await downloadSimulationPdf(reportDoc, "Equipe A");
+    const pdf = pdfMocks.instances.at(-1)!;
     expect(pdf.addPage).toHaveBeenCalled();
   });
 });

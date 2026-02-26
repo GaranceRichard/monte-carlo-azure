@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { NamedEntity } from "../../types";
+import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
 
 type ProjectStepProps = {
   err: string;
@@ -45,6 +46,8 @@ export default function ProjectStep({
         ref={projectsSelectRef}
         value={selectedProject}
         onChange={(e) => setSelectedProject(e.target.value)}
+        onFocus={keepSelectDropdownAtTop}
+        onMouseDown={keepSelectDropdownAtTop}
         onKeyDown={(e) => {
           if (e.key === "Enter" && !loading && !!selectedProject) {
             e.preventDefault();

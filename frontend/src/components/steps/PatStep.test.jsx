@@ -88,4 +88,35 @@ describe("PatStep", () => {
       expect(document.activeElement).toBe(document.querySelector('input[type="password"]'));
     });
   });
+
+  it("refocuses PAT input when an error appears", async () => {
+    const { rerender } = render(
+      <PatStep
+        err=""
+        patInput="bad-token"
+        setPatInput={vi.fn()}
+        loading={false}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    const input = document.querySelector('input[type="password"]');
+    expect(input).not.toBeNull();
+    input.blur();
+    expect(document.activeElement).not.toBe(input);
+
+    rerender(
+      <PatStep
+        err="PAT invalide"
+        patInput=""
+        setPatInput={vi.fn()}
+        loading={false}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(input);
+    });
+  });
 });

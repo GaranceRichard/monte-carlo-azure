@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { NamedEntity } from "../../types";
+import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
 
 type OrgStepProps = {
   err: string;
@@ -59,6 +60,8 @@ export default function OrgStep({
             ref={orgSelectRef}
             value={selectedOrg}
             onChange={(e) => setSelectedOrg(e.target.value)}
+            onFocus={keepSelectDropdownAtTop}
+            onMouseDown={keepSelectDropdownAtTop}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !loading && selectedOrg.trim()) {
                 e.preventDefault();

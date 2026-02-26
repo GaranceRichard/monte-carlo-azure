@@ -241,7 +241,7 @@ describe("downloadSimulationPdf", () => {
     expect(pdf).toBeDefined();
     expect(pdf.text).toHaveBeenCalled();
     expect(pdf.svg).toHaveBeenCalledTimes(3);
-    expect(pdf.addPage).toHaveBeenCalled();
+    expect(pdf.addPage).not.toHaveBeenCalled();
     expect(pdf.save).toHaveBeenCalledWith(expect.stringMatching(/^simulation-Equipe-A-\d{2}_\d{2}_\d{4}\.pdf$/));
   });
 });

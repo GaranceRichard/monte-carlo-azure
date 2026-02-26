@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import ProgressBar from "../ui/progress";
 import { useSimulationContext } from "../../hooks/SimulationContext";
+import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
 
 function formatHistoryEntryLabel(entry: {
   createdAt: string;
@@ -115,6 +116,8 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
             <div className="space-y-2">
               <select
                 value={selectedHistoryId}
+                onFocus={keepSelectDropdownAtTop}
+                onMouseDown={keepSelectDropdownAtTop}
                 onChange={(e) => {
                   const nextId = e.target.value;
                   if (!nextId) {

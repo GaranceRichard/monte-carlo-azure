@@ -16,7 +16,7 @@ export default function PatStep({ err, patInput, setPatInput, loading, onSubmit 
       patInputRef.current?.focus();
     });
     return () => window.cancelAnimationFrame(rafId);
-  }, []);
+  }, [err]);
 
   return (
     <>

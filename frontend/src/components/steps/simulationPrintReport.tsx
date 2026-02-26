@@ -79,18 +79,18 @@ export function exportSimulationPrintReport({
         <title>Export Simulation Monte Carlo</title>
         <style>
           * { box-sizing: border-box; }
-          body { margin: 0; padding: 24px; font-family: Arial, sans-serif; color: #111827; }
-          .header { margin-bottom: 14px; }
-          .title { margin: 0; font-size: 24px; }
-          .meta { margin-top: 10px; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; font-size: 12px; line-height: 1.5; }
+          body { margin: 0; padding: 12px; font-family: Arial, sans-serif; color: #111827; }
+          .header { margin-bottom: 8px; }
+          .title { margin: 0; font-size: 20px; }
+          .meta { margin-top: 6px; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; font-size: 11px; line-height: 1.35; }
           .meta-row { margin-bottom: 2px; }
-          .kpis { display: flex; gap: 8px; margin-top: 12px; margin-bottom: 14px; }
-          .kpi { border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 10px; min-width: 160px; background: #f9fafb; }
+          .kpis { display: flex; gap: 6px; margin-top: 8px; margin-bottom: 8px; }
+          .kpi { border: 1px solid #d1d5db; border-radius: 8px; padding: 6px 8px; min-width: 140px; background: #f9fafb; }
           .kpi-label { display: block; font-size: 11px; color: #374151; font-weight: 700; }
-          .kpi-value { display: block; margin-top: 4px; font-size: 18px; font-weight: 800; }
-          .section { margin-top: 16px; page-break-inside: avoid; }
-          .section h2 { margin: 0 0 6px 0; font-size: 17px; }
-          .chart-wrap { width: 100%; overflow: hidden; border: 1px solid #d1d5db; border-radius: 8px; padding: 8px; background: #fff; }
+          .kpi-value { display: block; margin-top: 2px; font-size: 16px; font-weight: 800; }
+          .section { margin-top: 8px; page-break-inside: avoid; }
+          .section h2 { margin: 0 0 4px 0; font-size: 14px; }
+          .chart-wrap { width: 100%; overflow: hidden; border: 1px solid #d1d5db; border-radius: 8px; padding: 4px; background: #fff; }
           .chart-wrap svg { width: 100%; height: auto; display: block; }
           .print-action {
             position: fixed;
@@ -107,7 +107,7 @@ export function exportSimulationPrintReport({
             cursor: pointer;
           }
           @media print {
-            body { padding: 12mm; }
+            body { padding: 7mm; }
             .print-action { display: none; }
           }
         </style>

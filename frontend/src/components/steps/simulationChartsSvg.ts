@@ -16,7 +16,7 @@ export type ProbabilityExportPoint = {
 };
 
 export const CHART_WIDTH = 960;
-export const CHART_HEIGHT = 300;
+export const CHART_HEIGHT = 360;
 const MARGIN = { top: 16, right: 16, bottom: 36, left: 44 };
 
 function escapeHtml(value: string): string {
@@ -119,6 +119,7 @@ export function renderThroughputChart(points: ThroughputExportPoint[]): string {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" role="img" aria-label="Throughput hebdomadaire">
       <rect x="0" y="0" width="${CHART_WIDTH}" height="${CHART_HEIGHT}" fill="#ffffff" />
       ${renderGridAndYAxis(yTicks, yScale)}
+      <line x1="${MARGIN.left}" y1="${MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       <line x1="${MARGIN.left}" y1="${MARGIN.top + plotHeight}" x2="${CHART_WIDTH - MARGIN.right}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       ${bars}
       <path d="${throughputPath}" fill="none" stroke="#2563eb" stroke-width="2" />
@@ -166,6 +167,7 @@ export function renderDistributionChart(points: DistributionExportPoint[]): stri
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" role="img" aria-label="Distribution Monte Carlo">
       <rect x="0" y="0" width="${CHART_WIDTH}" height="${CHART_HEIGHT}" fill="#ffffff" />
       ${renderGridAndYAxis(yTicks, yScale)}
+      <line x1="${MARGIN.left}" y1="${MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       <line x1="${MARGIN.left}" y1="${MARGIN.top + plotHeight}" x2="${CHART_WIDTH - MARGIN.right}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       ${bars}
       <path d="${gaussPath}" fill="none" stroke="#2563eb" stroke-width="2.5" />
@@ -201,6 +203,7 @@ export function renderProbabilityChart(points: ProbabilityExportPoint[]): string
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" role="img" aria-label="Courbe de probabilite">
       <rect x="0" y="0" width="${CHART_WIDTH}" height="${CHART_HEIGHT}" fill="#ffffff" />
       ${renderGridAndYAxis(yTicks, yScale)}
+      <line x1="${MARGIN.left}" y1="${MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       <line x1="${MARGIN.left}" y1="${MARGIN.top + plotHeight}" x2="${CHART_WIDTH - MARGIN.right}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       <path d="${probabilityPath}" fill="none" stroke="#2563eb" stroke-width="2.5" />
       ${xLabels}

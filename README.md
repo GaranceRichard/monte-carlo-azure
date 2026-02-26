@@ -6,6 +6,8 @@ Outil de prévision basé sur une simulation Monte Carlo. Il répond au Use Case
 
 Documentation produit (vision, cible, valeur):
 - [`PRODUCT.md`](PRODUCT.md)
+- [`docs/definition-of-done.md`](docs/definition-of-done.md)
+- [`docs/critical-paths.md`](docs/critical-paths.md)
 
 Architecture V2:
 - Le frontend appelle Azure DevOps directement depuis le navigateur.
@@ -250,13 +252,15 @@ npm --prefix frontend run test:unit
 npm --prefix frontend run test:unit:coverage
 npm --prefix frontend run test:e2e
 npm --prefix frontend run test:e2e:coverage:console
+.venv\Scripts\python.exe -m pytest tests/test_api_config.py tests/test_api_health.py tests/test_api_simulate.py --cov=backend --cov-fail-under=80 --cov-report=term-missing -q
+.venv\Scripts\python.exe -m pytest tests/test_repo_compliance.py --cov=tests.test_repo_compliance --cov-fail-under=80 --cov-report=term-missing -q
 ```
 
 Suite E2E découpée:
 - `frontend/tests/e2e/onboarding.spec.js`
 - `frontend/tests/e2e/selection.spec.js`
 - `frontend/tests/e2e/simulation.spec.js`
-- `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul agrégés: statements >= 75%, branches >= 70%, functions >= 65%, lines >= 75%)
+- `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul agrégés: statements >= 80%, branches >= 80%, functions >= 80%, lines >= 80%)
 
 ---
 
@@ -322,3 +326,4 @@ Le hook `pre-commit` exécute:
 - validation de mise à jour du `README.md` si des fichiers code/config sont commités
 - validation que `README.md` ne contient pas de mojibake (accents cassés)
 - `python Scripts/check_no_secrets.py`
+- `python Scripts/check_dod_compliance.py`

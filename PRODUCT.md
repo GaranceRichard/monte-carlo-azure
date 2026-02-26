@@ -1,70 +1,201 @@
-# Monte Carlo Azure — Prévision de livraison pour équipes agiles
+Monte-Carlo Azure
+Outil d'aide a la decision pour la planification sous incertitude
 
-> *Combien de semaines pour finir ce backlog ? Combien d'items livrés d'ici la fin du trimestre ?*
-> Monte Carlo Azure répond à ces questions en quelques secondes, à partir de l'historique réel de votre équipe.
+1. Positionnement
 
----
+Monte-Carlo Azure est un outil d'aide a la decision destine aux responsables de delivery, directeurs de projet, PMO et responsables portefeuille.
 
-## Le problème que ça résout
+Il transforme l'historique reel Azure DevOps en projections probabilistes exploitables pour :
 
-Les estimations de livraison en agile reposent souvent sur l'intuition ou des points de complexité difficiles à comparer. La simulation Monte Carlo est une approche éprouvée : elle utilise le **rythme de livraison passé de l'équipe** pour projeter des probabilités de livraison future, sans formule magique ni points de story.
+securiser une date
 
-Monte Carlo Azure automatise cette approche en se connectant directement à Azure DevOps — zéro saisie manuelle, zéro tableur à maintenir.
+arbitrer un perimetre
 
----
+dimensionner une capacite
 
-## Ce que fait l'outil
+expliciter un niveau de risque
 
-**Deux questions, deux modes :**
+Il ne remplace pas le jugement managerial.
+Il structure l'incertitude.
 
-- **Backlog → Semaines** — *"Combien de semaines pour finir mes 80 items ?"*
-  L'outil répond : "50% de chances d'ici 10 semaines, 90% de chances d'ici 14 semaines."
+2. Probleme traite
 
-- **Semaines → Items** — *"Combien d'items livrés d'ici 12 semaines ?"*
-  L'outil répond : "70% de chances de livrer au moins 35 items."
+Les decisions de planification reposent souvent sur :
 
-**Ce que vous obtenez :**
+des estimations subjectives
 
-- Des **probabilités claires** (P50, P70, P90) — pas une date unique qui sera forcément fausse
-- Des **graphiques exportables** en PDF, prêts pour une présentation ou un comité de pilotage
-- Un **historique local** des 10 dernières simulations pour comparer les scénarios
-- Un paramètre de **capacité réduite** — si l'équipe est à 70% pendant 4 semaines (congés, autre projet), l'impact est calculé automatiquement
+des moyennes historiques
 
----
+des story points heterogenes
 
-## Comment ça marche
+des engagements calendaires non probabilises
 
-1. **Connexion** avec votre PAT Azure DevOps (token personnel, jamais transmis à un serveur)
-2. **Sélection** de votre organisation → projet → équipe
-3. **Configuration** de la période d'historique et du type de tickets à analyser
-4. **Lancement** — la simulation tourne en quelques secondes
-5. **Export** du rapport en PDF ou du throughput en CSV
+Consequences :
 
----
+engagements intenables
 
-## Ce que l'outil ne fait pas
+arbitrages tardifs
 
-- Il ne se connecte pas à Jira (Azure DevOps uniquement pour l'instant)
-- Il ne stocke aucune donnée — tout reste dans votre navigateur
-- Il ne remplace pas le jugement d'équipe — il l'éclaire avec des données
+tensions operationnelles
 
----
+perte de credibilite en comite
 
-## Confidentialité
+Monte-Carlo Azure repond a cette problematique en produisant des distributions probabilistes a partir du throughput reel.
 
-Votre token Azure DevOps (PAT) ne quitte jamais votre navigateur. Le serveur ne reçoit que des nombres anonymes (le rythme de livraison hebdomadaire de l'équipe) pour calculer la simulation — aucune donnée d'identification, aucun nom de projet, aucun contenu de ticket.
+3. Proposition de valeur
+Ce que permet l'outil
 
----
+Transformer un backlog restant en horizon probabilise (P50 / P85)
 
-## Pour qui
+Convertir un horizon cible en capacite livrable probable
 
-- **Scrum Masters et coaches agiles** qui veulent des prévisions fondées sur des données réelles
-- **Chefs de projet** qui doivent répondre à "c'est livré pour quand ?"
-- **Product Owners** qui arbitrent entre scope et délai avec des éléments chiffrés
-- **Équipes de développement** qui veulent visualiser leur propre cadence
+Visualiser la dispersion et la stabilite
 
----
+Consolider plusieurs equipes en vision portefeuille
 
-## Accès
+Impact attendu
 
-L'outil est accessible via navigateur, sans installation. Un accès Azure DevOps et un PAT valide suffisent.
+Decisions explicitees par niveau de confiance
+
+Arbitrages scope / delai structures
+
+Dialogue directionnel apaise
+
+Preparation COPIL acceleree
+
+4. Cibles
+
+Directeur de projet
+
+Head of Delivery
+
+PMO
+
+Responsable transformation
+
+Direction programme
+
+L'outil est concu pour un usage operationnel mais aussi pour une restitution en comite.
+
+5. Cas d'usage type
+Scenario 1 - Securiser une date
+
+80 items restants
+
+Historique 16 semaines
+
+Simulation 10 000 iterations
+
+Resultat :
+
+P50 : 12 semaines
+
+P85 : 15 semaines
+
+Decision :
+
+Soit accepter le risque (50%)
+
+Soit ajuster perimetre
+
+Soit renforcer capacite
+
+Scenario 2 - Arbitrage portefeuille
+
+Mode Portefeuille :
+
+Selection de plusieurs equipes
+
+Hypotheses d'agregation explicites
+
+Projection consolidee
+
+Restitution :
+
+Synthese portefeuille
+
+Detail par equipe
+
+Hypotheses affichees
+
+6. Modele statistique
+
+L'outil repose sur :
+
+throughput reel (items clotures / periode)
+
+simulation Monte Carlo
+
+agregation par sommation des iterations simulees
+
+recalcul des percentiles consolides
+
+Hypotheses affichees :
+
+independance des equipes (mode par defaut)
+
+possibilite de mode conservateur
+
+transparence sur limites statistiques
+
+7. Securite & Gouvernance (Invariants)
+
+Principe non negociable :
+
+Aucune donnee d'identification Azure DevOps (PAT, UUID, organisation, equipe) ne transite par un serveur applicatif.
+
+Les appels Azure DevOps sont effectues directement depuis le navigateur.
+
+Le backend ne recoit que des donnees anonymisees de throughput.
+
+Des controles CI empechent toute violation de cette frontiere.
+
+Ce choix structure l'architecture et protege l'environnement client.
+
+8. Non-objectifs
+
+Monte-Carlo Azure :
+
+ne remplace pas Azure DevOps
+
+ne fait pas de gestion de backlog
+
+ne remplace pas la decision humaine
+
+ne garantit pas un resultat, mais explicite une probabilite
+
+9. Pilotage produit
+
+Indicateurs cles :
+
+temps moyen de calcul
+
+stabilite des simulations
+
+variance observee
+
+taux d'erreur API
+
+usage mode portefeuille
+
+Objectif : outil stable, rapide, explicite.
+
+10. Vision
+
+Passer d'un outil equipe a un outil portefeuille.
+
+Evolutions possibles :
+
+export directionnel structure
+
+comparaison periodes
+
+visualisation des dependances
+
+indicateur de maturite de stabilite
+
+Resume executif
+
+Monte-Carlo Azure permet de transformer des donnees operationnelles en decisions probabilisees, securisees et gouvernables.
+
+Il apporte une discipline de risque mesurable dans les environnements de delivery.

@@ -49,10 +49,10 @@ test.describe("e2e istanbul coverage", () => {
 
     expect(summary.files).toBeGreaterThan(0);
     expect(summary.statements.total).toBeGreaterThan(0);
-    expect(summary.statements.pct).toBeGreaterThanOrEqual(75);
-    expect(summary.branches.pct).toBeGreaterThanOrEqual(70);
-    expect(summary.functions.pct).toBeGreaterThanOrEqual(65);
-    expect(summary.lines.pct).toBeGreaterThanOrEqual(75);
+    expect(summary.statements.pct).toBeGreaterThanOrEqual(80);
+    expect(summary.branches.pct).toBeGreaterThanOrEqual(80);
+    expect(summary.functions.pct).toBeGreaterThanOrEqual(80);
+    expect(summary.lines.pct).toBeGreaterThanOrEqual(80);
   });
 
   test("coverage: flux complet front", async ({ page }) => {

@@ -1,4 +1,5 @@
 import { useSimulationContext } from "../../hooks/SimulationContext";
+import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
 
 export default function SimulationModeAndParametersControls() {
   const { simulation: s } = useSimulationContext();
@@ -10,6 +11,8 @@ export default function SimulationModeAndParametersControls() {
           <label className="sim-label sim-label--compact">Type de simulation</label>
           <select
             value={s.simulationMode}
+            onFocus={keepSelectDropdownAtTop}
+            onMouseDown={keepSelectDropdownAtTop}
             onChange={(e) => {
               s.setSimulationMode(e.target.value as "backlog_to_weeks" | "weeks_to_items");
               s.setActiveChartTab("throughput");

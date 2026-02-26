@@ -25,7 +25,7 @@ export async function downloadSimulationPdf(reportWindowDocument: Document, sele
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
-  const margin = 12;
+  const margin = 8;
   const contentW = pageW - margin * 2;
   let cursorY = margin;
 
@@ -37,29 +37,29 @@ export async function downloadSimulationPdf(reportWindowDocument: Document, sele
 
   const title = reportWindowDocument.querySelector("h1")?.textContent ?? "Simulation Monte Carlo";
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(18);
+  pdf.setFontSize(14);
   pdf.text(title, margin, cursorY);
-  cursorY += 10;
+  cursorY += 6;
 
   pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(9);
+  pdf.setFontSize(7);
   reportWindowDocument.querySelectorAll(".meta-row").forEach((row) => {
-    ensureSpace(5);
+    ensureSpace(3.6);
     const text = row.textContent ?? "";
     pdf.text(text, margin, cursorY);
-    cursorY += 5;
+    cursorY += 3.6;
   });
-  cursorY += 4;
+  cursorY += 2;
 
-  ensureSpace(12);
+  ensureSpace(8);
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(12);
+  pdf.setFontSize(9);
   reportWindowDocument.querySelectorAll(".kpi").forEach((kpi, i) => {
     const label = kpi.querySelector(".kpi-label")?.textContent ?? "";
     const value = kpi.querySelector(".kpi-value")?.textContent ?? "";
-    pdf.text(`${label}: ${value}`, margin + i * 60, cursorY);
+    pdf.text(`${label}: ${value}`, margin + i * (contentW / 3), cursorY);
   });
-  cursorY += 12;
+  cursorY += 7;
 
   const svgElements = reportWindowDocument.querySelectorAll<SVGSVGElement>(".chart-wrap svg");
   for (let i = 0; i < svgElements.length; i += 1) {
@@ -68,17 +68,21 @@ export async function downloadSimulationPdf(reportWindowDocument: Document, sele
     const svgW = svg.viewBox?.baseVal?.width || CHART_WIDTH;
     const svgH = svg.viewBox?.baseVal?.height || CHART_HEIGHT;
     const ratio = svgH / svgW;
-    const renderW = contentW;
+    const chartsLeft = svgElements.length - i;
+    const reservedForTitlesAndSpacing = chartsLeft * (4 + 1.5 + 2);
+    const maxChartH = Math.max(24, (pageH - margin - cursorY - reservedForTitlesAndSpacing) / chartsLeft);
+    const renderW = Math.min(contentW, maxChartH / ratio);
     const renderH = renderW * ratio;
+    const centeredX = margin + (contentW - renderW) / 2;
 
-    ensureSpace(6 + renderH + 8);
+    ensureSpace(4 + renderH + 2);
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(12);
+    pdf.setFontSize(9);
     pdf.text(SECTION_TITLES[i] ?? "", margin, cursorY);
-    cursorY += 6;
+    cursorY += 4;
 
-    await pdf.svg(svg, { x: margin, y: cursorY, width: renderW, height: renderH });
-    cursorY += renderH + 8;
+    await pdf.svg(svg, { x: centeredX, y: cursorY, width: renderW, height: renderH });
+    cursorY += renderH + 2;
   }
 
   pdf.save(buildSimulationPdfFileName(selectedTeam));
