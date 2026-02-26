@@ -1,33 +1,20 @@
-import { useSimulationFiltersContext } from "./SimulationContext";
+import { useSimulationContext } from "../../hooks/SimulationContext";
 
 export default function SimulationFilterControls() {
-  const {
-    workItemTypeOptions,
-    types,
-    setTypes,
-    filteredDoneStateOptions,
-    doneStates,
-    setDoneStates,
-    loadingTeamOptions,
-  } = useSimulationFiltersContext();
+  const { simulation: s } = useSimulationContext();
 
   return (
     <>
       <label className="sim-label sim-mt-10">Types de tickets pris en compte</label>
       <div className="sim-checklist">
-        {loadingTeamOptions && (
-          <div className="sim-empty-tip">Chargement des types de tickets...</div>
-        )}
-        {workItemTypeOptions.map((ticketType) => (
+        {s.loadingTeamOptions && <div className="sim-empty-tip">Chargement des types de tickets...</div>}
+        {s.workItemTypeOptions.map((ticketType) => (
           <label key={ticketType} className="sim-check-row">
             <input
               type="checkbox"
-              checked={types.includes(ticketType)}
+              checked={s.types.includes(ticketType)}
               onChange={(e) => {
-                setTypes((prev) => {
-                  const next = e.target.checked ? [...prev, ticketType] : prev.filter((t) => t !== ticketType);
-                  return next;
-                });
+                s.setTypes((prev) => (e.target.checked ? [...prev, ticketType] : prev.filter((t) => t !== ticketType)));
               }}
             />
             <span>{ticketType}</span>
@@ -37,28 +24,23 @@ export default function SimulationFilterControls() {
 
       <label className="sim-label sim-mt-10">États de résolution</label>
       <div className="sim-checklist sim-checklist--states">
-        {loadingTeamOptions && (
-          <div className="sim-empty-tip">Chargement des états de résolution...</div>
-        )}
-        {filteredDoneStateOptions.map((state) => (
+        {s.loadingTeamOptions && <div className="sim-empty-tip">Chargement des états de résolution...</div>}
+        {s.filteredDoneStateOptions.map((state) => (
           <label key={state} className="sim-check-row">
             <input
               type="checkbox"
-              checked={doneStates.includes(state)}
-              disabled={!types.length}
+              checked={s.doneStates.includes(state)}
+              disabled={!s.types.length}
               onChange={(e) => {
-                setDoneStates((prev) => (e.target.checked ? [...prev, state] : prev.filter((s) => s !== state)));
+                s.setDoneStates((prev) => (e.target.checked ? [...prev, state] : prev.filter((v) => v !== state)));
               }}
             />
             <span>{state}</span>
           </label>
         ))}
-        {!types.length && (
-          <div className="sim-empty-tip">
-            Sélectionnez d&apos;abord un ou plusieurs tickets.
-          </div>
-        )}
+        {!s.types.length && <div className="sim-empty-tip">Sélectionnez d&apos;abord un ou plusieurs tickets.</div>}
       </div>
     </>
   );
 }
+

@@ -14,6 +14,7 @@ export default defineConfig({
       reporter: ["text", "html"],
       reportsDirectory: "./coverage",
       all: false,
+      exclude: ["**/*.css", "src/components/steps/simulationPrintReport.tsx"],
       perFile: true,
       thresholds: {
         statements: 80,

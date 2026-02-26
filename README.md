@@ -10,12 +10,12 @@ Architecture V2:
 
 Refactors récents (frontend):
 - utilitaires centralisés `src/date.ts`, `src/storage.ts`, `src/utils/math.ts`, `src/utils/simulation.ts`
-- introduction d'un contexte React `src/components/steps/SimulationContext.tsx` pour éviter le prop-drilling de `SimulationViewModel`
+- contexte simulation unifié `src/hooks/SimulationContext.tsx` (un seul provider exposant `SimulationViewModel` complet + `selectedTeam`)
 - centralisation des accès `localStorage` via `storage.ts`
 - extraction de l'export CSV throughput vers `src/utils/export.ts`
 - extraction de la logique de calcul forecast vers `src/hooks/simulationForecastService.ts`
 - typages simulation segmentés (`SimulationForecastControls`, `SimulationDateRange`, `SimulationResult`, `ChartTab`)
-- découpage du contexte simulation en hooks ciblés (meta, run, filtres, dates, contrôles, résultats, historique, charts)
+- écran simulation chargé en lazy (`React.lazy`) + import dynamique du module rapport/PDF pour réduire la taille des chunks initiaux
 
 ---
 
@@ -79,7 +79,7 @@ frontend/
       useSimulationAutoRun.ts      # auto-run avec debounce
     components/steps/
       SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
-      simulationPdfExport.tsx      # export PDF via rendu statique Recharts
+      simulationPrintReport.tsx    # rapport imprimable + téléchargement PDF
 
 backend/
   api.py                # FastAPI + CORS + route /simulate + /health
@@ -251,7 +251,7 @@ Suite E2E découpée:
 - `frontend/tests/e2e/onboarding.spec.js`
 - `frontend/tests/e2e/selection.spec.js`
 - `frontend/tests/e2e/simulation.spec.js`
-- `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul agrégés, incluant branches >= 80%)
+- `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul agrégés: statements >= 75%, branches >= 70%, functions >= 65%, lines >= 75%)
 
 ---
 

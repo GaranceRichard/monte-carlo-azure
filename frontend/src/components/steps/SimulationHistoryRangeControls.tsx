@@ -1,7 +1,7 @@
-import { useSimulationDateRangeContext } from "./SimulationContext";
+import { useSimulationContext } from "../../hooks/SimulationContext";
 
 export default function SimulationHistoryRangeControls() {
-  const { startDate, setStartDate, endDate, setEndDate } = useSimulationDateRangeContext();
+  const { simulation: s } = useSimulationContext();
 
   return (
     <div className="sim-grid-2 sim-grid-2--compact">
@@ -9,8 +9,8 @@ export default function SimulationHistoryRangeControls() {
         <label className="sim-label sim-label--compact">Début historique</label>
         <input
           type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
+          value={s.startDate}
+          onChange={(e) => s.setStartDate(e.target.value)}
           className="sim-input sim-input--compact"
         />
       </div>
@@ -18,11 +18,12 @@ export default function SimulationHistoryRangeControls() {
         <label className="sim-label sim-label--compact">Fin historique</label>
         <input
           type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
+          value={s.endDate}
+          onChange={(e) => s.setEndDate(e.target.value)}
           className="sim-input sim-input--compact"
         />
       </div>
     </div>
   );
 }
+

@@ -11,44 +11,22 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { exportSimulationPdf } from "./simulationPdfExport";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "../ui/tabs";
-import {
-  useSimulationChartsContext as useChartsContext,
-  useSimulationDateRangeContext as useDateRangeContext,
-  useSimulationFiltersContext as useFiltersContext,
-  useSimulationForecastControlsContext as useForecastControlsContext,
-  useSimulationMetaContext as useMetaContext,
-  useSimulationResultContext as useResultContext,
-} from "./SimulationContext";
+import { useSimulationContext } from "../../hooks/SimulationContext";
 
 export default function SimulationChartTabs() {
-  const { selectedTeam } = useMetaContext();
-  const { result, displayPercentiles } = useResultContext();
-  const {
-    activeChartTab,
-    setActiveChartTab,
-    throughputData,
-    mcHistData,
-    probabilityCurveData,
-    tooltipBaseProps,
-    resetForTeamSelection,
-    exportThroughputCsv,
-  } = useChartsContext();
-  const { startDate, endDate } = useDateRangeContext();
-  const { simulationMode, includeZeroWeeks, backlogSize, targetWeeks, nSims, capacityPercent, reducedCapacityWeeks } =
-    useForecastControlsContext();
-  const { types, doneStates } = useFiltersContext();
+  const { selectedTeam, simulation } = useSimulationContext();
+  const s = simulation;
 
   const throughputWithMovingAverage = useMemo(() => {
     const windowSize = 4;
-    return throughputData.map((point, idx, arr) => {
+    return s.throughputData.map((point, idx, arr) => {
       const start = Math.max(0, idx - windowSize + 1);
       const slice = arr.slice(start, idx + 1);
       const average = slice.reduce((sum, p) => sum + p.throughput, 0) / slice.length;
       return { ...point, movingAverage: Number(average.toFixed(2)) };
     });
-  }, [throughputData]);
+  }, [s.throughputData]);
 
   const renderThroughputTooltip = ({
     active,
@@ -71,33 +49,34 @@ export default function SimulationChartTabs() {
     );
   };
 
-  function handleExportPdf(): void {
-    if (!result) return;
-    exportSimulationPdf({
+  async function handleExportReport(): Promise<void> {
+    if (!s.result) return;
+    const { exportSimulationPrintReport } = await import("./simulationPrintReport");
+    exportSimulationPrintReport({
       selectedTeam,
-      startDate,
-      endDate,
-      simulationMode,
-      includeZeroWeeks,
-      types,
-      doneStates,
-      backlogSize,
-      targetWeeks,
-      nSims,
-      capacityPercent,
-      reducedCapacityWeeks,
-      resultKind: result.result_kind,
-      displayPercentiles,
+      startDate: s.startDate,
+      endDate: s.endDate,
+      simulationMode: s.simulationMode,
+      includeZeroWeeks: s.includeZeroWeeks,
+      types: s.types,
+      doneStates: s.doneStates,
+      backlogSize: s.backlogSize,
+      targetWeeks: s.targetWeeks,
+      nSims: s.nSims,
+      capacityPercent: s.capacityPercent,
+      reducedCapacityWeeks: s.reducedCapacityWeeks,
+      resultKind: s.result.result_kind,
+      displayPercentiles: s.displayPercentiles,
       throughputPoints: throughputWithMovingAverage,
-      distributionPoints: mcHistData,
-      probabilityPoints: probabilityCurveData,
+      distributionPoints: s.mcHistData,
+      probabilityPoints: s.probabilityCurveData,
     });
   }
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      {result ? (
-        <TabsRoot value={activeChartTab} onValueChange={(value) => setActiveChartTab(value as typeof activeChartTab)}>
+      {s.result ? (
+        <TabsRoot value={s.activeChartTab} onValueChange={(value) => s.setActiveChartTab(value as typeof s.activeChartTab)}>
           <div className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <TabsList>
               <TabsTrigger value="throughput">Throughput</TabsTrigger>
@@ -107,15 +86,15 @@ export default function SimulationChartTabs() {
             <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
               <button
                 type="button"
-                onClick={handleExportPdf}
+                onClick={() => void handleExportReport()}
                 className="whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm font-semibold text-[var(--text)]"
-                title="Ouvrir le document imprimable pour export PDF"
+                title="Ouvrir le rapport imprimable"
               >
-                PDF
+                Rapport
               </button>
               <button
                 type="button"
-                onClick={exportThroughputCsv}
+                onClick={s.exportThroughputCsv}
                 className="whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm font-semibold text-[var(--text)]"
                 title="Exporter le throughput hebdomadaire en CSV"
               >
@@ -123,7 +102,7 @@ export default function SimulationChartTabs() {
               </button>
               <button
                 type="button"
-                onClick={resetForTeamSelection}
+                onClick={s.resetForTeamSelection}
                 className="whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm font-semibold text-[var(--text)]"
                 title="Revenir a l'etat initial (simulation non lancee)"
               >
@@ -143,7 +122,7 @@ export default function SimulationChartTabs() {
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
                   <XAxis dataKey="week" tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
                   <YAxis allowDecimals={false} tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
-                  <Tooltip {...tooltipBaseProps} content={renderThroughputTooltip} />
+                  <Tooltip {...s.tooltipBaseProps} content={renderThroughputTooltip} />
                   <Legend />
                   <Bar dataKey="throughput" name="Throughput" fill="var(--p90)" radius={[5, 5, 0, 0]} />
                   <Line type="monotone" dataKey="throughput" dot={false} strokeWidth={2} stroke="var(--brand)" name="Courbe" />
@@ -168,12 +147,12 @@ export default function SimulationChartTabs() {
             </p>
             <div className="h-[52vh] min-h-[320px] w-full">
               <ResponsiveContainer>
-                <ComposedChart data={mcHistData} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
+                <ComposedChart data={s.mcHistData} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
                   <XAxis dataKey="x" tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
                   <YAxis allowDecimals={false} tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
                   <Tooltip
-                    {...tooltipBaseProps}
+                    {...s.tooltipBaseProps}
                     formatter={(v, name) => {
                       if (name === "count") return [Number(v).toFixed(0), "Frequence"];
                       if (name === "gauss") return [Number(v).toFixed(1), "Courbe lissee"];
@@ -190,7 +169,7 @@ export default function SimulationChartTabs() {
 
           <TabsContent value="probability">
             <h4 className="m-0 text-base font-bold">
-              {result?.result_kind === "items"
+              {s.result?.result_kind === "items"
                 ? "Probabilite d'atteindre au moins X items"
                 : "Probabilite de terminer en au plus X semaines"}
             </h4>
@@ -199,15 +178,15 @@ export default function SimulationChartTabs() {
             </p>
             <div className="h-[52vh] min-h-[320px] w-full">
               <ResponsiveContainer>
-                <LineChart data={probabilityCurveData} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
+                <LineChart data={s.probabilityCurveData} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
                   <XAxis dataKey="x" tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
                   <YAxis domain={[0, 100]} tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
                   <Tooltip
-                    {...tooltipBaseProps}
+                    {...s.tooltipBaseProps}
                     formatter={(v) => [
                       `${Number(v).toFixed(1)}%`,
-                      result?.result_kind === "items" ? "P(X >= valeur)" : "P(X <= valeur)",
+                      s.result?.result_kind === "items" ? "P(X >= valeur)" : "P(X <= valeur)",
                     ]}
                   />
                   <Legend />
@@ -225,3 +204,4 @@ export default function SimulationChartTabs() {
     </div>
   );
 }
+

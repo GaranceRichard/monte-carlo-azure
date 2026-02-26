@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import OrgStep from "./OrgStep";
 
 describe("OrgStep", () => {
@@ -25,6 +25,26 @@ describe("OrgStep", () => {
     expect(setSelectedOrg).toHaveBeenCalledWith("org-b");
 
     fireEvent.click(screen.getByRole("button", { name: "Choisir cette organisation" }));
+    expect(onContinue).toHaveBeenCalledTimes(1);
+  });
+
+  it("submits on Enter in org select when valid and not loading", () => {
+    const onContinue = vi.fn();
+
+    render(
+      <OrgStep
+        err=""
+        userName="Garance"
+        orgs={[{ id: "1", name: "org-a" }]}
+        orgHint=""
+        selectedOrg="org-a"
+        setSelectedOrg={vi.fn()}
+        loading={false}
+        onContinue={onContinue}
+      />,
+    );
+
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
     expect(onContinue).toHaveBeenCalledTimes(1);
   });
 
@@ -108,5 +128,59 @@ describe("OrgStep", () => {
 
     fireEvent.keyDown(screen.getByPlaceholderText("Nom de l'organisation"), { key: "Enter" });
     expect(onContinueEmpty).not.toHaveBeenCalled();
+  });
+
+  it("focuses manual org input when an error is displayed", async () => {
+    const { rerender } = render(
+      <OrgStep
+        err=""
+        userName="User"
+        orgs={[]}
+        orgHint=""
+        selectedOrg="org-demo"
+        setSelectedOrg={vi.fn()}
+        loading={false}
+        onContinue={vi.fn()}
+      />,
+    );
+
+    const input = screen.getByPlaceholderText("Nom de l'organisation");
+    expect(document.activeElement).not.toBe(input);
+
+    rerender(
+      <OrgStep
+        err="Organisation inaccessible"
+        userName="User"
+        orgs={[]}
+        orgHint=""
+        selectedOrg=""
+        setSelectedOrg={vi.fn()}
+        loading={false}
+        onContinue={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(screen.getByPlaceholderText("Nom de l'organisation"));
+    });
+  });
+
+  it("focuses organization select when org list is available", async () => {
+    render(
+      <OrgStep
+        err=""
+        userName="User"
+        orgs={[{ id: "1", name: "org-a" }]}
+        orgHint=""
+        selectedOrg="org-a"
+        setSelectedOrg={vi.fn()}
+        loading={false}
+        onContinue={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(screen.getByRole("combobox"));
+    });
   });
 });

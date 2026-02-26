@@ -8,6 +8,13 @@ const openIfCollapsed = async (section) => {
   }
 };
 
+const closeIfExpanded = async (section) => {
+  const button = section.getByRole("button", { name: /R[ée]duire/i });
+  if (await button.isVisible().catch(() => false)) {
+    await button.click();
+  }
+};
+
 test("simulation: erreur puis succes sur les 2 modes", async ({ page }) => {
   const { closedDates } = await setupAppRoutes(page, {
     profileFirstUnauthorized: false,
@@ -40,6 +47,7 @@ test("simulation: erreur puis succes sur les 2 modes", async ({ page }) => {
   await openIfCollapsed(modeSection);
   await page.locator("select").first().selectOption("weeks_to_items");
   await page.locator('input[type="number"]').first().fill("12");
+  await closeIfExpanded(modeSection);
   await expect(page.getByText("P50")).toBeVisible({ timeout: 10_000 });
   await expect(page.getByText("38 items")).toBeVisible({ timeout: 10_000 });
 
@@ -50,5 +58,6 @@ test("simulation: erreur puis succes sur les 2 modes", async ({ page }) => {
   await openIfCollapsed(modeSection);
   await page.locator("select").first().selectOption("backlog_to_weeks");
   await page.locator('input[type="number"]').first().fill("120");
+  await closeIfExpanded(modeSection);
   await expect(page.getByText("10 semaines")).toBeVisible({ timeout: 10_000 });
 });

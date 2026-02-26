@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 type PatStepProps = {
   err: string;
   patInput: string;
@@ -7,6 +9,15 @@ type PatStepProps = {
 };
 
 export default function PatStep({ err, patInput, setPatInput, loading, onSubmit }: PatStepProps) {
+  const patInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const rafId = window.requestAnimationFrame(() => {
+      patInputRef.current?.focus();
+    });
+    return () => window.cancelAnimationFrame(rafId);
+  }, []);
+
   return (
     <>
       <h2 className="flow-title">Connexion Azure DevOps</h2>
@@ -20,6 +31,7 @@ export default function PatStep({ err, patInput, setPatInput, loading, onSubmit 
       )}
       <label className="flow-label">PAT</label>
       <input
+        ref={patInputRef}
         type="password"
         value={patInput}
         onChange={(e) => setPatInput(e.target.value)}

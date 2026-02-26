@@ -309,13 +309,14 @@
   max-height: 76px;
   overflow-y: auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   column-gap: var(--space-3);
 }
 
 .sim-checklist--states {
   padding: var(--space-2);
   max-height: 84px;
+  grid-template-columns: 1fr 1fr;
 }
 
 .sim-check-row {

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { NamedEntity } from "../../types";
 
 type OrgStepProps = {
@@ -22,6 +23,20 @@ export default function OrgStep({
   onContinue,
 }: OrgStepProps) {
   const welcomeTitle = userName && userName !== "Utilisateur" ? `Bienvenue ${userName}` : "Bienvenue";
+  const manualOrgInputRef = useRef<HTMLInputElement | null>(null);
+  const orgSelectRef = useRef<HTMLSelectElement | null>(null);
+
+  useEffect(() => {
+    const focusTarget = orgs.length ? orgSelectRef.current : manualOrgInputRef.current;
+    // Delay focus to next paint to avoid losing focus during animated step transitions.
+    const rafId = window.requestAnimationFrame(() => {
+      focusTarget?.focus();
+      if (!orgs.length && err) {
+        manualOrgInputRef.current?.select();
+      }
+    });
+    return () => window.cancelAnimationFrame(rafId);
+  }, [orgs.length, err]);
 
   return (
     <>
@@ -40,7 +55,18 @@ export default function OrgStep({
       {orgs.length > 0 ? (
         <>
           <label className="flow-label">Organisations accessibles</label>
-          <select value={selectedOrg} onChange={(e) => setSelectedOrg(e.target.value)} className="flow-input">
+          <select
+            ref={orgSelectRef}
+            value={selectedOrg}
+            onChange={(e) => setSelectedOrg(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !loading && selectedOrg.trim()) {
+                e.preventDefault();
+                void onContinue();
+              }
+            }}
+            className="flow-input"
+          >
             {orgs.map((org) => (
               <option key={org.id || org.name} value={org.name || ""}>
                 {org.name}
@@ -52,6 +78,7 @@ export default function OrgStep({
         <>
           <label className="flow-label">Organisation Azure DevOps</label>
           <input
+            ref={manualOrgInputRef}
             type="text"
             value={selectedOrg}
             onChange={(e) => setSelectedOrg(e.target.value)}

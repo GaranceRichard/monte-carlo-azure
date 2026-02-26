@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import ProjectStep from "./ProjectStep";
 
 describe("ProjectStep", () => {
@@ -59,5 +59,42 @@ describe("ProjectStep", () => {
 
     const button = screen.getByRole("button", { name: "Chargement..." });
     expect(button).toBeDisabled();
+  });
+
+  it("submits on Enter when a project is selected", () => {
+    const onContinue = vi.fn();
+
+    render(
+      <ProjectStep
+        err=""
+        selectedOrg="org-a"
+        projects={[{ id: "p1", name: "Projet A" }]}
+        selectedProject="Projet A"
+        setSelectedProject={vi.fn()}
+        loading={false}
+        onContinue={onContinue}
+      />,
+    );
+
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
+    expect(onContinue).toHaveBeenCalledTimes(1);
+  });
+
+  it("focuses projects select on mount", async () => {
+    render(
+      <ProjectStep
+        err=""
+        selectedOrg="org-a"
+        projects={[{ id: "p1", name: "Projet A" }]}
+        selectedProject="Projet A"
+        setSelectedProject={vi.fn()}
+        loading={false}
+        onContinue={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(screen.getByRole("combobox"));
+    });
   });
 });

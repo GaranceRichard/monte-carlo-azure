@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import PatStep from "./PatStep";
 
 describe("PatStep", () => {
@@ -71,5 +71,21 @@ describe("PatStep", () => {
     expect(input).not.toBeNull();
     fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("focuses PAT input when connection screen is displayed", async () => {
+    render(
+      <PatStep
+        err=""
+        patInput=""
+        setPatInput={vi.fn()}
+        loading={false}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(document.querySelector('input[type="password"]'));
+    });
   });
 });

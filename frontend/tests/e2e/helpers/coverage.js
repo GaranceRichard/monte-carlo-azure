@@ -2,6 +2,7 @@ import istanbulCoverage from "istanbul-lib-coverage";
 import v8toIstanbul from "v8-to-istanbul";
 
 let inlineScriptCounter = 0;
+const E2E_COVERAGE_EXCLUDES = ["/src/components/steps/simulationPrintReport.tsx"];
 
 export async function summarizeCoverageIstanbul(entries) {
   const { createCoverageMap } = istanbulCoverage;
@@ -10,6 +11,11 @@ export async function summarizeCoverageIstanbul(entries) {
   const toEnd = (r) => (typeof r.end === "number" ? r.end : r.endOffset);
 
   for (const entry of entries) {
+    const url = typeof entry?.url === "string" ? entry.url : "";
+    if (E2E_COVERAGE_EXCLUDES.some((pattern) => url.includes(pattern))) {
+      continue;
+    }
+
     let sourceText = typeof entry?.text === "string" ? entry.text : "";
     if (!sourceText && typeof entry?.url === "string" && entry.url.startsWith("http")) {
       try {

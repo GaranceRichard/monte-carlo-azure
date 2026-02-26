@@ -71,21 +71,19 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     submitInFlightRef.current = true;
     try {
       setSessionPat(clean);
-      try {
-        const resolved = await resolvePatOrganizationScopeDirect(clean);
+      const resolved = await resolvePatOrganizationScopeDirect(clean).catch(() => null);
+      if (resolved) {
         setUserName(resolved.displayName || "Utilisateur");
-        setOrgs(resolved.organizations);
-        if (resolved.organizations.length > 1) {
+        if (resolved.scope === "global" && resolved.organizations.length > 0) {
+          setOrgs(resolved.organizations);
           setSelectedOrg(resolved.organizations[0].name || "");
-          setOrgHint("");
-        } else if (resolved.organizations.length === 1) {
-          setSelectedOrg(resolved.organizations[0].name || "");
-          setOrgHint("PAT local détecté: organisation présélectionnée.");
+          setOrgHint("PAT global détecté: sélectionnez une organisation accessible.");
         } else {
+          setOrgs([]);
           setSelectedOrg("");
           setOrgHint("PAT local: saisissez votre organisation manuellement.");
         }
-      } catch {
+      } else {
         // Some org-scoped PATs cannot access profile discovery endpoints.
         // Keep the flow unblocked and validate with org/project calls next.
         setUserName("Utilisateur");
@@ -94,11 +92,6 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
         setOrgHint("Verification automatique impossible. Saisissez votre organisation manuellement.");
       }
       setStep("org");
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      setSessionPat("");
-      setStep("pat");
-      setErr(msg);
     } finally {
       setLoading(false);
       submitInFlightRef.current = false;
@@ -127,6 +120,9 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
       setStep("projects");
       return true;
     } catch (e: unknown) {
+      if (orgs.length === 0) {
+        setSelectedOrg("");
+      }
       setErr(e instanceof Error ? e.message : String(e));
       return false;
     } finally {

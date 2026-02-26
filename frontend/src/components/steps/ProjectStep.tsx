@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { NamedEntity } from "../../types";
 
 type ProjectStepProps = {
@@ -19,6 +20,15 @@ export default function ProjectStep({
   loading,
   onContinue,
 }: ProjectStepProps) {
+  const projectsSelectRef = useRef<HTMLSelectElement | null>(null);
+
+  useEffect(() => {
+    const rafId = window.requestAnimationFrame(() => {
+      projectsSelectRef.current?.focus();
+    });
+    return () => window.cancelAnimationFrame(rafId);
+  }, []);
+
   return (
     <>
       <h2 className="flow-title">Choix du projet</h2>
@@ -31,7 +41,18 @@ export default function ProjectStep({
         </div>
       )}
       <label className="flow-label">Projets accessibles</label>
-      <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)} className="flow-input">
+      <select
+        ref={projectsSelectRef}
+        value={selectedProject}
+        onChange={(e) => setSelectedProject(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !loading && !!selectedProject) {
+            e.preventDefault();
+            void onContinue();
+          }
+        }}
+        className="flow-input"
+      >
         {projects.length === 0 && <option value="">Aucun projet accessible</option>}
         {projects.map((project) => (
           <option key={project.id || project.name} value={project.name || ""}>

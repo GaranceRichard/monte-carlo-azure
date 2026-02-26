@@ -1,6 +1,7 @@
+import { useState } from "react";
 import SimulationChartTabs from "./SimulationChartTabs";
 import SimulationControlPanel from "./SimulationControlPanel";
-import { SimulationProvider } from "./SimulationContext";
+import { SimulationProvider } from "../../hooks/SimulationContext";
 import SimulationResultsPanel from "./SimulationResultsPanel";
 import type { SimulationViewModel } from "../../hooks/useSimulation";
 
@@ -11,6 +12,7 @@ type SimulationStepProps = {
 
 export default function SimulationStep({ selectedTeam, simulation }: SimulationStepProps) {
   const { err } = simulation;
+  const [controlExpanded, setControlExpanded] = useState(false);
 
   return (
     <SimulationProvider value={{ selectedTeam, simulation }}>
@@ -34,11 +36,13 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
         <div className="grid flex-1 min-h-0 grid-cols-1 gap-3 xl:grid-cols-12">
           <div className="min-h-0 space-y-3 xl:col-span-4 xl:grid xl:grid-rows-[auto_minmax(0,1fr)] xl:space-y-0 xl:gap-3">
             <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-3">
-              <SimulationControlPanel />
+              <SimulationControlPanel onExpansionChange={setControlExpanded} />
             </div>
-            <div className="min-h-0 overflow-auto rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-3">
-              <SimulationResultsPanel />
-            </div>
+            {!controlExpanded && (
+              <div className="min-h-0 overflow-auto rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-3">
+                <SimulationResultsPanel hideHistory={false} />
+              </div>
+            )}
           </div>
           <div className="min-h-0 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 xl:col-span-8">
             <SimulationChartTabs />
@@ -48,3 +52,4 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
     </SimulationProvider>
   );
 }
+

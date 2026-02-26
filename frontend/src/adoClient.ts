@@ -142,7 +142,7 @@ export async function resolvePatOrganizationScopeDirect(pat: string): Promise<{
       displayName: me.displayName || "Utilisateur",
       memberId: me.id || "",
       organizations: [],
-      scope: "none",
+      scope: "local",
     };
   }
   const memberId = me.id || me.publicAlias || "";
@@ -150,7 +150,7 @@ export async function resolvePatOrganizationScopeDirect(pat: string): Promise<{
     return { displayName: me.displayName || "Utilisateur", memberId: "", organizations: [], scope: "none" };
   }
   const organizations = await listOrgsByMemberId(memberId, pat);
-  const scope = organizations.length > 1 ? "global" : organizations.length === 1 ? "local" : "none";
+  const scope = organizations.length > 0 ? "global" : "none";
   return {
     displayName: me.displayName || "Utilisateur",
     memberId,

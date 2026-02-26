@@ -74,7 +74,7 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
   };
   if (throughputSamples.length < 6) {
     throw new Error(
-      "Historique insuffisant pour une simulation fiable. Ã‰largissez la pÃ©riode sÃ©lectionnÃ©e, ou vÃ©rifiez les types et Ã©tats de rÃ©solution choisis.",
+      "Historique insuffisant pour une simulation fiable. Élargissez la période sélectionnée, ou vérifiez les types et états de résolution choisis.",
     );
   }
 

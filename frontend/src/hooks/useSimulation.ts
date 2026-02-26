@@ -314,7 +314,7 @@ export function useSimulation({
     setWeeklyThroughput(entry.weeklyThroughput);
     setResult(entry.result);
     setActiveChartTab("throughput");
-    setHasLaunchedOnce(false);
+    setHasLaunchedOnce(true);
     resetAutoRunState();
   }
 
