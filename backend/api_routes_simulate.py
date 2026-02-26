@@ -3,16 +3,18 @@ from fastapi import APIRouter, HTTPException, Request
 from slowapi import Limiter
 
 from .api_config import get_api_config
-from .api_models import SimulateRequest, SimulateResponse
+from .api_models import SimulateRequest, SimulateResponse, SimulationHistoryItem
 from .mc_core import (
     histogram_buckets,
     mc_finish_weeks,
     mc_items_done_for_weeks,
     percentiles,
 )
+from .simulation_store import SimulationStore
 
 router = APIRouter()
 cfg = get_api_config()
+simulation_store = SimulationStore(cfg)
 
 
 def _client_key_from_request(request: Request) -> str:
@@ -67,9 +69,36 @@ def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
         )
         kind = "items"
 
-    return SimulateResponse(
+    response_model = SimulateResponse(
         result_kind=kind,
         result_percentiles=percentiles(result, ps=(50, 70, 90)),
         result_distribution=histogram_buckets(result),
         samples_count=int(len(samples)),
     )
+
+    mc_client_id = (request.cookies.get(cfg.client_cookie_name) or "").strip()
+    if simulation_store.enabled and mc_client_id:
+        try:
+            simulation_store.save_simulation(mc_client_id, req, response_model)
+        except Exception as exc:
+            raise HTTPException(
+                503,
+                "Persistence Mongo indisponible. Reessayez plus tard.",
+            ) from exc
+
+    return response_model
+
+
+@router.get("/simulations/history", response_model=list[SimulationHistoryItem])
+def simulation_history(request: Request) -> list[SimulationHistoryItem]:
+    mc_client_id = (request.cookies.get(cfg.client_cookie_name) or "").strip()
+    if not mc_client_id:
+        return []
+    if not simulation_store.enabled:
+        return []
+
+    try:
+        rows = simulation_store.list_recent(mc_client_id)
+        return [SimulationHistoryItem(**row) for row in rows]
+    except Exception as exc:
+        raise HTTPException(503, "Historique indisponible temporairement.") from exc

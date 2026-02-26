@@ -6,6 +6,7 @@ import ProjectStep from "./components/steps/ProjectStep";
 import TeamStep from "./components/steps/TeamStep";
 import { useOnboarding } from "./hooks/useOnboarding";
 import { useSimulation } from "./hooks/useSimulation";
+import { ensureMontecarloClientCookie } from "./clientId";
 import { storageGetItem, storageSetItem } from "./storage";
 import "./App.css";
 
@@ -52,6 +53,10 @@ export default function App() {
     onboardingActions.disconnect();
     simulation.resetAll();
   }
+
+  useEffect(() => {
+    ensureMontecarloClientCookie();
+  }, []);
 
   useEffect(() => {
     const isGlobalOrgStep = onboardingState.step === "org" && onboardingState.orgs.length > 0;

@@ -6,6 +6,7 @@ python-dotenv>=1.0,<2
 numpy>=2.0,<3
 slowapi>=0.1.9,<1
 redis>=5.0,<6
+pymongo>=4.9,<5
 
 pytest>=8.0,<9
 pytest-cov>=5.0,<6

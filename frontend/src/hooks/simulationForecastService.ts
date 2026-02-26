@@ -88,6 +88,16 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     backlog_size: simulationMode === "backlog_to_weeks" ? Number(backlogSize) : undefined,
     target_weeks: simulationMode === "weeks_to_items" ? Number(targetWeeks) : undefined,
     n_sims: Number(nSims),
+    capacity_percent: Number(capacityPercent),
+    client_context: {
+      selected_org: selectedOrg,
+      selected_project: selectedProject,
+      selected_team: selectedTeam,
+      start_date: startDate,
+      end_date: endDate,
+      done_states: [...doneStates],
+      types: [...types],
+    },
   };
 
   const response = await postSimulate(payload);

@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 from backend.api_config import (
+    DEFAULT_CLIENT_COOKIE_NAME,
     DEFAULT_CORS_ORIGINS,
+    DEFAULT_MONGO_COLLECTION_SIMULATIONS,
     DEFAULT_RATE_LIMIT_SIMULATE,
     DEFAULT_RATE_LIMIT_STORAGE_URL,
+    DEFAULT_SIMULATION_HISTORY_LIMIT,
     _parse_bool_env,
     _parse_csv_env,
     _parse_float_env,
+    _parse_int_env,
     _parse_str_env,
     get_api_config,
 )
@@ -18,6 +22,11 @@ def test_get_api_config_defaults(monkeypatch):
     monkeypatch.delenv("APP_FORECAST_TIMEOUT_SECONDS", raising=False)
     monkeypatch.delenv("APP_RATE_LIMIT_SIMULATE", raising=False)
     monkeypatch.delenv("APP_REDIS_URL", raising=False)
+    monkeypatch.delenv("APP_CLIENT_COOKIE_NAME", raising=False)
+    monkeypatch.delenv("APP_SIMULATION_HISTORY_LIMIT", raising=False)
+    monkeypatch.delenv("APP_MONGO_URL", raising=False)
+    monkeypatch.delenv("APP_MONGO_DB", raising=False)
+    monkeypatch.delenv("APP_MONGO_COLLECTION_SIMULATIONS", raising=False)
 
     cfg = get_api_config()
     assert cfg.cors_origins == DEFAULT_CORS_ORIGINS
@@ -25,6 +34,11 @@ def test_get_api_config_defaults(monkeypatch):
     assert cfg.forecast_timeout_seconds == 30.0
     assert cfg.rate_limit_simulate == DEFAULT_RATE_LIMIT_SIMULATE
     assert cfg.rate_limit_storage_url == DEFAULT_RATE_LIMIT_STORAGE_URL
+    assert cfg.client_cookie_name == DEFAULT_CLIENT_COOKIE_NAME
+    assert cfg.simulation_history_limit == DEFAULT_SIMULATION_HISTORY_LIMIT
+    assert cfg.mongo_url == ""
+    assert cfg.mongo_db == "montecarlo"
+    assert cfg.mongo_collection_simulations == DEFAULT_MONGO_COLLECTION_SIMULATIONS
 
 
 def test_parse_csv_env_values_and_empty_fallback(monkeypatch):
@@ -78,3 +92,17 @@ def test_parse_str_env(monkeypatch):
 
     monkeypatch.setenv("APP_REDIS_URL", "   ")
     assert _parse_str_env("APP_REDIS_URL", "memory://") == "memory://"
+
+
+def test_parse_int_env(monkeypatch):
+    monkeypatch.delenv("APP_SIMULATION_HISTORY_LIMIT", raising=False)
+    assert _parse_int_env("APP_SIMULATION_HISTORY_LIMIT", 10) == 10
+
+    monkeypatch.setenv("APP_SIMULATION_HISTORY_LIMIT", "20")
+    assert _parse_int_env("APP_SIMULATION_HISTORY_LIMIT", 10) == 20
+
+    monkeypatch.setenv("APP_SIMULATION_HISTORY_LIMIT", "abc")
+    assert _parse_int_env("APP_SIMULATION_HISTORY_LIMIT", 10) == 10
+
+    monkeypatch.setenv("APP_SIMULATION_HISTORY_LIMIT", "0")
+    assert _parse_int_env("APP_SIMULATION_HISTORY_LIMIT", 10) == 10

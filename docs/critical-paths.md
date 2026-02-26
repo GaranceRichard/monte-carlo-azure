@@ -11,7 +11,7 @@ Ce document reference les points vitaux du produit qui exigent une couverture de
 ## Liste officielle des points vitaux
 
 - SLA Identite: aucune donnee d'identification Azure DevOps (PAT, UUID, ORG, Team) ne transite par un serveur applicatif.
+- Cookie IDMontecarlo: ne doit jamais transiter vers `dev.azure.com` ou `app.vssps.visualstudio.com`.
 - Endpoint backend `POST /simulate`: validation, robustesse, et comportement deterministe sur erreurs.
 - Flux onboarding critique: PAT -> organisation -> projet -> equipe.
 - Export rapport simulation (SVG/PDF): generation stable et non regressif.
-

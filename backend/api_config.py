@@ -6,6 +6,9 @@ from dataclasses import dataclass
 DEFAULT_CORS_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
 DEFAULT_RATE_LIMIT_SIMULATE = "20/minute"
 DEFAULT_RATE_LIMIT_STORAGE_URL = "memory://"
+DEFAULT_CLIENT_COOKIE_NAME = "IDMontecarlo"
+DEFAULT_SIMULATION_HISTORY_LIMIT = 10
+DEFAULT_MONGO_COLLECTION_SIMULATIONS = "simulations"
 
 
 def _parse_csv_env(name: str, default: list[str]) -> list[str]:
@@ -36,6 +39,11 @@ class ApiConfig:
     forecast_timeout_seconds: float
     rate_limit_simulate: str
     rate_limit_storage_url: str
+    client_cookie_name: str
+    simulation_history_limit: int
+    mongo_url: str
+    mongo_db: str
+    mongo_collection_simulations: str
 
 
 def _parse_float_env(name: str, default: float) -> float:
@@ -49,6 +57,17 @@ def _parse_float_env(name: str, default: float) -> float:
     return value if value > 0 else default
 
 
+def _parse_int_env(name: str, default: int) -> int:
+    raw = (os.getenv(name) or "").strip()
+    if not raw:
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        return default
+    return value if value > 0 else default
+
+
 def get_api_config() -> ApiConfig:
     return ApiConfig(
         cors_origins=_parse_csv_env("APP_CORS_ORIGINS", DEFAULT_CORS_ORIGINS),
@@ -56,4 +75,15 @@ def get_api_config() -> ApiConfig:
         forecast_timeout_seconds=_parse_float_env("APP_FORECAST_TIMEOUT_SECONDS", 30.0),
         rate_limit_simulate=_parse_str_env("APP_RATE_LIMIT_SIMULATE", DEFAULT_RATE_LIMIT_SIMULATE),
         rate_limit_storage_url=_parse_str_env("APP_REDIS_URL", DEFAULT_RATE_LIMIT_STORAGE_URL),
+        client_cookie_name=_parse_str_env("APP_CLIENT_COOKIE_NAME", DEFAULT_CLIENT_COOKIE_NAME),
+        simulation_history_limit=_parse_int_env(
+            "APP_SIMULATION_HISTORY_LIMIT",
+            DEFAULT_SIMULATION_HISTORY_LIMIT,
+        ),
+        mongo_url=_parse_str_env("APP_MONGO_URL", ""),
+        mongo_db=_parse_str_env("APP_MONGO_DB", "montecarlo"),
+        mongo_collection_simulations=_parse_str_env(
+            "APP_MONGO_COLLECTION_SIMULATIONS",
+            DEFAULT_MONGO_COLLECTION_SIMULATIONS,
+        ),
     )

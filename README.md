@@ -39,6 +39,8 @@ Mises à jour récentes (backend/tests):
 - Visualisation des percentiles et distributions
 - Export CSV du throughput hebdomadaire
 - Historique local des dernières simulations (localStorage, sans compte)
+- Cookie client `IDMontecarlo` (UUID v4, 1 an, `SameSite=Strict`) pour relier les simulations à un client anonyme
+- Persistence MongoDB des simulations via `/simulate` + restitution des 10 dernières via `/simulations/history`
 - Paramètre de capacité réduite (ex: équipe à 70% pendant N semaines)
 
 ---
@@ -54,6 +56,7 @@ Le PAT Azure DevOps:
 
 Règle fondamentale:
 - 0 donnée d'identification (PAT, UUID, ORG, Team) ne doit transiter par un serveur applicatif (local ou distant).
+- Le cookie `IDMontecarlo` ne doit jamais transiter vers `https://dev.azure.com` ni `https://app.vssps.visualstudio.com`.
 - Les appels Azure DevOps doivent partir directement du navigateur vers:
   - `https://dev.azure.com`
   - `https://app.vssps.visualstudio.com`
@@ -129,14 +132,14 @@ L'application (frontend servi par FastAPI) est ensuite disponible sur:
 
 ## Lancer en développement
 
-Option rapide (Windows PowerShell, 3 terminaux: backend + frontend + health):
+Option rapide (Windows PowerShell, 4 terminaux: backend + frontend + health API + health Mongo):
 
 ```powershell
 .\start-dev.ps1 -ThreeTerminals
 ```
 
 Le terminal health verifie `http://127.0.0.1:8000/health` en boucle (intervalle par defaut: 5s).
-Dans VS Code, `Ctrl+Shift+B` lance aussi la tache par defaut `Dev: 3 terminaux`.
+Dans VS Code, `Ctrl+Shift+B` lance aussi la tache par defaut `Dev: 4 terminaux`.
 
 ### Backend
 
@@ -160,7 +163,7 @@ npm run dev
 
 UI: `http://localhost:5173`
 
-### Mode manuel en 3 terminaux
+### Mode manuel en 4 terminaux
 
 Terminal 1 (backend):
 
@@ -180,12 +183,19 @@ Terminal 3 (check recurrent health):
 while ($true) { try { Invoke-RestMethod http://127.0.0.1:8000/health -TimeoutSec 2 | ConvertTo-Json -Compress } catch { Write-Host $_.Exception.Message }; Start-Sleep -Seconds 5 }
 ```
 
+Terminal 4 (check recurrent health Mongo):
+
+```powershell
+while ($true) { try { Invoke-RestMethod http://127.0.0.1:8000/health/mongo -TimeoutSec 2 | ConvertTo-Json -Compress } catch { Write-Host $_.Exception.Message }; Start-Sleep -Seconds 5 }
+```
+
 ---
 
 ## API
 
 - `GET /health`
 - `POST /simulate`
+- `GET /simulations/history`
 - CORS autorisé: `GET`, `POST`, `OPTIONS`
 
 Swagger: `/docs`
@@ -223,6 +233,13 @@ ou
 }
 ```
 
+Le backend persiste aussi la simulation dans MongoDB (collection `simulations`) quand le cookie `IDMontecarlo` est présent.
+
+### Historique client `GET /simulations/history`
+
+- Le cookie `IDMontecarlo` est lu côté backend.
+- Réponse: jusqu'à 10 simulations récentes du client (mode, paramètres, percentiles, distribution, timestamps).
+
 `result_distribution` contient des buckets `{ x, count }`:
 - `x`: valeur simulée (semaines ou items selon le mode)
 - `count`: fréquence observée dans les simulations
@@ -257,8 +274,22 @@ npm --prefix frontend run test:unit
 npm --prefix frontend run test:unit:coverage
 npm --prefix frontend run test:e2e
 npm --prefix frontend run test:e2e:coverage:console
-.venv\Scripts\python.exe -m pytest tests/test_api_config.py tests/test_api_health.py tests/test_api_simulate.py --cov=backend --cov-fail-under=80 --cov-report=term-missing -q
+.venv\Scripts\python.exe -m pytest tests/test_api_config.py tests/test_api_health.py tests/test_api_simulate.py tests/test_api_history.py tests/test_simulation_store.py --cov=backend --cov-fail-under=80 --cov-report=term-missing -q
 .venv\Scripts\python.exe -m pytest tests/test_repo_compliance.py --cov=tests.test_repo_compliance --cov-fail-under=80 --cov-report=term-missing -q
+```
+
+### Variables d'environnement Mongo / purge
+
+- `APP_MONGO_URL` (ex: `mongodb://mongo:27017`)
+- `APP_MONGO_DB` (défaut: `montecarlo`)
+- `APP_MONGO_COLLECTION_SIMULATIONS` (défaut: `simulations`)
+- `APP_SIMULATION_HISTORY_LIMIT` (défaut: `10`)
+- `APP_PURGE_RETENTION_DAYS` (défaut script purge: `30`)
+
+Purge planifiée:
+
+```bash
+python Scripts/purge_inactive_clients.py
 ```
 
 Suite E2E découpée:
