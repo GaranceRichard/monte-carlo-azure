@@ -87,53 +87,55 @@ def main() -> int:
     )
     _ok("--cov-fail-under=80" in ci, "CI must enforce backend coverage >= 80", errors)
 
-    # Coverage task integration checks (VS Code)
-    tasks = _read(".vscode/tasks.json")
-    _ok(
-        '"label": "Coverage: 7 terminaux"' in tasks,
-        "Missing coverage aggregate task (7 terminaux)",
-        errors,
-    )
-    _ok(
-        '"label": "Coverage DoD Compliance (Repo)"' in tasks,
-        "Missing repo DoD compliance task in coverage workflow",
-        errors,
-    )
-    _ok(
-        "tests/test_repo_compliance.py" in tasks,
-        "Coverage task must execute tests/test_repo_compliance.py",
-        errors,
-    )
-    _ok(
-        "--cov=tests.test_repo_compliance" in tasks,
-        "Coverage task must measure DoD compliance test coverage",
-        errors,
-    )
-    _ok(
-        '"label": "Coverage Integration (Backend API)"' in tasks,
-        "Missing dedicated integration coverage task (backend API)",
-        errors,
-    )
-    _ok(
-        "tests/test_api_config.py" in tasks,
-        "Integration coverage task must include tests/test_api_config.py",
-        errors,
-    )
-    _ok(
-        "tests/test_api_health.py" in tasks,
-        "Integration coverage task must include tests/test_api_health.py",
-        errors,
-    )
-    _ok(
-        "tests/test_api_simulate.py" in tasks,
-        "Integration coverage task must include tests/test_api_simulate.py",
-        errors,
-    )
-    _ok(
-        "--cov-fail-under=80" in tasks,
-        "Coverage task must enforce integration coverage >= 80",
-        errors,
-    )
+    # Coverage task integration checks (VS Code): optional local developer file.
+    tasks_path = ROOT / ".vscode" / "tasks.json"
+    if tasks_path.exists():
+        tasks = tasks_path.read_text(encoding="utf-8")
+        _ok(
+            '"label": "Coverage: 7 terminaux"' in tasks,
+            "Missing coverage aggregate task (7 terminaux)",
+            errors,
+        )
+        _ok(
+            '"label": "Coverage DoD Compliance (Repo)"' in tasks,
+            "Missing repo DoD compliance task in coverage workflow",
+            errors,
+        )
+        _ok(
+            "tests/test_repo_compliance.py" in tasks,
+            "Coverage task must execute tests/test_repo_compliance.py",
+            errors,
+        )
+        _ok(
+            "--cov=tests.test_repo_compliance" in tasks,
+            "Coverage task must measure DoD compliance test coverage",
+            errors,
+        )
+        _ok(
+            '"label": "Coverage Integration (Backend API)"' in tasks,
+            "Missing dedicated integration coverage task (backend API)",
+            errors,
+        )
+        _ok(
+            "tests/test_api_config.py" in tasks,
+            "Integration coverage task must include tests/test_api_config.py",
+            errors,
+        )
+        _ok(
+            "tests/test_api_health.py" in tasks,
+            "Integration coverage task must include tests/test_api_health.py",
+            errors,
+        )
+        _ok(
+            "tests/test_api_simulate.py" in tasks,
+            "Integration coverage task must include tests/test_api_simulate.py",
+            errors,
+        )
+        _ok(
+            "--cov-fail-under=80" in tasks,
+            "Coverage task must enforce integration coverage >= 80",
+            errors,
+        )
 
     if errors:
         print("ERROR: DoD compliance check failed.", file=sys.stderr)

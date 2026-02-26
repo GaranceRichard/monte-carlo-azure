@@ -328,3 +328,4 @@ Le hook `pre-commit` exécute:
 - `python Scripts/check_no_secrets.py`
 - `python Scripts/check_dod_compliance.py`
   - ce contrôle vérifie la conformité DoD au niveau référentiel (docs, CI, seuils, tasks)
+  - les vérifications de tasks VS Code sont appliquées seulement si `.vscode/tasks.json` est présent
