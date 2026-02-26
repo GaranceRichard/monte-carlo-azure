@@ -79,6 +79,15 @@ def test_mc_items_done_for_weeks_invalid_inputs():
         mc_items_done_for_weeks(weeks=2, throughput_samples=np.array([0, 0], dtype=int))
 
 
+def test_mc_finish_weeks_include_zero_rejects_all_negative_samples():
+    with pytest.raises(ValueError):
+        mc_finish_weeks(
+            backlog_size=10,
+            throughput_samples=np.array([-5, -1], dtype=int),
+            include_zero_weeks=True,
+        )
+
+
 def test_mc_items_done_for_weeks_accepts_zero_samples_when_enabled():
     samples = np.array([0, 0, 1, 2], dtype=int)
     out = mc_items_done_for_weeks(
@@ -90,6 +99,15 @@ def test_mc_items_done_for_weeks_accepts_zero_samples_when_enabled():
     )
     assert out.shape == (1000,)
     assert int(out.min()) >= 0
+
+
+def test_mc_items_done_for_weeks_include_zero_rejects_all_negative_samples():
+    with pytest.raises(ValueError):
+        mc_items_done_for_weeks(
+            weeks=4,
+            throughput_samples=np.array([-4, -1], dtype=int),
+            include_zero_weeks=True,
+        )
 
 
 def test_histogram_buckets_empty_and_exact():
@@ -109,6 +127,13 @@ def test_histogram_buckets_aggregated_bin_count_and_mass():
     assert len(buckets) <= 20
     assert sum(b["count"] for b in buckets) == len(data)
     assert all(isinstance(b["x"], int) and isinstance(b["count"], int) for b in buckets)
+
+
+def test_histogram_buckets_aggregated_skips_zero_count_bins():
+    data = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1000], dtype=int)
+    buckets = histogram_buckets(data, max_buckets=10)
+    assert len(buckets) == 2
+    assert sum(b["count"] for b in buckets) == len(data)
 
 
 def test_percentiles_default_and_custom():

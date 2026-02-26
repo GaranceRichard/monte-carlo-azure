@@ -97,7 +97,7 @@ def test_coverage_tasks_separate_repo_compliance_and_integration() -> None:
     tasks_content = tasks_path.read_text(encoding="utf-8")
     assert '"label": "Coverage: 7 terminaux"' in tasks_content
     assert '"label": "Coverage Integration (Backend API)"' in tasks_content
-    assert '"label": "Coverage DoD Compliance (Repo)"' in tasks_content
+    assert '"label": "Coverage Repo Compliance"' in tasks_content
     assert "tests/test_repo_compliance.py" in tasks_content
     assert "--cov=tests.test_repo_compliance" in tasks_content
     assert "tests/test_api_config.py" in tasks_content

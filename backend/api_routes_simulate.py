@@ -1,6 +1,8 @@
 import numpy as np
 from fastapi import APIRouter, HTTPException, Request
+from slowapi import Limiter
 
+from .api_config import get_api_config
 from .api_models import SimulateRequest, SimulateResponse
 from .mc_core import (
     histogram_buckets,
@@ -8,27 +10,29 @@ from .mc_core import (
     mc_items_done_for_weeks,
     percentiles,
 )
-from .rate_limiter import SlidingWindowRateLimiter, client_key_from_request
 
 router = APIRouter()
+cfg = get_api_config()
 
-RATE_LIMIT_MAX_REQUESTS_PER_MINUTE = 20
-RATE_LIMIT_WINDOW_SECONDS = 60.0
 
-_rate_limiter = SlidingWindowRateLimiter(
-    max_requests=RATE_LIMIT_MAX_REQUESTS_PER_MINUTE,
-    window_seconds=RATE_LIMIT_WINDOW_SECONDS,
+def _client_key_from_request(request: Request) -> str:
+    xff = request.headers.get("x-forwarded-for", "").strip()
+    if xff:
+        return xff.split(",")[0].strip()
+    if request.client and request.client.host:
+        return request.client.host
+    return "unknown"
+
+
+limiter = Limiter(
+    key_func=_client_key_from_request,
+    storage_uri=cfg.rate_limit_storage_url,
 )
 
 
 @router.post("/simulate", response_model=SimulateResponse)
-def simulate(req: SimulateRequest, request: Request) -> SimulateResponse:
-    if not _rate_limiter.allow(client_key_from_request(request)):
-        raise HTTPException(
-            429,
-            "Trop de requetes sur /simulate. Reessayez dans quelques instants.",
-        )
-
+@limiter.limit(cfg.rate_limit_simulate)
+def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
     samples = np.array(req.throughput_samples)
     if req.include_zero_weeks:
         samples = samples[samples >= 0]

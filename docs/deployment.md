@@ -33,12 +33,15 @@ APP_PORT=8000
 APP_CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 APP_CORS_ALLOW_CREDENTIALS=true
 APP_FORECAST_TIMEOUT_SECONDS=30
+APP_RATE_LIMIT_SIMULATE=20/minute
+APP_REDIS_URL=redis://redis:6379/0
 ```
 
 ### 4) Commandes utiles
 
 ```bash
 docker compose logs -f backend
+docker compose logs -f redis
 docker compose restart backend
 docker compose down -v
 ```

@@ -97,7 +97,7 @@ def main() -> int:
             errors,
         )
         _ok(
-            '"label": "Coverage DoD Compliance (Repo)"' in tasks,
+            '"label": "Coverage Repo Compliance"' in tasks,
             "Missing repo DoD compliance task in coverage workflow",
             errors,
         )

@@ -63,7 +63,7 @@ Le backend ne reçoit que:
 - les paramètres de simulation (`mode`, `backlog_size`/`target_weeks`, `n_sims`)
 
 Garde-fous serveur:
-- rate limiting sur `POST /simulate` (limite par client/IP sur fenêtre glissante)
+- rate limiting distribue sur `POST /simulate` via Redis + slowapi (limite client/IP partagee entre workers)
 - niveau de logs applicatifs réduit (`warning`) et logs d'accès HTTP désactivés
 
 ---
@@ -91,7 +91,6 @@ frontend/
 backend/
   api.py                # FastAPI + CORS + route /simulate + /health
   api_routes_simulate.py # endpoint /simulate
-  rate_limiter.py       # rate limiter glissant + clé client
   api_models.py         # SimulateRequest / SimulateResponse
   mc_core.py            # coeur Monte Carlo
 ```

@@ -1,12 +1,19 @@
-﻿from fastapi import FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.extension import _rate_limit_exceeded_handler
 
 from .api_config import get_api_config
-from .api_routes_simulate import router
+from .api_routes_simulate import limiter, router
 from .api_static import mount_frontend
 
 app = FastAPI(title="Monte Carlo Simulate API", version="2.0")
 cfg = get_api_config()
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
