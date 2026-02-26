@@ -135,7 +135,10 @@ def test_simulate_rate_limit_returns_429():
     }
     headers = {"x-forwarded-for": "simulate-rate-limit-test"}
 
-    statuses = [client.post("/simulate", json=payload, headers=headers).status_code for _ in range(21)]
+    statuses = [
+        client.post("/simulate", json=payload, headers=headers).status_code
+        for _ in range(21)
+    ]
 
     assert statuses[:20] == [200] * 20
     assert statuses[20] == 429

@@ -22,6 +22,10 @@ Refactors récents (frontend):
 - typages simulation segmentés (`SimulationForecastControls`, `SimulationDateRange`, `SimulationResult`, `ChartTab`)
 - écran simulation chargé en lazy (`React.lazy`) + import dynamique du module rapport/PDF pour réduire la taille des chunks initiaux
 
+Mises à jour récentes (backend/tests):
+- tri des imports `slowapi` dans `backend/api.py` pour conformité Ruff/isort
+- découpage de la compréhension de liste dans `tests/test_api_simulate.py` pour respecter la limite de longueur de ligne
+
 ---
 
 ## Fonctionnalités
