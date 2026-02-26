@@ -28,6 +28,17 @@ const DEFAULT_STATES_BY_TYPE: Record<string, string[]> = {
   "Product Backlog Item": ["Done", "Closed", "Resolved"],
   Bug: ["Done", "Closed", "Resolved"],
 };
+const TOOLTIP_BASE_PROPS: TooltipBaseProps = {
+  cursor: false,
+  contentStyle: {
+    background: "var(--panel)",
+    border: "1px solid var(--border)",
+    borderRadius: 10,
+    boxShadow: "0 6px 20px rgba(0,0,0,0.22)",
+  },
+  labelStyle: { color: "var(--muted)", fontWeight: 700 },
+  itemStyle: { color: "var(--text)", fontWeight: 700 },
+};
 
 export type SimulationViewModel = SimulationForecastControls &
   SimulationDateRange &
@@ -103,18 +114,6 @@ export function useSimulation({
   const [weeklyThroughput, setWeeklyThroughput] = useState<WeeklyThroughputRow[]>([]);
   const [activeChartTab, setActiveChartTab] = useState<ChartTab>("throughput");
   const [hasLaunchedOnce, setHasLaunchedOnce] = useState(false);
-
-  const tooltipBaseProps: TooltipBaseProps = {
-    cursor: false,
-    contentStyle: {
-      background: "var(--panel)",
-      border: "1px solid var(--border)",
-      borderRadius: 10,
-      boxShadow: "0 6px 20px rgba(0,0,0,0.22)",
-    },
-    labelStyle: { color: "var(--muted)", fontWeight: 700 },
-    itemStyle: { color: "var(--text)", fontWeight: 700 },
-  };
 
   const { throughputData, mcHistData, probabilityCurveData, displayPercentiles } = useSimulationChartData({
     weeklyThroughput,
@@ -356,7 +355,7 @@ export function useSimulation({
     throughputData,
     mcHistData,
     probabilityCurveData,
-    tooltipBaseProps,
+    tooltipBaseProps: TOOLTIP_BASE_PROPS,
     simulationHistory,
     applyHistoryEntry,
     clearSimulationHistory,

@@ -12,6 +12,12 @@ import "./App.css";
 type ThemeMode = "light" | "dark";
 const SimulationStep = lazy(() => import("./components/steps/SimulationStep"));
 
+function isEditableTarget(target: EventTarget | null): boolean {
+  const element = target as HTMLElement | null;
+  const tag = element?.tagName?.toLowerCase();
+  return tag === "input" || tag === "textarea" || !!element?.isContentEditable;
+}
+
 export default function App() {
   const onboarding = useOnboarding();
   const { state: onboardingState, actions: onboardingActions } = onboarding;
@@ -49,80 +55,25 @@ export default function App() {
 
   useEffect(() => {
     const isGlobalOrgStep = onboardingState.step === "org" && onboardingState.orgs.length > 0;
-    if (!isGlobalOrgStep) return;
+    const canGoBack = onboardingState.step === "projects" || onboardingState.step === "teams" || onboardingState.step === "simulation";
+    if (!isGlobalOrgStep && !canGoBack) return;
 
-    function handleBackspaceDisconnect(event: KeyboardEvent): void {
+    function handleBackspaceNavigation(event: KeyboardEvent): void {
       if (event.key !== "Backspace") return;
-      const target = event.target as HTMLElement | null;
-      const tag = target?.tagName?.toLowerCase();
-      const isEditable = tag === "input" || tag === "textarea" || !!target?.isContentEditable;
-      if (isEditable) return;
+      if (isEditableTarget(event.target)) return;
       event.preventDefault();
-      handleDisconnect();
-    }
-
-    window.addEventListener("keydown", handleBackspaceDisconnect);
-    return () => {
-      window.removeEventListener("keydown", handleBackspaceDisconnect);
-    };
-  }, [onboardingState.step, onboardingState.orgs.length]);
-
-  useEffect(() => {
-    if (onboardingState.step !== "projects") return;
-
-    function handleBackspaceToOrg(event: KeyboardEvent): void {
-      if (event.key !== "Backspace") return;
-      const target = event.target as HTMLElement | null;
-      const tag = target?.tagName?.toLowerCase();
-      const isEditable = tag === "input" || tag === "textarea" || !!target?.isContentEditable;
-      if (isEditable) return;
-      event.preventDefault();
+      if (isGlobalOrgStep) {
+        handleDisconnect();
+        return;
+      }
       onboardingActions.goBack();
     }
 
-    window.addEventListener("keydown", handleBackspaceToOrg);
+    window.addEventListener("keydown", handleBackspaceNavigation);
     return () => {
-      window.removeEventListener("keydown", handleBackspaceToOrg);
+      window.removeEventListener("keydown", handleBackspaceNavigation);
     };
-  }, [onboardingState.step, onboardingActions]);
-
-  useEffect(() => {
-    if (onboardingState.step !== "teams") return;
-
-    function handleBackspaceToProjects(event: KeyboardEvent): void {
-      if (event.key !== "Backspace") return;
-      const target = event.target as HTMLElement | null;
-      const tag = target?.tagName?.toLowerCase();
-      const isEditable = tag === "input" || tag === "textarea" || !!target?.isContentEditable;
-      if (isEditable) return;
-      event.preventDefault();
-      onboardingActions.goBack();
-    }
-
-    window.addEventListener("keydown", handleBackspaceToProjects);
-    return () => {
-      window.removeEventListener("keydown", handleBackspaceToProjects);
-    };
-  }, [onboardingState.step, onboardingActions]);
-
-  useEffect(() => {
-    if (onboardingState.step !== "simulation") return;
-
-    function handleBackspaceToTeams(event: KeyboardEvent): void {
-      if (event.key !== "Backspace") return;
-      const target = event.target as HTMLElement | null;
-      const tag = target?.tagName?.toLowerCase();
-      const isEditable = tag === "input" || tag === "textarea" || !!target?.isContentEditable;
-      if (isEditable) return;
-      event.preventDefault();
-      onboardingActions.goBack();
-    }
-
-    window.addEventListener("keydown", handleBackspaceToTeams);
-    return () => {
-      window.removeEventListener("keydown", handleBackspaceToTeams);
-    };
-  }, [onboardingState.step, onboardingActions]);
+  }, [onboardingState.step, onboardingState.orgs.length, onboardingActions]);
 
   const onboardingOrder = ["pat", "org", "projects", "teams"] as const;
   const onboardingLabels: Record<(typeof onboardingOrder)[number], string> = {

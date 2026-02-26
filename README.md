@@ -4,6 +4,9 @@
 
 Outil de prévision basé sur une simulation Monte Carlo. Il répond au Use Case suivant : l'utilisateur se connecte et peut effectuer facilement une simulation sur un site avec peu d'informations, sans laisser de trace ou compromettre Azure avec son Token.
 
+Documentation produit (vision, cible, valeur):
+- [`PRODUCT.md`](PRODUCT.md)
+
 Architecture V2:
 - Le frontend appelle Azure DevOps directement depuis le navigateur.
 - Le backend OVH ne reçoit que des données anonymes de throughput (`throughput_samples`) pour calculer la simulation.
