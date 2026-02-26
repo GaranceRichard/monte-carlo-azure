@@ -9,6 +9,7 @@ from .mc_core import (
     mc_finish_weeks,
     mc_items_done_for_weeks,
     percentiles,
+    risk_score,
 )
 from .simulation_store import SimulationStore
 
@@ -69,9 +70,14 @@ def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
         )
         kind = "items"
 
+    simulation_percentiles = percentiles(result, ps=(50, 70, 90))
     response_model = SimulateResponse(
         result_kind=kind,
-        result_percentiles=percentiles(result, ps=(50, 70, 90)),
+        result_percentiles=simulation_percentiles,
+        risk_score=risk_score(
+            simulation_percentiles["P50"],
+            simulation_percentiles["P90"],
+        ),
         result_distribution=histogram_buckets(result),
         samples_count=int(len(samples)),
     )

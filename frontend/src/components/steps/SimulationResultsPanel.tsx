@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import ProgressBar from "../ui/progress";
 import { useSimulationContext } from "../../hooks/SimulationContext";
 import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
+import { computeRiskScoreFromPercentiles } from "../../utils/simulation";
 
 function formatHistoryEntryLabel(entry: {
   createdAt: string;
@@ -62,6 +63,27 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
     P90: "90% de probabilite",
   };
 
+  const riskScoreValue = useMemo(() => {
+    if (!s.result) return null;
+    return computeRiskScoreFromPercentiles(s.displayPercentiles ?? {});
+  }, [s.result, s.displayPercentiles]);
+
+  const riskLegend = useMemo(() => {
+    if (riskScoreValue == null) return "";
+    if (riskScoreValue <= 0.2) return "fiable";
+    if (riskScoreValue <= 0.5) return "incertain";
+    if (riskScoreValue <= 0.8) return "fragile";
+    return "non fiable";
+  }, [riskScoreValue]);
+
+  const riskColorClass = useMemo(() => {
+    if (riskLegend === "fiable") return "border-emerald-600 text-emerald-700";
+    if (riskLegend === "incertain") return "border-amber-500 text-amber-600";
+    if (riskLegend === "fragile") return "border-red-600 text-red-700";
+    if (riskLegend === "non fiable") return "border-black text-black";
+    return "border-[var(--border)] text-[var(--text)]";
+  }, [riskLegend]);
+
   return (
     <div className="min-h-0 space-y-4">
       {s.loading && (
@@ -90,7 +112,7 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
       {s.result && (
         <div className="space-y-2">
           <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Percentiles</div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {["P50", "P70", "P90"].map((k, index) => (
               <div
                 key={k}
@@ -100,10 +122,25 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
               >
                 <span className="block text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{k}</span>
                 <span className="mt-1 block whitespace-nowrap text-sm font-extrabold leading-tight text-[var(--text)]">
-                  {s.displayPercentiles?.[k]} {s.result?.result_kind === "items" ? "items" : "semaines"}
+                  {s.displayPercentiles?.[k]} {s.result?.result_kind === "items" ? "items" : "sem"}
                 </span>
               </div>
             ))}
+            {riskScoreValue != null && (
+              <div
+                className={`group relative rounded-xl border bg-[var(--surface-2)] p-2 opacity-0 [animation:flowFadeIn_300ms_ease-out_forwards] ${riskColorClass}`}
+                style={{ animationDelay: `${3 * 90}ms` }}
+                tabIndex={0}
+              >
+                <div className="flex min-h-[3.2rem] flex-col items-center justify-center text-center">
+                  <span className="block text-xs font-bold uppercase tracking-[0.08em]">Risk</span>
+                  <span className="mt-1 whitespace-nowrap text-sm font-extrabold leading-tight">
+                    <span className="group-hover:hidden group-focus-visible:hidden">{riskScoreValue.toFixed(2)}</span>
+                    <span className="hidden group-hover:inline group-focus-visible:inline">{riskLegend}</span>
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

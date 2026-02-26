@@ -20,6 +20,13 @@ def test_simulate_backlog_to_weeks_success():
     assert body["result_kind"] == "weeks"
     assert body["samples_count"] == 6
     assert set(body["result_percentiles"].keys()) == {"P50", "P70", "P90"}
+    assert "risk_score" in body
+    assert isinstance(body["risk_score"], float)
+    expected = (
+        (body["result_percentiles"]["P90"] - body["result_percentiles"]["P50"])
+        / body["result_percentiles"]["P50"]
+    )
+    assert body["risk_score"] == expected
     assert isinstance(body["result_distribution"], list)
     assert len(body["result_distribution"]) > 0
     first_bucket = body["result_distribution"][0]
@@ -44,6 +51,7 @@ def test_simulate_weeks_to_items_success():
     body = r.json()
     assert body["result_kind"] == "items"
     assert body["samples_count"] == 6
+    assert "risk_score" in body
 
 
 def test_simulate_include_zero_weeks_keeps_zero_samples():

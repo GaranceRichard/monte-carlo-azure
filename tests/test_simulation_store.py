@@ -107,6 +107,7 @@ def _req_resp():
     resp = SimulateResponse(
         result_kind="weeks",
         result_percentiles={"P50": 10, "P70": 12, "P90": 14},
+        risk_score=0.4,
         result_distribution=[DistributionBucket(x=8, count=12)],
         samples_count=6,
     )

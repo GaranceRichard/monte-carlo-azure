@@ -37,6 +37,7 @@ Mises à jour récentes (backend/tests):
 - Récupération du throughput hebdomadaire côté client
 - Simulation Monte Carlo côté backend (`POST /simulate`)
 - Visualisation des percentiles et distributions
+- Visualisation d'un `Risk Score` (fiabilite de la prevision) avec code couleur
 - Export CSV du throughput hebdomadaire
 - Historique local des dernières simulations (localStorage, sans compte)
 - Cookie client `IDMontecarlo` (UUID v4, 1 an, `SameSite=Strict`) pour relier les simulations à un client anonyme
@@ -228,6 +229,7 @@ ou
 {
   "result_kind": "weeks",
   "result_percentiles": { "P50": 10, "P70": 12, "P90": 15 },
+  "risk_score": 0.5,
   "result_distribution": [{ "x": 10, "count": 123 }],
   "samples_count": 30
 }
@@ -308,21 +310,23 @@ Workflow: `.github/workflows/ci.yml`
   - Setup Python 3.12
   - Installation des dépendances backend
   - Lint backend: `python -m ruff check .`
+  - Vérification DoD: `python Scripts/check_dod_compliance.py`
   - Contrôle SLA identité: `python Scripts/check_identity_boundary.py`
-  - Tests backend: `python -m pytest -q`
+  - Tests backend + seuil coverage: `python -m pytest --cov=backend --cov-fail-under=80 -q`
 
 - Job `frontend-tests`
   - Setup Node.js 22
   - Installation frontend: `npm ci` (dans `frontend`)
   - Lint frontend: `npm run lint -- --max-warnings 0`
-  - Tests unitaires: `npm run test:unit` (Vitest)
+  - Tests unitaires + coverage: `npm run test:unit:coverage` (Vitest)
   - Installation Playwright: `npx playwright install --with-deps chromium`
   - Tests e2e: `npm run test:e2e`
 
 - Job `docker-smoke`
   - Build de l'image Docker à chaque push/PR
   - Démarrage via `docker compose up -d --build`
-  - Smoke test santé: `GET /health`
+  - Smoke test santé: `GET /health` + `GET /health/mongo`
+  - Vérification persistence: `POST /simulate` puis `GET /simulations/history` avec cookie `IDMontecarlo`
 
 ---
 

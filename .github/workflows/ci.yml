@@ -27,6 +27,10 @@ jobs:
         run: |
           python -m ruff check .
 
+      - name: DoD compliance check
+        run: |
+          python Scripts/check_dod_compliance.py
+
       - name: Enforce Identity Boundary SLA
         run: |
           python Scripts/check_identity_boundary.py
@@ -68,7 +72,7 @@ jobs:
 
       - name: Run unit tests (Vitest)
         run: |
-          npm run test:unit
+          npm run test:unit:coverage
 
       - name: Install Playwright browsers
         run: |
@@ -105,17 +109,49 @@ jobs:
         run: |
           docker compose up -d
 
-      - name: Smoke test /health
+      - name: Smoke test API + persistence
         run: |
+          HEALTH_OK=0
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:8000/health; then
-              exit 0
+              HEALTH_OK=1
+              break
             fi
             sleep 2
           done
-          echo "Health endpoint did not become ready in time"
-          docker compose logs backend || true
-          exit 1
+          if [ "$HEALTH_OK" -ne 1 ]; then
+            echo "Health endpoint did not become ready in time"
+            docker compose logs backend || true
+            exit 1
+          fi
+
+          curl -fsS http://127.0.0.1:8000/health/mongo > /tmp/mongo-health.json
+          grep -q '"status":"ok"' /tmp/mongo-health.json || {
+            echo "Mongo healthcheck endpoint is not OK"
+            cat /tmp/mongo-health.json
+            docker compose logs backend mongo || true
+            exit 1
+          }
+
+          MC_COOKIE="ci-smoke-idmontecarlo"
+          curl -fsS \
+            -X POST http://127.0.0.1:8000/simulate \
+            -H "Content-Type: application/json" \
+            -H "Cookie: IDMontecarlo=${MC_COOKIE}" \
+            -d '{"throughput_samples":[1,2,3,4,5,6],"mode":"backlog_to_weeks","backlog_size":20,"n_sims":2000,"capacity_percent":100}' \
+            > /tmp/simulate-response.json
+
+          curl -fsS \
+            -H "Cookie: IDMontecarlo=${MC_COOKIE}" \
+            http://127.0.0.1:8000/simulations/history \
+            > /tmp/history-response.json
+
+          grep -q '"mode":"backlog_to_weeks"' /tmp/history-response.json || {
+            echo "History endpoint did not return persisted simulation"
+            cat /tmp/history-response.json
+            docker compose logs backend mongo || true
+            exit 1
+          }
 
       - name: Stop services
         if: always()

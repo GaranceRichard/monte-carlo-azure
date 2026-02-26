@@ -6,6 +6,7 @@ from backend.mc_core import (
     mc_finish_weeks,
     mc_items_done_for_weeks,
     percentiles,
+    risk_score,
 )
 
 
@@ -144,3 +145,9 @@ def test_percentiles_default_and_custom():
 
     p2 = percentiles(arr, ps=(25, 75))
     assert set(p2.keys()) == {"P25", "P75"}
+
+
+def test_risk_score_basic_and_guardrails():
+    assert risk_score(10, 14) == 0.4
+    assert risk_score(10, 8) == 0.0
+    assert risk_score(0, 5) == 0.0

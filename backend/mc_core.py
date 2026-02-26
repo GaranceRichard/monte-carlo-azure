@@ -129,3 +129,12 @@ def percentiles(arr: np.ndarray, ps: Tuple[int, ...] = (50, 80, 90)) -> Dict[str
     """
     a = np.asarray(arr)
     return {f"P{p}": int(np.percentile(a, p)) for p in ps}
+
+
+def risk_score(p50: int, p90: int) -> float:
+    """
+    Mesure la dispersion pessimiste vs mediane.
+    """
+    if p50 <= 0:
+        return 0.0
+    return max(0.0, float(p90 - p50) / float(p50))

@@ -12,12 +12,16 @@ services:
       APP_FORECAST_TIMEOUT_SECONDS: ${APP_FORECAST_TIMEOUT_SECONDS}
       APP_RATE_LIMIT_SIMULATE: ${APP_RATE_LIMIT_SIMULATE:-20/minute}
       APP_REDIS_URL: ${APP_REDIS_URL:-redis://redis:6379/0}
+      APP_MONGO_URL: ${APP_MONGO_URL:-mongodb://mongo:27017}
+      APP_MONGO_DB: ${APP_MONGO_DB:-montecarlo}
     ports:
       - "${APP_PORT:-8000}:8000"
     volumes:
       - montecarlo-runtime:/tmp/montecarlo
     depends_on:
       redis:
+        condition: service_healthy
+      mongo:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
@@ -38,5 +42,19 @@ services:
       retries: 10
     restart: unless-stopped
 
+  mongo:
+    image: mongo:7
+    container_name: montecarlo-mongo
+    volumes:
+      - montecarlo-mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
 volumes:
   montecarlo-runtime:
+  montecarlo-mongo-data:

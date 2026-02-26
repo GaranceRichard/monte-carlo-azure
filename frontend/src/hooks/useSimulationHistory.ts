@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getSimulationHistory, type SimulationHistoryItem } from "../api";
 import { storageGetItem, storageRemoveItem, storageSetItem } from "../storage";
 import type { SimulationHistoryEntry } from "./simulationTypes";
+import { computeRiskScoreFromPercentiles } from "../utils/simulation";
 
 const SIM_HISTORY_KEY = "mc_simulation_history_v1";
 const MAX_SIM_HISTORY = 10;
@@ -46,6 +47,7 @@ function mapRemoteHistoryItem(item: SimulationHistoryItem, index: number): Simul
       result_kind: item.mode === "backlog_to_weeks" ? "weeks" : "items",
       samples_count: Number(item.samples_count ?? 0),
       result_percentiles: item.percentiles ?? {},
+      risk_score: computeRiskScoreFromPercentiles(item.percentiles ?? {}),
       result_distribution: item.distribution ?? [],
     },
   };

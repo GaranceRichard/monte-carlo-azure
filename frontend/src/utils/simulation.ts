@@ -1,6 +1,13 @@
 import type { ForecastMode, ForecastResponse } from "../types";
 import { clamp } from "./math";
 
+export function computeRiskScoreFromPercentiles(percentiles: Record<string, number>): number {
+  const p50 = Number(percentiles?.P50 ?? 0);
+  const p90 = Number(percentiles?.P90 ?? 0);
+  if (p50 <= 0) return 0;
+  return Math.max(0, (p90 - p50) / p50);
+}
+
 export function applyCapacityReductionToResult(
   response: ForecastResponse,
   mode: ForecastMode,
@@ -15,11 +22,13 @@ export function applyCapacityReductionToResult(
   const lostWeeks = reducedWeeks * (1 - capacity);
 
   if (response.result_kind === "weeks") {
+    const adjustedPercentiles = Object.fromEntries(
+      Object.entries(response.result_percentiles).map(([key, value]) => [key, Number(value) + lostWeeks]),
+    );
     return {
       ...response,
-      result_percentiles: Object.fromEntries(
-        Object.entries(response.result_percentiles).map(([key, value]) => [key, Number(value) + lostWeeks]),
-      ),
+      result_percentiles: adjustedPercentiles,
+      risk_score: computeRiskScoreFromPercentiles(adjustedPercentiles),
       result_distribution: response.result_distribution.map((bucket) => ({
         ...bucket,
         x: Number(bucket.x) + lostWeeks,
@@ -29,11 +38,13 @@ export function applyCapacityReductionToResult(
 
   const horizon = Math.max(1, targetWeeksValue);
   const itemFactor = clamp((horizon - lostWeeks) / horizon, 0, 1);
+  const adjustedPercentiles = Object.fromEntries(
+    Object.entries(response.result_percentiles).map(([key, value]) => [key, Number(value) * itemFactor]),
+  );
   return {
     ...response,
-    result_percentiles: Object.fromEntries(
-      Object.entries(response.result_percentiles).map(([key, value]) => [key, Number(value) * itemFactor]),
-    ),
+    result_percentiles: adjustedPercentiles,
+    risk_score: computeRiskScoreFromPercentiles(adjustedPercentiles),
     result_distribution: response.result_distribution.map((bucket) => ({
       ...bucket,
       x: Number(bucket.x) * itemFactor,

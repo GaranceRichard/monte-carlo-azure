@@ -62,6 +62,7 @@ export type SimulationViewModel = SimulationForecastControls &
   clearSimulationHistory: () => void;
   exportThroughputCsv: () => void;
   runForecast: () => Promise<void>;
+  resetSimulationResults: () => void;
   resetForTeamSelection: () => void;
   resetAll: () => void;
 };
@@ -325,6 +326,12 @@ export function useSimulation({
     resetAutoRunState();
   }
 
+  function resetSimulationResults(): void {
+    setErr("");
+    setWarning("");
+    clearComputedSimulationState();
+  }
+
   return {
     loading,
     hasLaunchedOnce,
@@ -370,6 +377,7 @@ export function useSimulation({
     clearSimulationHistory,
     exportThroughputCsv: () => exportCsv(weeklyThroughput, selectedTeam),
     runForecast,
+    resetSimulationResults,
     resetForTeamSelection,
     resetAll,
   };

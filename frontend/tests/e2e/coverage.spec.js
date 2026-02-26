@@ -141,7 +141,7 @@ test.describe("e2e istanbul coverage", () => {
     await page.locator("select").first().selectOption("backlog_to_weeks");
     await page.locator('input[type="number"]').first().fill("120");
     await closeIfExpanded(modeSection);
-    await expect(page.getByText("10 semaines")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("10 sem")).toBeVisible({ timeout: 10_000 });
 
     await page.getByRole("button", { name: /Se d.*connecter/i }).click();
     await expect(page.getByText("Connexion Azure DevOps")).toBeVisible();
@@ -192,7 +192,7 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByLabel("Bug").check();
     await page.getByLabel("Done").check();
     await page.getByRole("button", { name: "Lancer la simulation" }).click();
-    await expect(page.getByText("10 semaines")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("10 sem")).toBeVisible({ timeout: 10_000 });
 
     await toggleThemeRoundTrip(page);
 

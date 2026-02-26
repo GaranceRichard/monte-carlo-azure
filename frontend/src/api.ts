@@ -22,6 +22,7 @@ export type SimulateRequest = {
 export type SimulateResponse = {
   result_kind: "weeks" | "items";
   result_percentiles: Record<string, number>;
+  risk_score?: number;
   result_distribution: { x: number; count: number }[];
   samples_count: number;
 };

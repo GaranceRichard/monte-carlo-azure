@@ -54,10 +54,12 @@ export async function downloadSimulationPdf(reportWindowDocument: Document, sele
   ensureSpace(8);
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(9);
-  reportWindowDocument.querySelectorAll(".kpi").forEach((kpi, i) => {
+  const kpis = Array.from(reportWindowDocument.querySelectorAll(".kpi"));
+  const kpiStep = kpis.length > 0 ? contentW / kpis.length : contentW;
+  kpis.forEach((kpi, i) => {
     const label = kpi.querySelector(".kpi-label")?.textContent ?? "";
     const value = kpi.querySelector(".kpi-value")?.textContent ?? "";
-    pdf.text(`${label}: ${value}`, margin + i * (contentW / 3), cursorY);
+    pdf.text(`${label}: ${value}`, margin + i * kpiStep, cursorY);
   });
   cursorY += 7;
 

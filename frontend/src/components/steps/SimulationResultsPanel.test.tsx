@@ -153,7 +153,7 @@ describe("SimulationResultsPanel history list", () => {
     render(<SimulationResultsPanel />);
     expect(screen.getByText("Calcul en cours...")).not.toBeNull();
     expect(screen.getByText(/Semaines utilisees: 26\/40/i)).not.toBeNull();
-    expect(screen.getByText(/5 semaines/i)).not.toBeNull();
+    expect(screen.getByText(/5 sem/i)).not.toBeNull();
   });
 
   it("renders ADO partial data warning when present", () => {
@@ -226,6 +226,28 @@ describe("SimulationResultsPanel history list", () => {
 
     render(<SimulationResultsPanel />);
     expect(screen.getByText(/38 items/i)).not.toBeNull();
+  });
+
+  it("renders risk score indicator", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        result: { result_kind: "weeks", risk_score: 0.42 },
+        displayPercentiles: { P50: 8, P70: 10, P90: 13 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+    expect(screen.getByText(/^Risk$/i)).not.toBeNull();
+    expect(screen.getByText(/^0.63$/i)).not.toBeNull();
+    expect(screen.queryByRole("tooltip")).toBeNull();
   });
 
   it("formats history option labels for both simulation modes", () => {

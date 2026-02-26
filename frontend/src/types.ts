@@ -28,6 +28,7 @@ export type ForecastResponse = {
   result_kind: ForecastKind;
   samples_count: number;
   result_percentiles: Record<string, number>;
+  risk_score?: number;
   result_distribution: ForecastHistogramBucket[];
 };
 

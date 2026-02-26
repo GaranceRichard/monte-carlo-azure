@@ -10,6 +10,9 @@ sans configuration manuelle de `nginx` ou `systemd`.
 
 - Docker Engine
 - Plugin `docker compose`
+- MongoDB pour la persistence:
+  - soit service local via `docker-compose.yml` (service `mongo`, par defaut),
+  - soit instance managée externe (OVH Managed Databases, Atlas, etc.) en pointant `APP_MONGO_URL`.
 
 ### 2) Depuis la racine du repo
 
@@ -35,13 +38,48 @@ APP_CORS_ALLOW_CREDENTIALS=true
 APP_FORECAST_TIMEOUT_SECONDS=30
 APP_RATE_LIMIT_SIMULATE=20/minute
 APP_REDIS_URL=redis://redis:6379/0
+APP_MONGO_URL=mongodb://mongo:27017
+APP_MONGO_DB=montecarlo
+APP_PURGE_RETENTION_DAYS=90
 ```
 
-### 4) Commandes utiles
+### 4) Verification persistence Mongo
+
+Verifier au demarrage que la persistence est active (pas seulement le health global):
+
+```bash
+docker compose logs -f backend
+curl -sS http://127.0.0.1:8000/health/mongo
+```
+
+Le endpoint `/health/mongo` doit retourner `{"status":"ok"}` en production.
+
+Verifier ensuite la lecture d'historique avec cookie client:
+
+```bash
+curl -sS -H 'Cookie: IDMontecarlo=ops-smoke-client' \
+  http://127.0.0.1:8000/simulations/history
+```
+
+Si Mongo est indisponible, l'API doit remonter une erreur explicite sur les chemins de persistence.
+
+### 5) Cron de purge (clients inactifs)
+
+Planifier une execution quotidienne de `Scripts/purge_inactive_clients.py` sur l'hote.
+Exemple `crontab -e`:
+
+```cron
+0 3 * * * cd /opt/montecarlo && /usr/bin/docker compose run --rm backend python Scripts/purge_inactive_clients.py >> /var/log/montecarlo-purge.log 2>&1
+```
+
+Le script utilise `APP_MONGO_URL`, `APP_MONGO_DB` et `APP_PURGE_RETENTION_DAYS`.
+
+### 6) Commandes utiles
 
 ```bash
 docker compose logs -f backend
 docker compose logs -f redis
+docker compose logs -f mongo
 docker compose restart backend
 docker compose down -v
 ```

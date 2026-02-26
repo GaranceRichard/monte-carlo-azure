@@ -70,6 +70,11 @@ export function exportSimulationPrintReport({
   const stateSummary = doneStates.length ? doneStates.join(", ") : "Aucun";
   const modeZeroLabel = includeZeroWeeks ? "Semaines 0 incluses" : "Semaines 0 exclues";
   const resultLabel = resultKind === "items" ? "items (au moins)" : "semaines (au plus)";
+  const p50 = Number(displayPercentiles?.P50 ?? 0);
+  const p90 = Number(displayPercentiles?.P90 ?? 0);
+  const riskScore = p50 > 0 ? Math.max(0, (p90 - p50) / p50) : 0;
+  const riskLegend = riskScore <= 0.2 ? "fiable" : riskScore <= 0.5 ? "incertain" : riskScore <= 0.8 ? "fragile" : "eleve";
+  const riskScoreLabel = riskScore.toFixed(1).replace(".", ",");
 
   const html = `
       <!doctype html>
@@ -131,6 +136,7 @@ export function exportSimulationPrintReport({
           <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">${Number(displayPercentiles?.P50 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
           <div class="kpi"><span class="kpi-label">P70</span><span class="kpi-value">${Number(displayPercentiles?.P70 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
           <div class="kpi"><span class="kpi-label">P90</span><span class="kpi-value">${Number(displayPercentiles?.P90 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
+          <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">Risk Score : ${escapeHtml(riskScoreLabel)} (${escapeHtml(riskLegend)})</span></div>
         </section>
 
         <section class="section">

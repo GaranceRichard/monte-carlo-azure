@@ -32,6 +32,7 @@ class DistributionBucket(BaseModel):
 class SimulateResponse(BaseModel):
     result_kind: Literal["weeks", "items"]
     result_percentiles: Dict[str, int]
+    risk_score: float
     result_distribution: List[DistributionBucket]
     samples_count: int
 

@@ -59,5 +59,5 @@ test("simulation: erreur puis succes sur les 2 modes", async ({ page }) => {
   await page.locator("select").first().selectOption("backlog_to_weeks");
   await page.locator('input[type="number"]').first().fill("120");
   await closeIfExpanded(modeSection);
-  await expect(page.getByText("10 semaines")).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByText("10 sem")).toBeVisible({ timeout: 10_000 });
 });

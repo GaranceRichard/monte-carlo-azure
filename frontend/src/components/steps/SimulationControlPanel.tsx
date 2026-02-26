@@ -45,6 +45,9 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
     }
     setShowFilters((prev) => {
       const next = !prev;
+      if (next && s.hasLaunchedOnce) {
+        s.resetSimulationResults();
+      }
       setShowPeriod(false);
       setShowMode(false);
       return next;

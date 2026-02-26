@@ -18,6 +18,8 @@ function setContext({
   loading = false,
   selectedTeam = "Equipe A",
   runForecast = vi.fn(async () => {}),
+  resetForTeamSelection = vi.fn(),
+  resetSimulationResults = vi.fn(),
 }: {
   hasLaunchedOnce: boolean;
   types?: string[];
@@ -25,6 +27,8 @@ function setContext({
   loading?: boolean;
   selectedTeam?: string;
   runForecast?: ReturnType<typeof vi.fn>;
+  resetForTeamSelection?: ReturnType<typeof vi.fn>;
+  resetSimulationResults?: ReturnType<typeof vi.fn>;
 }): ReturnType<typeof vi.fn> {
   vi.mocked(useSimulationContext).mockReturnValue({
     selectedTeam,
@@ -32,6 +36,8 @@ function setContext({
       loading,
       hasLaunchedOnce,
       runForecast,
+      resetForTeamSelection,
+      resetSimulationResults,
       types,
       doneStates,
       startDate: "2026-01-01",
@@ -115,6 +121,37 @@ describe("SimulationControlPanel launch button visibility", () => {
     fireEvent.click(within(modeSection).getByRole("button", { name: /developper/i }));
     expect(within(modeSection).getByText("Mode Content")).not.toBeNull();
     expect(within(periodSection).queryByText("Period Content")).toBeNull();
+  });
+
+  it("resets simulation when opening ticket filters after a launched simulation", () => {
+    const resetSimulationResults = vi.fn();
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Equipe A",
+      simulation: {
+        loading: false,
+        hasLaunchedOnce: true,
+        runForecast: vi.fn(async () => {}),
+        resetForTeamSelection: vi.fn(),
+        resetSimulationResults,
+        types: ["Bug"],
+        doneStates: ["Done"],
+        startDate: "2026-01-01",
+        endDate: "2026-02-01",
+        simulationMode: "backlog_to_weeks",
+        backlogSize: 100,
+        targetWeeks: 12,
+        includeZeroWeeks: true,
+        nSims: 20000,
+      },
+    } as never);
+
+    render(<SimulationControlPanel />);
+    const filtersSection = screen.getByRole("heading", { name: /filtres de tickets/i }).closest("section");
+    expect(filtersSection).not.toBeNull();
+    if (!filtersSection) return;
+
+    fireEvent.click(within(filtersSection).getByRole("button", { name: /developper/i }));
+    expect(resetSimulationResults).toHaveBeenCalledTimes(1);
   });
 
   it("clears validation message when filters become valid after an error", () => {
