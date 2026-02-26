@@ -49,6 +49,7 @@ export type SimulationHistoryEntry = {
   sampleStats: SampleStats | null;
   weeklyThroughput: WeeklyThroughputRow[];
   result: ForecastResponse;
+  warning?: string;
 };
 
 export type SimulationForecastControls = {
@@ -82,6 +83,7 @@ export type SimulationResult = {
   mcHistData: ChartPoint[];
   probabilityCurveData: ProbabilityPoint[];
   sampleStats: SampleStats | null;
+  warning: string;
 };
 
 export type ChartTab = "throughput" | "distribution" | "probability";

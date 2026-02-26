@@ -139,6 +139,7 @@ describe("SimulationResultsPanel history list", () => {
       simulation: {
         loading: true,
         loadingStageMessage: "Calcul en cours...",
+        warning: "",
         includeZeroWeeks: false,
         sampleStats: { totalWeeks: 40, zeroWeeks: 14, usedWeeks: 26 },
         result: { result_kind: "weeks" },
@@ -153,6 +154,28 @@ describe("SimulationResultsPanel history list", () => {
     expect(screen.getByText("Calcul en cours...")).not.toBeNull();
     expect(screen.getByText(/Semaines utilisees: 26\/40/i)).not.toBeNull();
     expect(screen.getByText(/5 semaines/i)).not.toBeNull();
+  });
+
+  it("renders ADO partial data warning when present", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        warning: "1/3 lot(s) de work items n'ont pas pu etre charges.",
+        includeZeroWeeks: false,
+        sampleStats: null,
+        result: null,
+        displayPercentiles: {},
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+    expect(screen.getByText(/Avertissement:/i)).not.toBeNull();
+    expect(screen.getByText(/1\/3 lot\(s\)/i)).not.toBeNull();
   });
 
   it("clears selection when selecting placeholder option and can clear history", () => {

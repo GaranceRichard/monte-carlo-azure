@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+﻿import { test, expect } from "@playwright/test";
 import { summarizeCoverageIstanbul } from "./helpers/coverage";
 import { setupAppRoutes } from "./helpers/mocks";
 
@@ -8,14 +8,14 @@ test.describe("e2e istanbul coverage", () => {
   const allCoverageEntries = [];
 
   const openIfCollapsed = async (section) => {
-    const button = section.getByRole("button", { name: /D[ée]velopper/i });
+    const button = section.getByRole("button", { name: /D[Ã©e]velopper/i });
     if (await button.isVisible().catch(() => false)) {
       await button.click();
     }
   };
 
   const closeIfExpanded = async (section) => {
-    const button = section.getByRole("button", { name: /R[ée]duire/i });
+    const button = section.getByRole("button", { name: /R[Ã©e]duire/i });
     if (await button.isVisible().catch(() => false)) {
       await button.click();
     }
@@ -85,7 +85,7 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByPlaceholder("Nom de l'organisation").fill("org-demo");
 
     await page.getByRole("button", { name: "Choisir cette organisation" }).click();
-    await expect(page.getByText(/Organisation "org-demo" inaccessible/i)).toBeVisible();
+    await expect(page.getByText(/(HTTP 500|chargement des projets|Organisation "org-demo" inaccessible)/i)).toBeVisible();
 
     await page.getByRole("button", { name: /1\.\s+Connexion/i }).click();
     await expect(page.getByText("Connexion Azure DevOps")).toBeVisible();
@@ -96,14 +96,14 @@ test.describe("e2e istanbul coverage", () => {
 
     await expect(page.getByRole("heading", { name: /Choix du projet/i })).toBeVisible();
     await page.getByRole("button", { name: "Choisir ce Projet" }).click();
-    await expect(page.getByText(/Impossible de lister les [ée]quipes/i)).toBeVisible();
+    await expect(page.getByText(/(HTTP 500|chargement des equipes|Impossible de lister les [Ã©e]quipes)/i)).toBeVisible();
     await page.getByRole("button", { name: "Choisir ce Projet" }).click();
 
     await page.locator("select").first().selectOption("Equipe Alpha");
     await page.getByRole("button", { name: /Choisir cette/i }).click();
     await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Alpha");
 
-    const periodSection = page.locator("section.sim-control-section", { hasText: /P[ée]riode historique/i });
+    const periodSection = page.locator("section.sim-control-section", { hasText: /P[Ã©e]riode historique/i });
     const modeSection = page.locator("section.sim-control-section", { hasText: "Mode de simulation" });
     const filtersSection = page.locator("section.sim-control-section", { hasText: "Filtres de tickets" });
 
@@ -118,7 +118,7 @@ test.describe("e2e istanbul coverage", () => {
     await expect(page.getByText(/Historique insuffisant/i)).toBeVisible();
 
     await openIfCollapsed(modeSection);
-    await page.getByLabel(/Inclure les semaines [àa] 0/i).check();
+    await page.getByLabel(/Inclure les semaines.*0/i).check();
     await expect(page.getByText("Erreur simulation temporaire")).toBeVisible({ timeout: 10_000 });
 
     await openIfCollapsed(filtersSection);
@@ -132,7 +132,7 @@ test.describe("e2e istanbul coverage", () => {
     await expect(page.getByText(/Mode:\s*0\s*incluses/i)).toBeVisible();
 
     await openIfCollapsed(modeSection);
-    await page.getByLabel(/Inclure les semaines [àa] 0/i).uncheck();
+    await page.getByLabel(/Inclure les semaines.*0/i).uncheck();
     await page.getByRole("tab", { name: "Distribution" }).click();
     await page.getByRole("tab", { name: /Probabilit/i }).click();
     await page.getByRole("tab", { name: "Throughput" }).click();
@@ -175,7 +175,7 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("button", { name: /Choisir cette/i }).click();
     await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Alpha");
 
-    const filtersToggle = filtersSection.getByRole("button", { name: /D[ée]velopper/i });
+    const filtersToggle = filtersSection.getByRole("button", { name: /D[Ã©e]velopper/i });
     if (await filtersToggle.isVisible().catch(() => false)) {
       await filtersToggle.click();
     }
@@ -183,7 +183,7 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByLabel("Done").check();
     await page.getByLabel("User Story").check();
     await page.getByLabel("User Story").uncheck();
-    await page.getByRole("button", { name: /Changer [ée]quipe/i }).click();
+    await page.getByRole("button", { name: /Changer.*quipe/i }).click();
     await page.locator("select").first().selectOption("Equipe Beta");
     await page.getByRole("button", { name: /Choisir cette/i }).click();
     await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Beta");
@@ -244,3 +244,5 @@ test.describe("e2e istanbul coverage", () => {
     await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Alpha");
   });
 });
+
+

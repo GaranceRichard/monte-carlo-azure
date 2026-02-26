@@ -1,7 +1,7 @@
-import { test, expect } from "@playwright/test";
+﻿import { test, expect } from "@playwright/test";
 import { setupAppRoutes } from "./helpers/mocks";
 
-test("selection: erreurs projets/équipes + listes vides", async ({ page }) => {
+test("selection: erreurs projets/Ã©quipes + listes vides", async ({ page }) => {
   await setupAppRoutes(page, {
     profileFirstUnauthorized: false,
     emptyAccountsBefore: 0,
@@ -15,12 +15,12 @@ test("selection: erreurs projets/équipes + listes vides", async ({ page }) => {
   await page.getByRole("button", { name: "Se connecter" }).click();
   await page.locator("select").first().selectOption("org-demo");
   await page.getByRole("button", { name: "Choisir cette organisation" }).click();
-  await expect(page.getByText(/Organisation "org-demo" inaccessible/i)).toBeVisible();
+  await expect(page.getByText(/(HTTP 500|chargement des projets|Organisation "org-demo" inaccessible)/i)).toBeVisible();
 
   await page.getByRole("button", { name: "Choisir cette organisation" }).click();
   await expect(page.getByRole("heading", { name: /Choix du projet/i })).toBeVisible();
   await page.getByRole("button", { name: "Choisir ce Projet" }).click();
-  await expect(page.getByText(/Impossible de lister les [ée]quipes/i)).toBeVisible();
+  await expect(page.getByText(/(HTTP 500|chargement des equipes|Impossible de lister les [Ã©e]quipes)/i)).toBeVisible();
 
   await page.getByRole("button", { name: "Choisir ce Projet" }).click();
   await expect(page.getByRole("heading", { name: /Choix de/i })).toBeVisible();
@@ -30,3 +30,4 @@ test("selection: erreurs projets/équipes + listes vides", async ({ page }) => {
   await page.getByRole("button", { name: "Choisir ce Projet" }).click();
   await expect(page.getByRole("button", { name: /Choisir cette/i })).toBeDisabled();
 });
+

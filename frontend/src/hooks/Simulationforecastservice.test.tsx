@@ -453,4 +453,16 @@ describe("cohérence du résultat retourné", () => {
 
     expect(sampleStats).toEqual(historyEntry.sampleStats);
   });
+
+  it("propage un warning de donnees partielles", async () => {
+    vi.mocked(getWeeklyThroughputDirect).mockResolvedValue({
+      weeklyThroughput: WEEKLY_6,
+      warning: "1/3 lot(s) de work items n'ont pas pu etre charges.",
+    });
+
+    const { warning, historyEntry } = await runSimulationForecast(baseParams());
+
+    expect(warning).toContain("1/3");
+    expect(historyEntry.warning).toContain("1/3");
+  });
 });

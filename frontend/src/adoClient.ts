@@ -1,4 +1,10 @@
-﻿import { formatDateLocal } from "./date";
+import { formatDateLocal } from "./date";
+import {
+  formatAdoHttpErrorMessage,
+  toAdoHttpError,
+  toAdoNetworkError,
+  type AdoErrorContext,
+} from "./adoErrors";
 
 function adoHeaders(pat: string): Record<string, string> {
   return {
@@ -16,6 +22,8 @@ type AdoProject = { id: string; name: string };
 type AdoTeam = { id: string; name: string };
 type TeamFieldValue = { value?: string; includeChildren?: boolean };
 type ProfileMe = { id?: string; publicAlias?: string; displayName?: string };
+type WeeklyThroughputRow = { week: string; throughput: number };
+type WeeklyThroughputResponse = WeeklyThroughputRow[] | { weeklyThroughput: WeeklyThroughputRow[]; warning?: string };
 type ResolvedPatProfile = {
   displayName: string;
   id: string;
@@ -26,6 +34,14 @@ const profileLookupInFlight = new Map<string, Promise<ResolvedPatProfile>>();
 
 function escWiql(value: string): string {
   return value.replace(/'/g, "''");
+}
+
+async function adoFetch(url: string, init: RequestInit, context: AdoErrorContext): Promise<Response> {
+  try {
+    return await fetch(url, init);
+  } catch (error: unknown) {
+    throw toAdoNetworkError(error, context);
+  }
 }
 
 async function getTeamAreaPathFilterClause(
@@ -74,36 +90,38 @@ export async function checkPatDirect(pat: string): Promise<ResolvedPatProfile> {
   if (existing) return existing;
 
   const task = (async (): Promise<ResolvedPatProfile> => {
-  const r = await fetch(`${VSSPS}/_apis/profile/profiles/me?${API}`, {
-    headers: adoHeaders(pat),
-  });
-  if (r.ok) {
-    const profile = await r.json() as ProfileMe;
-    return {
-      displayName: profile.displayName || "Utilisateur",
-      id: profile.id || "",
-      publicAlias: profile.publicAlias || "",
-      restrictedProfile: false,
+    const context: AdoErrorContext = {
+      operation: "verification du PAT",
+      requiredScopes: ["Profile (Read)"],
     };
-  }
-
-  // For some org-scoped PATs, profile endpoint answers 401 but still exposes identity metadata.
-  const userData = r.headers.get("x-vss-userdata") || "";
-  const sepIdx = userData.indexOf(":");
-  if (r.status === 401 && sepIdx > -1) {
-    const rawId = userData.slice(0, sepIdx).trim();
-    const rawName = userData.slice(sepIdx + 1).trim();
-    if (rawName) {
+    const r = await adoFetch(`${VSSPS}/_apis/profile/profiles/me?${API}`, { headers: adoHeaders(pat) }, context);
+    if (r.ok) {
+      const profile = await r.json() as ProfileMe;
       return {
-        id: rawId.replace(/^aad\./i, ""),
-        displayName: rawName,
-        publicAlias: "",
-        restrictedProfile: true,
+        displayName: profile.displayName || "Utilisateur",
+        id: profile.id || "",
+        publicAlias: profile.publicAlias || "",
+        restrictedProfile: false,
       };
     }
-  }
 
-  throw new Error("PAT invalide ou insuffisant.");
+    // For some org-scoped PATs, profile endpoint answers 401 but still exposes identity metadata.
+    const userData = r.headers.get("x-vss-userdata") || "";
+    const sepIdx = userData.indexOf(":");
+    if (r.status === 401 && sepIdx > -1) {
+      const rawId = userData.slice(0, sepIdx).trim();
+      const rawName = userData.slice(sepIdx + 1).trim();
+      if (rawName) {
+        return {
+          id: rawId.replace(/^aad\./i, ""),
+          displayName: rawName,
+          publicAlias: "",
+          restrictedProfile: true,
+        };
+      }
+    }
+
+    throw toAdoHttpError(r, context);
   })();
 
   profileLookupInFlight.set(pat, task);
@@ -160,10 +178,13 @@ export async function resolvePatOrganizationScopeDirect(pat: string): Promise<{
 }
 
 export async function listProjectsDirect(org: string, pat: string): Promise<AdoProject[]> {
-  const r = await fetch(`${ADO}/${org}/_apis/projects?${API}`, {
-    headers: adoHeaders(pat),
-  });
-  if (!r.ok) throw new Error(`Organisation "${org}" inaccessible avec ce PAT.`);
+  const context: AdoErrorContext = {
+    operation: "chargement des projets",
+    org,
+    requiredScopes: ["Project and Team (Read)"],
+  };
+  const r = await adoFetch(`${ADO}/${org}/_apis/projects?${API}`, { headers: adoHeaders(pat) }, context);
+  if (!r.ok) throw toAdoHttpError(r, context);
   const data = await r.json();
   return data.value ?? [];
 }
@@ -173,10 +194,14 @@ export async function listTeamsDirect(org: string, project: string, pat: string)
   const proj = projects.find((p) => p.name === project);
   if (!proj) throw new Error(`Projet "${project}" introuvable.`);
 
-  const r = await fetch(`${ADO}/${org}/_apis/projects/${proj.id}/teams?${API}`, {
-    headers: adoHeaders(pat),
-  });
-  if (!r.ok) throw new Error("Impossible de lister les équipes.");
+  const context: AdoErrorContext = {
+    operation: "chargement des equipes",
+    org,
+    project,
+    requiredScopes: ["Project and Team (Read)"],
+  };
+  const r = await adoFetch(`${ADO}/${org}/_apis/projects/${proj.id}/teams?${API}`, { headers: adoHeaders(pat) }, context);
+  if (!r.ok) throw toAdoHttpError(r, context);
   const data = await r.json();
   return data.value ?? [];
 }
@@ -187,10 +212,14 @@ export async function getTeamOptionsDirect(
   _team: string,
   pat: string,
 ): Promise<{ workItemTypes: string[]; statesByType: Record<string, string[]> }> {
-  const typesResp = await fetch(`${ADO}/${org}/${project}/_apis/wit/workitemtypes?${API}`, {
-    headers: adoHeaders(pat),
-  });
-  if (!typesResp.ok) throw new Error("Impossible de charger les types de tickets.");
+  const context: AdoErrorContext = {
+    operation: "chargement des types de tickets",
+    org,
+    project,
+    requiredScopes: ["Work Items (Read)"],
+  };
+  const typesResp = await adoFetch(`${ADO}/${org}/${project}/_apis/wit/workitemtypes?${API}`, { headers: adoHeaders(pat) }, context);
+  if (!typesResp.ok) throw toAdoHttpError(typesResp, context);
 
   const typesData = await typesResp.json();
   const witTypes: string[] = (typesData.value ?? []).map((t: { name?: string }) => t.name ?? "").filter(Boolean);
@@ -199,8 +228,13 @@ export async function getTeamOptionsDirect(
   await Promise.all(
     witTypes.map(async (type) => {
       const encoded = encodeURIComponent(type);
-      const r = await fetch(`${ADO}/${org}/${project}/_apis/wit/workitemtypes/${encoded}/states?${API}`, {
+      const r = await adoFetch(`${ADO}/${org}/${project}/_apis/wit/workitemtypes/${encoded}/states?${API}`, {
         headers: adoHeaders(pat),
+      }, {
+        operation: `chargement des etats pour le type "${type}"`,
+        org,
+        project,
+        requiredScopes: ["Work Items (Read)"],
       });
       if (!r.ok) return;
       const d = await r.json();
@@ -220,7 +254,7 @@ export async function getWeeklyThroughputDirect(
   endDate: string,
   doneStates: string[],
   workItemTypes: string[],
-): Promise<{ week: string; throughput: number }[]> {
+): Promise<WeeklyThroughputResponse> {
   const teamAreaFilter = await getTeamAreaPathFilterClause(org, project, team, pat);
   const typeFilter = workItemTypes.length
     ? `AND [System.WorkItemType] IN (${workItemTypes.map((t) => `'${escWiql(t)}'`).join(",")})`
@@ -243,12 +277,19 @@ export async function getWeeklyThroughputDirect(
     `,
   };
 
-  const wiqlResp = await fetch(`${ADO}/${org}/${project}/_apis/wit/wiql?${API}`, {
+  const wiqlContext: AdoErrorContext = {
+    operation: "requete WIQL (historique de fermeture)",
+    org,
+    project,
+    team,
+    requiredScopes: ["Work Items (Read)"],
+  };
+  const wiqlResp = await adoFetch(`${ADO}/${org}/${project}/_apis/wit/wiql?${API}`, {
     method: "POST",
     headers: adoHeaders(pat),
     body: JSON.stringify(wiql),
-  });
-  if (!wiqlResp.ok) throw new Error("Erreur lors de la requete WIQL.");
+  }, wiqlContext);
+  if (!wiqlResp.ok) throw toAdoHttpError(wiqlResp, wiqlContext);
 
   const wiqlData = await wiqlResp.json();
   const items: { id: number }[] = wiqlData.workItems ?? [];
@@ -259,13 +300,34 @@ export async function getWeeklyThroughputDirect(
   for (let i = 0; i < ids.length; i += 200) batches.push(ids.slice(i, i + 200));
 
   const allItems: { closedDate: string }[] = [];
+  const batchFailures: { status: number | null; statusText: string }[] = [];
   await Promise.all(
     batches.map(async (batch) => {
-      const r = await fetch(
-        `${ADO}/${org}/${project}/_apis/wit/workitems?ids=${batch.join(",")}&fields=Microsoft.VSTS.Common.ClosedDate&${API}`,
-        { headers: adoHeaders(pat) },
-      );
-      if (!r.ok) return;
+      const itemContext: AdoErrorContext = {
+        operation: "chargement des work items par lots",
+        org,
+        project,
+        team,
+        requiredScopes: ["Work Items (Read)"],
+      };
+
+      let r: Response;
+      try {
+        r = await adoFetch(
+          `${ADO}/${org}/${project}/_apis/wit/workitems?ids=${batch.join(",")}&fields=Microsoft.VSTS.Common.ClosedDate&${API}`,
+          { headers: adoHeaders(pat) },
+          itemContext,
+        );
+      } catch {
+        batchFailures.push({ status: null, statusText: "erreur reseau" });
+        return;
+      }
+
+      if (!r.ok) {
+        batchFailures.push({ status: r.status, statusText: r.statusText });
+        return;
+      }
+
       const d = await r.json();
       (d.value ?? []).forEach((item: { fields?: Record<string, string> }) => {
         const date = item.fields?.["Microsoft.VSTS.Common.ClosedDate"];
@@ -283,7 +345,7 @@ export async function getWeeklyThroughputDirect(
     weekMap.set(key, (weekMap.get(key) ?? 0) + 1);
   });
 
-  const result: { week: string; throughput: number }[] = [];
+  const result: WeeklyThroughputRow[] = [];
   const start = new Date(startDate);
   const end = new Date(endDate);
   const cursor = new Date(start);
@@ -293,6 +355,28 @@ export async function getWeeklyThroughputDirect(
     result.push({ week: key, throughput: weekMap.get(key) ?? 0 });
     cursor.setDate(cursor.getDate() + 7);
   }
-  return result;
-}
 
+  if (!batchFailures.length) return result;
+
+  const firstFailure = batchFailures[0];
+  const firstFailureDetail = firstFailure.status === null
+    ? "erreur reseau"
+    : formatAdoHttpErrorMessage(
+      firstFailure.status,
+      {
+        operation: "chargement des work items par lots",
+        org,
+        project,
+        team,
+        requiredScopes: ["Work Items (Read)"],
+      },
+      firstFailure.statusText,
+    );
+
+  return {
+    weeklyThroughput: result,
+    warning:
+      `${batchFailures.length}/${batches.length} lot(s) de work items n'ont pas pu etre charges. ` +
+      `La simulation utilise un historique partiel. Exemple: ${firstFailureDetail}`,
+  };
+}

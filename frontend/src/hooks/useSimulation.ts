@@ -106,6 +106,7 @@ export function useSimulation({
   const [loadingStageMessage, setLoadingStageMessage] = useState("");
   const [err, setErr] = useState("");
   const [sampleStats, setSampleStats] = useState<SampleStats | null>(null);
+  const [warning, setWarning] = useState("");
   const [workItemTypeOptions, setWorkItemTypeOptions] = useState<string[]>(DEFAULT_WORK_ITEM_TYPE_OPTIONS);
   const [statesByType, setStatesByType] = useState<Record<string, string[]>>({});
   const [doneStates, setDoneStates] = useState<string[]>([]);
@@ -139,6 +140,7 @@ export function useSimulation({
     setResult(null);
     setWeeklyThroughput([]);
     setSampleStats(null);
+    setWarning("");
     setActiveChartTab("throughput");
   }, []);
 
@@ -164,6 +166,7 @@ export function useSimulation({
 
     setHasLaunchedOnce(true);
     setErr("");
+    setWarning("");
     setLoading(true);
     setLoadingStageMessage("Récupération des données...");
     clearComputedSimulationState();
@@ -192,8 +195,10 @@ export function useSimulation({
       setSampleStats(forecast.sampleStats);
       setWeeklyThroughput(forecast.weeklyThroughput);
       setResult(forecast.result);
+      setWarning(forecast.warning ?? "");
       pushSimulationHistory(forecast.historyEntry);
     } catch (e: unknown) {
+      setWarning("");
       setErr(e instanceof Error ? e.message : String(e));
     } finally {
       window.clearTimeout(phaseTimer);
@@ -276,6 +281,7 @@ export function useSimulation({
 
   function resetForTeamSelection(): void {
     setErr("");
+    setWarning("");
     clearComputedSimulationState();
     setLoadingTeamOptions(false);
     setHasLaunchedOnce(false);
@@ -284,6 +290,7 @@ export function useSimulation({
 
   function resetAll(): void {
     setErr("");
+    setWarning("");
     setLoading(false);
     setLoadingTeamOptions(false);
     setLoadingStageMessage("");
@@ -298,6 +305,7 @@ export function useSimulation({
 
   function applyHistoryEntry(entry: SimulationHistoryEntry): void {
     setErr("");
+    setWarning(entry.warning ?? "");
     setStartDate(entry.startDate);
     setEndDate(entry.endDate);
     setSimulationMode(entry.simulationMode);
@@ -336,6 +344,7 @@ export function useSimulation({
     reducedCapacityWeeks,
     setReducedCapacityWeeks,
     sampleStats,
+    warning,
     backlogSize,
     setBacklogSize,
     targetWeeks,

@@ -15,6 +15,8 @@ Architecture V2:
 
 Refactors récents (frontend):
 - utilitaires centralisés `src/date.ts`, `src/storage.ts`, `src/utils/math.ts`, `src/utils/simulation.ts`
+- gestion granulaire des erreurs Azure DevOps (`401/403/404/429/5xx`) via `src/adoErrors.ts` avec messages actionnables pour l'UI
+- avertissement explicite en cas de chargement partiel des batches de work items (historique incomplet signalé dans les résultats)
 - contexte simulation unifié `src/hooks/SimulationContext.tsx` (un seul provider exposant `SimulationViewModel` complet + `selectedTeam`)
 - centralisation des accès `localStorage` via `storage.ts`
 - extraction de l'export CSV throughput vers `src/utils/export.ts`

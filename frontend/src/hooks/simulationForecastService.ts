@@ -33,6 +33,7 @@ type RunSimulationForecastResult = {
   sampleStats: SampleStats;
   result: ForecastResponse;
   historyEntry: SimulationHistoryEntry;
+  warning?: string;
 };
 
 export async function runSimulationForecast(params: RunSimulationForecastParams): Promise<RunSimulationForecastResult> {
@@ -54,7 +55,7 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     reducedCapacityWeeks,
   } = params;
 
-  const weekly = await getWeeklyThroughputDirect(
+  const throughputResponse = await getWeeklyThroughputDirect(
     selectedOrg,
     selectedProject,
     selectedTeam,
@@ -64,6 +65,8 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     doneStates,
     types,
   );
+  const weekly = Array.isArray(throughputResponse) ? throughputResponse : throughputResponse.weeklyThroughput;
+  const warning = Array.isArray(throughputResponse) ? undefined : throughputResponse.warning;
 
   const throughputSamples = weekly.map((r) => r.throughput).filter((n) => (includeZeroWeeks ? n >= 0 : n > 0));
   const zeroWeeks = weekly.filter((r) => r.throughput === 0).length;
@@ -122,6 +125,7 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     sampleStats,
     weeklyThroughput: weekly,
     result: adjusted,
+    warning,
   };
 
   return {
@@ -129,5 +133,6 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     sampleStats,
     result: adjusted,
     historyEntry,
+    warning,
   };
 }

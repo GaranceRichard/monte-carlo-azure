@@ -81,6 +81,12 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
         </div>
       )}
 
+      {s.warning && (
+        <div className="rounded-xl border border-[var(--warningBorder)] bg-[var(--warningBg)] p-3 text-xs text-[var(--text)]">
+          <b>Avertissement:</b> {s.warning}
+        </div>
+      )}
+
       {s.result && (
         <div className="space-y-2">
           <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Percentiles</div>
