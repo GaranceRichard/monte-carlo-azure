@@ -82,7 +82,9 @@ frontend/
       useSimulationAutoRun.ts      # auto-run avec debounce
     components/steps/
       SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
-      simulationPrintReport.tsx    # rapport imprimable + téléchargement PDF
+      simulationPrintReport.tsx    # rapport imprimable (orchestration HTML)
+      simulationChartsSvg.ts       # rendu SVG des 3 graphiques exportés
+      simulationPdfDownload.ts     # téléchargement PDF (jsPDF + svg2pdf)
 
 backend/
   api.py                # FastAPI + CORS + route /simulate + /health
