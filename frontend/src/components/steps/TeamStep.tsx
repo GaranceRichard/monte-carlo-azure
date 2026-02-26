@@ -11,6 +11,7 @@ type TeamStepProps = {
   setSelectedTeam: (value: string) => void;
   loading: boolean;
   onContinue: () => void | Promise<void>;
+  onPortfolio?: () => void | Promise<void>;
 };
 
 export default function TeamStep({
@@ -21,6 +22,7 @@ export default function TeamStep({
   setSelectedTeam,
   loading,
   onContinue,
+  onPortfolio,
 }: TeamStepProps) {
   const teamSelectRef = useRef<HTMLSelectElement | null>(null);
   const sortedTeams = useMemo(() => sortTeams(teams), [teams]);
@@ -34,16 +36,16 @@ export default function TeamStep({
 
   return (
     <>
-      <h2 className="flow-title">Choix de l&apos;équipe</h2>
+      <h2 className="flow-title">Choix de l&apos;equipe</h2>
       <p className="flow-text">
-        Projet sélectionné: <b>{selectedProject}</b>
+        Projet selectionne: <b>{selectedProject}</b>
       </p>
       {err && (
         <div className="ui-alert ui-alert--danger">
           <b>Erreur :</b> {err}
         </div>
       )}
-      <label className="flow-label">Équipes disponibles</label>
+      <label className="flow-label">Equipes disponibles</label>
       <select
         ref={teamSelectRef}
         value={selectedTeam}
@@ -58,20 +60,31 @@ export default function TeamStep({
         }}
         className="flow-input flow-input--team-compact"
       >
-        {sortedTeams.length === 0 && <option value="">Aucune équipe disponible</option>}
+        {sortedTeams.length === 0 && <option value="">Aucune equipe disponible</option>}
         {sortedTeams.map((team) => (
           <option key={team.id || team.name} value={team.name || ""}>
             {team.name}
           </option>
         ))}
       </select>
-      <button
-        onClick={() => void onContinue()}
-        disabled={loading || !selectedTeam}
-        className="ui-primary-btn"
-      >
-        Choisir cette équipe
-      </button>
+      <div className="team-step-actions">
+        <button
+          onClick={() => void onContinue()}
+          disabled={loading || !selectedTeam}
+          className="ui-primary-btn team-step-actions__primary"
+          type="button"
+        >
+          Choisir cette equipe
+        </button>
+        <button
+          onClick={() => void onPortfolio?.()}
+          disabled={loading || !selectedTeam}
+          className="ui-primary-btn team-step-actions__secondary"
+          type="button"
+        >
+          Portefeuille
+        </button>
+      </div>
     </>
   );
 }

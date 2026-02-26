@@ -73,8 +73,13 @@ def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
     simulation_percentiles = percentiles(result, ps=(50, 70, 90))
     response_model = SimulateResponse(
         result_kind=kind,
-        result_percentiles=simulation_percentiles,
+        result_percentiles={
+            "P50": simulation_percentiles["P50"],
+            "P70": simulation_percentiles["P70"],
+            "P90": simulation_percentiles["P90"],
+        },
         risk_score=risk_score(
+            req.mode,
             simulation_percentiles["P50"],
             simulation_percentiles["P90"],
         ),

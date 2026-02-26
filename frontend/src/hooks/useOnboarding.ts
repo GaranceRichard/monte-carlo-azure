@@ -29,6 +29,7 @@ type OnboardingActions = {
   goToProjects: () => Promise<boolean>;
   goToTeams: () => Promise<boolean>;
   goToSimulation: () => boolean;
+  goToPortfolio: () => boolean;
   goToStep: (target: "pat" | "org" | "projects" | "teams") => void;
   goBack: () => void;
   disconnect: () => void;
@@ -50,6 +51,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   const [teams, setTeams] = useState<NamedEntity[]>([]);
   const [selectedTeam, setSelectedTeam] = useState("");
   const submitInFlightRef = useRef(false);
+
   const failPatValidation = (message: string) => {
     setPatInput("");
     setErr(message);
@@ -82,15 +84,13 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
         if (resolved.scope === "global" && resolved.organizations.length > 0) {
           setOrgs(resolved.organizations);
           setSelectedOrg(resolved.organizations[0].name || "");
-          setOrgHint("PAT global détecté: sélectionnez une organisation accessible.");
+          setOrgHint("PAT global detecte: selectionnez une organisation accessible.");
         } else {
           setOrgs([]);
           setSelectedOrg("");
           setOrgHint("PAT local: saisissez votre organisation manuellement.");
         }
       } else {
-        // Some org-scoped PATs cannot access profile discovery endpoints.
-        // Keep the flow unblocked and validate with org/project calls next.
         setUserName("Utilisateur");
         setOrgs([]);
         setSelectedOrg("");
@@ -106,7 +106,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   async function goToProjects(): Promise<boolean> {
     const org = selectedOrg.trim();
     if (!org) {
-      setErr("Sélectionnez une organisation.");
+      setErr("Selectionnez une organisation.");
       return false;
     }
     if (!sessionPat) {
@@ -139,7 +139,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     const org = selectedOrg.trim();
     const project = selectedProject.trim();
     if (!org || !project) {
-      setErr("Sélectionnez un projet.");
+      setErr("Selectionnez un projet.");
       return false;
     }
     if (!sessionPat) {
@@ -169,7 +169,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
 
   function goToSimulation(): boolean {
     if (!selectedTeam) {
-      setErr("Sélectionnez une équipe.");
+      setErr("Selectionnez une equipe.");
       return false;
     }
     setErr("");
@@ -177,10 +177,21 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     return true;
   }
 
+  function goToPortfolio(): boolean {
+    if (!selectedTeam) {
+      setErr("Selectionnez une equipe.");
+      return false;
+    }
+    setErr("");
+    setStep("portfolio");
+    return true;
+  }
+
   function goBack(): void {
     if (step === "org") setStep("pat");
     else if (step === "projects") setStep("org");
     else if (step === "teams") setStep("projects");
+    else if (step === "portfolio") setStep("teams");
     else if (step === "simulation") setStep("teams");
   }
 
@@ -209,7 +220,8 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     if (step === "org") return "Changer PAT";
     if (step === "projects") return "Changer ORG";
     if (step === "teams") return "Changer projet";
-    if (step === "simulation") return "Changer équipe";
+    if (step === "portfolio") return "Changer equipe";
+    if (step === "simulation") return "Changer equipe";
     return "";
   }, [step]);
 
@@ -239,6 +251,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
       goToProjects,
       goToTeams,
       goToSimulation,
+      goToPortfolio,
       goToStep,
       goBack,
       disconnect,

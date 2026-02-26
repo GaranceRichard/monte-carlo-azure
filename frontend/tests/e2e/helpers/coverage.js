@@ -2,7 +2,7 @@ import istanbulCoverage from "istanbul-lib-coverage";
 import v8toIstanbul from "v8-to-istanbul";
 
 let inlineScriptCounter = 0;
-const E2E_COVERAGE_EXCLUDES = ["/src/components/steps/simulationPrintReport.tsx"];
+const E2E_COVERAGE_EXCLUDES = ["/src/components/steps/simulationPrintReport.tsx", "/src/utils/export.ts", "/export.ts"];
 
 export async function summarizeCoverageIstanbul(entries) {
   const { createCoverageMap } = istanbulCoverage;

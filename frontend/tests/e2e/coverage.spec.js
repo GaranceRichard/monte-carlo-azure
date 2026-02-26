@@ -128,6 +128,7 @@ test.describe("e2e istanbul coverage", () => {
     await page.locator("select").first().selectOption("weeks_to_items");
     await page.locator('input[type="number"]').first().fill("12");
     await closeIfExpanded(modeSection);
+    await page.getByRole("button", { name: "Lancer la simulation" }).click();
     await expect(page.getByText("38 items")).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText(/Mode:\s*0\s*incluses/i)).toBeVisible();
 
@@ -202,6 +203,11 @@ test.describe("e2e istanbul coverage", () => {
       mod.buildProbabilityCurve([{ x: 1, count: 0 }], "items");
       mod.buildAtLeastPercentiles([], [50, 70, 90]);
       mod.buildAtLeastPercentiles([{ x: 1, count: 0 }], [50, 70, 90]);
+
+      const dateMod = await import("/src/date.ts");
+      dateMod.formatDateLocal(new Date("2026-02-26T12:00:00.000Z"));
+      dateMod.today();
+      dateMod.nWeeksAgo(4);
     });
   });
 

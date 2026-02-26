@@ -7,6 +7,7 @@ import {
   type ThroughputExportPoint,
 } from "./simulationChartsSvg";
 import { buildSimulationPdfFileName, downloadSimulationPdf } from "./simulationPdfDownload";
+import { computeRiskScoreFromPercentiles } from "../../utils/simulation";
 
 function escapeHtml(value: string): string {
   return value
@@ -33,6 +34,7 @@ export function exportSimulationPrintReport({
   capacityPercent,
   reducedCapacityWeeks,
   resultKind,
+  riskScore,
   displayPercentiles,
   throughputPoints,
   distributionPoints,
@@ -51,6 +53,7 @@ export function exportSimulationPrintReport({
   capacityPercent: number | string;
   reducedCapacityWeeks: number | string;
   resultKind: "items" | "weeks";
+  riskScore?: number;
   displayPercentiles: Record<string, number>;
   throughputPoints: ThroughputExportPoint[];
   distributionPoints: DistributionExportPoint[];
@@ -70,11 +73,13 @@ export function exportSimulationPrintReport({
   const stateSummary = doneStates.length ? doneStates.join(", ") : "Aucun";
   const modeZeroLabel = includeZeroWeeks ? "Semaines 0 incluses" : "Semaines 0 exclues";
   const resultLabel = resultKind === "items" ? "items (au moins)" : "semaines (au plus)";
-  const p50 = Number(displayPercentiles?.P50 ?? 0);
-  const p90 = Number(displayPercentiles?.P90 ?? 0);
-  const riskScore = p50 > 0 ? Math.max(0, (p90 - p50) / p50) : 0;
-  const riskLegend = riskScore <= 0.2 ? "fiable" : riskScore <= 0.5 ? "incertain" : riskScore <= 0.8 ? "fragile" : "eleve";
-  const riskScoreLabel = riskScore.toFixed(1).replace(".", ",");
+  const effectiveRiskScore =
+    typeof riskScore === "number" && Number.isFinite(riskScore)
+      ? riskScore
+      : computeRiskScoreFromPercentiles(simulationMode, displayPercentiles);
+  const riskLegend =
+    effectiveRiskScore <= 0.2 ? "fiable" : effectiveRiskScore <= 0.5 ? "incertain" : effectiveRiskScore <= 0.8 ? "fragile" : "eleve";
+  const riskScoreLabel = effectiveRiskScore.toFixed(1).replace(".", ",");
 
   const html = `
       <!doctype html>
@@ -118,7 +123,7 @@ export function exportSimulationPrintReport({
         </style>
       </head>
       <body>
-        <button type="button" id="download-pdf" class="print-action">Télécharger PDF</button>
+        <button type="button" id="download-pdf" class="print-action" onclick="window.__downloadPdf && window.__downloadPdf()">Telecharger PDF</button>
         <header class="header">
           <h1 class="title">Simulation Monte Carlo - ${escapeHtml(selectedTeam)}</h1>
           <div class="meta">
@@ -136,7 +141,7 @@ export function exportSimulationPrintReport({
           <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">${Number(displayPercentiles?.P50 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
           <div class="kpi"><span class="kpi-label">P70</span><span class="kpi-value">${Number(displayPercentiles?.P70 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
           <div class="kpi"><span class="kpi-label">P90</span><span class="kpi-value">${Number(displayPercentiles?.P90 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
-          <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">Risk Score : ${escapeHtml(riskScoreLabel)} (${escapeHtml(riskLegend)})</span></div>
+          <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(riskScoreLabel)} (${escapeHtml(riskLegend)})</span></div>
         </section>
 
         <section class="section">
@@ -160,10 +165,44 @@ export function exportSimulationPrintReport({
   printWindow.document.open();
   printWindow.document.write(html);
   printWindow.document.close();
-  printWindow.onload = () => {
+
+  const popup = printWindow as Window & { __downloadPdf?: () => void };
+  popup.__downloadPdf = () => {
+    const button = printWindow.document.getElementById("download-pdf") as HTMLButtonElement | null;
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Generation...";
+    }
+    void downloadSimulationPdf(printWindow.document, selectedTeam)
+      .catch((err) => {
+        console.error(err);
+        const message = err instanceof Error ? err.message : String(err);
+        if (typeof printWindow.alert === "function") {
+          printWindow.alert(`Echec generation PDF: ${message}`);
+        }
+      })
+      .finally(() => {
+        if (button) {
+          button.disabled = false;
+          button.textContent = "Telecharger PDF";
+        }
+      });
+  };
+
+  const wireDownloadButton = () => {
     const button = printWindow.document.getElementById("download-pdf");
-    button?.addEventListener("click", () => {
-      void downloadSimulationPdf(printWindow.document, selectedTeam);
+    if (!button) return;
+    button.addEventListener("click", () => {
+      popup.__downloadPdf?.();
     });
   };
+  wireDownloadButton();
+  if (typeof printWindow.addEventListener === "function") {
+    printWindow.addEventListener("load", wireDownloadButton, { once: true });
+  } else {
+    printWindow.onload = wireDownloadButton;
+  }
 }
+
+
+

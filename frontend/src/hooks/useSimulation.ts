@@ -330,6 +330,8 @@ export function useSimulation({
     setErr("");
     setWarning("");
     clearComputedSimulationState();
+    setHasLaunchedOnce(false);
+    resetAutoRunState();
   }
 
   return {

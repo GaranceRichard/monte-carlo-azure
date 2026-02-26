@@ -312,6 +312,26 @@ describe("useOnboarding", () => {
     expect(result.current.state.step).toBe("simulation");
   });
 
+  it("validates selected team before entering portfolio", async () => {
+    const { result } = renderHook(() => useOnboarding());
+
+    let moved = false;
+    act(() => {
+      moved = result.current.actions.goToPortfolio();
+    });
+    expect(moved).toBe(false);
+    expect(result.current.state.err).toContain("quipe");
+
+    act(() => {
+      result.current.actions.setSelectedTeam("Equipe Alpha");
+    });
+    act(() => {
+      moved = result.current.actions.goToPortfolio();
+    });
+    expect(moved).toBe(true);
+    expect(result.current.state.step).toBe("portfolio");
+  });
+
   it("supports step navigation, back behavior and disconnect reset", async () => {
     const { result } = renderHook(() => useOnboarding());
 

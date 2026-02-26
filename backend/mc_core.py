@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Optional, Tuple
+from typing import Dict, Literal, Optional, Tuple
 
 import numpy as np
 
@@ -131,10 +131,19 @@ def percentiles(arr: np.ndarray, ps: Tuple[int, ...] = (50, 80, 90)) -> Dict[str
     return {f"P{p}": int(np.percentile(a, p)) for p in ps}
 
 
-def risk_score(p50: int, p90: int) -> float:
+def risk_score(
+    mode: Literal["backlog_to_weeks", "weeks_to_items"],
+    p50: int,
+    p90: int,
+) -> float:
     """
-    Mesure la dispersion pessimiste vs mediane.
+    Mesure la dispersion normalisee selon le mode.
+
+    - backlog_to_weeks: (P90 - P50) / P50
+    - weeks_to_items: (P50 - P90) / P50
     """
     if p50 <= 0:
         return 0.0
+    if mode == "weeks_to_items":
+        return max(0.0, float(p50 - p90) / float(p50))
     return max(0.0, float(p90 - p50) / float(p50))

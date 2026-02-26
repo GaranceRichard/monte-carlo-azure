@@ -65,8 +65,11 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
 
   const riskScoreValue = useMemo(() => {
     if (!s.result) return null;
-    return computeRiskScoreFromPercentiles(s.displayPercentiles ?? {});
-  }, [s.result, s.displayPercentiles]);
+    if (typeof s.result.risk_score === "number" && Number.isFinite(s.result.risk_score)) {
+      return s.result.risk_score;
+    }
+    return computeRiskScoreFromPercentiles(s.simulationMode, s.displayPercentiles ?? {});
+  }, [s.result, s.displayPercentiles, s.simulationMode]);
 
   const riskLegend = useMemo(() => {
     if (riskScoreValue == null) return "";
@@ -77,11 +80,11 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
   }, [riskScoreValue]);
 
   const riskColorClass = useMemo(() => {
-    if (riskLegend === "fiable") return "border-emerald-600 text-emerald-700";
-    if (riskLegend === "incertain") return "border-amber-500 text-amber-600";
-    if (riskLegend === "fragile") return "border-red-600 text-red-700";
-    if (riskLegend === "non fiable") return "border-black text-black";
-    return "border-[var(--border)] text-[var(--text)]";
+    if (riskLegend === "fiable") return "border-emerald-600 bg-emerald-50 text-emerald-700";
+    if (riskLegend === "incertain") return "border-amber-500 bg-amber-50 text-amber-700";
+    if (riskLegend === "fragile") return "border-red-600 bg-red-50 text-red-700";
+    if (riskLegend === "non fiable") return "border-black bg-neutral-200 text-black";
+    return "border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]";
   }, [riskLegend]);
 
   return (
@@ -128,7 +131,7 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
             ))}
             {riskScoreValue != null && (
               <div
-                className={`group relative rounded-xl border bg-[var(--surface-2)] p-2 opacity-0 [animation:flowFadeIn_300ms_ease-out_forwards] ${riskColorClass}`}
+                className={`group relative rounded-xl border p-2 opacity-0 [animation:flowFadeIn_300ms_ease-out_forwards] ${riskColorClass}`}
                 style={{ animationDelay: `${3 * 90}ms` }}
                 tabIndex={0}
               >

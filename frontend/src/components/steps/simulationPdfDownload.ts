@@ -21,6 +21,21 @@ export function buildSimulationPdfFileName(selectedTeam: string, date = new Date
   return `simulation-${teamPart}-${day}_${month}_${year}.pdf`;
 }
 
+function triggerDownloadFallback(reportWindowDocument: Document, blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  try {
+    const link = reportWindowDocument.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.rel = "noopener";
+    reportWindowDocument.body.appendChild(link);
+    link.click();
+    link.remove();
+  } finally {
+    window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
+  }
+}
+
 export async function downloadSimulationPdf(reportWindowDocument: Document, selectedTeam: string): Promise<void> {
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const pageW = pdf.internal.pageSize.getWidth();
@@ -87,5 +102,93 @@ export async function downloadSimulationPdf(reportWindowDocument: Document, sele
     cursorY += renderH + 2;
   }
 
-  pdf.save(buildSimulationPdfFileName(selectedTeam));
+  const filename = buildSimulationPdfFileName(selectedTeam);
+  pdf.save(filename);
+  if (typeof (pdf as { output?: unknown }).output === "function") {
+    triggerDownloadFallback(reportWindowDocument, (pdf as { output: (type: "blob") => Blob }).output("blob"), filename);
+  }
+}
+
+export async function downloadPortfolioPdf(reportWindowDocument: Document, selectedProject: string): Promise<void> {
+  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  const margin = 8;
+  const contentW = pageW - margin * 2;
+
+  const pages = Array.from(reportWindowDocument.querySelectorAll<HTMLElement>(".page"));
+  const sections = pages.length ? pages : [reportWindowDocument.body as HTMLElement];
+
+  for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex += 1) {
+    if (sectionIndex > 0) {
+      pdf.addPage();
+    }
+
+    let cursorY = margin;
+    const section = sections[sectionIndex];
+
+    const ensureSpace = (neededHeight: number): void => {
+      if (cursorY + neededHeight <= pageH - margin) return;
+      pdf.addPage();
+      cursorY = margin;
+    };
+
+    const title = section.querySelector("h1")?.textContent ?? "Simulation Portefeuille";
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    pdf.text(title, margin, cursorY);
+    cursorY += 6;
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7);
+    section.querySelectorAll(".meta-row").forEach((row) => {
+      ensureSpace(3.6);
+      const text = row.textContent ?? "";
+      pdf.text(text, margin, cursorY);
+      cursorY += 3.6;
+    });
+    cursorY += 2;
+
+    ensureSpace(8);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(9);
+    const kpis = Array.from(section.querySelectorAll(".kpi"));
+    const kpiStep = kpis.length > 0 ? contentW / kpis.length : contentW;
+    kpis.forEach((kpi, i) => {
+      const label = kpi.querySelector(".kpi-label")?.textContent ?? "";
+      const value = kpi.querySelector(".kpi-value")?.textContent ?? "";
+      pdf.text(`${label}: ${value}`, margin + i * kpiStep, cursorY);
+    });
+    cursorY += 7;
+
+    const svgElements = section.querySelectorAll<SVGSVGElement>(".chart-wrap svg");
+    for (let i = 0; i < svgElements.length; i += 1) {
+      const svg = svgElements[i];
+
+      const svgW = svg.viewBox?.baseVal?.width || CHART_WIDTH;
+      const svgH = svg.viewBox?.baseVal?.height || CHART_HEIGHT;
+      const ratio = svgH / svgW;
+      const chartsLeft = svgElements.length - i;
+      const reservedForTitlesAndSpacing = chartsLeft * (4 + 1.5 + 2);
+      const maxChartH = Math.max(24, (pageH - margin - cursorY - reservedForTitlesAndSpacing) / chartsLeft);
+      const renderW = Math.min(contentW, maxChartH / ratio);
+      const renderH = renderW * ratio;
+      const centeredX = margin + (contentW - renderW) / 2;
+
+      ensureSpace(4 + renderH + 2);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(9);
+      pdf.text(SECTION_TITLES[i] ?? "", margin, cursorY);
+      cursorY += 4;
+
+      await pdf.svg(svg, { x: centeredX, y: cursorY, width: renderW, height: renderH });
+      cursorY += renderH + 2;
+    }
+  }
+
+  const filename = buildSimulationPdfFileName(`Portefeuille-${selectedProject}`);
+  pdf.save(filename);
+  if (typeof (pdf as { output?: unknown }).output === "function") {
+    triggerDownloadFallback(reportWindowDocument, (pdf as { output: (type: "blob") => Blob }).output("blob"), filename);
+  }
 }

@@ -34,10 +34,18 @@ Mises à jour récentes (backend/tests):
 
 - Connexion Azure DevOps avec PAT côté navigateur (non transmis au backend)
 - Sélection organisation -> projet -> équipe
+- Accès à un mode `Portefeuille` depuis l'écran équipe
+- Simulation portefeuille multi-équipes avec ajout via modale (types + états), sans doublon d'équipe
+- Rapport portefeuille PDF avec une page par équipe
 - Récupération du throughput hebdomadaire côté client
 - Simulation Monte Carlo côté backend (`POST /simulate`)
 - Visualisation des percentiles et distributions
-- Visualisation d'un `Risk Score` (fiabilite de la prevision) avec code couleur
+- Visualisation d'un `Risk Score` (fiabilite de la prevision) avec code couleur:
+  - `fiable` = vert
+  - `incertain` = jaune
+  - `fragile` = rouge
+  - `non fiable` = noir
+- Reinitialisation explicite des resultats si les filtres tickets sont reouverts apres une simulation (le bouton `Lancer la simulation` reapparait)
 - Export CSV du throughput hebdomadaire
 - Historique local des dernières simulations (localStorage, sans compte)
 - Cookie client `IDMontecarlo` (UUID v4, 1 an, `SameSite=Strict`) pour relier les simulations à un client anonyme
@@ -251,9 +259,11 @@ Le backend persiste aussi la simulation dans MongoDB (collection `simulations`) 
 - mode `backlog_to_weeks`:
   - question: "en combien de semaines terminer le backlog ?"
   - lecture des probabilités: `P(X <= semaines)`
+  - formule `risk_score`: `(P90 - P50) / P50`
 - mode `weeks_to_items`:
   - question: "combien d'items livrer en N semaines ?"
   - en UI, la courbe de probabilité est affichée en `P(X >= items)` (probabilité d'atteindre au moins X items)
+  - formule `risk_score`: `(P50 - P90) / P50` (borne inferieure a 0)
 
 ---
 

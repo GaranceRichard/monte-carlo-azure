@@ -64,6 +64,18 @@
   min-height: 36px;
 }
 
+.team-step-actions {
+  margin-top: var(--space-4);
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: var(--space-2);
+}
+
+.team-step-actions .ui-primary-btn {
+  margin-top: 0;
+  width: 100%;
+}
+
 .flow-help {
   margin-top: var(--space-3);
   background: var(--softBorder);
@@ -603,5 +615,9 @@
 
   .sim-mode-zero-toggle {
     margin-bottom: 0;
+  }
+
+  .team-step-actions {
+    grid-template-columns: 1fr;
   }
 }

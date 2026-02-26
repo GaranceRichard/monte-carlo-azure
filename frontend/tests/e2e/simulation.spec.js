@@ -48,6 +48,7 @@ test("simulation: erreur puis succes sur les 2 modes", async ({ page }) => {
   await page.locator("select").first().selectOption("weeks_to_items");
   await page.locator('input[type="number"]').first().fill("12");
   await closeIfExpanded(modeSection);
+  await page.getByRole("button", { name: "Lancer la simulation" }).click();
   await expect(page.getByText("P50")).toBeVisible({ timeout: 10_000 });
   await expect(page.getByText("38 items")).toBeVisible({ timeout: 10_000 });
 

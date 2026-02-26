@@ -148,6 +148,8 @@ def test_percentiles_default_and_custom():
 
 
 def test_risk_score_basic_and_guardrails():
-    assert risk_score(10, 14) == 0.4
-    assert risk_score(10, 8) == 0.0
-    assert risk_score(0, 5) == 0.0
+    assert risk_score("backlog_to_weeks", 10, 14) == 0.4
+    assert risk_score("backlog_to_weeks", 10, 8) == 0.0
+    assert risk_score("weeks_to_items", 10, 6) == 0.4
+    assert risk_score("weeks_to_items", 10, 12) == 0.0
+    assert risk_score("backlog_to_weeks", 0, 5) == 0.0

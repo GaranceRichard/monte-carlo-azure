@@ -52,6 +52,12 @@ def test_simulate_weeks_to_items_success():
     assert body["result_kind"] == "items"
     assert body["samples_count"] == 6
     assert "risk_score" in body
+    assert isinstance(body["risk_score"], float)
+    expected = (
+        (body["result_percentiles"]["P50"] - body["result_percentiles"]["P90"])
+        / body["result_percentiles"]["P50"]
+    )
+    assert body["risk_score"] == max(0.0, expected)
 
 
 def test_simulate_include_zero_weeks_keeps_zero_samples():

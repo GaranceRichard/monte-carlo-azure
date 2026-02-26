@@ -246,7 +246,7 @@ describe("SimulationResultsPanel history list", () => {
 
     render(<SimulationResultsPanel />);
     expect(screen.getByText(/^Risk$/i)).not.toBeNull();
-    expect(screen.getByText(/^0.63$/i)).not.toBeNull();
+    expect(screen.getByText(/^0.42$/i)).not.toBeNull();
     expect(screen.queryByRole("tooltip")).toBeNull();
   });
 

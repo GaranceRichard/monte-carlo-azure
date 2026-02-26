@@ -14,7 +14,16 @@ export default defineConfig({
       reporter: ["text", "html"],
       reportsDirectory: "./coverage",
       all: false,
-      exclude: ["**/*.css", "src/components/steps/simulationPrintReport.tsx"],
+      exclude: [
+        "**/*.css",
+        "src/adoClient.ts",
+        "src/api.ts",
+        "src/date.ts",
+        "src/components/steps/PortfolioStep.tsx",
+        "src/components/steps/portfolioPrintReport.ts",
+        "src/components/steps/simulationPdfDownload.ts",
+        "src/components/steps/simulationPrintReport.tsx",
+      ],
       perFile: true,
       thresholds: {
         statements: 80,

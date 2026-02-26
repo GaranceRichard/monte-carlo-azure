@@ -1,4 +1,4 @@
-﻿import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import TeamStep from "./TeamStep";
 
 describe("TeamStep", () => {
@@ -20,8 +20,27 @@ describe("TeamStep", () => {
 
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "Equipe Beta" } });
     expect(setSelectedTeam).toHaveBeenCalledWith("Equipe Beta");
-    fireEvent.click(screen.getByRole("button", { name: "Choisir cette équipe" }));
+    fireEvent.click(screen.getByRole("button", { name: "Choisir cette equipe" }));
     expect(onContinue).toHaveBeenCalledTimes(1);
+  });
+
+  it("opens portfolio mode from dedicated button", () => {
+    const onPortfolio = vi.fn();
+    render(
+      <TeamStep
+        err=""
+        selectedProject="Projet A"
+        teams={[{ id: "t1", name: "Equipe Alpha" }]}
+        selectedTeam="Equipe Alpha"
+        setSelectedTeam={vi.fn()}
+        loading={false}
+        onContinue={vi.fn()}
+        onPortfolio={onPortfolio}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Portefeuille" }));
+    expect(onPortfolio).toHaveBeenCalledTimes(1);
   });
 
   it("shows empty-state team option and disabled button", () => {
@@ -38,8 +57,8 @@ describe("TeamStep", () => {
     );
 
     expect(screen.getByText("Erreur team")).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "Aucune équipe disponible" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Choisir cette équipe" })).toBeDisabled();
+    expect(screen.getByRole("option", { name: "Aucune equipe disponible" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Choisir cette equipe" })).toBeDisabled();
   });
 
   it("disables button while loading even with selected team", () => {
@@ -55,7 +74,7 @@ describe("TeamStep", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: "Choisir cette équipe" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Choisir cette equipe" })).toBeDisabled();
   });
 
   it("supports teams without id using name fallback", () => {

@@ -105,7 +105,7 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     result_kind: response.result_kind,
     samples_count: response.samples_count,
     result_percentiles: response.result_percentiles,
-    risk_score: Number(response.risk_score ?? computeRiskScoreFromPercentiles(response.result_percentiles)),
+    risk_score: Number(response.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, response.result_percentiles)),
     result_distribution: (response.result_distribution ?? []) as ForecastHistogramBucket[],
   };
   const adjusted = applyCapacityReductionToResult(

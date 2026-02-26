@@ -47,7 +47,7 @@ function mapRemoteHistoryItem(item: SimulationHistoryItem, index: number): Simul
       result_kind: item.mode === "backlog_to_weeks" ? "weeks" : "items",
       samples_count: Number(item.samples_count ?? 0),
       result_percentiles: item.percentiles ?? {},
-      risk_score: computeRiskScoreFromPercentiles(item.percentiles ?? {}),
+      risk_score: computeRiskScoreFromPercentiles(item.mode, item.percentiles ?? {}),
       result_distribution: item.distribution ?? [],
     },
   };

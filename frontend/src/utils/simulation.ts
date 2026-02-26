@@ -1,10 +1,16 @@
 import type { ForecastMode, ForecastResponse } from "../types";
 import { clamp } from "./math";
 
-export function computeRiskScoreFromPercentiles(percentiles: Record<string, number>): number {
+export function computeRiskScoreFromPercentiles(
+  mode: ForecastMode,
+  percentiles: Record<string, number>,
+): number {
   const p50 = Number(percentiles?.P50 ?? 0);
-  const p90 = Number(percentiles?.P90 ?? 0);
   if (p50 <= 0) return 0;
+  const p90 = Number(percentiles?.P90 ?? 0);
+  if (mode === "weeks_to_items") {
+    return Math.max(0, (p50 - p90) / p50);
+  }
   return Math.max(0, (p90 - p50) / p50);
 }
 
@@ -28,7 +34,7 @@ export function applyCapacityReductionToResult(
     return {
       ...response,
       result_percentiles: adjustedPercentiles,
-      risk_score: computeRiskScoreFromPercentiles(adjustedPercentiles),
+      risk_score: computeRiskScoreFromPercentiles(mode, adjustedPercentiles),
       result_distribution: response.result_distribution.map((bucket) => ({
         ...bucket,
         x: Number(bucket.x) + lostWeeks,
@@ -44,7 +50,7 @@ export function applyCapacityReductionToResult(
   return {
     ...response,
     result_percentiles: adjustedPercentiles,
-    risk_score: computeRiskScoreFromPercentiles(adjustedPercentiles),
+    risk_score: computeRiskScoreFromPercentiles(mode, adjustedPercentiles),
     result_distribution: response.result_distribution.map((bucket) => ({
       ...bucket,
       x: Number(bucket.x) * itemFactor,

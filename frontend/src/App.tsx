@@ -12,6 +12,7 @@ import "./App.css";
 
 type ThemeMode = "light" | "dark";
 const SimulationStep = lazy(() => import("./components/steps/SimulationStep"));
+const PortfolioStep = lazy(() => import("./components/steps/PortfolioStep"));
 
 function isEditableTarget(target: EventTarget | null): boolean {
   const element = target as HTMLElement | null;
@@ -49,6 +50,10 @@ export default function App() {
     if (moved) simulation.resetForTeamSelection();
   }
 
+  function handleGoToPortfolio() {
+    onboardingActions.goToPortfolio();
+  }
+
   function handleDisconnect() {
     onboardingActions.disconnect();
     simulation.resetAll();
@@ -60,7 +65,11 @@ export default function App() {
 
   useEffect(() => {
     const isGlobalOrgStep = onboardingState.step === "org" && onboardingState.orgs.length > 0;
-    const canGoBack = onboardingState.step === "projects" || onboardingState.step === "teams" || onboardingState.step === "simulation";
+    const canGoBack =
+      onboardingState.step === "projects" ||
+      onboardingState.step === "teams" ||
+      onboardingState.step === "simulation" ||
+      onboardingState.step === "portfolio";
     if (!isGlobalOrgStep && !canGoBack) return;
 
     function handleBackspaceNavigation(event: KeyboardEvent): void {
@@ -194,7 +203,21 @@ export default function App() {
             setSelectedTeam={onboardingActions.setSelectedTeam}
             loading={onboardingState.loading}
             onContinue={handleGoToSimulation}
+            onPortfolio={handleGoToPortfolio}
           />
+        </div>
+      )}
+
+      {onboardingState.step === "portfolio" && (
+        <div className="flow-card flow-card--animated">
+          <Suspense fallback={<div className="p-4 text-sm text-[var(--muted)]">Chargement du portefeuille...</div>}>
+            <PortfolioStep
+              selectedOrg={onboardingState.selectedOrg}
+              selectedProject={onboardingState.selectedProject}
+              teams={onboardingState.teams}
+              pat={onboardingState.sessionPat}
+            />
+          </Suspense>
         </div>
       )}
 

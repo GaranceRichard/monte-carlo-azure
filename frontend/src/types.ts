@@ -1,4 +1,4 @@
-﻿export type AppStep = "pat" | "org" | "projects" | "teams" | "simulation";
+export type AppStep = "pat" | "org" | "projects" | "teams" | "simulation" | "portfolio";
 
 export type NamedEntity = {
   id?: string;
@@ -50,3 +50,4 @@ export type ForecastRequestPayload = {
     types?: string[];
   };
 };
+

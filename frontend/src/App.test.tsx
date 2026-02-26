@@ -22,10 +22,15 @@ vi.mock("./components/steps/ProjectStep", () => ({
   default: () => <div>ProjectStep</div>,
 }));
 vi.mock("./components/steps/TeamStep", () => ({
-  default: ({ onContinue }: { onContinue: () => void }) => (
-    <button type="button" onClick={onContinue}>
-      Continue Team
-    </button>
+  default: ({ onContinue, onPortfolio }: { onContinue: () => void; onPortfolio: () => void }) => (
+    <>
+      <button type="button" onClick={onContinue}>
+        Continue Team
+      </button>
+      <button type="button" onClick={onPortfolio}>
+        Portfolio Team
+      </button>
+    </>
   ),
 }));
 vi.mock("./components/steps/SimulationStep", () => ({
@@ -61,6 +66,7 @@ function buildActions(goToSimulationReturn = true) {
     goToProjects: vi.fn(async () => true),
     goToTeams: vi.fn(async () => true),
     goToSimulation: vi.fn(() => goToSimulationReturn),
+    goToPortfolio: vi.fn(() => true),
     goToStep: vi.fn(),
     goBack: vi.fn(),
     disconnect: vi.fn(),
@@ -134,5 +140,21 @@ describe("App", () => {
     fireEvent.click(toggle);
     const nextTheme = document.documentElement.getAttribute("data-theme");
     expect(nextTheme).not.toBe(initialTheme);
+  });
+
+  it("calls goToPortfolio when portfolio action is triggered from team step", () => {
+    const actions = buildActions();
+    vi.mocked(useOnboarding).mockReturnValue({
+      state: buildState("teams"),
+      actions,
+    } as never);
+    vi.mocked(useSimulation).mockReturnValue({
+      resetForTeamSelection: vi.fn(),
+      resetAll: vi.fn(),
+    } as never);
+
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Portfolio Team" }));
+    expect(actions.goToPortfolio).toHaveBeenCalledTimes(1);
   });
 });
