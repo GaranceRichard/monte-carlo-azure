@@ -327,3 +327,4 @@ Le hook `pre-commit` exécute:
 - validation que `README.md` ne contient pas de mojibake (accents cassés)
 - `python Scripts/check_no_secrets.py`
 - `python Scripts/check_dod_compliance.py`
+  - ce contrôle vérifie la conformité DoD au niveau référentiel (docs, CI, seuils, tasks)

@@ -31,9 +31,21 @@ def main() -> int:
     _ok(dod.exists(), "Missing docs/definition-of-done.md", errors)
     _ok(critical.exists(), "Missing docs/critical-paths.md", errors)
     readme = _read("README.md")
-    _ok("docs/definition-of-done.md" in readme, "README must link docs/definition-of-done.md", errors)
-    _ok("docs/critical-paths.md" in readme, "README must link docs/critical-paths.md", errors)
-    _ok("Integration: couverture globale >= 80%." in _read("docs/definition-of-done.md"), "DoD must define integration coverage >= 80%", errors)
+    _ok(
+        "docs/definition-of-done.md" in readme,
+        "README must link docs/definition-of-done.md",
+        errors,
+    )
+    _ok(
+        "docs/critical-paths.md" in readme,
+        "README must link docs/critical-paths.md",
+        errors,
+    )
+    _ok(
+        "Integration: couverture globale >= 80%." in _read("docs/definition-of-done.md"),
+        "DoD must define integration coverage >= 80%",
+        errors,
+    )
 
     # Frontend script guards
     package_json = json.loads(_read("frontend/package.json"))
@@ -77,13 +89,21 @@ def main() -> int:
 
     # Coverage task integration checks (VS Code)
     tasks = _read(".vscode/tasks.json")
-    _ok('"label": "Coverage: 7 terminaux"' in tasks, "Missing coverage aggregate task (7 terminaux)", errors)
+    _ok(
+        '"label": "Coverage: 7 terminaux"' in tasks,
+        "Missing coverage aggregate task (7 terminaux)",
+        errors,
+    )
     _ok(
         '"label": "Coverage DoD Compliance (Repo)"' in tasks,
         "Missing repo DoD compliance task in coverage workflow",
         errors,
     )
-    _ok("tests/test_repo_compliance.py" in tasks, "Coverage task must execute tests/test_repo_compliance.py", errors)
+    _ok(
+        "tests/test_repo_compliance.py" in tasks,
+        "Coverage task must execute tests/test_repo_compliance.py",
+        errors,
+    )
     _ok(
         "--cov=tests.test_repo_compliance" in tasks,
         "Coverage task must measure DoD compliance test coverage",
@@ -94,10 +114,26 @@ def main() -> int:
         "Missing dedicated integration coverage task (backend API)",
         errors,
     )
-    _ok("tests/test_api_config.py" in tasks, "Integration coverage task must include tests/test_api_config.py", errors)
-    _ok("tests/test_api_health.py" in tasks, "Integration coverage task must include tests/test_api_health.py", errors)
-    _ok("tests/test_api_simulate.py" in tasks, "Integration coverage task must include tests/test_api_simulate.py", errors)
-    _ok("--cov-fail-under=80" in tasks, "Coverage task must enforce integration coverage >= 80", errors)
+    _ok(
+        "tests/test_api_config.py" in tasks,
+        "Integration coverage task must include tests/test_api_config.py",
+        errors,
+    )
+    _ok(
+        "tests/test_api_health.py" in tasks,
+        "Integration coverage task must include tests/test_api_health.py",
+        errors,
+    )
+    _ok(
+        "tests/test_api_simulate.py" in tasks,
+        "Integration coverage task must include tests/test_api_simulate.py",
+        errors,
+    )
+    _ok(
+        "--cov-fail-under=80" in tasks,
+        "Coverage task must enforce integration coverage >= 80",
+        errors,
+    )
 
     if errors:
         print("ERROR: DoD compliance check failed.", file=sys.stderr)
