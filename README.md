@@ -26,6 +26,7 @@ Refactors récents (frontend):
 - calcul du `risk score` harmonise sur les percentiles effectivement affiches (notamment mode `weeks_to_items`), avec affichage a 2 decimales dans les rapports
 - typages simulation segmentés (`SimulationForecastControls`, `SimulationDateRange`, `SimulationResult`, `ChartTab`)
 - écran simulation chargé en lazy (`React.lazy`) + import dynamique du module rapport/PDF pour réduire la taille des chunks initiaux
+- accessibilité du chargement renforcée dans `SimulationResultsPanel` (`role="status"` + `aria-live="polite"` pour annoncer `loadingStageMessage` aux lecteurs d'écran)
 
 Mises à jour récentes (backend/tests):
 - tri des imports `slowapi` dans `backend/api.py` pour conformité Ruff/isort

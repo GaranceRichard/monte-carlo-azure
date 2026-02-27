@@ -93,7 +93,11 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
   return (
     <div className="min-h-0 space-y-4">
       {s.loading && (
-        <div className="space-y-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
+        <div
+          className="space-y-2 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3"
+          role="status"
+          aria-live="polite"
+        >
           <div className="text-xs font-semibold text-[var(--muted)]">{s.loadingStageMessage}</div>
           <div aria-hidden="true">
             <ProgressBar value={65} />

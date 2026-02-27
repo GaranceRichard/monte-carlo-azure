@@ -152,6 +152,8 @@ describe("SimulationResultsPanel history list", () => {
 
     render(<SimulationResultsPanel />);
     expect(screen.getByText("Calcul en cours...")).not.toBeNull();
+    const loadingStatus = screen.getByRole("status");
+    expect(loadingStatus.getAttribute("aria-live")).toBe("polite");
     expect(screen.getByText(/Semaines utilisees: 26\/40/i)).not.toBeNull();
     expect(screen.getByText(/5 sem/i)).not.toBeNull();
   });
