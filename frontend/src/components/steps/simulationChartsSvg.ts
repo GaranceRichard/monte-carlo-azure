@@ -15,6 +15,12 @@ export type ProbabilityExportPoint = {
   probability: number;
 };
 
+export type OverlayProbabilitySeries = {
+  label: string;
+  color: string;
+  points: ProbabilityExportPoint[];
+};
+
 export const CHART_WIDTH = 960;
 export const CHART_HEIGHT = 360;
 const MARGIN = { top: 16, right: 16, bottom: 36, left: 44 };
@@ -51,6 +57,17 @@ function linePath(values: number[], yScale: (value: number) => number, xScale: (
   if (!values.length) return "";
   return values
     .map((value, index) => `${index === 0 ? "M" : "L"} ${xScale(index).toFixed(2)} ${yScale(value).toFixed(2)}`)
+    .join(" ");
+}
+
+function linePathFromPoints(
+  points: Array<{ x: number; y: number }>,
+  xScale: (value: number) => number,
+  yScale: (value: number) => number,
+): string {
+  if (!points.length) return "";
+  return points
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${xScale(point.x).toFixed(2)} ${yScale(point.y).toFixed(2)}`)
     .join(" ");
 }
 
@@ -207,6 +224,69 @@ export function renderProbabilityChart(points: ProbabilityExportPoint[]): string
       <line x1="${MARGIN.left}" y1="${MARGIN.top + plotHeight}" x2="${CHART_WIDTH - MARGIN.right}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       <path d="${probabilityPath}" fill="none" stroke="#2563eb" stroke-width="2.5" />
       ${xLabels}
+    </svg>
+  `;
+}
+
+export function renderOverlayProbabilityChart(series: OverlayProbabilitySeries[]): string {
+  const sanitized = series
+    .map((entry) => ({
+      label: entry.label,
+      color: entry.color,
+      points: entry.points
+        .map((p) => ({ x: Number(p.x), y: Number(p.probability) }))
+        .filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y))
+        .sort((a, b) => a.x - b.x),
+    }))
+    .filter((entry) => entry.points.length > 0);
+
+  if (!sanitized.length) return renderEmptyChart("Comparaison des probabilites");
+
+  const allX = sanitized.flatMap((entry) => entry.points.map((p) => p.x));
+  const minX = Math.min(...allX);
+  const maxX = Math.max(...allX);
+  const safeMaxX = maxX > minX ? maxX : minX + 1;
+
+  const plotWidth = CHART_WIDTH - MARGIN.left - MARGIN.right;
+  const plotHeight = CHART_HEIGHT - MARGIN.top - MARGIN.bottom;
+  const xScale = (value: number) => MARGIN.left + ((value - minX) / (safeMaxX - minX)) * plotWidth;
+  const yScale = (value: number) => MARGIN.top + plotHeight - (Math.max(0, Math.min(100, value)) / 100) * plotHeight;
+  const yTicks = [0, 25, 50, 75, 100];
+
+  const xTickCount = 6;
+  const xTicks = Array.from({ length: xTickCount }, (_, index) => minX + ((safeMaxX - minX) * index) / (xTickCount - 1));
+  const xLabels = xTicks
+    .map((tick) => `<text x="${xScale(tick).toFixed(2)}" y="${CHART_HEIGHT - 12}" text-anchor="middle" fill="#6b7280" font-size="10">${escapeHtml(formatNum(tick))}</text>`)
+    .join("");
+
+  const paths = sanitized
+    .map((entry) => {
+      const path = linePathFromPoints(entry.points, xScale, yScale);
+      return `<path d="${path}" fill="none" stroke="${escapeHtml(entry.color)}" stroke-width="2.5" />`;
+    })
+    .join("");
+
+  const legendY = CHART_HEIGHT - 8;
+  const legendStep = (CHART_WIDTH - MARGIN.left - MARGIN.right) / Math.max(1, sanitized.length);
+  const legend = sanitized
+    .map((entry, index) => {
+      const x = MARGIN.left + index * legendStep;
+      return `
+        <circle cx="${x.toFixed(2)}" cy="${legendY}" r="4" fill="${escapeHtml(entry.color)}" />
+        <text x="${(x + 10).toFixed(2)}" y="${legendY + 4}" fill="#374151" font-size="11">${escapeHtml(entry.label)}</text>
+      `;
+    })
+    .join("");
+
+  return `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" role="img" aria-label="Comparaison des probabilites">
+      <rect x="0" y="0" width="${CHART_WIDTH}" height="${CHART_HEIGHT}" fill="#ffffff" />
+      ${renderGridAndYAxis(yTicks, yScale)}
+      <line x1="${MARGIN.left}" y1="${MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
+      <line x1="${MARGIN.left}" y1="${MARGIN.top + plotHeight}" x2="${CHART_WIDTH - MARGIN.right}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
+      ${paths}
+      ${xLabels}
+      ${legend}
     </svg>
   `;
 }

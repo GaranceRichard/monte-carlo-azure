@@ -76,10 +76,10 @@ describe("usePortfolioReport", () => {
     });
 
     expect(vi.mocked(fetchTeamThroughput)).toHaveBeenCalledTimes(2);
-    expect(vi.mocked(simulateForecastFromSamples)).toHaveBeenCalledTimes(5);
+    expect(vi.mocked(simulateForecastFromSamples)).toHaveBeenCalledTimes(6);
     expect(result.current.reportErrors).toEqual([]);
     expect(result.current.reportErr).toBe("");
-    expect(result.current.generationProgress).toEqual({ done: 5, total: 5 });
+    expect(result.current.generationProgress).toEqual({ done: 6, total: 6 });
     expect(vi.mocked(exportPortfolioPrintReport)).toHaveBeenCalledTimes(1);
   });
 
@@ -96,7 +96,7 @@ describe("usePortfolioReport", () => {
     });
 
     expect(result.current.reportErrors).toEqual([expect.objectContaining({ teamName: "Team B" })]);
-    expect(vi.mocked(simulateForecastFromSamples)).toHaveBeenCalledTimes(4);
+    expect(vi.mocked(simulateForecastFromSamples)).toHaveBeenCalledTimes(5);
     expect(vi.mocked(exportPortfolioPrintReport)).toHaveBeenCalledTimes(1);
   });
 
@@ -118,6 +118,7 @@ describe("usePortfolioReport", () => {
       deferred<typeof simulationResult>(),
       deferred<typeof simulationResult>(),
       deferred<typeof simulationResult>(),
+      deferred<typeof simulationResult>(),
     ];
     let idx = 0;
     vi.mocked(simulateForecastFromSamples).mockImplementation(() => jobs[idx++].promise);
@@ -128,7 +129,7 @@ describe("usePortfolioReport", () => {
       void result.current.handleGenerateReport();
     });
 
-    expect(result.current.generationProgress).toEqual({ done: 0, total: 5 });
+    expect(result.current.generationProgress).toEqual({ done: 0, total: 6 });
 
     await act(async () => {
       jobs[0].resolve(simulationResult);
@@ -142,9 +143,10 @@ describe("usePortfolioReport", () => {
       jobs[2].resolve(simulationResult);
       jobs[3].resolve(simulationResult);
       jobs[4].resolve(simulationResult);
+      jobs[5].resolve(simulationResult);
     });
     await waitFor(() => {
-      expect(result.current.generationProgress).toEqual({ done: 5, total: 5 });
+      expect(result.current.generationProgress).toEqual({ done: 6, total: 6 });
     });
   });
 

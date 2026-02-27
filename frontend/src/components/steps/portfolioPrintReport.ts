@@ -4,9 +4,11 @@ import { buildAtLeastPercentiles, buildProbabilityCurve } from "../../hooks/prob
 import { computeRiskLegend, computeRiskScoreFromPercentiles } from "../../utils/simulation";
 import {
   renderDistributionChart,
+  renderOverlayProbabilityChart,
   renderProbabilityChart,
   renderThroughputChart,
   type DistributionExportPoint,
+  type OverlayProbabilitySeries,
   type ThroughputExportPoint,
 } from "./simulationChartsSvg";
 import { downloadPortfolioPdf } from "./simulationPdfDownload";
@@ -21,7 +23,14 @@ function escapeHtml(value: string): string {
 }
 
 function getScenarioDisplayLabel(label: string): string {
-  return label.startsWith("Arrime") ? label.replace("Arrime", "Arrim\u00e9") : label;
+  return label.startsWith("Arrime") ? label.replace("Arrime", "Arrimé") : label;
+}
+
+function getScenarioOrder(label: PortfolioScenarioResult["label"]): number {
+  if (label === "Optimiste") return 0;
+  if (label.startsWith("Arrime")) return 1;
+  if (label.startsWith("Friction")) return 2;
+  return 3;
 }
 
 type PortfolioSectionInput = {
@@ -76,6 +85,16 @@ function formatRiskScore(
   };
 }
 
+function formatRiskScoreFromValue(score: number): { score: number; label: string; valueLabel: string } {
+  const safe = Number.isFinite(score) ? Math.max(0, score) : 0;
+  const label = computeRiskLegend(safe);
+  return {
+    score: safe,
+    label,
+    valueLabel: safe.toFixed(2).replace(".", ","),
+  };
+}
+
 function buildTeamLikePageHtml({
   title,
   subtitle,
@@ -91,6 +110,7 @@ function buildTeamLikePageHtml({
   distribution,
   weeklyThroughput,
   displayPercentiles,
+  riskScore,
   note,
   pageBreak,
 }: {
@@ -108,12 +128,11 @@ function buildTeamLikePageHtml({
   distribution: Array<{ x: number; count: number }>;
   weeklyThroughput: Array<{ week: string; throughput: number }>;
   displayPercentiles: Record<string, number>;
+  riskScore?: number;
   note?: string;
   pageBreak: boolean;
 }): string {
-  const throughputRows = includeZeroWeeks
-    ? weeklyThroughput
-    : weeklyThroughput.filter((row) => row.throughput > 0);
+  const throughputRows = includeZeroWeeks ? weeklyThroughput : weeklyThroughput.filter((row) => row.throughput > 0);
   const throughputPoints: ThroughputExportPoint[] = throughputRows.map((point, index, arr) => {
     const windowSize = 4;
     const start = Math.max(0, index - windowSize + 1);
@@ -133,10 +152,7 @@ function buildTeamLikePageHtml({
     gauss: smoothed[i],
   }));
   const probabilityPoints = buildProbabilityCurve(sortedDistribution, resultKind);
-  const effectivePercentiles =
-    resultKind === "items"
-      ? buildAtLeastPercentiles(sortedDistribution, [50, 70, 90])
-      : displayPercentiles;
+  const effectivePercentiles = resultKind === "items" ? buildAtLeastPercentiles(sortedDistribution, [50, 70, 90]) : displayPercentiles;
 
   const throughputSvg = renderThroughputChart(throughputPoints);
   const distributionSvg = renderDistributionChart(distributionPoints);
@@ -147,7 +163,10 @@ function buildTeamLikePageHtml({
       : `Semaines vers items - cible: ${String(targetWeeks)} semaines`;
   const resultLabel = resultKind === "items" ? "items (au moins)" : "semaines (au plus)";
   const modeZeroLabel = includeZeroWeeks ? "Semaines 0 incluses" : "Semaines 0 exclues";
-  const risk = formatRiskScore(simulationMode, effectivePercentiles);
+  const risk =
+    typeof riskScore === "number" && Number.isFinite(riskScore)
+      ? formatRiskScoreFromValue(riskScore)
+      : formatRiskScore(simulationMode, effectivePercentiles);
 
   return `
     <section class="page ${pageBreak ? "page-break" : ""}">
@@ -210,10 +229,10 @@ function buildSummaryPage({
   targetWeeks: number;
   scenarios: PortfolioScenarioResult[];
 }): string {
-  const orderedLabels = ["Optimiste", `Arrime (${String(arrimageRate)}%)`, "Conservateur"];
-  const orderedScenarios = orderedLabels
-    .map((label) => scenarios.find((scenario) => scenario.label === label))
-    .filter((scenario): scenario is PortfolioScenarioResult => Boolean(scenario));
+  const orderedScenarios = [...scenarios].sort((a, b) => getScenarioOrder(a.label) - getScenarioOrder(b.label));
+  const effectiveFrictionLabel =
+    orderedScenarios.find((scenario) => scenario.label.startsWith("Friction"))?.label ??
+    `Friction (${Math.round((Math.max(0, Math.min(100, arrimageRate)) / 100) ** includedTeams.length * 100)}%)`;
 
   const rows = orderedScenarios
     .map((scenario) => {
@@ -226,7 +245,10 @@ function buildSummaryPage({
         summaryResultKind === "items"
           ? buildAtLeastPercentiles(sortedDistribution, [50, 70, 90])
           : scenario.percentiles;
-      const risk = formatRiskScore(simulationMode, effectivePercentiles);
+      const risk =
+        summaryResultKind === "items"
+          ? formatRiskScore(simulationMode, effectivePercentiles)
+          : formatRiskScoreFromValue(Number(scenario.riskScore ?? computeRiskScoreFromPercentiles(simulationMode, effectivePercentiles)));
       return `
         <tr>
           <td>${escapeHtml(getScenarioDisplayLabel(scenario.label))}</td>
@@ -239,16 +261,39 @@ function buildSummaryPage({
     })
     .join("");
 
+  const overlaySeries: OverlayProbabilitySeries[] = orderedScenarios.map((scenario) => {
+    const summaryResultKind: ForecastKind = simulationMode === "weeks_to_items" ? "items" : "weeks";
+    const sortedDistribution = [...scenario.distribution]
+      .map((p) => ({ x: Number(p.x), count: Number(p.count) }))
+      .filter((p) => Number.isFinite(p.x) && Number.isFinite(p.count) && p.count > 0)
+      .sort((a, b) => a.x - b.x);
+    const points = buildProbabilityCurve(sortedDistribution, summaryResultKind);
+    const color = scenario.label === "Optimiste"
+      ? "#15803d"
+      : scenario.label.startsWith("Arrime")
+        ? "#2563eb"
+        : scenario.label.startsWith("Friction")
+          ? "#d97706"
+          : "#dc2626";
+    return {
+      label: getScenarioDisplayLabel(scenario.label),
+      color,
+      points,
+    };
+  });
+  const overlaySvg = renderOverlayProbabilityChart(overlaySeries);
+
   const hypotheses = [
     "1. Optimiste : Somme des débits de toutes les équipes. Hypothèse : livraison indépendante, aucun coût de synchronisation inter-équipes.",
-    `2. Arrimé : ${String(arrimageRate)}% de la capacité combinée. Hypothèse : coûts PI (cérémonies, dépendances, alignement) absorbés sur le débit global.`,
-    "3. Conservateur : Débit de l'équipe la plus lente retenu à chaque semaine simulée. Hypothèse : PI contraint par le bottleneck.",
+    `2. Arrimé : ${String(arrimageRate)}% de la capacité combinée. Hypothèse : coûts de synchronisation (cérémonies, dépendances, alignement) absorbés sur le débit global.`,
+    `3. ${getScenarioDisplayLabel(effectiveFrictionLabel)} : ${effectiveFrictionLabel.replace("Friction ", "")} de la capacité combinée. Hypothèse : chaque équipe supplémentaire absorbe un coût d'alignement identique.`,
+    "4. Conservateur : Débit médian des équipes x nb équipes. Hypothèse : le portefeuille est contraint par l'équipe médiane, pas par la pire.",
   ];
 
   return `
     <section class="page page-break">
       <header class="header">
-        <h1 class="title">Synthèse PI - Simulation Portefeuille</h1>
+        <h1 class="title">Synthèse - Simulation Portefeuille</h1>
         <div class="meta">
           <div class="meta-row"><b>Projet:</b> ${escapeHtml(selectedProject)}</div>
           <div class="meta-row"><b>Période:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
@@ -272,6 +317,11 @@ function buildSummaryPage({
             ${rows}
           </tbody>
         </table>
+      </section>
+
+      <section class="section">
+        <h2>Courbes de probabilités comparées</h2>
+        <div class="chart-wrap">${overlaySvg}</div>
       </section>
 
       <section class="section section--hypotheses">
@@ -303,10 +353,7 @@ export function exportPortfolioPrintReport({
   if (!printWindow) return;
 
   const simulationMode = sections[0]?.simulationMode ?? "backlog_to_weeks";
-  const orderedScenarioLabels = ["Optimiste", `Arrime (${String(arrimageRate)}%)`, "Conservateur"];
-  const orderedScenarios = orderedScenarioLabels
-    .map((label) => scenarios.find((scenario) => scenario.label === label))
-    .filter((scenario): scenario is PortfolioScenarioResult => Boolean(scenario));
+  const orderedScenarios = [...scenarios].sort((a, b) => getScenarioOrder(a.label) - getScenarioOrder(b.label));
 
   const summaryPage = buildSummaryPage({
     selectedProject,
@@ -323,7 +370,7 @@ export function exportPortfolioPrintReport({
   const scenarioPages = orderedScenarios
     .map((scenario, idx) =>
       buildTeamLikePageHtml({
-        title: `Scenario PI - ${getScenarioDisplayLabel(scenario.label)}`,
+        title: `Scénario - ${getScenarioDisplayLabel(scenario.label)}`,
         subtitle: scenario.hypothese,
         selectedProject,
         startDate,
@@ -337,6 +384,7 @@ export function exportPortfolioPrintReport({
         distribution: scenario.distribution,
         weeklyThroughput: scenario.weeklyData,
         displayPercentiles: scenario.percentiles,
+        riskScore: scenario.riskScore,
         note: "Débit reconstruit par simulation bootstrap - non issu de l'historique réel.",
         pageBreak: idx < orderedScenarios.length - 1 || sections.length > 0,
       }),
@@ -359,6 +407,7 @@ export function exportPortfolioPrintReport({
         distribution: section.distribution,
         weeklyThroughput: section.weeklyThroughput,
         displayPercentiles: section.displayPercentiles,
+        riskScore: section.riskScore,
         pageBreak: idx < sections.length - 1,
       }),
     )

@@ -359,6 +359,17 @@ describe("useOnboarding", () => {
     act(() => {
       result.current.actions.goToStep("simulation");
     });
+    expect(result.current.state.backLabel).toBe("Changer équipe");
+    act(() => result.current.actions.goBack());
+    expect(result.current.state.step).toBe("teams");
+
+    act(() => {
+      result.current.actions.setSelectedTeam("Equipe Alpha");
+    });
+    act(() => {
+      result.current.actions.goToPortfolio();
+    });
+    expect(result.current.state.backLabel).toBe("Changer équipe");
     act(() => result.current.actions.goBack());
     expect(result.current.state.step).toBe("teams");
 

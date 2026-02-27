@@ -109,18 +109,33 @@ describe("SimulationControlPanel launch button visibility", () => {
     setContext({ hasLaunchedOnce: false });
     render(<SimulationControlPanel />);
 
-    const periodSection = screen.getByRole("heading", { name: /p.riode historique/i }).closest("section");
+    const periodSection = screen.getByRole("heading", { name: "Période historique" }).closest("section");
     const modeSection = screen.getByRole("heading", { name: /mode de simulation/i }).closest("section");
     expect(periodSection).not.toBeNull();
     expect(modeSection).not.toBeNull();
     if (!periodSection || !modeSection) return;
 
-    fireEvent.click(within(periodSection).getByRole("button", { name: /d.velopper/i }));
+    fireEvent.click(within(periodSection).getByRole("button", { name: "Développer" }));
     expect(within(periodSection).getByText("Period Content")).not.toBeNull();
 
-    fireEvent.click(within(modeSection).getByRole("button", { name: /d.velopper/i }));
+    fireEvent.click(within(modeSection).getByRole("button", { name: "Développer" }));
     expect(within(modeSection).getByText("Mode Content")).not.toBeNull();
     expect(within(periodSection).queryByText("Period Content")).toBeNull();
+  });
+
+  it("renders UTF-8 labels for period section toggle", () => {
+    setContext({ hasLaunchedOnce: false });
+    render(<SimulationControlPanel />);
+
+    const periodSection = screen.getByRole("heading", { name: "Période historique" }).closest("section");
+    expect(periodSection).not.toBeNull();
+    if (!periodSection) return;
+
+    expect(within(periodSection).queryByText("P?riode historique")).toBeNull();
+    fireEvent.click(within(periodSection).getByRole("button", { name: "Développer" }));
+    expect(within(periodSection).getByRole("button", { name: "Réduire" })).not.toBeNull();
+    expect(screen.queryByText("D?velopper")).toBeNull();
+    expect(screen.queryByText("R?duire")).toBeNull();
   });
 
   it("shows business-friendly summary when mode section is collapsed", () => {

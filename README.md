@@ -40,6 +40,9 @@ Refactors récents (frontend):
 - résumés compactés du panneau simulation reformulés en libellés métier plus lisibles (période, mode, filtres)
 - mode portefeuille: critères généraux réorganisés sur 2 lignes, labels harmonisés (`Items` / `Semaines`), largeur du champ `Mode` augmentée et champs numériques centrés (`Items/Semaines`, `Nombre de simulations`, `Taux d'arrimage`)
 - rapport portefeuille PDF enrichi: page de synthèse décisionnelle + hypothèses, détails par scénario, amélioration visuelle du tableau de synthèse (taille/couleurs/contraste) et espacement ajusté
+- refonte des scénarios portefeuille: `Conservateur` basé sur médiane x nb équipes (au lieu de `min` strict) + nouveau scénario `Friction (r^n)`
+- page de synthèse PDF: ajout d'un graphe comparatif des 4 courbes de probabilité (Optimiste, Arrimé, Friction, Conservateur)
+- ordre des scénarios harmonisé partout: `Optimiste -> Arrimé -> Friction -> Conservateur`, avec progression `nb équipes + 4`
 - correction d'un bug de cohérence `Risk Score` entre synthèse PDF et pages de détail (même logique de percentiles selon le mode)
 - correction du déclenchement multi-téléchargements PDF (binding bouton unique, suppression des doublons)
 - robustesse e2e renforcée sur l'écran simulation (sélecteurs moins sensibles aux accents/encodage)
@@ -57,7 +60,7 @@ Mises à jour récentes (backend/tests):
 - Sélection organisation -> projet -> équipe
 - Accès à un mode `Portefeuille` depuis l'écran équipe
 - Simulation portefeuille multi-équipes avec ajout via modale (types + états), sans doublon d'équipe
-- Rapport portefeuille PDF avec page de synthèse PI, pages scénario (Optimiste/Arrimé/Conservateur), puis pages équipes
+- Rapport portefeuille PDF avec page de synthèse, pages scénario (Optimiste/Arrimé/Friction/Conservateur), puis pages équipes
 - Récupération du throughput hebdomadaire côté client
 - Simulation Monte Carlo côté backend (`POST /simulate`)
 - Visualisation des percentiles et distributions

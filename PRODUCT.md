@@ -1,4 +1,4 @@
-Monte-Carlo Azure
+﻿Monte-Carlo Azure
 Outil d'aide a la decision pour la planification sous incertitude
 
 1. Positionnement
@@ -200,13 +200,15 @@ Monte-Carlo Azure permet de transformer des donnees operationnelles en decisions
 
 Il apporte une discipline de risque mesurable dans les environnements de delivery.
 
-11. Evolutions recentes (PI portefeuille)
+11. Evolutions recentes (portefeuille)
 
-Simulation PI multi-equipes:
+Simulation portefeuille multi-equipes:
 
-introduction de 3 scenarios d'agrégation (Optimiste, Arrime, Conservateur)
+introduction de 4 scenarios d'agregation (Optimiste, Arrime, Friction, Conservateur)
 
-ajout du taux d'arrimage PI configurable dans les criteres generaux
+scenario Conservateur revise: mediane des tirages x nombre d'equipes (au lieu du minimum strict)
+
+scenario Friction ajoute: somme des tirages x (taux d'arrimage ^ nb equipes)
 
 generation parallele des simulations (scenarios + equipes) avec progression visible
 
@@ -214,9 +216,9 @@ tolerance aux echecs partiels par equipe (rapport partiel exportable)
 
 Rapport PDF portefeuille:
 
-page 1 orientee decision (synthese + hypotheses)
+page 1 orientee decision (synthese + hypotheses + comparaison des courbes de probabilites)
 
-pages dediees par scenario avant les pages equipes
+pages dediees par scenario (Optimiste, Arrime, Friction, Conservateur) avant les pages equipes
 
 coherence du calcul Risk Score entre synthese et pages detail (meme base percentile selon le mode)
 

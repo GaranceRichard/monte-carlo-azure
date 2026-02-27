@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   renderDistributionChart,
+  renderOverlayProbabilityChart,
   renderProbabilityChart,
   renderThroughputChart,
   type DistributionExportPoint,
@@ -93,6 +94,18 @@ describe("simulationChartsSvg", () => {
     const svg = renderProbabilityChart([{ x: 4, probability: 120 }]);
     expect(svg).toContain("Courbe de probabilite");
     expect(svg).toContain(">4</text>");
+  });
+
+  it("renders overlay probability chart with legend for multiple series", () => {
+    const svg = renderOverlayProbabilityChart([
+      { label: "Optimiste", color: "#15803d", points: [{ x: 10, probability: 20 }, { x: 20, probability: 80 }] },
+      { label: "Conservateur", color: "#dc2626", points: [{ x: 10, probability: 10 }, { x: 20, probability: 70 }] },
+    ]);
+    expect(svg).toContain("Comparaison des probabilites");
+    expect(svg).toContain("Optimiste");
+    expect(svg).toContain("Conservateur");
+    expect(svg).toContain("#15803d");
+    expect(svg).toContain("#dc2626");
   });
 });
 

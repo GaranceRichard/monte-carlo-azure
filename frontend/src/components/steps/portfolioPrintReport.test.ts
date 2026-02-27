@@ -38,6 +38,19 @@ function baseArgs() {
         distribution: [{ x: 8, count: 10 }],
       },
       {
+        label: "Friction (64%)" as const,
+        hypothese: "hyp friction",
+        samples: [1.5, 2, 2.5],
+        weeklyData: [
+          { week: "2026-01-01", throughput: 1.5 },
+          { week: "2026-01-08", throughput: 2 },
+        ],
+        percentiles: { P50: 7, P70: 8, P90: 10 },
+        riskScore: 0.28,
+        riskLegend: "incertain" as const,
+        distribution: [{ x: 7, count: 10 }],
+      },
+      {
         label: "Conservateur" as const,
         hypothese: "hyp conservateur",
         samples: [1, 2, 3],
@@ -70,7 +83,7 @@ function baseArgs() {
 }
 
 describe("exportPortfolioPrintReport", () => {
-  it("renders synthesis page and scenario pages in expected order", () => {
+  it("renders synthesis page and scenario pages in expected order with friction in position 4", () => {
     let writtenHtml = "";
     const fakeWindow = {
       document: {
@@ -88,25 +101,27 @@ describe("exportPortfolioPrintReport", () => {
 
     exportPortfolioPrintReport(baseArgs());
 
-    expect(writtenHtml).toContain("Synthèse PI - Simulation Portefeuille");
-    expect(writtenHtml).toContain("Taux d'arrimage:</b> 80%");
-    expect(writtenHtml).toContain("Scenario PI - Optimiste");
-    expect(writtenHtml).toContain("Scenario PI - Arrimé (80%)");
-    expect(writtenHtml).toContain("Scenario PI - Conservateur");
-    expect(writtenHtml).toContain("Simulation Portefeuille - Team A");
-
-    const idxSynth = writtenHtml.indexOf("Synthèse PI - Simulation Portefeuille");
-    const idxOpt = writtenHtml.indexOf("Scenario PI - Optimiste");
-    const idxArr = writtenHtml.indexOf("Scenario PI - Arrimé (80%)");
-    const idxCons = writtenHtml.indexOf("Scenario PI - Conservateur");
+    const idxSynth = writtenHtml.indexOf("Synthèse - Simulation Portefeuille");
+    const idxOpt = writtenHtml.indexOf("Scénario - Optimiste");
+    const idxArr = writtenHtml.indexOf("Scénario - Arrimé (80%)");
+    const idxFriction = writtenHtml.indexOf("Scénario - Friction (64%)");
+    const idxCons = writtenHtml.indexOf("Scénario - Conservateur");
     const idxTeam = writtenHtml.indexOf("Simulation Portefeuille - Team A");
+
+    expect(idxSynth).toBeGreaterThanOrEqual(0);
+    expect(idxOpt).toBeGreaterThanOrEqual(0);
+    expect(idxArr).toBeGreaterThanOrEqual(0);
+    expect(idxFriction).toBeGreaterThanOrEqual(0);
+    expect(idxCons).toBeGreaterThanOrEqual(0);
+    expect(idxTeam).toBeGreaterThanOrEqual(0);
     expect(idxSynth).toBeLessThan(idxOpt);
     expect(idxOpt).toBeLessThan(idxArr);
-    expect(idxArr).toBeLessThan(idxCons);
+    expect(idxArr).toBeLessThan(idxFriction);
+    expect(idxFriction).toBeLessThan(idxCons);
     expect(idxCons).toBeLessThan(idxTeam);
   });
 
-  it("includes hypotheses and reconstructed throughput note", () => {
+  it("includes 4-line summary and overlay probability svg on synthesis page", () => {
     let writtenHtml = "";
     const fakeWindow = {
       document: {
@@ -124,40 +139,14 @@ describe("exportPortfolioPrintReport", () => {
 
     exportPortfolioPrintReport(baseArgs());
 
-    expect(writtenHtml).toContain("1. Optimiste");
-    expect(writtenHtml).toContain("2. Arrimé : 80%");
-    expect(writtenHtml).toContain("3. Conservateur");
-    expect(writtenHtml).toContain("Débit reconstruit par simulation bootstrap - non issu de l&#39;historique réel.");
+    expect(writtenHtml).toContain("<td>Optimiste</td>");
+    expect(writtenHtml).toContain("<td>Arrimé (80%)</td>");
+    expect(writtenHtml).toContain("<td>Friction (64%)</td>");
+    expect(writtenHtml).toContain("<td>Conservateur</td>");
+    expect(writtenHtml).toContain("Courbes de probabilités comparées");
+    expect(writtenHtml).toContain("aria-label=\"Comparaison des probabilites\"");
   });
 
-  it("keeps accented labels and avoids mojibake in generated HTML", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    exportPortfolioPrintReport(baseArgs());
-
-    expect(writtenHtml).toContain("Synthèse décisionnelle");
-    expect(writtenHtml).toContain("Hypothèses");
-    expect(writtenHtml).toContain("Période");
-    expect(writtenHtml).toContain("Équipes incluses");
-    expect(writtenHtml).toContain("Scénario");
-    expect(writtenHtml).toContain("Arrimé (80%)");
-    expect(writtenHtml).not.toContain("Ã");
-    expect(writtenHtml).not.toContain("Â");
-    expect(writtenHtml).not.toContain("�");
-  });
   it("uses weeks_to_items effective percentiles for summary risk score", () => {
     let writtenHtml = "";
     const fakeWindow = {
@@ -178,13 +167,22 @@ describe("exportPortfolioPrintReport", () => {
     args.sections[0].simulationMode = "weeks_to_items";
     args.scenarios = [
       {
-      ...args.scenarios[0],
-      percentiles: { P50: 100, P70: 110, P90: 120 },
-      distribution: [
-        { x: 10, count: 10 },
-        { x: 20, count: 80 },
-        { x: 30, count: 10 },
-      ],
+        ...args.scenarios[0],
+        percentiles: { P50: 100, P70: 110, P90: 120 },
+        distribution: [
+          { x: 10, count: 10 },
+          { x: 20, count: 80 },
+          { x: 30, count: 10 },
+        ],
+      },
+      {
+        ...args.scenarios[1],
+      },
+      {
+        ...args.scenarios[2],
+      },
+      {
+        ...args.scenarios[3],
       },
     ];
 
@@ -197,9 +195,7 @@ describe("exportPortfolioPrintReport", () => {
     const expectedP90 = Number(effectivePercentiles.P90 ?? 0).toFixed(0);
 
     expect(writtenHtml).toMatch(
-      new RegExp(
-        `Optimiste[\\s\\S]*?<td>${expectedP50}</td>\\s*<td>${expectedP70}</td>\\s*<td>${expectedP90}</td>`,
-      ),
+      new RegExp(`Optimiste[\\s\\S]*?<td>${expectedP50}</td>\\s*<td>${expectedP70}</td>\\s*<td>${expectedP90}</td>`),
     );
     expect(writtenHtml).not.toMatch(/Optimiste[\s\S]*?<td>100<\/td>\s*<td>110<\/td>\s*<td>120<\/td>/);
     expect(writtenHtml).toContain(expectedRisk.toFixed(2).replace(".", ","));

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import {
   Bar,
   CartesianGrid,
@@ -81,7 +81,7 @@ export default function SimulationChartTabs() {
             <TabsList>
               <TabsTrigger value="throughput">Throughput</TabsTrigger>
               <TabsTrigger value="distribution">Distribution</TabsTrigger>
-              <TabsTrigger value="probability">Probabilit?s</TabsTrigger>
+              <TabsTrigger value="probability">Probabilités</TabsTrigger>
             </TabsList>
             <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
               <button
@@ -104,9 +104,9 @@ export default function SimulationChartTabs() {
                 type="button"
                 onClick={s.resetForTeamSelection}
                 className="whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm font-semibold text-[var(--text)]"
-                title="Revenir ? l'?tat initial (simulation non lanc?e)"
+                title="Revenir à l'état initial (simulation non lancée)"
               >
-                R?initialiser
+                Réinitialiser
               </button>
             </div>
           </div>
@@ -114,7 +114,7 @@ export default function SimulationChartTabs() {
           <TabsContent value="throughput">
             <h4 className="m-0 text-base font-bold">Throughput hebdomadaire</h4>
             <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
-              Chaque point repr?sente le nombre d&apos;items termin?s sur une semaine historique.
+              Chaque point représente le nombre d&apos;items terminés sur une semaine historique.
             </p>
             <div className="h-[52vh] min-h-[320px] w-full">
               <ResponsiveContainer>
@@ -143,7 +143,7 @@ export default function SimulationChartTabs() {
           <TabsContent value="distribution">
             <h4 className="m-0 text-base font-bold">Distribution Monte Carlo</h4>
             <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
-              Chaque barre repr?sente la fr?quence d&apos;une dur?e simul?e sur l&apos;ensemble des runs.
+              Chaque barre représente la fréquence d&apos;une durée simulée sur l&apos;ensemble des runs.
             </p>
             <div className="h-[52vh] min-h-[320px] w-full">
               <ResponsiveContainer>
@@ -154,8 +154,8 @@ export default function SimulationChartTabs() {
                   <Tooltip
                     {...s.tooltipBaseProps}
                     formatter={(v, name) => {
-                      if (name === "count") return [Number(v).toFixed(0), "Fr?quence"];
-                      if (name === "gauss") return [Number(v).toFixed(1), "Courbe liss?e"];
+                      if (name === "count") return [Number(v).toFixed(0), "Fréquence"];
+                      if (name === "gauss") return [Number(v).toFixed(1), "Courbe lissée"];
                       return [Number(v).toFixed(1), name];
                     }}
                   />
@@ -170,11 +170,11 @@ export default function SimulationChartTabs() {
           <TabsContent value="probability">
             <h4 className="m-0 text-base font-bold">
               {s.result?.result_kind === "items"
-                ? "Probabilit? d'atteindre au moins X items"
-                : "Probabilit? de terminer en au plus X semaines"}
+                ? "Probabilité d'atteindre au moins X items"
+                : "Probabilité de terminer en au plus X semaines"}
             </h4>
             <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
-              Cette courbe indique la probabilit? cumul?e pour chaque valeur possible.
+              Cette courbe indique la probabilité cumulée pour chaque valeur possible.
             </p>
             <div className="h-[52vh] min-h-[320px] w-full">
               <ResponsiveContainer>
@@ -204,3 +204,4 @@ export default function SimulationChartTabs() {
     </div>
   );
 }
+

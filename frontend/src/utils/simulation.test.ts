@@ -39,7 +39,7 @@ describe("applyCapacityReductionToResult", () => {
 });
 
 describe("buildScenarioSamples", () => {
-  it("builds optimistic, arrime and conservative samples for 2 teams", () => {
+  it("builds optimistic, arrime, friction and conservative samples for 2 teams", () => {
     const randomSpy = vi.spyOn(Math, "random");
     randomSpy
       .mockReturnValueOnce(0.1) // team1 -> 10
@@ -59,9 +59,11 @@ describe("buildScenarioSamples", () => {
 
     expect(scenarios.optimiste).toEqual([210, 120, 210]);
     expect(scenarios.arrime).toEqual([168, 96, 168]);
-    expect(scenarios.conservateur).toEqual([10, 20, 10]);
+    expect(scenarios.friction).toEqual([134, 76, 134]);
+    expect(scenarios.conservateur).toEqual([210, 120, 210]);
     expect(scenarios.optimiste).toHaveLength(3);
     expect(scenarios.arrime).toHaveLength(3);
+    expect(scenarios.friction).toHaveLength(3);
     expect(scenarios.conservateur).toHaveLength(3);
     randomSpy.mockRestore();
   });
@@ -73,7 +75,50 @@ describe("buildScenarioSamples", () => {
     const scenarios = buildScenarioSamples([[5, 8, 13]], 20);
 
     expect(scenarios.optimiste).toEqual(scenarios.arrime);
+    expect(scenarios.arrime).toEqual(scenarios.friction);
     expect(scenarios.optimiste).toEqual(scenarios.conservateur);
+    randomSpy.mockRestore();
+  });
+
+  it("uses median * team count for conservative scenario with odd team count", () => {
+    const randomSpy = vi.spyOn(Math, "random");
+    randomSpy
+      .mockReturnValueOnce(0.1) // 10
+      .mockReturnValueOnce(0.1) // 30
+      .mockReturnValueOnce(0.1); // 20
+
+    const scenarios = buildScenarioSamples(
+      [
+        [10],
+        [30],
+        [20],
+      ],
+      80,
+    );
+
+    expect(scenarios.conservateur).toEqual([60]); // median(10,20,30)=20, *3 => 60
+    randomSpy.mockRestore();
+  });
+
+  it("uses median * team count for conservative scenario with even team count", () => {
+    const randomSpy = vi.spyOn(Math, "random");
+    randomSpy
+      .mockReturnValueOnce(0.1) // 10
+      .mockReturnValueOnce(0.1) // 20
+      .mockReturnValueOnce(0.1) // 40
+      .mockReturnValueOnce(0.1); // 80
+
+    const scenarios = buildScenarioSamples(
+      [
+        [10],
+        [20],
+        [40],
+        [80],
+      ],
+      80,
+    );
+
+    expect(scenarios.conservateur).toEqual([120]); // median=(20+40)/2=30, *4 =>120
     randomSpy.mockRestore();
   });
 

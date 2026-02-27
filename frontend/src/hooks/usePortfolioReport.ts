@@ -71,9 +71,11 @@ const SCENARIO_HYPOTHESES = {
   optimiste:
     "Somme des debits de toutes les equipes. Hypothese : livraison independante, aucun cout de synchronisation inter-equipes.",
   arrime:
-    "N% de la capacite combinee. Hypothese : couts PI (ceremonies, dependances, alignement) absorbes sur le debit global.",
+    "N% de la capacite combinee. Hypothese : couts de synchronisation (ceremonies, dependances, alignement) absorbes sur le debit global.",
+  friction:
+    "X% de la capacite combinee. Hypothese : chaque equipe supplementaire absorbe un cout d'alignement identique.",
   conservateur:
-    "Debit de l'equipe la plus lente retenu a chaque semaine simulee. Hypothese : PI contraint par le bottleneck.",
+    "Debit median des equipes x nb equipes. Hypothese : le portefeuille est contraint par l'equipe mediane, pas par la pire.",
 } as const;
 
 export function getPortfolioErrorMessage(error: unknown, context: AdoErrorContext): string {
@@ -218,8 +220,9 @@ export function usePortfolioReport({
         successfulTeams.map((team) => team.data.throughputSamples),
         arrimageRate,
       );
+      const effectiveFrictionRate = Math.round((Math.max(0, Math.min(100, arrimageRate)) / 100) ** successfulTeams.length * 100);
 
-      const totalSimulations = successfulTeams.length + 3;
+      const totalSimulations = successfulTeams.length + 4;
       setGenerationProgress({ done: 0, total: totalSimulations });
       let completedSimulations = 0;
       const markSimulationDone = (): void => {
@@ -282,7 +285,7 @@ export function usePortfolioReport({
               reducedCapacityWeeks: 0,
               selectedOrg,
               selectedProject,
-              selectedTeam: "PI Optimiste",
+              selectedTeam: "Optimiste",
               startDate,
               endDate,
             });
@@ -316,7 +319,7 @@ export function usePortfolioReport({
               reducedCapacityWeeks: 0,
               selectedOrg,
               selectedProject,
-              selectedTeam: `PI Arrime (${String(arrimageRate)}%)`,
+              selectedTeam: `Arrime (${String(arrimageRate)}%)`,
               startDate,
               endDate,
             });
@@ -340,6 +343,40 @@ export function usePortfolioReport({
         (async () => {
           try {
             const result = await simulateForecastFromSamples({
+              throughputSamples: scenarioSamples.friction,
+              includeZeroWeeks: true,
+              simulationMode,
+              backlogSize,
+              targetWeeks,
+              nSims,
+              capacityPercent: 100,
+              reducedCapacityWeeks: 0,
+              selectedOrg,
+              selectedProject,
+              selectedTeam: `Friction (${String(effectiveFrictionRate)}%)`,
+              startDate,
+              endDate,
+            });
+            return {
+              kind: "scenario" as const,
+              scenario: toScenarioResult(
+                `Friction (${effectiveFrictionRate}%)`,
+                SCENARIO_HYPOTHESES.friction.replace("X%", `${String(effectiveFrictionRate)}%`),
+                scenarioSamples.friction,
+                simulationMode,
+                result,
+                startDate,
+              ),
+            };
+          } catch (error: unknown) {
+            throw { kind: "scenario", teamName: "Friction", error };
+          } finally {
+            markSimulationDone();
+          }
+        })(),
+        (async () => {
+          try {
+            const result = await simulateForecastFromSamples({
               throughputSamples: scenarioSamples.conservateur,
               includeZeroWeeks: true,
               simulationMode,
@@ -350,7 +387,7 @@ export function usePortfolioReport({
               reducedCapacityWeeks: 0,
               selectedOrg,
               selectedProject,
-              selectedTeam: "PI Conservateur",
+              selectedTeam: "Conservateur",
               startDate,
               endDate,
             });

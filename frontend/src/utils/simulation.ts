@@ -4,12 +4,21 @@ import { clamp } from "./math";
 export type ScenarioSamples = {
   optimiste: number[];
   arrime: number[];
+  friction: number[];
   conservateur: number[];
 };
 
 function pickBootstrapSample(samples: number[]): number {
   const randomIndex = Math.floor(Math.random() * samples.length);
   return samples[randomIndex] ?? 0;
+}
+
+function median(values: number[]): number {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 1) return sorted[middle] ?? 0;
+  return ((sorted[middle - 1] ?? 0) + (sorted[middle] ?? 0)) / 2;
 }
 
 export function buildScenarioSamples(teamSamples: number[][], arrimageRate: number): ScenarioSamples {
@@ -22,20 +31,25 @@ export function buildScenarioSamples(teamSamples: number[][], arrimageRate: numb
 
   const maxLength = Math.max(...teamSamples.map((samples) => samples.length));
   const safeRate = clamp(arrimageRate, 0, 100) / 100;
+  const teamCount = teamSamples.length;
   const optimiste: number[] = [];
   const arrime: number[] = [];
+  const friction: number[] = [];
   const conservateur: number[] = [];
 
   for (let index = 0; index < maxLength; index += 1) {
     const draws = teamSamples.map((samples) => pickBootstrapSample(samples));
     const optimisticValue = draws.reduce((sum, value) => sum + value, 0);
-    const conservativeValue = Math.min(...draws);
+    const conservativeValue = teamCount === 1 ? optimisticValue : median(draws) * teamCount;
+    const arrimeValue = teamCount === 1 ? optimisticValue : Math.floor(optimisticValue * safeRate);
+    const frictionValue = teamCount === 1 ? arrimeValue : Math.floor(optimisticValue * safeRate ** teamCount);
     optimiste.push(optimisticValue);
     conservateur.push(conservativeValue);
-    arrime.push(draws.length === 1 ? optimisticValue : Math.floor(optimisticValue * safeRate));
+    arrime.push(arrimeValue);
+    friction.push(frictionValue);
   }
 
-  return { optimiste, arrime, conservateur };
+  return { optimiste, arrime, friction, conservateur };
 }
 
 export function computeRiskLegend(score: number): "fiable" | "incertain" | "fragile" | "non fiable" {

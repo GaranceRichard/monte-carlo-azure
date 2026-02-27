@@ -89,7 +89,7 @@ export type SimulationResult = {
 export type ChartTab = "throughput" | "distribution" | "probability";
 
 export type PortfolioScenarioResult = {
-  label: "Optimiste" | `Arrime (${number}%)` | "Conservateur";
+  label: "Optimiste" | `Arrime (${number}%)` | `Friction (${number}%)` | "Conservateur";
   hypothese: string;
   samples: number[];
   weeklyData: WeeklyThroughputRow[];

@@ -1,4 +1,4 @@
-import { useSimulationContext } from "../../hooks/SimulationContext";
+﻿import { useSimulationContext } from "../../hooks/SimulationContext";
 import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
 
 export default function SimulationModeAndParametersControls() {
@@ -81,4 +81,5 @@ export default function SimulationModeAndParametersControls() {
     </>
   );
 }
+
 
