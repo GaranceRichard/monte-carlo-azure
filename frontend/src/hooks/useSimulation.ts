@@ -21,6 +21,7 @@ import { runSimulationForecast } from "./simulationForecastService";
 import { useSimulationHistory } from "./useSimulationHistory";
 import { useSimulationPrefs } from "./useSimulationPrefs";
 import { useTeamOptions } from "./useTeamOptions";
+import { buildQuickFiltersScopeKey, writeStoredQuickFilters } from "../storage";
 
 const TOOLTIP_BASE_PROPS: TooltipBaseProps = {
   cursor: false,
@@ -48,6 +49,8 @@ export type SimulationViewModel = SimulationForecastControls &
   filteredDoneStateOptions: string[];
   doneStates: string[];
   setDoneStates: Dispatch<SetStateAction<string[]>>;
+  hasQuickFilterConfig: boolean;
+  applyQuickFilterConfig: () => void;
   activeChartTab: ChartTab;
   setActiveChartTab: (value: ChartTab) => void;
   tooltipBaseProps: TooltipBaseProps;
@@ -119,12 +122,27 @@ export function useSimulation({
     setTypes([]);
   }, []);
 
-  const { loadingTeamOptions, workItemTypeOptions, statesByType, resetTeamOptions } = useTeamOptions({
+  const quickFiltersScopeKey = useMemo(() => {
+    if (!selectedOrg || !selectedProject || !selectedTeam) return "";
+    return buildQuickFiltersScopeKey(selectedOrg, selectedProject, selectedTeam);
+  }, [selectedOrg, selectedProject, selectedTeam]);
+
+  const {
+    loadingTeamOptions,
+    workItemTypeOptions,
+    statesByType,
+    hasQuickFilterConfig,
+    applyQuickFilterConfig,
+    resetTeamOptions,
+  } = useTeamOptions({
     step,
     selectedOrg,
     selectedProject,
     selectedTeam,
     pat,
+    quickFiltersScopeKey,
+    setTypes,
+    setDoneStates,
     onTeamOptionsReset,
   });
 
@@ -141,6 +159,25 @@ export function useSimulation({
   useEffect(() => {
     setDoneStates((prev) => prev.filter((state) => filteredDoneStateOptions.includes(state)));
   }, [filteredDoneStateOptions]);
+
+  useEffect(() => {
+    if (step !== "simulation" || !quickFiltersScopeKey) return;
+
+    const allowedTypes = new Set(workItemTypeOptions);
+    const persistedTypes = types.filter((type, idx, arr) => allowedTypes.has(type) && arr.indexOf(type) === idx);
+    if (!persistedTypes.length) return;
+
+    const allowedStates = new Set(persistedTypes.flatMap((type) => statesByType[type] || []));
+    const persistedDoneStates = doneStates.filter(
+      (state, idx, arr) => allowedStates.has(state) && arr.indexOf(state) === idx,
+    );
+    if (!persistedDoneStates.length) return;
+
+    writeStoredQuickFilters(quickFiltersScopeKey, {
+      types: persistedTypes,
+      doneStates: persistedDoneStates,
+    });
+  }, [doneStates, quickFiltersScopeKey, statesByType, step, types, workItemTypeOptions]);
 
   const clearComputedSimulationState = useCallback(() => {
     setResult(null);
@@ -336,6 +373,8 @@ export function useSimulation({
     filteredDoneStateOptions,
     doneStates,
     setDoneStates,
+    hasQuickFilterConfig,
+    applyQuickFilterConfig,
     result,
     displayPercentiles,
     activeChartTab,

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { getTeamOptionsDirect } from "../adoClient";
 import { nWeeksAgo, today } from "../date";
@@ -20,6 +20,16 @@ type UsePortfolioParams = {
   selectedProject: string;
   teams: NamedEntity[];
   pat: string;
+};
+
+type TeamOptionsCacheEntry = {
+  workItemTypes: string[];
+  statesByType: Record<string, string[]>;
+};
+
+type TeamReportError = {
+  teamName: string;
+  message: string;
 };
 
 function getPortfolioErrorMessage(error: unknown, context: AdoErrorContext): string {
@@ -50,6 +60,8 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
   const [loadingReport, setLoadingReport] = useState<boolean>(false);
   const [err, setErr] = useState<string>("");
   const [modalErr, setModalErr] = useState<string>("");
+  const [reportProgressLabel, setReportProgressLabel] = useState<string>("");
+  const [reportErrors, setReportErrors] = useState<TeamReportError[]>([]);
   const [teamConfigs, setTeamConfigs] = useState<TeamPortfolioConfig[]>([]);
 
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
@@ -59,6 +71,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
   const [modalStatesByType, setModalStatesByType] = useState<Record<string, string[]>>({});
   const [modalTypes, setModalTypes] = useState<string[]>([]);
   const [modalDoneStates, setModalDoneStates] = useState<string[]>([]);
+  const teamOptionsCacheRef = useRef<Map<string, TeamOptionsCacheEntry>>(new Map());
 
   const sortedTeams = useMemo(() => sortTeams(teams), [teams]);
   const availableTeamNames = useMemo(() => {
@@ -76,6 +89,14 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
 
   const canGenerate = teamConfigs.length > 0 && !loadingReport;
 
+  useEffect(() => {
+    teamOptionsCacheRef.current.clear();
+  }, [selectedOrg, selectedProject]);
+
+  function getTeamCacheKey(teamName: string): string {
+    return `${selectedOrg}::${selectedProject}::${teamName}`;
+  }
+
   function handlePortfolioError(
     setMessage: Dispatch<SetStateAction<string>>,
     error: unknown,
@@ -92,11 +113,25 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
       setModalDoneStates([]);
       return;
     }
+    const cachedOptions = teamOptionsCacheRef.current.get(getTeamCacheKey(teamName));
+    if (cachedOptions) {
+      setModalTypeOptions(cachedOptions.workItemTypes);
+      setModalStatesByType(cachedOptions.statesByType);
+      setModalTypes([]);
+      setModalDoneStates([]);
+      return;
+    }
+
     setModalLoading(true);
     try {
       const options = await getTeamOptionsDirect(selectedOrg, selectedProject, teamName, pat);
-      setModalTypeOptions(options.workItemTypes);
-      setModalStatesByType(options.statesByType || {});
+      const nextCacheEntry = {
+        workItemTypes: options.workItemTypes || [],
+        statesByType: options.statesByType || {},
+      };
+      teamOptionsCacheRef.current.set(getTeamCacheKey(teamName), nextCacheEntry);
+      setModalTypeOptions(nextCacheEntry.workItemTypes);
+      setModalStatesByType(nextCacheEntry.statesByType);
       setModalTypes([]);
       setModalDoneStates([]);
     } catch (e: unknown) {
@@ -187,40 +222,79 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     if (!teamConfigs.length) return;
 
     setErr("");
+    setReportErrors([]);
     setLoadingReport(true);
+    const totalTeams = teamConfigs.length;
+    setReportProgressLabel(`0/${String(totalTeams)} equipes simulees`);
     try {
+      let completedTeams = 0;
+      const settledSections = await Promise.allSettled(
+        teamConfigs.map(async (cfg) => {
+          try {
+            const forecast = await runSimulationForecast({
+              selectedOrg,
+              selectedProject,
+              selectedTeam: cfg.teamName,
+              pat,
+              startDate,
+              endDate,
+              doneStates: cfg.doneStates,
+              types: cfg.types,
+              includeZeroWeeks,
+              simulationMode,
+              backlogSize,
+              targetWeeks,
+              nSims,
+              capacityPercent: 100,
+              reducedCapacityWeeks: 0,
+            });
+            return {
+              selectedTeam: cfg.teamName,
+              simulationMode,
+              includeZeroWeeks,
+              backlogSize: Number(backlogSize),
+              targetWeeks: Number(targetWeeks),
+              nSims: Number(nSims),
+              resultKind: forecast.result.result_kind,
+              riskScore: forecast.result.risk_score,
+              distribution: forecast.result.result_distribution,
+              weeklyThroughput: forecast.weeklyThroughput,
+              displayPercentiles: forecast.result.result_percentiles,
+            };
+          } catch (error: unknown) {
+            throw { teamName: cfg.teamName, error };
+          } finally {
+            completedTeams += 1;
+            setReportProgressLabel(`${String(completedTeams)}/${String(totalTeams)} equipes simulees`);
+          }
+        }),
+      );
+
       const sections = [];
-      for (const cfg of teamConfigs) {
-        const forecast = await runSimulationForecast({
-          selectedOrg,
-          selectedProject,
-          selectedTeam: cfg.teamName,
-          pat,
-          startDate,
-          endDate,
-          doneStates: cfg.doneStates,
-          types: cfg.types,
-          includeZeroWeeks,
-          simulationMode,
-          backlogSize,
-          targetWeeks,
-          nSims,
-          capacityPercent: 100,
-          reducedCapacityWeeks: 0,
+      const teamErrors: TeamReportError[] = [];
+      for (const result of settledSections) {
+        if (result.status === "fulfilled") {
+          sections.push(result.value);
+          continue;
+        }
+        const reason = result.reason as { teamName?: unknown; error?: unknown };
+        const failedTeamName = typeof reason?.teamName === "string" ? reason.teamName : "Equipe inconnue";
+        teamErrors.push({
+          teamName: failedTeamName,
+          message: getPortfolioErrorMessage(reason?.error, {
+            operation: "generation du rapport portefeuille",
+            org: selectedOrg,
+            project: selectedProject,
+            team: failedTeamName,
+            requiredScopes: ["Work Items (Read)"],
+          }),
         });
-        sections.push({
-          selectedTeam: cfg.teamName,
-          simulationMode,
-          includeZeroWeeks,
-          backlogSize: Number(backlogSize),
-          targetWeeks: Number(targetWeeks),
-          nSims: Number(nSims),
-          resultKind: forecast.result.result_kind,
-          riskScore: forecast.result.risk_score,
-          distribution: forecast.result.result_distribution,
-          weeklyThroughput: forecast.weeklyThroughput,
-          displayPercentiles: forecast.result.result_percentiles,
-        });
+      }
+      setReportErrors(teamErrors);
+
+      if (!sections.length) {
+        setErr("Aucune equipe n'a pu etre simulee.");
+        return;
       }
 
       const { exportPortfolioPrintReport } = await import("../components/steps/portfolioPrintReport");
@@ -242,6 +316,10 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     }
   }
 
+  function clearReportErrors(): void {
+    setReportErrors([]);
+  }
+
   return {
     startDate,
     setStartDate,
@@ -258,6 +336,8 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     nSims,
     setNSims,
     loadingReport,
+    reportProgressLabel,
+    reportErrors,
     err,
     modalErr,
     teamConfigs,
@@ -278,5 +358,6 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     validateAddModal,
     removeTeam,
     handleGenerateReport,
+    clearReportErrors,
   };
 }

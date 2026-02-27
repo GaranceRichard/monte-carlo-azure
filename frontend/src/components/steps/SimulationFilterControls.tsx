@@ -5,6 +5,14 @@ export default function SimulationFilterControls() {
 
   return (
     <>
+      <button
+        type="button"
+        className="sim-advanced-toggle"
+        onClick={s.applyQuickFilterConfig}
+        disabled={!s.hasQuickFilterConfig || s.loadingTeamOptions}
+      >
+        Configuration rapide
+      </button>
       <label className="sim-label sim-mt-10">Types de tickets pris en compte</label>
       <div className="sim-checklist">
         {s.loadingTeamOptions && <div className="sim-empty-tip">Chargement des types de tickets...</div>}

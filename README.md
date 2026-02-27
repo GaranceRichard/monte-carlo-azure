@@ -30,6 +30,11 @@ Refactors récents (frontend):
 - typages simulation segmentés (`SimulationForecastControls`, `SimulationDateRange`, `SimulationResult`, `ChartTab`)
 - écran simulation chargé en lazy (`React.lazy`) + import dynamique du module rapport/PDF pour réduire la taille des chunks initiaux
 - accessibilité du chargement renforcée dans `SimulationResultsPanel` (`role="status"` + `aria-live="polite"` pour annoncer `loadingStageMessage` aux lecteurs d'écran)
+- cache en mémoire des options d'équipe portefeuille (`org::project::team`) pour éviter les appels ADO redondants lors des réouvertures de la modale
+- génération du rapport portefeuille parallélisée (`Promise.allSettled`) avec progression visible `x/n équipes simulées`
+- tolérance aux échecs partiels en portefeuille: les équipes en erreur sont listées sans bloquer l'export des équipes valides
+- persistance locale de la "Configuration rapide" (types + états) par scope `org::project::team`, avec auto-apply si valide + bouton d'application manuelle
+- résumés compactés du panneau simulation reformulés en libellés métier plus lisibles (période, mode, filtres)
 
 Mises à jour récentes (backend/tests):
 - tri des imports `slowapi` dans `backend/api.py` pour conformité Ruff/isort
@@ -58,6 +63,8 @@ Mises à jour récentes (backend/tests):
 - Cookie client `IDMontecarlo` (UUID v4, 1 an, `SameSite=Strict`) pour relier les simulations à un client anonyme
 - Persistence MongoDB des simulations via `/simulate` + restitution des 10 dernières via `/simulations/history`
 - Paramètre de capacité réduite (ex: équipe à 70% pendant N semaines)
+- Configuration rapide des filtres (types + états) mémorisée localement par organisation/projet/équipe
+- Rapport portefeuille avec progression de simulation et gestion des erreurs par équipe
 
 ---
 

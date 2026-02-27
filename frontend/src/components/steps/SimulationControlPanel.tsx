@@ -17,10 +17,10 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
   const modeZeroText = s.includeZeroWeeks ? "incluses" : "non incluses";
   const modeSummary =
     s.simulationMode === "backlog_to_weeks"
-      ? `Objectif backlog: ${String(s.backlogSize)} items, semaines a 0 ${modeZeroText}, ${String(s.nSims)} simulations`
-      : `Objectif livraison: ${String(s.targetWeeks)} semaines, semaines a 0 ${modeZeroText}, ${String(s.nSims)} simulations`;
-  const typeListText = s.types.length ? s.types.join(", ") : "aucun";
-  const stateListText = s.doneStates.length ? s.doneStates.join(", ") : "aucun";
+      ? `Backlog de ${String(s.backlogSize)} items | semaines a 0 ${modeZeroText} | ${String(s.nSims)} simulations`
+      : `Horizon de ${String(s.targetWeeks)} semaines | semaines a 0 ${modeZeroText} | ${String(s.nSims)} simulations`;
+  const typeListText = s.types.length ? s.types.join(", ") : "Aucun type";
+  const stateListText = s.doneStates.length ? s.doneStates.join(", ") : "Aucun etat";
   const hasRequiredFilters = s.types.length > 0 && s.doneStates.length > 0;
   const canRunSimulation = !s.loading && !!selectedTeam && hasRequiredFilters;
   const showPeriod = openSection === "period";
@@ -105,7 +105,7 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
             {showFilters ? "Reduire" : "Developper"}
           </button>
         </div>
-        {!showFilters && <div className="sim-advanced-summary">type {typeListText} ; etats {stateListText}</div>}
+        {!showFilters && <div className="sim-advanced-summary">{typeListText} | {stateListText}</div>}
         {showFilters && <SimulationFilterControls />}
       </section>
 

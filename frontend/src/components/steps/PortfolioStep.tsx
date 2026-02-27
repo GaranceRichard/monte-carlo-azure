@@ -24,6 +24,23 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
           <b>Erreur :</b> {portfolio.err}
         </div>
       )}
+      {portfolio.reportErrors.length > 0 && (
+        <div className="ui-alert ui-alert--danger">
+          <div className="flex items-center justify-between gap-2">
+            <b>Equipes en echec :</b>
+            <button type="button" className="sim-advanced-toggle" onClick={portfolio.clearReportErrors}>
+              Fermer
+            </button>
+          </div>
+          <ul className="mt-2 list-disc pl-5 text-sm">
+            {portfolio.reportErrors.map((teamError) => (
+              <li key={teamError.teamName}>
+                <b>{teamError.teamName}</b>: {teamError.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <section className="sim-control-section">
         <h3 className="sim-control-heading">Criteres generaux</h3>
@@ -149,6 +166,7 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
       >
         {portfolio.loadingReport ? "Generation du rapport..." : "Generer rapport portefeuille"}
       </button>
+      {portfolio.reportProgressLabel && <div className="sim-advanced-summary">{portfolio.reportProgressLabel}</div>}
 
       {portfolio.showAddModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4">

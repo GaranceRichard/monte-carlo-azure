@@ -94,10 +94,10 @@ describe("SimulationControlPanel launch button visibility", () => {
     expect(filtersSection).not.toBeNull();
     if (!filtersSection) return;
 
-    expect(within(filtersSection).getByText(/type bug ; etats done/i)).not.toBeNull();
+    expect(within(filtersSection).getByText(/bug \| done/i)).not.toBeNull();
     fireEvent.click(within(filtersSection).getByRole("button", { name: /developper/i }));
 
-    expect(within(filtersSection).queryByText(/type bug ; etats done/i)).toBeNull();
+    expect(within(filtersSection).queryByText(/bug \| done/i)).toBeNull();
     expect(within(filtersSection).getByText("Filters Content")).not.toBeNull();
     expect(onExpansionChange).toHaveBeenLastCalledWith(true);
 
@@ -126,8 +126,8 @@ describe("SimulationControlPanel launch button visibility", () => {
   it("shows business-friendly summary when mode section is collapsed", () => {
     setContext({ hasLaunchedOnce: false });
     render(<SimulationControlPanel />);
-    expect(screen.getByText(/Objectif backlog: 100 items/i)).not.toBeNull();
-    expect(screen.getByText(/semaines a 0 incluses, 20000 simulations/i)).not.toBeNull();
+    expect(screen.getByText(/Backlog de 100 items/i)).not.toBeNull();
+    expect(screen.getByText(/semaines a 0 incluses \| 20000 simulations/i)).not.toBeNull();
   });
 
   it("resets simulation when opening ticket filters after a launched simulation", () => {
@@ -186,8 +186,11 @@ describe("SimulationControlPanel launch button visibility", () => {
     fireEvent.click(screen.getByRole("button", { name: /lancer la simulation/i }));
     expect(screen.getByText("Ticket et Etat obligatoires.")).not.toBeNull();
 
-    contextValue.simulation.types = ["Bug"];
-    contextValue.simulation.doneStates = ["Done"];
+    contextValue.simulation = {
+      ...contextValue.simulation,
+      types: ["Bug"],
+      doneStates: ["Done"],
+    };
     rerender(<SimulationControlPanel />);
 
     expect(screen.queryByText("Ticket et Etat obligatoires.")).toBeNull();
