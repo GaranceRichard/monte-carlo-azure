@@ -196,6 +196,16 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
                 ))}
               </select>
             </label>
+            {portfolio.modalHasQuickFilterConfig && (
+              <button
+                type="button"
+                className="sim-advanced-toggle"
+                disabled={portfolio.modalLoading}
+                onClick={portfolio.applyModalQuickFilterConfig}
+              >
+                Configuration rapide
+              </button>
+            )}
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div>

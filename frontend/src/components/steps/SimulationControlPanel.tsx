@@ -8,17 +8,29 @@ type SimulationControlPanelProps = {
   onExpansionChange?: (isExpanded: boolean) => void;
 };
 
+function formatIsoDateToFr(dateIso: string): string {
+  const [year, month, day] = dateIso.split("-");
+  if (!year || !month || !day) return dateIso;
+  return `${day}/${month}/${year}`;
+}
+
+function formatFrNumber(value: number | string): string {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return String(value);
+  return new Intl.NumberFormat("fr-CA").format(parsed);
+}
+
 export default function SimulationControlPanel({ onExpansionChange }: SimulationControlPanelProps) {
   const { selectedTeam, simulation } = useSimulationContext();
   const s = simulation;
   const [openSection, setOpenSection] = useState<"period" | "mode" | "filters" | null>(null);
   const [validationMessage, setValidationMessage] = useState("");
 
-  const modeZeroText = s.includeZeroWeeks ? "incluses" : "non incluses";
+  const modeZeroText = s.includeZeroWeeks ? "incluses" : "exclues";
   const modeSummary =
     s.simulationMode === "backlog_to_weeks"
-      ? `Backlog de ${String(s.backlogSize)} items | semaines a 0 ${modeZeroText} | ${String(s.nSims)} simulations`
-      : `Horizon de ${String(s.targetWeeks)} semaines | semaines a 0 ${modeZeroText} | ${String(s.nSims)} simulations`;
+      ? `Backlog de ${String(s.backlogSize)} items · ${formatFrNumber(s.nSims)} simulations · semaines a 0 ${modeZeroText}`
+      : `Horizon de ${String(s.targetWeeks)} semaines · ${formatFrNumber(s.nSims)} simulations · semaines a 0 ${modeZeroText}`;
   const typeListText = s.types.length ? s.types.join(", ") : "Aucun type";
   const stateListText = s.doneStates.length ? s.doneStates.join(", ") : "Aucun etat";
   const hasRequiredFilters = s.types.length > 0 && s.doneStates.length > 0;
@@ -71,7 +83,11 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
             {showPeriod ? "Reduire" : "Developper"}
           </button>
         </div>
-        {!showPeriod && <div className="sim-advanced-summary">du {s.startDate} au {s.endDate}</div>}
+        {!showPeriod && (
+          <div className="sim-advanced-summary">
+            du {formatIsoDateToFr(s.startDate)} au {formatIsoDateToFr(s.endDate)}
+          </div>
+        )}
         {showPeriod && <SimulationHistoryRangeControls />}
       </section>
       <section className="sim-control-section sim-control-section--compact">
@@ -105,7 +121,7 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
             {showFilters ? "Reduire" : "Developper"}
           </button>
         </div>
-        {!showFilters && <div className="sim-advanced-summary">{typeListText} | {stateListText}</div>}
+        {!showFilters && <div className="sim-advanced-summary">{typeListText} {"\u2192"} {stateListText}</div>}
         {showFilters && <SimulationFilterControls />}
       </section>
 

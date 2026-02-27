@@ -20,8 +20,8 @@ import { useSimulationChartData } from "./useSimulationChartData";
 import { runSimulationForecast } from "./simulationForecastService";
 import { useSimulationHistory } from "./useSimulationHistory";
 import { useSimulationPrefs } from "./useSimulationPrefs";
+import { useSimulationQuickFilters } from "./useSimulationQuickFilters";
 import { useTeamOptions } from "./useTeamOptions";
-import { buildQuickFiltersScopeKey, writeStoredQuickFilters } from "../storage";
 
 const TOOLTIP_BASE_PROPS: TooltipBaseProps = {
   cursor: false,
@@ -124,7 +124,7 @@ export function useSimulation({
 
   const quickFiltersScopeKey = useMemo(() => {
     if (!selectedOrg || !selectedProject || !selectedTeam) return "";
-    return buildQuickFiltersScopeKey(selectedOrg, selectedProject, selectedTeam);
+    return `${selectedOrg}::${selectedProject}::${selectedTeam}`;
   }, [selectedOrg, selectedProject, selectedTeam]);
 
   const {
@@ -156,28 +156,20 @@ export function useSimulation({
     return Array.from(out).sort();
   }, [types, statesByType]);
 
+  useSimulationQuickFilters({
+    step,
+    selectedOrg,
+    selectedProject,
+    selectedTeam,
+    workItemTypeOptions,
+    statesByType,
+    types,
+    doneStates,
+  });
+
   useEffect(() => {
     setDoneStates((prev) => prev.filter((state) => filteredDoneStateOptions.includes(state)));
   }, [filteredDoneStateOptions]);
-
-  useEffect(() => {
-    if (step !== "simulation" || !quickFiltersScopeKey) return;
-
-    const allowedTypes = new Set(workItemTypeOptions);
-    const persistedTypes = types.filter((type, idx, arr) => allowedTypes.has(type) && arr.indexOf(type) === idx);
-    if (!persistedTypes.length) return;
-
-    const allowedStates = new Set(persistedTypes.flatMap((type) => statesByType[type] || []));
-    const persistedDoneStates = doneStates.filter(
-      (state, idx, arr) => allowedStates.has(state) && arr.indexOf(state) === idx,
-    );
-    if (!persistedDoneStates.length) return;
-
-    writeStoredQuickFilters(quickFiltersScopeKey, {
-      types: persistedTypes,
-      doneStates: persistedDoneStates,
-    });
-  }, [doneStates, quickFiltersScopeKey, statesByType, step, types, workItemTypeOptions]);
 
   const clearComputedSimulationState = useCallback(() => {
     setResult(null);

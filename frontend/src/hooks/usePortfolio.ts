@@ -2,18 +2,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { getTeamOptionsDirect } from "../adoClient";
 import { nWeeksAgo, today } from "../date";
-import { runSimulationForecast } from "./simulationForecastService";
 import type { ForecastMode, NamedEntity } from "../types";
 import { sortTeams } from "../utils/teamSort";
-import { formatAdoHttpErrorMessage, type AdoErrorContext } from "../adoErrors";
+import { buildQuickFiltersScopeKey, readStoredQuickFilters, writeStoredQuickFilters } from "../storage";
+import { getPortfolioErrorMessage, usePortfolioReport, type TeamPortfolioConfig } from "./usePortfolioReport";
+import type { AdoErrorContext } from "../adoErrors";
 
-export type TeamPortfolioConfig = {
-  teamName: string;
-  workItemTypeOptions: string[];
-  statesByType: Record<string, string[]>;
-  types: string[];
-  doneStates: string[];
-};
+export type { TeamPortfolioConfig } from "./usePortfolioReport";
 
 type UsePortfolioParams = {
   selectedOrg: string;
@@ -27,25 +22,23 @@ type TeamOptionsCacheEntry = {
   statesByType: Record<string, string[]>;
 };
 
-type TeamReportError = {
-  teamName: string;
-  message: string;
+type QuickFilterSelection = {
+  types: string[];
+  doneStates: string[];
 };
 
-function getPortfolioErrorMessage(error: unknown, context: AdoErrorContext): string {
-  if (error instanceof Error) return error.message;
-
-  if (error && typeof error === "object") {
-    const statusValue = (error as { status?: unknown }).status;
-    const statusTextValue = (error as { statusText?: unknown }).statusText;
-    const status = typeof statusValue === "number" ? statusValue : NaN;
-    const statusText = typeof statusTextValue === "string" ? statusTextValue : "";
-    if (Number.isFinite(status) && status >= 100 && status <= 599) {
-      return formatAdoHttpErrorMessage(status, context, statusText);
-    }
-  }
-
-  return `Erreur inattendue pendant "${context.operation}".`;
+function getValidQuickFilterSelection(
+  workItemTypeOptions: string[],
+  statesByType: Record<string, string[]>,
+  quickFilters: QuickFilterSelection,
+): QuickFilterSelection {
+  const allowedTypes = new Set(workItemTypeOptions);
+  const types = quickFilters.types.filter((type, idx, arr) => allowedTypes.has(type) && arr.indexOf(type) === idx);
+  const allowedStates = new Set(types.flatMap((type) => statesByType[type] || []));
+  const doneStates = quickFilters.doneStates.filter(
+    (state, idx, arr) => allowedStates.has(state) && arr.indexOf(state) === idx,
+  );
+  return { types, doneStates };
 }
 
 export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePortfolioParams) {
@@ -57,11 +50,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
   const [targetWeeks, setTargetWeeks] = useState<number>(12);
   const [nSims, setNSims] = useState<number>(20000);
 
-  const [loadingReport, setLoadingReport] = useState<boolean>(false);
-  const [err, setErr] = useState<string>("");
   const [modalErr, setModalErr] = useState<string>("");
-  const [reportProgressLabel, setReportProgressLabel] = useState<string>("");
-  const [reportErrors, setReportErrors] = useState<TeamReportError[]>([]);
   const [teamConfigs, setTeamConfigs] = useState<TeamPortfolioConfig[]>([]);
 
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
@@ -71,6 +60,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
   const [modalStatesByType, setModalStatesByType] = useState<Record<string, string[]>>({});
   const [modalTypes, setModalTypes] = useState<string[]>([]);
   const [modalDoneStates, setModalDoneStates] = useState<string[]>([]);
+  const [modalHasQuickFilterConfig, setModalHasQuickFilterConfig] = useState<boolean>(false);
   const teamOptionsCacheRef = useRef<Map<string, TeamOptionsCacheEntry>>(new Map());
 
   const sortedTeams = useMemo(() => sortTeams(teams), [teams]);
@@ -87,6 +77,28 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     return Array.from(out).sort();
   }, [modalTypes, modalStatesByType]);
 
+  const {
+    loadingReport,
+    reportErr,
+    reportProgressLabel,
+    reportErrors,
+    handleGenerateReport,
+    clearReportErrors,
+    clearReportErr,
+  } = usePortfolioReport({
+    selectedOrg,
+    selectedProject,
+    pat,
+    startDate,
+    endDate,
+    includeZeroWeeks,
+    simulationMode,
+    backlogSize,
+    targetWeeks,
+    nSims,
+    teamConfigs,
+  });
+
   const canGenerate = teamConfigs.length > 0 && !loadingReport;
 
   useEffect(() => {
@@ -95,6 +107,15 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
 
   function getTeamCacheKey(teamName: string): string {
     return `${selectedOrg}::${selectedProject}::${teamName}`;
+  }
+
+  function getQuickFiltersScopeKey(teamName: string): string {
+    if (!teamName) return "";
+    return buildQuickFiltersScopeKey(selectedOrg, selectedProject, teamName);
+  }
+
+  function refreshModalQuickFilterAvailability(teamName: string): void {
+    setModalHasQuickFilterConfig(Boolean(readStoredQuickFilters(getQuickFiltersScopeKey(teamName))));
   }
 
   function handlePortfolioError(
@@ -111,6 +132,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
       setModalStatesByType({});
       setModalTypes([]);
       setModalDoneStates([]);
+      setModalHasQuickFilterConfig(false);
       return;
     }
     const cachedOptions = teamOptionsCacheRef.current.get(getTeamCacheKey(teamName));
@@ -119,6 +141,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
       setModalStatesByType(cachedOptions.statesByType);
       setModalTypes([]);
       setModalDoneStates([]);
+      refreshModalQuickFilterAvailability(teamName);
       return;
     }
 
@@ -134,6 +157,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
       setModalStatesByType(nextCacheEntry.statesByType);
       setModalTypes([]);
       setModalDoneStates([]);
+      refreshModalQuickFilterAvailability(teamName);
     } catch (e: unknown) {
       handlePortfolioError(setModalErr, e, {
         operation: "chargement des types de tickets",
@@ -148,7 +172,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
   }
 
   function openAddModal(): void {
-    setErr("");
+    clearReportErr();
     setModalErr("");
     const initialTeam = availableTeamNames[0] ?? "";
     setModalTeamName(initialTeam);
@@ -156,6 +180,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     setModalStatesByType({});
     setModalTypes([]);
     setModalDoneStates([]);
+    setModalHasQuickFilterConfig(false);
     setShowAddModal(true);
     void loadTeamOptions(initialTeam);
   }
@@ -163,12 +188,25 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
   function closeAddModal(): void {
     setShowAddModal(false);
     setModalErr("");
+    setModalHasQuickFilterConfig(false);
   }
 
   function onModalTeamNameChange(teamName: string): void {
     setModalErr("");
     setModalTeamName(teamName);
     void loadTeamOptions(teamName);
+  }
+
+  function applyModalQuickFilterConfig(): void {
+    const storedQuickFilters = readStoredQuickFilters(getQuickFiltersScopeKey(modalTeamName));
+    setModalHasQuickFilterConfig(Boolean(storedQuickFilters));
+    if (!storedQuickFilters) return;
+
+    const nextSelection = getValidQuickFilterSelection(modalTypeOptions, modalStatesByType, storedQuickFilters);
+    if (!nextSelection.types.length || !nextSelection.doneStates.length) return;
+
+    setModalTypes(nextSelection.types);
+    setModalDoneStates(nextSelection.doneStates);
   }
 
   function toggleModalType(ticketType: string, checked: boolean): void {
@@ -200,6 +238,11 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
       return;
     }
 
+    writeStoredQuickFilters(getQuickFiltersScopeKey(modalTeamName), {
+      types: modalTypes,
+      doneStates: modalDoneStates,
+    });
+
     setTeamConfigs((prev) => [
       ...prev,
       {
@@ -216,108 +259,6 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
 
   function removeTeam(teamName: string): void {
     setTeamConfigs((prev) => prev.filter((cfg) => cfg.teamName !== teamName));
-  }
-
-  async function handleGenerateReport(): Promise<void> {
-    if (!teamConfigs.length) return;
-
-    setErr("");
-    setReportErrors([]);
-    setLoadingReport(true);
-    const totalTeams = teamConfigs.length;
-    setReportProgressLabel(`0/${String(totalTeams)} equipes simulees`);
-    try {
-      let completedTeams = 0;
-      const settledSections = await Promise.allSettled(
-        teamConfigs.map(async (cfg) => {
-          try {
-            const forecast = await runSimulationForecast({
-              selectedOrg,
-              selectedProject,
-              selectedTeam: cfg.teamName,
-              pat,
-              startDate,
-              endDate,
-              doneStates: cfg.doneStates,
-              types: cfg.types,
-              includeZeroWeeks,
-              simulationMode,
-              backlogSize,
-              targetWeeks,
-              nSims,
-              capacityPercent: 100,
-              reducedCapacityWeeks: 0,
-            });
-            return {
-              selectedTeam: cfg.teamName,
-              simulationMode,
-              includeZeroWeeks,
-              backlogSize: Number(backlogSize),
-              targetWeeks: Number(targetWeeks),
-              nSims: Number(nSims),
-              resultKind: forecast.result.result_kind,
-              riskScore: forecast.result.risk_score,
-              distribution: forecast.result.result_distribution,
-              weeklyThroughput: forecast.weeklyThroughput,
-              displayPercentiles: forecast.result.result_percentiles,
-            };
-          } catch (error: unknown) {
-            throw { teamName: cfg.teamName, error };
-          } finally {
-            completedTeams += 1;
-            setReportProgressLabel(`${String(completedTeams)}/${String(totalTeams)} equipes simulees`);
-          }
-        }),
-      );
-
-      const sections = [];
-      const teamErrors: TeamReportError[] = [];
-      for (const result of settledSections) {
-        if (result.status === "fulfilled") {
-          sections.push(result.value);
-          continue;
-        }
-        const reason = result.reason as { teamName?: unknown; error?: unknown };
-        const failedTeamName = typeof reason?.teamName === "string" ? reason.teamName : "Equipe inconnue";
-        teamErrors.push({
-          teamName: failedTeamName,
-          message: getPortfolioErrorMessage(reason?.error, {
-            operation: "generation du rapport portefeuille",
-            org: selectedOrg,
-            project: selectedProject,
-            team: failedTeamName,
-            requiredScopes: ["Work Items (Read)"],
-          }),
-        });
-      }
-      setReportErrors(teamErrors);
-
-      if (!sections.length) {
-        setErr("Aucune equipe n'a pu etre simulee.");
-        return;
-      }
-
-      const { exportPortfolioPrintReport } = await import("../components/steps/portfolioPrintReport");
-      exportPortfolioPrintReport({
-        selectedProject,
-        startDate,
-        endDate,
-        sections,
-      });
-    } catch (e: unknown) {
-      handlePortfolioError(setErr, e, {
-        operation: "generation du rapport portefeuille",
-        org: selectedOrg,
-        project: selectedProject,
-        requiredScopes: ["Work Items (Read)"],
-      });
-    } finally {
-      setLoadingReport(false);
-    }
-  }
-
-  function clearReportErrors(): void {
-    setReportErrors([]);
   }
 
   return {
@@ -338,7 +279,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     loadingReport,
     reportProgressLabel,
     reportErrors,
-    err,
+    err: reportErr,
     modalErr,
     teamConfigs,
     showAddModal,
@@ -347,12 +288,14 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     modalTypeOptions,
     modalTypes,
     modalDoneStates,
+    modalHasQuickFilterConfig,
     availableTeamNames,
     modalAvailableStates,
     canGenerate,
     openAddModal,
     closeAddModal,
     onModalTeamNameChange,
+    applyModalQuickFilterConfig,
     toggleModalType,
     toggleModalState,
     validateAddModal,

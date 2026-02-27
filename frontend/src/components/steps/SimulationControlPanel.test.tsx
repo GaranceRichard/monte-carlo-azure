@@ -94,10 +94,10 @@ describe("SimulationControlPanel launch button visibility", () => {
     expect(filtersSection).not.toBeNull();
     if (!filtersSection) return;
 
-    expect(within(filtersSection).getByText(/bug \| done/i)).not.toBeNull();
+    expect(within(filtersSection).getByText(/bug\s+\u2192\s+done/i)).not.toBeNull();
     fireEvent.click(within(filtersSection).getByRole("button", { name: /developper/i }));
 
-    expect(within(filtersSection).queryByText(/bug \| done/i)).toBeNull();
+    expect(within(filtersSection).queryByText(/bug\s+\u2192\s+done/i)).toBeNull();
     expect(within(filtersSection).getByText("Filters Content")).not.toBeNull();
     expect(onExpansionChange).toHaveBeenLastCalledWith(true);
 
@@ -127,7 +127,9 @@ describe("SimulationControlPanel launch button visibility", () => {
     setContext({ hasLaunchedOnce: false });
     render(<SimulationControlPanel />);
     expect(screen.getByText(/Backlog de 100 items/i)).not.toBeNull();
-    expect(screen.getByText(/semaines a 0 incluses \| 20000 simulations/i)).not.toBeNull();
+    expect(screen.getByText(/20\s?000 simulations/i)).not.toBeNull();
+    expect(screen.getByText(/semaines a 0 incluses/i)).not.toBeNull();
+    expect(screen.getByText(/du 01\/01\/2026 au 01\/02\/2026/i)).not.toBeNull();
   });
 
   it("resets simulation when opening ticket filters after a launched simulation", () => {
@@ -169,8 +171,8 @@ describe("SimulationControlPanel launch button visibility", () => {
         loading: false,
         hasLaunchedOnce: false,
         runForecast,
-        types: [],
-        doneStates: [],
+        types: [] as string[],
+        doneStates: [] as string[],
         startDate: "2026-01-01",
         endDate: "2026-02-01",
         simulationMode: "backlog_to_weeks",

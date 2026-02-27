@@ -22,7 +22,9 @@ Refactors récents (frontend):
 - extraction de l'export CSV throughput vers `src/utils/export.ts`
 - extraction de la logique de calcul forecast vers `src/hooks/simulationForecastService.ts`
 - extraction de la logique portefeuille vers `src/hooks/usePortfolio.ts` (etat modale, options equipe, orchestration forecast/rapport)
+- extraction de la generation du rapport portefeuille vers `src/hooks/usePortfolioReport.ts` (progression, erreurs par equipe, export partiel)
 - extraction du chargement des options d'equipe simulation vers `src/hooks/useTeamOptions.ts` (work item types + states par type)
+- extraction de la persistance des quick filters simulation vers `src/hooks/useSimulationQuickFilters.ts`
 - simplification du contrat de `useSimulationAutoRun` via un objet `params` groupe (surface d'entree reduite, comportement inchange)
 - libelles metier clarifies dans l'UI portefeuille/simulation (modes lisibles pour PMO/COPIL)
 - calcul du `risk score` harmonise sur les percentiles effectivement affiches (notamment mode `weeks_to_items`), avec affichage a 2 decimales dans les rapports
@@ -34,6 +36,7 @@ Refactors récents (frontend):
 - génération du rapport portefeuille parallélisée (`Promise.allSettled`) avec progression visible `x/n équipes simulées`
 - tolérance aux échecs partiels en portefeuille: les équipes en erreur sont listées sans bloquer l'export des équipes valides
 - persistance locale de la "Configuration rapide" (types + états) par scope `org::project::team`, avec auto-apply si valide + bouton d'application manuelle
+- modale portefeuille: bouton `Configuration rapide` affiche si une configuration existe pour l'equipe selectionnee, avec application manuelle et sauvegarde a la validation
 - résumés compactés du panneau simulation reformulés en libellés métier plus lisibles (période, mode, filtres)
 
 Mises à jour récentes (backend/tests):
@@ -64,7 +67,9 @@ Mises à jour récentes (backend/tests):
 - Persistence MongoDB des simulations via `/simulate` + restitution des 10 dernières via `/simulations/history`
 - Paramètre de capacité réduite (ex: équipe à 70% pendant N semaines)
 - Configuration rapide des filtres (types + états) mémorisée localement par organisation/projet/équipe
+- Modale portefeuille: application de la configuration rapide existante par equipe et ecriture de la configuration validee
 - Rapport portefeuille avec progression de simulation et gestion des erreurs par équipe
+- Rapport portefeuille tolerant aux echecs partiels (export maintenu avec les equipes reussies)
 
 ---
 
@@ -114,8 +119,10 @@ frontend/
       useSimulationHistory.ts      # historique local (10 dernières simulations)
       useSimulationChartData.ts    # mapping/useMemo des données graphiques
       useSimulationAutoRun.ts      # auto-run avec debounce (entree via objet params)
+      useSimulationQuickFilters.ts # persistance des quick filters simulation (scope org/projet/equipe)
       useTeamOptions.ts            # chargement options equipe (types + etats) pour simulation
-      usePortfolio.ts              # logique mode portefeuille (equipes, modal, generation rapport)
+      usePortfolio.ts              # logique mode portefeuille (equipes, modal, quick config)
+      usePortfolioReport.ts        # generation rapport portefeuille (parallelisation, progression, erreurs)
     components/steps/
       SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
       simulationPrintReport.tsx    # rapport imprimable (orchestration HTML)
