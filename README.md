@@ -344,6 +344,7 @@ Workflow: `.github/workflows/ci.yml`
 - Job `publish`
   - Déclenché uniquement sur `push` vers `main` après `docker-smoke`
   - Build + push de l'image vers GHCR avec tags `latest` et `${{ github.sha }}`
+  - Le nom d'image GHCR est normalisé en minuscules (contrainte GHCR)
 
 ---
 
