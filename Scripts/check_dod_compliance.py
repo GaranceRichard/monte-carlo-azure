@@ -86,6 +86,11 @@ def main() -> int:
         errors,
     )
     _ok("--cov-fail-under=80" in ci, "CI must enforce backend coverage >= 80", errors)
+    _ok(
+        ("services:" in ci) and ("mongo:" in ci) and ("image: mongo:7" in ci),
+        "CI must declare a real MongoDB service for integration tests",
+        errors,
+    )
 
     # Coverage task integration checks (VS Code): optional local developer file.
     tasks_path = ROOT / ".vscode" / "tasks.json"

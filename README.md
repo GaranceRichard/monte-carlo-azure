@@ -274,7 +274,7 @@ Depuis la racine:
 ```bash
 .venv\Scripts\python.exe -m ruff check .
 .venv\Scripts\python.exe -m ruff format --check .
-.venv\Scripts\python.exe -m pytest --cov=backend --cov-report=term-missing -q
+APP_MONGO_URL=mongodb://localhost:27017 APP_MONGO_DB=montecarlo_test .venv\Scripts\python.exe -m pytest --cov=backend --cov-report=term-missing -q
 ```
 
 Frontend:
@@ -308,7 +308,9 @@ Suite E2E découpée:
 - `frontend/tests/e2e/onboarding.spec.js`
 - `frontend/tests/e2e/selection.spec.js`
 - `frontend/tests/e2e/simulation.spec.js`
-- `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul agrégés: statements >= 80%, branches >= 80%, functions >= 80%, lines >= 80%)
+- `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul agrégés: statements >= 80%, branches >= 82%, functions >= 80%, lines >= 80%)
+
+Sous Windows/VS Code, les tâches `pytest --cov` parallèles utilisent des fichiers coverage distincts via `COVERAGE_FILE` pour éviter les conflits de verrouillage.
 
 ---
 
@@ -317,12 +319,13 @@ Suite E2E découpée:
 Workflow: `.github/workflows/ci.yml`
 
 - Job `backend-tests`
+  - Service MongoDB réel (`mongo:7`) pour exécuter les tests d'intégration
   - Setup Python 3.12
   - Installation des dépendances backend
   - Lint backend: `python -m ruff check .`
   - Vérification DoD: `python Scripts/check_dod_compliance.py`
   - Contrôle SLA identité: `python Scripts/check_identity_boundary.py`
-  - Tests backend + seuil coverage: `python -m pytest --cov=backend --cov-fail-under=80 -q`
+  - Tests backend + seuil coverage: `python -m pytest --cov=backend --cov-fail-under=80 -q` avec `APP_MONGO_URL`/`APP_MONGO_DB`
 
 - Job `frontend-tests`
   - Setup Node.js 22
@@ -337,6 +340,10 @@ Workflow: `.github/workflows/ci.yml`
   - Démarrage via `docker compose up -d --build`
   - Smoke test santé: `GET /health` + `GET /health/mongo`
   - Vérification persistence: `POST /simulate` puis `GET /simulations/history` avec cookie `IDMontecarlo`
+
+- Job `publish`
+  - Déclenché uniquement sur `push` vers `main` après `docker-smoke`
+  - Build + push de l'image vers GHCR avec tags `latest` et `${{ github.sha }}`
 
 ---
 

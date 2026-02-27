@@ -101,3 +101,57 @@ def test_simulation_history_returns_empty_without_cookie(monkeypatch):
     r = client.get("/simulations/history")
     assert r.status_code == 200
     assert r.json() == []
+
+
+def test_simulation_history_returns_503_when_store_unavailable(monkeypatch):
+    fake = _FakeStore(enabled=True, fail=True)
+    monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
+    client_id = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+
+    client = TestClient(app)
+    client.cookies.set(api_routes_simulate.cfg.client_cookie_name, client_id)
+    r = client.get("/simulations/history")
+    assert r.status_code == 503
+    assert "Historique indisponible" in r.json()["detail"]
+
+
+def test_simulation_history_returns_503_on_malformed_store_row(monkeypatch):
+    fake = _FakeStore(
+        enabled=True,
+        rows=[
+            {
+                "created_at": "2026-02-26T10:00:00Z",
+                "last_seen": "2026-02-26T10:00:00Z",
+                "mode": "bad-mode-value",
+            }
+        ],
+    )
+    monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
+    client_id = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+
+    client = TestClient(app)
+    client.cookies.set(api_routes_simulate.cfg.client_cookie_name, client_id)
+    r = client.get("/simulations/history")
+    assert r.status_code == 503
+    assert "Historique indisponible" in r.json()["detail"]
+
+
+def test_simulate_returns_503_when_store_unavailable(monkeypatch):
+    fake = _FakeStore(enabled=True, fail=True)
+    monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
+    client_id = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+
+    client = TestClient(app)
+    client.cookies.set(api_routes_simulate.cfg.client_cookie_name, client_id)
+    r = client.post(
+        "/simulate",
+        json={
+            "throughput_samples": [1, 2, 3, 4, 5, 6],
+            "mode": "backlog_to_weeks",
+            "backlog_size": 20,
+            "n_sims": 2000,
+            "capacity_percent": 90,
+        },
+    )
+    assert r.status_code == 503
+    assert "Persistence Mongo indisponible" in r.json()["detail"]

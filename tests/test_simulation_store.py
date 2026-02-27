@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import os
+import uuid
 from datetime import datetime, timezone
+
+import pytest
+from pymongo import MongoClient
 
 from backend.api_config import ApiConfig
 from backend.api_models import ClientContext, DistributionBucket, SimulateRequest, SimulateResponse
@@ -38,8 +43,8 @@ class _FakeCollection:
         self.updated = []
         self.find_calls = []
 
-    def create_index(self, spec):
-        self.index_calls.append(spec)
+    def create_index(self, spec, **kwargs):
+        self.index_calls.append((spec, kwargs))
 
     def insert_one(self, doc):
         self.inserted.append(doc)
@@ -153,6 +158,8 @@ def test_save_simulation_inserts_and_updates(monkeypatch):
     store.save_simulation("c1", req, resp)
 
     assert len(fake_coll.index_calls) == 2
+    assert fake_coll.index_calls[1][0] == [("last_seen", 1)]
+    assert fake_coll.index_calls[1][1]["expireAfterSeconds"] == 30 * 24 * 3600
     assert len(fake_coll.inserted) == 1
     assert fake_coll.inserted[0]["mc_client_id"] == "c1"
     assert fake_coll.inserted[0]["capacity_percent"] == 95
@@ -199,3 +206,51 @@ def test_list_recent_converts_datetimes_to_iso(monkeypatch):
     assert out[1]["created_at"] == "already-string"
     assert out[1]["last_seen"] == "already-string"
     assert fake_coll.find_calls[0][0] == {"mc_client_id": "c1"}
+
+
+def test_save_and_list_recent_with_real_mongo():
+    mongo_url = (os.getenv("APP_MONGO_URL") or "mongodb://localhost:27017").strip()
+
+    db_name = f"{(os.getenv('APP_MONGO_DB') or 'montecarlo_test').strip()}_{uuid.uuid4().hex[:8]}"
+    collection_name = "simulations_integration"
+    cfg = ApiConfig(
+        cors_origins=["http://localhost:5173"],
+        cors_allow_credentials=True,
+        forecast_timeout_seconds=30.0,
+        rate_limit_simulate="20/minute",
+        rate_limit_storage_url="memory://",
+        client_cookie_name="IDMontecarlo",
+        simulation_history_limit=10,
+        mongo_url=mongo_url,
+        mongo_db=db_name,
+        mongo_collection_simulations=collection_name,
+    )
+    store = SimulationStore(cfg)
+    req, resp = _req_resp()
+    client = MongoClient(mongo_url, serverSelectionTimeoutMS=1200)
+
+    try:
+        try:
+            store.save_simulation("integration-client", req, resp)
+            rows = store.list_recent("integration-client")
+        except Exception as exc:
+            pytest.fail(
+                f"MongoDB integration test requires a reachable Mongo instance at {mongo_url} "
+                f"(override with APP_MONGO_URL). Error: {exc}"
+            )
+
+        assert len(rows) == 1
+        row = rows[0]
+        assert row["mode"] == "backlog_to_weeks"
+        assert row["samples_count"] == 6
+        assert row["capacity_percent"] == 95
+        assert row["percentiles"]["P50"] == 10
+
+        indexes = list(client[db_name][collection_name].list_indexes())
+        ttl_indexes = [
+            idx for idx in indexes if idx.get("key") == {"last_seen": 1} and "expireAfterSeconds" in idx
+        ]
+        assert ttl_indexes
+        assert ttl_indexes[0]["expireAfterSeconds"] == 30 * 24 * 3600
+    finally:
+        client.drop_database(db_name)

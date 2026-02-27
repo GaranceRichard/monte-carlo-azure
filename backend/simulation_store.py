@@ -44,7 +44,10 @@ class SimulationStore:
         self._client = MongoClient(self._mongo_url, serverSelectionTimeoutMS=1200)
         self._collection = self._client[self._mongo_db][self._collection_name]
         self._collection.create_index([("mc_client_id", 1), ("created_at", DESCENDING)])
-        self._collection.create_index([("last_seen", 1)])
+        self._collection.create_index(
+            [("last_seen", 1)],
+            expireAfterSeconds=30 * 24 * 3600,
+        )
         return self._collection
 
     def save_simulation(

@@ -50,7 +50,7 @@ test.describe("e2e istanbul coverage", () => {
     expect(summary.files).toBeGreaterThan(0);
     expect(summary.statements.total).toBeGreaterThan(0);
     expect(summary.statements.pct).toBeGreaterThanOrEqual(80);
-    expect(summary.branches.pct).toBeGreaterThanOrEqual(80);
+    expect(summary.branches.pct).toBeGreaterThanOrEqual(82);
     expect(summary.functions.pct).toBeGreaterThanOrEqual(80);
     expect(summary.lines.pct).toBeGreaterThanOrEqual(80);
   });
@@ -208,6 +208,96 @@ test.describe("e2e istanbul coverage", () => {
       dateMod.formatDateLocal(new Date("2026-02-26T12:00:00.000Z"));
       dateMod.today();
       dateMod.nWeeksAgo(4);
+
+      const simulationMod = await import("/src/utils/simulation.ts");
+      simulationMod.computeRiskScoreFromPercentiles("backlog_to_weeks", { P50: 0, P90: 4 });
+      simulationMod.computeRiskScoreFromPercentiles("backlog_to_weeks", { P50: 10, P90: 14 });
+      simulationMod.computeRiskScoreFromPercentiles("weeks_to_items", { P50: 12, P90: 9 });
+      const baseResponse = {
+        result_kind: "weeks",
+        result_percentiles: { P50: 8, P70: 10, P90: 14 },
+        risk_score: 0.2,
+        result_distribution: [{ x: 8, count: 10 }],
+        samples_count: 6,
+      };
+      simulationMod.applyCapacityReductionToResult(baseResponse, "backlog_to_weeks", 0, 100, 0);
+      simulationMod.applyCapacityReductionToResult(baseResponse, "backlog_to_weeks", 0, 70, 6);
+      simulationMod.applyCapacityReductionToResult(
+        {
+          ...baseResponse,
+          result_kind: "items",
+          result_distribution: [{ x: 50, count: 8 }],
+        },
+        "weeks_to_items",
+        12,
+        70,
+        6,
+      );
+
+      const adoErrorMod = await import("/src/adoErrors.ts");
+      adoErrorMod.formatAdoHttpErrorMessage(401, { operation: "profile" });
+      adoErrorMod.formatAdoHttpErrorMessage(403, { operation: "projects", requiredScopes: [] });
+      adoErrorMod.formatAdoHttpErrorMessage(404, { operation: "teams", org: "org" });
+      adoErrorMod.formatAdoHttpErrorMessage(404, { operation: "teams", org: "org", project: "proj" });
+      adoErrorMod.formatAdoHttpErrorMessage(404, { operation: "teams", org: "org", project: "proj", team: "alpha" });
+      adoErrorMod.formatAdoHttpErrorMessage(429, { operation: "wiql" });
+      adoErrorMod.formatAdoHttpErrorMessage(503, { operation: "throughput" }, "Service Unavailable");
+      adoErrorMod.formatAdoHttpErrorMessage(418, { operation: "other" });
+      adoErrorMod.toAdoHttpError(new Response("{}", { status: 401, statusText: "Unauthorized" }), { operation: "profile" });
+      adoErrorMod.toAdoNetworkError(new Error("boom"), { operation: "fetch" });
+      adoErrorMod.toAdoNetworkError("boom", { operation: "fetch" });
+
+      const teamSortMod = await import("/src/utils/teamSort.ts");
+      teamSortMod.sortTeams([{ name: "Equipe B-2" }, { name: "Equipe A-1" }, { name: "Équipe A-3" }]);
+
+      const chartSvgMod = await import("/src/components/steps/simulationChartsSvg.ts");
+      chartSvgMod.renderThroughputChart([]);
+      chartSvgMod.renderThroughputChart([{ week: "2026-W01", throughput: 0, movingAverage: 0 }]);
+      chartSvgMod.renderThroughputChart([
+        { week: "<W1>", throughput: Number.NaN, movingAverage: 120 },
+        { week: "W2", throughput: 18.456, movingAverage: 11.25 },
+      ]);
+      chartSvgMod.renderDistributionChart([]);
+      chartSvgMod.renderDistributionChart([{ x: 1, count: 2, gauss: 1.5 }]);
+      chartSvgMod.renderDistributionChart([
+        { x: 1, count: 200, gauss: 180 },
+        { x: 2, count: 10.52, gauss: 11.1 },
+      ]);
+      chartSvgMod.renderProbabilityChart([]);
+      chartSvgMod.renderProbabilityChart([{ x: 1, probability: 120 }]);
+
+      const originalFetch = window.fetch.bind(window);
+      const calls = [];
+      window.fetch = async (url, init) => {
+        calls.push({ url: String(url), method: init?.method || "GET" });
+        if (String(url).includes("/simulate")) {
+          return new Response(
+            JSON.stringify({ detail: "bad payload" }),
+            { status: 400, headers: { "content-type": "application/json" } },
+          );
+        }
+        if (calls.length % 2 === 0) {
+          return new Response("not-json", { status: 200, headers: { "content-type": "text/plain" } });
+        }
+        return new Response(JSON.stringify({ hello: "world" }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      };
+
+      try {
+        const apiMod = await import("/src/api.ts");
+        await apiMod.postSimulate({
+          throughput_samples: [1, 2, 3, 4, 5, 6],
+          mode: "backlog_to_weeks",
+          backlog_size: 10,
+          n_sims: 2000,
+        }).catch(() => null);
+        await apiMod.getSimulationHistory();
+        await apiMod.getSimulationHistory();
+      } finally {
+        window.fetch = originalFetch;
+      }
     });
   });
 

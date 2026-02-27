@@ -1,3 +1,7 @@
+import json
+import logging
+import time
+
 import numpy as np
 from fastapi import APIRouter, HTTPException, Request
 from slowapi import Limiter
@@ -16,6 +20,7 @@ from .simulation_store import SimulationStore
 router = APIRouter()
 cfg = get_api_config()
 simulation_store = SimulationStore(cfg)
+logger = logging.getLogger(__name__)
 
 
 def _client_key_from_request(request: Request) -> str:
@@ -36,6 +41,7 @@ limiter = Limiter(
 @router.post("/simulate", response_model=SimulateResponse)
 @limiter.limit(cfg.rate_limit_simulate)
 def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
+    started_at = time.perf_counter()
     samples = np.array(req.throughput_samples)
     if req.include_zero_weeks:
         samples = samples[samples >= 0]
@@ -96,6 +102,19 @@ def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
                 503,
                 "Persistence Mongo indisponible. Reessayez plus tard.",
             ) from exc
+
+    logger.info(
+        json.dumps(
+            {
+                "event": "simulation_completed",
+                "mode": req.mode,
+                "n_sims": req.n_sims,
+                "samples_count": response_model.samples_count,
+                "duration_ms": round((time.perf_counter() - started_at) * 1000, 2),
+            },
+            ensure_ascii=True,
+        )
+    )
 
     return response_model
 
