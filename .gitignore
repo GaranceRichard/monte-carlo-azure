@@ -53,4 +53,5 @@ frontend/dist-ssr/
 frontend/coverage/
 frontend/playwright-report/
 frontend/test-results/
+test-results/
 frontend/*.tsbuildinfo
