@@ -42,6 +42,7 @@ Refactors récents (frontend):
 - rapport portefeuille PDF enrichi: page de synthèse décisionnelle + hypothèses, détails par scénario, amélioration visuelle du tableau de synthèse (taille/couleurs/contraste) et espacement ajusté
 - refonte des scénarios portefeuille: `Conservateur` basé sur médiane x nb équipes (au lieu de `min` strict) + nouveau scénario `Friction (r^n)`
 - page de synthèse PDF: ajout d'un graphe comparatif des 4 courbes de probabilité (Optimiste, Arrimé, Friction, Conservateur)
+- correction CI front: tests portefeuille alignés sur 4 scénarios + titre de graphe synthèse `courbes de probabilités comparées`
 - ordre des scénarios harmonisé partout: `Optimiste -> Arrimé -> Friction -> Conservateur`, avec progression `nb équipes + 4`
 - correction d'un bug de cohérence `Risk Score` entre synthèse PDF et pages de détail (même logique de percentiles selon le mode)
 - correction du déclenchement multi-téléchargements PDF (binding bouton unique, suppression des doublons)

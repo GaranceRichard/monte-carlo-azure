@@ -143,7 +143,7 @@ describe("exportPortfolioPrintReport", () => {
     expect(writtenHtml).toContain("<td>Arrimé (80%)</td>");
     expect(writtenHtml).toContain("<td>Friction (64%)</td>");
     expect(writtenHtml).toContain("<td>Conservateur</td>");
-    expect(writtenHtml).toContain("Courbes de probabilités comparées");
+    expect(writtenHtml).toContain("courbes de probabilités comparées");
     expect(writtenHtml).toContain("aria-label=\"Comparaison des probabilites\"");
   });
 

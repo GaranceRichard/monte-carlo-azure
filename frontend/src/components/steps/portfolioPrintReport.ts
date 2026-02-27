@@ -320,7 +320,7 @@ function buildSummaryPage({
       </section>
 
       <section class="section">
-        <h2>Courbes de probabilités comparées</h2>
+        <h2>courbes de probabilités comparées</h2>
         <div class="chart-wrap">${overlaySvg}</div>
       </section>
 

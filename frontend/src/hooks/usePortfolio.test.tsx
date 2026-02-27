@@ -90,7 +90,7 @@ describe("usePortfolio", () => {
     });
 
     expect(vi.mocked(fetchTeamThroughput)).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(simulateForecastFromSamples)).toHaveBeenCalledTimes(4);
+    expect(vi.mocked(simulateForecastFromSamples)).toHaveBeenCalledTimes(5);
     expect(vi.mocked(exportPortfolioPrintReport)).toHaveBeenCalledTimes(1);
     expect(result.current.err).toBe("");
   });
