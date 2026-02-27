@@ -24,6 +24,7 @@ Refactors récents (frontend):
 - extraction de la logique portefeuille vers `src/hooks/usePortfolio.ts` (etat modale, options equipe, orchestration forecast/rapport)
 - libelles metier clarifies dans l'UI portefeuille/simulation (modes lisibles pour PMO/COPIL)
 - calcul du `risk score` harmonise sur les percentiles effectivement affiches (notamment mode `weeks_to_items`), avec affichage a 2 decimales dans les rapports
+- gestion des erreurs Azure DevOps unifiee entre mode simulation et mode portefeuille (messages actionnables 401/403/404/429/5xx via `adoErrors.ts`)
 - typages simulation segmentés (`SimulationForecastControls`, `SimulationDateRange`, `SimulationResult`, `ChartTab`)
 - écran simulation chargé en lazy (`React.lazy`) + import dynamique du module rapport/PDF pour réduire la taille des chunks initiaux
 - accessibilité du chargement renforcée dans `SimulationResultsPanel` (`role="status"` + `aria-live="polite"` pour annoncer `loadingStageMessage` aux lecteurs d'écran)

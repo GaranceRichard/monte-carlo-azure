@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { getTeamOptionsDirect } from "../adoClient";
 import { nWeeksAgo, today } from "../date";
 import { runSimulationForecast } from "./simulationForecastService";
 import type { ForecastMode, NamedEntity } from "../types";
 import { sortTeams } from "../utils/teamSort";
+import { formatAdoHttpErrorMessage, type AdoErrorContext } from "../adoErrors";
 
 export type TeamPortfolioConfig = {
   teamName: string;
@@ -19,6 +21,22 @@ type UsePortfolioParams = {
   teams: NamedEntity[];
   pat: string;
 };
+
+function getPortfolioErrorMessage(error: unknown, context: AdoErrorContext): string {
+  if (error instanceof Error) return error.message;
+
+  if (error && typeof error === "object") {
+    const statusValue = (error as { status?: unknown }).status;
+    const statusTextValue = (error as { statusText?: unknown }).statusText;
+    const status = typeof statusValue === "number" ? statusValue : NaN;
+    const statusText = typeof statusTextValue === "string" ? statusTextValue : "";
+    if (Number.isFinite(status) && status >= 100 && status <= 599) {
+      return formatAdoHttpErrorMessage(status, context, statusText);
+    }
+  }
+
+  return `Erreur inattendue pendant "${context.operation}".`;
+}
 
 export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePortfolioParams) {
   const [startDate, setStartDate] = useState<string>(nWeeksAgo(26));
@@ -58,6 +76,14 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
 
   const canGenerate = teamConfigs.length > 0 && !loadingReport;
 
+  function handlePortfolioError(
+    setMessage: Dispatch<SetStateAction<string>>,
+    error: unknown,
+    context: AdoErrorContext,
+  ): void {
+    setMessage(getPortfolioErrorMessage(error, context));
+  }
+
   async function loadTeamOptions(teamName: string): Promise<void> {
     if (!teamName) {
       setModalTypeOptions([]);
@@ -74,7 +100,13 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
       setModalTypes([]);
       setModalDoneStates([]);
     } catch (e: unknown) {
-      setModalErr(e instanceof Error ? e.message : String(e));
+      handlePortfolioError(setModalErr, e, {
+        operation: "chargement des types de tickets",
+        org: selectedOrg,
+        project: selectedProject,
+        team: teamName,
+        requiredScopes: ["Work Items (Read)"],
+      });
     } finally {
       setModalLoading(false);
     }
@@ -199,7 +231,12 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
         sections,
       });
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : String(e));
+      handlePortfolioError(setErr, e, {
+        operation: "generation du rapport portefeuille",
+        org: selectedOrg,
+        project: selectedProject,
+        requiredScopes: ["Work Items (Read)"],
+      });
     } finally {
       setLoadingReport(false);
     }
