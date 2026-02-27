@@ -248,7 +248,9 @@ def test_save_and_list_recent_with_real_mongo():
 
         indexes = list(client[db_name][collection_name].list_indexes())
         ttl_indexes = [
-            idx for idx in indexes if idx.get("key") == {"last_seen": 1} and "expireAfterSeconds" in idx
+            idx
+            for idx in indexes
+            if idx.get("key") == {"last_seen": 1} and "expireAfterSeconds" in idx
         ]
         assert ttl_indexes
         assert ttl_indexes[0]["expireAfterSeconds"] == 30 * 24 * 3600
