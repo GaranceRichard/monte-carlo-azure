@@ -11,9 +11,7 @@ type SimulationControlPanelProps = {
 export default function SimulationControlPanel({ onExpansionChange }: SimulationControlPanelProps) {
   const { selectedTeam, simulation } = useSimulationContext();
   const s = simulation;
-  const [showPeriod, setShowPeriod] = useState(false);
-  const [showMode, setShowMode] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
+  const [openSection, setOpenSection] = useState<"period" | "mode" | "filters" | null>(null);
   const [validationMessage, setValidationMessage] = useState("");
 
   const modeZeroText = s.includeZeroWeeks ? "incluses" : "non incluses";
@@ -25,33 +23,16 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
   const stateListText = s.doneStates.length ? s.doneStates.join(", ") : "aucun";
   const hasRequiredFilters = s.types.length > 0 && s.doneStates.length > 0;
   const canRunSimulation = !s.loading && !!selectedTeam && hasRequiredFilters;
+  const showPeriod = openSection === "period";
+  const showMode = openSection === "mode";
+  const showFilters = openSection === "filters";
 
   function toggleSection(section: "period" | "mode" | "filters"): void {
-    if (section === "period") {
-      setShowPeriod((prev) => {
-        const next = !prev;
-        setShowMode(false);
-        setShowFilters(false);
-        return next;
-      });
-      return;
-    }
-    if (section === "mode") {
-      setShowMode((prev) => {
-        const next = !prev;
-        setShowPeriod(false);
-        setShowFilters(false);
-        return next;
-      });
-      return;
-    }
-    setShowFilters((prev) => {
-      const next = !prev;
-      if (next && s.hasLaunchedOnce) {
+    setOpenSection((current) => {
+      const next = current === section ? null : section;
+      if (next === "filters" && s.hasLaunchedOnce) {
         s.resetSimulationResults();
       }
-      setShowPeriod(false);
-      setShowMode(false);
       return next;
     });
   }
@@ -62,9 +43,7 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
       return;
     }
     setValidationMessage("");
-    setShowPeriod(false);
-    setShowMode(false);
-    setShowFilters(false);
+    setOpenSection(null);
     await s.runForecast();
   }
 
@@ -75,8 +54,8 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
   }, [hasRequiredFilters, validationMessage]);
 
   useEffect(() => {
-    onExpansionChange?.(showPeriod || showMode || showFilters);
-  }, [showPeriod, showMode, showFilters, onExpansionChange]);
+    onExpansionChange?.(openSection !== null);
+  }, [openSection, onExpansionChange]);
 
   return (
     <>

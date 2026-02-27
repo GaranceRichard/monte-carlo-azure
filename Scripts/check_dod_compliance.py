@@ -97,48 +97,33 @@ def main() -> int:
     if tasks_path.exists():
         tasks = tasks_path.read_text(encoding="utf-8")
         _ok(
-            '"label": "Coverage: 7 terminaux"' in tasks,
-            "Missing coverage aggregate task (7 terminaux)",
+            '"label": "Coverage: 6 terminaux"' in tasks,
+            "Missing coverage aggregate task (6 terminaux)",
             errors,
         )
         _ok(
-            '"label": "Coverage Repo Compliance"' in tasks,
-            "Missing repo DoD compliance task in coverage workflow",
+            '"label": "Coverage Back (Full)"' in tasks,
+            "Missing backend full coverage task",
             errors,
         )
         _ok(
-            "tests/test_repo_compliance.py" in tasks,
-            "Coverage task must execute tests/test_repo_compliance.py",
+            '"label": "Coverage Integration (Backend API)"' not in tasks,
+            "Coverage workflow should avoid duplicate backend integration task",
             errors,
         )
         _ok(
-            "--cov=tests.test_repo_compliance" in tasks,
-            "Coverage task must measure DoD compliance test coverage",
+            '"label": "Coverage Repo Compliance"' not in tasks,
+            "Coverage workflow should avoid duplicate repo compliance task",
             errors,
         )
         _ok(
-            '"label": "Coverage Integration (Backend API)"' in tasks,
-            "Missing dedicated integration coverage task (backend API)",
-            errors,
-        )
-        _ok(
-            "tests/test_api_config.py" in tasks,
-            "Integration coverage task must include tests/test_api_config.py",
-            errors,
-        )
-        _ok(
-            "tests/test_api_health.py" in tasks,
-            "Integration coverage task must include tests/test_api_health.py",
-            errors,
-        )
-        _ok(
-            "tests/test_api_simulate.py" in tasks,
-            "Integration coverage task must include tests/test_api_simulate.py",
+            "--cov=backend" in tasks,
+            "Coverage workflow must measure backend coverage",
             errors,
         )
         _ok(
             "--cov-fail-under=80" in tasks,
-            "Coverage task must enforce integration coverage >= 80",
+            "Coverage task must enforce backend coverage >= 80",
             errors,
         )
 

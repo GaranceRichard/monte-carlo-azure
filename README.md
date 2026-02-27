@@ -290,8 +290,7 @@ npm --prefix frontend run test:unit
 npm --prefix frontend run test:unit:coverage
 npm --prefix frontend run test:e2e
 npm --prefix frontend run test:e2e:coverage:console
-.venv\Scripts\python.exe -m pytest tests/test_api_config.py tests/test_api_health.py tests/test_api_simulate.py tests/test_api_history.py tests/test_simulation_store.py --cov=backend --cov-fail-under=80 --cov-report=term-missing -q
-.venv\Scripts\python.exe -m pytest tests/test_repo_compliance.py --cov=tests.test_repo_compliance --cov-fail-under=80 --cov-report=term-missing -q
+.venv\Scripts\python.exe -m pytest --cov=backend --cov-fail-under=80 --cov-report=term-missing -q
 ```
 
 ### Variables d'environnement Mongo / purge
@@ -312,7 +311,7 @@ Suite E2E découpée:
 - `frontend/tests/e2e/onboarding.spec.js`
 - `frontend/tests/e2e/selection.spec.js`
 - `frontend/tests/e2e/simulation.spec.js`
-- `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul agrégés: statements >= 80%, branches >= 82%, functions >= 80%, lines >= 80%)
+- `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul agrégés: statements >= 80%, branches >= 80%, functions >= 80%, lines >= 80%)
 
 Sous Windows/VS Code, les tâches `pytest --cov` parallèles utilisent des fichiers coverage distincts via `COVERAGE_FILE` pour éviter les conflits de verrouillage.
 Le projet desactive aussi le cacheprovider pytest via `pytest.ini` (`-p no:cacheprovider`) pour supprimer les warnings d'ecriture `.pytest_cache` en environnement restreint.

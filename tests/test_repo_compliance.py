@@ -89,18 +89,17 @@ def test_ci_enforces_required_checks() -> None:
     ), "Backend CI should enforce a minimum coverage threshold (>=80%)."
 
 
-def test_coverage_tasks_separate_repo_compliance_and_integration() -> None:
+def test_coverage_tasks_separate_repo_compliance_and_backend_full() -> None:
     tasks_path = ROOT / ".vscode" / "tasks.json"
     if not tasks_path.exists():
         # Optional local developer tooling file; may be absent in CI checkouts.
         return
     tasks_content = tasks_path.read_text(encoding="utf-8")
-    assert '"label": "Coverage: 7 terminaux"' in tasks_content
-    assert '"label": "Coverage Integration (Backend API)"' in tasks_content
-    assert '"label": "Coverage Repo Compliance"' in tasks_content
-    assert "tests/test_repo_compliance.py" in tasks_content
-    assert "--cov=tests.test_repo_compliance" in tasks_content
-    assert "tests/test_api_config.py" in tasks_content
-    assert "tests/test_api_health.py" in tasks_content
-    assert "tests/test_api_simulate.py" in tasks_content
+    assert '"label": "Coverage: 6 terminaux"' in tasks_content
+    assert '"label": "Coverage Back (Full)"' in tasks_content
+    assert '"label": "Coverage Integration (Backend API)"' not in tasks_content
+    assert '"label": "Coverage Repo Compliance"' not in tasks_content
+    assert "tests/test_repo_compliance.py" not in tasks_content
+    assert "--cov=tests.test_repo_compliance" not in tasks_content
+    assert "--cov=backend" in tasks_content
     assert "--cov-fail-under=80" in tasks_content
