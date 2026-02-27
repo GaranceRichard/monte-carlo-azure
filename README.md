@@ -21,6 +21,7 @@ Refactors récents (frontend):
 - centralisation des accès `localStorage` via `storage.ts`
 - extraction de l'export CSV throughput vers `src/utils/export.ts`
 - extraction de la logique de calcul forecast vers `src/hooks/simulationForecastService.ts`
+- extraction de la logique portefeuille vers `src/hooks/usePortfolio.ts` (etat modale, options equipe, orchestration forecast/rapport)
 - typages simulation segmentés (`SimulationForecastControls`, `SimulationDateRange`, `SimulationResult`, `ChartTab`)
 - écran simulation chargé en lazy (`React.lazy`) + import dynamique du module rapport/PDF pour réduire la taille des chunks initiaux
 
@@ -100,6 +101,7 @@ frontend/
       useSimulationHistory.ts      # historique local (10 dernières simulations)
       useSimulationChartData.ts    # mapping/useMemo des données graphiques
       useSimulationAutoRun.ts      # auto-run avec debounce
+      usePortfolio.ts              # logique mode portefeuille (equipes, modal, generation rapport)
     components/steps/
       SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
       simulationPrintReport.tsx    # rapport imprimable (orchestration HTML)
