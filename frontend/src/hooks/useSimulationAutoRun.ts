@@ -1,6 +1,30 @@
 import { useEffect, useRef } from "react";
 import type { AppStep, ForecastMode } from "../types";
 
+type SimulationAutoRunParams = {
+  step: AppStep;
+  selectedTeam: string;
+  startDate: string;
+  endDate: string;
+  simulationMode: ForecastMode;
+  includeZeroWeeks: boolean;
+  capacityPercent: number | string;
+  reducedCapacityWeeks: number | string;
+  backlogSize: number | string;
+  targetWeeks: number | string;
+  nSims: number | string;
+  types: string[];
+  doneStates: string[];
+};
+
+type UseSimulationAutoRunArgs = {
+  params: SimulationAutoRunParams;
+  hasLaunchedOnce: boolean;
+  loading: boolean;
+  onInvalidFilters: () => void;
+  onRun: () => Promise<void>;
+};
+
 function buildAutoRunKey({
   step,
   selectedTeam,
@@ -15,21 +39,7 @@ function buildAutoRunKey({
   nSims,
   types,
   doneStates,
-}: {
-  step: AppStep;
-  selectedTeam: string;
-  startDate: string;
-  endDate: string;
-  simulationMode: ForecastMode;
-  includeZeroWeeks: boolean;
-  capacityPercent: number | string;
-  reducedCapacityWeeks: number | string;
-  backlogSize: number | string;
-  targetWeeks: number | string;
-  nSims: number | string;
-  types: string[];
-  doneStates: string[];
-}): string {
+}: SimulationAutoRunParams): string {
   return [
     step,
     selectedTeam,
@@ -48,6 +58,13 @@ function buildAutoRunKey({
 }
 
 export function useSimulationAutoRun({
+  params,
+  hasLaunchedOnce,
+  loading,
+  onInvalidFilters,
+  onRun,
+}: UseSimulationAutoRunArgs) {
+  const {
   step,
   selectedTeam,
   startDate,
@@ -61,29 +78,7 @@ export function useSimulationAutoRun({
   nSims,
   types,
   doneStates,
-  hasLaunchedOnce,
-  loading,
-  onInvalidFilters,
-  onRun,
-}: {
-  step: AppStep;
-  selectedTeam: string;
-  startDate: string;
-  endDate: string;
-  simulationMode: ForecastMode;
-  includeZeroWeeks: boolean;
-  capacityPercent: number | string;
-  reducedCapacityWeeks: number | string;
-  backlogSize: number | string;
-  targetWeeks: number | string;
-  nSims: number | string;
-  types: string[];
-  doneStates: string[];
-  hasLaunchedOnce: boolean;
-  loading: boolean;
-  onInvalidFilters: () => void;
-  onRun: () => Promise<void>;
-}) {
+  } = params;
   const autoRunKeyRef = useRef("");
   const pendingAutoRunRef = useRef(false);
 

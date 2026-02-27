@@ -19,8 +19,8 @@ export default function SimulationModeAndParametersControls() {
             }}
             className="sim-input sim-input--compact"
           >
-            <option value="backlog_to_weeks">Nombre d&apos;items de backlog vers semaines</option>
-            <option value="weeks_to_items">Nombre de semaines vers items livres</option>
+            <option value="backlog_to_weeks">Prevoir le delai pour vider un backlog</option>
+            <option value="weeks_to_items">Prevoir le volume livre en N semaines</option>
           </select>
         </div>
         <label className="sim-check-row sim-mode-zero-toggle sim-mode-zero-toggle--compact">

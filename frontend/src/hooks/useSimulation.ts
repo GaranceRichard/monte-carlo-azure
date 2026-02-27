@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { getTeamOptionsDirect } from "../adoClient";
 import type {
   AppStep,
   ForecastResponse,
@@ -21,13 +20,8 @@ import { useSimulationChartData } from "./useSimulationChartData";
 import { runSimulationForecast } from "./simulationForecastService";
 import { useSimulationHistory } from "./useSimulationHistory";
 import { useSimulationPrefs } from "./useSimulationPrefs";
+import { useTeamOptions } from "./useTeamOptions";
 
-const DEFAULT_WORK_ITEM_TYPE_OPTIONS = ["User Story", "Product Backlog Item", "Bug"];
-const DEFAULT_STATES_BY_TYPE: Record<string, string[]> = {
-  "User Story": ["Done", "Closed", "Resolved"],
-  "Product Backlog Item": ["Done", "Closed", "Resolved"],
-  Bug: ["Done", "Closed", "Resolved"],
-};
 const TOOLTIP_BASE_PROPS: TooltipBaseProps = {
   cursor: false,
   contentStyle: {
@@ -103,13 +97,10 @@ export function useSimulation({
   const { simulationHistory, pushSimulationHistory, clearSimulationHistory } = useSimulationHistory();
 
   const [loading, setLoading] = useState(false);
-  const [loadingTeamOptions, setLoadingTeamOptions] = useState(false);
   const [loadingStageMessage, setLoadingStageMessage] = useState("");
   const [err, setErr] = useState("");
   const [sampleStats, setSampleStats] = useState<SampleStats | null>(null);
   const [warning, setWarning] = useState("");
-  const [workItemTypeOptions, setWorkItemTypeOptions] = useState<string[]>(DEFAULT_WORK_ITEM_TYPE_OPTIONS);
-  const [statesByType, setStatesByType] = useState<Record<string, string[]>>({});
   const [doneStates, setDoneStates] = useState<string[]>([]);
   const [types, setTypes] = useState<string[]>([]);
   const [result, setResult] = useState<ForecastResponse | null>(null);
@@ -121,6 +112,20 @@ export function useSimulation({
     weeklyThroughput,
     includeZeroWeeks,
     result,
+  });
+
+  const onTeamOptionsReset = useCallback((): void => {
+    setDoneStates([]);
+    setTypes([]);
+  }, []);
+
+  const { loadingTeamOptions, workItemTypeOptions, statesByType, resetTeamOptions } = useTeamOptions({
+    step,
+    selectedOrg,
+    selectedProject,
+    selectedTeam,
+    pat,
+    onTeamOptionsReset,
   });
 
   const filteredDoneStateOptions = useMemo((): string[] => {
@@ -229,62 +234,31 @@ export function useSimulation({
   ]);
 
   const { resetAutoRunState } = useSimulationAutoRun({
-    step,
-    selectedTeam,
-    startDate,
-    endDate,
-    simulationMode,
-    includeZeroWeeks,
-    capacityPercent,
-    reducedCapacityWeeks,
-    backlogSize,
-    targetWeeks,
-    nSims,
-    types,
-    doneStates,
+    params: {
+      step,
+      selectedTeam,
+      startDate,
+      endDate,
+      simulationMode,
+      includeZeroWeeks,
+      capacityPercent,
+      reducedCapacityWeeks,
+      backlogSize,
+      targetWeeks,
+      nSims,
+      types,
+      doneStates,
+    },
     hasLaunchedOnce,
     loading,
     onInvalidFilters,
     onRun: runForecast,
   });
 
-  useEffect(() => {
-    if (step !== "simulation" || !selectedOrg || !selectedProject || !selectedTeam || !pat) return;
-    let active = true;
-
-    (async () => {
-      try {
-        setLoadingTeamOptions(true);
-        const options = await getTeamOptionsDirect(selectedOrg, selectedProject, selectedTeam, pat);
-        if (!active) return;
-        const nextTypes = (options.workItemTypes?.length ? options.workItemTypes : DEFAULT_WORK_ITEM_TYPE_OPTIONS)
-          .slice()
-          .sort((a, b) => a.localeCompare(b, "fr", { sensitivity: "base" }));
-        setWorkItemTypeOptions(nextTypes);
-        setStatesByType(options.statesByType || {});
-        setDoneStates([]);
-        setTypes([]);
-      } catch {
-        if (!active) return;
-        setWorkItemTypeOptions(DEFAULT_WORK_ITEM_TYPE_OPTIONS);
-        setStatesByType(DEFAULT_STATES_BY_TYPE);
-        setDoneStates([]);
-        setTypes([]);
-      } finally {
-        if (active) setLoadingTeamOptions(false);
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [step, selectedOrg, selectedProject, selectedTeam, pat]);
-
   function resetForTeamSelection(): void {
     setErr("");
     setWarning("");
     clearComputedSimulationState();
-    setLoadingTeamOptions(false);
     setHasLaunchedOnce(false);
     resetAutoRunState();
   }
@@ -293,13 +267,9 @@ export function useSimulation({
     setErr("");
     setWarning("");
     setLoading(false);
-    setLoadingTeamOptions(false);
     setLoadingStageMessage("");
     clearComputedSimulationState();
-    setWorkItemTypeOptions(DEFAULT_WORK_ITEM_TYPE_OPTIONS);
-    setStatesByType({});
-    setDoneStates([]);
-    setTypes([]);
+    resetTeamOptions();
     setHasLaunchedOnce(false);
     resetAutoRunState();
   }

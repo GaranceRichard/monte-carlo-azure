@@ -22,6 +22,8 @@ Refactors récents (frontend):
 - extraction de l'export CSV throughput vers `src/utils/export.ts`
 - extraction de la logique de calcul forecast vers `src/hooks/simulationForecastService.ts`
 - extraction de la logique portefeuille vers `src/hooks/usePortfolio.ts` (etat modale, options equipe, orchestration forecast/rapport)
+- extraction du chargement des options d'equipe simulation vers `src/hooks/useTeamOptions.ts` (work item types + states par type)
+- simplification du contrat de `useSimulationAutoRun` via un objet `params` groupe (surface d'entree reduite, comportement inchange)
 - libelles metier clarifies dans l'UI portefeuille/simulation (modes lisibles pour PMO/COPIL)
 - calcul du `risk score` harmonise sur les percentiles effectivement affiches (notamment mode `weeks_to_items`), avec affichage a 2 decimales dans les rapports
 - gestion des erreurs Azure DevOps unifiee entre mode simulation et mode portefeuille (messages actionnables 401/403/404/429/5xx via `adoErrors.ts`)
@@ -104,7 +106,8 @@ frontend/
       useSimulationPrefs.ts        # persistance localStorage des préférences
       useSimulationHistory.ts      # historique local (10 dernières simulations)
       useSimulationChartData.ts    # mapping/useMemo des données graphiques
-      useSimulationAutoRun.ts      # auto-run avec debounce
+      useSimulationAutoRun.ts      # auto-run avec debounce (entree via objet params)
+      useTeamOptions.ts            # chargement options equipe (types + etats) pour simulation
       usePortfolio.ts              # logique mode portefeuille (equipes, modal, generation rapport)
     components/steps/
       SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
