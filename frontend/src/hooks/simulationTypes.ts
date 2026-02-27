@@ -87,3 +87,19 @@ export type SimulationResult = {
 };
 
 export type ChartTab = "throughput" | "distribution" | "probability";
+
+export type PortfolioScenarioResult = {
+  label: "Optimiste" | `Arrime (${number}%)` | "Conservateur";
+  hypothese: string;
+  samples: number[];
+  weeklyData: WeeklyThroughputRow[];
+  percentiles: Record<string, number>;
+  riskScore: number;
+  riskLegend: "fiable" | "incertain" | "fragile" | "non fiable";
+  distribution: DistributionBucket[];
+};
+
+type DistributionBucket = {
+  x: number;
+  count: number;
+};

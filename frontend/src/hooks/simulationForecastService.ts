@@ -36,7 +36,44 @@ type RunSimulationForecastResult = {
   warning?: string;
 };
 
-export async function runSimulationForecast(params: RunSimulationForecastParams): Promise<RunSimulationForecastResult> {
+type FetchTeamThroughputResult = {
+  weeklyThroughput: SimulationHistoryEntry["weeklyThroughput"];
+  throughputSamples: number[];
+  sampleStats: SampleStats;
+  warning?: string;
+};
+
+type FetchTeamThroughputParams = {
+  selectedOrg: string;
+  selectedProject: string;
+  selectedTeam: string;
+  pat: string;
+  startDate: string;
+  endDate: string;
+  doneStates: string[];
+  types: string[];
+  includeZeroWeeks: boolean;
+};
+
+type SimulateFromSamplesParams = {
+  throughputSamples: number[];
+  includeZeroWeeks?: boolean;
+  simulationMode: ForecastMode;
+  backlogSize: number | string;
+  targetWeeks: number | string;
+  nSims: number | string;
+  capacityPercent: number | string;
+  reducedCapacityWeeks: number | string;
+  selectedOrg?: string;
+  selectedProject?: string;
+  selectedTeam?: string;
+  startDate?: string;
+  endDate?: string;
+  doneStates?: string[];
+  types?: string[];
+};
+
+export async function fetchTeamThroughput(params: FetchTeamThroughputParams): Promise<FetchTeamThroughputResult> {
   const {
     selectedOrg,
     selectedProject,
@@ -47,12 +84,6 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     doneStates,
     types,
     includeZeroWeeks,
-    simulationMode,
-    backlogSize,
-    targetWeeks,
-    nSims,
-    capacityPercent,
-    reducedCapacityWeeks,
   } = params;
 
   const throughputResponse = await getWeeklyThroughputDirect(
@@ -67,7 +98,6 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
   );
   const weekly = Array.isArray(throughputResponse) ? throughputResponse : throughputResponse.weeklyThroughput;
   const warning = Array.isArray(throughputResponse) ? undefined : throughputResponse.warning;
-
   const throughputSamples = weekly.map((r) => r.throughput).filter((n) => (includeZeroWeeks ? n >= 0 : n > 0));
   const zeroWeeks = weekly.filter((r) => r.throughput === 0).length;
   const sampleStats: SampleStats = {
@@ -77,9 +107,36 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
   };
   if (throughputSamples.length < 6) {
     throw new Error(
-      "Historique insuffisant pour une simulation fiable. Élargissez la période sélectionnée, ou vérifiez les types et états de résolution choisis.",
+      "Historique insuffisant pour une simulation fiable. Elargissez la periode selectionnee, ou verifiez les types et etats de resolution choisis.",
     );
   }
+
+  return {
+    weeklyThroughput: weekly,
+    throughputSamples,
+    sampleStats,
+    warning,
+  };
+}
+
+export async function simulateForecastFromSamples(params: SimulateFromSamplesParams): Promise<ForecastResponse> {
+  const {
+    throughputSamples,
+    includeZeroWeeks = true,
+    simulationMode,
+    backlogSize,
+    targetWeeks,
+    nSims,
+    capacityPercent,
+    reducedCapacityWeeks,
+    selectedOrg,
+    selectedProject,
+    selectedTeam,
+    startDate,
+    endDate,
+    doneStates = [],
+    types = [],
+  } = params;
 
   const payload: ForecastRequestPayload = {
     throughput_samples: throughputSamples,
@@ -108,13 +165,64 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     risk_score: Number(response.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, response.result_percentiles)),
     result_distribution: (response.result_distribution ?? []) as ForecastHistogramBucket[],
   };
-  const adjusted = applyCapacityReductionToResult(
+
+  return applyCapacityReductionToResult(
     normalized,
     simulationMode,
     toSafeNumber(targetWeeks, 12),
     toSafeNumber(capacityPercent, 100),
     toSafeNumber(reducedCapacityWeeks, 0),
   );
+}
+
+export async function runSimulationForecast(params: RunSimulationForecastParams): Promise<RunSimulationForecastResult> {
+  const {
+    selectedOrg,
+    selectedProject,
+    selectedTeam,
+    pat,
+    startDate,
+    endDate,
+    doneStates,
+    types,
+    includeZeroWeeks,
+    simulationMode,
+    backlogSize,
+    targetWeeks,
+    nSims,
+    capacityPercent,
+    reducedCapacityWeeks,
+  } = params;
+
+  const throughputData = await fetchTeamThroughput({
+    selectedOrg,
+    selectedProject,
+    selectedTeam,
+    pat,
+    startDate,
+    endDate,
+    doneStates,
+    types,
+    includeZeroWeeks,
+  });
+
+  const adjusted = await simulateForecastFromSamples({
+    throughputSamples: throughputData.throughputSamples,
+    includeZeroWeeks,
+    simulationMode,
+    backlogSize,
+    targetWeeks,
+    nSims,
+    capacityPercent,
+    reducedCapacityWeeks,
+    selectedOrg,
+    selectedProject,
+    selectedTeam,
+    startDate,
+    endDate,
+    doneStates,
+    types,
+  });
 
   const historyEntry: SimulationHistoryEntry = {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -133,17 +241,17 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     reducedCapacityWeeks: clamp(toSafeNumber(reducedCapacityWeeks, 0), 0, 260),
     types: [...types],
     doneStates: [...doneStates],
-    sampleStats,
-    weeklyThroughput: weekly,
+    sampleStats: throughputData.sampleStats,
+    weeklyThroughput: throughputData.weeklyThroughput,
     result: adjusted,
-    warning,
+    warning: throughputData.warning,
   };
 
   return {
-    weeklyThroughput: weekly,
-    sampleStats,
+    weeklyThroughput: throughputData.weeklyThroughput,
+    sampleStats: throughputData.sampleStats,
     result: adjusted,
     historyEntry,
-    warning,
+    warning: throughputData.warning,
   };
 }

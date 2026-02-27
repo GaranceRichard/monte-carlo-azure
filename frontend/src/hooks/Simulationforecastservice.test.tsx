@@ -225,7 +225,7 @@ describe("seuil d'historique insuffisant", () => {
 
     await expect(
       runSimulationForecast(baseParams()),
-    ).rejects.toThrow("Élargissez la période");
+    ).rejects.toThrow("Elargissez la periode");
   });
 
   it("ne lève pas d'erreur avec exactement 6 semaines valides", async () => {

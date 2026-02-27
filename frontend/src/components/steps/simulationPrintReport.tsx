@@ -118,7 +118,7 @@ export function exportSimulationPrintReport({
         </style>
       </head>
       <body>
-        <button type="button" id="download-pdf" class="print-action" onclick="window.__downloadPdf && window.__downloadPdf()">Telecharger PDF</button>
+        <button type="button" id="download-pdf" class="print-action">Telecharger PDF</button>
         <header class="header">
           <h1 class="title">Simulation Monte Carlo - ${escapeHtml(selectedTeam)}</h1>
           <div class="meta">
@@ -186,8 +186,10 @@ export function exportSimulationPrintReport({
 
   const wireDownloadButton = () => {
     const button = printWindow.document.getElementById("download-pdf");
-    if (!button) return;
-    button.addEventListener("click", () => {
+    const bindableButton = button as (HTMLElement & { __downloadBound?: boolean }) | null;
+    if (!bindableButton || bindableButton.__downloadBound) return;
+    bindableButton.__downloadBound = true;
+    bindableButton.addEventListener("click", () => {
       popup.__downloadPdf?.();
     });
   };

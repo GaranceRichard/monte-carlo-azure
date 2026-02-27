@@ -2,9 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   buildQuickFiltersScopeKey,
   readStoredQuickFilters,
+  readStoredPortfolioPrefs,
   storageGetItem,
   storageRemoveItem,
   storageSetItem,
+  writeStoredPortfolioPrefs,
   writeStoredQuickFilters,
 } from "./storage";
 
@@ -83,5 +85,15 @@ describe("storage helpers", () => {
   it("returns null when scope key exists but no quick filters are stored", () => {
     const scopeKey = buildQuickFiltersScopeKey("Org", "Projet", "Team Z");
     expect(readStoredQuickFilters(scopeKey)).toBeNull();
+  });
+
+  it("writes and reads portfolio prefs", () => {
+    writeStoredPortfolioPrefs({ arrimageRate: 75 });
+    expect(readStoredPortfolioPrefs()).toEqual({ arrimageRate: 75 });
+  });
+
+  it("returns empty object when portfolio prefs JSON is invalid", () => {
+    storageSetItem("mc_portfolio_prefs_v1", "{");
+    expect(readStoredPortfolioPrefs()).toEqual({});
   });
 });

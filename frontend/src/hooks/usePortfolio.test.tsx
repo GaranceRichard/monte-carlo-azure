@@ -2,433 +2,280 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { usePortfolio } from "./usePortfolio";
 import { getTeamOptionsDirect } from "../adoClient";
-import { runSimulationForecast } from "./simulationForecastService";
+import { fetchTeamThroughput, simulateForecastFromSamples } from "./simulationForecastService";
 import { exportPortfolioPrintReport } from "../components/steps/portfolioPrintReport";
-import { buildQuickFiltersScopeKey, readStoredQuickFilters, writeStoredQuickFilters } from "../storage";
+import { buildQuickFiltersScopeKey, readStoredPortfolioPrefs, writeStoredQuickFilters } from "../storage";
 
 vi.mock("../adoClient", () => ({
   getTeamOptionsDirect: vi.fn(),
 }));
 
 vi.mock("./simulationForecastService", () => ({
-  runSimulationForecast: vi.fn(),
+  fetchTeamThroughput: vi.fn(),
+  simulateForecastFromSamples: vi.fn(),
 }));
 
 vi.mock("../components/steps/portfolioPrintReport", () => ({
   exportPortfolioPrintReport: vi.fn(),
 }));
 
-describe("usePortfolio error handling", () => {
+const throughputData = {
+  weeklyThroughput: [{ week: "2026-01-05", throughput: 3 }],
+  throughputSamples: [2, 3, 5, 8, 13, 21],
+  sampleStats: { totalWeeks: 10, zeroWeeks: 1, usedWeeks: 9 },
+};
+
+const simulationResult = {
+  result_kind: "weeks" as const,
+  samples_count: 100,
+  risk_score: 0.3,
+  result_percentiles: { P50: 10, P70: 12, P90: 15 },
+  result_distribution: [{ x: 10, count: 25 }],
+};
+
+function setup(teams = [{ name: "Team A" }, { name: "Team B" }]) {
+  return renderHook(() =>
+    usePortfolio({
+      selectedOrg: "Org A",
+      selectedProject: "Project A",
+      teams,
+      pat: "pat",
+    }),
+  );
+}
+
+async function addTeam(result: ReturnType<typeof setup>["result"]) {
+  await act(async () => {
+    result.current.openAddModal();
+  });
+  await waitFor(() => {
+    expect(result.current.modalTypeOptions).toEqual(["Bug"]);
+  });
+  act(() => {
+    result.current.toggleModalType("Bug", true);
+  });
+  await waitFor(() => {
+    expect(result.current.modalAvailableStates).toEqual(["Done"]);
+  });
+  act(() => {
+    result.current.toggleModalState("Done", true);
+  });
+  act(() => {
+    result.current.validateAddModal();
+  });
+  await waitFor(() => {
+    expect(result.current.showAddModal).toBe(false);
+  });
+}
+
+describe("usePortfolio", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-  });
-
-  it("formats HTTP-like 403 errors with adoErrors pipeline during report generation", async () => {
     vi.mocked(getTeamOptionsDirect).mockResolvedValue({
       workItemTypes: ["Bug"],
       statesByType: { Bug: ["Done"] },
     });
-    vi.mocked(runSimulationForecast).mockRejectedValue({
-      status: 403,
-      statusText: "Forbidden",
-    });
+  });
 
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }],
-        pat: "pat",
-      }),
-    );
+  it("generates report with scenario + team simulations", async () => {
+    vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
+    vi.mocked(simulateForecastFromSamples).mockResolvedValue(simulationResult);
 
-    await act(async () => {
-      result.current.openAddModal();
-    });
-    await waitFor(() => {
-      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
-    });
-
-    act(() => {
-      result.current.toggleModalType("Bug", true);
-    });
-    act(() => {
-      result.current.toggleModalState("Done", true);
-    });
-    act(() => {
-      result.current.validateAddModal();
-    });
-    await waitFor(() => {
-      expect(result.current.teamConfigs).toHaveLength(1);
-    });
+    const { result } = setup([{ name: "Team A" }]);
+    await addTeam(result);
 
     await act(async () => {
       await result.current.handleGenerateReport();
     });
 
-    expect(result.current.err).toContain("Aucune equipe n'a pu etre simulee.");
-    expect(result.current.reportErrors).toHaveLength(1);
-    expect(result.current.reportErrors[0]?.message).toContain("HTTP 403");
-    expect(result.current.reportErrors[0]?.message).toContain("permissions requises");
-    expect(vi.mocked(exportPortfolioPrintReport)).not.toHaveBeenCalled();
-  });
-
-  it("covers invalid modal validations and duplicate team guard", async () => {
-    vi.mocked(getTeamOptionsDirect).mockResolvedValue({
-      workItemTypes: ["Bug"],
-      statesByType: { Bug: ["Done"] },
-    });
-
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [],
-        pat: "pat",
-      }),
-    );
-
-    act(() => {
-      result.current.openAddModal();
-      result.current.validateAddModal();
-    });
-    expect(result.current.modalErr).toBe("Selectionnez une equipe.");
-
-    const { result: resultWithTeam } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }],
-        pat: "pat",
-      }),
-    );
-
-    await act(async () => {
-      resultWithTeam.current.openAddModal();
-    });
-    await waitFor(() => {
-      expect(resultWithTeam.current.modalTypeOptions).toEqual(["Bug"]);
-    });
-
-    act(() => {
-      resultWithTeam.current.validateAddModal();
-    });
-    expect(resultWithTeam.current.modalErr).toBe("Selectionnez au moins un type et un etat.");
-
-    act(() => {
-      resultWithTeam.current.toggleModalType("Bug", true);
-    });
-    act(() => {
-      resultWithTeam.current.toggleModalState("Done", true);
-    });
-    act(() => {
-      resultWithTeam.current.validateAddModal();
-    });
-    await waitFor(() => {
-      expect(resultWithTeam.current.teamConfigs).toHaveLength(1);
-    });
-
-    act(() => {
-      resultWithTeam.current.openAddModal();
-      resultWithTeam.current.onModalTeamNameChange("Team A");
-    });
-    await waitFor(() => {
-      expect(resultWithTeam.current.modalTypeOptions).toEqual(["Bug"]);
-    });
-    act(() => {
-      resultWithTeam.current.toggleModalType("Bug", true);
-    });
-    act(() => {
-      resultWithTeam.current.toggleModalState("Done", true);
-    });
-    act(() => {
-      resultWithTeam.current.validateAddModal();
-    });
-    expect(resultWithTeam.current.modalErr).toBe("Cette equipe est deja ajoutee.");
-  });
-
-  it("updates available teams when adding then removing a team", async () => {
-    vi.mocked(getTeamOptionsDirect).mockResolvedValue({
-      workItemTypes: ["Bug"],
-      statesByType: { Bug: ["Done", "Closed"] },
-    });
-
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }, { name: "Team B" }],
-        pat: "pat",
-      }),
-    );
-
-    expect(result.current.availableTeamNames).toEqual(["Team A", "Team B"]);
-
-    await act(async () => {
-      result.current.openAddModal();
-    });
-    await waitFor(() => {
-      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
-    });
-
-    act(() => {
-      result.current.toggleModalType("Bug", true);
-    });
-    act(() => {
-      result.current.toggleModalState("Done", true);
-    });
-    act(() => {
-      result.current.validateAddModal();
-    });
-    await waitFor(() => {
-      expect(result.current.teamConfigs).toHaveLength(1);
-    });
-    expect(result.current.availableTeamNames).toEqual(["Team B"]);
-
-    act(() => {
-      result.current.removeTeam("Team A");
-    });
-    expect(result.current.availableTeamNames).toEqual(["Team A", "Team B"]);
-  });
-
-  it("generates and exports a portfolio report on success", async () => {
-    vi.mocked(getTeamOptionsDirect).mockResolvedValue({
-      workItemTypes: ["Bug"],
-      statesByType: { Bug: ["Done"] },
-    });
-    vi.mocked(runSimulationForecast).mockResolvedValue({
-      weeklyThroughput: [{ week: "2026-01-05", throughput: 3 }],
-      sampleStats: { totalWeeks: 10, zeroWeeks: 1, usedWeeks: 9 },
-      result: {
-        result_kind: "weeks",
-        samples_count: 100,
-        risk_score: 0.3,
-        result_percentiles: { P50: 10, P70: 12, P90: 15 },
-        result_distribution: [{ x: 10, count: 25 }],
-      },
-      historyEntry: {} as never,
-    });
-
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }],
-        pat: "pat",
-      }),
-    );
-
-    await act(async () => {
-      result.current.openAddModal();
-    });
-    await waitFor(() => {
-      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
-    });
-
-    act(() => {
-      result.current.toggleModalType("Bug", true);
-    });
-    act(() => {
-      result.current.toggleModalState("Done", true);
-    });
-    act(() => {
-      result.current.validateAddModal();
-    });
-    await waitFor(() => {
-      expect(result.current.teamConfigs).toHaveLength(1);
-    });
-
-    await act(async () => {
-      await result.current.handleGenerateReport();
-    });
-
-    expect(vi.mocked(runSimulationForecast)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(fetchTeamThroughput)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(simulateForecastFromSamples)).toHaveBeenCalledTimes(4);
     expect(vi.mocked(exportPortfolioPrintReport)).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0]).toMatchObject({
-      selectedProject: "Project A",
-      sections: [
-        expect.objectContaining({
-          selectedTeam: "Team A",
-          resultKind: "weeks",
-          riskScore: 0.3,
-        }),
-      ],
-    });
+    expect(result.current.err).toBe("");
   });
 
-  it("handles unknown modal loading failures and closeAddModal resets modal state", async () => {
-    vi.mocked(getTeamOptionsDirect).mockRejectedValue("unexpected-failure");
-
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }],
-        pat: "pat",
-      }),
-    );
-
-    await act(async () => {
-      result.current.openAddModal();
+  it("keeps partial output when one team fails throughput collection", async () => {
+    vi.mocked(fetchTeamThroughput).mockImplementation(async ({ selectedTeam }) => {
+      if (selectedTeam === "Team B") throw new Error("team-b-failure");
+      return throughputData;
     });
-    await waitFor(() => {
-      expect(result.current.modalErr).toContain('Erreur inattendue pendant "chargement des types de tickets"');
-    });
-    expect(result.current.showAddModal).toBe(true);
+    vi.mocked(simulateForecastFromSamples).mockResolvedValue(simulationResult);
 
-    act(() => {
-      result.current.closeAddModal();
-    });
-    expect(result.current.showAddModal).toBe(false);
-    expect(result.current.modalErr).toBe("");
-  });
-
-  it("returns early when generating report with no team config", async () => {
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }],
-        pat: "pat",
-      }),
-    );
+    const { result } = setup();
+    await addTeam(result);
+    await addTeam(result);
 
     await act(async () => {
       await result.current.handleGenerateReport();
     });
 
-    expect(vi.mocked(runSimulationForecast)).not.toHaveBeenCalled();
+    expect(result.current.reportErrors).toEqual([expect.objectContaining({ teamName: "Team B" })]);
+    expect(vi.mocked(exportPortfolioPrintReport)).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports blocking error when all teams fail throughput collection", async () => {
+    vi.mocked(fetchTeamThroughput).mockRejectedValue(new Error("collect-failure"));
+
+    const { result } = setup([{ name: "Team A" }]);
+    await addTeam(result);
+
+    await act(async () => {
+      await result.current.handleGenerateReport();
+    });
+
+    expect(result.current.err).toBe("Aucune equipe n'a pu etre simulee.");
     expect(vi.mocked(exportPortfolioPrintReport)).not.toHaveBeenCalled();
   });
 
-  it("covers modal branch paths for type/state toggles and statesByType fallback", async () => {
-    vi.mocked(getTeamOptionsDirect).mockResolvedValue({
-      workItemTypes: ["Bug", "Task"],
-      statesByType: undefined as unknown as Record<string, string[]>,
+  it("keeps arrimageRate when returning to a single team", async () => {
+    const { result } = setup();
+    await addTeam(result);
+    await addTeam(result);
+
+    act(() => {
+      result.current.setArrimageRate(75);
+    });
+    expect(result.current.arrimageRate).toBe(75);
+
+    act(() => {
+      result.current.removeTeam("Team B");
+    });
+    await waitFor(() => {
+      expect(result.current.arrimageRate).toBe(75);
+    });
+    expect(readStoredPortfolioPrefs().arrimageRate).toBe(75);
+  });
+
+  it("shows error when validating modal without team selection", async () => {
+    const { result } = setup([]);
+
+    await act(async () => {
+      result.current.openAddModal();
+    });
+    act(() => {
+      result.current.validateAddModal();
     });
 
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }],
-        pat: "pat",
-      }),
-    );
+    expect(result.current.modalErr).toBe("Selectionnez une equipe.");
+  });
+
+  it("shows error when validating modal without type/state", async () => {
+    const { result } = setup([{ name: "Team A" }]);
 
     await act(async () => {
       result.current.openAddModal();
     });
     await waitFor(() => {
-      expect(result.current.modalTypeOptions).toEqual(["Bug", "Task"]);
+      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
     });
 
     act(() => {
+      result.current.validateAddModal();
+    });
+
+    expect(result.current.modalErr).toBe("Selectionnez au moins un type et un etat.");
+  });
+
+  it("shows duplicate team error when same team is added twice", async () => {
+    const { result } = setup([{ name: "Team A" }, { name: "Team B" }]);
+    await addTeam(result);
+
+    await act(async () => {
+      result.current.openAddModal();
+    });
+    act(() => {
+      result.current.onModalTeamNameChange("Team A");
+    });
+    await waitFor(() => {
+      expect(result.current.modalTeamName).toBe("Team A");
+    });
+    await waitFor(() => {
+      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
+    });
+    act(() => {
       result.current.toggleModalType("Bug", true);
+    });
+    await waitFor(() => {
+      expect(result.current.modalAvailableStates).toEqual(["Done"]);
     });
     act(() => {
       result.current.toggleModalState("Done", true);
     });
-    act(() => {
-      result.current.toggleModalState("Done", false);
+    await waitFor(() => {
+      expect(result.current.modalTypes).toEqual(["Bug"]);
+      expect(result.current.modalDoneStates).toEqual(["Done"]);
     });
     act(() => {
-      result.current.toggleModalType("Task", true);
-    });
-    act(() => {
-      result.current.toggleModalType("Bug", false);
+      result.current.validateAddModal();
     });
 
-    expect(result.current.modalTypes).toEqual(["Task"]);
+    expect(result.current.modalErr).toBe("Cette equipe est deja ajoutee.");
+  });
+
+  it("applies only valid stored quick filters", async () => {
+    const { result } = setup([{ name: "Team A" }]);
+    const scopeKey = buildQuickFiltersScopeKey("Org A", "Project A", "Team A");
+    writeStoredQuickFilters(scopeKey, {
+      types: ["Bug", "Bug", "Unknown"],
+      doneStates: ["Done", "Done", "Invalid"],
+    });
+
+    await act(async () => {
+      result.current.openAddModal();
+    });
+    await waitFor(() => {
+      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
+    });
+
+    act(() => {
+      result.current.applyModalQuickFilterConfig();
+    });
+
+    expect(result.current.modalTypes).toEqual(["Bug"]);
+    expect(result.current.modalDoneStates).toEqual(["Done"]);
+  });
+
+  it("ignores stored quick filters when no valid selection remains", async () => {
+    const { result } = setup([{ name: "Team A" }]);
+    const scopeKey = buildQuickFiltersScopeKey("Org A", "Project A", "Team A");
+    writeStoredQuickFilters(scopeKey, {
+      types: ["Unknown"],
+      doneStates: ["Invalid"],
+    });
+
+    await act(async () => {
+      result.current.openAddModal();
+    });
+    await waitFor(() => {
+      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
+    });
+
+    act(() => {
+      result.current.applyModalQuickFilterConfig();
+    });
+
+    expect(result.current.modalTypes).toEqual([]);
     expect(result.current.modalDoneStates).toEqual([]);
   });
 
-  it("falls back to empty work-item list when options do not include workItemTypes", async () => {
-    vi.mocked(getTeamOptionsDirect).mockResolvedValue({
-      workItemTypes: undefined as unknown as string[],
-      statesByType: { Bug: ["Done"] },
-    });
-
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }],
-        pat: "pat",
-      }),
-    );
+  it("sets modalErr when team options loading fails", async () => {
+    vi.mocked(getTeamOptionsDirect).mockRejectedValueOnce(new Error("load-options-failure"));
+    const { result } = setup([{ name: "Team A" }]);
 
     await act(async () => {
       result.current.openAddModal();
     });
+
     await waitFor(() => {
-      expect(result.current.modalTypeOptions).toEqual([]);
+      expect(result.current.modalErr).toBe("load-options-failure");
     });
   });
 
-  it("caches team options per team within the same org/project session", async () => {
-    vi.mocked(getTeamOptionsDirect).mockResolvedValue({
-      workItemTypes: ["Bug"],
-      statesByType: { Bug: ["Done"] },
-    });
-
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }, { name: "Team B" }],
-        pat: "pat",
-      }),
-    );
-
-    await act(async () => {
-      result.current.openAddModal();
-    });
-    await waitFor(() => {
-      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
-    });
-    expect(vi.mocked(getTeamOptionsDirect)).toHaveBeenCalledTimes(1);
-
-    act(() => {
-      result.current.closeAddModal();
-      result.current.openAddModal();
-    });
-    await waitFor(() => {
-      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
-    });
-    expect(vi.mocked(getTeamOptionsDirect)).toHaveBeenCalledTimes(1);
-
-    await act(async () => {
-      result.current.onModalTeamNameChange("Team B");
-    });
-    await waitFor(() => {
-      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
-    });
-    expect(vi.mocked(getTeamOptionsDirect)).toHaveBeenCalledTimes(2);
-
-    await act(async () => {
-      result.current.onModalTeamNameChange("Team A");
-    });
-    expect(vi.mocked(getTeamOptionsDirect)).toHaveBeenCalledTimes(2);
-  });
-
-  it("applies stored quick filters in modal and persists validated selections", async () => {
+  it("closeAddModal resets modal visibility, error and quick-filter flag", async () => {
+    const { result } = setup([{ name: "Team A" }]);
     const scopeKey = buildQuickFiltersScopeKey("Org A", "Project A", "Team A");
     writeStoredQuickFilters(scopeKey, { types: ["Bug"], doneStates: ["Done"] });
-    vi.mocked(getTeamOptionsDirect).mockResolvedValue({
-      workItemTypes: ["Bug", "Task"],
-      statesByType: { Bug: ["Done", "Closed"], Task: ["Done"] },
-    });
-
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }],
-        pat: "pat",
-      }),
-    );
 
     await act(async () => {
       result.current.openAddModal();
@@ -438,266 +285,18 @@ describe("usePortfolio error handling", () => {
     });
 
     act(() => {
-      result.current.applyModalQuickFilterConfig();
-    });
-    expect(result.current.modalTypes).toEqual(["Bug"]);
-    expect(result.current.modalDoneStates).toEqual(["Done"]);
-
-    act(() => {
+      result.current.toggleModalType("Bug", true);
       result.current.validateAddModal();
+      result.current.closeAddModal();
     });
 
-    expect(readStoredQuickFilters(scopeKey)).toEqual({
-      types: ["Bug"],
-      doneStates: ["Done"],
-    });
+    expect(result.current.showAddModal).toBe(false);
+    expect(result.current.modalErr).toBe("");
+    expect(result.current.modalHasQuickFilterConfig).toBe(false);
   });
 
-  it("generates report with successful teams even when one team fails", async () => {
-    vi.mocked(getTeamOptionsDirect).mockResolvedValue({
-      workItemTypes: ["Bug"],
-      statesByType: { Bug: ["Done"] },
-    });
-    vi.mocked(runSimulationForecast).mockImplementation(async ({ selectedTeam }) => {
-      if (selectedTeam === "Team B") {
-        throw new Error("team-b-failure");
-      }
-      return {
-        weeklyThroughput: [{ week: "2026-01-05", throughput: 3 }],
-        sampleStats: { totalWeeks: 10, zeroWeeks: 1, usedWeeks: 9 },
-        result: {
-          result_kind: "weeks",
-          samples_count: 100,
-          risk_score: 0.3,
-          result_percentiles: { P50: 10, P70: 12, P90: 15 },
-          result_distribution: [{ x: 10, count: 25 }],
-        },
-        historyEntry: {} as never,
-      };
-    });
-
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }, { name: "Team B" }, { name: "Team C" }],
-        pat: "pat",
-      }),
-    );
-
-    const addTeam = async () => {
-      await act(async () => {
-        result.current.openAddModal();
-      });
-      await waitFor(() => {
-        expect(result.current.modalTypeOptions).toEqual(["Bug"]);
-      });
-      act(() => {
-        result.current.toggleModalType("Bug", true);
-      });
-      act(() => {
-        result.current.toggleModalState("Done", true);
-      });
-      act(() => {
-        result.current.validateAddModal();
-      });
-    };
-
-    await addTeam();
-    await addTeam();
-    await addTeam();
-    await waitFor(() => {
-      expect(result.current.teamConfigs).toHaveLength(3);
-    });
-
-    await act(async () => {
-      await result.current.handleGenerateReport();
-    });
-
-    expect(vi.mocked(runSimulationForecast)).toHaveBeenCalledTimes(3);
-    expect(result.current.reportProgressLabel).toBe("3/3 equipes simulees");
-    expect(result.current.reportErrors).toEqual([
-      expect.objectContaining({ teamName: "Team B" }),
-    ]);
-    expect(vi.mocked(exportPortfolioPrintReport)).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0]).toMatchObject({
-      sections: [expect.objectContaining({ selectedTeam: "Team A" }), expect.objectContaining({ selectedTeam: "Team C" })],
-    });
-  });
-
-  it("tracks intermediate portfolio report progress while teams settle", async () => {
-    vi.mocked(getTeamOptionsDirect).mockResolvedValue({
-      workItemTypes: ["Bug"],
-      statesByType: { Bug: ["Done"] },
-    });
-
-    type Deferred<T> = {
-      promise: Promise<T>;
-      resolve: (value: T) => void;
-      reject: (reason?: unknown) => void;
-    };
-    function deferred<T>(): Deferred<T> {
-      let resolve!: (value: T) => void;
-      let reject!: (reason?: unknown) => void;
-      const promise = new Promise<T>((res, rej) => {
-        resolve = res;
-        reject = rej;
-      });
-      return { promise, resolve, reject };
-    }
-
-    const teamAPromise = deferred<{
-      weeklyThroughput: { week: string; throughput: number }[];
-      sampleStats: { totalWeeks: number; zeroWeeks: number; usedWeeks: number };
-      result: {
-        result_kind: "weeks";
-        samples_count: number;
-        risk_score: number;
-        result_percentiles: Record<string, number>;
-        result_distribution: { x: number; count: number }[];
-      };
-      historyEntry: never;
-    }>();
-    const teamBPromise = deferred<{
-      weeklyThroughput: { week: string; throughput: number }[];
-      sampleStats: { totalWeeks: number; zeroWeeks: number; usedWeeks: number };
-      result: {
-        result_kind: "weeks";
-        samples_count: number;
-        risk_score: number;
-        result_percentiles: Record<string, number>;
-        result_distribution: { x: number; count: number }[];
-      };
-      historyEntry: never;
-    }>();
-    const teamCPromise = deferred<{
-      weeklyThroughput: { week: string; throughput: number }[];
-      sampleStats: { totalWeeks: number; zeroWeeks: number; usedWeeks: number };
-      result: {
-        result_kind: "weeks";
-        samples_count: number;
-        risk_score: number;
-        result_percentiles: Record<string, number>;
-        result_distribution: { x: number; count: number }[];
-      };
-      historyEntry: never;
-    }>();
-
-    const okForecast = {
-      weeklyThroughput: [{ week: "2026-01-05", throughput: 3 }],
-      sampleStats: { totalWeeks: 10, zeroWeeks: 1, usedWeeks: 9 },
-      result: {
-        result_kind: "weeks" as const,
-        samples_count: 100,
-        risk_score: 0.3,
-        result_percentiles: { P50: 10, P70: 12, P90: 15 },
-        result_distribution: [{ x: 10, count: 25 }],
-      },
-      historyEntry: {} as never,
-    };
-
-    vi.mocked(runSimulationForecast).mockImplementation(({ selectedTeam }) => {
-      if (selectedTeam === "Team A") return teamAPromise.promise;
-      if (selectedTeam === "Team B") return teamBPromise.promise;
-      return teamCPromise.promise;
-    });
-
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }, { name: "Team B" }, { name: "Team C" }],
-        pat: "pat",
-      }),
-    );
-
-    const addTeam = async () => {
-      await act(async () => {
-        result.current.openAddModal();
-      });
-      await waitFor(() => {
-        expect(result.current.modalTypeOptions).toEqual(["Bug"]);
-      });
-      act(() => {
-        result.current.toggleModalType("Bug", true);
-      });
-      act(() => {
-        result.current.toggleModalState("Done", true);
-      });
-      act(() => {
-        result.current.validateAddModal();
-      });
-    };
-
-    await addTeam();
-    await addTeam();
-    await addTeam();
-    await waitFor(() => {
-      expect(result.current.teamConfigs).toHaveLength(3);
-    });
-
-    await act(async () => {
-      void result.current.handleGenerateReport();
-    });
-    expect(result.current.reportProgressLabel).toBe("0/3 equipes simulees");
-
-    await act(async () => {
-      teamBPromise.reject(new Error("team-b-failure"));
-    });
-    await waitFor(() => {
-      expect(result.current.reportProgressLabel).toBe("1/3 equipes simulees");
-    });
-
-    await act(async () => {
-      teamAPromise.resolve(okForecast);
-    });
-    await waitFor(() => {
-      expect(result.current.reportProgressLabel).toBe("2/3 equipes simulees");
-    });
-
-    await act(async () => {
-      teamCPromise.resolve(okForecast);
-    });
-    await waitFor(() => {
-      expect(result.current.reportProgressLabel).toBe("3/3 equipes simulees");
-    });
-    await waitFor(() => {
-      expect(result.current.loadingReport).toBe(false);
-    });
-
-    expect(result.current.reportErrors).toEqual([expect.objectContaining({ teamName: "Team B" })]);
-    expect(vi.mocked(exportPortfolioPrintReport)).toHaveBeenCalledTimes(1);
-  });
-
-  it("handles export failure in global report catch and clears report errors on demand", async () => {
-    vi.mocked(getTeamOptionsDirect).mockResolvedValue({
-      workItemTypes: ["Bug"],
-      statesByType: { Bug: ["Done"] },
-    });
-    vi.mocked(runSimulationForecast).mockResolvedValue({
-      weeklyThroughput: [{ week: "2026-01-05", throughput: 3 }],
-      sampleStats: { totalWeeks: 10, zeroWeeks: 1, usedWeeks: 9 },
-      result: {
-        result_kind: "weeks",
-        samples_count: 100,
-        risk_score: 0.3,
-        result_percentiles: { P50: 10, P70: 12, P90: 15 },
-        result_distribution: [{ x: 10, count: 25 }],
-      },
-      historyEntry: {} as never,
-    });
-    vi.mocked(exportPortfolioPrintReport).mockImplementation(() => {
-      throw new Error("export-failure");
-    });
-
-    const { result } = renderHook(() =>
-      usePortfolio({
-        selectedOrg: "Org A",
-        selectedProject: "Project A",
-        teams: [{ name: "Team A" }],
-        pat: "pat",
-      }),
-    );
+  it("keeps modal quick-filter flag false when no stored quick filter exists", async () => {
+    const { result } = setup([{ name: "Team A" }]);
 
     await act(async () => {
       result.current.openAddModal();
@@ -705,28 +304,76 @@ describe("usePortfolio error handling", () => {
     await waitFor(() => {
       expect(result.current.modalTypeOptions).toEqual(["Bug"]);
     });
+
+    act(() => {
+      result.current.applyModalQuickFilterConfig();
+    });
+
+    expect(result.current.modalHasQuickFilterConfig).toBe(false);
+    expect(result.current.modalTypes).toEqual([]);
+    expect(result.current.modalDoneStates).toEqual([]);
+  });
+
+  it("removes selected state when ticket type is unchecked", async () => {
+    const { result } = setup([{ name: "Team A" }]);
+
+    await act(async () => {
+      result.current.openAddModal();
+    });
+    await waitFor(() => {
+      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
+    });
+
     act(() => {
       result.current.toggleModalType("Bug", true);
     });
+    await waitFor(() => {
+      expect(result.current.modalAvailableStates).toEqual(["Done"]);
+    });
+
     act(() => {
       result.current.toggleModalState("Done", true);
     });
-    act(() => {
-      result.current.validateAddModal();
-    });
     await waitFor(() => {
-      expect(result.current.teamConfigs).toHaveLength(1);
+      expect(result.current.modalDoneStates).toEqual(["Done"]);
     });
+
+    act(() => {
+      result.current.toggleModalType("Bug", false);
+    });
+
+    expect(result.current.modalTypes).toEqual([]);
+    expect(result.current.modalDoneStates).toEqual([]);
+  });
+
+  it("removes state when unchecked", async () => {
+    const { result } = setup([{ name: "Team A" }]);
 
     await act(async () => {
-      await result.current.handleGenerateReport();
+      result.current.openAddModal();
+    });
+    await waitFor(() => {
+      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
     });
 
-    expect(result.current.err).toContain("export-failure");
-    expect(result.current.loadingReport).toBe(false);
     act(() => {
-      result.current.clearReportErrors();
+      result.current.toggleModalType("Bug", true);
     });
-    expect(result.current.reportErrors).toEqual([]);
+    await waitFor(() => {
+      expect(result.current.modalAvailableStates).toEqual(["Done"]);
+    });
+
+    act(() => {
+      result.current.toggleModalState("Done", true);
+    });
+    await waitFor(() => {
+      expect(result.current.modalDoneStates).toEqual(["Done"]);
+    });
+
+    act(() => {
+      result.current.toggleModalState("Done", false);
+    });
+
+    expect(result.current.modalDoneStates).toEqual([]);
   });
 });

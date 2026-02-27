@@ -29,10 +29,10 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
   const modeZeroText = s.includeZeroWeeks ? "incluses" : "exclues";
   const modeSummary =
     s.simulationMode === "backlog_to_weeks"
-      ? `Backlog de ${String(s.backlogSize)} items · ${formatFrNumber(s.nSims)} simulations · semaines a 0 ${modeZeroText}`
-      : `Horizon de ${String(s.targetWeeks)} semaines · ${formatFrNumber(s.nSims)} simulations · semaines a 0 ${modeZeroText}`;
+      ? `Backlog de ${String(s.backlogSize)} items ? ${formatFrNumber(s.nSims)} simulations ? semaines ? 0 ${modeZeroText}`
+      : `Horizon de ${String(s.targetWeeks)} semaines ? ${formatFrNumber(s.nSims)} simulations ? semaines ? 0 ${modeZeroText}`;
   const typeListText = s.types.length ? s.types.join(", ") : "Aucun type";
-  const stateListText = s.doneStates.length ? s.doneStates.join(", ") : "Aucun etat";
+  const stateListText = s.doneStates.length ? s.doneStates.join(", ") : "Aucun ?tat";
   const hasRequiredFilters = s.types.length > 0 && s.doneStates.length > 0;
   const canRunSimulation = !s.loading && !!selectedTeam && hasRequiredFilters;
   const showPeriod = openSection === "period";
@@ -51,7 +51,7 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
 
   async function handleRunForecast(): Promise<void> {
     if (!hasRequiredFilters) {
-      setValidationMessage("Ticket et Etat obligatoires.");
+      setValidationMessage("Ticket et ?tat obligatoires.");
       return;
     }
     setValidationMessage("");
@@ -73,14 +73,14 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
     <>
       <section className="sim-control-section sim-control-section--compact">
         <div className="sim-advanced-header">
-          <h3 className="sim-control-heading">Periode historique</h3>
+          <h3 className="sim-control-heading">P?riode historique</h3>
           <button
             type="button"
             className="sim-advanced-toggle"
             onClick={() => toggleSection("period")}
             aria-expanded={showPeriod}
           >
-            {showPeriod ? "Reduire" : "Developper"}
+            {showPeriod ? "R?duire" : "D?velopper"}
           </button>
         </div>
         {!showPeriod && (
@@ -99,7 +99,7 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
             onClick={() => toggleSection("mode")}
             aria-expanded={showMode}
           >
-            {showMode ? "Reduire" : "Developper"}
+            {showMode ? "R?duire" : "D?velopper"}
           </button>
         </div>
         {!showMode && (
@@ -118,10 +118,10 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
             onClick={() => toggleSection("filters")}
             aria-expanded={showFilters}
           >
-            {showFilters ? "Reduire" : "Developper"}
+            {showFilters ? "R?duire" : "D?velopper"}
           </button>
         </div>
-        {!showFilters && <div className="sim-advanced-summary">{typeListText} {"\u2192"} {stateListText}</div>}
+        {!showFilters && <div className="sim-advanced-summary">{typeListText} {"→"} {stateListText}</div>}
         {showFilters && <SimulationFilterControls />}
       </section>
 
@@ -138,4 +138,3 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
     </>
   );
 }
-

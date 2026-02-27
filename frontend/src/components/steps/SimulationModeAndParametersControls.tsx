@@ -19,8 +19,8 @@ export default function SimulationModeAndParametersControls() {
             }}
             className="sim-input sim-input--compact"
           >
-            <option value="backlog_to_weeks">Prevoir le delai pour vider un backlog</option>
-            <option value="weeks_to_items">Prevoir le volume livre en N semaines</option>
+            <option value="backlog_to_weeks">Prévoir le délai pour vider un backlog</option>
+            <option value="weeks_to_items">Prévoir le volume livré en N semaines</option>
           </select>
         </div>
         <label className="sim-check-row sim-mode-zero-toggle sim-mode-zero-toggle--compact">
@@ -29,8 +29,8 @@ export default function SimulationModeAndParametersControls() {
             checked={s.includeZeroWeeks}
             onChange={(e) => s.setIncludeZeroWeeks(e.target.checked)}
           />
-          <span title="Inclure les semaines sans ticket ferme rend la prevision plus prudente.">
-            Inclure les semaines a 0
+          <span title="Inclure les semaines sans ticket fermé rend la prévision plus prudente.">
+            Inclure les semaines à 0
           </span>
         </label>
       </div>
@@ -38,7 +38,7 @@ export default function SimulationModeAndParametersControls() {
       <div className="sim-grid-2 sim-grid-2--compact sim-mt-10">
         <div>
           <label className="sim-label sim-label--compact">
-            {s.simulationMode === "backlog_to_weeks" ? "Backlog (items)" : "Semaines ciblees"}
+            {s.simulationMode === "backlog_to_weeks" ? "Backlog (items)" : "Semaines ciblées"}
           </label>
           {s.simulationMode === "backlog_to_weeks" ? (
             <input

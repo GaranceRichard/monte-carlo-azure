@@ -15,9 +15,6 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
   return (
     <div className="space-y-4">
       <h2 className="flow-title">Simulation Portefeuille</h2>
-      <p className="flow-text">
-        Projet selectionne: <b>{selectedProject}</b>
-      </p>
 
       {portfolio.err && (
         <div className="ui-alert ui-alert--danger">
@@ -27,7 +24,7 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
       {portfolio.reportErrors.length > 0 && (
         <div className="ui-alert ui-alert--danger">
           <div className="flex items-center justify-between gap-2">
-            <b>Equipes en echec :</b>
+            <b>Équipes en échec :</b>
             <button type="button" className="sim-advanced-toggle" onClick={portfolio.clearReportErrors}>
               Fermer
             </button>
@@ -43,10 +40,10 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
       )}
 
       <section className="sim-control-section">
-        <h3 className="sim-control-heading">Criteres generaux</h3>
-        <div className="sim-grid-2">
+        <h3 className="sim-control-heading">Critères généraux</h3>
+        <div className="sim-grid-3">
           <label className="sim-label">
-            Date de debut
+            Date de début
             <input
               className="sim-input"
               type="date"
@@ -63,57 +60,8 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
               onChange={(e) => portfolio.setEndDate(e.target.value)}
             />
           </label>
-        </div>
-        <div className="sim-grid-2">
           <label className="sim-label">
-            Mode
-            <select
-              className="sim-input"
-              value={portfolio.simulationMode}
-              onChange={(e) => portfolio.setSimulationMode(e.target.value as "backlog_to_weeks" | "weeks_to_items")}
-            >
-              <option value="backlog_to_weeks">Prevoir le delai pour vider un backlog</option>
-              <option value="weeks_to_items">Prevoir le volume livre en N semaines</option>
-            </select>
-          </label>
-          {portfolio.simulationMode === "backlog_to_weeks" ? (
-            <label className="sim-label">
-              Backlog
-              <input
-                className="sim-input"
-                type="number"
-                min={1}
-                value={portfolio.backlogSize}
-                onChange={(e) => portfolio.setBacklogSize(Number(e.target.value) || 1)}
-              />
-            </label>
-          ) : (
-            <label className="sim-label">
-              Cible (semaines)
-              <input
-                className="sim-input"
-                type="number"
-                min={1}
-                value={portfolio.targetWeeks}
-                onChange={(e) => portfolio.setTargetWeeks(Number(e.target.value) || 1)}
-              />
-            </label>
-          )}
-        </div>
-        <div className="sim-grid-2">
-          <label className="sim-label">
-            Nombre de simulations
-            <input
-              className="sim-input"
-              type="number"
-              min={1000}
-              max={200000}
-              value={portfolio.nSims}
-              onChange={(e) => portfolio.setNSims(Number(e.target.value) || 20000)}
-            />
-          </label>
-          <label className="sim-label">
-            Semaines a 0
+            Semaines à 0
             <select
               className="sim-input"
               value={portfolio.includeZeroWeeks ? "1" : "0"}
@@ -124,17 +72,79 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
             </select>
           </label>
         </div>
+        <div className="sim-grid-portfolio-line2">
+          <label className="sim-label">
+            Mode
+            <select
+              className="sim-input"
+              value={portfolio.simulationMode}
+              onChange={(e) => portfolio.setSimulationMode(e.target.value as "backlog_to_weeks" | "weeks_to_items")}
+            >
+              <option value="backlog_to_weeks">Prévoir le délai pour vider un backlog</option>
+              <option value="weeks_to_items">Prévoir le volume livré en N semaines</option>
+            </select>
+          </label>
+          {portfolio.simulationMode === "backlog_to_weeks" ? (
+            <label className="sim-label">
+              Items
+              <input
+                className="sim-input sim-input--center"
+                type="number"
+                min={1}
+                value={portfolio.backlogSize}
+                onChange={(e) => portfolio.setBacklogSize(Number(e.target.value) || 1)}
+              />
+            </label>
+          ) : (
+            <label className="sim-label">
+              Semaines
+              <input
+                className="sim-input sim-input--center"
+                type="number"
+                min={1}
+                value={portfolio.targetWeeks}
+                onChange={(e) => portfolio.setTargetWeeks(Number(e.target.value) || 1)}
+              />
+            </label>
+          )}
+          <label className="sim-label">
+            Nombre de simulations
+            <input
+              className="sim-input sim-input--center"
+              type="number"
+              min={1000}
+              max={200000}
+              value={portfolio.nSims}
+              onChange={(e) => portfolio.setNSims(Number(e.target.value) || 20000)}
+            />
+          </label>
+          <label
+            className="sim-label"
+            title="Proportion de la capacité combinée disponible après coûts de synchronisation PI (cérémonies, dépendances, alignement). 100% = équipes totalement indépendantes."
+          >
+            Taux d'arrimage
+            <input
+              className="sim-input sim-input--center"
+              type="number"
+              min={0}
+              max={100}
+              step={5}
+              value={portfolio.arrimageRate}
+              onChange={(e) => portfolio.setArrimageRate(Math.max(0, Math.min(100, Number(e.target.value) || 0)))}
+            />
+          </label>
+        </div>
       </section>
 
       <section className="sim-control-section">
-        <h3 className="sim-control-heading">Equipes du portefeuille</h3>
+        <h3 className="sim-control-heading">Équipes du portefeuille</h3>
         <button
           type="button"
           className="ui-primary-btn"
           disabled={portfolio.availableTeamNames.length === 0}
           onClick={portfolio.openAddModal}
         >
-          Ajouter equipe
+          Ajouter équipe
         </button>
 
         <div className="space-y-2">
@@ -154,7 +164,7 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
               </div>
             </div>
           ))}
-          {portfolio.teamConfigs.length === 0 && <div className="sim-empty-tip">Aucune equipe ajoutee.</div>}
+          {portfolio.teamConfigs.length === 0 && <div className="sim-empty-tip">Aucune équipe ajoutée.</div>}
         </div>
       </section>
 
@@ -164,21 +174,25 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
         disabled={!portfolio.canGenerate}
         onClick={() => void portfolio.handleGenerateReport()}
       >
-        {portfolio.loadingReport ? "Generation du rapport..." : "Generer rapport portefeuille"}
+        {portfolio.loadingReport ? "Génération du rapport..." : "Générer rapport portefeuille"}
       </button>
-      {portfolio.reportProgressLabel && <div className="sim-advanced-summary">{portfolio.reportProgressLabel}</div>}
+      {portfolio.reportProgressLabel && (
+        <div className="sim-advanced-summary">
+          {portfolio.reportProgressLabel} ({portfolio.generationProgress.done}/{portfolio.generationProgress.total})
+        </div>
+      )}
 
       {portfolio.showAddModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4">
           <div className="w-full max-w-4xl rounded-xl border border-[var(--border)] bg-[var(--panel)] p-4 shadow-2xl">
-            <h3 className="sim-control-heading">Ajouter equipe</h3>
+            <h3 className="sim-control-heading">Ajouter équipe</h3>
             {portfolio.modalErr && (
               <div className="ui-alert ui-alert--danger">
                 <b>Erreur :</b> {portfolio.modalErr}
               </div>
             )}
             <label className="sim-label">
-              Equipe
+              Équipe
               <select
                 className="sim-input"
                 value={portfolio.modalTeamName}
@@ -187,7 +201,7 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
                 onChange={(e) => portfolio.onModalTeamNameChange(e.target.value)}
               >
                 {portfolio.availableTeamNames.length === 0 && (
-                  <option value="">Toutes les equipes sont deja ajoutees</option>
+                  <option value="">Toutes les équipes sont déjà ajoutées</option>
                 )}
                 {portfolio.availableTeamNames.map((teamName) => (
                   <option key={teamName} value={teamName}>
@@ -227,7 +241,7 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
               </div>
 
               <div>
-                <label className="sim-label">Etat</label>
+                <label className="sim-label">État</label>
                 <div className="sim-checklist sim-checklist--states" style={{ maxHeight: 220 }}>
                   {portfolio.modalAvailableStates.map((state) => (
                     <label key={state} className="sim-check-row">
@@ -241,7 +255,7 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
                     </label>
                   ))}
                   {portfolio.modalTypes.length === 0 && (
-                    <div className="sim-empty-tip">Selectionnez d'abord un ou plusieurs tickets.</div>
+                    <div className="sim-empty-tip">Sélectionnez d&apos;abord un ou plusieurs tickets.</div>
                   )}
                 </div>
               </div>

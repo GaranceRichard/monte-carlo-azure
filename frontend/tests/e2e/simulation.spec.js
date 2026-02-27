@@ -2,14 +2,14 @@ import { test, expect } from "@playwright/test";
 import { completeOnboardingToSimulation, setupAppRoutes } from "./helpers/mocks";
 
 const openIfCollapsed = async (section) => {
-  const button = section.getByRole("button", { name: /D[ée]velopper/i });
+  const button = section.getByRole("button", { name: /D.+velopper/i });
   if (await button.isVisible().catch(() => false)) {
     await button.click();
   }
 };
 
 const closeIfExpanded = async (section) => {
-  const button = section.getByRole("button", { name: /R[ée]duire/i });
+  const button = section.getByRole("button", { name: /R.+duire/i });
   if (await button.isVisible().catch(() => false)) {
     await button.click();
   }
@@ -27,9 +27,9 @@ test("simulation: erreur puis succes sur les 2 modes", async ({ page }) => {
   await completeOnboardingToSimulation(page);
   await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Alpha");
 
-  const periodSection = page.locator("section.sim-control-section", { hasText: /P[ée]riode historique/i });
-  const modeSection = page.locator("section.sim-control-section", { hasText: "Mode de simulation" });
-  const filtersSection = page.locator("section.sim-control-section", { hasText: "Filtres de tickets" });
+  const periodSection = page.locator("section.sim-control-section").nth(0);
+  const modeSection = page.locator("section.sim-control-section").nth(1);
+  const filtersSection = page.locator("section.sim-control-section").nth(2);
 
   await openIfCollapsed(periodSection);
   await page.locator('input[type="date"]').first().fill(closedDates[closedDates.length - 1].slice(0, 10));
@@ -62,3 +62,4 @@ test("simulation: erreur puis succes sur les 2 modes", async ({ page }) => {
   await closeIfExpanded(modeSection);
   await expect(page.getByText("10 sem")).toBeVisible({ timeout: 10_000 });
 });
+

@@ -20,7 +20,7 @@ describe("TeamStep", () => {
 
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "Equipe Beta" } });
     expect(setSelectedTeam).toHaveBeenCalledWith("Equipe Beta");
-    fireEvent.click(screen.getByRole("button", { name: "Choisir cette equipe" }));
+    fireEvent.click(screen.getByRole("button", { name: /Choisir cette .quipe/i }));
     expect(onContinue).toHaveBeenCalledTimes(1);
   });
 
@@ -57,8 +57,8 @@ describe("TeamStep", () => {
     );
 
     expect(screen.getByText("Erreur team")).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "Aucune equipe disponible" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Choisir cette equipe" })).toBeDisabled();
+    expect(screen.getByRole("option", { name: /Aucune .quipe disponible/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Choisir cette .quipe/i })).toBeDisabled();
   });
 
   it("disables button while loading even with selected team", () => {
@@ -74,7 +74,7 @@ describe("TeamStep", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: "Choisir cette equipe" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Choisir cette .quipe/i })).toBeDisabled();
   });
 
   it("supports teams without id using name fallback", () => {

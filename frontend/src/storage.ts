@@ -27,7 +27,12 @@ export type StoredQuickFilters = {
   doneStates: string[];
 };
 
+export type StoredPortfolioPrefs = {
+  arrimageRate?: number;
+};
+
 const QUICK_FILTERS_KEY_PREFIX = "mc_quick_filters_v1::";
+const PORTFOLIO_PREFS_KEY = "mc_portfolio_prefs_v1";
 
 function toStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
@@ -62,4 +67,20 @@ export function writeStoredQuickFilters(scopeKey: string, quickFilters: StoredQu
       doneStates: [...quickFilters.doneStates],
     }),
   );
+}
+
+export function readStoredPortfolioPrefs(): StoredPortfolioPrefs {
+  const raw = storageGetItem(PORTFOLIO_PREFS_KEY);
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw) as StoredPortfolioPrefs;
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed;
+  } catch {
+    return {};
+  }
+}
+
+export function writeStoredPortfolioPrefs(prefs: StoredPortfolioPrefs): void {
+  storageSetItem(PORTFOLIO_PREFS_KEY, JSON.stringify(prefs));
 }

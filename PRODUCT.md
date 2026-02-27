@@ -199,3 +199,33 @@ Resume executif
 Monte-Carlo Azure permet de transformer des donnees operationnelles en decisions probabilisees, securisees et gouvernables.
 
 Il apporte une discipline de risque mesurable dans les environnements de delivery.
+
+11. Evolutions recentes (PI portefeuille)
+
+Simulation PI multi-equipes:
+
+introduction de 3 scenarios d'agrégation (Optimiste, Arrime, Conservateur)
+
+ajout du taux d'arrimage PI configurable dans les criteres generaux
+
+generation parallele des simulations (scenarios + equipes) avec progression visible
+
+tolerance aux echecs partiels par equipe (rapport partiel exportable)
+
+Rapport PDF portefeuille:
+
+page 1 orientee decision (synthese + hypotheses)
+
+pages dediees par scenario avant les pages equipes
+
+coherence du calcul Risk Score entre synthese et pages detail (meme base percentile selon le mode)
+
+qualite visuelle renforcee du tableau de synthese (taille/contraste/couleurs)
+
+Qualite engineering:
+
+corrections d'encodage/accents sur ecrans et PDF
+
+durcissement des tests unitaires et e2e (selecteurs robustes aux variations d'encodage)
+
+hausse de la couverture front sur les hooks portefeuille critiques

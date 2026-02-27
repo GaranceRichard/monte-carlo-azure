@@ -1,5 +1,10 @@
-import { describe, expect, it } from "vitest";
-import { applyCapacityReductionToResult, computeRiskScoreFromPercentiles } from "./simulation";
+import { describe, expect, it, vi } from "vitest";
+import {
+  applyCapacityReductionToResult,
+  buildScenarioSamples,
+  computeRiskLegend,
+  computeRiskScoreFromPercentiles,
+} from "./simulation";
 
 describe("computeRiskScoreFromPercentiles", () => {
   it("returns 0 when P50 is missing or non-positive", () => {
@@ -30,5 +35,62 @@ describe("applyCapacityReductionToResult", () => {
     };
     expect(applyCapacityReductionToResult(input, "backlog_to_weeks", 12, 100, 4)).toBe(input);
     expect(applyCapacityReductionToResult(input, "backlog_to_weeks", 12, 80, 0)).toBe(input);
+  });
+});
+
+describe("buildScenarioSamples", () => {
+  it("builds optimistic, arrime and conservative samples for 2 teams", () => {
+    const randomSpy = vi.spyOn(Math, "random");
+    randomSpy
+      .mockReturnValueOnce(0.1) // team1 -> 10
+      .mockReturnValueOnce(0.8) // team2 -> 200
+      .mockReturnValueOnce(0.6) // team1 -> 30
+      .mockReturnValueOnce(0.2) // team2 -> 100
+      .mockReturnValueOnce(0.3) // team1 -> 10
+      .mockReturnValueOnce(0.9); // team2 -> 200
+
+    const scenarios = buildScenarioSamples(
+      [
+        [10, 20, 30],
+        [100, 200],
+      ],
+      80,
+    );
+
+    expect(scenarios.optimiste).toEqual([210, 120, 210]);
+    expect(scenarios.arrime).toEqual([168, 96, 168]);
+    expect(scenarios.conservateur).toEqual([10, 20, 10]);
+    expect(scenarios.optimiste).toHaveLength(3);
+    expect(scenarios.arrime).toHaveLength(3);
+    expect(scenarios.conservateur).toHaveLength(3);
+    randomSpy.mockRestore();
+  });
+
+  it("uses same values for all scenarios with 1 team", () => {
+    const randomSpy = vi.spyOn(Math, "random");
+    randomSpy.mockReturnValue(0.1);
+
+    const scenarios = buildScenarioSamples([[5, 8, 13]], 20);
+
+    expect(scenarios.optimiste).toEqual(scenarios.arrime);
+    expect(scenarios.optimiste).toEqual(scenarios.conservateur);
+    randomSpy.mockRestore();
+  });
+
+  it("throws explicit error when teamSamples is empty", () => {
+    expect(() => buildScenarioSamples([], 100)).toThrow("teamSamples ne peut pas etre vide");
+  });
+
+  it("throws explicit error when a team has no samples", () => {
+    expect(() => buildScenarioSamples([[1, 2], []], 100)).toThrow(
+      "chaque equipe doit contenir au moins un sample",
+    );
+  });
+});
+
+describe("computeRiskLegend", () => {
+  it("covers fragile and non fiable ranges", () => {
+    expect(computeRiskLegend(0.7)).toBe("fragile");
+    expect(computeRiskLegend(0.95)).toBe("non fiable");
   });
 });

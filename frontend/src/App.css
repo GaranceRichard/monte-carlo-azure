@@ -253,6 +253,38 @@
   gap: var(--space-3);
 }
 
+.sim-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.sim-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.sim-grid-portfolio-line2 {
+  display: grid;
+  grid-template-columns: minmax(300px, 1.7fr) minmax(120px, 0.8fr) minmax(160px, 1fr) minmax(120px, 0.8fr);
+  gap: var(--space-3);
+}
+
+@media (max-width: 1100px) {
+  .sim-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .sim-grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sim-grid-portfolio-line2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .sim-grid-2--compact {
   gap: var(--space-2);
 }
@@ -281,6 +313,10 @@
 .sim-input--compact {
   padding: 8px;
   margin-top: 6px;
+}
+
+.sim-input--center {
+  text-align: center;
 }
 
 .sim-mode-row {

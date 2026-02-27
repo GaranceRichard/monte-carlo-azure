@@ -71,7 +71,7 @@ describe("SimulationControlPanel launch button visibility", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /lancer la simulation/i }));
 
-    expect(screen.getByText("Ticket et Etat obligatoires.")).not.toBeNull();
+    expect(screen.getByText(/Ticket et .tat obligatoires\./i)).not.toBeNull();
     expect(runForecast).not.toHaveBeenCalled();
   });
 
@@ -95,13 +95,13 @@ describe("SimulationControlPanel launch button visibility", () => {
     if (!filtersSection) return;
 
     expect(within(filtersSection).getByText(/bug\s+\u2192\s+done/i)).not.toBeNull();
-    fireEvent.click(within(filtersSection).getByRole("button", { name: /developper/i }));
+    fireEvent.click(within(filtersSection).getByRole("button", { name: /d.velopper/i }));
 
     expect(within(filtersSection).queryByText(/bug\s+\u2192\s+done/i)).toBeNull();
     expect(within(filtersSection).getByText("Filters Content")).not.toBeNull();
     expect(onExpansionChange).toHaveBeenLastCalledWith(true);
 
-    fireEvent.click(within(filtersSection).getByRole("button", { name: /reduire/i }));
+    fireEvent.click(within(filtersSection).getByRole("button", { name: /r.duire/i }));
     expect(onExpansionChange).toHaveBeenLastCalledWith(false);
   });
 
@@ -109,16 +109,16 @@ describe("SimulationControlPanel launch button visibility", () => {
     setContext({ hasLaunchedOnce: false });
     render(<SimulationControlPanel />);
 
-    const periodSection = screen.getByRole("heading", { name: /periode historique/i }).closest("section");
+    const periodSection = screen.getByRole("heading", { name: /p.riode historique/i }).closest("section");
     const modeSection = screen.getByRole("heading", { name: /mode de simulation/i }).closest("section");
     expect(periodSection).not.toBeNull();
     expect(modeSection).not.toBeNull();
     if (!periodSection || !modeSection) return;
 
-    fireEvent.click(within(periodSection).getByRole("button", { name: /developper/i }));
+    fireEvent.click(within(periodSection).getByRole("button", { name: /d.velopper/i }));
     expect(within(periodSection).getByText("Period Content")).not.toBeNull();
 
-    fireEvent.click(within(modeSection).getByRole("button", { name: /developper/i }));
+    fireEvent.click(within(modeSection).getByRole("button", { name: /d.velopper/i }));
     expect(within(modeSection).getByText("Mode Content")).not.toBeNull();
     expect(within(periodSection).queryByText("Period Content")).toBeNull();
   });
@@ -128,7 +128,7 @@ describe("SimulationControlPanel launch button visibility", () => {
     render(<SimulationControlPanel />);
     expect(screen.getByText(/Backlog de 100 items/i)).not.toBeNull();
     expect(screen.getByText(/20\s?000 simulations/i)).not.toBeNull();
-    expect(screen.getByText(/semaines a 0 incluses/i)).not.toBeNull();
+    expect(screen.getByText(/semaines . 0 incluses/i)).not.toBeNull();
     expect(screen.getByText(/du 01\/01\/2026 au 01\/02\/2026/i)).not.toBeNull();
   });
 
@@ -159,7 +159,7 @@ describe("SimulationControlPanel launch button visibility", () => {
     expect(filtersSection).not.toBeNull();
     if (!filtersSection) return;
 
-    fireEvent.click(within(filtersSection).getByRole("button", { name: /developper/i }));
+    fireEvent.click(within(filtersSection).getByRole("button", { name: /d.velopper/i }));
     expect(resetSimulationResults).toHaveBeenCalledTimes(1);
   });
 
@@ -186,7 +186,7 @@ describe("SimulationControlPanel launch button visibility", () => {
 
     const { rerender } = render(<SimulationControlPanel />);
     fireEvent.click(screen.getByRole("button", { name: /lancer la simulation/i }));
-    expect(screen.getByText("Ticket et Etat obligatoires.")).not.toBeNull();
+    expect(screen.getByText(/Ticket et .tat obligatoires\./i)).not.toBeNull();
 
     contextValue.simulation = {
       ...contextValue.simulation,
@@ -195,7 +195,7 @@ describe("SimulationControlPanel launch button visibility", () => {
     };
     rerender(<SimulationControlPanel />);
 
-    expect(screen.queryByText("Ticket et Etat obligatoires.")).toBeNull();
+    expect(screen.queryByText(/Ticket et .tat obligatoires\./i)).toBeNull();
     expect(runForecast).not.toHaveBeenCalled();
   });
 });

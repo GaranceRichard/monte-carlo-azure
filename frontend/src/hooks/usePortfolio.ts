@@ -4,7 +4,13 @@ import { getTeamOptionsDirect } from "../adoClient";
 import { nWeeksAgo, today } from "../date";
 import type { ForecastMode, NamedEntity } from "../types";
 import { sortTeams } from "../utils/teamSort";
-import { buildQuickFiltersScopeKey, readStoredQuickFilters, writeStoredQuickFilters } from "../storage";
+import {
+  buildQuickFiltersScopeKey,
+  readStoredPortfolioPrefs,
+  readStoredQuickFilters,
+  writeStoredPortfolioPrefs,
+  writeStoredQuickFilters,
+} from "../storage";
 import { getPortfolioErrorMessage, usePortfolioReport, type TeamPortfolioConfig } from "./usePortfolioReport";
 import type { AdoErrorContext } from "../adoErrors";
 
@@ -42,6 +48,7 @@ function getValidQuickFilterSelection(
 }
 
 export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePortfolioParams) {
+  const portfolioPrefs = useMemo(() => readStoredPortfolioPrefs(), []);
   const [startDate, setStartDate] = useState<string>(nWeeksAgo(26));
   const [endDate, setEndDate] = useState<string>(today());
   const [simulationMode, setSimulationMode] = useState<ForecastMode>("backlog_to_weeks");
@@ -49,6 +56,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
   const [backlogSize, setBacklogSize] = useState<number>(120);
   const [targetWeeks, setTargetWeeks] = useState<number>(12);
   const [nSims, setNSims] = useState<number>(20000);
+  const [arrimageRate, setArrimageRate] = useState<number>(Number(portfolioPrefs.arrimageRate ?? 100));
 
   const [modalErr, setModalErr] = useState<string>("");
   const [teamConfigs, setTeamConfigs] = useState<TeamPortfolioConfig[]>([]);
@@ -81,6 +89,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     loadingReport,
     reportErr,
     reportProgressLabel,
+    generationProgress,
     reportErrors,
     handleGenerateReport,
     clearReportErrors,
@@ -96,6 +105,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     backlogSize,
     targetWeeks,
     nSims,
+    arrimageRate,
     teamConfigs,
   });
 
@@ -104,6 +114,10 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
   useEffect(() => {
     teamOptionsCacheRef.current.clear();
   }, [selectedOrg, selectedProject]);
+
+  useEffect(() => {
+    writeStoredPortfolioPrefs({ arrimageRate: Number(arrimageRate) || 100 });
+  }, [arrimageRate]);
 
   function getTeamCacheKey(teamName: string): string {
     return `${selectedOrg}::${selectedProject}::${teamName}`;
@@ -276,8 +290,11 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     setTargetWeeks,
     nSims,
     setNSims,
+    arrimageRate,
+    setArrimageRate,
     loadingReport,
     reportProgressLabel,
+    generationProgress,
     reportErrors,
     err: reportErr,
     modalErr,

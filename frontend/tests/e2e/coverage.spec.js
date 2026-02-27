@@ -1,4 +1,4 @@
-﻿import { test, expect } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { summarizeCoverageIstanbul } from "./helpers/coverage";
 import { setupAppRoutes } from "./helpers/mocks";
 
@@ -8,14 +8,14 @@ test.describe("e2e istanbul coverage", () => {
   const allCoverageEntries = [];
 
   const openIfCollapsed = async (section) => {
-    const button = section.getByRole("button", { name: /D[Ã©e]velopper/i });
+    const button = section.getByRole("button", { name: /D.+velopper/i });
     if (await button.isVisible().catch(() => false)) {
       await button.click();
     }
   };
 
   const closeIfExpanded = async (section) => {
-    const button = section.getByRole("button", { name: /R[Ã©e]duire/i });
+    const button = section.getByRole("button", { name: /R.+duire/i });
     if (await button.isVisible().catch(() => false)) {
       await button.click();
     }
@@ -103,9 +103,9 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("button", { name: /Choisir cette/i }).click();
     await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Alpha");
 
-    const periodSection = page.locator("section.sim-control-section", { hasText: /P[Ã©e]riode historique/i });
-    const modeSection = page.locator("section.sim-control-section", { hasText: "Mode de simulation" });
-    const filtersSection = page.locator("section.sim-control-section", { hasText: "Filtres de tickets" });
+    const periodSection = page.locator("section.sim-control-section").nth(0);
+    const modeSection = page.locator("section.sim-control-section").nth(1);
+    const filtersSection = page.locator("section.sim-control-section").nth(2);
 
     await openIfCollapsed(periodSection);
     await page.locator('input[type="date"]').first().fill(closedDates[closedDates.length - 1].slice(0, 10));
@@ -176,7 +176,7 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("button", { name: /Choisir cette/i }).click();
     await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Alpha");
 
-    const filtersToggle = filtersSection.getByRole("button", { name: /D[Ã©e]velopper/i });
+    const filtersToggle = filtersSection.getByRole("button", { name: /D.+velopper/i });
     if (await filtersToggle.isVisible().catch(() => false)) {
       await filtersToggle.click();
     }
@@ -386,5 +386,6 @@ test.describe("e2e istanbul coverage", () => {
     await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Alpha");
   });
 });
+
 
 
