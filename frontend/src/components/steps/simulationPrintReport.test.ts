@@ -99,7 +99,7 @@ describe("exportSimulationPrintReport", () => {
     expect(writtenHtml).toContain("Distribution Monte Carlo");
     expect(writtenHtml).toContain("Courbe de probabilite");
     expect(writtenHtml).toContain('<span class="kpi-label">Risk Score</span>');
-    expect(writtenHtml).toContain('<span class="kpi-value">0,6 (fragile)</span>');
+    expect(writtenHtml).toContain('<span class="kpi-value">0,63 (fragile)</span>');
     expect(writtenHtml).toContain('id="download-pdf"');
     expect((writtenHtml.match(/<svg/g) || []).length).toBeGreaterThanOrEqual(3);
     expect(typeof fakeWindow.onload).toBe("function");

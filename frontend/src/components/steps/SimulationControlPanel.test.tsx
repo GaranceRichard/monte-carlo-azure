@@ -123,6 +123,13 @@ describe("SimulationControlPanel launch button visibility", () => {
     expect(within(periodSection).queryByText("Period Content")).toBeNull();
   });
 
+  it("shows business-friendly summary when mode section is collapsed", () => {
+    setContext({ hasLaunchedOnce: false });
+    render(<SimulationControlPanel />);
+    expect(screen.getByText(/Objectif backlog: 100 items/i)).not.toBeNull();
+    expect(screen.getByText(/semaines a 0 incluses, 20000 simulations/i)).not.toBeNull();
+  });
+
   it("resets simulation when opening ticket filters after a launched simulation", () => {
     const resetSimulationResults = vi.fn();
     vi.mocked(useSimulationContext).mockReturnValue({

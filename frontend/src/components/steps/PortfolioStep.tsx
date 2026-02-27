@@ -55,8 +55,8 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
               value={portfolio.simulationMode}
               onChange={(e) => portfolio.setSimulationMode(e.target.value as "backlog_to_weeks" | "weeks_to_items")}
             >
-              <option value="backlog_to_weeks">backlog_to_weeks</option>
-              <option value="weeks_to_items">weeks_to_items</option>
+              <option value="backlog_to_weeks">Prevoir le delai pour vider un backlog</option>
+              <option value="weeks_to_items">Prevoir le volume livrable dans un delai</option>
             </select>
           </label>
           {portfolio.simulationMode === "backlog_to_weeks" ? (

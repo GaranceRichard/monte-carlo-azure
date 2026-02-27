@@ -236,8 +236,8 @@ describe("SimulationResultsPanel history list", () => {
         loadingStageMessage: "",
         includeZeroWeeks: true,
         sampleStats: null,
-        result: { result_kind: "weeks", risk_score: 0.42 },
-        displayPercentiles: { P50: 8, P70: 10, P90: 13 },
+        result: { result_kind: "weeks", risk_score: 0.01 },
+        displayPercentiles: { P50: 50, P70: 60, P90: 71 },
         simulationHistory: [],
         applyHistoryEntry: vi.fn(),
         clearSimulationHistory: vi.fn(),
@@ -248,6 +248,46 @@ describe("SimulationResultsPanel history list", () => {
     expect(screen.getByText(/^Risk$/i)).not.toBeNull();
     expect(screen.getByText(/^0.42$/i)).not.toBeNull();
     expect(screen.queryByRole("tooltip")).toBeNull();
+  });
+
+  it("uses API risk_score when display percentiles are incomplete", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        result: { result_kind: "weeks", risk_score: 0.42 },
+        displayPercentiles: { P70: 10 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+    expect(screen.getByText(/^0.42$/i)).not.toBeNull();
+  });
+
+  it("falls back to computed risk score when percentiles are incomplete and API score is missing", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        result: { result_kind: "weeks" },
+        displayPercentiles: { P70: 10 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+    expect(screen.getByText(/^0.00$/i)).not.toBeNull();
   });
 
   it("formats history option labels for both simulation modes", () => {

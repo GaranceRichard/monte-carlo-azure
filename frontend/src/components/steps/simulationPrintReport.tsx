@@ -34,7 +34,6 @@ export function exportSimulationPrintReport({
   capacityPercent,
   reducedCapacityWeeks,
   resultKind,
-  riskScore,
   displayPercentiles,
   throughputPoints,
   distributionPoints,
@@ -53,7 +52,6 @@ export function exportSimulationPrintReport({
   capacityPercent: number | string;
   reducedCapacityWeeks: number | string;
   resultKind: "items" | "weeks";
-  riskScore?: number;
   displayPercentiles: Record<string, number>;
   throughputPoints: ThroughputExportPoint[];
   distributionPoints: DistributionExportPoint[];
@@ -73,13 +71,10 @@ export function exportSimulationPrintReport({
   const stateSummary = doneStates.length ? doneStates.join(", ") : "Aucun";
   const modeZeroLabel = includeZeroWeeks ? "Semaines 0 incluses" : "Semaines 0 exclues";
   const resultLabel = resultKind === "items" ? "items (au moins)" : "semaines (au plus)";
-  const effectiveRiskScore =
-    typeof riskScore === "number" && Number.isFinite(riskScore)
-      ? riskScore
-      : computeRiskScoreFromPercentiles(simulationMode, displayPercentiles);
+  const effectiveRiskScore = computeRiskScoreFromPercentiles(simulationMode, displayPercentiles);
   const riskLegend =
     effectiveRiskScore <= 0.2 ? "fiable" : effectiveRiskScore <= 0.5 ? "incertain" : effectiveRiskScore <= 0.8 ? "fragile" : "eleve";
-  const riskScoreLabel = effectiveRiskScore.toFixed(1).replace(".", ",");
+  const riskScoreLabel = effectiveRiskScore.toFixed(2).replace(".", ",");
 
   const html = `
       <!doctype html>

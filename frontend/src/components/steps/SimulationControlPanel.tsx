@@ -16,9 +16,11 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
   const [showFilters, setShowFilters] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
 
-  const modeKind = s.simulationMode === "backlog_to_weeks" ? "item" : "semaine";
-  const modeValue = s.simulationMode === "backlog_to_weeks" ? s.backlogSize : s.targetWeeks;
   const modeZeroText = s.includeZeroWeeks ? "incluses" : "non incluses";
+  const modeSummary =
+    s.simulationMode === "backlog_to_weeks"
+      ? `Objectif backlog: ${String(s.backlogSize)} items, semaines a 0 ${modeZeroText}, ${String(s.nSims)} simulations`
+      : `Objectif livraison: ${String(s.targetWeeks)} semaines, semaines a 0 ${modeZeroText}, ${String(s.nSims)} simulations`;
   const typeListText = s.types.length ? s.types.join(", ") : "aucun";
   const stateListText = s.doneStates.length ? s.doneStates.join(", ") : "aucun";
   const hasRequiredFilters = s.types.length > 0 && s.doneStates.length > 0;
@@ -107,7 +109,7 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
         </div>
         {!showMode && (
           <div className="sim-advanced-summary">
-            Type {modeKind} : {String(modeValue)} 0 {modeZeroText} sur {String(s.nSims)} simulations
+            {modeSummary}
           </div>
         )}
         {showMode && <SimulationModeAndParametersControls />}

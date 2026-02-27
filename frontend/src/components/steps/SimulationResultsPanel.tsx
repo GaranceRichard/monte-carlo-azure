@@ -65,6 +65,9 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
 
   const riskScoreValue = useMemo(() => {
     if (!s.result) return null;
+    if (typeof s.displayPercentiles?.P50 === "number" && typeof s.displayPercentiles?.P90 === "number") {
+      return computeRiskScoreFromPercentiles(s.simulationMode, s.displayPercentiles ?? {});
+    }
     if (typeof s.result.risk_score === "number" && Number.isFinite(s.result.risk_score)) {
       return s.result.risk_score;
     }

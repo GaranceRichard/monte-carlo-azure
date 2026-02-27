@@ -61,10 +61,9 @@ function computeRiskLegend(score: number): string {
 function formatRiskScore(
   mode: "backlog_to_weeks" | "weeks_to_items",
   percentiles: Record<string, number>,
-  riskScore?: number,
 ): string {
-  const risk = typeof riskScore === "number" && Number.isFinite(riskScore) ? riskScore : computeRiskScoreFromPercentiles(mode, percentiles);
-  const label = risk.toFixed(1).replace(".", ",");
+  const risk = computeRiskScoreFromPercentiles(mode, percentiles);
+  const label = risk.toFixed(2).replace(".", ",");
   return `${label} (${computeRiskLegend(risk)})`;
 }
 
@@ -138,7 +137,7 @@ export function exportPortfolioPrintReport({
             <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">${Number(displayPercentiles?.P50 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
             <div class="kpi"><span class="kpi-label">P70</span><span class="kpi-value">${Number(displayPercentiles?.P70 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
             <div class="kpi"><span class="kpi-label">P90</span><span class="kpi-value">${Number(displayPercentiles?.P90 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
-            <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(formatRiskScore(section.simulationMode, displayPercentiles, section.riskScore))}</span></div>
+            <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(formatRiskScore(section.simulationMode, displayPercentiles))}</span></div>
           </section>
 
           <section class="section">

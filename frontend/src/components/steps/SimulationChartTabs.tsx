@@ -66,7 +66,6 @@ export default function SimulationChartTabs() {
       capacityPercent: s.capacityPercent,
       reducedCapacityWeeks: s.reducedCapacityWeeks,
       resultKind: s.result.result_kind,
-      riskScore: s.result.risk_score,
       displayPercentiles: s.displayPercentiles,
       throughputPoints: throughputWithMovingAverage,
       distributionPoints: s.mcHistData,

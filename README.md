@@ -22,6 +22,8 @@ Refactors récents (frontend):
 - extraction de l'export CSV throughput vers `src/utils/export.ts`
 - extraction de la logique de calcul forecast vers `src/hooks/simulationForecastService.ts`
 - extraction de la logique portefeuille vers `src/hooks/usePortfolio.ts` (etat modale, options equipe, orchestration forecast/rapport)
+- libelles metier clarifies dans l'UI portefeuille/simulation (modes lisibles pour PMO/COPIL)
+- calcul du `risk score` harmonise sur les percentiles effectivement affiches (notamment mode `weeks_to_items`), avec affichage a 2 decimales dans les rapports
 - typages simulation segmentés (`SimulationForecastControls`, `SimulationDateRange`, `SimulationResult`, `ChartTab`)
 - écran simulation chargé en lazy (`React.lazy`) + import dynamique du module rapport/PDF pour réduire la taille des chunks initiaux
 
@@ -313,6 +315,7 @@ Suite E2E découpée:
 - `frontend/tests/e2e/coverage.spec.js` (seuils Istanbul agrégés: statements >= 80%, branches >= 82%, functions >= 80%, lines >= 80%)
 
 Sous Windows/VS Code, les tâches `pytest --cov` parallèles utilisent des fichiers coverage distincts via `COVERAGE_FILE` pour éviter les conflits de verrouillage.
+Le projet desactive aussi le cacheprovider pytest via `pytest.ini` (`-p no:cacheprovider`) pour supprimer les warnings d'ecriture `.pytest_cache` en environnement restreint.
 
 ---
 
