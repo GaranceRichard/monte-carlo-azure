@@ -55,7 +55,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
   const [includeZeroWeeks, setIncludeZeroWeeks] = useState<boolean>(true);
   const [backlogSize, setBacklogSize] = useState<number>(120);
   const [targetWeeks, setTargetWeeks] = useState<number>(12);
-  const [nSims, setNSims] = useState<number>(20000);
+  const [nSims, setNSims] = useState<number | string>(20000);
   const [arrimageRate, setArrimageRate] = useState<number>(Number(portfolioPrefs.arrimageRate ?? 100));
 
   const [modalErr, setModalErr] = useState<string>("");
@@ -85,6 +85,9 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     return Array.from(out).sort();
   }, [modalTypes, modalStatesByType]);
 
+  const normalizedNSims = typeof nSims === "string" && nSims.trim() === "" ? Number.NaN : Number(nSims);
+  const hasValidNSims = Number.isFinite(normalizedNSims) && normalizedNSims >= 1000;
+
   const {
     loadingReport,
     reportErr,
@@ -104,12 +107,12 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     simulationMode,
     backlogSize,
     targetWeeks,
-    nSims,
+    nSims: hasValidNSims ? normalizedNSims : 20000,
     arrimageRate,
     teamConfigs,
   });
 
-  const canGenerate = teamConfigs.length > 0 && !loadingReport;
+  const canGenerate = teamConfigs.length > 0 && !loadingReport && hasValidNSims;
 
   useEffect(() => {
     teamOptionsCacheRef.current.clear();

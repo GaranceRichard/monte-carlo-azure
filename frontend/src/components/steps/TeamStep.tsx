@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+﻿import { useEffect, useMemo, useRef } from "react";
 import type { NamedEntity } from "../../types";
 import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
 import { sortTeams } from "../../utils/teamSort";
@@ -36,16 +36,16 @@ export default function TeamStep({
 
   return (
     <>
-      <h2 className="flow-title">Choix de l&apos;équipe</h2>
+      <h2 className="flow-title">Choix de l&apos;\u00E9quipe</h2>
       <p className="flow-text">
-        Projet sélectionné: <b>{selectedProject}</b>
+        Projet s\u00E9lectionn\u00E9: <b>{selectedProject}</b>
       </p>
       {err && (
         <div className="ui-alert ui-alert--danger">
           <b>Erreur :</b> {err}
         </div>
       )}
-      <label className="flow-label">Équipes disponibles</label>
+      <label className="flow-label">\u00C9quipes disponibles</label>
       <select
         ref={teamSelectRef}
         value={selectedTeam}
@@ -60,7 +60,7 @@ export default function TeamStep({
         }}
         className="flow-input flow-input--team-compact"
       >
-        {sortedTeams.length === 0 && <option value="">Aucune équipe disponible</option>}
+        {sortedTeams.length === 0 && <option value="">Aucune \u00E9quipe disponible</option>}
         {sortedTeams.map((team) => (
           <option key={team.id || team.name} value={team.name || ""}>
             {team.name}
@@ -74,7 +74,7 @@ export default function TeamStep({
           className="ui-primary-btn team-step-actions__primary"
           type="button"
         >
-          Choisir cette équipe
+          Choisir cette \u00E9quipe
         </button>
         <button
           onClick={() => void onPortfolio?.()}
@@ -88,3 +88,4 @@ export default function TeamStep({
     </>
   );
 }
+

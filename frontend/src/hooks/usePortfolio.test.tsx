@@ -147,6 +147,27 @@ describe("usePortfolio", () => {
     expect(readStoredPortfolioPrefs().arrimageRate).toBe(75);
   });
 
+  it("disables report generation while nSims is empty, then reenables it once valid", async () => {
+    const { result } = setup([{ name: "Team A" }]);
+    await addTeam(result);
+
+    expect(result.current.canGenerate).toBe(true);
+
+    act(() => {
+      result.current.setNSims("");
+    });
+
+    expect(result.current.nSims).toBe("");
+    expect(result.current.canGenerate).toBe(false);
+
+    act(() => {
+      result.current.setNSims("30000");
+    });
+
+    expect(result.current.nSims).toBe("30000");
+    expect(result.current.canGenerate).toBe(true);
+  });
+
   it("shows error when validating modal without team selection", async () => {
     const { result } = setup([]);
 

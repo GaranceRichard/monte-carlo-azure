@@ -26,6 +26,7 @@ test("simulation: erreur puis succes sur les 2 modes", async ({ page }) => {
 
   await page.goto("/");
   await completeOnboardingToSimulation(page);
+  await expect(page.getByTestId("selected-team-card")).toBeVisible();
   await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Alpha");
 
   const periodSection = page.locator("section.sim-control-section").nth(0);
@@ -63,4 +64,3 @@ test("simulation: erreur puis succes sur les 2 modes", async ({ page }) => {
   await closeIfExpanded(modeSection);
   await expect(page.getByText("10 sem")).toBeVisible({ timeout: 10_000 });
 });
-

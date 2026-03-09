@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+﻿import { useEffect, useRef } from "react";
 import type { NamedEntity } from "../../types";
 import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
 
@@ -34,7 +34,7 @@ export default function ProjectStep({
     <>
       <h2 className="flow-title">Choix du projet</h2>
       <p className="flow-text">
-        Organisation sélectionnée: <b>{selectedOrg}</b>
+        Organisation s\u00E9lectionn\u00E9e: <b>{selectedOrg}</b>
       </p>
       {err && (
         <div className="ui-alert ui-alert--danger">
@@ -73,3 +73,4 @@ export default function ProjectStep({
     </>
   );
 }
+

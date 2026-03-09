@@ -4,19 +4,21 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SimulationProvider } from "../../hooks/SimulationContext";
 import SimulationModeAndParametersControls from "./SimulationModeAndParametersControls";
 
-const keepSelectDropdownAtTop = vi.fn();
+const selectTopMocks = vi.hoisted(() => ({
+  keepSelectDropdownAtTop: vi.fn(),
+}));
 
 vi.mock("../../utils/selectTopStart", () => ({
-  keepSelectDropdownAtTop: (...args: unknown[]) => keepSelectDropdownAtTop(...args),
+  keepSelectDropdownAtTop: selectTopMocks.keepSelectDropdownAtTop,
 }));
 
 type SpyBag = {
-  setSimulationMode: ReturnType<typeof vi.fn>;
-  setActiveChartTab: ReturnType<typeof vi.fn>;
-  setIncludeZeroWeeks: ReturnType<typeof vi.fn>;
-  setBacklogSize: ReturnType<typeof vi.fn>;
-  setTargetWeeks: ReturnType<typeof vi.fn>;
-  setNSims: ReturnType<typeof vi.fn>;
+  setSimulationMode: (value: "backlog_to_weeks" | "weeks_to_items") => void;
+  setActiveChartTab: (value: string) => void;
+  setIncludeZeroWeeks: (value: boolean) => void;
+  setBacklogSize: (value: string) => void;
+  setTargetWeeks: (value: string) => void;
+  setNSims: (value: string) => void;
 };
 
 function TestHarness({
@@ -84,6 +86,7 @@ function createSpies(): SpyBag {
 describe("SimulationModeAndParametersControls", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    selectTopMocks.keepSelectDropdownAtTop.mockClear();
   });
 
   it("covers the select handlers and the backlog branch", () => {
@@ -109,7 +112,7 @@ describe("SimulationModeAndParametersControls", () => {
     fireEvent.click(checkbox);
     fireEvent.change(numberInputs[1], { target: { value: "30000" } });
 
-    expect(keepSelectDropdownAtTop).toHaveBeenCalledTimes(2);
+    expect(selectTopMocks.keepSelectDropdownAtTop).toHaveBeenCalledTimes(2);
     expect(spies.setSimulationMode).toHaveBeenCalledWith("weeks_to_items");
     expect(spies.setActiveChartTab).toHaveBeenCalledWith("throughput");
     expect(spies.setIncludeZeroWeeks).toHaveBeenCalledWith(true);

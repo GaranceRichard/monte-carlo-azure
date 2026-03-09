@@ -28,8 +28,12 @@ def main() -> int:
     # Docs presence and linkage
     dod = ROOT / "docs/definition-of-done.md"
     critical = ROOT / "docs/critical-paths.md"
+    traceability = ROOT / "docs/vitals-traceability.md"
+    vitals_map = ROOT / "docs/vitals-coverage-map.json"
     _ok(dod.exists(), "Missing docs/definition-of-done.md", errors)
     _ok(critical.exists(), "Missing docs/critical-paths.md", errors)
+    _ok(traceability.exists(), "Missing docs/vitals-traceability.md", errors)
+    _ok(vitals_map.exists(), "Missing docs/vitals-coverage-map.json", errors)
     readme = _read("README.md")
     _ok(
         "docs/definition-of-done.md" in readme,
@@ -39,6 +43,11 @@ def main() -> int:
     _ok(
         "docs/critical-paths.md" in readme,
         "README must link docs/critical-paths.md",
+        errors,
+    )
+    _ok(
+        "docs/vitals-traceability.md" in readme,
+        "README must link docs/vitals-traceability.md",
         errors,
     )
     _ok(
@@ -97,8 +106,18 @@ def main() -> int:
     if tasks_path.exists():
         tasks = tasks_path.read_text(encoding="utf-8")
         _ok(
-            '"label": "Coverage: 6 terminaux"' in tasks,
-            "Missing coverage aggregate task (6 terminaux)",
+            '"label": "Coverage: 8 terminaux"' in tasks,
+            "Missing coverage aggregate task (8 terminaux)",
+            errors,
+        )
+        _ok(
+            '"label": "Coverage Vitals Compliance"' in tasks,
+            "Missing vitals compliance coverage task",
+            errors,
+        )
+        _ok(
+            '"label": "Coverage Vitals Rates"' in tasks,
+            "Missing vitals coverage rates task",
             errors,
         )
         _ok(

@@ -1,6 +1,8 @@
 from fastapi.testclient import TestClient
+from starlette.requests import Request
 
 from backend.api import app
+from backend.api_routes_simulate import _client_key_from_request
 
 
 def test_simulate_backlog_to_weeks_success():
@@ -156,3 +158,38 @@ def test_simulate_rate_limit_returns_429():
 
     assert statuses[:20] == [200] * 20
     assert statuses[20] == 429
+
+
+def test_client_key_prefers_first_forwarded_ip():
+    request = Request(
+        {
+            "type": "http",
+            "headers": [(b"x-forwarded-for", b"203.0.113.10, 10.0.0.7")],
+            "client": ("127.0.0.1", 50000),
+        }
+    )
+
+    assert _client_key_from_request(request) == "203.0.113.10"
+
+
+def test_client_key_falls_back_to_client_host():
+    request = Request(
+        {
+            "type": "http",
+            "headers": [],
+            "client": ("127.0.0.1", 50000),
+        }
+    )
+
+    assert _client_key_from_request(request) == "127.0.0.1"
+
+
+def test_client_key_returns_unknown_without_forwarded_or_client():
+    request = Request(
+        {
+            "type": "http",
+            "headers": [],
+        }
+    )
+
+    assert _client_key_from_request(request) == "unknown"

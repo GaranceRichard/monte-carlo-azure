@@ -180,4 +180,58 @@ describe("App backspace disconnect on global org step", () => {
     expect(goBack).toHaveBeenCalledTimes(1);
     expect(disconnect).not.toHaveBeenCalled();
   });
+
+  it("ignores Backspace inside editable fields", () => {
+    const disconnect = vi.fn();
+    const goBack = vi.fn();
+
+    vi.mocked(useOnboarding).mockReturnValue({
+      state: {
+        ...buildOnboardingState([{ id: "1", name: "org-a" }]),
+        step: "simulation",
+      },
+      actions: {
+        ...buildOnboardingActions(disconnect),
+        goBack,
+      },
+    });
+    vi.mocked(useSimulation).mockReturnValue({
+      resetAll: vi.fn(),
+      resetForTeamSelection: vi.fn(),
+    });
+
+    const { container } = render(<App />);
+    const input = document.createElement("input");
+    container.appendChild(input);
+    fireEvent.keyDown(input, { key: "Backspace" });
+
+    expect(goBack).not.toHaveBeenCalled();
+    expect(disconnect).not.toHaveBeenCalled();
+  });
+
+  it("ignores non-Backspace keys in navigable steps", () => {
+    const disconnect = vi.fn();
+    const goBack = vi.fn();
+
+    vi.mocked(useOnboarding).mockReturnValue({
+      state: {
+        ...buildOnboardingState([{ id: "1", name: "org-a" }]),
+        step: "projects",
+      },
+      actions: {
+        ...buildOnboardingActions(disconnect),
+        goBack,
+      },
+    });
+    vi.mocked(useSimulation).mockReturnValue({
+      resetAll: vi.fn(),
+      resetForTeamSelection: vi.fn(),
+    });
+
+    render(<App />);
+    fireEvent.keyDown(window, { key: "Enter" });
+
+    expect(goBack).not.toHaveBeenCalled();
+    expect(disconnect).not.toHaveBeenCalled();
+  });
 });

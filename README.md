@@ -17,6 +17,8 @@ Outil de prevision base sur une simulation Monte Carlo. L'application aide a tra
 - historique des evolutions: [`CHANGELOG.md`](CHANGELOG.md)
 - definition of done: [`docs/definition-of-done.md`](docs/definition-of-done.md)
 - chemins critiques: [`docs/critical-paths.md`](docs/critical-paths.md)
+- traceabilite vitals -> tests: [`docs/vitals-traceability.md`](docs/vitals-traceability.md)
+- mapping coverage vitals: [`docs/vitals-coverage-map.json`](docs/vitals-coverage-map.json)
 - deploiement production: [`docs/deployment.md`](docs/deployment.md)
 
 ---
@@ -160,6 +162,14 @@ npm --prefix frontend run test:e2e:coverage:console
 .venv\Scripts\python.exe -m pytest --cov=backend --cov-fail-under=80 --cov-report=term-missing -q
 ```
 
+Coverage vitals:
+
+```powershell
+$env:VITALS_FRONTEND_COVERAGE="1"
+npm --prefix frontend run test:unit:coverage
+powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\run-vitals-compliance.ps1 -WorkspaceRoot .
+```
+
 ### Variables d'environnement Mongo / purge
 
 - `APP_MONGO_URL` (ex: `mongodb://mongo:27017`)
@@ -183,6 +193,11 @@ Suite E2E decoupee:
 
 Sous Windows/VS Code, les taches `pytest --cov` paralleles utilisent des fichiers coverage distincts via `COVERAGE_FILE` pour eviter les conflits de verrouillage.
 Le projet desactive aussi le cacheprovider pytest via `pytest.ini` (`-p no:cacheprovider`) pour supprimer les warnings d'ecriture `.pytest_cache` en environnement restreint.
+La task VS Code `Coverage: 8 terminaux` execute aussi:
+
+- `Scripts/check_vitals_compliance.py` pour verifier la traceabilite des points vitaux vers leurs tests cibles
+- `Scripts/report_vitals_coverage.py` pour afficher les taux de couverture par vital a partir des artefacts backend/frontend/e2e
+- `frontend/coverage-vitals/coverage-final.json` comme artefact dedie au frontend unit vitals
 
 Les details d'API, d'architecture et de CI sont documentes dans [`ARCHITECTURE.md`](ARCHITECTURE.md).
 

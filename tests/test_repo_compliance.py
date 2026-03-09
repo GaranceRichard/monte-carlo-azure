@@ -14,12 +14,18 @@ def _read(relpath: str) -> str:
 def test_dod_docs_exist_and_are_linked_from_readme() -> None:
     dod = ROOT / "docs/definition-of-done.md"
     critical = ROOT / "docs/critical-paths.md"
+    traceability = ROOT / "docs/vitals-traceability.md"
+    vitals_map = ROOT / "docs/vitals-coverage-map.json"
     readme = _read("README.md")
 
     assert dod.exists(), "Missing docs/definition-of-done.md"
     assert critical.exists(), "Missing docs/critical-paths.md"
+    assert traceability.exists(), "Missing docs/vitals-traceability.md"
+    assert vitals_map.exists(), "Missing docs/vitals-coverage-map.json"
     assert "docs/definition-of-done.md" in readme
     assert "docs/critical-paths.md" in readme
+    assert "docs/vitals-traceability.md" in readme
+    assert "docs/vitals-coverage-map.json" in readme
 
 
 def test_dod_contains_required_sections() -> None:
@@ -95,8 +101,10 @@ def test_coverage_tasks_separate_repo_compliance_and_backend_full() -> None:
         # Optional local developer tooling file; may be absent in CI checkouts.
         return
     tasks_content = tasks_path.read_text(encoding="utf-8")
-    assert '"label": "Coverage: 6 terminaux"' in tasks_content
+    assert '"label": "Coverage: 8 terminaux"' in tasks_content
     assert '"label": "Coverage Back (Full)"' in tasks_content
+    assert '"label": "Coverage Vitals Compliance"' in tasks_content
+    assert '"label": "Coverage Vitals Rates"' in tasks_content
     assert '"label": "Coverage Integration (Backend API)"' not in tasks_content
     assert '"label": "Coverage Repo Compliance"' not in tasks_content
     assert "tests/test_repo_compliance.py" not in tasks_content

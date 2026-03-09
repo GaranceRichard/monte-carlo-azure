@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+﻿import { lazy, Suspense, useEffect, useState } from "react";
 import AppHeader from "./components/AppHeader";
 import OrgStep from "./components/steps/OrgStep";
 import PatStep from "./components/steps/PatStep";
@@ -94,7 +94,7 @@ export default function App() {
     pat: "Connexion",
     org: "Organisation",
     projects: "Projet",
-    teams: "Équipe",
+    teams: "\u00C9quipe",
   };
   const currentOnboardingIndex = onboardingOrder.findIndex((step) => step === onboardingState.step);
   const isSimulationStep = onboardingState.step === "simulation";
@@ -132,7 +132,7 @@ export default function App() {
                   type="button"
                   className="flow-step flow-step-btn"
                   onClick={() => handleStepperBack(step)}
-                  title={step === "pat" ? "Revenir au début (déconnexion)" : "Revenir à cette étape"}
+                  title={step === "pat" ? "Revenir au d\u00E9but (d\u00E9connexion)" : "Revenir \u00E0 cette \u00E9tape"}
                 >
                   {idx + 1}. {onboardingLabels[step]}
                 </button>
@@ -147,7 +147,7 @@ export default function App() {
             ))}
           </div>
           <div className="flow-stepper-caption">
-            Étape {currentOnboardingIndex + 1} / {onboardingOrder.length}
+            \u00C9tape {currentOnboardingIndex + 1} / {onboardingOrder.length}
           </div>
         </div>
       )}
@@ -231,3 +231,4 @@ export default function App() {
     </div>
   );
 }
+

@@ -57,8 +57,8 @@ describe("useOnboarding", () => {
       displayName: "User",
       memberId: "id-1",
       organizations: [
-        { id: "1", name: "org-a" },
-        { id: "2", name: "org-b" },
+        { name: "org-a" },
+        { name: "org-b" },
       ],
       scope: "global",
     });
@@ -103,6 +103,44 @@ describe("useOnboarding", () => {
     expect(result.current.state.userName).toBe("Utilisateur");
   });
 
+  it("ignores a second PAT submit while one is already in flight", async () => {
+    let resolveScope: ((value: {
+      displayName: string;
+      memberId: string;
+      organizations: { name: string }[];
+      scope: "global" | "local";
+    }) => void) | null = null;
+    vi.mocked(resolvePatOrganizationScopeDirect).mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveScope = resolve;
+        }),
+    );
+
+    const { result } = renderHook(() => useOnboarding());
+
+    await act(async () => {
+      result.current.actions.setPatInput("abcdefghijklmnopqrstuvwxyz123456");
+    });
+    await act(async () => {
+      const firstSubmit = result.current.actions.submitPat();
+      const secondSubmit = result.current.actions.submitPat();
+      expect(resolvePatOrganizationScopeDirect).toHaveBeenCalledTimes(1);
+
+      resolveScope?.({
+        displayName: "User",
+        memberId: "id-1",
+        organizations: [{ name: "org-a" }],
+        scope: "global",
+      });
+
+      await Promise.all([firstSubmit, secondSubmit]);
+    });
+
+    expect(result.current.state.step).toBe("org");
+    expect(result.current.state.selectedOrg).toBe("org-a");
+  });
+
   it("clears manual org input when local PAT org validation fails", async () => {
     vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
       displayName: "User",
@@ -132,7 +170,7 @@ describe("useOnboarding", () => {
     vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
       displayName: "User",
       memberId: "id-1",
-      organizations: [{ id: "1", name: "org-a" }],
+      organizations: [{ name: "org-a" }],
       scope: "global",
     });
     vi.mocked(listProjectsDirect).mockResolvedValue([
@@ -152,6 +190,44 @@ describe("useOnboarding", () => {
     expect(result.current.state.step).toBe("projects");
     expect(result.current.state.projects).toHaveLength(2);
     expect(result.current.state.selectedProject).toBe("Projet A");
+  });
+
+  it("falls back to default labels when API entities contain empty names", async () => {
+    vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
+      displayName: "",
+      memberId: "id-1",
+      organizations: [{ name: "" }],
+      scope: "global",
+    });
+    vi.mocked(listProjectsDirect).mockResolvedValue([{ id: "p1", name: "" }]);
+    vi.mocked(listTeamsDirect).mockResolvedValue([
+      { id: "t1", name: "" },
+      { id: "t2", name: "Zulu-Team" },
+    ]);
+
+    const { result } = renderHook(() => useOnboarding());
+
+    await setPatAndSubmit(result);
+    expect(result.current.state.userName).toBe("Utilisateur");
+    expect(result.current.state.selectedOrg).toBe("");
+
+    await act(async () => {
+      result.current.actions.setSelectedOrg("org-a");
+    });
+    await act(async () => {
+      const moved = await result.current.actions.goToProjects();
+      expect(moved).toBe(true);
+    });
+    expect(result.current.state.selectedProject).toBe("");
+
+    await act(async () => {
+      result.current.actions.setSelectedProject("Projet A");
+    });
+    await act(async () => {
+      const moved = await result.current.actions.goToTeams();
+      expect(moved).toBe(true);
+    });
+    expect(result.current.state.selectedTeam).toBe("");
   });
 
   it("requires org and PAT when going to projects", async () => {
@@ -174,11 +250,33 @@ describe("useOnboarding", () => {
     expect(result.current.state.step).toBe("pat");
   });
 
+  it("goes to projects with an empty list and keeps selectedProject blank", async () => {
+    vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
+      displayName: "User",
+      memberId: "id-1",
+      organizations: [{ name: "org-a" }],
+      scope: "global",
+    });
+    vi.mocked(listProjectsDirect).mockResolvedValue([]);
+
+    const { result } = renderHook(() => useOnboarding());
+
+    await setPatAndSubmit(result);
+    await act(async () => {
+      const moved = await result.current.actions.goToProjects();
+      expect(moved).toBe(true);
+    });
+
+    expect(result.current.state.step).toBe("projects");
+    expect(result.current.state.projects).toEqual([]);
+    expect(result.current.state.selectedProject).toBe("");
+  });
+
   it("goes to teams and preselects first team on success", async () => {
     vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
       displayName: "User",
       memberId: "id-1",
-      organizations: [{ id: "1", name: "org-a" }],
+      organizations: [{ name: "org-a" }],
       scope: "global",
     });
     vi.mocked(listProjectsDirect).mockResolvedValue([{ id: "p1", name: "Projet A" }]);
@@ -208,7 +306,7 @@ describe("useOnboarding", () => {
     vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
       displayName: "User",
       memberId: "id-1",
-      organizations: [{ id: "1", name: "org-a" }],
+      organizations: [{ name: "org-a" }],
       scope: "global",
     });
     vi.mocked(listProjectsDirect).mockResolvedValue([{ id: "p1", name: "Projet A" }]);
@@ -237,7 +335,7 @@ describe("useOnboarding", () => {
     vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
       displayName: "User",
       memberId: "id-1",
-      organizations: [{ id: "1", name: "org-a" }],
+      organizations: [{ name: "org-a" }],
       scope: "global",
     });
     vi.mocked(listProjectsDirect).mockRejectedValue("raw-project-error");
@@ -263,6 +361,32 @@ describe("useOnboarding", () => {
       expect(moved).toBe(false);
     });
     expect(result.current.state.err).toContain("raw-team-error");
+  });
+
+  it("maps Error failures in team listing to their message", async () => {
+    vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
+      displayName: "User",
+      memberId: "id-1",
+      organizations: [{ name: "org-a" }],
+      scope: "global",
+    });
+    vi.mocked(listProjectsDirect).mockResolvedValue([{ id: "p1", name: "Projet A" }]);
+    vi.mocked(listTeamsDirect).mockRejectedValue(new Error("Equipe inaccessible"));
+
+    const { result } = renderHook(() => useOnboarding());
+    await setPatAndSubmit(result);
+    await act(async () => {
+      await result.current.actions.goToProjects();
+    });
+    await act(async () => {
+      result.current.actions.setSelectedProject("Projet A");
+    });
+    await act(async () => {
+      const moved = await result.current.actions.goToTeams();
+      expect(moved).toBe(false);
+    });
+
+    expect(result.current.state.err).toContain("Equipe inaccessible");
   });
 
   it("requires organization and project before loading teams", async () => {
@@ -357,7 +481,10 @@ describe("useOnboarding", () => {
     expect(result.current.state.step).toBe("projects");
 
     act(() => {
-      result.current.actions.goToStep("simulation");
+      result.current.actions.setSelectedTeam("Equipe Alpha");
+    });
+    act(() => {
+      result.current.actions.goToSimulation();
     });
     expect(result.current.state.backLabel).toBe("Changer équipe");
     act(() => result.current.actions.goBack());
@@ -391,3 +518,4 @@ describe("useOnboarding", () => {
     expect(result.current.state.teams).toEqual([]);
   });
 });
+

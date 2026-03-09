@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+﻿import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import PortfolioStep from "./PortfolioStep";
 import { usePortfolio } from "../../hooks/usePortfolio";
@@ -101,4 +101,37 @@ describe("PortfolioStep", () => {
     fireEvent.change(screen.getByLabelText("Taux d'arrimage"), { target: { value: "75" } });
     expect(setArrimageRate).toHaveBeenCalledWith(75);
   });
+
+  it("passes the raw simulations input value without forcing 20000", () => {
+    const setNSims = vi.fn();
+    vi.mocked(usePortfolio).mockReturnValue({
+      ...basePortfolioMock(),
+      nSims: 20000,
+      setNSims,
+      teamConfigs: [{ teamName: "Team A", workItemTypeOptions: [], statesByType: {}, types: [], doneStates: [] }],
+      canGenerate: true,
+    });
+
+    render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" />);
+
+    const input = screen.getByLabelText("Nombre de simulations") as HTMLInputElement;
+    fireEvent.change(input, { target: { value: "30000" } });
+
+    expect(setNSims).toHaveBeenCalledWith("30000");
+  });
+
+  it("disables report generation when simulations count is not valid", () => {
+    vi.mocked(usePortfolio).mockReturnValue({
+      ...basePortfolioMock(),
+      nSims: "",
+      teamConfigs: [{ teamName: "Team A", workItemTypeOptions: [], statesByType: {}, types: [], doneStates: [] }],
+      canGenerate: false,
+    });
+
+    render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" />);
+
+    expect((screen.getByRole("button", { name: /G.n.rer rapport portefeuille/i }) as HTMLButtonElement).disabled).toBe(true);
+  });
 });
+
+

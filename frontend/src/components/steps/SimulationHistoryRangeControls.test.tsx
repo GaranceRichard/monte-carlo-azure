@@ -8,8 +8,8 @@ function TestHarness({
   spies,
 }: {
   spies: {
-    setStartDate: ReturnType<typeof vi.fn>;
-    setEndDate: ReturnType<typeof vi.fn>;
+    setStartDate: (value: string) => void;
+    setEndDate: (value: string) => void;
   };
 }) {
   const [startDate, rawSetStartDate] = useState("2026-01-01");

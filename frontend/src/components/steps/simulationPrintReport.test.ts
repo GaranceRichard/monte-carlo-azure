@@ -10,17 +10,25 @@ const pdfMocks = vi.hoisted(() => ({
     svg: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   }>,
+  nextSvgError: null as Error | null,
 }));
 
 vi.mock("jspdf", () => ({
   jsPDF: vi.fn(function MockJsPdfCtor() {
+    const svgImpl = pdfMocks.nextSvgError
+      ? vi.fn(async () => {
+          const error = pdfMocks.nextSvgError;
+          pdfMocks.nextSvgError = null;
+          throw error;
+        })
+      : vi.fn(async () => undefined);
     const instance = {
       internal: { pageSize: { getWidth: () => 210, getHeight: () => 297 } },
       setFont: vi.fn().mockReturnThis(),
       setFontSize: vi.fn().mockReturnThis(),
       text: vi.fn().mockReturnThis(),
       addPage: vi.fn().mockReturnThis(),
-      svg: vi.fn(async () => undefined),
+      svg: svgImpl,
       save: vi.fn(),
     };
     pdfMocks.instances.push(instance);
@@ -72,6 +80,7 @@ describe("exportSimulationPrintReport", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     pdfMocks.instances.length = 0;
+    pdfMocks.nextSvgError = null;
   });
 
   it("writes report HTML containing 3 chart SVGs and a download button", () => {
@@ -162,6 +171,99 @@ describe("exportSimulationPrintReport", () => {
     expect(writtenHtml).toContain("items (au moins)");
   });
 
+  it("renders empty type/state summaries and reliable risk legend", () => {
+    let writtenHtml = "";
+    const fakeWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          writtenHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+
+    exportSimulationPrintReport({
+      ...buildBaseArgs(),
+      types: [],
+      doneStates: [],
+      displayPercentiles: { P50: 10, P70: 11, P90: 12 },
+    });
+
+    expect(writtenHtml).toContain("<b>Tickets:</b> Aucun");
+    expect(writtenHtml).toContain("<b>Etats:</b> Aucun");
+    expect(writtenHtml).toContain("0,20 (fiable)");
+  });
+
+  it("uses zero defaults when display percentiles are missing", () => {
+    let writtenHtml = "";
+    const fakeWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          writtenHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+
+    exportSimulationPrintReport({
+      ...buildBaseArgs(),
+      displayPercentiles: {},
+    });
+
+    expect(writtenHtml).toMatch(/>P50<\/span><span class="kpi-value">0 semaines \(au plus\)</);
+    expect(writtenHtml).toMatch(/>P70<\/span><span class="kpi-value">0 semaines \(au plus\)</);
+    expect(writtenHtml).toMatch(/>P90<\/span><span class="kpi-value">0 semaines \(au plus\)</);
+  });
+
+  it("renders incertain and eleve risk legends from percentiles", () => {
+    let incertainHtml = "";
+    const incertainWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          incertainHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValueOnce(incertainWindow as unknown as Window);
+    exportSimulationPrintReport({
+      ...buildBaseArgs(),
+      displayPercentiles: { P50: 10, P70: 12, P90: 14 },
+    });
+
+    let eleveHtml = "";
+    const eleveWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          eleveHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValueOnce(eleveWindow as unknown as Window);
+    exportSimulationPrintReport({
+      ...buildBaseArgs(),
+      displayPercentiles: { P50: 10, P70: 18, P90: 20 },
+    });
+
+    expect(incertainHtml).toContain("0,40 (incertain)");
+    expect(eleveHtml).toContain("1,00 (eleve)");
+  });
+
   it("returns early when popup opening is blocked", () => {
     vi.spyOn(window, "open").mockReturnValue(null);
     expect(() => exportSimulationPrintReport(buildBaseArgs())).not.toThrow();
@@ -200,10 +302,194 @@ describe("exportSimulationPrintReport", () => {
 
     fakeWindow.onload?.();
     expect(fakeButton.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
-    await clickHandler?.();
+    const wiredClickHandler = clickHandler as null | (() => void | Promise<void>);
+    if (wiredClickHandler) {
+      await wiredClickHandler();
+    }
 
     const pdf = pdfMocks.instances[0];
     expect(pdf?.save).toHaveBeenCalled();
+  });
+
+  it("registers a one-shot load listener when addEventListener is available", () => {
+    const addEventListener = vi.fn();
+    const fakeButton = {
+      addEventListener: vi.fn(),
+    };
+    const fakeWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn(),
+        close: vi.fn(),
+        getElementById: vi.fn(() => fakeButton),
+      },
+      addEventListener,
+      onload: null as null | (() => void),
+    };
+
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+    exportSimulationPrintReport(buildBaseArgs());
+
+    expect(addEventListener).toHaveBeenCalledWith("load", expect.any(Function), { once: true });
+    expect(fakeWindow.onload).toBeNull();
+  });
+
+  it("does not bind the download button twice when it is already bound", () => {
+    const addEventListener = vi.fn();
+    const fakeButton = {
+      __downloadBound: true,
+      addEventListener: vi.fn(),
+    };
+    const fakeWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn(),
+        close: vi.fn(),
+        getElementById: vi.fn(() => fakeButton),
+      },
+      addEventListener,
+      onload: null as null | (() => void),
+    };
+
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+    exportSimulationPrintReport(buildBaseArgs());
+
+    const loadHandler = addEventListener.mock.calls[0]?.[1];
+    loadHandler?.();
+    expect(fakeButton.addEventListener).not.toHaveBeenCalled();
+  });
+
+  it("alerts the user when PDF generation fails", async () => {
+    let clickHandler: null | (() => void) = null;
+    const fakeButton = {
+      disabled: false,
+      textContent: "Telecharger PDF",
+      addEventListener: vi.fn((_event: string, handler: () => void) => {
+        clickHandler = handler;
+      }),
+    };
+    const alert = vi.fn();
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo - Equipe A</h1>
+      <div class="meta-row">Periode: 2025-01-01 au 2025-03-01</div>
+      <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">8 semaines</span></div>
+      <div class="chart-wrap"><svg viewBox="0 0 960 300"></svg></div>
+    `;
+
+    const fakeWindow = {
+      document: Object.assign(reportDoc, {
+        open: vi.fn(),
+        write: vi.fn(),
+        close: vi.fn(),
+        getElementById: vi.fn(() => fakeButton),
+      }),
+      addEventListener: vi.fn(),
+      alert,
+      onload: null as null | (() => void),
+    };
+
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+    const pdfFailure = new Error("printer offline");
+    pdfMocks.nextSvgError = pdfFailure;
+
+    exportSimulationPrintReport(buildBaseArgs());
+    const loadHandler = fakeWindow.addEventListener.mock.calls[0]?.[1];
+    loadHandler?.();
+    const wiredClickHandler = clickHandler as null | (() => void | Promise<void>);
+    if (wiredClickHandler) {
+      await wiredClickHandler();
+    }
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(alert).toHaveBeenCalledWith("Echec generation PDF: printer offline");
+    expect(errorSpy).toHaveBeenCalledWith(pdfFailure);
+    expect(fakeButton.disabled).toBe(false);
+    expect(fakeButton.textContent).toBe("Telecharger PDF");
+  });
+
+  it("logs pdf failures without alert when alert is unavailable", async () => {
+    let clickHandler: null | (() => void) = null;
+    const fakeButton = {
+      disabled: false,
+      textContent: "Telecharger PDF",
+      addEventListener: vi.fn((_event: string, handler: () => void) => {
+        clickHandler = handler;
+      }),
+    };
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo - Equipe A</h1>
+      <div class="meta-row">Periode: 2025-01-01 au 2025-03-01</div>
+      <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">8 semaines</span></div>
+      <div class="chart-wrap"><svg viewBox="0 0 960 300"></svg></div>
+    `;
+
+    const fakeWindow = {
+      document: Object.assign(reportDoc, {
+        open: vi.fn(),
+        write: vi.fn(),
+        close: vi.fn(),
+        getElementById: vi.fn(() => fakeButton),
+      }),
+      addEventListener: vi.fn(),
+      onload: null as null | (() => void),
+    };
+
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+    pdfMocks.nextSvgError = new Error("silent failure");
+
+    exportSimulationPrintReport(buildBaseArgs());
+    const loadHandler = fakeWindow.addEventListener.mock.calls[0]?.[1];
+    loadHandler?.();
+    const wiredClickHandler = clickHandler as null | (() => void | Promise<void>);
+    if (wiredClickHandler) {
+      await wiredClickHandler();
+    }
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(errorSpy).toHaveBeenCalled();
+    expect(fakeButton.disabled).toBe(false);
+    expect(fakeButton.textContent).toBe("Telecharger PDF");
+  });
+
+  it("handles missing download button and string pdf failures", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo - Equipe A</h1>
+      <div class="meta-row">Periode: 2025-01-01 au 2025-03-01</div>
+      <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">8 semaines</span></div>
+      <div class="chart-wrap"><svg viewBox="0 0 960 300"></svg></div>
+    `;
+    const fakeWindow = {
+      document: Object.assign(reportDoc, {
+        open: vi.fn(),
+        write: vi.fn(),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      }),
+      addEventListener: vi.fn(),
+      onload: null as null | (() => void),
+    };
+
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+    pdfMocks.nextSvgError = "string failure" as unknown as Error;
+
+    exportSimulationPrintReport(buildBaseArgs());
+    const loadHandler = fakeWindow.addEventListener.mock.calls[0]?.[1];
+    loadHandler?.();
+    const popup = fakeWindow as unknown as Window & { __downloadPdf?: () => void | Promise<void> };
+    await popup.__downloadPdf?.();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(errorSpy).toHaveBeenCalledWith("string failure");
   });
 
   it("builds expected PDF filename using team name and date", () => {

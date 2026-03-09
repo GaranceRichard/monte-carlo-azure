@@ -115,7 +115,7 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
               min={1000}
               max={200000}
               value={portfolio.nSims}
-              onChange={(e) => portfolio.setNSims(Number(e.target.value) || 20000)}
+              onChange={(e) => portfolio.setNSims(e.target.value)}
             />
           </label>
           <label

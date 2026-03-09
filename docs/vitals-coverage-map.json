@@ -1,0 +1,61 @@
+{
+  "vitals": [
+    {
+      "title": "SLA Identite",
+      "sources": {
+        "frontend_unit": [
+          "frontend/src/hooks/simulationForecastService.ts"
+        ],
+        "e2e": [
+          "frontend/src/api.ts",
+          "frontend/src/hooks/simulationForecastService.ts"
+        ]
+      }
+    },
+    {
+      "title": "Cookie IDMontecarlo",
+      "sources": {
+        "frontend_unit": [
+          "frontend/src/clientId.ts"
+        ],
+        "backend": [
+          "backend/api_routes_simulate.py"
+        ],
+        "e2e": [
+          "frontend/src/clientId.ts"
+        ]
+      }
+    },
+    {
+      "title": "Endpoint backend `POST /simulate`",
+      "sources": {
+        "backend": [
+          "backend/api_routes_simulate.py",
+          "backend/mc_core.py"
+        ]
+      }
+    },
+    {
+      "title": "Flux onboarding critique",
+      "sources": {
+        "frontend_unit": [
+          "frontend/src/App.tsx",
+          "frontend/src/hooks/useOnboarding.ts"
+        ],
+        "e2e": [
+          "frontend/src/App.tsx"
+        ]
+      }
+    },
+    {
+      "title": "Export rapport simulation (SVG/PDF)",
+      "sources": {
+        "frontend_unit": [
+          "frontend/src/components/steps/simulationPrintReport.tsx",
+          "frontend/src/components/steps/simulationPdfDownload.ts",
+          "frontend/src/components/steps/portfolioPrintReport.ts"
+        ]
+      }
+    }
+  ]
+}

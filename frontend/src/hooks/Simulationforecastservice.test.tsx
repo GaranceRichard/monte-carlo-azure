@@ -129,6 +129,19 @@ describe("appels réseau", () => {
       }),
     );
   });
+
+  it("normalise une distribution absente en tableau vide", async () => {
+    vi.mocked(postSimulate).mockResolvedValue({
+      result_kind: "weeks",
+      samples_count: 6,
+      result_percentiles: { P50: 8, P70: 10, P90: 13 },
+      risk_score: 0.25,
+    } as never);
+
+    const result = await runSimulationForecast(baseParams());
+
+    expect(result.result.result_distribution).toEqual([]);
+  });
 });
 
 // ─── 2. Filtrage des samples ──────────────────────────────────────────────────

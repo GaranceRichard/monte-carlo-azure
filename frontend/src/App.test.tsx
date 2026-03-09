@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { useOnboarding } from "./hooks/useOnboarding";
 import { useSimulation } from "./hooks/useSimulation";
+import { storageGetItem, storageSetItem } from "./storage";
 
 vi.mock("./hooks/useOnboarding", () => ({
   useOnboarding: vi.fn(),
@@ -11,6 +12,14 @@ vi.mock("./hooks/useOnboarding", () => ({
 vi.mock("./hooks/useSimulation", () => ({
   useSimulation: vi.fn(),
 }));
+vi.mock("./storage", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./storage")>();
+  return {
+    ...actual,
+    storageGetItem: vi.fn(actual.storageGetItem),
+    storageSetItem: vi.fn(actual.storageSetItem),
+  };
+});
 
 vi.mock("./components/steps/PatStep", () => ({
   default: () => <div>PatStep</div>,
@@ -35,6 +44,9 @@ vi.mock("./components/steps/TeamStep", () => ({
 }));
 vi.mock("./components/steps/SimulationStep", () => ({
   default: () => <div>SimulationStep</div>,
+}));
+vi.mock("./components/steps/PortfolioStep", () => ({
+  default: () => <div>PortfolioStep</div>,
 }));
 
 function buildState(step: "pat" | "org" | "projects" | "teams" | "simulation") {
@@ -142,6 +154,25 @@ describe("App", () => {
     expect(nextTheme).not.toBe(initialTheme);
   });
 
+  it("toggles theme from light to dark when light is the starting theme", () => {
+    const originalTheme = document.documentElement.getAttribute("data-theme");
+    vi.mocked(useOnboarding).mockReturnValue({
+      state: buildState("pat"),
+      actions: buildActions(),
+    } as never);
+    vi.mocked(useSimulation).mockReturnValue({
+      resetForTeamSelection: vi.fn(),
+      resetAll: vi.fn(),
+    } as never);
+    vi.mocked(storageGetItem).mockReturnValue("light");
+
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: /Nuit|Jour/i }));
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    expect(storageSetItem).toHaveBeenCalledWith("theme", "dark");
+    document.documentElement.setAttribute("data-theme", originalTheme ?? "dark");
+  });
+
   it("calls goToPortfolio when portfolio action is triggered from team step", () => {
     const actions = buildActions();
     vi.mocked(useOnboarding).mockReturnValue({
@@ -156,5 +187,19 @@ describe("App", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Portfolio Team" }));
     expect(actions.goToPortfolio).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders portfolio step when onboarding is in portfolio mode", async () => {
+    vi.mocked(useOnboarding).mockReturnValue({
+      state: { ...buildState("teams"), step: "portfolio" },
+      actions: buildActions(),
+    } as never);
+    vi.mocked(useSimulation).mockReturnValue({
+      resetForTeamSelection: vi.fn(),
+      resetAll: vi.fn(),
+    } as never);
+
+    render(<App />);
+    expect(await screen.findByText("Chargement du portefeuille...")).toBeTruthy();
   });
 });

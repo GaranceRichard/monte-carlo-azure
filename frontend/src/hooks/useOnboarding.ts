@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+﻿import { useMemo, useRef, useState } from "react";
 import { listProjectsDirect, listTeamsDirect, resolvePatOrganizationScopeDirect } from "../adoClient";
 import type { AppStep, NamedEntity } from "../types";
 import { sortTeams } from "../utils/teamSort";
@@ -220,8 +220,8 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     if (step === "org") return "Changer PAT";
     if (step === "projects") return "Changer ORG";
     if (step === "teams") return "Changer projet";
-    if (step === "portfolio") return "Changer équipe";
-    if (step === "simulation") return "Changer équipe";
+    if (step === "portfolio") return "Changer \u00E9quipe";
+    if (step === "simulation") return "Changer \u00E9quipe";
     return "";
   }, [step]);
 
@@ -259,3 +259,4 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     },
   };
 }
+

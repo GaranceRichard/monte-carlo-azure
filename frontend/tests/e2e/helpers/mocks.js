@@ -268,9 +268,15 @@ export async function completeOnboardingToSimulation(page, { org = "org-demo", p
   }
 
   await page.getByRole("button", { name: "Choisir cette organisation" }).click();
-  await page.locator("select").first().selectOption(project);
+  const projectSelect = page.locator("select").first();
+  await expect(projectSelect.locator("option")).toContainText([project]);
+  await projectSelect.selectOption(project);
   await page.getByRole("button", { name: "Choisir ce Projet" }).click();
-  await page.locator("select").first().selectOption(team);
+  const teamSelect = page.locator("select").first();
+  await expect(page.getByRole("button", { name: /Choisir cette/i })).toBeVisible();
+  await expect(teamSelect.locator("option")).toContainText([team]);
+  await teamSelect.selectOption(team);
   await page.getByRole("button", { name: /Choisir cette/i }).click();
+  await expect(page.getByTestId("selected-team-card")).toBeVisible({ timeout: 10_000 });
   await expect(page.getByTestId("selected-team-name")).toHaveText(team);
 }
