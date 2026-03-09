@@ -42,10 +42,19 @@ test.describe("e2e istanbul coverage", () => {
 
   test.afterAll(async () => {
     const summary = await summarizeCoverageIstanbul(allCoverageEntries);
+    const weakestFunctions = summary.byFile
+      .filter((file) => file.functions.total > 0)
+      .slice(0, 8)
+      .map((file) =>
+        `${file.functions.pct}% (${file.functions.covered}/${file.functions.total}) ${file.file}`,
+      );
 
     console.log(
       `[E2E ISTANBUL] files=${summary.files} statements=${summary.statements.pct}% (${summary.statements.covered}/${summary.statements.total}) branches=${summary.branches.pct}% (${summary.branches.covered}/${summary.branches.total}) functions=${summary.functions.pct}% (${summary.functions.covered}/${summary.functions.total}) lines=${summary.lines.pct}% (${summary.lines.covered}/${summary.lines.total})`,
     );
+    if (weakestFunctions.length > 0) {
+      console.log(`[E2E ISTANBUL] weakest functions:\n- ${weakestFunctions.join("\n- ")}`);
+    }
 
     expect(summary.files).toBeGreaterThan(0);
     expect(summary.statements.total).toBeGreaterThan(0);

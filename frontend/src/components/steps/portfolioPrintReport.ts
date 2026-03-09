@@ -23,7 +23,7 @@ function escapeHtml(value: string): string {
 }
 
 function getScenarioDisplayLabel(label: string): string {
-  return label.startsWith("Arrime") ? label.replace("Arrime", "Arrimé") : label;
+  return label.startsWith("Arrime") ? label.replace("Arrime", "Arrim\u00E9") : label;
 }
 
 function getScenarioOrder(label: PortfolioScenarioResult["label"]): number {
@@ -95,6 +95,30 @@ function formatRiskScoreFromValue(score: number): { score: number; label: string
   };
 }
 
+function resolveRiskScore({
+  simulationMode,
+  resultKind,
+  displayPercentiles,
+  distribution,
+  riskScore,
+}: {
+  simulationMode: "backlog_to_weeks" | "weeks_to_items";
+  resultKind: ForecastKind;
+  displayPercentiles: Record<string, number>;
+  distribution: Array<{ x: number; count: number }>;
+  riskScore?: number;
+}): { score: number; label: string; valueLabel: string } {
+  const effectivePercentiles =
+    resultKind === "items" ? buildAtLeastPercentiles(distribution, [50, 70, 90]) : displayPercentiles;
+  if (resultKind === "items") {
+    return formatRiskScore(simulationMode, effectivePercentiles);
+  }
+  if (typeof riskScore === "number" && Number.isFinite(riskScore)) {
+    return formatRiskScoreFromValue(riskScore);
+  }
+  return formatRiskScore(simulationMode, effectivePercentiles);
+}
+
 function buildTeamLikePageHtml({
   title,
   subtitle,
@@ -163,10 +187,13 @@ function buildTeamLikePageHtml({
       : `Semaines vers items - cible: ${String(targetWeeks)} semaines`;
   const resultLabel = resultKind === "items" ? "items (au moins)" : "semaines (au plus)";
   const modeZeroLabel = includeZeroWeeks ? "Semaines 0 incluses" : "Semaines 0 exclues";
-  const risk =
-    typeof riskScore === "number" && Number.isFinite(riskScore)
-      ? formatRiskScoreFromValue(riskScore)
-      : formatRiskScore(simulationMode, effectivePercentiles);
+  const risk = resolveRiskScore({
+    simulationMode,
+    resultKind,
+    displayPercentiles: effectivePercentiles,
+    distribution: sortedDistribution,
+    riskScore,
+  });
 
   return `
     <section class="page ${pageBreak ? "page-break" : ""}">
@@ -175,7 +202,7 @@ function buildTeamLikePageHtml({
         ${subtitle ? `<div class="subtitle"><i>${escapeHtml(subtitle)}</i></div>` : ""}
         <div class="meta">
           <div class="meta-row"><b>Projet:</b> ${escapeHtml(selectedProject)}</div>
-          <div class="meta-row"><b>Période:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
+          <div class="meta-row"><b>P\u00E9riode:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
           <div class="meta-row"><b>Mode:</b> ${escapeHtml(modeSummary)}</div>
           <div class="meta-row"><b>Échantillon:</b> ${escapeHtml(modeZeroLabel)}</div>
           <div class="meta-row"><b>Simulations:</b> ${escapeHtml(String(nSims))}</div>
@@ -284,16 +311,19 @@ function buildSummaryPage({
   const overlaySvg = renderOverlayProbabilityChart(overlaySeries);
 
   const hypotheses = [
-    "1. Optimiste : Somme des débits de toutes les équipes. Hypothèse : livraison indépendante, aucun coût de synchronisation inter-équipes.",
-    `2. Arrimé : ${String(arrimageRate)}% de la capacité combinée. Hypothèse : coûts de synchronisation (cérémonies, dépendances, alignement) absorbés sur le débit global.`,
-    `3. ${getScenarioDisplayLabel(effectiveFrictionLabel)} : ${effectiveFrictionLabel.replace("Friction ", "")} de la capacité combinée. Hypothèse : chaque équipe supplémentaire absorbe un coût d'alignement identique.`,
-    "4. Conservateur : Débit médian des équipes x nb équipes. Hypothèse : le portefeuille est contraint par l'équipe médiane, pas par la pire.",
+    "1. Optimiste : Somme des d\u00E9bits de toutes les \u00E9quipes. Hypoth\u00E8se : livraison ind\u00E9pendante, aucun co\u00FBt de synchronisation inter-\u00E9quipes.",
+    `2. Arrim\u00E9 : ${String(arrimageRate)}% de la capacit\u00E9 combin\u00E9e. Hypoth\u00E8se : co\u00FBts de synchronisation (c\u00E9r\u00E9monies, d\u00E9pendances, alignement) absorb\u00E9s sur le d\u00E9bit global.`,
+    `3. ${getScenarioDisplayLabel(effectiveFrictionLabel)} : ${effectiveFrictionLabel.replace("Friction ", "")} de la capacit\u00E9 combin\u00E9e. Hypoth\u00E8se : chaque \u00E9quipe suppl\u00E9mentaire absorbe un co\u00FBt d'alignement identique.`,
+    "4. Conservateur : D\u00E9bit m\u00E9dian des \u00E9quipes x nb \u00E9quipes. Hypoth\u00E8se : le portefeuille est contraint par l'\u00E9quipe m\u00E9diane, pas par la pire.",
+    simulationMode === "weeks_to_items"
+      ? "5. Risk Score : (P50 - P90) / P50 sur la courbe affich\u00E9e en P(X >= items). Plus le score est faible, plus la pr\u00E9vision est stable."
+      : "5. Risk Score : (P90 - P50) / P50. Plus le score est faible, plus la pr\u00E9vision est stable.",
   ];
 
   return `
     <section class="page page-break">
       <header class="header">
-        <h1 class="title">Synthèse - Simulation Portefeuille</h1>
+        <h1 class="title">Synth\u00E8se - Simulation Portefeuille</h1>
         <div class="meta">
           <div class="meta-row"><b>Projet:</b> ${escapeHtml(selectedProject)}</div>
           <div class="meta-row"><b>Période:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
@@ -302,16 +332,16 @@ function buildSummaryPage({
               ? `Backlog vers semaines - backlog: ${String(backlogSize)} items`
               : `Semaines vers items - cible: ${String(targetWeeks)} semaines`,
           )}</div>
-          <div class="meta-row"><b>Équipes incluses:</b> ${escapeHtml(includedTeams.join(", ") || "Aucune")}</div>
+          <div class="meta-row"><b>\u00C9quipes incluses:</b> ${escapeHtml(includedTeams.join(", ") || "Aucune")}</div>
           <div class="meta-row"><b>Taux d'arrimage:</b> ${escapeHtml(String(arrimageRate))}%</div>
         </div>
       </header>
 
       <section class="section">
-        <h2>Synthèse décisionnelle</h2>
+        <h2>Synth\u00E8se d\u00E9cisionnelle</h2>
         <table class="summary-table">
           <thead>
-            <tr><th>Scénario</th><th>P50</th><th>P70</th><th>P90</th><th>Risk Score</th></tr>
+            <tr><th>Sc\u00E9nario</th><th>P50</th><th>P70</th><th>P90</th><th>Risk Score</th></tr>
           </thead>
           <tbody>
             ${rows}
@@ -320,12 +350,12 @@ function buildSummaryPage({
       </section>
 
       <section class="section">
-        <h2>courbes de probabilités comparées</h2>
+        <h2>courbes de probabilit\u00E9s compar\u00E9es</h2>
         <div class="chart-wrap">${overlaySvg}</div>
       </section>
 
       <section class="section section--hypotheses">
-        <h2>Hypothèses</h2>
+        <h2>Hypoth\u00E8ses</h2>
         ${hypotheses.map((line) => `<p class="hypothesis">${escapeHtml(line)}</p>`).join("")}
       </section>
     </section>
@@ -370,7 +400,7 @@ export function exportPortfolioPrintReport({
   const scenarioPages = orderedScenarios
     .map((scenario, idx) =>
       buildTeamLikePageHtml({
-        title: `Scénario - ${getScenarioDisplayLabel(scenario.label)}`,
+        title: `Sc\u00E9nario - ${getScenarioDisplayLabel(scenario.label)}`,
         subtitle: scenario.hypothese,
         selectedProject,
         startDate,
@@ -385,7 +415,7 @@ export function exportPortfolioPrintReport({
         weeklyThroughput: scenario.weeklyData,
         displayPercentiles: scenario.percentiles,
         riskScore: scenario.riskScore,
-        note: "Débit reconstruit par simulation bootstrap - non issu de l'historique réel.",
+        note: "D\u00E9bit reconstruit par simulation bootstrap - non issu de l'historique r\u00E9el.",
         pageBreak: idx < orderedScenarios.length - 1 || sections.length > 0,
       }),
     )

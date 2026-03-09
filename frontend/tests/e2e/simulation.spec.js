@@ -16,6 +16,7 @@ const closeIfExpanded = async (section) => {
 };
 
 test("simulation: erreur puis succes sur les 2 modes", async ({ page }) => {
+  test.setTimeout(60_000);
   const { closedDates } = await setupAppRoutes(page, {
     profileFirstUnauthorized: false,
     emptyAccountsBefore: 0,

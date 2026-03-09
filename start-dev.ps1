@@ -4,6 +4,8 @@ param(
     [int]$BackendPort = 8000,
     [string]$FrontendHost = "127.0.0.1",
     [int]$FrontendPort = 5173,
+    [int]$MongoPort = 27017,
+    [string]$MongoDbName = "montecarlo",
     [switch]$InstallDeps,
     [switch]$ThreeTerminals,
     [int]$HealthIntervalSeconds = 5
@@ -46,16 +48,22 @@ if ($HealthIntervalSeconds -lt 1) {
     throw "HealthIntervalSeconds doit etre >= 1."
 }
 
-if ($ThreeTerminals) {
-    Write-Step "Mode 3 terminaux active (backend + frontend + health monitor)."
+$env:APP_MONGO_URL = "mongodb://127.0.0.1:$MongoPort"
+$env:APP_MONGO_DB = $MongoDbName
 
-    $backendCmd = "& '$pythonExe' run_app.py --host $BackendHost --port $BackendPort --no-browser"
+if ($ThreeTerminals) {
+    Write-Step "Mode dev local active (mongo + backend + frontend + health monitor)."
+
+    $mongoScript = Join-Path $root ".vscode\scripts\start-mongo-dev.ps1"
+    $mongoDbPath = Join-Path $root ".local-mongo\db"
+    $backendCmd = "`$env:APP_MONGO_URL='mongodb://127.0.0.1:$MongoPort'; `$env:APP_MONGO_DB='$MongoDbName'; & '$pythonExe' run_app.py --host $BackendHost --port $BackendPort --no-browser"
     $frontendCmd = "npm run dev -- --host $FrontendHost --port $FrontendPort"
     $healthCmd = @"
 while (`$true) {
     try {
-        `$response = Invoke-RestMethod -Uri 'http://$BackendHost`:$BackendPort/health' -TimeoutSec 2
-        Write-Host ("[{0}] health=OK status={1}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), `$response.status) -ForegroundColor Green
+        `$api = Invoke-RestMethod -Uri 'http://$BackendHost`:$BackendPort/health' -TimeoutSec 2
+        `$mongo = Invoke-RestMethod -Uri 'http://$BackendHost`:$BackendPort/health/mongo' -TimeoutSec 2
+        Write-Host ("[{0}] health=OK api={1} mongo={2}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), `$api.status, `$mongo.status) -ForegroundColor Green
     }
     catch {
         Write-Host ("[{0}] health=KO {1}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), `$_.Exception.Message) -ForegroundColor Red
@@ -64,11 +72,12 @@ while (`$true) {
 }
 "@
 
+    Start-Process -FilePath "powershell" -ArgumentList @("-NoExit", "-ExecutionPolicy", "Bypass", "-File", $mongoScript, "-DbPath", $mongoDbPath, "-Port", "$MongoPort") -WorkingDirectory $root | Out-Null
     Start-Process -FilePath "powershell" -ArgumentList @("-NoExit", "-Command", $backendCmd) -WorkingDirectory $root | Out-Null
     Start-Process -FilePath "powershell" -ArgumentList @("-NoExit", "-Command", $frontendCmd) -WorkingDirectory (Join-Path $root "frontend") | Out-Null
     Start-Process -FilePath "powershell" -ArgumentList @("-NoExit", "-Command", $healthCmd) -WorkingDirectory $root | Out-Null
 
-    Write-Step "3 terminaux lances."
+    Write-Step "4 terminaux lances."
     exit 0
 }
 

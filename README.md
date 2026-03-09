@@ -72,14 +72,14 @@ Application disponible sur:
 
 ## Lancer en developpement
 
-Option rapide (Windows PowerShell, 4 terminaux: backend + frontend + health API + health Mongo):
+Option rapide (Windows PowerShell, 4 terminaux: mongo + backend + frontend + health):
 
 ```powershell
 .\start-dev.ps1 -ThreeTerminals
 ```
 
-Le terminal health verifie `http://127.0.0.1:8000/health` en boucle (intervalle par defaut: 5s).
-Dans VS Code, `Ctrl+Shift+B` lance aussi la tache par defaut `Dev: 4 terminaux`.
+Le terminal health verifie `http://127.0.0.1:8000/health` et `http://127.0.0.1:8000/health/mongo` en boucle (intervalle par defaut: 5s).
+Dans VS Code, `Ctrl+Shift+B` lance aussi la tache par defaut `Dev: 5 terminaux`.
 
 ### Backend
 
@@ -102,27 +102,35 @@ npm run dev
 
 UI: `http://localhost:5173`
 
-### Mode manuel en 4 terminaux
+### Mode manuel en 5 terminaux
 
-Terminal 1 (backend):
+Terminal 1 (mongo local dev):
 
 ```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\start-mongo-dev.ps1 -DbPath .\.local-mongo\db -Port 27017
+```
+
+Terminal 2 (backend):
+
+```powershell
+$env:APP_MONGO_URL="mongodb://127.0.0.1:27017"
+$env:APP_MONGO_DB="montecarlo"
 python run_app.py --no-browser
 ```
 
-Terminal 2 (frontend):
+Terminal 3 (frontend):
 
 ```powershell
 npm --prefix frontend run dev
 ```
 
-Terminal 3 (check recurrent health):
+Terminal 4 (check recurrent health):
 
 ```powershell
 while ($true) { try { Invoke-RestMethod http://127.0.0.1:8000/health -TimeoutSec 2 | ConvertTo-Json -Compress } catch { Write-Host $_.Exception.Message }; Start-Sleep -Seconds 5 }
 ```
 
-Terminal 4 (check recurrent health Mongo):
+Terminal 5 (check recurrent health Mongo):
 
 ```powershell
 while ($true) { try { Invoke-RestMethod http://127.0.0.1:8000/health/mongo -TimeoutSec 2 | ConvertTo-Json -Compress } catch { Write-Host $_.Exception.Message }; Start-Sleep -Seconds 5 }

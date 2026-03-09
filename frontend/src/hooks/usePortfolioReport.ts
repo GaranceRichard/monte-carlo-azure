@@ -7,6 +7,7 @@ import {
   simulateForecastFromSamples,
 } from "./simulationForecastService";
 import type { PortfolioScenarioResult } from "./simulationTypes";
+import { buildAtLeastPercentiles } from "./probability";
 import { buildScenarioSamples, computeRiskLegend, computeRiskScoreFromPercentiles } from "../utils/simulation";
 
 export type TeamPortfolioConfig = {
@@ -114,7 +115,13 @@ function toScenarioResult(
   startDate: string,
 ): PortfolioScenarioResult {
   const percentiles = result.result_percentiles;
-  const riskScore = Number(result.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, percentiles));
+  const effectivePercentiles =
+    result.result_kind === "items"
+      ? buildAtLeastPercentiles(result.result_distribution, [50, 70, 90])
+      : percentiles;
+  const riskScore = Number(
+    result.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, effectivePercentiles),
+  );
   return {
     label,
     hypothese,
@@ -260,7 +267,13 @@ export function usePortfolioReport({
                 targetWeeks: Number(targetWeeks),
                 nSims: Number(nSims),
                 resultKind: result.result_kind,
-                riskScore: result.risk_score,
+                riskScore:
+                  result.result_kind === "items"
+                    ? computeRiskScoreFromPercentiles(
+                        simulationMode,
+                        buildAtLeastPercentiles(result.result_distribution, [50, 70, 90]),
+                      )
+                    : result.risk_score,
                 distribution: result.result_distribution,
                 weeklyThroughput: data.weeklyThroughput,
                 displayPercentiles: result.result_percentiles,

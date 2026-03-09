@@ -21,7 +21,7 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
           className="mb-3 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3"
           data-testid="selected-team-card"
         >
-          <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Équipe active</div>
+          <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{"\u00C9quipe active"}</div>
           <div className="mt-1 text-xl font-extrabold text-[var(--brand)]" data-testid="selected-team-name">
             {selectedTeam}
           </div>
@@ -52,4 +52,3 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
     </SimulationProvider>
   );
 }
-

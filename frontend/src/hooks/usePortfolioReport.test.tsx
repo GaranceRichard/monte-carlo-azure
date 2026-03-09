@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchTeamThroughput, simulateForecastFromSamples } from "./simulationForecastService";
 import { exportPortfolioPrintReport } from "../components/steps/portfolioPrintReport";
 import { getPortfolioErrorMessage, usePortfolioReport } from "./usePortfolioReport";
+import { buildAtLeastPercentiles } from "./probability";
+import { computeRiskScoreFromPercentiles } from "../utils/simulation";
 
 vi.mock("./simulationForecastService", () => ({
   fetchTeamThroughput: vi.fn(),
@@ -27,7 +29,7 @@ const simulationResult = {
   result_distribution: [{ x: 10, count: 25 }],
 };
 
-function setupReportHook() {
+function setupReportHook(overrides: Partial<Parameters<typeof usePortfolioReport>[0]> = {}) {
   return renderHook(() =>
     usePortfolioReport({
       selectedOrg: "Org A",
@@ -57,6 +59,7 @@ function setupReportHook() {
           doneStates: ["Done"],
         },
       ],
+      ...overrides,
     }),
   );
 }
@@ -195,6 +198,137 @@ describe("usePortfolioReport", () => {
     expect(result.current.reportErr).toBe("export-failure");
   });
 
+  it("computes section riskScore from effective percentiles when result_kind is items", async () => {
+    vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
+    vi.mocked(simulateForecastFromSamples).mockResolvedValue({
+      result_kind: "items",
+      samples_count: 100,
+      risk_score: 0,
+      result_percentiles: { P50: 100, P70: 110, P90: 120 },
+      result_distribution: [
+        { x: 10, count: 10 },
+        { x: 20, count: 80 },
+        { x: 30, count: 10 },
+      ],
+    });
+
+    const { result } = setupReportHook({
+      simulationMode: "weeks_to_items",
+      targetWeeks: 12,
+    });
+
+    await act(async () => {
+      await result.current.handleGenerateReport();
+    });
+
+    expect(vi.mocked(exportPortfolioPrintReport)).toHaveBeenCalledTimes(1);
+    const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
+    const expectedPercentiles = buildAtLeastPercentiles(
+      [
+        { x: 10, count: 10 },
+        { x: 20, count: 80 },
+        { x: 30, count: 10 },
+      ],
+      [50, 70, 90],
+    );
+    const expectedRisk = computeRiskScoreFromPercentiles("weeks_to_items", expectedPercentiles);
+
+    expect(exportArgs.sections[0].resultKind).toBe("items");
+    expect(exportArgs.sections[0].riskScore).toBe(expectedRisk);
+  });
+
+  it("uses the wrapped throughput rejection payload when the original error is undefined", async () => {
+    vi.mocked(fetchTeamThroughput).mockImplementation(async ({ selectedTeam }) => {
+      if (selectedTeam === "Team B") throw undefined;
+      return throughputData;
+    });
+    vi.mocked(simulateForecastFromSamples).mockResolvedValue(simulationResult);
+
+    const { result } = setupReportHook();
+
+    await act(async () => {
+      await result.current.handleGenerateReport();
+    });
+
+    expect(result.current.reportErrors).toEqual([
+      expect.objectContaining({
+        teamName: "Team B",
+        message: 'Erreur inattendue pendant "collecte throughput portefeuille".',
+      }),
+    ]);
+  });
+
+  it("falls back to 'Simulation inconnue' when a settled simulation rejection has no teamName", async () => {
+    vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
+    vi.mocked(simulateForecastFromSamples).mockResolvedValue(simulationResult);
+
+    const originalAllSettled = Promise.allSettled.bind(Promise);
+    vi.spyOn(Promise, "allSettled")
+      .mockImplementationOnce(async () => ([
+        {
+          status: "fulfilled",
+          value: {
+            cfg: {
+              teamName: "Team A",
+              workItemTypeOptions: ["Bug"],
+              statesByType: { Bug: ["Done"] },
+              types: ["Bug"],
+              doneStates: ["Done"],
+            },
+            data: throughputData,
+          },
+        },
+      ] as PromiseSettledResult<unknown>[]))
+      .mockImplementationOnce(async () => ([
+        {
+          status: "fulfilled",
+          value: {
+            kind: "team",
+            section: {
+              selectedTeam: "Team A",
+              simulationMode: "backlog_to_weeks",
+              includeZeroWeeks: true,
+              backlogSize: 120,
+              targetWeeks: 12,
+              nSims: 20000,
+              resultKind: "weeks",
+              riskScore: 0.3,
+              distribution: [{ x: 10, count: 25 }],
+              weeklyThroughput: throughputData.weeklyThroughput,
+              displayPercentiles: { P50: 10, P70: 12, P90: 15 },
+            },
+          },
+        },
+        {
+          status: "rejected",
+          reason: { error: new Error("sim-failure") },
+        },
+      ] as PromiseSettledResult<unknown>[]))
+      .mockImplementation(originalAllSettled);
+
+    const { result } = setupReportHook({
+      teamConfigs: [
+        {
+          teamName: "Team A",
+          workItemTypeOptions: ["Bug"],
+          statesByType: { Bug: ["Done"] },
+          types: ["Bug"],
+          doneStates: ["Done"],
+        },
+      ],
+    });
+
+    await act(async () => {
+      await result.current.handleGenerateReport();
+    });
+
+    expect(result.current.reportErrors).toEqual([
+      expect.objectContaining({
+        teamName: "Simulation inconnue",
+      }),
+    ]);
+  });
+
   it("clears reportErrors when clearReportErrors is called", async () => {
     vi.mocked(fetchTeamThroughput).mockImplementation(async ({ selectedTeam }) => {
       if (selectedTeam === "Team B") throw new Error("collect-failure");
@@ -214,6 +348,23 @@ describe("usePortfolioReport", () => {
     });
 
     expect(result.current.reportErrors).toEqual([]);
+  });
+
+  it("clears reportErr when clearReportErr is called", async () => {
+    vi.mocked(fetchTeamThroughput).mockRejectedValue(new Error("collect-failure"));
+
+    const { result } = setupReportHook();
+
+    await act(async () => {
+      await result.current.handleGenerateReport();
+    });
+    expect(result.current.reportErr).toBe("Aucune equipe n'a pu etre simulee.");
+
+    act(() => {
+      result.current.clearReportErr();
+    });
+
+    expect(result.current.reportErr).toBe("");
   });
 });
 

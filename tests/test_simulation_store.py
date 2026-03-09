@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 
 import pytest
 from pymongo import MongoClient
+from pymongo.errors import PyMongoError
 
 from backend.api_config import ApiConfig
 from backend.api_models import ClientContext, DistributionBucket, SimulateRequest, SimulateResponse
@@ -228,8 +229,18 @@ def test_save_and_list_recent_with_real_mongo():
     store = SimulationStore(cfg)
     req, resp = _req_resp()
     client = MongoClient(mongo_url, serverSelectionTimeoutMS=1200)
+    mongo_available = False
 
     try:
+        try:
+            client.admin.command("ping")
+            mongo_available = True
+        except PyMongoError as exc:
+            pytest.skip(
+                f"MongoDB integration test skipped: no reachable Mongo instance at {mongo_url} "
+                f"(override with APP_MONGO_URL). Error: {exc}"
+            )
+
         try:
             store.save_simulation("integration-client", req, resp)
             rows = store.list_recent("integration-client")
@@ -255,4 +266,5 @@ def test_save_and_list_recent_with_real_mongo():
         assert ttl_indexes
         assert ttl_indexes[0]["expireAfterSeconds"] == 30 * 24 * 3600
     finally:
-        client.drop_database(db_name)
+        if mongo_available:
+            client.drop_database(db_name)

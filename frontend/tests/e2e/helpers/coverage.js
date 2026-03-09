@@ -56,11 +56,28 @@ export async function summarizeCoverageIstanbul(entries) {
   }
 
   const summary = map.getCoverageSummary().toJSON();
+  const byFile = map.files()
+    .map((filePath) => {
+      const fileSummary = map.fileCoverageFor(filePath).toSummary().toJSON();
+      return {
+        file: filePath,
+        statements: fileSummary.statements,
+        branches: fileSummary.branches,
+        functions: fileSummary.functions,
+        lines: fileSummary.lines,
+      };
+    })
+    .sort((a, b) => {
+      if (a.functions.pct !== b.functions.pct) return a.functions.pct - b.functions.pct;
+      if (a.functions.total !== b.functions.total) return b.functions.total - a.functions.total;
+      return a.file.localeCompare(b.file);
+    });
   return {
     files: map.files().length,
     statements: summary.statements,
     branches: summary.branches,
     functions: summary.functions,
     lines: summary.lines,
+    byFile,
   };
 }

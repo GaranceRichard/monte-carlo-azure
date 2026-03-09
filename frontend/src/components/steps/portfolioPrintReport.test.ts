@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+﻿import { describe, expect, it, vi } from "vitest";
 import { exportPortfolioPrintReport } from "./portfolioPrintReport";
 import { buildAtLeastPercentiles } from "../../hooks/probability";
 import { computeRiskScoreFromPercentiles } from "../../utils/simulation";
@@ -121,7 +121,7 @@ describe("exportPortfolioPrintReport", () => {
     expect(idxCons).toBeLessThan(idxTeam);
   });
 
-  it("includes 4-line summary and overlay probability svg on synthesis page", () => {
+  it("includes 4-line summary, overlay probability svg and risk score definition on synthesis page", () => {
     let writtenHtml = "";
     const fakeWindow = {
       document: {
@@ -144,7 +144,8 @@ describe("exportPortfolioPrintReport", () => {
     expect(writtenHtml).toContain("<td>Friction (64%)</td>");
     expect(writtenHtml).toContain("<td>Conservateur</td>");
     expect(writtenHtml).toContain("courbes de probabilités comparées");
-    expect(writtenHtml).toContain("aria-label=\"Comparaison des probabilites\"");
+    expect(writtenHtml).toContain('aria-label="Comparaison des probabilites"');
+    expect(writtenHtml).toContain("Risk Score : (P90 - P50) / P50");
   });
 
   it("uses weeks_to_items effective percentiles for summary risk score", () => {
@@ -163,7 +164,7 @@ describe("exportPortfolioPrintReport", () => {
     };
     vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
 
-    const args = baseArgs();
+    const args: any = baseArgs();
     args.sections[0].simulationMode = "weeks_to_items";
     args.scenarios = [
       {
@@ -199,5 +200,57 @@ describe("exportPortfolioPrintReport", () => {
     );
     expect(writtenHtml).not.toMatch(/Optimiste[\s\S]*?<td>100<\/td>\s*<td>110<\/td>\s*<td>120<\/td>/);
     expect(writtenHtml).toContain(expectedRisk.toFixed(2).replace(".", ","));
+  });
+
+  it("uses weeks_to_items effective percentiles for scenario and team page risk score", () => {
+    let writtenHtml = "";
+    const fakeWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          writtenHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+      addEventListener: vi.fn(),
+    };
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+
+    const args: any = baseArgs();
+    args.sections[0] = {
+      ...args.sections[0],
+      simulationMode: "weeks_to_items",
+      resultKind: "items",
+      riskScore: 0,
+      displayPercentiles: { P50: 100, P70: 110, P90: 120 },
+      distribution: [
+        { x: 10, count: 10 },
+        { x: 20, count: 80 },
+        { x: 30, count: 10 },
+      ],
+    };
+    args.scenarios[0] = {
+      ...args.scenarios[0],
+      riskScore: 0,
+      percentiles: { P50: 100, P70: 110, P90: 120 },
+      distribution: [
+        { x: 10, count: 10 },
+        { x: 20, count: 80 },
+        { x: 30, count: 10 },
+      ],
+    };
+
+    exportPortfolioPrintReport(args);
+
+    const effectivePercentiles = buildAtLeastPercentiles(args.sections[0].distribution, [50, 70, 90]);
+    const expectedRisk = computeRiskScoreFromPercentiles("weeks_to_items", effectivePercentiles)
+      .toFixed(2)
+      .replace(".", ",");
+
+    expect(writtenHtml).toContain("Risk Score : (P50 - P90) / P50");
+    expect(writtenHtml).toMatch(new RegExp(`Scénario - Optimiste[\\s\\S]*?Risk Score</span><span class="kpi-value">${expectedRisk}`));
+    expect(writtenHtml).toMatch(new RegExp(`Simulation Portefeuille - Team A[\\s\\S]*?Risk Score</span><span class="kpi-value">${expectedRisk}`));
   });
 });
