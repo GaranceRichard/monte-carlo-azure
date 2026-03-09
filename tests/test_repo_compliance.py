@@ -80,8 +80,8 @@ def test_ci_enforces_required_checks() -> None:
     assert "npm run test:e2e" in ci
     assert "npm run build" in ci
 
-    # Backend checks (project can use pytest or manage.py style)
-    assert ("python -m pytest" in ci) or ("python manage.py test" in ci)
+    # Backend checks: this project uses pytest/FastAPI, not Django manage.py.
+    assert "python -m pytest" in ci
 
     # Coverage gate for backend should be explicit in CI.
     assert (

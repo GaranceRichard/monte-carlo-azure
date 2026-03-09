@@ -5,7 +5,7 @@ Une tache est "Done" uniquement si tous les criteres ci-dessous sont valides. Ce
 ## 1. Verifications obligatoires (zero tolerance)
 
 - Frontend: `npm run lint` passe sans erreur.
-- Backend: `python manage.py test` passe sans erreur.
+- Backend: `python -m pytest -q` passe sans erreur.
 - E2E: `npm run test:e2e` passe sur les parcours critiques.
 - Build: `npm run build` passe sans erreur.
 
@@ -62,7 +62,7 @@ Sont toleres sans tests uniquement:
 ## Checklist DoD
 
 - [ ] Frontend: `npm run lint` passe sans erreur.
-- [ ] Backend: `python manage.py test` (ou equivalent projet) passe sans erreur.
+- [ ] Backend: `python -m pytest -q` passe sans erreur.
 - [ ] E2E: `npm run test:e2e` passe sur les parcours critiques.
 - [ ] Build: `npm run build` passe sans erreur.
 - [ ] Couverture backend >= 80%.

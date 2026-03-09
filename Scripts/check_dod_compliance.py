@@ -81,8 +81,8 @@ def main() -> int:
     _ok("npm run test:e2e" in ci, "CI must run E2E tests", errors)
     _ok("npm run build" in ci, "CI must run frontend build", errors)
     _ok(
-        ("python -m pytest" in ci) or ("python manage.py test" in ci),
-        "CI must run backend tests",
+        "python -m pytest" in ci,
+        "CI must run backend tests with pytest",
         errors,
     )
     _ok("--cov-fail-under=80" in ci, "CI must enforce backend coverage >= 80", errors)
