@@ -79,17 +79,25 @@ def _append_vitals_rate_errors(errors: list[str]) -> None:
         for source_name, result in sources.items():
             matched = result.get("matched") or []
             if not matched:
-                errors.append(f"Vital coverage source has no matching files: {title} / {source_name}")
+                errors.append(
+                    "Vital coverage source has no matching files: "
+                    f"{title} / {source_name}"
+                )
                 continue
             metrics = result.get("metrics") or {}
             for metric_name, metric in metrics.items():
                 pct = _metric_pct(metric)
                 if pct is None:
-                    errors.append(f"Vital coverage metric has no data: {title} / {source_name} / {metric_name}")
+                    errors.append(
+                        "Vital coverage metric has no data: "
+                        f"{title} / {source_name} / {metric_name}"
+                    )
                     continue
                 if pct < VITALS_THRESHOLD:
                     errors.append(
-                        f"Vital coverage below {VITALS_THRESHOLD:.0f}%: {title} / {source_name} / {metric_name} = {pct:.2f}%"
+                        "Vital coverage below "
+                        f"{VITALS_THRESHOLD:.0f}%: "
+                        f"{title} / {source_name} / {metric_name} = {pct:.2f}%"
                     )
 
 

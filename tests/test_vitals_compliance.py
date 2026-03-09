@@ -6,8 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "Scripts"))
-
-import check_vitals_compliance as vitals_compliance
+import check_vitals_compliance as vitals_compliance  # noqa: E402
 
 
 def _read(relpath: str) -> str:
@@ -54,7 +53,10 @@ def test_each_critical_vital_has_traceability_section_and_existing_test_files() 
         assert title in sections, f"Missing traceability section for vital: {title}"
         assert sections[title], f"Vital must reference at least one test: {title}"
         for relpath in sections[title]:
-            assert (ROOT / relpath).exists(), f"Missing referenced test file for vital {title}: {relpath}"
+            assert (ROOT / relpath).exists(), (
+                "Missing referenced test file for vital "
+                f"{title}: {relpath}"
+            )
 
 
 def test_coverage_task_runs_vitals_compliance() -> None:

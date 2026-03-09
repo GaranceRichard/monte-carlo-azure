@@ -199,6 +199,8 @@ La task VS Code `Coverage: 8 terminaux` execute aussi:
 - `Scripts/report_vitals_coverage.py` pour afficher les taux de couverture par vital a partir des artefacts backend/frontend/e2e
 - `frontend/coverage-vitals/coverage-final.json` comme artefact dedie au frontend unit vitals
 
+Ces scripts Python de coverage vitals font partie du lint backend et doivent rester conformes a `ruff check .`, y compris la limite de 100 caracteres par ligne.
+
 Les details d'API, d'architecture et de CI sont documentes dans [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ---

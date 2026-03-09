@@ -40,12 +40,16 @@ def _raw_istanbul_metrics(payload: dict) -> dict[str, dict]:
     statement_map = payload.get("statementMap") or {}
     statement_hits = payload.get("s") or {}
     metrics["statements"]["total"] = len(statement_map)
-    metrics["statements"]["covered"] = sum(1 for key in statement_map if int(statement_hits.get(str(key), 0)) > 0)
+    metrics["statements"]["covered"] = sum(
+        1 for key in statement_map if int(statement_hits.get(str(key), 0)) > 0
+    )
 
     function_map = payload.get("fnMap") or {}
     function_hits = payload.get("f") or {}
     metrics["functions"]["total"] = len(function_map)
-    metrics["functions"]["covered"] = sum(1 for key in function_map if int(function_hits.get(str(key), 0)) > 0)
+    metrics["functions"]["covered"] = sum(
+        1 for key in function_map if int(function_hits.get(str(key), 0)) > 0
+    )
 
     branch_hits = payload.get("b") or {}
     for counts in branch_hits.values():
@@ -174,12 +178,29 @@ def _pct(covered: int, total: int) -> str:
 
 def build_vitals_report() -> list[dict]:
     mapping = json.loads(MAP_PATH.read_text(encoding="utf-8"))
-    frontend_unit_files = json.loads(FRONTEND_UNIT.read_text(encoding="utf-8")) if FRONTEND_UNIT.exists() else {}
-    backend_raw = json.loads(BACKEND_JSON.read_text(encoding="utf-8")) if BACKEND_JSON.exists() else {}
+    frontend_unit_files = (
+        json.loads(FRONTEND_UNIT.read_text(encoding="utf-8"))
+        if FRONTEND_UNIT.exists()
+        else {}
+    )
+    backend_raw = (
+        json.loads(BACKEND_JSON.read_text(encoding="utf-8"))
+        if BACKEND_JSON.exists()
+        else {}
+    )
     backend_files = backend_raw.get("files", {})
-    e2e_raw = json.loads(E2E_JSON.read_text(encoding="utf-8")) if E2E_JSON.exists() else {}
+    e2e_raw = (
+        json.loads(E2E_JSON.read_text(encoding="utf-8"))
+        if E2E_JSON.exists()
+        else {}
+    )
     e2e_files = {
-        entry["file"]: {"summary": {metric: entry[metric] for metric in ["statements", "branches", "functions", "lines"]}}
+        entry["file"]: {
+            "summary": {
+                metric: entry[metric]
+                for metric in ["statements", "branches", "functions", "lines"]
+            }
+        }
         for entry in e2e_raw.get("byFile", [])
     }
 
@@ -188,9 +209,15 @@ def build_vitals_report() -> list[dict]:
         sources = vital.get("sources", {})
         vital_entry = {"title": vital["title"], "sources": {}}
         if "frontend_unit" in sources:
-            vital_entry["sources"]["frontend_unit"] = _aggregate_istanbul(frontend_unit_files, sources["frontend_unit"])
+            vital_entry["sources"]["frontend_unit"] = _aggregate_istanbul(
+                frontend_unit_files,
+                sources["frontend_unit"],
+            )
         if "backend" in sources:
-            vital_entry["sources"]["backend"] = _aggregate_backend(backend_files, sources["backend"])
+            vital_entry["sources"]["backend"] = _aggregate_backend(
+                backend_files,
+                sources["backend"],
+            )
         if "e2e" in sources:
             vital_entry["sources"]["e2e"] = _aggregate_istanbul(e2e_files, sources["e2e"])
         report.append(vital_entry)
@@ -208,11 +235,17 @@ def main() -> int:
         for source_name, result in vital["sources"].items():
             metrics = result["metrics"]
             parts = [
-                f"statements={_pct(metrics['statements']['covered'], metrics['statements']['total'])}",
+                (
+                    "statements="
+                    f"{_pct(metrics['statements']['covered'], metrics['statements']['total'])}"
+                ),
                 f"branches={_pct(metrics['branches']['covered'], metrics['branches']['total'])}",
             ]
             if "functions" in metrics:
-                parts.append(f"functions={_pct(metrics['functions']['covered'], metrics['functions']['total'])}")
+                parts.append(
+                    "functions="
+                    f"{_pct(metrics['functions']['covered'], metrics['functions']['total'])}"
+                )
             parts.append(f"lines={_pct(metrics['lines']['covered'], metrics['lines']['total'])}")
             print(f"  {source_name}: {' '.join(parts)}")
         print("")
