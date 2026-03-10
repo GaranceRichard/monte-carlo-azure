@@ -1,18 +1,17 @@
 # Deploiement Production
 
 Ce guide privilegie un deploiement simple et reproductible via Docker Compose.
-L'objectif est de lancer une instance complete (backend + frontend statique servi par FastAPI)
-sans configuration manuelle de `nginx` ou `systemd`.
+L'objectif est de lancer une instance complete, backend et frontend statique servi par FastAPI, sans configuration manuelle de `nginx` ou `systemd`.
 
-## Option A: Docker Compose (recommandee)
+## Option A: Docker Compose
 
 ### 1) Pre-requis
 
 - Docker Engine
 - Plugin `docker compose`
 - MongoDB pour la persistence:
-  - soit service local via `docker-compose.yml` (service `mongo`, par defaut),
-  - soit instance managée externe (OVH Managed Databases, Atlas, etc.) en pointant `APP_MONGO_URL`.
+  - soit service local via `docker-compose.yml` avec le service `mongo`
+  - soit instance managee externe en pointant `APP_MONGO_URL`
 
 ### 2) Depuis la racine du repo
 
@@ -22,14 +21,14 @@ docker compose up -d --build
 curl -sS http://127.0.0.1:8000/health
 ```
 
-Si le endpoint retourne `{"status":"ok"}`, l'application est disponible sur:
+Si le endpoint retourne `{"status":"ok"}`, l'application est disponible sur :
 
 - `http://127.0.0.1:8000`
 
 ### 3) Variables d'environnement
 
 Le fichier `.env` est charge par `docker-compose.yml`.
-Base recommandee:
+Base recommandee :
 
 ```dotenv
 APP_PORT=8000
@@ -45,7 +44,7 @@ APP_PURGE_RETENTION_DAYS=90
 
 ### 4) Verification persistence Mongo
 
-Verifier au demarrage que la persistence est active (pas seulement le health global):
+Verifier au demarrage que la persistence est active, pas seulement le health global :
 
 ```bash
 docker compose logs -f backend
@@ -54,7 +53,7 @@ curl -sS http://127.0.0.1:8000/health/mongo
 
 Le endpoint `/health/mongo` doit retourner `{"status":"ok"}` en production.
 
-Verifier ensuite la lecture d'historique avec cookie client:
+Verifier ensuite la lecture d'historique avec cookie client :
 
 ```bash
 curl -sS -H 'Cookie: IDMontecarlo=ops-smoke-client' \
@@ -63,10 +62,10 @@ curl -sS -H 'Cookie: IDMontecarlo=ops-smoke-client' \
 
 Si Mongo est indisponible, l'API doit remonter une erreur explicite sur les chemins de persistence.
 
-### 5) Cron de purge (clients inactifs)
+### 5) Cron de purge
 
 Planifier une execution quotidienne de `Scripts/purge_inactive_clients.py` sur l'hote.
-Exemple `crontab -e`:
+Exemple `crontab -e` :
 
 ```cron
 0 3 * * * cd /opt/montecarlo && /usr/bin/docker compose run --rm backend python Scripts/purge_inactive_clients.py >> /var/log/montecarlo-purge.log 2>&1
@@ -84,15 +83,15 @@ docker compose restart backend
 docker compose down -v
 ```
 
-## Option B: Nginx + systemd (sans Docker)
+## Option B: Nginx + systemd
 
-Cette option reste valide pour des environnements qui imposent un runtime natif Linux.
+Cette option reste valable pour des environnements qui imposent un runtime Linux natif.
 
 ### 1) Pre-requis
 
 - Python 3.12
 - Nginx
-- Utilisateur systeme dedie (ex: `montecarlo`)
+- utilisateur systeme dedie, par exemple `montecarlo`
 
 ### 2) Installation backend
 
@@ -108,7 +107,7 @@ pip install -r requirements.txt
 
 ### 3) Service systemd
 
-Fichier `/etc/systemd/system/montecarlo-api.service`:
+Fichier `/etc/systemd/system/montecarlo-api.service` :
 
 ```ini
 [Unit]
@@ -128,7 +127,7 @@ RestartSec=3
 WantedBy=multi-user.target
 ```
 
-Activation:
+Activation :
 
 ```bash
 sudo systemctl daemon-reload
@@ -138,7 +137,7 @@ sudo systemctl status montecarlo-api
 
 ### 4) Reverse proxy Nginx
 
-Fichier `/etc/nginx/sites-available/montecarlo-api`:
+Fichier `/etc/nginx/sites-available/montecarlo-api` :
 
 ```nginx
 server {
@@ -156,7 +155,7 @@ server {
 }
 ```
 
-Activation:
+Activation :
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/montecarlo-api /etc/nginx/sites-enabled/montecarlo-api
@@ -166,6 +165,11 @@ sudo systemctl reload nginx
 
 ## Notes securite
 
-- Ne jamais exposer de PAT cote serveur.
-- Garder uniquement `POST /simulate` et `GET /health`.
-- Conserver `python Scripts/check_identity_boundary.py` en CI.
+- ne jamais exposer de PAT cote serveur
+- conserver seulement les endpoints applicatifs documentes et necessaires
+- endpoints attendus:
+- `POST /simulate`
+- `GET /simulations/history`
+- `GET /health`
+- `GET /health/mongo`
+- conserver `python Scripts/check_identity_boundary.py` en CI

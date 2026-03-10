@@ -15,6 +15,7 @@ Outil de prevision base sur une simulation Monte Carlo. L'application aide a tra
 - vision produit et valeur: [`PRODUCT.md`](PRODUCT.md)
 - architecture, securite, API, CI: [`ARCHITECTURE.md`](ARCHITECTURE.md)
 - historique des evolutions: [`CHANGELOG.md`](CHANGELOG.md)
+- guide frontend: [`frontend/README.md`](frontend/README.md)
 - definition of done: [`docs/definition-of-done.md`](docs/definition-of-done.md)
 - chemins critiques: [`docs/critical-paths.md`](docs/critical-paths.md)
 - traceabilite vitals -> tests: [`docs/vitals-traceability.md`](docs/vitals-traceability.md)

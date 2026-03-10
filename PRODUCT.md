@@ -1,233 +1,198 @@
-﻿Monte-Carlo Azure
-Outil d'aide a la decision pour la planification sous incertitude
+# Product Vision
 
-1. Positionnement
+## Monte Carlo Azure
 
-Monte-Carlo Azure est un outil d'aide a la decision destine aux responsables de delivery, directeurs de projet, PMO et responsables portefeuille.
+Monte Carlo Azure est un outil d'aide a la decision pour la planification sous incertitude.
+Il transforme un historique Azure DevOps en projections probabilistes exploitables, sans exposer le PAT Azure DevOps au backend.
 
-Il transforme l'historique reel Azure DevOps en projections probabilistes exploitables pour :
+## Positionnement
 
-securiser une date
+Le produit s'adresse en priorite a :
 
-arbitrer un perimetre
+- directeur de projet
+- PMO
+- responsables delivery
+- responsables portefeuille
+- directions programme ou transformation
 
-dimensionner une capacite
+Le produit ne remplace pas le jugement managerial. Il rend l'incertitude visible, mesurable et actionnable.
 
-expliciter un niveau de risque
+## Probleme traite
 
-Il ne remplace pas le jugement managerial.
-Il structure l'incertitude.
+Les decisions de planification reposent encore souvent sur :
 
-2. Probleme traite
+- des estimations subjectives
+- des moyennes historiques peu explicites
+- des story points heterogenes
+- des engagements calendaires non probabilises
 
-Les decisions de planification reposent souvent sur :
+Les effets observes sont connus :
 
-des estimations subjectives
+- engagements intenables
+- arbitrages tardifs
+- tensions operationnelles
+- perte de credibilite en comite
 
-des moyennes historiques
+Monte Carlo Azure repond a ce probleme en produisant des distributions probabilistes a partir du throughput reel.
 
-des story points heterogenes
+## Proposition de valeur
 
-des engagements calendaires non probabilises
+Le produit permet de :
 
-Consequences :
+- securiser une date a partir d'un backlog restant
+- convertir un horizon cible en capacite livrable probable
+- visualiser la dispersion et la stabilite d'un scenario
+- consolider plusieurs equipes dans une lecture portefeuille
+- expliciter un niveau de risque via percentiles et `Risk Score`
 
-engagements intenables
+Valeur attendue :
 
-arbitrages tardifs
+- decisions explicitees par niveau de confiance
+- arbitrages scope / delai plus structures
+- dialogue directionnel plus serein
+- preparation COPIL plus rapide
 
-tensions operationnelles
+## Capacites produit actuelles
 
-perte de credibilite en comite
+Fonctionnalites actuellement presentes dans le produit :
 
-Monte-Carlo Azure repond a cette problematique en produisant des distributions probabilistes a partir du throughput reel.
+- connexion Azure DevOps avec PAT cote navigateur
+- selection organisation -> projet -> equipe
+- simulation Monte Carlo cote backend via `POST /simulate`
+- deux modes de projection :
+  - backlog vers semaines
+  - semaines vers items
+- visualisation des percentiles et distributions
+- affichage d'un `Risk Score`
+- export CSV du throughput hebdomadaire
+- historique local des simulations recentes
+- cookie client `IDMontecarlo` pour relier un client anonyme a son historique persiste
+- persistence MongoDB et restitution des 10 dernieres simulations via `/simulations/history`
+- parametre de capacite reduite
+- configuration rapide des filtres types + etats, memorisee localement
+- mode `Portefeuille` multi-equipes
+- rapport PDF portefeuille avec synthese decisionnelle et pages detaillees
 
-3. Proposition de valeur
-Ce que permet l'outil
+## Cas d'usage
 
-Transformer un backlog restant en horizon probabilise (P50 / P85)
+### 1. Securiser une date
 
-Convertir un horizon cible en capacite livrable probable
+Exemple :
 
-Visualiser la dispersion et la stabilite
+- 80 items restants
+- historique de throughput sur plusieurs semaines
+- simulation de plusieurs milliers d'iterations
 
-Consolider plusieurs equipes en vision portefeuille
+Restitution attendue :
 
-Impact attendu
+- `P50` pour une lecture mediane
+- `P85` ou `P90` pour une lecture prudente
+- `Risk Score` pour objectiver la dispersion
 
-Decisions explicitees par niveau de confiance
+Decision supportee :
 
-Arbitrages scope / delai structures
+- accepter le niveau de risque
+- ajuster le perimetre
+- renforcer la capacite
 
-Dialogue directionnel apaise
+### 2. Arbitrer une capacite cible
 
-Preparation COPIL acceleree
+Question metier :
 
-4. Cibles
+"Combien d'items peut-on livrer en N semaines avec un niveau de confiance donne ?"
 
-Directeur de projet
+Le produit repond a cette question via le mode `weeks_to_items`.
 
-Head of Delivery
+### 3. Piloter un portefeuille
 
-PMO
+Le mode portefeuille permet de :
 
-Responsable transformation
+- selectionner plusieurs equipes
+- consolider les projections
+- comparer plusieurs hypotheses d'agregation
+- produire un support exportable pour revue de pilotage
 
-Direction programme
+Les scenarios actuellement proposes sont :
 
-L'outil est concu pour un usage operationnel mais aussi pour une restitution en comite.
+- `Optimiste`
+- `Arrime`
+- `Friction`
+- `Conservateur`
 
-5. Cas d'usage type
-Scenario 1 - Securiser une date
+Le rapport portefeuille gere aussi la progression de generation et la tolerance aux echecs partiels par equipe.
 
-80 items restants
+## Modele de simulation
 
-Historique 16 semaines
+Le coeur du produit repose sur :
 
-Simulation 10 000 iterations
+- le throughput reel observe
+- la simulation Monte Carlo
+- l'agregation des iterations simulees
+- le recalcul des percentiles selon le mode utilise
 
-Resultat :
+En mode portefeuille, le produit compare plusieurs hypotheses d'agregation plutot que de masquer l'incertitude derriere une seule projection.
 
-P50 : 12 semaines
-
-P85 : 15 semaines
-
-Decision :
-
-Soit accepter le risque (50%)
-
-Soit ajuster perimetre
-
-Soit renforcer capacite
-
-Scenario 2 - Arbitrage portefeuille
-
-Mode Portefeuille :
-
-Selection de plusieurs equipes
-
-Hypotheses d'agregation explicites
-
-Projection consolidee
-
-Restitution :
-
-Synthese portefeuille
-
-Detail par equipe
-
-Hypotheses affichees
-
-6. Modele statistique
-
-L'outil repose sur :
-
-throughput reel (items clotures / periode)
-
-simulation Monte Carlo
-
-agregation par sommation des iterations simulees
-
-recalcul des percentiles consolides
-
-Hypotheses affichees :
-
-independance des equipes (mode par defaut)
-
-possibilite de mode conservateur
-
-transparence sur limites statistiques
-
-7. Securite & Gouvernance (Invariants)
+## Invariants de securite et de gouvernance
 
 Principe non negociable :
 
-Aucune donnee d'identification Azure DevOps (PAT, UUID, organisation, equipe) ne transite par un serveur applicatif.
+- le PAT Azure DevOps est utilise uniquement dans le navigateur
+- aucune donnee d'identification Azure DevOps ne doit transiter par le backend
+- le backend ne recoit que des donnees anonymisees de throughput et des parametres de simulation
 
-Les appels Azure DevOps sont effectues directement depuis le navigateur.
+Cette frontiere d'identite est un invariant produit autant qu'un invariant d'architecture.
+Elle est protegee par des controles CI dedies.
 
-Le backend ne recoit que des donnees anonymisees de throughput.
+## Non-objectifs
 
-Des controles CI empechent toute violation de cette frontiere.
+Monte Carlo Azure :
 
-Ce choix structure l'architecture et protege l'environnement client.
+- ne remplace pas Azure DevOps
+- ne fait pas de gestion de backlog
+- ne remplace pas la decision humaine
+- ne promet pas un resultat certain
+- explicite une probabilite plutot qu'un engagement artificiellement precis
 
-8. Non-objectifs
+## Indicateurs de pilotage
 
-Monte-Carlo Azure :
+Le produit cherche a rester :
 
-ne remplace pas Azure DevOps
+- rapide a calculer
+- stable dans ses simulations
+- explicite dans ses hypotheses
+- fiable dans ses exports et ses parcours critiques
 
-ne fait pas de gestion de backlog
+Indicateurs utiles :
 
-ne remplace pas la decision humaine
+- temps moyen de calcul
+- stabilite des resultats
+- variance observee
+- taux d'erreur API
+- usage du mode portefeuille
+- qualite de restitution des scenarios
 
-ne garantit pas un resultat, mais explicite une probabilite
+## Etat recent du produit
 
-9. Pilotage produit
+Les evolutions recentes les plus structurantes sont :
 
-Indicateurs cles :
+- refonte du mode portefeuille autour de 4 scenarios explicites
+- harmonisation du calcul du `Risk Score` avec les percentiles affiches
+- generation parallele du rapport portefeuille avec progression visible
+- tolerance aux echecs partiels lors de l'agregation portefeuille
+- enrichissement du rapport PDF avec une page de synthese orientee decision
+- durcissement des tests, de la CI et des controles de conformite repo
+- mise sous controle des points vitaux via traceabilite et coverage dediee
 
-temps moyen de calcul
+## Vision
 
-stabilite des simulations
+La trajectoire produit est claire :
 
-variance observee
+- passer d'un outil equipe a un outil portefeuille robuste
+- mieux soutenir les arbitrages de direction
+- rendre les hypotheses de simulation plus lisibles et plus gouvernables
+- conserver une architecture stricte ou l'identite Azure DevOps reste cote navigateur
 
-taux d'erreur API
+## Resume executif
 
-usage mode portefeuille
-
-Objectif : outil stable, rapide, explicite.
-
-10. Vision
-
-Passer d'un outil equipe a un outil portefeuille.
-
-Evolutions possibles :
-
-export directionnel structure
-
-comparaison periodes
-
-visualisation des dependances
-
-indicateur de maturite de stabilite
-
-Resume executif
-
-Monte-Carlo Azure permet de transformer des donnees operationnelles en decisions probabilisees, securisees et gouvernables.
-
-Il apporte une discipline de risque mesurable dans les environnements de delivery.
-
-11. Evolutions recentes (portefeuille)
-
-Simulation portefeuille multi-equipes:
-
-introduction de 4 scenarios d'agregation (Optimiste, Arrime, Friction, Conservateur)
-
-scenario Conservateur revise: mediane des tirages x nombre d'equipes (au lieu du minimum strict)
-
-scenario Friction ajoute: somme des tirages x (taux d'arrimage ^ nb equipes)
-
-generation parallele des simulations (scenarios + equipes) avec progression visible
-
-tolerance aux echecs partiels par equipe (rapport partiel exportable)
-
-Rapport PDF portefeuille:
-
-page 1 orientee decision (synthese + hypotheses + comparaison des courbes de probabilites)
-
-pages dediees par scenario (Optimiste, Arrime, Friction, Conservateur) avant les pages equipes
-
-coherence du calcul Risk Score entre synthese et pages detail (meme base percentile selon le mode)
-
-qualite visuelle renforcee du tableau de synthese (taille/contraste/couleurs)
-
-Qualite engineering:
-
-corrections d'encodage/accents sur ecrans et PDF
-
-durcissement des tests unitaires et e2e (selecteurs robustes aux variations d'encodage)
-
-hausse de la couverture front sur les hooks portefeuille critiques
+Monte Carlo Azure transforme des donnees operationnelles en decisions probabilisees.
+Le produit aide a arbitrer delai, capacite et perimetre avec un niveau de confiance explicite, tout en preservant une frontiere de securite stricte entre Azure DevOps et le backend.
