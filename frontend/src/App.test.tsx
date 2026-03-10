@@ -52,7 +52,10 @@ vi.mock("./components/steps/PortfolioStep", () => ({
 function buildState(step: "pat" | "org" | "projects" | "teams" | "simulation") {
   return {
     patInput: "",
+    serverUrlInput: "",
     sessionPat: "pat-token-abcdefghijklmnopqrstuvwxyz",
+    sessionServerUrl: "",
+    deploymentTarget: "cloud",
     step,
     loading: false,
     err: "",
@@ -71,6 +74,7 @@ function buildState(step: "pat" | "org" | "projects" | "teams" | "simulation") {
 function buildActions(goToSimulationReturn = true) {
   return {
     setPatInput: vi.fn(),
+    setServerUrlInput: vi.fn(),
     setSelectedOrg: vi.fn(),
     setSelectedProject: vi.fn(),
     setSelectedTeam: vi.fn(),
@@ -134,6 +138,20 @@ describe("App", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /2\.\s*Organisation/i }));
     expect(actions.goToStep).toHaveBeenCalledWith("org");
+  });
+
+  it("shows Collection as step 2 label when onboarding targets on-prem", () => {
+    vi.mocked(useOnboarding).mockReturnValue({
+      state: { ...buildState("org"), deploymentTarget: "onprem", orgs: [] },
+      actions: buildActions(),
+    } as never);
+    vi.mocked(useSimulation).mockReturnValue({
+      resetForTeamSelection: vi.fn(),
+      resetAll: vi.fn(),
+    } as never);
+
+    render(<App />);
+    expect(screen.getByText(/2\.\s*Collection/i)).toBeTruthy();
   });
 
   it("toggles theme and updates document attribute", () => {

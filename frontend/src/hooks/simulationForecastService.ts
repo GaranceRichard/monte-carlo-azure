@@ -15,6 +15,7 @@ type RunSimulationForecastParams = {
   selectedProject: string;
   selectedTeam: string;
   pat: string;
+  serverUrl: string;
   startDate: string;
   endDate: string;
   doneStates: string[];
@@ -48,6 +49,7 @@ type FetchTeamThroughputParams = {
   selectedProject: string;
   selectedTeam: string;
   pat: string;
+  serverUrl: string;
   startDate: string;
   endDate: string;
   doneStates: string[];
@@ -79,6 +81,7 @@ export async function fetchTeamThroughput(params: FetchTeamThroughputParams): Pr
     selectedProject,
     selectedTeam,
     pat,
+    serverUrl,
     startDate,
     endDate,
     doneStates,
@@ -95,6 +98,7 @@ export async function fetchTeamThroughput(params: FetchTeamThroughputParams): Pr
     endDate,
     doneStates,
     types,
+    serverUrl,
   );
   const weekly = Array.isArray(throughputResponse) ? throughputResponse : throughputResponse.weeklyThroughput;
   const warning = Array.isArray(throughputResponse) ? undefined : throughputResponse.warning;
@@ -107,7 +111,7 @@ export async function fetchTeamThroughput(params: FetchTeamThroughputParams): Pr
   };
   if (throughputSamples.length < 6) {
     throw new Error(
-      "Historique insuffisant pour une simulation fiable. Elargissez la periode selectionnee, ou verifiez les types et etats de resolution choisis.",
+      "Historique insuffisant pour une simulation fiable. Elargissez la periode selectionnee, verifiez les types et etats choisis, ou activez les semaines a 0 incluses.",
     );
   }
 
@@ -181,6 +185,7 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     selectedProject,
     selectedTeam,
     pat,
+    serverUrl,
     startDate,
     endDate,
     doneStates,
@@ -199,6 +204,7 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     selectedProject,
     selectedTeam,
     pat,
+    serverUrl,
     startDate,
     endDate,
     doneStates,

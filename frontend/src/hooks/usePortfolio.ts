@@ -21,6 +21,7 @@ type UsePortfolioParams = {
   selectedProject: string;
   teams: NamedEntity[];
   pat: string;
+  serverUrl: string;
 };
 
 type TeamOptionsCacheEntry = {
@@ -47,7 +48,7 @@ function getValidQuickFilterSelection(
   return { types, doneStates };
 }
 
-export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePortfolioParams) {
+export function usePortfolio({ selectedOrg, selectedProject, teams, pat, serverUrl }: UsePortfolioParams) {
   const portfolioPrefs = useMemo(() => readStoredPortfolioPrefs(), []);
   const [startDate, setStartDate] = useState<string>(nWeeksAgo(26));
   const [endDate, setEndDate] = useState<string>(today());
@@ -101,6 +102,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
     selectedOrg,
     selectedProject,
     pat,
+    serverUrl,
     startDate,
     endDate,
     includeZeroWeeks,
@@ -164,7 +166,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat }: UsePo
 
     setModalLoading(true);
     try {
-      const options = await getTeamOptionsDirect(selectedOrg, selectedProject, teamName, pat);
+      const options = await getTeamOptionsDirect(selectedOrg, selectedProject, teamName, pat, serverUrl);
       const nextCacheEntry = {
         workItemTypes: options.workItemTypes || [],
         statesByType: options.statesByType || {},

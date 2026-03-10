@@ -7,10 +7,11 @@ type PortfolioStepProps = {
   selectedProject: string;
   teams: NamedEntity[];
   pat: string;
+  serverUrl: string;
 };
 
-export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat }: PortfolioStepProps) {
-  const portfolio = usePortfolio({ selectedOrg, selectedProject, teams, pat });
+export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat, serverUrl }: PortfolioStepProps) {
+  const portfolio = usePortfolio({ selectedOrg, selectedProject, teams, pat, serverUrl });
 
   return (
     <div className="space-y-4">

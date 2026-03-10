@@ -30,7 +30,7 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
   const modeSummary =
     s.simulationMode === "backlog_to_weeks"
       ? `Backlog de ${String(s.backlogSize)} items · ${formatFrNumber(s.nSims)} simulations · semaines à 0 ${modeZeroText}`
-      : `Horizon de ${String(s.targetWeeks)} semaines · ${formatFrNumber(s.nSims)} simulations · semaines à 0 ${modeZeroText}`;
+      : `En ${String(s.targetWeeks)} semaines · ${formatFrNumber(s.nSims)} simulations · semaines à 0 ${modeZeroText}`;
   const typeListText = s.types.length ? s.types.join(", ") : "Aucun type";
   const stateListText = s.doneStates.length ? s.doneStates.join(", ") : "Aucun état";
   const hasRequiredFilters = s.types.length > 0 && s.doneStates.length > 0;
@@ -112,14 +112,24 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
       <section className="sim-control-section">
         <div className="sim-advanced-header">
           <h3 className="sim-control-heading">Filtres de tickets</h3>
-          <button
-            type="button"
-            className="sim-advanced-toggle"
-            onClick={() => toggleSection("filters")}
-            aria-expanded={showFilters}
-          >
-            {showFilters ? "Réduire" : "Développer"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="sim-advanced-toggle"
+              onClick={s.applyQuickFilterConfig}
+              disabled={!s.hasQuickFilterConfig || s.loadingTeamOptions}
+            >
+              Configuration rapide
+            </button>
+            <button
+              type="button"
+              className="sim-advanced-toggle"
+              onClick={() => toggleSection("filters")}
+              aria-expanded={showFilters}
+            >
+              {showFilters ? "Réduire" : "Développer"}
+            </button>
+          </div>
         </div>
         {!showFilters && <div className="sim-advanced-summary">{typeListText} {"→"} {stateListText}</div>}
         {showFilters && <SimulationFilterControls />}

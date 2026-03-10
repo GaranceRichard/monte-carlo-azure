@@ -40,6 +40,7 @@ function setup(teams = [{ name: "Team A" }, { name: "Team B" }]) {
       selectedProject: "Project A",
       teams,
       pat: "pat",
+      serverUrl: "",
     }),
   );
 }

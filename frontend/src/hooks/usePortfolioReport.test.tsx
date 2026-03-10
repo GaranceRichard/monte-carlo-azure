@@ -35,6 +35,7 @@ function setupReportHook(overrides: Partial<Parameters<typeof usePortfolioReport
       selectedOrg: "Org A",
       selectedProject: "Project A",
       pat: "pat",
+      serverUrl: "",
       startDate: "2026-01-01",
       endDate: "2026-02-01",
       includeZeroWeeks: true,

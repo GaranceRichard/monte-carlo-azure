@@ -13,6 +13,9 @@ vi.mock("./SimulationModeAndParametersControls", () => ({ default: () => <div>Mo
 
 function setContext({
   hasLaunchedOnce,
+  hasQuickFilterConfig = true,
+  loadingTeamOptions = false,
+  applyQuickFilterConfig = vi.fn(),
   types = ["Bug"],
   doneStates = ["Done"],
   loading = false,
@@ -22,6 +25,9 @@ function setContext({
   resetSimulationResults = vi.fn(),
 }: {
   hasLaunchedOnce: boolean;
+  hasQuickFilterConfig?: boolean;
+  loadingTeamOptions?: boolean;
+  applyQuickFilterConfig?: ReturnType<typeof vi.fn>;
   types?: string[];
   doneStates?: string[];
   loading?: boolean;
@@ -35,6 +41,9 @@ function setContext({
     simulation: {
       loading,
       hasLaunchedOnce,
+      hasQuickFilterConfig,
+      loadingTeamOptions,
+      applyQuickFilterConfig,
       runForecast,
       resetForTeamSelection,
       resetSimulationResults,
@@ -105,6 +114,19 @@ describe("SimulationControlPanel launch button visibility", () => {
     expect(onExpansionChange).toHaveBeenLastCalledWith(false);
   });
 
+  it("places quick configuration in the ticket filters header and triggers it", () => {
+    const applyQuickFilterConfig = vi.fn();
+    setContext({ hasLaunchedOnce: false, applyQuickFilterConfig });
+    render(<SimulationControlPanel />);
+
+    const filtersSection = screen.getByRole("heading", { name: /filtres de tickets/i }).closest("section");
+    expect(filtersSection).not.toBeNull();
+    if (!filtersSection) return;
+
+    fireEvent.click(within(filtersSection).getByRole("button", { name: /configuration rapide/i }));
+    expect(applyQuickFilterConfig).toHaveBeenCalledTimes(1);
+  });
+
   it("opens period then mode section with exclusive content", () => {
     setContext({ hasLaunchedOnce: false });
     render(<SimulationControlPanel />);
@@ -145,6 +167,35 @@ describe("SimulationControlPanel launch button visibility", () => {
     expect(screen.getByText(/20\s?000 simulations/i)).not.toBeNull();
     expect(screen.getByText(/semaines . 0 incluses/i)).not.toBeNull();
     expect(screen.getByText(/du 01\/01\/2026 au 01\/02\/2026/i)).not.toBeNull();
+  });
+
+  it("uses 'En X semaines' summary for weeks-to-items mode", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Equipe A",
+      simulation: {
+        loading: false,
+        hasLaunchedOnce: false,
+        hasQuickFilterConfig: true,
+        loadingTeamOptions: false,
+        applyQuickFilterConfig: vi.fn(),
+        runForecast: vi.fn(async () => {}),
+        resetForTeamSelection: vi.fn(),
+        resetSimulationResults: vi.fn(),
+        types: ["Bug"],
+        doneStates: ["Done"],
+        startDate: "2026-01-01",
+        endDate: "2026-02-01",
+        simulationMode: "weeks_to_items",
+        backlogSize: 100,
+        targetWeeks: 12,
+        includeZeroWeeks: true,
+        nSims: 20000,
+      },
+    } as never);
+
+    render(<SimulationControlPanel />);
+    expect(screen.getByText(/En 12 semaines/i)).not.toBeNull();
+    expect(screen.queryByText(/Horizon de 12 semaines/i)).toBeNull();
   });
 
   it("resets simulation when opening ticket filters after a launched simulation", () => {

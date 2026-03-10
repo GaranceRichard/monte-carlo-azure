@@ -1,4 +1,4 @@
-﻿import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import PortfolioStep from "./PortfolioStep";
 import { usePortfolio } from "../../hooks/usePortfolio";
@@ -67,7 +67,7 @@ describe("PortfolioStep", () => {
     });
 
     const { rerender } = render(
-      <PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" />,
+      <PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" serverUrl="" />,
     );
 
     expect(screen.getByLabelText("Taux d'arrimage")).toBeTruthy();
@@ -79,7 +79,7 @@ describe("PortfolioStep", () => {
         { teamName: "Team B", workItemTypeOptions: [], statesByType: {}, types: [], doneStates: [] },
       ],
     });
-    rerender(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" />);
+    rerender(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" serverUrl="" />);
 
     expect(screen.getByLabelText("Taux d'arrimage")).toBeTruthy();
   });
@@ -96,7 +96,7 @@ describe("PortfolioStep", () => {
       ],
     });
 
-    render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" />);
+    render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" serverUrl="" />);
 
     fireEvent.change(screen.getByLabelText("Taux d'arrimage"), { target: { value: "75" } });
     expect(setArrimageRate).toHaveBeenCalledWith(75);
@@ -112,7 +112,7 @@ describe("PortfolioStep", () => {
       canGenerate: true,
     });
 
-    render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" />);
+    render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" serverUrl="" />);
 
     const input = screen.getByLabelText("Nombre de simulations") as HTMLInputElement;
     fireEvent.change(input, { target: { value: "30000" } });
@@ -128,10 +128,8 @@ describe("PortfolioStep", () => {
       canGenerate: false,
     });
 
-    render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" />);
+    render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" serverUrl="" />);
 
     expect((screen.getByRole("button", { name: /G.n.rer rapport portefeuille/i }) as HTMLButtonElement).disabled).toBe(true);
   });
 });
-
-

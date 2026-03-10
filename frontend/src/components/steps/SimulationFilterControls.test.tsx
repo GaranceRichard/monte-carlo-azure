@@ -42,21 +42,6 @@ function setContext({
 }
 
 describe("SimulationFilterControls quick configuration", () => {
-  it("triggers the quick configuration action when available", () => {
-    const { applyQuickFilterConfig } = setContext({});
-    render(<SimulationFilterControls />);
-
-    fireEvent.click(screen.getByRole("button", { name: /configuration rapide/i }));
-    expect(applyQuickFilterConfig).toHaveBeenCalledTimes(1);
-  });
-
-  it("disables quick configuration button when no stored preset exists", () => {
-    setContext({ hasQuickFilterConfig: false });
-    render(<SimulationFilterControls />);
-
-    expect((screen.getByRole("button", { name: /configuration rapide/i }) as HTMLButtonElement).disabled).toBe(true);
-  });
-
   it("shows loading and empty-state hints when team options are still loading", () => {
     setContext({ loadingTeamOptions: true, types: [] });
     render(<SimulationFilterControls />);

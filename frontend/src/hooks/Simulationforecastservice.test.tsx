@@ -56,6 +56,7 @@ function baseParams(overrides: Partial<Parameters<typeof runSimulationForecast>[
     selectedProject: "Projet A",
     selectedTeam: "Equipe Alpha",
     pat: "pat-token-abcdefghijklmnopqrstuvwxyz",
+    serverUrl: "",
     startDate: "2025-01-01",
     endDate: "2025-02-28",
     doneStates: ["Done", "Closed"],
@@ -98,6 +99,7 @@ describe("appels réseau", () => {
       "2025-02-28",
       ["Done", "Closed"],
       ["User Story", "Bug"],
+      "",
     );
   });
 

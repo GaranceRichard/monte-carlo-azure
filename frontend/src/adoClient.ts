@@ -5,6 +5,15 @@ import {
   toAdoNetworkError,
   type AdoErrorContext,
 } from "./adoErrors";
+import {
+  ADO_CLOUD_BASE_URL,
+  ADO_CLOUD_PROFILE_BASE_URL,
+  buildOnPremCollectionUrl,
+  extractOnPremCollectionName,
+  getAdoDeploymentTarget,
+  listOnPremCollectionCandidates,
+  normalizeAdoServerUrl,
+} from "./adoPlatform";
 
 function adoHeaders(pat: string): Record<string, string> {
   return {
@@ -13,9 +22,8 @@ function adoHeaders(pat: string): Record<string, string> {
   };
 }
 
-const ADO = "https://dev.azure.com";
-const VSSPS = "https://app.vssps.visualstudio.com";
-const API = "api-version=7.1";
+const CLOUD_API = "api-version=7.1";
+const ONPREM_API = "api-version=6.0";
 
 type AdoOrg = { name: string };
 type AdoProject = { id: string; name: string };
@@ -31,9 +39,108 @@ type ResolvedPatProfile = {
   restrictedProfile?: boolean;
 };
 const profileLookupInFlight = new Map<string, Promise<ResolvedPatProfile>>();
+const onPremCollectionDiscoveryInFlight = new Map<string, Promise<DiscoveredOnPremCollection | null>>();
+
+type AdoRuntimeContext = {
+  deploymentTarget: "cloud" | "onprem";
+  serverUrl: string;
+  collectionName: string;
+  collectionUrl: string;
+  profileUrl: string;
+};
+
+type DiscoveredOnPremCollection = {
+  collectionName: string;
+  collectionUrl: string;
+  resolvedServerUrl: string;
+};
 
 function escWiql(value: string): string {
   return value.replace(/'/g, "''");
+}
+
+function buildCompletionDateFilter(startDate: string, endDate: string): string {
+  return `AND (
+      (
+        [Microsoft.VSTS.Common.ClosedDate] >= '${startDate}'
+        AND [Microsoft.VSTS.Common.ClosedDate] <= '${endDate}'
+      )
+      OR (
+        [Microsoft.VSTS.Common.ResolvedDate] >= '${startDate}'
+        AND [Microsoft.VSTS.Common.ResolvedDate] <= '${endDate}'
+      )
+    )`;
+}
+
+function getAdoRuntimeContext(serverUrl?: string, collectionName?: string): AdoRuntimeContext {
+  const normalizedServerUrl = normalizeAdoServerUrl(serverUrl);
+  const deploymentTarget = getAdoDeploymentTarget(normalizedServerUrl);
+
+  if (deploymentTarget === "cloud") {
+    const org = (collectionName ?? "").trim();
+    return {
+      deploymentTarget,
+      serverUrl: ADO_CLOUD_BASE_URL,
+      collectionName: org,
+      collectionUrl: org ? `${ADO_CLOUD_BASE_URL}/${encodeURIComponent(org)}` : ADO_CLOUD_BASE_URL,
+      profileUrl: ADO_CLOUD_PROFILE_BASE_URL,
+    };
+  }
+
+  const resolvedCollectionName = (collectionName ?? "").trim() || extractOnPremCollectionName(normalizedServerUrl);
+  const collectionUrl = buildOnPremCollectionUrl(normalizedServerUrl, resolvedCollectionName);
+  return {
+    deploymentTarget,
+    serverUrl: normalizedServerUrl,
+    collectionName: resolvedCollectionName,
+    collectionUrl,
+    profileUrl: normalizedServerUrl,
+  };
+}
+
+function getApiVersionQuery(runtime: AdoRuntimeContext): string {
+  return runtime.deploymentTarget === "onprem" ? ONPREM_API : CLOUD_API;
+}
+
+async function discoverOnPremCollection(serverUrl: string, pat: string): Promise<DiscoveredOnPremCollection | null> {
+  const normalizedServerUrl = normalizeAdoServerUrl(serverUrl);
+  const cacheKey = `${normalizedServerUrl}::${pat}`;
+  const existing = onPremCollectionDiscoveryInFlight.get(cacheKey);
+  if (existing) return existing;
+
+  const task = (async (): Promise<DiscoveredOnPremCollection | null> => {
+    const candidates = listOnPremCollectionCandidates(normalizedServerUrl);
+    for (const candidate of candidates) {
+      try {
+        const response = await adoFetch(
+          `${candidate.collectionUrl}/_apis/projects?$top=1&${ONPREM_API}`,
+          { headers: adoHeaders(pat) },
+          {
+            operation: "detection de la collection Azure DevOps Server",
+            org: candidate.collectionName,
+            requiredScopes: ["Project and Team (Read)"],
+          },
+        );
+        if (response.ok) {
+          return {
+            collectionName: candidate.collectionName,
+            collectionUrl: candidate.collectionUrl,
+            resolvedServerUrl: candidate.collectionUrl,
+          };
+        }
+      } catch {
+        continue;
+      }
+    }
+    return null;
+  })();
+
+  onPremCollectionDiscoveryInFlight.set(cacheKey, task);
+  try {
+    return await task;
+  } finally {
+    onPremCollectionDiscoveryInFlight.delete(cacheKey);
+  }
 }
 
 async function adoFetch(url: string, init: RequestInit, context: AdoErrorContext): Promise<Response> {
@@ -49,13 +156,16 @@ async function getTeamAreaPathFilterClause(
   project: string,
   team: string,
   pat: string,
+  serverUrl?: string,
 ): Promise<string> {
+  const runtime = getAdoRuntimeContext(serverUrl, org);
+  const api = getApiVersionQuery(runtime);
   const fallbackPath = `${project}\\${team}`;
 
   try {
     const teamEncoded = encodeURIComponent(team);
     const r = await fetch(
-      `${ADO}/${org}/${project}/${teamEncoded}/_apis/work/teamsettings/teamfieldvalues?${API}`,
+      `${runtime.collectionUrl}/${encodeURIComponent(project)}/${teamEncoded}/_apis/work/teamsettings/teamfieldvalues?${api}`,
       { headers: adoHeaders(pat) },
     );
     if (!r.ok) {
@@ -85,16 +195,56 @@ async function getTeamAreaPathFilterClause(
   }
 }
 
-export async function checkPatDirect(pat: string): Promise<ResolvedPatProfile> {
-  const existing = profileLookupInFlight.get(pat);
+export async function checkPatDirect(pat: string, serverUrl?: string, collectionName?: string): Promise<ResolvedPatProfile> {
+  const cacheKey = `${normalizeAdoServerUrl(serverUrl)}::${(collectionName ?? "").trim()}::${pat}`;
+  const existing = profileLookupInFlight.get(cacheKey);
   if (existing) return existing;
 
   const task = (async (): Promise<ResolvedPatProfile> => {
+    const runtime = getAdoRuntimeContext(serverUrl, collectionName);
+    if (runtime.deploymentTarget === "onprem") {
+      const explicitCollectionName = (collectionName ?? "").trim();
+      const discovered =
+        explicitCollectionName
+          ? {
+            collectionName: runtime.collectionName,
+            collectionUrl: runtime.collectionUrl,
+            resolvedServerUrl: runtime.collectionUrl,
+          }
+          : await discoverOnPremCollection(runtime.serverUrl, pat);
+      if (!discovered?.collectionUrl) {
+        return {
+          displayName: "Utilisateur",
+          id: "",
+          publicAlias: "",
+          restrictedProfile: true,
+        };
+      }
+
+      const context: AdoErrorContext = {
+        operation: "verification du PAT",
+        org: discovered.collectionName,
+        requiredScopes: ["Project and Team (Read)"],
+      };
+      const response = await adoFetch(
+        `${discovered.collectionUrl}/_apis/projects?$top=1&${ONPREM_API}`,
+        { headers: adoHeaders(pat) },
+        context,
+      );
+      if (!response.ok) throw toAdoHttpError(response, context);
+      return {
+        displayName: "Utilisateur",
+        id: "",
+        publicAlias: "",
+        restrictedProfile: true,
+      };
+    }
+
     const context: AdoErrorContext = {
       operation: "verification du PAT",
       requiredScopes: ["Profile (Read)"],
     };
-    const r = await adoFetch(`${VSSPS}/_apis/profile/profiles/me?${API}`, { headers: adoHeaders(pat) }, context);
+    const r = await adoFetch(`${runtime.profileUrl}/_apis/profile/profiles/me?${CLOUD_API}`, { headers: adoHeaders(pat) }, context);
     if (r.ok) {
       const profile = await r.json() as ProfileMe;
       return {
@@ -124,17 +274,17 @@ export async function checkPatDirect(pat: string): Promise<ResolvedPatProfile> {
     throw toAdoHttpError(r, context);
   })();
 
-  profileLookupInFlight.set(pat, task);
+  profileLookupInFlight.set(cacheKey, task);
   try {
     return await task;
   } finally {
-    profileLookupInFlight.delete(pat);
+    profileLookupInFlight.delete(cacheKey);
   }
 }
 
 async function listOrgsByMemberId(memberId: string, pat: string): Promise<AdoOrg[]> {
   if (!memberId) return [];
-  const r = await fetch(`${VSSPS}/_apis/accounts?memberId=${encodeURIComponent(memberId)}&${API}`, {
+  const r = await fetch(`${ADO_CLOUD_PROFILE_BASE_URL}/_apis/accounts?memberId=${encodeURIComponent(memberId)}&${CLOUD_API}`, {
     headers: adoHeaders(pat),
   });
   if (!r.ok) return [];
@@ -142,19 +292,35 @@ async function listOrgsByMemberId(memberId: string, pat: string): Promise<AdoOrg
   return (data.value ?? []).map((a: { accountName?: string }) => ({ name: a.accountName ?? "" }));
 }
 
-export async function listOrgsDirect(pat: string): Promise<AdoOrg[]> {
-  const me = await checkPatDirect(pat);
+export async function listOrgsDirect(pat: string, serverUrl?: string): Promise<AdoOrg[]> {
+  const runtime = getAdoRuntimeContext(serverUrl);
+  if (runtime.deploymentTarget === "onprem") return [];
+  const me = await checkPatDirect(pat, serverUrl);
   const memberId = me.id || me.publicAlias || "";
   return listOrgsByMemberId(memberId, pat);
 }
 
-export async function resolvePatOrganizationScopeDirect(pat: string): Promise<{
+export async function resolvePatOrganizationScopeDirect(pat: string, serverUrl?: string): Promise<{
   displayName: string;
   memberId: string;
   organizations: AdoOrg[];
   scope: "none" | "local" | "global";
+  resolvedServerUrl?: string;
 }> {
-  const me = await checkPatDirect(pat);
+  const runtime = getAdoRuntimeContext(serverUrl);
+  const discoveredOnPremCollection =
+    runtime.deploymentTarget === "onprem" ? await discoverOnPremCollection(runtime.serverUrl, pat) : null;
+  const onPremCollectionName = discoveredOnPremCollection?.collectionName || extractOnPremCollectionName(serverUrl);
+  const me = await checkPatDirect(pat, serverUrl, onPremCollectionName);
+  if (runtime.deploymentTarget === "onprem") {
+    return {
+      displayName: me.displayName || "Utilisateur",
+      memberId: me.id || "",
+      organizations: onPremCollectionName ? [{ name: onPremCollectionName }] : [],
+      scope: "local",
+      resolvedServerUrl: discoveredOnPremCollection?.resolvedServerUrl,
+    };
+  }
   if (me.restrictedProfile) {
     return {
       displayName: me.displayName || "Utilisateur",
@@ -177,20 +343,27 @@ export async function resolvePatOrganizationScopeDirect(pat: string): Promise<{
   };
 }
 
-export async function listProjectsDirect(org: string, pat: string): Promise<AdoProject[]> {
+export async function listProjectsDirect(org: string, pat: string, serverUrl?: string): Promise<AdoProject[]> {
+  const runtime = getAdoRuntimeContext(serverUrl, org);
+  const api = getApiVersionQuery(runtime);
   const context: AdoErrorContext = {
     operation: "chargement des projets",
     org,
     requiredScopes: ["Project and Team (Read)"],
   };
-  const r = await adoFetch(`${ADO}/${org}/_apis/projects?${API}`, { headers: adoHeaders(pat) }, context);
+  if (!runtime.collectionUrl) {
+    throw new Error("Collection Azure DevOps Server manquante. Saisissez-la pour continuer.");
+  }
+  const r = await adoFetch(`${runtime.collectionUrl}/_apis/projects?${api}`, { headers: adoHeaders(pat) }, context);
   if (!r.ok) throw toAdoHttpError(r, context);
   const data = await r.json();
   return data.value ?? [];
 }
 
-export async function listTeamsDirect(org: string, project: string, pat: string): Promise<AdoTeam[]> {
-  const projects = await listProjectsDirect(org, pat);
+export async function listTeamsDirect(org: string, project: string, pat: string, serverUrl?: string): Promise<AdoTeam[]> {
+  const runtime = getAdoRuntimeContext(serverUrl, org);
+  const api = getApiVersionQuery(runtime);
+  const projects = await listProjectsDirect(org, pat, serverUrl);
   const proj = projects.find((p) => p.name === project);
   if (!proj) throw new Error(`Projet "${project}" introuvable.`);
 
@@ -200,7 +373,11 @@ export async function listTeamsDirect(org: string, project: string, pat: string)
     project,
     requiredScopes: ["Project and Team (Read)"],
   };
-  const r = await adoFetch(`${ADO}/${org}/_apis/projects/${proj.id}/teams?${API}`, { headers: adoHeaders(pat) }, context);
+  const r = await adoFetch(
+    `${runtime.collectionUrl}/_apis/projects/${proj.id}/teams?${api}`,
+    { headers: adoHeaders(pat) },
+    context,
+  );
   if (!r.ok) throw toAdoHttpError(r, context);
   const data = await r.json();
   return data.value ?? [];
@@ -211,14 +388,21 @@ export async function getTeamOptionsDirect(
   project: string,
   _team: string,
   pat: string,
+  serverUrl?: string,
 ): Promise<{ workItemTypes: string[]; statesByType: Record<string, string[]> }> {
+  const runtime = getAdoRuntimeContext(serverUrl, org);
+  const api = getApiVersionQuery(runtime);
   const context: AdoErrorContext = {
     operation: "chargement des types de tickets",
     org,
     project,
     requiredScopes: ["Work Items (Read)"],
   };
-  const typesResp = await adoFetch(`${ADO}/${org}/${project}/_apis/wit/workitemtypes?${API}`, { headers: adoHeaders(pat) }, context);
+  const typesResp = await adoFetch(
+    `${runtime.collectionUrl}/${encodeURIComponent(project)}/_apis/wit/workitemtypes?${api}`,
+    { headers: adoHeaders(pat) },
+    context,
+  );
   if (!typesResp.ok) throw toAdoHttpError(typesResp, context);
 
   const typesData = await typesResp.json();
@@ -228,7 +412,7 @@ export async function getTeamOptionsDirect(
   await Promise.all(
     witTypes.map(async (type) => {
       const encoded = encodeURIComponent(type);
-      const r = await adoFetch(`${ADO}/${org}/${project}/_apis/wit/workitemtypes/${encoded}/states?${API}`, {
+      const r = await adoFetch(`${runtime.collectionUrl}/${encodeURIComponent(project)}/_apis/wit/workitemtypes/${encoded}/states?${api}`, {
         headers: adoHeaders(pat),
       }, {
         operation: `chargement des etats pour le type "${type}"`,
@@ -254,8 +438,11 @@ export async function getWeeklyThroughputDirect(
   endDate: string,
   doneStates: string[],
   workItemTypes: string[],
+  serverUrl?: string,
 ): Promise<WeeklyThroughputResponse> {
-  const teamAreaFilter = await getTeamAreaPathFilterClause(org, project, team, pat);
+  const runtime = getAdoRuntimeContext(serverUrl, org);
+  const api = getApiVersionQuery(runtime);
+  const teamAreaFilter = await getTeamAreaPathFilterClause(org, project, team, pat, serverUrl);
   const typeFilter = workItemTypes.length
     ? `AND [System.WorkItemType] IN (${workItemTypes.map((t) => `'${escWiql(t)}'`).join(",")})`
     : "";
@@ -265,11 +452,10 @@ export async function getWeeklyThroughputDirect(
 
   const wiql = {
     query: `
-      SELECT [System.Id], [Microsoft.VSTS.Common.ClosedDate]
+      SELECT [System.Id], [Microsoft.VSTS.Common.ClosedDate], [Microsoft.VSTS.Common.ResolvedDate]
       FROM WorkItems
       WHERE [System.TeamProject] = '${escWiql(project)}'
-      AND [Microsoft.VSTS.Common.ClosedDate] >= '${startDate}'
-      AND [Microsoft.VSTS.Common.ClosedDate] <= '${endDate}'
+      ${buildCompletionDateFilter(startDate, endDate)}
       ${teamAreaFilter}
       ${typeFilter}
       ${stateFilter}
@@ -284,7 +470,7 @@ export async function getWeeklyThroughputDirect(
     team,
     requiredScopes: ["Work Items (Read)"],
   };
-  const wiqlResp = await adoFetch(`${ADO}/${org}/${project}/_apis/wit/wiql?${API}`, {
+  const wiqlResp = await adoFetch(`${runtime.collectionUrl}/${encodeURIComponent(project)}/_apis/wit/wiql?${api}`, {
     method: "POST",
     headers: adoHeaders(pat),
     body: JSON.stringify(wiql),
@@ -299,7 +485,7 @@ export async function getWeeklyThroughputDirect(
   const batches: number[][] = [];
   for (let i = 0; i < ids.length; i += 200) batches.push(ids.slice(i, i + 200));
 
-  const allItems: { closedDate: string }[] = [];
+  const allItems: { completionDate: string }[] = [];
   const batchFailures: { status: number | null; statusText: string }[] = [];
   await Promise.all(
     batches.map(async (batch) => {
@@ -314,7 +500,7 @@ export async function getWeeklyThroughputDirect(
       let r: Response;
       try {
         r = await adoFetch(
-          `${ADO}/${org}/${project}/_apis/wit/workitems?ids=${batch.join(",")}&fields=Microsoft.VSTS.Common.ClosedDate&${API}`,
+          `${runtime.collectionUrl}/${encodeURIComponent(project)}/_apis/wit/workitems?ids=${batch.join(",")}&fields=Microsoft.VSTS.Common.ClosedDate,Microsoft.VSTS.Common.ResolvedDate&${api}`,
           { headers: adoHeaders(pat) },
           itemContext,
         );
@@ -330,15 +516,17 @@ export async function getWeeklyThroughputDirect(
 
       const d = await r.json();
       (d.value ?? []).forEach((item: { fields?: Record<string, string> }) => {
-        const date = item.fields?.["Microsoft.VSTS.Common.ClosedDate"];
-        if (date) allItems.push({ closedDate: date });
+        const completionDate =
+          item.fields?.["Microsoft.VSTS.Common.ClosedDate"] ||
+          item.fields?.["Microsoft.VSTS.Common.ResolvedDate"];
+        if (completionDate) allItems.push({ completionDate });
       });
     }),
   );
 
   const weekMap = new Map<string, number>();
-  allItems.forEach(({ closedDate }) => {
-    const d = new Date(closedDate);
+  allItems.forEach(({ completionDate }) => {
+    const d = new Date(completionDate);
     const monday = new Date(d);
     monday.setDate(d.getDate() - ((d.getDay() + 6) % 7));
     const key = formatDateLocal(monday);

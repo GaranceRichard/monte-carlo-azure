@@ -44,7 +44,7 @@ export function useSimulationPrefs(): SimulationPrefsState {
   const [startDate, setStartDate] = useState(() => prefs.startDate || nWeeksAgo(52));
   const [endDate, setEndDate] = useState(() => prefs.endDate || today());
   const [simulationMode, setSimulationMode] = useState<ForecastMode>(() => prefs.simulationMode || "backlog_to_weeks");
-  const [includeZeroWeeks, setIncludeZeroWeeks] = useState(() => Boolean(prefs.includeZeroWeeks));
+  const [includeZeroWeeks, setIncludeZeroWeeks] = useState(() => prefs.includeZeroWeeks ?? true);
   const [capacityPercent, setCapacityPercent] = useState<number | string>(prefs.capacityPercent ?? 100);
   const [reducedCapacityWeeks, setReducedCapacityWeeks] = useState<number | string>(prefs.reducedCapacityWeeks ?? 0);
   const [backlogSize, setBacklogSize] = useState<number | string>(prefs.backlogSize ?? 120);

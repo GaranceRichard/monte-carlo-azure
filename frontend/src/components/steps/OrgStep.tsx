@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import type { AdoDeploymentTarget } from "../../adoPlatform";
 import type { NamedEntity } from "../../types";
 import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
 
@@ -8,6 +9,7 @@ type OrgStepProps = {
   orgs: NamedEntity[];
   orgHint: string;
   selectedOrg: string;
+  deploymentTarget: AdoDeploymentTarget;
   setSelectedOrg: (value: string) => void;
   loading: boolean;
   onContinue: () => void | Promise<boolean>;
@@ -19,6 +21,7 @@ export default function OrgStep({
   orgs,
   orgHint,
   selectedOrg,
+  deploymentTarget,
   setSelectedOrg,
   loading,
   onContinue,
@@ -26,10 +29,16 @@ export default function OrgStep({
   const welcomeTitle = userName && userName !== "Utilisateur" ? `Bienvenue ${userName}` : "Bienvenue";
   const manualOrgInputRef = useRef<HTMLInputElement | null>(null);
   const orgSelectRef = useRef<HTMLSelectElement | null>(null);
+  const entityLabel = deploymentTarget === "onprem" ? "collection" : "organisation";
+  const entityLabelTitle = deploymentTarget === "onprem" ? "Collection Azure DevOps Server" : "Organisation Azure DevOps";
+  const entityPlaceholder = deploymentTarget === "onprem" ? "Nom de la collection" : "Nom de l'organisation";
+  const buttonLabel = deploymentTarget === "onprem" ? "Choisir cette collection" : "Choisir cette organisation";
+  const introText = deploymentTarget === "onprem"
+    ? "Sélectionnez la collection Azure DevOps Server à utiliser."
+    : "Sélectionnez l'organisation Azure DevOps à utiliser.";
 
   useEffect(() => {
     const focusTarget = orgs.length ? orgSelectRef.current : manualOrgInputRef.current;
-    // Delay focus to next paint to avoid losing focus during animated step transitions.
     const rafId = window.requestAnimationFrame(() => {
       focusTarget?.focus();
       if (!orgs.length && err) {
@@ -42,7 +51,7 @@ export default function OrgStep({
   return (
     <>
       <h2 className="flow-title">{welcomeTitle}</h2>
-      <p className="flow-text">{"S\u00E9lectionnez l'organisation Azure DevOps \u00E0 utiliser."}</p>
+      <p className="flow-text">{introText}</p>
       {err && (
         <div className="ui-alert ui-alert--danger">
           <b>Erreur :</b> {err}
@@ -55,7 +64,7 @@ export default function OrgStep({
       )}
       {orgs.length > 0 ? (
         <>
-          <label className="flow-label">Organisations accessibles</label>
+          <label className="flow-label">{deploymentTarget === "onprem" ? "Collections accessibles" : "Organisations accessibles"}</label>
           <select
             ref={orgSelectRef}
             value={selectedOrg}
@@ -79,7 +88,7 @@ export default function OrgStep({
         </>
       ) : (
         <>
-          <label className="flow-label">Organisation Azure DevOps</label>
+          <label className="flow-label">{entityLabelTitle}</label>
           <input
             ref={manualOrgInputRef}
             type="text"
@@ -91,7 +100,7 @@ export default function OrgStep({
                 void onContinue();
               }
             }}
-            placeholder="Nom de l'organisation"
+            placeholder={entityPlaceholder}
             className="flow-input"
           />
         </>
@@ -101,7 +110,7 @@ export default function OrgStep({
         disabled={loading || !selectedOrg.trim()}
         className="ui-primary-btn"
       >
-        {loading ? "Chargement..." : "Choisir cette organisation"}
+        {loading ? "Chargement..." : buttonLabel}
       </button>
     </>
   );

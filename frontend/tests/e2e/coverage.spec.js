@@ -977,4 +977,52 @@ test.describe("e2e istanbul coverage", () => {
 
     await expect(page.locator("body")).toBeVisible();
   });
+
+  test("coverage: branches ado platform", async ({ page }) => {
+    await page.goto("/");
+
+    const results = await page.evaluate(async () => {
+      const adoPlatform = await import("/src/adoPlatform.ts");
+
+      return {
+        cloudMissing: adoPlatform.getAdoDeploymentTarget(undefined),
+        cloudHost: adoPlatform.getAdoDeploymentTarget("https://dev.azure.com/demo"),
+        cloudVssps: adoPlatform.isOnPremAdoServer("https://app.vssps.visualstudio.com"),
+        cloudVisualStudio: adoPlatform.isOnPremAdoServer("https://contoso.visualstudio.com"),
+        onPremHost: adoPlatform.getAdoDeploymentTarget("https://serveur.local/tfs"),
+        normalized: adoPlatform.normalizeAdoServerUrl("  https://serveur.local/tfs/CollectionA///  "),
+        emptyCollection: adoPlatform.extractOnPremCollectionName("https://serveur.local/tfs"),
+        apiCollection: adoPlatform.extractOnPremCollectionName("https://serveur.local/tfs/_apis"),
+        encodedCollection: adoPlatform.extractOnPremCollectionName("https://serveur.local/tfs/Collection%20A"),
+        inferredCollectionUrl: adoPlatform.buildOnPremCollectionUrl("https://serveur.local/tfs/CollectionA", ""),
+        explicitCollectionUrl: adoPlatform.buildOnPremCollectionUrl("https://serveur.local/tfs", "Collection A"),
+        deepCollectionUrl: adoPlatform.buildOnPremCollectionUrl("https://devops700.itp.extra/700/TN", "700"),
+        cloudCollectionUrl: adoPlatform.buildOnPremCollectionUrl("https://dev.azure.com/demo", "ignored"),
+        emptyCandidates: adoPlatform.listOnPremCollectionCandidates("https://serveur.local"),
+        deepCandidates: adoPlatform.listOnPremCollectionCandidates("https://serveur/tfs/Collection%20A/projet"),
+        invalidCandidates: adoPlatform.listOnPremCollectionCandidates("not-a-url"),
+      };
+    });
+
+    expect(results.cloudMissing).toBe("cloud");
+    expect(results.cloudHost).toBe("cloud");
+    expect(results.cloudVssps).toBe(false);
+    expect(results.cloudVisualStudio).toBe(false);
+    expect(results.onPremHost).toBe("onprem");
+    expect(results.normalized).toBe("https://serveur.local/tfs/CollectionA");
+    expect(results.emptyCollection).toBe("");
+    expect(results.apiCollection).toBe("");
+    expect(results.encodedCollection).toBe("Collection A");
+    expect(results.inferredCollectionUrl).toBe("https://serveur.local/tfs/CollectionA");
+    expect(results.explicitCollectionUrl).toBe("https://serveur.local/tfs/Collection%20A");
+    expect(results.deepCollectionUrl).toBe("https://devops700.itp.extra/700");
+    expect(results.cloudCollectionUrl).toBe("");
+    expect(results.emptyCandidates).toEqual([]);
+    expect(results.deepCandidates).toEqual([
+      { collectionName: "tfs", collectionUrl: "https://serveur/tfs" },
+      { collectionName: "Collection A", collectionUrl: "https://serveur/tfs/Collection%20A" },
+      { collectionName: "projet", collectionUrl: "https://serveur/tfs/Collection%20A/projet" },
+    ]);
+    expect(results.invalidCandidates).toEqual([]);
+  });
 });

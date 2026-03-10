@@ -3,12 +3,22 @@ import { useEffect, useRef } from "react";
 type PatStepProps = {
   err: string;
   patInput: string;
+  serverUrlInput: string;
   setPatInput: (value: string) => void;
+  setServerUrlInput: (value: string) => void;
   loading: boolean;
   onSubmit: () => void | Promise<void>;
 };
 
-export default function PatStep({ err, patInput, setPatInput, loading, onSubmit }: PatStepProps) {
+export default function PatStep({
+  err,
+  patInput,
+  serverUrlInput,
+  setPatInput,
+  setServerUrlInput,
+  loading,
+  onSubmit,
+}: PatStepProps) {
   const patInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -22,13 +32,25 @@ export default function PatStep({ err, patInput, setPatInput, loading, onSubmit 
     <>
       <h2 className="flow-title">Connexion Azure DevOps</h2>
       <p className="flow-text">
-        Votre PAT Azure DevOps est utilisé uniquement dans votre navigateur pour interroger directement Microsoft. Il ne transite jamais par nos serveurs. Nous ne recevons que des chiffres anonymes (throughput hebdomadaire) pour calculer la simulation.
+        Votre PAT Azure DevOps reste dans votre navigateur. Pour Azure DevOps Cloud, laissez l&apos;URL serveur vide.
+        Pour Azure DevOps Server on-premise, saisissez l&apos;URL du serveur ou de la collection avant de continuer.
       </p>
       {err && (
         <div className="ui-alert ui-alert--danger">
           <b>Erreur :</b> {err}
         </div>
       )}
+      <label className="flow-label">URL Azure (obligatoire si on-premise avec serveur et collection)</label>
+      <input
+        type="url"
+        value={serverUrlInput}
+        onChange={(e) => setServerUrlInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !loading) void onSubmit();
+        }}
+        placeholder="https://ado.monentreprise.local/tfs/DefaultCollection"
+        className="flow-input"
+      />
       <label className="flow-label">PAT</label>
       <input
         ref={patInputRef}

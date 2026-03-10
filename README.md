@@ -27,6 +27,7 @@ Outil de prevision base sur une simulation Monte Carlo. L'application aide a tra
 ## Fonctionnalites
 
 - connexion Azure DevOps avec PAT cote navigateur
+- support Azure DevOps Cloud et Azure DevOps Server / TFS on-premise
 - selection organisation -> projet -> equipe
 - mode `Portefeuille` multi-equipes
 - simulation Monte Carlo cote backend (`POST /simulate`)
@@ -104,6 +105,18 @@ npm run dev
 ```
 
 UI: `http://localhost:5173`
+
+Le frontend detecte automatiquement le mode Azure DevOps a partir de l'URL saisie :
+
+- URL vide ou hote `dev.azure.com` / `*.visualstudio.com` => Cloud
+- tout autre hote => on-prem
+
+En on-prem, l'URL attendue est l'URL serveur + collection, par exemple :
+
+- `https://ado.monentreprise.local/tfs/DefaultCollection`
+- `https://devops700.itp.extra/700`
+
+Le detail du flux Cloud / on-prem est documente dans [`frontend/README.md`](frontend/README.md).
 
 ### Mode manuel en 5 terminaux
 

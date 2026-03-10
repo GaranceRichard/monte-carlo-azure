@@ -29,6 +29,7 @@ export default function App() {
     selectedProject: onboardingState.selectedProject,
     selectedTeam: onboardingState.selectedTeam,
     pat: onboardingState.sessionPat,
+    serverUrl: onboardingState.sessionServerUrl,
   });
 
   const [theme, setTheme] = useState<ThemeMode>(() => {
@@ -92,7 +93,7 @@ export default function App() {
   const onboardingOrder = ["pat", "org", "projects", "teams"] as const;
   const onboardingLabels: Record<(typeof onboardingOrder)[number], string> = {
     pat: "Connexion",
-    org: "Organisation",
+    org: onboardingState.deploymentTarget === "onprem" ? "Collection" : "Organisation",
     projects: "Projet",
     teams: "\u00C9quipe",
   };
@@ -157,7 +158,9 @@ export default function App() {
           <PatStep
             err={onboardingState.err}
             patInput={onboardingState.patInput}
+            serverUrlInput={onboardingState.serverUrlInput}
             setPatInput={onboardingActions.setPatInput}
+            setServerUrlInput={onboardingActions.setServerUrlInput}
             loading={onboardingState.loading}
             onSubmit={onboardingActions.submitPat}
           />
@@ -172,6 +175,7 @@ export default function App() {
             orgs={onboardingState.orgs}
             orgHint={onboardingState.orgHint}
             selectedOrg={onboardingState.selectedOrg}
+            deploymentTarget={onboardingState.deploymentTarget}
             setSelectedOrg={onboardingActions.setSelectedOrg}
             loading={onboardingState.loading}
             onContinue={onboardingActions.goToProjects}
@@ -216,6 +220,7 @@ export default function App() {
               selectedProject={onboardingState.selectedProject}
               teams={onboardingState.teams}
               pat={onboardingState.sessionPat}
+              serverUrl={onboardingState.sessionServerUrl}
             />
           </Suspense>
         </div>

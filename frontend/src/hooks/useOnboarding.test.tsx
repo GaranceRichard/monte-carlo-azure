@@ -14,7 +14,14 @@ describe("useOnboarding", () => {
     vi.clearAllMocks();
   });
 
-  async function setPatAndSubmit(result: { current: ReturnType<typeof useOnboarding> }, value = "abcdefghijklmnopqrstuvwxyz123456"): Promise<void> {
+  async function setPatAndSubmit(
+    result: { current: ReturnType<typeof useOnboarding> },
+    value = "abcdefghijklmnopqrstuvwxyz123456",
+    serverUrl = "",
+  ): Promise<void> {
+    await act(async () => {
+      result.current.actions.setServerUrlInput(serverUrl);
+    });
     await act(async () => {
       result.current.actions.setPatInput(value);
     });
@@ -89,6 +96,95 @@ describe("useOnboarding", () => {
     expect(result.current.state.orgs).toEqual([]);
     expect(result.current.state.selectedOrg).toBe("");
     expect(result.current.state.orgHint).toContain("PAT local");
+  });
+
+  it("supports on-prem PAT onboarding by preloading the collection from the server URL", async () => {
+    vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
+      displayName: "User",
+      memberId: "id-1",
+      organizations: [{ name: "DefaultCollection" }],
+      scope: "local",
+      resolvedServerUrl: "https://ado.local/tfs/DefaultCollection",
+    });
+
+    const { result } = renderHook(() => useOnboarding());
+
+    await setPatAndSubmit(result, "abcdefghijklmnopqrstuvwxyz123456", "https://ado.local/tfs/DefaultCollection");
+
+    expect(result.current.state.step).toBe("org");
+    expect(result.current.state.deploymentTarget).toBe("onprem");
+    expect(result.current.state.sessionServerUrl).toBe("https://ado.local/tfs/DefaultCollection");
+    expect(result.current.state.selectedOrg).toBe("DefaultCollection");
+    expect(result.current.state.orgHint).toContain("Serveur Azure DevOps Server");
+  });
+
+  it("asks for a manual collection name when on-prem server url has no collection", async () => {
+    vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
+      displayName: "User",
+      memberId: "id-1",
+      organizations: [],
+      scope: "local",
+    });
+
+    const { result } = renderHook(() => useOnboarding());
+
+    await setPatAndSubmit(result, "abcdefghijklmnopqrstuvwxyz123456", "https://ado.local/tfs");
+
+    expect(result.current.state.step).toBe("org");
+    expect(result.current.state.deploymentTarget).toBe("onprem");
+    expect(result.current.state.orgs).toEqual([]);
+    expect(result.current.state.selectedOrg).toBe("");
+    expect(result.current.state.orgHint).toContain("saisissez le nom de la collection manuellement");
+  });
+
+  it("uses the resolved on-prem collection instead of the last url segment", async () => {
+    vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
+      displayName: "User",
+      memberId: "id-1",
+      organizations: [{ name: "700" }],
+      scope: "local",
+      resolvedServerUrl: "https://devops700.itp.extra/700",
+    });
+
+    const { result } = renderHook(() => useOnboarding());
+
+    await setPatAndSubmit(result, "abcdefghijklmnopqrstuvwxyz123456", "https://devops700.itp.extra/700/TN");
+
+    expect(result.current.state.step).toBe("org");
+    expect(result.current.state.deploymentTarget).toBe("onprem");
+    expect(result.current.state.sessionServerUrl).toBe("https://devops700.itp.extra/700");
+    expect(result.current.state.orgs).toEqual([{ name: "700" }]);
+    expect(result.current.state.selectedOrg).toBe("700");
+  });
+
+  it("keeps the user on PAT step when on-prem PAT verification cannot reach the server", async () => {
+    vi.mocked(resolvePatOrganizationScopeDirect).mockRejectedValue(
+      new Error('Impossible de joindre Azure DevOps pendant "verification du PAT". Verifiez votre connexion puis reessayez.'),
+    );
+
+    const { result } = renderHook(() => useOnboarding());
+
+    await setPatAndSubmit(result, "abcdefghijklmnopqrstuvwxyz123456", "https://ado.local/tfs/DefaultCollection");
+
+    expect(result.current.state.step).toBe("pat");
+    expect(result.current.state.sessionPat).toBe("");
+    expect(result.current.state.sessionServerUrl).toBe("");
+    expect(result.current.state.deploymentTarget).toBe("cloud");
+    expect(result.current.state.err).toContain("verification du PAT");
+  });
+
+  it("surfaces non-Error on-prem PAT failures and resets the session", async () => {
+    vi.mocked(resolvePatOrganizationScopeDirect).mockRejectedValue("serveur on-prem indisponible");
+
+    const { result } = renderHook(() => useOnboarding());
+
+    await setPatAndSubmit(result, "abcdefghijklmnopqrstuvwxyz123456", "https://ado.local/tfs/DefaultCollection");
+
+    expect(result.current.state.step).toBe("pat");
+    expect(result.current.state.sessionPat).toBe("");
+    expect(result.current.state.sessionServerUrl).toBe("");
+    expect(result.current.state.deploymentTarget).toBe("cloud");
+    expect(result.current.state.err).toContain("serveur on-prem indisponible");
   });
 
   it("uses fallback hint when scope discovery fails", async () => {
@@ -192,6 +288,31 @@ describe("useOnboarding", () => {
     expect(result.current.state.selectedProject).toBe("Projet A");
   });
 
+  it("sorts projects alphabetically before displaying them", async () => {
+    vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
+      displayName: "User",
+      memberId: "id-1",
+      organizations: [{ name: "org-a" }],
+      scope: "global",
+    });
+    vi.mocked(listProjectsDirect).mockResolvedValue([
+      { id: "p2", name: "Zulu" },
+      { id: "p1", name: "Alpha" },
+    ]);
+
+    const { result } = renderHook(() => useOnboarding());
+
+    await setPatAndSubmit(result);
+
+    await act(async () => {
+      const moved = await result.current.actions.goToProjects();
+      expect(moved).toBe(true);
+    });
+
+    expect(result.current.state.projects.map((project) => project.name)).toEqual(["Alpha", "Zulu"]);
+    expect(result.current.state.selectedProject).toBe("Alpha");
+  });
+
   it("falls back to default labels when API entities contain empty names", async () => {
     vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
       displayName: "",
@@ -250,6 +371,35 @@ describe("useOnboarding", () => {
     expect(result.current.state.step).toBe("pat");
   });
 
+  it("requires a collection when going to projects in on-prem mode", async () => {
+    const { result } = renderHook(() => useOnboarding());
+
+    await act(async () => {
+      result.current.actions.setServerUrlInput("https://ado.local/tfs/DefaultCollection");
+      result.current.actions.setPatInput("abcdefghijklmnopqrstuvwxyz123456");
+    });
+    vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
+      displayName: "User",
+      memberId: "id-1",
+      organizations: [],
+      scope: "local",
+    });
+    await act(async () => {
+      await result.current.actions.submitPat();
+    });
+
+    await act(async () => {
+      result.current.actions.setSelectedOrg("");
+    });
+    await act(async () => {
+      const moved = await result.current.actions.goToProjects();
+      expect(moved).toBe(false);
+    });
+
+    expect(result.current.state.deploymentTarget).toBe("onprem");
+    expect(result.current.state.err).toContain("collection");
+  });
+
   it("goes to projects with an empty list and keeps selectedProject blank", async () => {
     vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
       displayName: "User",
@@ -300,6 +450,32 @@ describe("useOnboarding", () => {
     expect(result.current.state.step).toBe("teams");
     expect(result.current.state.teams).toHaveLength(2);
     expect(result.current.state.selectedTeam).toBe("Alpha-Core");
+  });
+
+  it("goes to teams with an empty list and keeps selectedTeam blank", async () => {
+    vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
+      displayName: "User",
+      memberId: "id-1",
+      organizations: [{ name: "org-a" }],
+      scope: "global",
+    });
+    vi.mocked(listProjectsDirect).mockResolvedValue([{ id: "p1", name: "Projet A" }]);
+    vi.mocked(listTeamsDirect).mockResolvedValue([]);
+
+    const { result } = renderHook(() => useOnboarding());
+
+    await setPatAndSubmit(result);
+    await act(async () => {
+      await result.current.actions.goToProjects();
+    });
+    await act(async () => {
+      const moved = await result.current.actions.goToTeams();
+      expect(moved).toBe(true);
+    });
+
+    expect(result.current.state.step).toBe("teams");
+    expect(result.current.state.teams).toEqual([]);
+    expect(result.current.state.selectedTeam).toBe("");
   });
 
   it("preselects the first alphabetic team shown in team step", async () => {
@@ -510,12 +686,39 @@ describe("useOnboarding", () => {
 
     expect(result.current.state.step).toBe("pat");
     expect(result.current.state.patInput).toBe("");
+    expect(result.current.state.serverUrlInput).toBe("");
+    expect(result.current.state.sessionPat).toBe("");
+    expect(result.current.state.sessionServerUrl).toBe("");
+    expect(result.current.state.deploymentTarget).toBe("cloud");
+    expect(result.current.state.userName).toBe("Utilisateur");
+    expect(result.current.state.orgHint).toBe("");
+    expect(result.current.state.loading).toBe(false);
     expect(result.current.state.selectedOrg).toBe("");
     expect(result.current.state.selectedProject).toBe("");
     expect(result.current.state.selectedTeam).toBe("");
     expect(result.current.state.orgs).toEqual([]);
     expect(result.current.state.projects).toEqual([]);
     expect(result.current.state.teams).toEqual([]);
+  });
+
+  it("uses the on-prem back label for the projects step", async () => {
+    vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
+      displayName: "User",
+      memberId: "id-1",
+      organizations: [{ name: "700" }],
+      scope: "local",
+      resolvedServerUrl: "https://devops700.itp.extra/700",
+    });
+
+    const { result } = renderHook(() => useOnboarding());
+
+    await setPatAndSubmit(result, "abcdefghijklmnopqrstuvwxyz123456", "https://devops700.itp.extra/700/TN");
+    await act(async () => {
+      const moved = await result.current.actions.goToProjects();
+      expect(moved).toBe(true);
+    });
+
+    expect(result.current.state.backLabel).toBe("Changer collection");
   });
 });
 

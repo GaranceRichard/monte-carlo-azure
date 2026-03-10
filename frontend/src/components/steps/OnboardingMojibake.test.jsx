@@ -5,7 +5,7 @@ import TeamStep from "./TeamStep";
 
 function expectNoMojibake(container) {
   expect(container.textContent).not.toMatch(/\\u00[0-9A-Fa-f]{2}/);
-  expect(container.textContent).not.toMatch(/[Ãâ][^\s]*/);
+  expect(container.textContent).not.toMatch(/[ÃƒÃ¢][^\s]*/);
 }
 
 describe("Onboarding mojibake guard", () => {
@@ -17,6 +17,7 @@ describe("Onboarding mojibake guard", () => {
         orgs={[{ id: "1", name: "messqc" }]}
         orgHint={"PAT global détecté: sélectionnez une organisation accessible."}
         selectedOrg="messqc"
+        deploymentTarget="cloud"
         setSelectedOrg={vi.fn()}
         loading={false}
         onContinue={vi.fn()}
@@ -24,9 +25,7 @@ describe("Onboarding mojibake guard", () => {
     );
 
     expect(screen.getByText("Sélectionnez l'organisation Azure DevOps à utiliser.")).toBeInTheDocument();
-    expect(
-      screen.getByText("PAT global détecté: sélectionnez une organisation accessible."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("PAT global détecté: sélectionnez une organisation accessible.")).toBeInTheDocument();
     expect(screen.getByText("Organisations accessibles")).toBeInTheDocument();
     expectNoMojibake(container);
 

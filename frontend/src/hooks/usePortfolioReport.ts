@@ -41,6 +41,7 @@ type UsePortfolioReportParams = {
   selectedOrg: string;
   selectedProject: string;
   pat: string;
+  serverUrl: string;
   startDate: string;
   endDate: string;
   includeZeroWeeks: boolean;
@@ -138,6 +139,7 @@ export function usePortfolioReport({
   selectedOrg,
   selectedProject,
   pat,
+  serverUrl,
   startDate,
   endDate,
   includeZeroWeeks,
@@ -178,6 +180,7 @@ export function usePortfolioReport({
               selectedProject,
               selectedTeam: cfg.teamName,
               pat,
+              serverUrl,
               startDate,
               endDate,
               doneStates: cfg.doneStates,

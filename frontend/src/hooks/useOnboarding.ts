@@ -1,11 +1,24 @@
-﻿import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { listProjectsDirect, listTeamsDirect, resolvePatOrganizationScopeDirect } from "../adoClient";
+import {
+  extractOnPremCollectionName,
+  getAdoDeploymentTarget,
+  normalizeAdoServerUrl,
+  type AdoDeploymentTarget,
+} from "../adoPlatform";
 import type { AppStep, NamedEntity } from "../types";
 import { sortTeams } from "../utils/teamSort";
 
+function sortNamedEntities(items: NamedEntity[]): NamedEntity[] {
+  return [...items].sort((a, b) => (a.name || "").localeCompare(b.name || "", "fr", { sensitivity: "base" }));
+}
+
 type OnboardingState = {
   patInput: string;
+  serverUrlInput: string;
   sessionPat: string;
+  sessionServerUrl: string;
+  deploymentTarget: AdoDeploymentTarget;
   step: AppStep;
   loading: boolean;
   err: string;
@@ -22,6 +35,7 @@ type OnboardingState = {
 
 type OnboardingActions = {
   setPatInput: (value: string) => void;
+  setServerUrlInput: (value: string) => void;
   setSelectedOrg: (value: string) => void;
   setSelectedProject: (value: string) => void;
   setSelectedTeam: (value: string) => void;
@@ -38,7 +52,10 @@ type OnboardingActions = {
 
 export function useOnboarding(): { state: OnboardingState; actions: OnboardingActions } {
   const [patInput, setPatInput] = useState("");
+  const [serverUrlInput, setServerUrlInput] = useState("");
   const [sessionPat, setSessionPat] = useState("");
+  const [sessionServerUrl, setSessionServerUrl] = useState("");
+  const [deploymentTarget, setDeploymentTarget] = useState<AdoDeploymentTarget>("cloud");
   const [step, setStep] = useState<AppStep>("pat");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
@@ -60,6 +77,8 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   async function submitPat(): Promise<void> {
     if (submitInFlightRef.current) return;
     const clean = patInput.trim();
+    const normalizedServerUrl = normalizeAdoServerUrl(serverUrlInput);
+    const nextDeploymentTarget = getAdoDeploymentTarget(normalizedServerUrl);
     if (!clean) {
       failPatValidation("PAT requis pour continuer.");
       return;
@@ -78,23 +97,58 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     submitInFlightRef.current = true;
     try {
       setSessionPat(clean);
-      const resolved = await resolvePatOrganizationScopeDirect(clean).catch(() => null);
+      setSessionServerUrl(normalizedServerUrl);
+      setDeploymentTarget(nextDeploymentTarget);
+
+      let resolved: Awaited<ReturnType<typeof resolvePatOrganizationScopeDirect>> | null = null;
+      try {
+        resolved = await resolvePatOrganizationScopeDirect(clean, normalizedServerUrl);
+      } catch (error: unknown) {
+        if (nextDeploymentTarget === "onprem") {
+          setSessionPat("");
+          setSessionServerUrl("");
+          setDeploymentTarget("cloud");
+          setErr(error instanceof Error ? error.message : String(error));
+          return;
+        }
+        resolved = null;
+      }
       if (resolved) {
+        if (resolved.resolvedServerUrl) {
+          setSessionServerUrl(resolved.resolvedServerUrl);
+        }
         setUserName(resolved.displayName || "Utilisateur");
-        if (resolved.scope === "global" && resolved.organizations.length > 0) {
+        if (resolved.organizations.length > 0) {
           setOrgs(resolved.organizations);
           setSelectedOrg(resolved.organizations[0].name || "");
-          setOrgHint("PAT global detecte: selectionnez une organisation accessible.");
+          setOrgHint(
+            nextDeploymentTarget === "onprem"
+              ? "Serveur Azure DevOps Server detecte: verifiez la collection puis continuez."
+              : "PAT global detecte: selectionnez une organisation accessible.",
+          );
         } else {
-          setOrgs([]);
-          setSelectedOrg("");
-          setOrgHint("PAT local: saisissez votre organisation manuellement.");
+          const onPremCollection = nextDeploymentTarget === "onprem" ? extractOnPremCollectionName(normalizedServerUrl) : "";
+          setOrgs(nextDeploymentTarget === "onprem" && onPremCollection ? [{ name: onPremCollection }] : []);
+          setSelectedOrg(onPremCollection);
+          setOrgHint(
+            nextDeploymentTarget === "onprem"
+              ? (
+                onPremCollection
+                  ? "Serveur Azure DevOps Server detecte: verifiez la collection puis continuez."
+                  : "Serveur Azure DevOps Server detecte: saisissez le nom de la collection manuellement."
+              )
+              : "PAT local: saisissez votre organisation manuellement.",
+          );
         }
       } else {
         setUserName("Utilisateur");
         setOrgs([]);
-        setSelectedOrg("");
-        setOrgHint("Verification automatique impossible. Saisissez votre organisation manuellement.");
+        setSelectedOrg(nextDeploymentTarget === "onprem" ? extractOnPremCollectionName(normalizedServerUrl) : "");
+        setOrgHint(
+          nextDeploymentTarget === "onprem"
+            ? "Verification automatique impossible. Saisissez ou confirmez la collection Azure DevOps Server."
+            : "Verification automatique impossible. Saisissez votre organisation manuellement.",
+        );
       }
       setStep("org");
     } finally {
@@ -106,7 +160,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   async function goToProjects(): Promise<boolean> {
     const org = selectedOrg.trim();
     if (!org) {
-      setErr("Selectionnez une organisation.");
+      setErr(deploymentTarget === "onprem" ? "Selectionnez une collection." : "Selectionnez une organisation.");
       return false;
     }
     if (!sessionPat) {
@@ -118,10 +172,11 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     setErr("");
     setLoading(true);
     try {
-      const list = await listProjectsDirect(org, sessionPat);
+      const list = await listProjectsDirect(org, sessionPat, sessionServerUrl);
+      const sortedList = sortNamedEntities(list);
       setSelectedOrg(org);
-      setProjects(list);
-      setSelectedProject(list.length > 0 ? (list[0].name || "") : "");
+      setProjects(sortedList);
+      setSelectedProject(sortedList.length > 0 ? (sortedList[0].name || "") : "");
       setStep("projects");
       return true;
     } catch (e: unknown) {
@@ -151,7 +206,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     setErr("");
     setLoading(true);
     try {
-      const list = await listTeamsDirect(org, project, sessionPat);
+      const list = await listTeamsDirect(org, project, sessionPat, sessionServerUrl);
       const sortedList = sortTeams(list);
       setSelectedOrg(org);
       setSelectedProject(project);
@@ -202,6 +257,9 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
 
   function disconnect(): void {
     setSessionPat("");
+    setServerUrlInput("");
+    setSessionServerUrl("");
+    setDeploymentTarget("cloud");
     setPatInput("");
     setErr("");
     setUserName("Utilisateur");
@@ -218,17 +276,20 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
 
   const backLabel = useMemo((): string => {
     if (step === "org") return "Changer PAT";
-    if (step === "projects") return "Changer ORG";
+    if (step === "projects") return deploymentTarget === "onprem" ? "Changer collection" : "Changer ORG";
     if (step === "teams") return "Changer projet";
     if (step === "portfolio") return "Changer \u00E9quipe";
     if (step === "simulation") return "Changer \u00E9quipe";
     return "";
-  }, [step]);
+  }, [deploymentTarget, step]);
 
   return {
     state: {
       patInput,
+      serverUrlInput,
       sessionPat,
+      sessionServerUrl,
+      deploymentTarget,
       step,
       loading,
       err,
@@ -244,6 +305,7 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     },
     actions: {
       setPatInput,
+      setServerUrlInput,
       setSelectedOrg,
       setSelectedProject,
       setSelectedTeam,
@@ -259,4 +321,3 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
     },
   };
 }
-

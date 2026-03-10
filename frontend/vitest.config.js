@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react";
 const vitalsCoverage = env.VITALS_FRONTEND_COVERAGE === "1";
 const standardCoverageExclude = [
   "**/*.css",
+  "src/e2e/**",
   "src/adoClient.ts",
   "src/api.ts",
   "src/date.ts",
@@ -40,7 +41,7 @@ export default defineConfig({
       reportsDirectory: vitalsCoverage ? "./coverage-vitals" : "./coverage",
       all: vitalsCoverage,
       include: vitalsCoverage ? vitalsCoverageInclude : undefined,
-      exclude: vitalsCoverage ? ["**/*.css", "src/adoClient.ts", "src/api.ts", "src/date.ts"] : standardCoverageExclude,
+      exclude: vitalsCoverage ? ["**/*.css", "src/e2e/**", "src/adoClient.ts", "src/api.ts", "src/date.ts"] : standardCoverageExclude,
       perFile: true,
       thresholds: vitalsCoverage
         ? undefined

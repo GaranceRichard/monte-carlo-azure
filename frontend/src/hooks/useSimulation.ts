@@ -70,12 +70,14 @@ export function useSimulation({
   selectedProject,
   selectedTeam,
   pat,
+  serverUrl,
 }: {
   step: AppStep;
   selectedOrg: string;
   selectedProject: string;
   selectedTeam: string;
   pat: string;
+  serverUrl: string;
 }): SimulationViewModel {
   const {
     startDate,
@@ -140,6 +142,7 @@ export function useSimulation({
     selectedProject,
     selectedTeam,
     pat,
+    serverUrl,
     quickFiltersScopeKey,
     setTypes,
     setDoneStates,
@@ -215,6 +218,7 @@ export function useSimulation({
         selectedProject,
         selectedTeam,
         pat,
+        serverUrl,
         startDate,
         endDate,
         doneStates,
@@ -251,6 +255,7 @@ export function useSimulation({
     nSims,
     onInvalidFilters,
     pat,
+    serverUrl,
     pushSimulationHistory,
     reducedCapacityWeeks,
     selectedOrg,

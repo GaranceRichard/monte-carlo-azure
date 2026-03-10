@@ -10,6 +10,7 @@ const DEFAULT_STATES_BY_TYPE: Record<string, string[]> = {
   "Product Backlog Item": ["Done", "Closed", "Resolved"],
   Bug: ["Done", "Closed", "Resolved"],
 };
+const DEFAULT_DONE_STATES = ["Done", "Closed", "Resolved"];
 
 type UseTeamOptionsParams = {
   step: AppStep;
@@ -17,6 +18,7 @@ type UseTeamOptionsParams = {
   selectedProject: string;
   selectedTeam: string;
   pat: string;
+  serverUrl: string;
   quickFiltersScopeKey: string;
   setTypes: Dispatch<SetStateAction<string[]>>;
   setDoneStates: Dispatch<SetStateAction<string[]>>;
@@ -51,12 +53,25 @@ function getValidQuickFilterSelection(
   return { types, doneStates };
 }
 
+function withFallbackStatesByType(
+  workItemTypeOptions: string[],
+  statesByType: Record<string, string[]>,
+): Record<string, string[]> {
+  const nextStatesByType: Record<string, string[]> = {};
+  for (const ticketType of workItemTypeOptions) {
+    const states = statesByType[ticketType] || DEFAULT_STATES_BY_TYPE[ticketType] || DEFAULT_DONE_STATES;
+    nextStatesByType[ticketType] = [...states];
+  }
+  return nextStatesByType;
+}
+
 export function useTeamOptions({
   step,
   selectedOrg,
   selectedProject,
   selectedTeam,
   pat,
+  serverUrl,
   quickFiltersScopeKey,
   setTypes,
   setDoneStates,
@@ -97,12 +112,12 @@ export function useTeamOptions({
     (async () => {
       try {
         setLoadingTeamOptions(true);
-        const options = await getTeamOptionsDirect(selectedOrg, selectedProject, selectedTeam, pat);
+        const options = await getTeamOptionsDirect(selectedOrg, selectedProject, selectedTeam, pat, serverUrl);
         if (!active) return;
         const nextTypes = (options.workItemTypes?.length ? options.workItemTypes : DEFAULT_WORK_ITEM_TYPE_OPTIONS)
           .slice()
           .sort((a, b) => a.localeCompare(b, "fr", { sensitivity: "base" }));
-        const nextStatesByType = options.statesByType || {};
+        const nextStatesByType = withFallbackStatesByType(nextTypes, options.statesByType || {});
         setWorkItemTypeOptions(nextTypes);
         setStatesByType(nextStatesByType);
         onTeamOptionsReset();
@@ -146,6 +161,7 @@ export function useTeamOptions({
     selectedOrg,
     selectedProject,
     selectedTeam,
+    serverUrl,
     setDoneStates,
     setTypes,
     step,

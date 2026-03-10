@@ -33,6 +33,7 @@ describe("useTeamOptions quick filters", () => {
         selectedProject: "Projet",
         selectedTeam: "Team A",
         pat: "pat",
+        serverUrl: "",
         quickFiltersScopeKey: scopeKey,
         setTypes,
         setDoneStates,
@@ -68,6 +69,7 @@ describe("useTeamOptions quick filters", () => {
         selectedProject: "Projet",
         selectedTeam: "Team A",
         pat: "pat",
+        serverUrl: "",
         quickFiltersScopeKey: scopeKey,
         setTypes,
         setDoneStates,
@@ -106,6 +108,7 @@ describe("useTeamOptions quick filters", () => {
         selectedProject: "Projet",
         selectedTeam: "Team A",
         pat: "pat",
+        serverUrl: "",
         quickFiltersScopeKey: scopeKey,
         setTypes,
         setDoneStates,
@@ -127,6 +130,39 @@ describe("useTeamOptions quick filters", () => {
     expect(setDoneStates).not.toHaveBeenCalled();
   });
 
+  it("injects fallback done states when types load but states are missing", async () => {
+    vi.mocked(getTeamOptionsDirect).mockResolvedValue({
+      workItemTypes: ["Bug", "Task"],
+      statesByType: {},
+    });
+    const setTypes = vi.fn();
+    const setDoneStates = vi.fn();
+    const onTeamOptionsReset = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTeamOptions({
+        step: "simulation",
+        selectedOrg: "Org",
+        selectedProject: "Projet",
+        selectedTeam: "Team A",
+        pat: "pat",
+        serverUrl: "https://devops700.itp.extra/700",
+        quickFiltersScopeKey: buildQuickFiltersScopeKey("Org", "Projet", "Team A"),
+        setTypes,
+        setDoneStates,
+        onTeamOptionsReset,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(result.current.loadingTeamOptions).toBe(false);
+    });
+
+    expect(result.current.workItemTypeOptions).toEqual(["Bug", "Task"]);
+    expect(result.current.statesByType.Bug).toEqual(["Done", "Closed", "Resolved"]);
+    expect(result.current.statesByType.Task).toEqual(["Done", "Closed", "Resolved"]);
+  });
+
   it("resets team options and delegates reset callback", async () => {
     vi.mocked(getTeamOptionsDirect).mockResolvedValue({
       workItemTypes: ["Bug"],
@@ -143,6 +179,7 @@ describe("useTeamOptions quick filters", () => {
         selectedProject: "Projet",
         selectedTeam: "Team A",
         pat: "pat",
+        serverUrl: "",
         quickFiltersScopeKey: buildQuickFiltersScopeKey("Org", "Projet", "Team A"),
         setTypes,
         setDoneStates,
@@ -176,6 +213,7 @@ describe("useTeamOptions quick filters", () => {
         selectedProject: "Projet",
         selectedTeam: "Team A",
         pat: "pat",
+        serverUrl: "",
         quickFiltersScopeKey: scopeKey,
         setTypes,
         setDoneStates,
@@ -206,6 +244,7 @@ describe("useTeamOptions quick filters", () => {
         selectedProject: "Projet",
         selectedTeam: "Team A",
         pat: "pat",
+        serverUrl: "",
         quickFiltersScopeKey: buildQuickFiltersScopeKey("Org", "Projet", "Team A"),
         setTypes,
         setDoneStates,
@@ -236,6 +275,7 @@ describe("useTeamOptions quick filters", () => {
         selectedProject: "Projet",
         selectedTeam: "Team A",
         pat: "pat",
+        serverUrl: "",
         quickFiltersScopeKey: scopeKey,
         setTypes,
         setDoneStates,
@@ -259,6 +299,7 @@ describe("useTeamOptions quick filters", () => {
         selectedProject: "Projet",
         selectedTeam: "Team A",
         pat: "pat",
+        serverUrl: "",
         quickFiltersScopeKey: buildQuickFiltersScopeKey("Org", "Projet", "Team A"),
         setTypes: vi.fn(),
         setDoneStates: vi.fn(),

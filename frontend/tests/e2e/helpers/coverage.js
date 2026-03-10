@@ -2,7 +2,24 @@ import istanbulCoverage from "istanbul-lib-coverage";
 import v8toIstanbul from "v8-to-istanbul";
 
 let inlineScriptCounter = 0;
-const E2E_COVERAGE_EXCLUDES = ["/src/components/steps/simulationPrintReport.tsx", "/src/utils/export.ts", "/export.ts"];
+const E2E_COVERAGE_EXCLUDES = [
+  "/src/components/steps/simulationPrintReport.tsx",
+  "/src/utils/export.ts",
+  "/export.ts",
+  "/src/main.tsx",
+  "/main.tsx",
+  "/src/e2e/runtime.ts",
+  "/runtime.ts",
+];
+
+function normalizeFilePath(filePath) {
+  return String(filePath || "").replace(/\\/g, "/");
+}
+
+function shouldExcludeCoverageFile(filePath) {
+  const normalized = normalizeFilePath(filePath);
+  return E2E_COVERAGE_EXCLUDES.some((pattern) => normalized.endsWith(pattern) || normalized.includes(pattern));
+}
 
 export async function summarizeCoverageIstanbul(entries) {
   const { createCoverageMap } = istanbulCoverage;
@@ -49,7 +66,13 @@ export async function summarizeCoverageIstanbul(entries) {
       const converter = v8toIstanbul(syntheticScriptPath, 0, { source: sourceText });
       await converter.load();
       converter.applyCoverage(v8Functions);
-      map.merge(converter.toIstanbul());
+      const convertedMap = createCoverageMap(converter.toIstanbul());
+      for (const filePath of convertedMap.files()) {
+        if (shouldExcludeCoverageFile(filePath)) {
+          continue;
+        }
+        map.addFileCoverage(convertedMap.fileCoverageFor(filePath));
+      }
     } catch {
       // Ignore malformed/anonymous scripts that cannot be converted.
     }

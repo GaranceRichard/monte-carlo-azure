@@ -13,6 +13,7 @@ describe("OrgStep", () => {
         orgs={[{ id: "1", name: "org-a" }, { id: "2", name: "org-b" }]}
         orgHint=""
         selectedOrg="org-a"
+        deploymentTarget="cloud"
         setSelectedOrg={setSelectedOrg}
         loading={false}
         onContinue={onContinue}
@@ -34,19 +35,38 @@ describe("OrgStep", () => {
         err=""
         userName="Garance"
         orgs={[{ id: "1", name: "org-a" }]}
-        orgHint={"PAT global d\u00E9tect\u00E9: s\u00E9lectionnez une organisation accessible."}
+        orgHint={"PAT global détecté: sélectionnez une organisation accessible."}
         selectedOrg="org-a"
+        deploymentTarget="cloud"
         setSelectedOrg={vi.fn()}
         loading={false}
         onContinue={vi.fn()}
       />,
     );
 
-    expect(screen.getByText("S\u00E9lectionnez l'organisation Azure DevOps \u00E0 utiliser.")).toBeInTheDocument();
-    expect(
-      screen.getByText("PAT global d\u00E9tect\u00E9: s\u00E9lectionnez une organisation accessible."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Sélectionnez l'organisation Azure DevOps à utiliser.")).toBeInTheDocument();
+    expect(screen.getByText("PAT global détecté: sélectionnez une organisation accessible.")).toBeInTheDocument();
     expect(screen.getByText("Organisations accessibles")).toBeInTheDocument();
+  });
+
+  it("renders collection wording for on-premise onboarding", () => {
+    render(
+      <OrgStep
+        err=""
+        userName="Garance"
+        orgs={[]}
+        orgHint="Serveur Azure DevOps Server detecte"
+        selectedOrg="DefaultCollection"
+        deploymentTarget="onprem"
+        setSelectedOrg={vi.fn()}
+        loading={false}
+        onContinue={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Sélectionnez la collection Azure DevOps Server à utiliser.")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Nom de la collection")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Choisir cette collection" })).toBeInTheDocument();
   });
 
   it("submits on Enter in org select when valid and not loading", () => {
@@ -59,6 +79,7 @@ describe("OrgStep", () => {
         orgs={[{ id: "1", name: "org-a" }]}
         orgHint=""
         selectedOrg="org-a"
+        deploymentTarget="cloud"
         setSelectedOrg={vi.fn()}
         loading={false}
         onContinue={onContinue}
@@ -79,6 +100,7 @@ describe("OrgStep", () => {
         orgs={[]}
         orgHint="PAT non global"
         selectedOrg=""
+        deploymentTarget="cloud"
         setSelectedOrg={setSelectedOrg}
         loading
         onContinue={vi.fn()}
@@ -103,6 +125,7 @@ describe("OrgStep", () => {
         orgs={[]}
         orgHint=""
         selectedOrg="org-demo"
+        deploymentTarget="cloud"
         setSelectedOrg={vi.fn()}
         loading={false}
         onContinue={onContinue}
@@ -125,6 +148,7 @@ describe("OrgStep", () => {
         orgs={[]}
         orgHint=""
         selectedOrg="org-demo"
+        deploymentTarget="cloud"
         setSelectedOrg={vi.fn()}
         loading
         onContinue={onContinueLoading}
@@ -141,6 +165,7 @@ describe("OrgStep", () => {
         orgs={[]}
         orgHint=""
         selectedOrg="   "
+        deploymentTarget="cloud"
         setSelectedOrg={vi.fn()}
         loading={false}
         onContinue={onContinueEmpty}
@@ -159,6 +184,7 @@ describe("OrgStep", () => {
         orgs={[]}
         orgHint=""
         selectedOrg="org-demo"
+        deploymentTarget="cloud"
         setSelectedOrg={vi.fn()}
         loading={false}
         onContinue={vi.fn()}
@@ -175,6 +201,7 @@ describe("OrgStep", () => {
         orgs={[]}
         orgHint=""
         selectedOrg=""
+        deploymentTarget="cloud"
         setSelectedOrg={vi.fn()}
         loading={false}
         onContinue={vi.fn()}
@@ -194,6 +221,7 @@ describe("OrgStep", () => {
         orgs={[{ id: "1", name: "org-a" }]}
         orgHint=""
         selectedOrg="org-a"
+        deploymentTarget="cloud"
         setSelectedOrg={vi.fn()}
         loading={false}
         onContinue={vi.fn()}

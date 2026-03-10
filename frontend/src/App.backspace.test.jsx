@@ -19,7 +19,10 @@ vi.mock("./components/steps/SimulationStep", () => ({
 function buildOnboardingState(orgs) {
   return {
     patInput: "",
+    serverUrlInput: "",
     sessionPat: "pat",
+    sessionServerUrl: "",
+    deploymentTarget: "cloud",
     step: "org",
     loading: false,
     err: "",
@@ -38,6 +41,7 @@ function buildOnboardingState(orgs) {
 function buildOnboardingActions(disconnect) {
   return {
     setPatInput: vi.fn(),
+    setServerUrlInput: vi.fn(),
     setSelectedOrg: vi.fn(),
     setSelectedProject: vi.fn(),
     setSelectedTeam: vi.fn(),
@@ -45,6 +49,7 @@ function buildOnboardingActions(disconnect) {
     goToProjects: vi.fn(async () => true),
     goToTeams: vi.fn(async () => true),
     goToSimulation: vi.fn(() => true),
+    goToPortfolio: vi.fn(() => true),
     goToStep: vi.fn(),
     goBack: vi.fn(),
     disconnect,
