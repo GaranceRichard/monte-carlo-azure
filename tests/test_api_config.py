@@ -27,6 +27,12 @@ def test_get_api_config_defaults(monkeypatch):
     monkeypatch.delenv("APP_MONGO_URL", raising=False)
     monkeypatch.delenv("APP_MONGO_DB", raising=False)
     monkeypatch.delenv("APP_MONGO_COLLECTION_SIMULATIONS", raising=False)
+    monkeypatch.delenv("APP_MONGO_MIN_POOL_SIZE", raising=False)
+    monkeypatch.delenv("APP_MONGO_MAX_POOL_SIZE", raising=False)
+    monkeypatch.delenv("APP_MONGO_SERVER_SELECTION_TIMEOUT_MS", raising=False)
+    monkeypatch.delenv("APP_MONGO_CONNECT_TIMEOUT_MS", raising=False)
+    monkeypatch.delenv("APP_MONGO_SOCKET_TIMEOUT_MS", raising=False)
+    monkeypatch.delenv("APP_MONGO_MAX_IDLE_TIME_MS", raising=False)
 
     cfg = get_api_config()
     assert cfg.cors_origins == DEFAULT_CORS_ORIGINS
@@ -39,6 +45,12 @@ def test_get_api_config_defaults(monkeypatch):
     assert cfg.mongo_url == ""
     assert cfg.mongo_db == "montecarlo"
     assert cfg.mongo_collection_simulations == DEFAULT_MONGO_COLLECTION_SIMULATIONS
+    assert cfg.mongo_min_pool_size == 5
+    assert cfg.mongo_max_pool_size == 20
+    assert cfg.mongo_server_selection_timeout_ms == 2000
+    assert cfg.mongo_connect_timeout_ms == 2000
+    assert cfg.mongo_socket_timeout_ms == 5000
+    assert cfg.mongo_max_idle_time_ms == 60000
 
 
 def test_parse_csv_env_values_and_empty_fallback(monkeypatch):

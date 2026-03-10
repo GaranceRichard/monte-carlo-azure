@@ -1,12 +1,23 @@
-﻿import argparse
+import argparse
+import asyncio
 import os
 import socket
+import sys
 import webbrowser
 
-import uvicorn
 
-# IMPORTANT: import reel pour que PyInstaller embarque le package backend
-from backend.api import app
+def configure_event_loop_policy() -> None:
+    if sys.platform != "win32":
+        return
+    policy_cls = getattr(asyncio, "WindowsSelectorEventLoopPolicy", None)
+    if policy_cls is None:
+        return
+    asyncio.set_event_loop_policy(policy_cls())
+
+
+# Sous Windows, on force la policy des le chargement du module pour eviter
+# les tracebacks Proactor bruyants quand un client coupe brutalement la connexion.
+configure_event_loop_policy()
 
 
 def is_port_free(host: str, port: int) -> bool:
@@ -16,6 +27,11 @@ def is_port_free(host: str, port: int) -> bool:
 
 
 def main():
+    import uvicorn
+
+    # IMPORTANT: import reel pour que PyInstaller embarque le package backend
+    from backend.api import app
+
     parser = argparse.ArgumentParser(description="MonteCarloADO launcher")
     parser.add_argument("--host", default=os.getenv("APP_HOST", "127.0.0.1"))
     parser.add_argument("--port", type=int, default=int(os.getenv("APP_PORT", "8000")))
@@ -34,8 +50,15 @@ def main():
     if not args.no_browser:
         webbrowser.open(url)
 
-    # On passe l'objet app (pas une string), donc pas d'import dynamique
-    uvicorn.run(app, host=host, port=port, reload=False, log_level="warning", access_log=False)
+    uvicorn.run(
+        app,
+        host=host,
+        port=port,
+        reload=False,
+        loop="asyncio",
+        log_level="warning",
+        access_log=False,
+    )
 
 
 if __name__ == "__main__":

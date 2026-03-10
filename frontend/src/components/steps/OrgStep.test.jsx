@@ -28,6 +28,27 @@ describe("OrgStep", () => {
     expect(onContinue).toHaveBeenCalledTimes(1);
   });
 
+  it("renders organization texts with proper accents", () => {
+    render(
+      <OrgStep
+        err=""
+        userName="Garance"
+        orgs={[{ id: "1", name: "org-a" }]}
+        orgHint={"PAT global d\u00E9tect\u00E9: s\u00E9lectionnez une organisation accessible."}
+        selectedOrg="org-a"
+        setSelectedOrg={vi.fn()}
+        loading={false}
+        onContinue={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("S\u00E9lectionnez l'organisation Azure DevOps \u00E0 utiliser.")).toBeInTheDocument();
+    expect(
+      screen.getByText("PAT global d\u00E9tect\u00E9: s\u00E9lectionnez une organisation accessible."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Organisations accessibles")).toBeInTheDocument();
+  });
+
   it("submits on Enter in org select when valid and not loading", () => {
     const onContinue = vi.fn();
 

@@ -42,7 +42,7 @@ export default function OrgStep({
   return (
     <>
       <h2 className="flow-title">{welcomeTitle}</h2>
-      <p className="flow-text">Sélectionnez l&apos;organisation Azure DevOps à utiliser.</p>
+      <p className="flow-text">{"S\u00E9lectionnez l'organisation Azure DevOps \u00E0 utiliser."}</p>
       {err && (
         <div className="ui-alert ui-alert--danger">
           <b>Erreur :</b> {err}

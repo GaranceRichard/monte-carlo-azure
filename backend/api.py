@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
@@ -8,7 +10,17 @@ from .api_config import get_api_config
 from .api_routes_simulate import limiter, router, simulation_store
 from .api_static import mount_frontend
 
-app = FastAPI(title="Monte Carlo Simulate API", version="2.0")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    simulation_store.connect()
+    try:
+        yield
+    finally:
+        simulation_store.close()
+
+
+app = FastAPI(title="Monte Carlo Simulate API", version="2.0", lifespan=lifespan)
 cfg = get_api_config()
 
 app.state.limiter = limiter

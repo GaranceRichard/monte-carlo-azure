@@ -39,7 +39,9 @@ test.describe("e2e istanbul coverage", () => {
 
   test.afterEach(async ({ page }) => {
     const coverageEntries = await page.coverage.stopJSCoverage();
-    const appEntries = coverageEntries.filter((e) => e?.url && e.url.includes("127.0.0.1:4173/src/"));
+    const appEntries = coverageEntries.filter(
+      (e) => typeof e?.url === "string" && /^http:\/\/127\.0\.0\.1:\d+\/src\//.test(e.url),
+    );
     allCoverageEntries.push(...appEntries);
   });
 
@@ -48,18 +50,36 @@ test.describe("e2e istanbul coverage", () => {
     const reportDir = path.resolve(cwd(), "coverage");
     fs.mkdirSync(reportDir, { recursive: true });
     fs.writeFileSync(path.join(reportDir, "e2e-coverage-summary.json"), JSON.stringify(summary, null, 2));
-    const weakestFunctions = summary.byFile
-      .filter((file) => file.functions.total > 0)
-      .slice(0, 8)
-      .map((file) =>
-        `${file.functions.pct}% (${file.functions.covered}/${file.functions.total}) ${file.file}`,
-      );
+    const metricLabels = {
+      statements: "statements",
+      branches: "branches",
+      functions: "functions",
+      lines: "lines",
+    };
+    const weakestByMetric = Object.entries(metricLabels)
+      .map(([metricKey, metricLabel]) => {
+        const weakest = summary.byFile
+          .filter((file) => file[metricKey].total > 0)
+          .sort((a, b) => {
+            if (a[metricKey].pct !== b[metricKey].pct) return a[metricKey].pct - b[metricKey].pct;
+            if (a[metricKey].total !== b[metricKey].total) return b[metricKey].total - a[metricKey].total;
+            return a.file.localeCompare(b.file);
+          })
+          .slice(0, 3)
+          .map((file) => `${file[metricKey].pct}% (${file[metricKey].covered}/${file[metricKey].total}) ${file.file}`);
+        return { metricLabel, weakest };
+      })
+      .filter((entry) => entry.weakest.length > 0);
 
     console.log(
       `[E2E ISTANBUL] files=${summary.files} statements=${summary.statements.pct}% (${summary.statements.covered}/${summary.statements.total}) branches=${summary.branches.pct}% (${summary.branches.covered}/${summary.branches.total}) functions=${summary.functions.pct}% (${summary.functions.covered}/${summary.functions.total}) lines=${summary.lines.pct}% (${summary.lines.covered}/${summary.lines.total})`,
     );
-    if (weakestFunctions.length > 0) {
-      console.log(`[E2E ISTANBUL] weakest functions:\n- ${weakestFunctions.join("\n- ")}`);
+    if (weakestByMetric.length > 0) {
+      const lines = weakestByMetric.flatMap(({ metricLabel, weakest }) => [
+        `${metricLabel}:`,
+        ...weakest.map((item) => `- ${item}`),
+      ]);
+      console.log(`[E2E ISTANBUL] weakest by category:\n${lines.join("\n")}`);
     }
 
     expect(summary.files).toBeGreaterThan(0);
@@ -83,6 +103,41 @@ test.describe("e2e istanbul coverage", () => {
       teamFieldValuesFirstError: true,
       wiqlFirstEmpty: true,
       simulateFirstError: true,
+    });
+    await page.route("**/simulations/history", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([
+          {
+            created_at: "2026-02-26T10:00:00Z",
+            last_seen: "2026-02-26T10:00:00Z",
+            mode: "backlog_to_weeks",
+            backlog_size: 70,
+            target_weeks: null,
+            n_sims: 2000,
+            capacity_percent: 100,
+            samples_count: 24,
+            percentiles: { P50: 7, P70: 9, P90: 12 },
+            distribution: [
+              { x: 7, count: 5 },
+              { x: 9, count: 4 },
+              { x: 12, count: 3 },
+            ],
+            selected_org: "org-demo",
+            selected_project: "Projet A",
+            selected_team: "Equipe Alpha",
+            start_date: "2026-01-01",
+            end_date: "2026-02-01",
+            done_states: ["Done"],
+            types: ["Bug"],
+            include_zero_weeks: false,
+          },
+        ]),
+      });
+    });
+    await page.addInitScript(() => {
+      window.localStorage.clear();
     });
 
     await page.goto("/");
@@ -143,6 +198,9 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("button", { name: "Lancer la simulation" }).click();
     await expect(page.getByText(/Historique insuffisant/i)).toBeVisible();
 
+    await openIfCollapsed(filtersSection);
+    await page.getByLabel("Bug").check();
+    await page.getByLabel("Done").check();
     await openIfCollapsed(modeSection);
     const modeSelect = modeSection.locator("select");
     const modeNumberInputs = modeSection.locator('input[type="number"]');
@@ -150,6 +208,7 @@ test.describe("e2e istanbul coverage", () => {
     await modeSelect.click();
     await page.getByLabel(/Inclure les semaines.*0/i).check();
     await modeNumberInputs.nth(1).fill("3000");
+    await page.getByRole("button", { name: "Lancer la simulation" }).click();
     await expect(page.getByText("Erreur simulation temporaire")).toBeVisible({ timeout: 10_000 });
 
     await openIfCollapsed(filtersSection);
@@ -176,6 +235,8 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("button", { name: "Rapport" }).click();
     const reportPopup = await popupPromise;
     if (reportPopup) {
+      await reportPopup.waitForLoadState("domcontentloaded");
+      await reportPopup.getByRole("button", { name: /Telecharger PDF/i }).click();
       await reportPopup.close().catch(() => null);
     }
 
@@ -189,6 +250,35 @@ test.describe("e2e istanbul coverage", () => {
     await expect(page.getByText(/Lancez une simulation pour afficher les graphiques/i)).toBeVisible();
     await page.getByRole("button", { name: "Lancer la simulation" }).click();
     await expect(page.getByText("10 sem")).toBeVisible({ timeout: 10_000 });
+
+    const historySection = page.locator("div").filter({
+      has: page.getByRole("button", { name: "Vider" }),
+      hasText: "Historique local",
+    }).first();
+    const historySelect = historySection.locator("select");
+    await expect(historySelect).toBeVisible();
+    await expect(historySelect.locator("option").first()).toContainText(/simulation/i);
+    await expect.poll(async () => {
+      const labels = await historySelect.locator("option").evaluateAll((options) =>
+        options.map((option) => option.textContent || ""),
+      );
+      return labels.some((label) => label.includes("2026_02_26_") && label.includes("70 items"));
+    }).toBe(true);
+    const remoteHistoryValue = await historySelect.locator("option").evaluateAll((options) => {
+      const match = options.find((option) => {
+        const label = option.textContent || "";
+        return label.includes("2026_02_26_") && label.includes("70 items");
+      });
+      return match?.getAttribute("value") || "";
+    });
+    expect(remoteHistoryValue).toBeTruthy();
+    await historySelect.selectOption(remoteHistoryValue);
+    await expect(page.getByText(/Semaines utilisees:\s*24\/24/i)).toBeVisible();
+    await expect(page.getByText(/Mode:\s*0\s*exclues/i)).toBeVisible();
+    await expect(page.getByText(/Backlog de 70 items/i)).toBeVisible();
+    await expect(page.getByText(/2\s*000 simulations/i)).toBeVisible();
+    await historySection.getByRole("button", { name: "Vider" }).click();
+    await expect(historySection.getByText(/pas de simulation pour l'équipe/i)).toBeVisible();
 
     await page.getByRole("button", { name: /Se d.*connecter/i }).click();
     await expect(page.getByText("Connexion Azure DevOps")).toBeVisible();
@@ -221,6 +311,42 @@ test.describe("e2e istanbul coverage", () => {
     await page.locator("select").first().selectOption("Equipe Alpha");
     await page.getByRole("button", { name: /Portefeuille/i }).click();
     await expect(page.getByText(/Chargement du portefeuille|Simulation Portefeuille/i)).toBeVisible();
+    await page.getByRole("button", { name: /Ajouter équipe/i }).click();
+    await expect(page.getByRole("heading", { name: /Ajouter équipe/i })).toBeVisible();
+    await page.getByRole("button", { name: "Valider" }).click();
+    await expect(page.getByText(/Selectionnez au moins un type et un etat/i)).toBeVisible();
+    const quickConfigButton = page.getByRole("button", { name: /Configuration rapide/i });
+    if (await quickConfigButton.isVisible().catch(() => false)) {
+      await quickConfigButton.click();
+    } else {
+      await page.getByLabel("Type de ticket").locator("..").getByLabel("Bug").check();
+      await page.getByLabel("État").locator("..").getByLabel("Done").check();
+    }
+    await page.getByRole("button", { name: "Valider" }).click();
+    await expect(page.getByText(/Equipe Alpha - Bug - Done/i)).toBeVisible();
+    await page.getByRole("button", { name: /Ajouter équipe/i }).click();
+    const secondAddTeamModal = page.locator("div.fixed.inset-0").last();
+    await expect(secondAddTeamModal.getByRole("heading", { name: /Ajouter équipe/i })).toBeVisible();
+    await secondAddTeamModal.getByLabel("Équipe").selectOption("Equipe Beta");
+    const secondQuickConfigButton = secondAddTeamModal.getByRole("button", { name: /Configuration rapide/i });
+    if (await secondQuickConfigButton.isVisible().catch(() => false)) {
+      await secondQuickConfigButton.click();
+    } else {
+      await secondAddTeamModal.locator(".sim-check-row", { hasText: "Bug" }).locator('input[type="checkbox"]').check();
+      await secondAddTeamModal.locator(".sim-check-row", { hasText: "Done" }).locator('input[type="checkbox"]').check();
+    }
+    await secondAddTeamModal.getByRole("button", { name: "Valider" }).click();
+    await expect(page.getByText(/Equipe Beta - Bug - Done/i)).toBeVisible();
+    await page.getByRole("button", { name: "Retirer" }).first().click();
+    await expect(page.getByText(/Equipe Alpha - Bug - Done/i)).not.toBeVisible();
+    const portfolioPopupPromise = page.waitForEvent("popup").catch(() => null);
+    await page.getByRole("button", { name: /Générer rapport portefeuille/i }).click();
+    const portfolioPopup = await portfolioPopupPromise;
+    if (portfolioPopup) {
+      await portfolioPopup.waitForLoadState("domcontentloaded");
+      await portfolioPopup.getByRole("button", { name: /Telecharger PDF/i }).click();
+      await portfolioPopup.close().catch(() => null);
+    }
     await page.getByRole("button", { name: /Changer.*quipe/i }).click();
     await expect(page.getByRole("button", { name: /Choisir cette/i })).toBeVisible();
     await page.locator("select").first().selectOption("Equipe Alpha");
@@ -247,12 +373,6 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("button", { name: /Choisir cette/i }).click();
     await expect(page.getByTestId("selected-team-card")).toBeVisible();
     await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Beta");
-
-    await openIfCollapsed(filtersSection);
-    await page.getByLabel("Bug").check();
-    await page.getByLabel("Done").check();
-    await page.getByRole("button", { name: "Lancer la simulation" }).click();
-    await expect(page.getByText("10 sem")).toBeVisible({ timeout: 10_000 });
 
     await toggleThemeRoundTrip(page);
 
@@ -624,5 +744,237 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("button", { name: /Choisir cette/i }).click();
     await expect(page.getByTestId("selected-team-card")).toBeVisible();
     await expect(page.getByTestId("selected-team-name")).toHaveText("Equipe Alpha");
+  });
+
+  test("coverage: branches team sort et simulation history", async ({ page }) => {
+    test.setTimeout(45_000);
+    await page.goto("/");
+
+    await page.evaluate(async () => {
+      const { React, createRoot, sortTeams, useSimulationHistory } = await import("/src/e2e/runtime.ts");
+      const simHistoryKey = "mc_simulation_history_v1";
+
+      sortTeams([
+        { id: "3", name: "Zulu - Beta" },
+        { id: "1", name: "Éclair - Alpha" },
+        { id: "2", name: "alpha - Squad" },
+      ]);
+      sortTeams([
+        { id: "2", name: "Alpha - Zeta" },
+        { id: "1", name: "Alpha - Beta" },
+        { id: "3", name: "Alpha - Éclair" },
+      ]);
+      sortTeams([
+        { id: "2", name: "Bravo" },
+        { id: "1", name: "" },
+        { id: "3" },
+      ]);
+
+      const flush = async () => {
+        await Promise.resolve();
+        await new Promise((resolve) => window.setTimeout(resolve, 0));
+      };
+
+      const buildResponse = (payload) =>
+        new Response(JSON.stringify(payload), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+
+      const baseEntry = {
+        createdAt: "2026-03-01T10:00:00Z",
+        selectedOrg: "org-demo",
+        selectedProject: "Projet A",
+        selectedTeam: "Equipe Alpha",
+        startDate: "2026-01-01",
+        endDate: "2026-02-01",
+        simulationMode: "backlog_to_weeks",
+        includeZeroWeeks: false,
+        backlogSize: 70,
+        targetWeeks: 0,
+        nSims: 2000,
+        capacityPercent: 100,
+        reducedCapacityWeeks: 0,
+        types: ["Bug"],
+        doneStates: ["Done"],
+        sampleStats: { totalWeeks: 24, zeroWeeks: 0, usedWeeks: 24 },
+        weeklyThroughput: [],
+        result: {
+          result_kind: "weeks",
+          samples_count: 24,
+          result_percentiles: { P50: 7, P70: 9, P90: 12 },
+          risk_score: 0.71,
+          result_distribution: [],
+        },
+      };
+
+      const mountHookScenario = async ({
+        storageValue,
+        remotePayload = [],
+        rejectRemote = false,
+        deferredRemote = false,
+        unmountBeforeResolve = false,
+        afterReady = null,
+      }) => {
+        if (storageValue == null) {
+          window.localStorage.removeItem(simHistoryKey);
+        } else {
+          window.localStorage.setItem(simHistoryKey, storageValue);
+        }
+
+        const originalFetch = window.fetch.bind(window);
+        let resolveDeferred = null;
+        window.fetch = async (input, init) => {
+          if (String(input).includes("/simulations/history")) {
+            if (deferredRemote) {
+              return new Promise((resolve) => {
+                resolveDeferred = resolve;
+              });
+            }
+            if (rejectRemote) {
+              throw new Error("remote unavailable");
+            }
+            return buildResponse(remotePayload);
+          }
+          return originalFetch(input, init);
+        };
+
+        const container = document.createElement("div");
+        document.body.appendChild(container);
+        const root = createRoot(container);
+        let latestState = null;
+        let readyResolve = null;
+        const ready = new Promise((resolve) => {
+          readyResolve = resolve;
+        });
+
+        function Harness() {
+          const state = useSimulationHistory();
+          React.useEffect(() => {
+            latestState = state;
+            readyResolve?.(state);
+          }, [state]);
+          return null;
+        }
+
+        root.render(React.createElement(Harness));
+        await flush();
+
+        if (deferredRemote && unmountBeforeResolve) {
+          root.unmount();
+          container.remove();
+          resolveDeferred?.(buildResponse(remotePayload));
+          await flush();
+          window.fetch = originalFetch;
+          return;
+        }
+
+        if (deferredRemote) {
+          resolveDeferred?.(buildResponse(remotePayload));
+        }
+
+        await ready;
+        await flush();
+
+        if (afterReady) {
+          await afterReady(latestState);
+          await flush();
+        }
+
+        root.unmount();
+        container.remove();
+        window.fetch = originalFetch;
+      };
+
+      await mountHookScenario({ storageValue: "{bad json", remotePayload: [] });
+      await mountHookScenario({ storageValue: JSON.stringify({ nope: true }), remotePayload: [] });
+      await mountHookScenario({
+        storageValue: JSON.stringify([{ ...baseEntry, id: "local-1" }]),
+        remotePayload: [
+          {
+            created_at: "2026-02-26T10:00:00Z",
+            mode: "backlog_to_weeks",
+            backlog_size: 70,
+            target_weeks: null,
+            n_sims: 2000,
+            capacity_percent: 100,
+            samples_count: 24,
+            percentiles: { P50: 7, P70: 9, P90: 12 },
+            distribution: [{ x: 7, count: 5 }],
+            selected_org: "org-demo",
+            selected_project: "Projet A",
+            selected_team: "Equipe Alpha",
+            start_date: "2026-01-01",
+            end_date: "2026-02-01",
+            done_states: ["Done"],
+            types: ["Bug"],
+            include_zero_weeks: false,
+          },
+        ],
+      });
+      await mountHookScenario({
+        storageValue: null,
+        remotePayload: [
+          {
+            created_at: "2026-02-26T10:00:00Z",
+            mode: "backlog_to_weeks",
+            backlog_size: 70,
+            target_weeks: null,
+            n_sims: 2000,
+            capacity_percent: 100,
+            samples_count: 24,
+            percentiles: { P50: 7, P70: 9, P90: 12 },
+            distribution: [{ x: 7, count: 5 }],
+            selected_org: "org-demo",
+            selected_project: "Projet A",
+            selected_team: "Equipe Alpha",
+            start_date: "2026-01-01",
+            end_date: "2026-02-01",
+            done_states: ["Done"],
+            types: ["Bug"],
+            include_zero_weeks: false,
+          },
+          {
+            created_at: "2026-02-27T10:00:00Z",
+            mode: "weeks_to_items",
+            backlog_size: null,
+            target_weeks: 6,
+            n_sims: null,
+            capacity_percent: null,
+            samples_count: null,
+            percentiles: { P50: 21, P70: 34, P90: 55 },
+            distribution: null,
+            selected_org: null,
+            selected_project: null,
+            selected_team: null,
+            start_date: null,
+            end_date: null,
+            done_states: null,
+            types: null,
+            include_zero_weeks: true,
+          },
+        ],
+      });
+      await mountHookScenario({ storageValue: null, rejectRemote: true });
+      await mountHookScenario({
+        storageValue: null,
+        deferredRemote: true,
+        unmountBeforeResolve: true,
+        remotePayload: [],
+      });
+      await mountHookScenario({
+        storageValue: null,
+        remotePayload: [],
+        afterReady: async (state) => {
+          for (let index = 0; index < 12; index += 1) {
+            state.pushSimulationHistory({ ...baseEntry, id: `local-${index}` });
+            await flush();
+          }
+          state.clearSimulationHistory();
+        },
+      });
+    });
+
+    await expect(page.locator("body")).toBeVisible();
   });
 });

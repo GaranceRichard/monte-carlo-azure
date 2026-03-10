@@ -44,6 +44,12 @@ class ApiConfig:
     mongo_url: str
     mongo_db: str
     mongo_collection_simulations: str
+    mongo_min_pool_size: int
+    mongo_max_pool_size: int
+    mongo_server_selection_timeout_ms: int
+    mongo_connect_timeout_ms: int
+    mongo_socket_timeout_ms: int
+    mongo_max_idle_time_ms: int
 
 
 def _parse_float_env(name: str, default: float) -> float:
@@ -86,4 +92,13 @@ def get_api_config() -> ApiConfig:
             "APP_MONGO_COLLECTION_SIMULATIONS",
             DEFAULT_MONGO_COLLECTION_SIMULATIONS,
         ),
+        mongo_min_pool_size=_parse_int_env("APP_MONGO_MIN_POOL_SIZE", 5),
+        mongo_max_pool_size=_parse_int_env("APP_MONGO_MAX_POOL_SIZE", 20),
+        mongo_server_selection_timeout_ms=_parse_int_env(
+            "APP_MONGO_SERVER_SELECTION_TIMEOUT_MS",
+            2000,
+        ),
+        mongo_connect_timeout_ms=_parse_int_env("APP_MONGO_CONNECT_TIMEOUT_MS", 2000),
+        mongo_socket_timeout_ms=_parse_int_env("APP_MONGO_SOCKET_TIMEOUT_MS", 5000),
+        mongo_max_idle_time_ms=_parse_int_env("APP_MONGO_MAX_IDLE_TIME_MS", 60000),
     )

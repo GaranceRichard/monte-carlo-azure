@@ -199,4 +199,3 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
     </div>
   );
 }
-

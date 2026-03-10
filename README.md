@@ -176,6 +176,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\run-vitals
 - `APP_MONGO_URL` (ex: `mongodb://mongo:27017`)
 - `APP_MONGO_DB` (defaut: `montecarlo`)
 - `APP_MONGO_COLLECTION_SIMULATIONS` (defaut: `simulations`)
+- `APP_MONGO_MIN_POOL_SIZE` (defaut: `5`)
+- `APP_MONGO_MAX_POOL_SIZE` (defaut: `20`)
+- `APP_MONGO_SERVER_SELECTION_TIMEOUT_MS` (defaut: `2000`)
+- `APP_MONGO_CONNECT_TIMEOUT_MS` (defaut: `2000`)
+- `APP_MONGO_SOCKET_TIMEOUT_MS` (defaut: `5000`)
+- `APP_MONGO_MAX_IDLE_TIME_MS` (defaut: `60000`)
 - `APP_SIMULATION_HISTORY_LIMIT` (defaut: `10`)
 - `APP_PURGE_RETENTION_DAYS` (defaut script purge: `30`)
 

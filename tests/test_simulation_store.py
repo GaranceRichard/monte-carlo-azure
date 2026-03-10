@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 import pytest
 from pymongo import MongoClient
-from pymongo.errors import PyMongoError
+from pymongo.errors import AutoReconnect, PyMongoError
 
 from backend.api_config import ApiConfig
 from backend.api_models import ClientContext, DistributionBucket, SimulateRequest, SimulateResponse
@@ -72,9 +72,13 @@ class _FakeMongoClient:
     def __init__(self, coll: _FakeCollection):
         self._coll = coll
         self.admin = _FakeAdmin()
+        self.closed = False
 
     def __getitem__(self, _db_name):
         return _FakeDatabase(self._coll)
+
+    def close(self):
+        self.closed = True
 
 
 def _cfg(mongo_url: str) -> ApiConfig:
@@ -89,6 +93,12 @@ def _cfg(mongo_url: str) -> ApiConfig:
         mongo_url=mongo_url,
         mongo_db="montecarlo",
         mongo_collection_simulations="simulations",
+        mongo_min_pool_size=5,
+        mongo_max_pool_size=20,
+        mongo_server_selection_timeout_ms=2000,
+        mongo_connect_timeout_ms=2000,
+        mongo_socket_timeout_ms=5000,
+        mongo_max_idle_time_ms=60000,
     )
 
 
@@ -138,7 +148,46 @@ def test_ping_calls_admin_ping_when_enabled(monkeypatch):
 
     ok = store.ping()
     assert ok is True
-    assert fake_client.admin.calls == ["ping"]
+    assert fake_client.admin.calls == ["ping", "ping"]
+
+
+def test_connect_initializes_indexes_and_pool(monkeypatch):
+    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    fake_coll = _FakeCollection()
+    fake_client = _FakeMongoClient(fake_coll)
+    mongo_calls = []
+
+    def _mongo_factory(*_args, **kwargs):
+        mongo_calls.append(kwargs)
+        return fake_client
+
+    monkeypatch.setattr("backend.simulation_store.MongoClient", _mongo_factory)
+
+    store.connect()
+
+    assert mongo_calls[0]["minPoolSize"] == 5
+    assert mongo_calls[0]["maxPoolSize"] == 20
+    assert mongo_calls[0]["retryWrites"] is True
+    assert mongo_calls[0]["retryReads"] is True
+    assert len(fake_coll.index_calls) == 2
+
+
+def test_save_simulation_reconnects_once_after_pymongo_error(monkeypatch):
+    req, resp = _req_resp()
+    first_coll = _FakeCollection()
+    second_coll = _FakeCollection()
+    first_coll.insert_one = lambda _doc: (_ for _ in ()).throw(AutoReconnect("down"))
+    clients = [_FakeMongoClient(first_coll), _FakeMongoClient(second_coll)]
+
+    def _mongo_factory(*_args, **_kwargs):
+        return clients.pop(0)
+
+    monkeypatch.setattr("backend.simulation_store.MongoClient", _mongo_factory)
+
+    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store.save_simulation("c1", req, resp)
+
+    assert second_coll.inserted[0]["mc_client_id"] == "c1"
 
 
 def test_save_simulation_noop_when_disabled_or_empty_client():
@@ -225,6 +274,12 @@ def test_save_and_list_recent_with_real_mongo():
         mongo_url=mongo_url,
         mongo_db=db_name,
         mongo_collection_simulations=collection_name,
+        mongo_min_pool_size=5,
+        mongo_max_pool_size=20,
+        mongo_server_selection_timeout_ms=2000,
+        mongo_connect_timeout_ms=2000,
+        mongo_socket_timeout_ms=5000,
+        mongo_max_idle_time_ms=60000,
     )
     store = SimulationStore(cfg)
     req, resp = _req_resp()

@@ -39,12 +39,20 @@ APP_RATE_LIMIT_SIMULATE=20/minute
 APP_REDIS_URL=redis://redis:6379/0
 APP_MONGO_URL=mongodb://mongo:27017
 APP_MONGO_DB=montecarlo
+APP_MONGO_COLLECTION_SIMULATIONS=simulations
+APP_MONGO_MIN_POOL_SIZE=5
+APP_MONGO_MAX_POOL_SIZE=20
+APP_MONGO_SERVER_SELECTION_TIMEOUT_MS=2000
+APP_MONGO_CONNECT_TIMEOUT_MS=2000
+APP_MONGO_SOCKET_TIMEOUT_MS=5000
+APP_MONGO_MAX_IDLE_TIME_MS=60000
 APP_PURGE_RETENTION_DAYS=90
 ```
 
 ### 4) Verification persistence Mongo
 
-Verifier au demarrage que la persistence est active, pas seulement le health global :
+Verifier au demarrage que la persistence est active, pas seulement le health global.
+Si Mongo est configure mais indisponible, l'application doit echouer au startup plutot que d'attendre la premiere requete :
 
 ```bash
 docker compose logs -f backend

@@ -61,6 +61,25 @@ describe("TeamStep", () => {
     expect(screen.getByRole("button", { name: /Choisir cette/i })).toBeDisabled();
   });
 
+  it("renders team screen labels with proper accents", () => {
+    render(
+      <TeamStep
+        err=""
+        selectedProject="Projet A"
+        teams={[{ id: "t1", name: "Equipe Alpha" }]}
+        selectedTeam="Equipe Alpha"
+        setSelectedTeam={vi.fn()}
+        loading={false}
+        onContinue={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "Choix de l'\u00E9quipe" })).toBeInTheDocument();
+    expect(screen.getByText("Projet s\u00E9lectionn\u00E9:")).toBeInTheDocument();
+    expect(screen.getByText("\u00C9quipes disponibles")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Choisir cette \u00E9quipe" })).toBeInTheDocument();
+  });
+
   it("disables button while loading even with selected team", () => {
     render(
       <TeamStep
@@ -229,4 +248,3 @@ describe("TeamStep", () => {
     expect(options[1]).toHaveValue("");
   });
 });
-
