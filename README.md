@@ -50,6 +50,7 @@ Le PAT Azure DevOps:
 - est utilise uniquement dans le navigateur de l'utilisateur
 - ne transite jamais par le backend
 - n'est pas sauvegarde par le serveur
+- en mode Cloud, les appels partent directement vers `https://dev.azure.com` et `https://app.vssps.visualstudio.com`
 
 Les invariants techniques et les controles CI associes sont documentes dans [`ARCHITECTURE.md`](ARCHITECTURE.md).
 

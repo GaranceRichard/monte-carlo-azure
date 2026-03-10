@@ -6,14 +6,15 @@ import {
   type AdoErrorContext,
 } from "./adoErrors";
 import {
-  ADO_CLOUD_BASE_URL,
-  ADO_CLOUD_PROFILE_BASE_URL,
   buildOnPremCollectionUrl,
   extractOnPremCollectionName,
   getAdoDeploymentTarget,
   listOnPremCollectionCandidates,
   normalizeAdoServerUrl,
 } from "./adoPlatform";
+
+const ADO = "https://dev.azure.com";
+const VSSPS = "https://app.vssps.visualstudio.com";
 
 function adoHeaders(pat: string): Record<string, string> {
   return {
@@ -80,10 +81,10 @@ function getAdoRuntimeContext(serverUrl?: string, collectionName?: string): AdoR
     const org = (collectionName ?? "").trim();
     return {
       deploymentTarget,
-      serverUrl: ADO_CLOUD_BASE_URL,
+      serverUrl: ADO,
       collectionName: org,
-      collectionUrl: org ? `${ADO_CLOUD_BASE_URL}/${encodeURIComponent(org)}` : ADO_CLOUD_BASE_URL,
-      profileUrl: ADO_CLOUD_PROFILE_BASE_URL,
+      collectionUrl: org ? `${ADO}/${encodeURIComponent(org)}` : ADO,
+      profileUrl: VSSPS,
     };
   }
 
@@ -284,7 +285,7 @@ export async function checkPatDirect(pat: string, serverUrl?: string, collection
 
 async function listOrgsByMemberId(memberId: string, pat: string): Promise<AdoOrg[]> {
   if (!memberId) return [];
-  const r = await fetch(`${ADO_CLOUD_PROFILE_BASE_URL}/_apis/accounts?memberId=${encodeURIComponent(memberId)}&${CLOUD_API}`, {
+  const r = await fetch(`${VSSPS}/_apis/accounts?memberId=${encodeURIComponent(memberId)}&${CLOUD_API}`, {
     headers: adoHeaders(pat),
   });
   if (!r.ok) return [];
