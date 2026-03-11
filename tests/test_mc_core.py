@@ -53,6 +53,8 @@ def test_mc_finish_weeks_invalid_inputs():
     with pytest.raises(ValueError):
         mc_finish_weeks(backlog_size=10, throughput_samples=np.array([], dtype=int))
     with pytest.raises(ValueError):
+        mc_finish_weeks(backlog_size=10, throughput_samples=None)
+    with pytest.raises(ValueError):
         mc_finish_weeks(backlog_size=10, throughput_samples=np.array([0, 0], dtype=int))
 
 
@@ -77,7 +79,21 @@ def test_mc_items_done_for_weeks_invalid_inputs():
     with pytest.raises(ValueError):
         mc_items_done_for_weeks(weeks=2, throughput_samples=np.array([], dtype=int))
     with pytest.raises(ValueError):
+        mc_items_done_for_weeks(weeks=2, throughput_samples=None)
+    with pytest.raises(ValueError):
         mc_items_done_for_weeks(weeks=2, throughput_samples=np.array([0, 0], dtype=int))
+
+
+def test_mc_finish_weeks_accepts_zero_only_samples_when_enabled():
+    samples = np.array([0, 0, 0], dtype=int)
+    out = mc_finish_weeks(
+        backlog_size=1,
+        throughput_samples=samples,
+        n_sims=10,
+        include_zero_weeks=True,
+        seed=1,
+    )
+    assert np.all(out == 521)
 
 
 def test_mc_finish_weeks_include_zero_rejects_all_negative_samples():

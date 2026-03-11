@@ -9,6 +9,9 @@ L'objectif est de lancer une instance complete, backend et frontend statique ser
 
 - Docker Engine
 - Plugin `docker compose`
+- Redis pour le rate limiting:
+  - soit service local via `docker-compose.yml` avec le service `redis`
+  - soit instance geree externe en pointant `APP_REDIS_URL`
 - MongoDB pour la persistence:
   - soit service local via `docker-compose.yml` avec le service `mongo`
   - soit instance managee externe en pointant `APP_MONGO_URL`
@@ -28,7 +31,7 @@ Si le endpoint retourne `{"status":"ok"}`, l'application est disponible sur :
 ### 3) Variables d'environnement
 
 Le fichier `.env` est charge par `docker-compose.yml`.
-Base recommandee :
+Base recommandee pour la production multi-workers :
 
 ```dotenv
 APP_PORT=8000
@@ -48,6 +51,12 @@ APP_MONGO_SOCKET_TIMEOUT_MS=5000
 APP_MONGO_MAX_IDLE_TIME_MS=60000
 APP_PURGE_RETENTION_DAYS=90
 ```
+
+Note rate limiting:
+
+- en developpement local, ne pas definir `APP_REDIS_URL`; l'application retombe sur `memory://`, ce qui est suffisant avec un seul processus
+- en production avec `uvicorn --workers 2`, `APP_REDIS_URL` est requise pour partager le compteur entre les workers
+- si Redis est indisponible, l'application reste permissive mais ecrit un log `warning`; il faut donc surveiller les logs backend
 
 ### 4) Verification persistence Mongo
 
@@ -70,7 +79,29 @@ curl -sS -H 'Cookie: IDMontecarlo=ops-smoke-client' \
 
 Si Mongo est indisponible, l'API doit remonter une erreur explicite sur les chemins de persistence.
 
-### 5) Cron de purge
+### 5) Verification rate limiting Redis
+
+Verifier que la limitation est bien partagee par Redis et qu'elle retourne `429` apres depassement du seuil :
+
+```bash
+for i in $(seq 1 21); do
+  curl -s -o /tmp/rate-limit.json -w "%{http_code}\n" \
+    -X POST http://127.0.0.1:8000/simulate \
+    -H "Content-Type: application/json" \
+    -H "X-Forwarded-For: ops-rate-limit-check" \
+    -d '{"throughput_samples":[1,2,3,4,5,6],"mode":"backlog_to_weeks","backlog_size":10,"n_sims":2000}'
+done
+```
+
+Les 20 premieres reponses doivent etre `200`, puis la 21e doit etre `429`.
+Si Redis tombe, la limitation peut devenir permissive; dans ce cas, verifier les logs :
+
+```bash
+docker compose logs -f backend
+docker compose logs -f redis
+```
+
+### 6) Cron de purge
 
 Planifier une execution quotidienne de `Scripts/purge_inactive_clients.py` sur l'hote.
 Exemple `crontab -e` :
@@ -81,7 +112,7 @@ Exemple `crontab -e` :
 
 Le script utilise `APP_MONGO_URL`, `APP_MONGO_DB` et `APP_PURGE_RETENTION_DAYS`.
 
-### 6) Commandes utiles
+### 7) Commandes utiles
 
 ```bash
 docker compose logs -f backend
@@ -99,6 +130,7 @@ Cette option reste valable pour des environnements qui imposent un runtime Linux
 
 - Python 3.12
 - Nginx
+- Redis joignable par `APP_REDIS_URL`
 - utilisateur systeme dedie, par exemple `montecarlo`
 
 ### 2) Installation backend
@@ -127,6 +159,7 @@ User=montecarlo
 Group=montecarlo
 WorkingDirectory=/opt/montecarlo
 Environment=PYTHONUNBUFFERED=1
+Environment=APP_REDIS_URL=redis://127.0.0.1:6379/0
 ExecStart=/opt/montecarlo/.venv/bin/uvicorn backend.api:app --host 127.0.0.1 --port 8000 --workers 2 --proxy-headers
 Restart=always
 RestartSec=3
@@ -142,6 +175,8 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now montecarlo-api
 sudo systemctl status montecarlo-api
 ```
+
+Avec `--workers 2`, Redis doit etre disponible via `APP_REDIS_URL`; sans cela, chaque worker comptera ses requetes localement.
 
 ### 4) Reverse proxy Nginx
 

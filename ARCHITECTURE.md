@@ -30,7 +30,10 @@ Le backend ne recoit que:
 
 Garde-fous serveur:
 
-- rate limiting distribue sur `POST /simulate` via Redis + slowapi
+- rate limiting sur `POST /simulate` via `slowapi`
+- stockage `memory://` en developpement local mono-processus
+- stockage Redis en production multi-workers pour partager le compteur entre processus
+- mode permissif si Redis devient indisponible, avec log applicatif au niveau `warning`
 - niveau de logs applicatifs reduit (`warning`)
 - logs d'acces HTTP desactives
 
@@ -155,6 +158,7 @@ CI GitHub Actions:
   - build image
   - smoke tests `/health` et `/health/mongo`
   - verification de persistance via `/simulate` puis `/simulations/history`
+  - verification du `429` au-dela du seuil de `POST /simulate`
 
 ## Notes d'implementation recentes
 

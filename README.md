@@ -99,6 +99,11 @@ python run_app.py
 
 API: `http://127.0.0.1:8000`
 
+Note rate limiting:
+`APP_REDIS_URL` est inutile en developpement local avec un seul processus `python run_app.py`.
+Laissez cette variable absente pour conserver le backend `memory://`.
+Elle devient requise en production quand l'API tourne avec plusieurs workers, sinon la limite est comptee separement par processus.
+
 ### Frontend
 
 ```bash
@@ -200,6 +205,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\run-vitals
 - `APP_MONGO_MAX_IDLE_TIME_MS` (defaut: `60000`)
 - `APP_SIMULATION_HISTORY_LIMIT` (defaut: `10`)
 - `APP_PURGE_RETENTION_DAYS` (defaut script purge: `30`)
+
+Variable d'environnement rate limiting:
+
+- `APP_RATE_LIMIT_SIMULATE` (defaut: `20/minute`)
+- `APP_REDIS_URL` uniquement en production multi-workers; ne pas la definir en developpement local
 
 Purge planifiee:
 

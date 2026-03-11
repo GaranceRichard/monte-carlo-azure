@@ -14,6 +14,7 @@ from .api_static import mount_frontend
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     simulation_store.connect()
+    limiter.check_storage()
     try:
         yield
     finally:

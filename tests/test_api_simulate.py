@@ -1,8 +1,12 @@
+import time
+
+import pytest
 from fastapi.testclient import TestClient
+from slowapi.errors import RateLimitExceeded
 from starlette.requests import Request
 
 from backend.api import app
-from backend.api_routes_simulate import _client_key_from_request
+from backend.api_routes_simulate import _client_key_from_request, limiter
 
 
 def test_simulate_backlog_to_weeks_success():
@@ -193,3 +197,179 @@ def test_client_key_returns_unknown_without_forwarded_or_client():
     )
 
     assert _client_key_from_request(request) == "unknown"
+
+
+def test_simulate_logs_warning_and_stays_permissive_when_rate_limit_storage_fails(
+    monkeypatch, caplog
+):
+    client = TestClient(app)
+    payload = {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 2000,
+    }
+    original_hit = limiter._limiter.hit
+    original_storage_uri = limiter._storage_uri
+    original_warning_active = limiter._storage_warning_active
+    original_warning_logged_at = limiter._storage_warning_last_logged_at
+
+    def broken_hit(*args, **kwargs):
+        raise RuntimeError("redis unavailable")
+
+    monkeypatch.setattr(limiter._limiter, "hit", broken_hit)
+    limiter._storage_uri = "redis://redis:6379/0"
+    limiter._storage_warning_active = False
+    limiter._storage_warning_last_logged_at = 0.0
+
+    with caplog.at_level("WARNING"):
+        response = client.post("/simulate", json=payload)
+
+    limiter._limiter.hit = original_hit
+    limiter._storage_uri = original_storage_uri
+    limiter._storage_warning_active = original_warning_active
+    limiter._storage_warning_last_logged_at = original_warning_logged_at
+
+    assert response.status_code == 200
+    assert "Rate limit storage unreachable" in caplog.text
+
+
+def test_rate_limit_storage_check_logs_warning_when_redis_is_unreachable(caplog, monkeypatch):
+    original_storage_uri = limiter._storage_uri
+    original_storage_check = limiter._storage.check
+    original_warning_active = limiter._storage_warning_active
+    original_warning_logged_at = limiter._storage_warning_last_logged_at
+
+    def broken_check():
+        raise RuntimeError("redis healthcheck unavailable")
+
+    monkeypatch.setattr(limiter._storage, "check", broken_check)
+    limiter._storage_uri = "redis://redis:6379/0"
+    limiter._storage_warning_active = False
+    limiter._storage_warning_last_logged_at = 0.0
+
+    with caplog.at_level("WARNING"):
+        assert limiter.check_storage() is False
+
+    limiter._storage_uri = original_storage_uri
+    limiter._storage.check = original_storage_check
+    limiter._storage_warning_active = original_warning_active
+    limiter._storage_warning_last_logged_at = original_warning_logged_at
+
+    assert "Rate limit storage unreachable" in caplog.text
+
+
+def test_rate_limit_storage_warning_is_throttled(caplog, monkeypatch):
+    original_warning_active = limiter._storage_warning_active
+    original_warning_logged_at = limiter._storage_warning_last_logged_at
+
+    limiter._storage_warning_active = True
+    limiter._storage_warning_last_logged_at = 0.0
+    monkeypatch.setattr(limiter, "_warning_interval_elapsed", lambda: False)
+
+    with caplog.at_level("WARNING"):
+        limiter._log_storage_warning(RuntimeError("redis unavailable"))
+
+    limiter._storage_warning_active = original_warning_active
+    limiter._storage_warning_last_logged_at = original_warning_logged_at
+
+    assert "Rate limit storage unreachable" not in caplog.text
+
+
+def test_rate_limit_storage_recovery_logs_when_warning_was_active(caplog):
+    original_warning_active = limiter._storage_warning_active
+
+    limiter._storage_warning_active = True
+
+    with caplog.at_level("WARNING"):
+        limiter._log_storage_recovery()
+
+    limiter._storage_warning_active = original_warning_active
+
+    assert "Rate limit storage recovered" in caplog.text
+
+
+def test_rate_limit_storage_check_memory_backend_returns_true():
+    original_storage_uri = limiter._storage_uri
+    limiter._storage_uri = "memory://"
+
+    assert limiter.check_storage() is True
+
+    limiter._storage_uri = original_storage_uri
+
+
+def test_rate_limit_storage_check_true_clears_warning_state(caplog, monkeypatch):
+    original_storage_uri = limiter._storage_uri
+    original_warning_active = limiter._storage_warning_active
+
+    monkeypatch.setattr(limiter._storage, "check", lambda: True)
+    limiter._storage_uri = "redis://redis:6379/0"
+    limiter._storage_warning_active = True
+
+    with caplog.at_level("WARNING"):
+        assert limiter.check_storage() is True
+
+    limiter._storage_uri = original_storage_uri
+    limiter._storage_warning_active = original_warning_active
+
+    assert "Rate limit storage recovered" in caplog.text
+
+
+def test_rate_limit_storage_warning_interval_elapsed():
+    original_warning_logged_at = limiter._storage_warning_last_logged_at
+    limiter._storage_warning_last_logged_at = time.monotonic() - 10
+
+    assert limiter._warning_interval_elapsed() is True
+
+    limiter._storage_warning_last_logged_at = original_warning_logged_at
+
+
+def test_rate_limit_storage_check_false_logs_warning(caplog, monkeypatch):
+    original_storage_uri = limiter._storage_uri
+    original_warning_active = limiter._storage_warning_active
+    original_warning_logged_at = limiter._storage_warning_last_logged_at
+
+    monkeypatch.setattr(limiter._storage, "check", lambda: False)
+    limiter._storage_uri = "redis://redis:6379/0"
+    limiter._storage_warning_active = False
+    limiter._storage_warning_last_logged_at = 0.0
+
+    with caplog.at_level("WARNING"):
+        assert limiter.check_storage() is False
+
+    limiter._storage_uri = original_storage_uri
+    limiter._storage_warning_active = original_warning_active
+    limiter._storage_warning_last_logged_at = original_warning_logged_at
+
+    assert "Rate limit storage unreachable" in caplog.text
+
+
+def test_check_request_limit_returns_early_when_storage_warning_active(monkeypatch):
+    request = Request({"type": "http", "headers": [], "path": "/simulate"})
+    limiter._storage_warning_active = True
+    monkeypatch.setattr(limiter, "check_storage", lambda: False)
+
+    limiter._check_request_limit(request, None, False)
+
+    limiter._storage_warning_active = False
+
+    assert request.state.view_rate_limit is None
+
+
+def test_check_request_limit_reraises_rate_limit_exceeded(monkeypatch):
+    request = Request({"type": "http", "headers": [], "path": "/simulate"})
+
+    class _FakeLimit:
+        error_message = None
+        limit = "1/minute"
+
+    def raise_rate_limit(self, request, endpoint_func, in_middleware):
+        raise RateLimitExceeded(_FakeLimit())
+
+    monkeypatch.setattr(
+        "backend.api_routes_simulate.Limiter._check_request_limit",
+        raise_rate_limit,
+    )
+
+    with pytest.raises(RateLimitExceeded):
+        limiter._check_request_limit(request, None, False)

@@ -101,6 +101,18 @@ def test_simulation_history_returns_empty_without_cookie(monkeypatch):
     assert r.json() == []
 
 
+def test_simulation_history_returns_empty_when_store_disabled(monkeypatch):
+    fake = _FakeStore(enabled=False)
+    monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
+    client_id = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+
+    client = TestClient(app)
+    client.cookies.set(api_routes_simulate.cfg.client_cookie_name, client_id)
+    r = client.get("/simulations/history")
+    assert r.status_code == 200
+    assert r.json() == []
+
+
 def test_simulation_history_returns_503_when_store_unavailable(monkeypatch):
     fake = _FakeStore(enabled=True, fail=True)
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)

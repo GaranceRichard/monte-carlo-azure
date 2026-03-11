@@ -160,6 +160,30 @@ jobs:
             exit 1
           }
 
+          RATE_LIMIT_PAYLOAD='{"throughput_samples":[1,2,3,4,5,6],"mode":"backlog_to_weeks","backlog_size":10,"n_sims":2000}'
+          RATE_LIMIT_IP="ci-rate-limit-shared"
+          LAST_STATUS=""
+          for i in $(seq 1 21); do
+            LAST_STATUS=$(curl -sS -o /tmp/rate-limit-response.json -w "%{http_code}" \
+              -X POST http://127.0.0.1:8000/simulate \
+              -H "Content-Type: application/json" \
+              -H "X-Forwarded-For: ${RATE_LIMIT_IP}" \
+              -d "${RATE_LIMIT_PAYLOAD}")
+            if [ "$i" -le 20 ] && [ "$LAST_STATUS" != "200" ]; then
+              echo "Rate limit rejected too early on request ${i}: ${LAST_STATUS}"
+              cat /tmp/rate-limit-response.json
+              docker compose logs backend redis || true
+              exit 1
+            fi
+          done
+
+          if [ "$LAST_STATUS" != "429" ]; then
+            echo "Expected HTTP 429 after exceeding shared rate limit, got ${LAST_STATUS}"
+            cat /tmp/rate-limit-response.json
+            docker compose logs backend redis || true
+            exit 1
+          fi
+
       - name: Stop services
         if: always()
         run: |

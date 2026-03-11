@@ -1003,4 +1003,427 @@ test.describe("e2e istanbul coverage", () => {
     ]);
     expect(results.invalidCandidates).toEqual([]);
   });
+
+  test("coverage: branches ado client direct", async ({ page }) => {
+    await page.goto("/");
+
+    const results = await page.evaluate(async () => {
+      const adoClient = await import("/src/adoClient.ts");
+      const originalFetch = window.fetch.bind(window);
+      let teamFieldMode = "fallback";
+      let throughputMode = "empty";
+      let profileMode = "cloud-ok";
+      let projectMode = "ok";
+
+      const jsonResponse = (payload, status = 200, statusText = "OK") =>
+        new Response(JSON.stringify(payload), {
+          status,
+          statusText,
+          headers: { "Content-Type": "application/json" },
+        });
+
+      window.fetch = async (input, init) => {
+        const url = String(input);
+
+        if (url.includes("/_apis/profile/profiles/me?")) {
+          if (profileMode === "cloud-ok") {
+            return jsonResponse({ displayName: "Utilisateur", id: "member-1", publicAlias: "alias-1" });
+          }
+          if (profileMode === "cloud-restricted") {
+            return new Response("{}", {
+              status: 401,
+              headers: { "x-vss-userdata": "aad.member-2:Jane Doe" },
+            });
+          }
+          if (profileMode === "cloud-forbidden") {
+            return new Response("{}", { status: 403, statusText: "Forbidden" });
+          }
+        }
+
+        if (url.includes("/_apis/accounts?memberId=")) {
+          if (url.includes("member-1")) return jsonResponse({ value: [{ accountName: "org-demo" }] });
+          if (url.includes("member-none")) return jsonResponse({ value: [] });
+          return new Response("{}", { status: 500, statusText: "Server Error" });
+        }
+
+        if (url.includes("/_apis/projects?$top=1&api-version=6.0")) {
+          if (url.includes("https://serveur/tfs/_apis/projects")) {
+            return new Response("{}", { status: 404, statusText: "Not Found" });
+          }
+          if (projectMode === "network-error") {
+            throw new Error("network down");
+          }
+          return jsonResponse({ value: [{ id: "p1", name: "Projet A" }] });
+        }
+
+        if (url.includes("/_apis/projects?api-version=6.0")) {
+          if (projectMode === "network-error") {
+            throw new Error("network down");
+          }
+          return jsonResponse({ value: [{ id: "p1", name: "Projet A" }] });
+        }
+
+        if (url.includes("/_apis/projects/p1/teams?api-version=6.0")) {
+          return jsonResponse({ value: [{ id: "t1", name: "Equipe A" }] });
+        }
+
+        if (url.includes("/_apis/wit/workitemtypes?")) {
+          return jsonResponse({ value: [{ name: "Bug" }, { name: "Task" }] });
+        }
+
+        if (url.includes("/workitemtypes/Bug/states?")) {
+          return jsonResponse({ value: [{ name: "Done" }] });
+        }
+
+        if (url.includes("/workitemtypes/Task/states?")) {
+          return new Response("{}", { status: 500, statusText: "Server Error" });
+        }
+
+        if (url.includes("/teamfieldvalues?")) {
+          if (teamFieldMode === "fallback") {
+            return new Response("{}", { status: 404, statusText: "Not Found" });
+          }
+          if (teamFieldMode === "empty") {
+            return jsonResponse({ values: [{ value: "", includeChildren: true }] });
+          }
+          if (teamFieldMode === "throw") {
+            throw new Error("teamfieldvalues down");
+          }
+          return jsonResponse({
+            values: [
+              { value: "Projet A\\Equipe A", includeChildren: false },
+              { value: "Projet A\\Equipe A\\Sous-equipe", includeChildren: true },
+            ],
+          });
+        }
+
+        if (url.includes("/_apis/wit/wiql?")) {
+          if (throughputMode === "empty") {
+            return jsonResponse({ workItems: [] });
+          }
+          const size = throughputMode === "warning" ? 210 : 12;
+          return jsonResponse({
+            workItems: Array.from({ length: size }, (_, index) => ({ id: index + 1 })),
+          });
+        }
+
+        if (url.includes("/_apis/wit/workitems?ids=")) {
+          const ids = new URL(url).searchParams.get("ids").split(",").map((id) => Number(id));
+          if (throughputMode === "warning" && ids[0] > 200) {
+            return new Response("batch-failure", { status: 500, statusText: "Server Error" });
+          }
+          return jsonResponse({
+            value: ids.map((id) => ({
+              fields: {
+                "Microsoft.VSTS.Common.ClosedDate": new Date(
+                  Date.UTC(2026, 0, 1 + ((id - 1) % 6) * 7, 12, 0, 0, 0),
+                ).toISOString(),
+              },
+            })),
+          });
+        }
+
+        return originalFetch(input, init);
+      };
+
+      try {
+        profileMode = "cloud-ok";
+        const cloudProfile = await adoClient.checkPatDirect("pat-a");
+
+        profileMode = "cloud-restricted";
+        const restrictedProfile = await adoClient.checkPatDirect("pat-b");
+
+        profileMode = "cloud-forbidden";
+        const cloudForbidden = await adoClient.checkPatDirect("pat-c").catch((error) => error instanceof Error);
+
+        profileMode = "cloud-ok";
+        const cloudScope = await adoClient.resolvePatOrganizationScopeDirect("pat-d");
+
+        const onPremScope = await adoClient.resolvePatOrganizationScopeDirect(
+          "pat-e",
+          "https://serveur/tfs/collection/projet",
+        );
+
+        const orgsOnPrem = await adoClient.listOrgsDirect("pat-f", "https://serveur/tfs/collection");
+        const projects = await adoClient.listProjectsDirect(
+          "collection",
+          "pat-g",
+          "https://serveur/tfs/collection",
+        );
+        const teams = await adoClient.listTeamsDirect(
+          "collection",
+          "Projet A",
+          "pat-h",
+          "https://serveur/tfs/collection",
+        );
+        const missingTeamProject = await adoClient
+          .listTeamsDirect("collection", "Projet introuvable", "pat-i", "https://serveur/tfs/collection")
+          .catch((error) => error instanceof Error);
+
+        const teamOptions = await adoClient.getTeamOptionsDirect(
+          "collection",
+          "Projet A",
+          "Equipe A",
+          "pat-j",
+          "https://serveur/tfs/collection",
+        );
+
+        teamFieldMode = "fallback";
+        throughputMode = "empty";
+        const emptyThroughput = await adoClient.getWeeklyThroughputDirect(
+          "collection",
+          "Projet A",
+          "Equipe A",
+          "pat-k",
+          "2026-01-01",
+          "2026-03-01",
+          [],
+          [],
+          "https://serveur/tfs/collection",
+        );
+
+        teamFieldMode = "explicit";
+        throughputMode = "warning";
+        const warningThroughput = await adoClient.getWeeklyThroughputDirect(
+          "collection",
+          "Projet A",
+          "Equipe A",
+          "pat-l",
+          "2026-01-01",
+          "2026-03-01",
+          ["Done"],
+          ["Bug"],
+          "https://serveur/tfs/collection",
+        );
+
+        teamFieldMode = "throw";
+        throughputMode = "full";
+        const recoveredThroughput = await adoClient.getWeeklyThroughputDirect(
+          "collection",
+          "Projet A",
+          "Equipe A",
+          "pat-m",
+          "2026-01-01",
+          "2026-03-01",
+          ["Done"],
+          ["Bug"],
+          "https://serveur/tfs/collection",
+        );
+
+        projectMode = "network-error";
+        const projectNetworkError = await adoClient
+          .listProjectsDirect("collection", "pat-n", "https://serveur/tfs/collection")
+          .catch((error) => error instanceof Error);
+
+        return {
+          cloudProfile,
+          restrictedProfile,
+          cloudForbidden,
+          cloudScope,
+          onPremScope,
+          orgsOnPrem,
+          projects,
+          teams,
+          missingTeamProject,
+          teamOptions,
+          emptyThroughput,
+          warningThroughput,
+          recoveredThroughput,
+          projectNetworkError,
+        };
+      } finally {
+        window.fetch = originalFetch;
+      }
+    });
+
+    expect(results.cloudProfile.displayName).toBe("Utilisateur");
+    expect(results.restrictedProfile.restrictedProfile).toBe(true);
+    expect(results.cloudForbidden).toBe(true);
+    expect(results.cloudScope.scope).toBe("global");
+    expect(results.onPremScope.scope).toBe("local");
+    expect(results.orgsOnPrem).toEqual([]);
+    expect(results.projects).toEqual([{ id: "p1", name: "Projet A" }]);
+    expect(results.teams).toEqual([{ id: "t1", name: "Equipe A" }]);
+    expect(results.missingTeamProject).toBe(true);
+    expect(results.teamOptions.workItemTypes).toEqual(["Bug", "Task"]);
+    expect(Array.isArray(results.emptyThroughput)).toBe(true);
+    expect(results.warningThroughput.warning).toContain("historique partiel");
+    expect(Array.isArray(results.recoveredThroughput)).toBe(true);
+    expect(results.projectNetworkError).toBe(true);
+  });
+
+  test("coverage: branches usePortfolioReport direct", async ({ page }) => {
+    await page.goto("/");
+
+    const results = await page.evaluate(async () => {
+      const { React, createRoot } = await import("/src/e2e/runtime.ts");
+      const { usePortfolioReport } = await import("/src/hooks/usePortfolioReport.ts");
+      const originalFetch = window.fetch.bind(window);
+      const originalOpen = window.open.bind(window);
+      let portfolioMode = "success";
+
+      const flush = async () => {
+        await Promise.resolve();
+        await new Promise((resolve) => window.setTimeout(resolve, 0));
+      };
+
+      const jsonResponse = (payload, status = 200, statusText = "OK") =>
+        new Response(JSON.stringify(payload), {
+          status,
+          statusText,
+          headers: { "Content-Type": "application/json" },
+        });
+
+      const createPopup = () => {
+        const doc = document.implementation.createHTMLDocument("portfolio-export");
+        return {
+          document: doc,
+          alert: () => undefined,
+          addEventListener: (_name, callback) => {
+            window.setTimeout(() => callback(), 0);
+          },
+          close: () => undefined,
+        };
+      };
+
+      window.open = () => createPopup();
+      window.fetch = async (input, init) => {
+        const url = String(input);
+
+        if (url.includes("/teamfieldvalues?")) {
+          return jsonResponse({ values: [{ value: "Projet A\\Equipe A", includeChildren: true }] });
+        }
+        if (url.includes("/_apis/wit/wiql?")) {
+          if (portfolioMode === "phase1-fail") {
+            return jsonResponse({ workItems: [] });
+          }
+          return jsonResponse({
+            workItems: Array.from({ length: 8 }, (_, index) => ({ id: index + 1 })),
+          });
+        }
+        if (url.includes("/_apis/wit/workitems?ids=")) {
+          const ids = new URL(url).searchParams.get("ids").split(",").map((id) => Number(id));
+          return jsonResponse({
+            value: ids.map((id) => ({
+              fields: {
+                "Microsoft.VSTS.Common.ClosedDate": new Date(
+                  Date.UTC(2026, 0, 1 + ((id - 1) % 6) * 7, 12, 0, 0, 0),
+                ).toISOString(),
+              },
+            })),
+          });
+        }
+        if (url.includes("/simulate")) {
+          if (portfolioMode === "phase2-fail") {
+            return new Response("sim-failure", { status: 503, statusText: "Service Unavailable" });
+          }
+          return jsonResponse({
+            result_kind: "weeks",
+            samples_count: 8,
+            risk_score: 0.3,
+            result_percentiles: { P50: 10, P70: 12, P90: 15 },
+            result_distribution: [{ x: 10, count: 5 }],
+          });
+        }
+        return originalFetch(input, init);
+      };
+
+      const runScenario = async (teamConfigs) => {
+        const container = document.createElement("div");
+        document.body.appendChild(container);
+        const root = createRoot(container);
+        let latestState;
+        let readyResolve;
+        const ready = new Promise((resolve) => {
+          readyResolve = resolve;
+        });
+
+        function Harness() {
+          const state = usePortfolioReport({
+            selectedOrg: "collection",
+            selectedProject: "Projet A",
+            pat: "token",
+            serverUrl: "https://serveur/tfs/collection",
+            startDate: "2026-01-01",
+            endDate: "2026-03-01",
+            includeZeroWeeks: true,
+            simulationMode: "backlog_to_weeks",
+            backlogSize: 120,
+            targetWeeks: 12,
+            nSims: 2000,
+            arrimageRate: 80,
+            teamConfigs,
+          });
+          React.useEffect(() => {
+            latestState = state;
+            readyResolve?.(state);
+          }, [state]);
+          return null;
+        }
+
+        root.render(React.createElement(Harness));
+        await ready;
+        await latestState.handleGenerateReport();
+        for (let index = 0; index < 5; index += 1) {
+          await flush();
+        }
+        const snapshot = {
+          loadingReport: latestState.loadingReport,
+          reportErr: latestState.reportErr,
+          reportErrors: latestState.reportErrors,
+          generationProgress: latestState.generationProgress,
+        };
+        root.unmount();
+        container.remove();
+        return snapshot;
+      };
+
+      try {
+        const noOp = await runScenario([]);
+
+        portfolioMode = "phase1-fail";
+        const phase1Fail = await runScenario([
+          {
+            teamName: "Equipe A",
+            workItemTypeOptions: ["Bug"],
+            statesByType: { Bug: ["Done"] },
+            types: ["Bug"],
+            doneStates: ["Done"],
+          },
+        ]);
+
+        portfolioMode = "phase2-fail";
+        const phase2Fail = await runScenario([
+          {
+            teamName: "Equipe A",
+            workItemTypeOptions: ["Bug"],
+            statesByType: { Bug: ["Done"] },
+            types: ["Bug"],
+            doneStates: ["Done"],
+          },
+        ]);
+
+        portfolioMode = "success";
+        const success = await runScenario([
+          {
+            teamName: "Equipe A",
+            workItemTypeOptions: ["Bug"],
+            statesByType: { Bug: ["Done"] },
+            types: ["Bug"],
+            doneStates: ["Done"],
+          },
+        ]);
+
+        return { noOp, phase1Fail, phase2Fail, success };
+      } finally {
+        window.fetch = originalFetch;
+        window.open = originalOpen;
+      }
+    });
+
+    expect(results.noOp.generationProgress).toEqual({ done: 0, total: 0 });
+    expect(results.phase1Fail.reportErr).toBe("Aucune equipe n'a pu etre simulee.");
+    expect(results.phase2Fail.reportErr).toBe("Aucune simulation n'a pu etre finalisee.");
+    expect(results.success.reportErr).toBe("");
+  });
 });
