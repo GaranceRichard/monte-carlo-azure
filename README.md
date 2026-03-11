@@ -211,6 +211,12 @@ Variable d'environnement rate limiting:
 - `APP_RATE_LIMIT_SIMULATE` (defaut: `20/minute`)
 - `APP_REDIS_URL` uniquement en production multi-workers; ne pas la definir en developpement local
 
+Variable d'environnement simulation:
+
+- `APP_FORECAST_TIMEOUT_SECONDS` (defaut: `30`)
+  - applique un timeout de reponse sur `POST /simulate`
+  - le calcul NumPy continue jusqu'a sa fin dans son thread si le delai est depasse, mais l'API rend immediatement un `503`
+
 Purge planifiee:
 
 ```bash

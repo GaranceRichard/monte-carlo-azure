@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import time
@@ -6,6 +7,7 @@ import numpy as np
 from fastapi import APIRouter, HTTPException, Request
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
+from starlette.concurrency import run_in_threadpool
 
 from .api_config import get_api_config
 from .api_models import SimulateRequest, SimulateResponse, SimulationHistoryItem
@@ -103,9 +105,39 @@ limiter = ObservableLimiter(
 )
 
 
+def _compute_simulation_result(
+    req: SimulateRequest,
+    samples: np.ndarray,
+) -> tuple[np.ndarray, str]:
+    if req.mode == "backlog_to_weeks":
+        if not req.backlog_size:
+            raise HTTPException(400, "backlog_size requis.")
+        return (
+            mc_finish_weeks(
+                req.backlog_size,
+                samples,
+                req.n_sims,
+                include_zero_weeks=req.include_zero_weeks,
+            ),
+            "weeks",
+        )
+
+    if not req.target_weeks:
+        raise HTTPException(400, "target_weeks requis.")
+    return (
+        mc_items_done_for_weeks(
+            req.target_weeks,
+            samples,
+            req.n_sims,
+            include_zero_weeks=req.include_zero_weeks,
+        ),
+        "items",
+    )
+
+
 @router.post("/simulate", response_model=SimulateResponse)
 @limiter.limit(cfg.rate_limit_simulate)
-def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
+async def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
     started_at = time.perf_counter()
     samples = np.array(req.throughput_samples)
     if req.include_zero_weeks:
@@ -120,26 +152,29 @@ def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
         )
         raise HTTPException(422, detail)
 
-    if req.mode == "backlog_to_weeks":
-        if not req.backlog_size:
-            raise HTTPException(400, "backlog_size requis.")
-        result = mc_finish_weeks(
-            req.backlog_size,
-            samples,
-            req.n_sims,
-            include_zero_weeks=req.include_zero_weeks,
+    try:
+        result, kind = await asyncio.wait_for(
+            run_in_threadpool(_compute_simulation_result, req, samples),
+            timeout=cfg.forecast_timeout_seconds,
         )
-        kind = "weeks"
-    else:
-        if not req.target_weeks:
-            raise HTTPException(400, "target_weeks requis.")
-        result = mc_items_done_for_weeks(
-            req.target_weeks,
-            samples,
-            req.n_sims,
-            include_zero_weeks=req.include_zero_weeks,
+    except TimeoutError as exc:
+        logger.warning(
+            json.dumps(
+                {
+                    "event": "simulation_timeout",
+                    "mode": req.mode,
+                    "n_sims": req.n_sims,
+                    "timeout_seconds": cfg.forecast_timeout_seconds,
+                    "samples_count": int(len(samples)),
+                    "duration_ms": round((time.perf_counter() - started_at) * 1000, 2),
+                },
+                ensure_ascii=True,
+            )
         )
-        kind = "items"
+        raise HTTPException(
+            503,
+            "Simulation trop longue. Reessayez avec moins de simulations ou plus tard.",
+        ) from exc
 
     simulation_percentiles = percentiles(result, ps=(50, 70, 90))
     response_model = SimulateResponse(

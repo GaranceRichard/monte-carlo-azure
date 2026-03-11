@@ -6,6 +6,7 @@ from slowapi.errors import RateLimitExceeded
 from starlette.requests import Request
 
 from backend.api import app
+from backend.api_config import ApiConfig
 from backend.api_routes_simulate import _client_key_from_request, limiter
 
 
@@ -162,6 +163,48 @@ def test_simulate_rate_limit_returns_429():
 
     assert statuses[:20] == [200] * 20
     assert statuses[20] == 429
+
+
+def test_simulate_returns_503_when_forecast_timeout_is_exceeded(monkeypatch):
+    client = TestClient(app)
+    payload = {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 2000,
+    }
+
+    def slow_compute(req, samples):
+        time.sleep(0.05)
+        return [1, 2, 3], "weeks"
+
+    monkeypatch.setattr("backend.api_routes_simulate._compute_simulation_result", slow_compute)
+    monkeypatch.setattr(
+        "backend.api_routes_simulate.cfg",
+        ApiConfig(
+            cors_origins=[],
+            cors_allow_credentials=True,
+            forecast_timeout_seconds=0.01,
+            rate_limit_simulate="20/minute",
+            rate_limit_storage_url="memory://",
+            client_cookie_name="IDMontecarlo",
+            simulation_history_limit=10,
+            mongo_url="",
+            mongo_db="montecarlo",
+            mongo_collection_simulations="simulations",
+            mongo_min_pool_size=5,
+            mongo_max_pool_size=20,
+            mongo_server_selection_timeout_ms=2000,
+            mongo_connect_timeout_ms=2000,
+            mongo_socket_timeout_ms=5000,
+            mongo_max_idle_time_ms=60000,
+        ),
+    )
+
+    response = client.post("/simulate", json=payload)
+
+    assert response.status_code == 503
+    assert "Simulation trop longue" in response.json()["detail"]
 
 
 def test_client_key_prefers_first_forwarded_ip():
