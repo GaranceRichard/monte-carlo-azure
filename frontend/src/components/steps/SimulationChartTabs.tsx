@@ -13,6 +13,19 @@ import {
 } from "recharts";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "../ui/tabs";
 import { useSimulationContext } from "../../hooks/SimulationContext";
+import { computeThroughputReliability } from "../../utils/simulation";
+
+function formatReliabilityMetric(value: number): string {
+  return value.toFixed(2).replace(".", ",");
+}
+
+function getReliabilityTone(label?: string): string {
+  if (label === "fiable") return "border-emerald-600 bg-emerald-50 text-emerald-700";
+  if (label === "incertain") return "border-amber-500 bg-amber-50 text-amber-700";
+  if (label === "fragile") return "border-red-600 bg-red-50 text-red-700";
+  if (label === "non fiable") return "border-black bg-neutral-200 text-black";
+  return "border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]";
+}
 
 export default function SimulationChartTabs() {
   const { selectedTeam, simulation } = useSimulationContext();
@@ -27,6 +40,15 @@ export default function SimulationChartTabs() {
       return { ...point, movingAverage: Number(average.toFixed(2)) };
     });
   }, [s.throughputData]);
+
+  const reliability = useMemo(() => {
+    if (s.result?.throughput_reliability) {
+      return s.result.throughput_reliability;
+    }
+    return computeThroughputReliability((s.throughputData ?? []).map((point) => point.throughput));
+  }, [s.result?.throughput_reliability, s.throughputData]);
+
+  const reliabilityTone = useMemo(() => getReliabilityTone(reliability?.label), [reliability?.label]);
 
   const renderThroughputTooltip = ({
     active,
@@ -65,6 +87,7 @@ export default function SimulationChartTabs() {
       nSims: s.nSims,
       resultKind: s.result.result_kind,
       displayPercentiles: s.displayPercentiles,
+      throughputReliability: reliability,
       throughputPoints: throughputWithMovingAverage,
       distributionPoints: s.mcHistData,
       probabilityPoints: s.probabilityCurveData,
@@ -110,7 +133,17 @@ export default function SimulationChartTabs() {
           </div>
 
           <TabsContent value="throughput">
-            <h4 className="m-0 text-base font-bold">Throughput hebdomadaire</h4>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <h4 className="m-0 text-base font-bold">Throughput hebdomadaire</h4>
+              {reliability && (
+                <span
+                  className={`inline-flex items-center self-start rounded-full border px-3 py-1 text-xs font-semibold ${reliabilityTone}`}
+                  title={`CV ${formatReliabilityMetric(reliability.cv)} · IQR ${formatReliabilityMetric(reliability.iqr_ratio)} · pente ${formatReliabilityMetric(reliability.slope_norm)} · ${reliability.samples_count} semaines`}
+                >
+                  Fiabilite {reliability.label} · CV {formatReliabilityMetric(reliability.cv)}
+                </span>
+              )}
+            </div>
             <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
               Chaque point représente le nombre d&apos;items terminés sur une semaine historique.
             </p>

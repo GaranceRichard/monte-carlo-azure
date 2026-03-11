@@ -24,12 +24,23 @@ export type WeeklyThroughputRow = {
   throughput: number;
 };
 
+export type ThroughputReliabilityLabel = "fiable" | "incertain" | "fragile" | "non fiable";
+
+export type ThroughputReliability = {
+  cv: number;
+  iqr_ratio: number;
+  slope_norm: number;
+  label: ThroughputReliabilityLabel;
+  samples_count: number;
+};
+
 export type ForecastResponse = {
   result_kind: ForecastKind;
   samples_count: number;
   result_percentiles: Record<string, number>;
   risk_score?: number;
   result_distribution: ForecastHistogramBucket[];
+  throughput_reliability?: ThroughputReliability;
 };
 
 export type ForecastRequestPayload = {

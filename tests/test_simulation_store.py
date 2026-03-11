@@ -9,7 +9,13 @@ from pymongo import MongoClient
 from pymongo.errors import AutoReconnect, PyMongoError
 
 from backend.api_config import ApiConfig
-from backend.api_models import ClientContext, DistributionBucket, SimulateRequest, SimulateResponse
+from backend.api_models import (
+    ClientContext,
+    DistributionBucket,
+    SimulateRequest,
+    SimulateResponse,
+    ThroughputReliability,
+)
 from backend.simulation_store import SimulationStore
 
 
@@ -125,6 +131,13 @@ def _req_resp():
         risk_score=0.4,
         result_distribution=[DistributionBucket(x=8, count=12)],
         samples_count=6,
+        throughput_reliability=ThroughputReliability(
+            cv=0.25,
+            iqr_ratio=0.2,
+            slope_norm=-0.01,
+            label="fiable",
+            samples_count=6,
+        ),
     )
     return req, resp
 

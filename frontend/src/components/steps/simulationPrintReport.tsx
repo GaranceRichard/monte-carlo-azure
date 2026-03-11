@@ -7,7 +7,8 @@ import {
   type ThroughputExportPoint,
 } from "./simulationChartsSvg";
 import { buildSimulationPdfFileName, downloadSimulationPdf } from "./simulationPdfDownload";
-import { computeRiskScoreFromPercentiles } from "../../utils/simulation";
+import { computeRiskScoreFromPercentiles, computeThroughputReliability } from "../../utils/simulation";
+import type { ThroughputReliability } from "../../types";
 
 function escapeHtml(value: string): string {
   return value
@@ -19,6 +20,22 @@ function escapeHtml(value: string): string {
 }
 
 export { buildSimulationPdfFileName, downloadSimulationPdf };
+
+function formatMetric(value: number): string {
+  return Number(value ?? 0).toFixed(2).replace(".", ",");
+}
+
+function buildReliabilitySummary(reliability?: ThroughputReliability): string {
+  if (!reliability) return "Non disponible";
+  if (reliability.samples_count < 6) return "Historique trop court pour projeter avec confiance.";
+  if (reliability.slope_norm <= -0.15) return "Throughput en forte baisse sur les dernieres semaines.";
+  if (reliability.slope_norm <= -0.05) return "Throughput en baisse sur les dernieres semaines.";
+  if (reliability.slope_norm >= 0.10) return "Throughput en forte hausse sur les dernieres semaines.";
+  if (reliability.slope_norm >= 0.05) return "Throughput en hausse sur les dernieres semaines.";
+  if (reliability.cv >= 1 || reliability.iqr_ratio >= 1) return "Dispersion elevee du throughput historique.";
+  if (reliability.samples_count < 8) return "Volume historique encore limite.";
+  return "Historique globalement stable.";
+}
 
 export function exportSimulationPrintReport({
   selectedTeam,
@@ -33,6 +50,7 @@ export function exportSimulationPrintReport({
   nSims,
   resultKind,
   displayPercentiles,
+  throughputReliability,
   throughputPoints,
   distributionPoints,
   probabilityPoints,
@@ -49,6 +67,7 @@ export function exportSimulationPrintReport({
   nSims: number | string;
   resultKind: "items" | "weeks";
   displayPercentiles: Record<string, number>;
+  throughputReliability?: ThroughputReliability;
   throughputPoints: ThroughputExportPoint[];
   distributionPoints: DistributionExportPoint[];
   probabilityPoints: ProbabilityExportPoint[];
@@ -66,11 +85,16 @@ export function exportSimulationPrintReport({
   const typeSummary = types.length ? types.join(", ") : "Aucun";
   const stateSummary = doneStates.length ? doneStates.join(", ") : "Aucun";
   const modeZeroLabel = includeZeroWeeks ? "Semaines 0 incluses" : "Semaines 0 exclues";
-  const resultLabel = resultKind === "items" ? "items (au moins)" : "semaines (au plus)";
+  const resultLabel = resultKind === "items" ? "items" : "semaines (au plus)";
   const effectiveRiskScore = computeRiskScoreFromPercentiles(simulationMode, displayPercentiles);
+  const effectiveReliability =
+    throughputReliability ?? computeThroughputReliability(throughputPoints.map((point) => Number(point.throughput ?? 0)));
   const riskLegend =
     effectiveRiskScore <= 0.2 ? "fiable" : effectiveRiskScore <= 0.5 ? "incertain" : effectiveRiskScore <= 0.8 ? "fragile" : "eleve";
-  const riskScoreLabel = effectiveRiskScore.toFixed(2).replace(".", ",");
+  const riskScoreLabel = formatMetric(effectiveRiskScore);
+  const reliabilityLegend = effectiveReliability?.label ?? "Non disponible";
+  const reliabilityScoreLabel = effectiveReliability ? `${formatMetric(effectiveReliability.cv)} (${reliabilityLegend})` : "Non disponible";
+  const reliabilitySummary = buildReliabilitySummary(effectiveReliability);
 
   const html = `
       <!doctype html>
@@ -83,9 +107,13 @@ export function exportSimulationPrintReport({
           body { margin: 0; padding: 12px; font-family: Arial, sans-serif; color: #111827; }
           .header { margin-bottom: 8px; }
           .title { margin: 0; font-size: 20px; }
-          .meta { margin-top: 6px; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; font-size: 11px; line-height: 1.35; }
+          .summary-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.9fr); gap: 8px; margin-top: 6px; }
+          .meta { padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; font-size: 11px; line-height: 1.35; }
+          .diagnostic-card { padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; font-size: 11px; line-height: 1.35; }
+          .diagnostic-title { margin: 0 0 4px 0; font-size: 12px; font-weight: 700; color: #374151; }
           .meta-row { margin-bottom: 2px; }
           .kpis { display: flex; gap: 6px; margin-top: 8px; margin-bottom: 8px; }
+          .kpis + .kpis { margin-top: 0; }
           .kpi { border: 1px solid #d1d5db; border-radius: 8px; padding: 6px 8px; min-width: 140px; background: #f9fafb; }
           .kpi-label { display: block; font-size: 11px; color: #374151; font-weight: 700; }
           .kpi-value { display: block; margin-top: 2px; font-size: 16px; font-weight: 800; }
@@ -111,19 +139,32 @@ export function exportSimulationPrintReport({
             body { padding: 7mm; }
             .print-action { display: none; }
           }
+          @media (max-width: 720px) {
+            .summary-grid { grid-template-columns: 1fr; }
+          }
         </style>
       </head>
       <body>
         <button type="button" id="download-pdf" class="print-action">Telecharger PDF</button>
         <header class="header">
           <h1 class="title">Simulation Monte Carlo - ${escapeHtml(selectedTeam)}</h1>
-          <div class="meta">
-            <div class="meta-row"><b>Periode:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
-            <div class="meta-row"><b>Mode:</b> ${escapeHtml(modeSummary)}</div>
-            <div class="meta-row"><b>Tickets:</b> ${escapeHtml(typeSummary)}</div>
-            <div class="meta-row"><b>Etats:</b> ${escapeHtml(stateSummary)}</div>
-            <div class="meta-row"><b>Echantillon:</b> ${escapeHtml(modeZeroLabel)}</div>
-            <div class="meta-row"><b>Simulations:</b> ${escapeHtml(String(nSims))}</div>
+          <div class="summary-grid">
+            <div class="meta">
+              <div class="meta-row"><b>Periode:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
+              <div class="meta-row"><b>Mode:</b> ${escapeHtml(modeSummary)}</div>
+              <div class="meta-row"><b>Tickets:</b> ${escapeHtml(typeSummary)}</div>
+              <div class="meta-row"><b>Etats:</b> ${escapeHtml(stateSummary)}</div>
+              <div class="meta-row"><b>Echantillon:</b> ${escapeHtml(modeZeroLabel)}</div>
+              <div class="meta-row"><b>Simulations:</b> ${escapeHtml(String(nSims))}</div>
+            </div>
+            <aside class="diagnostic-card">
+              <h2 class="diagnostic-title">Diagnostic</h2>
+              <div class="meta-row"><b>Lecture:</b> ${escapeHtml(reliabilitySummary)}</div>
+              <div class="meta-row"><b>CV:</b> ${escapeHtml(formatMetric(effectiveReliability?.cv ?? 0))}</div>
+              <div class="meta-row"><b>IQR ratio:</b> ${escapeHtml(formatMetric(effectiveReliability?.iqr_ratio ?? 0))}</div>
+              <div class="meta-row"><b>Pente normalisee:</b> ${escapeHtml(formatMetric(effectiveReliability?.slope_norm ?? 0))}</div>
+              <div class="meta-row"><b>Semaines utilisees:</b> ${escapeHtml(String(effectiveReliability?.samples_count ?? 0))}</div>
+            </aside>
           </div>
         </header>
 
@@ -131,9 +172,11 @@ export function exportSimulationPrintReport({
           <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">${Number(displayPercentiles?.P50 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
           <div class="kpi"><span class="kpi-label">P70</span><span class="kpi-value">${Number(displayPercentiles?.P70 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
           <div class="kpi"><span class="kpi-label">P90</span><span class="kpi-value">${Number(displayPercentiles?.P90 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
-          <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(riskScoreLabel)} (${escapeHtml(riskLegend)})</span></div>
         </section>
-
+        <section class="kpis">
+          <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(riskScoreLabel)} (${escapeHtml(riskLegend)})</span></div>
+          <div class="kpi"><span class="kpi-label">Fiabilite historique</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>
+        </section>
         <section class="section">
           <h2>Throughput hebdomadaire</h2>
           <div class="chart-wrap">${throughputSvg}</div>

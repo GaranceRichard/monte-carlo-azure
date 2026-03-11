@@ -29,6 +29,14 @@ def test_simulate_backlog_to_weeks_success():
     assert set(body["result_percentiles"].keys()) == {"P50", "P70", "P90"}
     assert "risk_score" in body
     assert isinstance(body["risk_score"], float)
+    assert body["throughput_reliability"]["samples_count"] == 6
+    assert set(body["throughput_reliability"].keys()) == {
+        "cv",
+        "iqr_ratio",
+        "slope_norm",
+        "label",
+        "samples_count",
+    }
     expected = (
         (body["result_percentiles"]["P90"] - body["result_percentiles"]["P50"])
         / body["result_percentiles"]["P50"]
@@ -60,6 +68,7 @@ def test_simulate_weeks_to_items_success():
     assert body["samples_count"] == 6
     assert "risk_score" in body
     assert isinstance(body["risk_score"], float)
+    assert body["throughput_reliability"]["samples_count"] == 6
     expected = (
         (body["result_percentiles"]["P50"] - body["result_percentiles"]["P90"])
         / body["result_percentiles"]["P50"]
@@ -83,6 +92,7 @@ def test_simulate_include_zero_weeks_keeps_zero_samples():
     assert r.status_code == 200
     body = r.json()
     assert body["samples_count"] == 8
+    assert body["throughput_reliability"]["samples_count"] == 8
 
 
 def test_simulate_requires_backlog_size_for_backlog_mode():

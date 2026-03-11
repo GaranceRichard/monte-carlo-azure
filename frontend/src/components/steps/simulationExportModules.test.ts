@@ -17,6 +17,7 @@ const pdfMocks = vi.hoisted(() => ({
     setTextColor: ReturnType<typeof vi.fn>;
     setDrawColor: ReturnType<typeof vi.fn>;
     setFillColor: ReturnType<typeof vi.fn>;
+    roundedRect: ReturnType<typeof vi.fn>;
     rect: ReturnType<typeof vi.fn>;
     splitTextToSize: ReturnType<typeof vi.fn>;
     text: ReturnType<typeof vi.fn>;
@@ -35,6 +36,7 @@ vi.mock("jspdf", () => ({
       setTextColor: vi.fn().mockReturnThis(),
       setDrawColor: vi.fn().mockReturnThis(),
       setFillColor: vi.fn().mockReturnThis(),
+      roundedRect: vi.fn().mockReturnThis(),
       rect: vi.fn().mockReturnThis(),
       splitTextToSize: vi.fn((text: string) => [text]),
       text: vi.fn().mockReturnThis(),
@@ -202,6 +204,95 @@ describe("simulationPdfDownload", () => {
     await downloadSimulationPdf(reportDoc, "Equipe A");
     const pdf = pdfMocks.instances.at(-1)!;
     expect(pdf.addPage).toHaveBeenCalled();
+  });
+
+  it("renders boxed scoped metadata, grouped kpis and diagnostic card", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo</h1>
+      <div class="summary-grid">
+        <div class="meta">
+          <div class="meta-row">Periode: 2025-12-12 au 2026-03-11</div>
+          <div class="meta-row">Mode: Semaines vers items - cible: 12 semaines</div>
+        </div>
+        <aside class="diagnostic-card">
+          <div class="diagnostic-title">Diagnostic</div>
+          <div class="meta-row">Lecture: Historique globalement stable.</div>
+          <div class="meta-row">CV: 0,62</div>
+        </aside>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">82 items</span></div>
+        <div class="kpi"><span class="kpi-label">P70</span><span class="kpi-value">75 items</span></div>
+        <div class="kpi"><span class="kpi-label">P90</span><span class="kpi-value">65 items</span></div>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">0,21 (incertain)</span></div>
+        <div class="kpi"><span class="kpi-label">Fiabilite historique</span><span class="kpi-value">0,62 (incertain)</span></div>
+      </div>
+    `;
+
+    await downloadSimulationPdf(reportDoc, "Equipe A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.roundedRect).toHaveBeenCalledTimes(2);
+    expect(pdf.splitTextToSize).toHaveBeenCalledWith("Lecture: Historique globalement stable.", expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith("Diagnostic", expect.any(Number), expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith("P50: 82 items", 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith("Risk Score: 0,21 (incertain)", 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith("Fiabilite historique: 0,62 (incertain)", expect.any(Number), expect.any(Number));
+  });
+
+  it("renders a boxed scoped metadata block without diagnostic card", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo</h1>
+      <div class="meta">
+        <div class="meta-row">Periode: 2025-12-12 au 2026-03-11</div>
+      </div>
+    `;
+
+    await downloadSimulationPdf(reportDoc, "Equipe A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.roundedRect).toHaveBeenCalledTimes(1);
+    expect(pdf.text).toHaveBeenCalledWith("Periode: 2025-12-12 au 2026-03-11", 11, expect.any(Number));
+  });
+
+  it("falls back to rect when roundedRect is unavailable", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo</h1>
+      <div class="meta">
+        <div class="meta-row">Periode: 2025-12-12 au 2026-03-11</div>
+      </div>
+    `;
+
+    pdfMocks.instances.length = 0;
+    const { jsPDF } = await import("jspdf");
+    (jsPDF as unknown as { mockImplementationOnce: (impl: () => unknown) => void }).mockImplementationOnce(function MockJsPdfCtor() {
+      const instance = {
+        internal: { pageSize: { getWidth: () => 210, getHeight: () => 297 } },
+        setFont: vi.fn().mockReturnThis(),
+        setFontSize: vi.fn().mockReturnThis(),
+        setTextColor: vi.fn().mockReturnThis(),
+        setDrawColor: vi.fn().mockReturnThis(),
+        setFillColor: vi.fn().mockReturnThis(),
+        rect: vi.fn().mockReturnThis(),
+        splitTextToSize: vi.fn((text: string) => [text]),
+        text: vi.fn().mockReturnThis(),
+        addPage: vi.fn().mockReturnThis(),
+        svg: vi.fn(async () => undefined),
+        save: vi.fn(),
+      };
+      pdfMocks.instances.push(instance as never);
+      return instance as never;
+    });
+
+    await downloadSimulationPdf(reportDoc, "Equipe A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.rect).toHaveBeenCalledWith(8, expect.any(Number), expect.any(Number), expect.any(Number), "S");
   });
 
   it("falls back to default chart dimensions when svg viewBox is missing", async () => {
@@ -481,6 +572,7 @@ describe("simulationPdfDownload", () => {
         setTextColor: vi.fn().mockReturnThis(),
         setDrawColor: vi.fn().mockReturnThis(),
         setFillColor: vi.fn().mockReturnThis(),
+        roundedRect: vi.fn().mockReturnThis(),
         rect: vi.fn().mockReturnThis(),
         splitTextToSize: splitSpy,
         text: vi.fn().mockReturnThis(),

@@ -161,6 +161,7 @@ export async function simulateForecastFromSamples(params: SimulateFromSamplesPar
     result_percentiles: response.result_percentiles,
     risk_score: Number(response.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, response.result_percentiles)),
     result_distribution: (response.result_distribution ?? []) as ForecastHistogramBucket[],
+    throughput_reliability: response.throughput_reliability,
   };
 
   return normalized;

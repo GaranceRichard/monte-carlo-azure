@@ -5,7 +5,11 @@ const pdfMocks = vi.hoisted(() => ({
     internal: { pageSize: { getWidth: () => number; getHeight: () => number } };
     setFont: ReturnType<typeof vi.fn>;
     setFontSize: ReturnType<typeof vi.fn>;
+    setDrawColor: ReturnType<typeof vi.fn>;
+    setFillColor: ReturnType<typeof vi.fn>;
+    splitTextToSize: ReturnType<typeof vi.fn>;
     text: ReturnType<typeof vi.fn>;
+    roundedRect: ReturnType<typeof vi.fn>;
     addPage: ReturnType<typeof vi.fn>;
     svg: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
@@ -26,7 +30,11 @@ vi.mock("jspdf", () => ({
       internal: { pageSize: { getWidth: () => 210, getHeight: () => 297 } },
       setFont: vi.fn().mockReturnThis(),
       setFontSize: vi.fn().mockReturnThis(),
+      setDrawColor: vi.fn().mockReturnThis(),
+      setFillColor: vi.fn().mockReturnThis(),
+      splitTextToSize: vi.fn((text: string) => [text]),
       text: vi.fn().mockReturnThis(),
+      roundedRect: vi.fn().mockReturnThis(),
       addPage: vi.fn().mockReturnThis(),
       svg: svgImpl,
       save: vi.fn(),
@@ -56,6 +64,7 @@ function buildBaseArgs() {
     nSims: 20000,
     resultKind: "weeks" as const,
     displayPercentiles: { P50: 8, P70: 10, P90: 13 },
+    throughputReliability: { cv: 0.62, iqr_ratio: 0.55, slope_norm: -0.07, label: "incertain" as const, samples_count: 10 },
     throughputPoints: [
       { week: "2025-01-06", throughput: 7, movingAverage: 7 },
       { week: "2025-01-13", throughput: 5, movingAverage: 6 },
@@ -105,8 +114,14 @@ describe("exportSimulationPrintReport", () => {
     expect(writtenHtml).toContain("Throughput hebdomadaire");
     expect(writtenHtml).toContain("Distribution Monte Carlo");
     expect(writtenHtml).toContain("Courbe de probabilite");
+    expect(writtenHtml).toContain('class="summary-grid"');
+    expect(writtenHtml).toContain('class="diagnostic-card"');
+    expect(writtenHtml).toContain("Diagnostic");
     expect(writtenHtml).toContain('<span class="kpi-label">Risk Score</span>');
+    expect(writtenHtml).toContain('<span class="kpi-label">Fiabilite historique</span>');
     expect(writtenHtml).toContain('<span class="kpi-value">0,63 (fragile)</span>');
+    expect(writtenHtml).toContain('<span class="kpi-value">0,62 (incertain)</span>');
+    expect(writtenHtml).toContain("Throughput en baisse sur les dernieres semaines.");
     expect(writtenHtml).toContain('id="download-pdf"');
     expect((writtenHtml.match(/<svg/g) || []).length).toBeGreaterThanOrEqual(3);
     expect(typeof fakeWindow.onload).toBe("function");
@@ -132,6 +147,7 @@ describe("exportSimulationPrintReport", () => {
       selectedTeam: `<script>alert("x")</script>`,
       types: [],
       doneStates: [],
+      throughputReliability: undefined,
       throughputPoints: [],
       distributionPoints: [],
       probabilityPoints: [],
@@ -140,6 +156,166 @@ describe("exportSimulationPrintReport", () => {
     expect((writtenHtml.match(/Donnees insuffisantes pour afficher ce graphique/g) || []).length).toBe(3);
     expect(writtenHtml).toContain("&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;");
     expect(writtenHtml).not.toContain(`<script>alert("x")</script>`);
+    expect(writtenHtml).toContain("Non disponible");
+  });
+
+  it("computes reliability from throughput points when API reliability is absent", () => {
+    let writtenHtml = "";
+    const fakeWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          writtenHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+
+    exportSimulationPrintReport({
+      ...buildBaseArgs(),
+      throughputReliability: undefined,
+      throughputPoints: [
+        { week: "2025-01-06", throughput: 10, movingAverage: 10 },
+        { week: "2025-01-13", throughput: 9, movingAverage: 9.5 },
+        { week: "2025-01-20", throughput: 10, movingAverage: 9.67 },
+        { week: "2025-01-27", throughput: 11, movingAverage: 10 },
+        { week: "2025-02-03", throughput: 10, movingAverage: 10 },
+        { week: "2025-02-10", throughput: 9, movingAverage: 10 },
+        { week: "2025-02-17", throughput: 10, movingAverage: 10 },
+        { week: "2025-02-24", throughput: 10, movingAverage: 10 },
+      ],
+    });
+
+    expect(writtenHtml).not.toContain("Non disponible");
+    expect(writtenHtml).toContain('<span class="kpi-value">0,06 (fiable)</span>');
+    expect(writtenHtml).toContain("Historique globalement stable.");
+  });
+
+  it("renders the short-history diagnostic message", () => {
+    let writtenHtml = "";
+    const fakeWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          writtenHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+
+    exportSimulationPrintReport({
+      ...buildBaseArgs(),
+      throughputReliability: { cv: 0.1, iqr_ratio: 0.1, slope_norm: 0, label: "non fiable", samples_count: 5 },
+    });
+
+    expect(writtenHtml).toContain("Historique trop court pour projeter avec confiance.");
+  });
+
+  it("renders strong trend and high-dispersion reliability diagnostics", () => {
+    let dropHtml = "";
+    const dropWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          dropHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValueOnce(dropWindow as unknown as Window);
+    exportSimulationPrintReport({
+      ...buildBaseArgs(),
+      throughputReliability: { cv: 0.2, iqr_ratio: 0.2, slope_norm: -0.16, label: "non fiable", samples_count: 10 },
+    });
+
+    let riseHtml = "";
+    const riseWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          riseHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValueOnce(riseWindow as unknown as Window);
+    exportSimulationPrintReport({
+      ...buildBaseArgs(),
+      throughputReliability: { cv: 1.1, iqr_ratio: 1.2, slope_norm: 0.12, label: "fragile", samples_count: 10 },
+    });
+
+    expect(dropHtml).toContain("Throughput en forte baisse sur les dernieres semaines.");
+    expect(riseHtml).toContain("Throughput en forte hausse sur les dernieres semaines.");
+  });
+
+  it("renders moderate upward trend, high dispersion and limited-volume diagnostics", () => {
+    let riseHtml = "";
+    const riseWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          riseHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValueOnce(riseWindow as unknown as Window);
+    exportSimulationPrintReport({
+      ...buildBaseArgs(),
+      throughputReliability: { cv: 0.2, iqr_ratio: 0.2, slope_norm: 0.06, label: "incertain", samples_count: 10 },
+    });
+
+    let dispersionHtml = "";
+    const dispersionWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          dispersionHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValueOnce(dispersionWindow as unknown as Window);
+    exportSimulationPrintReport({
+      ...buildBaseArgs(),
+      throughputReliability: { cv: 1.01, iqr_ratio: 0.4, slope_norm: 0, label: "fragile", samples_count: 10 },
+    });
+
+    let volumeHtml = "";
+    const volumeWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          volumeHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValueOnce(volumeWindow as unknown as Window);
+    exportSimulationPrintReport({
+      ...buildBaseArgs(),
+      throughputReliability: { cv: 0.2, iqr_ratio: 0.2, slope_norm: 0, label: "incertain", samples_count: 7 },
+    });
+
+    expect(riseHtml).toContain("Throughput en hausse sur les dernieres semaines.");
+    expect(dispersionHtml).toContain("Dispersion elevee du throughput historique.");
+    expect(volumeHtml).toContain("Volume historique encore limite.");
   });
 
   it("supports weeks_to_items mode and excluded zero-weeks label", () => {
@@ -166,7 +342,8 @@ describe("exportSimulationPrintReport", () => {
 
     expect(writtenHtml).toContain("Semaines vers items - cible: 12 semaines");
     expect(writtenHtml).toContain("Semaines 0 exclues");
-    expect(writtenHtml).toContain("items (au moins)");
+    expect(writtenHtml).toContain("8 items");
+    expect(writtenHtml).not.toContain("items (au moins)");
   });
 
   it("renders empty type/state summaries and reliable risk legend", () => {
@@ -529,5 +706,57 @@ describe("downloadSimulationPdf", () => {
     expect(pdf.svg).toHaveBeenCalledTimes(3);
     expect(pdf.addPage).not.toHaveBeenCalled();
     expect(pdf.save).toHaveBeenCalledWith(expect.stringMatching(/^simulation-Equipe-A-\d{2}_\d{2}_\d{4}\.pdf$/));
+  });
+
+  it("renders KPI rows on separate PDF lines when report groups them in multiple sections", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo - Equipe A</h1>
+      <div class="meta-row">Periode: 2025-01-01 au 2025-03-01</div>
+      <section class="kpis">
+        <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">8 items</span></div>
+        <div class="kpi"><span class="kpi-label">P70</span><span class="kpi-value">10 items</span></div>
+        <div class="kpi"><span class="kpi-label">P90</span><span class="kpi-value">13 items</span></div>
+      </section>
+      <section class="kpis">
+        <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">0,20 (fiable)</span></div>
+        <div class="kpi"><span class="kpi-label">Fiabilite historique</span><span class="kpi-value">0,62 (incertain)</span></div>
+      </section>
+      <div class="chart-wrap"><svg viewBox="0 0 960 300"></svg></div>
+    `;
+
+    await downloadSimulationPdf(reportDoc, "Equipe A");
+
+    const pdf = pdfMocks.instances[0];
+    const textCalls = pdf?.text.mock.calls ?? [];
+    const p50Call = textCalls.find((call) => String(call[0]).includes("P50: 8 items"));
+    const riskCall = textCalls.find((call) => String(call[0]).includes("Risk Score: 0,20 (fiable)"));
+
+    expect(p50Call).toBeDefined();
+    expect(riskCall).toBeDefined();
+    expect(Number(riskCall?.[2])).toBeGreaterThan(Number(p50Call?.[2]));
+  });
+
+  it("renders diagnostic card in a dedicated right column in PDF export", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo - Equipe A</h1>
+      <div class="meta">
+        <div class="meta-row">Periode: 2025-01-01 au 2025-03-01</div>
+        <div class="meta-row">Mode: Semaines vers items - cible: 12 semaines</div>
+      </div>
+      <aside class="diagnostic-card">
+        <h2 class="diagnostic-title">Diagnostic</h2>
+        <div class="meta-row">Lecture: Historique globalement stable.</div>
+        <div class="meta-row">CV: 0,62</div>
+      </aside>
+      <div class="chart-wrap"><svg viewBox="0 0 960 300"></svg></div>
+    `;
+
+    await downloadSimulationPdf(reportDoc, "Equipe A");
+
+    const pdf = pdfMocks.instances[0];
+    expect(pdf?.text).toHaveBeenCalledWith("Diagnostic", expect.any(Number), expect.any(Number));
+    expect(pdf?.text).toHaveBeenCalledWith("Periode: 2025-01-01 au 2025-03-01", expect.any(Number), expect.any(Number));
   });
 });

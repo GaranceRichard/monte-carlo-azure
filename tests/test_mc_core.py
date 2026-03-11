@@ -7,6 +7,7 @@ from backend.mc_core import (
     mc_items_done_for_weeks,
     percentiles,
     risk_score,
+    throughput_reliability,
 )
 
 
@@ -169,3 +170,33 @@ def test_risk_score_basic_and_guardrails():
     assert risk_score("weeks_to_items", 10, 6) == 0.4
     assert risk_score("weeks_to_items", 10, 12) == 0.0
     assert risk_score("backlog_to_weeks", 0, 5) == 0.0
+
+
+def test_throughput_reliability_marks_stable_history_as_fiable():
+    result = throughput_reliability(np.array([9, 10, 10, 11, 9, 10, 11, 10, 9, 10], dtype=int))
+
+    assert result["label"] == "fiable"
+    assert result["samples_count"] == 10
+    assert float(result["cv"]) < 0.5
+    assert abs(float(result["slope_norm"])) < 0.05
+
+
+def test_throughput_reliability_marks_volatile_history_as_fragile():
+    result = throughput_reliability(np.array([1, 12, 2, 14, 1, 15, 2, 13, 1, 16], dtype=int))
+
+    assert result["label"] == "fragile"
+    assert float(result["cv"]) >= 1.0 or float(result["iqr_ratio"]) >= 1.0
+
+
+def test_throughput_reliability_marks_downward_trend_as_non_fiable():
+    result = throughput_reliability(np.array([20, 18, 16, 14, 12, 10, 8, 6], dtype=int))
+
+    assert result["label"] == "non fiable"
+    assert float(result["slope_norm"]) <= -0.15
+
+
+def test_throughput_reliability_marks_short_history_as_non_fiable():
+    result = throughput_reliability(np.array([8, 8, 8, 8, 8], dtype=int))
+
+    assert result["label"] == "non fiable"
+    assert result["samples_count"] == 5

@@ -1,8 +1,6 @@
-import { env } from "node:process";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 
-const vitalsCoverage = env.VITALS_FRONTEND_COVERAGE === "1";
 const standardCoverageExclude = [
   "**/*.css",
   "src/e2e/**",
@@ -10,18 +8,6 @@ const standardCoverageExclude = [
   "src/api.ts",
   "src/date.ts",
   "src/components/steps/PortfolioStep.tsx",
-  "src/components/steps/portfolioPrintReport.ts",
-  "src/components/steps/simulationPdfDownload.ts",
-  "src/components/steps/simulationPrintReport.tsx",
-];
-const vitalsCoverageInclude = [
-  "src/App.tsx",
-  "src/clientId.ts",
-  "src/hooks/useOnboarding.ts",
-  "src/hooks/simulationForecastService.ts",
-  "src/components/steps/portfolioPrintReport.ts",
-  "src/components/steps/simulationPdfDownload.ts",
-  "src/components/steps/simulationPrintReport.tsx",
 ];
 
 export default defineConfig({
@@ -38,19 +24,16 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "json"],
-      reportsDirectory: vitalsCoverage ? "./coverage-vitals" : "./coverage",
-      all: vitalsCoverage,
-      include: vitalsCoverage ? vitalsCoverageInclude : undefined,
-      exclude: vitalsCoverage ? ["**/*.css", "src/e2e/**", "src/adoClient.ts", "src/api.ts", "src/date.ts"] : standardCoverageExclude,
+      reportsDirectory: "./coverage",
+      all: false,
+      exclude: standardCoverageExclude,
       perFile: true,
-      thresholds: vitalsCoverage
-        ? undefined
-        : {
-            statements: 80,
-            branches: 80,
-            functions: 80,
-            lines: 80,
-          },
+      thresholds: {
+        statements: 80,
+        branches: 80,
+        functions: 80,
+        lines: 80,
+      },
     },
   },
 });

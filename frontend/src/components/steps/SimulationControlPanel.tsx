@@ -84,9 +84,7 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
           </button>
         </div>
         {!showPeriod && (
-          <div className="sim-advanced-summary">
-            du {formatIsoDateToFr(s.startDate)} au {formatIsoDateToFr(s.endDate)}
-          </div>
+          <div className="sim-advanced-summary">du {formatIsoDateToFr(s.startDate)} au {formatIsoDateToFr(s.endDate)}</div>
         )}
         {showPeriod && <SimulationHistoryRangeControls />}
       </section>
@@ -119,7 +117,7 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
               onClick={s.applyQuickFilterConfig}
               disabled={!s.hasQuickFilterConfig || s.loadingTeamOptions}
             >
-              Configuration rapide
+              Raccourci
             </button>
             <button
               type="button"

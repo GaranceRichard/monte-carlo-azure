@@ -142,6 +142,7 @@ class SimulationStore:
                 "samples_count": response.samples_count,
                 "percentiles": response.result_percentiles,
                 "distribution": [bucket.model_dump() for bucket in response.result_distribution],
+                "throughput_reliability": response.throughput_reliability.model_dump(),
                 "selected_org": context.selected_org if context else None,
                 "selected_project": context.selected_project if context else None,
                 "selected_team": context.selected_team if context else None,

@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MAP_PATH = ROOT / "docs" / "vitals-coverage-map.json"
-FRONTEND_UNIT = ROOT / "frontend" / "coverage-vitals" / "coverage-final.json"
+FRONTEND_UNIT = ROOT / "frontend" / "coverage" / "coverage-final.json"
 BACKEND_JSON = ROOT / ".coverage.backend.json"
 E2E_JSON = ROOT / "frontend" / "coverage" / "e2e-coverage-summary.json"
 

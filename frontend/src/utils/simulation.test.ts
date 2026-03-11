@@ -3,6 +3,7 @@ import {
   buildScenarioSamples,
   computeRiskLegend,
   computeRiskScoreFromPercentiles,
+  computeThroughputReliability,
 } from "./simulation";
 
 describe("computeRiskScoreFromPercentiles", () => {
@@ -122,5 +123,54 @@ describe("computeRiskLegend", () => {
   it("covers fragile and non fiable ranges", () => {
     expect(computeRiskLegend(0.7)).toBe("fragile");
     expect(computeRiskLegend(0.95)).toBe("non fiable");
+  });
+});
+
+describe("computeThroughputReliability", () => {
+  it("returns null for empty or non-finite samples", () => {
+    expect(computeThroughputReliability([])).toBeNull();
+    expect(computeThroughputReliability([Number.NaN, Number.POSITIVE_INFINITY])).toBeNull();
+  });
+
+  it("marks very short histories as non fiable", () => {
+    const reliability = computeThroughputReliability([4, 4, 4, 4, 4]);
+
+    expect(reliability).toMatchObject({
+      label: "non fiable",
+      samples_count: 5,
+      cv: 0,
+      iqr_ratio: 0,
+      slope_norm: 0,
+    });
+  });
+
+  it("marks highly volatile histories as fragile", () => {
+    const reliability = computeThroughputReliability([0, 20, 0, 20, 0, 20, 0, 20]);
+
+    expect(reliability?.label).toBe("fragile");
+    expect(reliability?.cv).toBeGreaterThanOrEqual(1);
+  });
+
+  it("marks moderate variability as incertain", () => {
+    const reliability = computeThroughputReliability([10, 11, 12, 13, 14, 15, 16, 17]);
+
+    expect(reliability).toMatchObject({
+      label: "incertain",
+      samples_count: 8,
+    });
+    expect(Math.abs(reliability?.slope_norm ?? 0)).toBeGreaterThanOrEqual(0.05);
+    expect(Math.abs(reliability?.slope_norm ?? 0)).toBeLessThan(0.1);
+  });
+
+  it("downgrades otherwise stable short histories to incertain", () => {
+    const reliability = computeThroughputReliability([10, 10, 10, 10, 10, 10, 10]);
+
+    expect(reliability).toMatchObject({
+      label: "incertain",
+      samples_count: 7,
+      cv: 0,
+      iqr_ratio: 0,
+      slope_norm: 0,
+    });
   });
 });

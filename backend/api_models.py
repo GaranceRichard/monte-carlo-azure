@@ -28,12 +28,21 @@ class DistributionBucket(BaseModel):
     count: int
 
 
+class ThroughputReliability(BaseModel):
+    cv: float
+    iqr_ratio: float
+    slope_norm: float
+    label: Literal["fiable", "incertain", "fragile", "non fiable"]
+    samples_count: int
+
+
 class SimulateResponse(BaseModel):
     result_kind: Literal["weeks", "items"]
     result_percentiles: Dict[str, int]
     risk_score: float
     result_distribution: List[DistributionBucket]
     samples_count: int
+    throughput_reliability: ThroughputReliability
 
 
 class SimulationHistoryItem(BaseModel):
@@ -54,3 +63,4 @@ class SimulationHistoryItem(BaseModel):
     done_states: List[str] = Field(default_factory=list)
     types: List[str] = Field(default_factory=list)
     include_zero_weeks: bool = False
+    throughput_reliability: Optional[ThroughputReliability] = None

@@ -47,6 +47,7 @@ function mapRemoteHistoryItem(item: SimulationHistoryItem, index: number): Simul
       result_percentiles: item.percentiles ?? {},
       risk_score: computeRiskScoreFromPercentiles(item.mode, item.percentiles ?? {}),
       result_distribution: item.distribution ?? [],
+      throughput_reliability: item.throughput_reliability,
     },
   };
 }

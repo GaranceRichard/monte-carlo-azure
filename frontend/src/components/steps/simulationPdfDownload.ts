@@ -41,27 +41,94 @@ export async function downloadSimulationPdf(reportWindowDocument: Document, sele
   pdf.text(title, margin, cursorY);
   cursorY += 6;
 
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(7);
-  reportWindowDocument.querySelectorAll(".meta-row").forEach((row) => {
-    ensureSpace(3.6);
-    const text = row.textContent ?? "";
-    pdf.text(text, margin, cursorY);
-    cursorY += 3.6;
-  });
-  cursorY += 2;
+  const drawRoundedBox = (x: number, y: number, width: number, height: number): void => {
+    if ("roundedRect" in pdf && typeof pdf.roundedRect === "function") {
+      pdf.roundedRect(x, y, width, height, 2, 2, "S");
+      return;
+    }
+    pdf.rect(x, y, width, height, "S");
+  };
 
-  ensureSpace(8);
+  const scopedMetaRows = Array.from(reportWindowDocument.querySelectorAll(".meta .meta-row")).map((row) => row.textContent ?? "");
+  const fallbackMetaRows =
+    scopedMetaRows.length > 0
+      ? []
+      : Array.from(reportWindowDocument.querySelectorAll(".meta-row")).map((row) => row.textContent ?? "");
+  const usesLegacyFlatMeta = scopedMetaRows.length === 0 && fallbackMetaRows.length > 0;
+  const metaRows = scopedMetaRows.length > 0 ? scopedMetaRows : fallbackMetaRows;
+  const diagnosticTitle = reportWindowDocument.querySelector(".diagnostic-title")?.textContent ?? "Diagnostic";
+  const diagnosticRows = Array.from(reportWindowDocument.querySelectorAll(".diagnostic-card .meta-row")).map(
+    (row) => row.textContent ?? "",
+  );
+  const hasDiagnosticCard = diagnosticRows.length > 0;
+
+  if (usesLegacyFlatMeta && !hasDiagnosticCard) {
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7);
+    metaRows.forEach((text) => {
+      ensureSpace(3.6);
+      pdf.text(text, margin, cursorY);
+      cursorY += 3.6;
+    });
+    cursorY += 2;
+  } else if (metaRows.length || hasDiagnosticCard) {
+    const gap = 4;
+    const leftW = hasDiagnosticCard ? contentW * 0.58 : contentW;
+    const rightW = hasDiagnosticCard ? contentW - leftW - gap : 0;
+    const lineH = 3.6;
+    const leftH = Math.max(12, 6 + metaRows.length * lineH);
+    const rightH = hasDiagnosticCard ? Math.max(12, 8 + diagnosticRows.length * lineH) : 0;
+    const boxH = Math.max(leftH, rightH);
+
+    ensureSpace(boxH + 2);
+    pdf.setDrawColor(209, 213, 219);
+    drawRoundedBox(margin, cursorY, leftW, boxH);
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7);
+    let leftY = cursorY + 4.5;
+    metaRows.forEach((text) => {
+      pdf.text(text, margin + 3, leftY);
+      leftY += lineH;
+    });
+
+    if (hasDiagnosticCard) {
+      const rightX = margin + leftW + gap;
+      drawRoundedBox(rightX, cursorY, rightW, boxH);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(8);
+      pdf.text(diagnosticTitle, rightX + 3, cursorY + 4.5);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(7);
+      let rightY = cursorY + 8.5;
+      diagnosticRows.forEach((text) => {
+        const wrapped = pdf.splitTextToSize(text, rightW - 6);
+        const lines = Array.isArray(wrapped) ? wrapped : [String(wrapped)];
+        pdf.text(lines, rightX + 3, rightY);
+        rightY += Math.max(lines.length, 1) * lineH;
+      });
+    }
+
+    cursorY += boxH + 3;
+  }
+
+  const kpiRows = Array.from(reportWindowDocument.querySelectorAll(".kpis"));
+  const rowsToRender = kpiRows.length
+    ? kpiRows.map((row) => Array.from(row.querySelectorAll(".kpi")))
+    : [Array.from(reportWindowDocument.querySelectorAll(".kpi"))];
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(9);
-  const kpis = Array.from(reportWindowDocument.querySelectorAll(".kpi"));
-  const kpiStep = kpis.length > 0 ? contentW / kpis.length : contentW;
-  kpis.forEach((kpi, i) => {
-    const label = kpi.querySelector(".kpi-label")?.textContent ?? "";
-    const value = kpi.querySelector(".kpi-value")?.textContent ?? "";
-    pdf.text(`${label}: ${value}`, margin + i * kpiStep, cursorY);
+  rowsToRender.forEach((row) => {
+    if (!row.length) return;
+    ensureSpace(8);
+    const kpiStep = contentW / row.length;
+    row.forEach((kpi, i) => {
+      const label = kpi.querySelector(".kpi-label")?.textContent ?? "";
+      const value = kpi.querySelector(".kpi-value")?.textContent ?? "";
+      pdf.text(`${label}: ${value}`, margin + i * kpiStep, cursorY);
+    });
+    cursorY += 7;
   });
-  cursorY += 7;
 
   const svgElements = reportWindowDocument.querySelectorAll<SVGSVGElement>(".chart-wrap svg");
   for (let i = 0; i < svgElements.length; i += 1) {

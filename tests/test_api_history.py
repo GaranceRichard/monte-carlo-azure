@@ -50,6 +50,7 @@ def test_simulate_persists_when_cookie_present(monkeypatch):
     assert saved_id.startswith("f47ac10b")
     assert "capacity_percent" not in saved_req
     assert "result_percentiles" in saved_resp
+    assert saved_resp["throughput_reliability"]["samples_count"] == 6
 
 
 def test_simulation_history_reads_last_items_from_store(monkeypatch):
@@ -74,6 +75,13 @@ def test_simulation_history_reads_last_items_from_store(monkeypatch):
                 "done_states": ["Done"],
                 "types": ["Bug"],
                 "include_zero_weeks": False,
+                "throughput_reliability": {
+                    "cv": 0.2,
+                    "iqr_ratio": 0.3,
+                    "slope_norm": -0.02,
+                    "label": "fiable",
+                    "samples_count": 24,
+                },
             }
         ],
     )
@@ -90,6 +98,7 @@ def test_simulation_history_reads_last_items_from_store(monkeypatch):
     assert len(body) == 1
     assert body[0]["mode"] == "backlog_to_weeks"
     assert body[0]["samples_count"] == 24
+    assert body[0]["throughput_reliability"]["label"] == "fiable"
 
 
 def test_simulation_history_returns_empty_without_cookie(monkeypatch):

@@ -187,7 +187,6 @@ npm --prefix frontend run test:e2e:coverage:console
 Coverage vitals:
 
 ```powershell
-$env:VITALS_FRONTEND_COVERAGE="1"
 npm --prefix frontend run test:unit:coverage
 powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\run-vitals-compliance.ps1 -WorkspaceRoot .
 ```
@@ -236,7 +235,7 @@ La task VS Code `Coverage: 8 terminaux` execute aussi:
 
 - `Scripts/check_vitals_compliance.py` pour verifier la traceabilite des points vitaux vers leurs tests cibles
 - `Scripts/report_vitals_coverage.py` pour afficher les taux de couverture par vital a partir des artefacts backend/frontend/e2e
-- `frontend/coverage-vitals/coverage-final.json` comme artefact dedie au frontend unit vitals
+- `frontend/coverage/coverage-final.json` comme artefact frontend unique pour le global et les vitals
 
 Ces scripts Python de coverage vitals font partie du lint backend et doivent rester conformes a `ruff check .`, y compris la limite de 100 caracteres par ligne.
 

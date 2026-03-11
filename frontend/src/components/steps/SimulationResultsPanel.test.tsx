@@ -236,7 +236,12 @@ describe("SimulationResultsPanel history list", () => {
         loadingStageMessage: "",
         includeZeroWeeks: true,
         sampleStats: null,
-        result: { result_kind: "weeks", risk_score: 0.01 },
+        throughputData: [],
+        result: {
+          result_kind: "weeks",
+          risk_score: 0.01,
+          throughput_reliability: { cv: 0.42, iqr_ratio: 0.3, slope_norm: -0.02, label: "incertain", samples_count: 10 },
+        },
         displayPercentiles: { P50: 50, P70: 60, P90: 71 },
         simulationHistory: [],
         applyHistoryEntry: vi.fn(),
@@ -245,8 +250,10 @@ describe("SimulationResultsPanel history list", () => {
     } as never);
 
     render(<SimulationResultsPanel />);
-    expect(screen.getByText(/^Risk$/i)).not.toBeNull();
-    expect(screen.getByText(/^0.42$/i)).not.toBeNull();
+    expect(screen.getByText(/^Risque \/ Fiabilite$/i)).not.toBeNull();
+    expect(screen.getByText(/^0,42 \/ 0,42$/i)).not.toBeNull();
+    expect(screen.getByText(/^R : incertain$/i)).not.toBeNull();
+    expect(screen.getByText(/^F : incertain$/i)).not.toBeNull();
     expect(screen.queryByRole("tooltip")).toBeNull();
   });
 
@@ -258,6 +265,7 @@ describe("SimulationResultsPanel history list", () => {
         loadingStageMessage: "",
         includeZeroWeeks: true,
         sampleStats: null,
+        throughputData: [],
         result: { result_kind: "weeks", risk_score: 0.42 },
         displayPercentiles: { P70: 10 },
         simulationHistory: [],
@@ -267,7 +275,7 @@ describe("SimulationResultsPanel history list", () => {
     } as never);
 
     render(<SimulationResultsPanel />);
-    expect(screen.getByText(/^0.42$/i)).not.toBeNull();
+    expect(screen.getByText(/^0,42 \/ -$/i)).not.toBeNull();
   });
 
   it("falls back to computed risk score when percentiles are incomplete and API score is missing", () => {
@@ -278,6 +286,7 @@ describe("SimulationResultsPanel history list", () => {
         loadingStageMessage: "",
         includeZeroWeeks: true,
         sampleStats: null,
+        throughputData: [],
         result: { result_kind: "weeks" },
         displayPercentiles: { P70: 10 },
         simulationHistory: [],
@@ -287,7 +296,40 @@ describe("SimulationResultsPanel history list", () => {
     } as never);
 
     render(<SimulationResultsPanel />);
-    expect(screen.getByText(/^0.00$/i)).not.toBeNull();
+    expect(screen.getByText(/^0,00 \/ -$/i)).not.toBeNull();
+  });
+
+  it("falls back to frontend reliability computation when API reliability is missing", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        throughputData: [
+          { week: "2026-01-01", throughput: 10 },
+          { week: "2026-01-08", throughput: 9 },
+          { week: "2026-01-15", throughput: 10 },
+          { week: "2026-01-22", throughput: 11 },
+          { week: "2026-01-29", throughput: 10 },
+          { week: "2026-02-05", throughput: 9 },
+          { week: "2026-02-12", throughput: 10 },
+          { week: "2026-02-19", throughput: 10 },
+        ],
+        result: { result_kind: "weeks", risk_score: 0.2 },
+        displayPercentiles: { P50: 10, P70: 12, P90: 14 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+    expect(screen.getByText(/^Risque \/ Fiabilite$/i)).not.toBeNull();
+    expect(screen.getByText(/^0,40 \/ 0,06$/i)).not.toBeNull();
+    expect(screen.getByText(/^R : incertain$/i)).not.toBeNull();
+    expect(screen.getByText(/^F : fiable$/i)).not.toBeNull();
   });
 
   it("formats history option labels for both simulation modes", () => {

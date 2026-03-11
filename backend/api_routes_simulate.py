@@ -10,13 +10,19 @@ from slowapi.errors import RateLimitExceeded
 from starlette.concurrency import run_in_threadpool
 
 from .api_config import get_api_config
-from .api_models import SimulateRequest, SimulateResponse, SimulationHistoryItem
+from .api_models import (
+    SimulateRequest,
+    SimulateResponse,
+    SimulationHistoryItem,
+    ThroughputReliability,
+)
 from .mc_core import (
     histogram_buckets,
     mc_finish_weeks,
     mc_items_done_for_weeks,
     percentiles,
     risk_score,
+    throughput_reliability,
 )
 from .simulation_store import SimulationStore
 
@@ -177,6 +183,7 @@ async def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
         ) from exc
 
     simulation_percentiles = percentiles(result, ps=(50, 70, 90))
+    reliability = ThroughputReliability(**throughput_reliability(samples))
     response_model = SimulateResponse(
         result_kind=kind,
         result_percentiles={
@@ -191,6 +198,7 @@ async def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
         ),
         result_distribution=histogram_buckets(result),
         samples_count=int(len(samples)),
+        throughput_reliability=reliability,
     )
 
     mc_client_id = (request.cookies.get(cfg.client_cookie_name) or "").strip()

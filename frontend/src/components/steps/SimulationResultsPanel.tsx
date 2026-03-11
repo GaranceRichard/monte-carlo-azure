@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import ProgressBar from "../ui/progress";
 import { useSimulationContext } from "../../hooks/SimulationContext";
 import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
-import { computeRiskScoreFromPercentiles } from "../../utils/simulation";
+import { computeRiskScoreFromPercentiles, computeThroughputReliability } from "../../utils/simulation";
 
 function formatHistoryEntryLabel(entry: {
   createdAt: string;
@@ -29,6 +29,10 @@ function formatHistoryEntryLabel(entry: {
 type SimulationResultsPanelProps = {
   hideHistory?: boolean;
 };
+
+function formatCoefficient(value: number): string {
+  return value.toFixed(2).replace(".", ",");
+}
 
 export default function SimulationResultsPanel({ hideHistory = false }: SimulationResultsPanelProps) {
   const { simulation: s, selectedTeam } = useSimulationContext();
@@ -82,13 +86,21 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
     return "non fiable";
   }, [riskScoreValue]);
 
-  const riskColorClass = useMemo(() => {
-    if (riskLegend === "fiable") return "border-emerald-600 bg-emerald-50 text-emerald-700";
-    if (riskLegend === "incertain") return "border-amber-500 bg-amber-50 text-amber-700";
-    if (riskLegend === "fragile") return "border-red-600 bg-red-50 text-red-700";
-    if (riskLegend === "non fiable") return "border-black bg-neutral-200 text-black";
+  const reliability = useMemo(() => {
+    if (s.result?.throughput_reliability) {
+      return s.result.throughput_reliability;
+    }
+    return computeThroughputReliability((s.throughputData ?? []).map((point) => point.throughput));
+  }, [s.result?.throughput_reliability, s.throughputData]);
+
+  const combinedIndicatorTone = useMemo(() => {
+    const labels = [riskLegend, reliability?.label].filter(Boolean);
+    if (labels.includes("non fiable")) return "border-black bg-neutral-200 text-black";
+    if (labels.includes("fragile")) return "border-red-600 bg-red-50 text-red-700";
+    if (labels.includes("incertain")) return "border-amber-500 bg-amber-50 text-amber-700";
+    if (labels.includes("fiable")) return "border-emerald-600 bg-emerald-50 text-emerald-700";
     return "border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]";
-  }, [riskLegend]);
+  }, [riskLegend, reliability?.label]);
 
   return (
     <div className="min-h-0 space-y-4">
@@ -126,7 +138,7 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
             {["P50", "P70", "P90"].map((k, index) => (
               <div
                 key={k}
-                className={`rounded-xl border p-2 opacity-0 [animation:flowFadeIn_300ms_ease-out_forwards] ${kpiToneByLabel[k]}`}
+                className={`flex min-h-[3.2rem] flex-col items-center justify-center rounded-xl border p-2 text-center opacity-0 [animation:flowFadeIn_300ms_ease-out_forwards] ${kpiToneByLabel[k]}`}
                 style={{ animationDelay: `${index * 90}ms` }}
                 title={kpiHintByLabel[k]}
               >
@@ -138,16 +150,23 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
             ))}
             {riskScoreValue != null && (
               <div
-                className={`group relative rounded-xl border p-2 opacity-0 [animation:flowFadeIn_300ms_ease-out_forwards] ${riskColorClass}`}
+                className={`group relative h-[4.4rem] rounded-xl border p-2 opacity-0 [animation:flowFadeIn_300ms_ease-out_forwards] ${combinedIndicatorTone}`}
                 style={{ animationDelay: `${3 * 90}ms` }}
                 tabIndex={0}
               >
-                <div className="flex min-h-[3.2rem] flex-col items-center justify-center text-center">
-                  <span className="block text-xs font-bold uppercase tracking-[0.08em]">Risk</span>
-                  <span className="mt-1 whitespace-nowrap text-sm font-extrabold leading-tight">
-                    <span className="group-hover:hidden group-focus-visible:hidden">{riskScoreValue.toFixed(2)}</span>
-                    <span className="hidden group-hover:inline group-focus-visible:inline">{riskLegend}</span>
-                  </span>
+                <div className="relative h-full w-full text-center">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-150 group-hover:opacity-0 group-focus-visible:opacity-0">
+                    <span className="block text-xs font-bold uppercase tracking-[0.08em]">Risque / Fiabilite</span>
+                    <div className="mt-1 whitespace-nowrap text-[13px] font-extrabold leading-tight">
+                      {formatCoefficient(riskScoreValue)} / {reliability ? formatCoefficient(reliability.cv) : "-"}
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                    <div className="flex h-full flex-col items-center justify-evenly text-[10px] font-extrabold leading-[1.05]">
+                      <div className="whitespace-nowrap">R : {riskLegend}</div>
+                      {reliability && <div className="whitespace-nowrap">F : {reliability.label}</div>}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

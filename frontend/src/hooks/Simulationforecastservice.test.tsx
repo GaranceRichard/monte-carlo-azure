@@ -24,6 +24,7 @@ const API_RESPONSE_WEEKS = {
   result_kind: "weeks" as const,
   samples_count: 6,
   result_percentiles: { P50: 8, P70: 10, P90: 13 },
+  throughput_reliability: { cv: 0.22, iqr_ratio: 0.3, slope_norm: -0.02, label: "fiable" as const, samples_count: 6 },
   result_distribution: [
     { x: 6, count: 400 },
     { x: 8, count: 3000 },
@@ -36,6 +37,7 @@ const API_RESPONSE_ITEMS = {
   result_kind: "items" as const,
   samples_count: 6,
   result_percentiles: { P50: 30, P70: 35, P90: 40 },
+  throughput_reliability: { cv: 0.65, iqr_ratio: 0.7, slope_norm: -0.08, label: "incertain" as const, samples_count: 6 },
   result_distribution: [
     { x: 25, count: 1000 },
     { x: 30, count: 5000 },
@@ -121,11 +123,18 @@ describe("appels réseau", () => {
       samples_count: 6,
       result_percentiles: { P50: 8, P70: 10, P90: 13 },
       risk_score: 0.25,
+      throughput_reliability: { cv: 0.22, iqr_ratio: 0.3, slope_norm: -0.02, label: "fiable", samples_count: 6 },
     } as never);
 
     const result = await runSimulationForecast(baseParams());
 
     expect(result.result.result_distribution).toEqual([]);
+  });
+
+  it("propage throughput_reliability tel quel", async () => {
+    const result = await runSimulationForecast(baseParams());
+
+    expect(result.result.throughput_reliability).toEqual(API_RESPONSE_WEEKS.throughput_reliability);
   });
 });
 

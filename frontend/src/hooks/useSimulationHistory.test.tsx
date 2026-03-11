@@ -33,6 +33,7 @@ function buildRemoteItem(overrides: Partial<SimulationHistoryItem> = {}): Simula
     done_states: ["Done"],
     types: ["Bug"],
     include_zero_weeks: false,
+    throughput_reliability: { cv: 0.22, iqr_ratio: 0.3, slope_norm: -0.02, label: "fiable", samples_count: 24 },
     ...overrides,
   };
 }
@@ -111,6 +112,7 @@ describe("useSimulationHistory", () => {
       nSims: 2000,
       result: expect.objectContaining({
         result_kind: "weeks",
+        throughput_reliability: expect.objectContaining({ label: "fiable" }),
       }),
       sampleStats: { totalWeeks: 24, zeroWeeks: 0, usedWeeks: 24 },
     });

@@ -23,6 +23,7 @@ function setContext({
   runForecast = vi.fn(async () => {}),
   resetForTeamSelection = vi.fn(),
   resetSimulationResults = vi.fn(),
+  throughputReliability,
 }: {
   hasLaunchedOnce: boolean;
   hasQuickFilterConfig?: boolean;
@@ -35,6 +36,13 @@ function setContext({
   runForecast?: ReturnType<typeof vi.fn>;
   resetForTeamSelection?: ReturnType<typeof vi.fn>;
   resetSimulationResults?: ReturnType<typeof vi.fn>;
+  throughputReliability?: {
+    cv: number;
+    iqr_ratio: number;
+    slope_norm: number;
+    label: "fiable" | "incertain" | "fragile" | "non fiable";
+    samples_count: number;
+  };
 }): ReturnType<typeof vi.fn> {
   vi.mocked(useSimulationContext).mockReturnValue({
     selectedTeam,
@@ -56,6 +64,7 @@ function setContext({
       targetWeeks: 12,
       includeZeroWeeks: true,
       nSims: 20000,
+      result: throughputReliability ? { throughput_reliability: throughputReliability } : null,
     },
   } as never);
   return runForecast;
@@ -114,7 +123,7 @@ describe("SimulationControlPanel launch button visibility", () => {
     expect(onExpansionChange).toHaveBeenLastCalledWith(false);
   });
 
-  it("places quick configuration in the ticket filters header and triggers it", () => {
+  it("places shortcut action in the ticket filters header and triggers it", () => {
     const applyQuickFilterConfig = vi.fn();
     setContext({ hasLaunchedOnce: false, applyQuickFilterConfig });
     render(<SimulationControlPanel />);
@@ -123,7 +132,7 @@ describe("SimulationControlPanel launch button visibility", () => {
     expect(filtersSection).not.toBeNull();
     if (!filtersSection) return;
 
-    fireEvent.click(within(filtersSection).getByRole("button", { name: /configuration rapide/i }));
+    fireEvent.click(within(filtersSection).getByRole("button", { name: /raccourci/i }));
     expect(applyQuickFilterConfig).toHaveBeenCalledTimes(1);
   });
 

@@ -56,7 +56,6 @@ Scripts disponibles :
 Couverture critique frontend :
 
 ```powershell
-$env:VITALS_FRONTEND_COVERAGE="1"
 npm run test:unit:coverage
 ```
 

@@ -147,3 +147,62 @@ def risk_score(
     if mode == "weeks_to_items":
         return max(0.0, float(p50 - p90) / float(p50))
     return max(0.0, float(p90 - p50) / float(p50))
+
+
+def throughput_reliability(samples: np.ndarray) -> Dict[str, float | int | str]:
+    """
+    Evalue la fiabilite de l'historique de throughput brut avant simulation.
+
+    Retourne les signaux bruts et un label composite:
+    - fiable
+    - incertain
+    - fragile
+    - non fiable
+    """
+    values = np.asarray(samples, dtype=float)
+    if values.size == 0:
+        raise ValueError("throughput_samples est vide")
+
+    n = int(values.size)
+    mean = float(np.mean(values))
+    std = float(np.std(values))
+    q25, q50, q75 = np.percentile(values, [25, 50, 75])
+    slope = float(np.polyfit(np.arange(n, dtype=float), values, deg=1)[0]) if n >= 2 else 0.0
+
+    cv = 0.0 if mean <= 0 else std / mean
+    iqr = float(q75 - q25)
+    iqr_ratio = 0.0 if q50 <= 0 else iqr / float(q50)
+    slope_norm = 0.0 if mean <= 0 else slope / mean
+
+    if n < 6 or cv >= 1.5 or slope_norm <= -0.15 or mean <= 0:
+        label = "non fiable"
+    else:
+        cv_state = "stable" if cv < 0.5 else "moderate" if cv < 1.0 else "volatile"
+        iqr_state = (
+            "stable" if iqr_ratio < 0.5 else "moderate" if iqr_ratio < 1.0 else "volatile"
+        )
+        slope_state = (
+            "stable"
+            if abs(slope_norm) < 0.05
+            else "moderate"
+            if abs(slope_norm) < 0.10
+            else "strong"
+        )
+
+        if "volatile" in (cv_state, iqr_state) or slope_state == "strong":
+            label = "fragile"
+        elif "moderate" in (cv_state, iqr_state, slope_state):
+            label = "incertain"
+        else:
+            label = "fiable"
+
+        if n < 8 and label == "fiable":
+            label = "incertain"
+
+    return {
+        "cv": round(cv, 4),
+        "iqr_ratio": round(iqr_ratio, 4),
+        "slope_norm": round(slope_norm, 4),
+        "label": label,
+        "samples_count": n,
+    }

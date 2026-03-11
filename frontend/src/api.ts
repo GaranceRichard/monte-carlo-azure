@@ -24,6 +24,13 @@ export type SimulateResponse = {
   risk_score?: number;
   result_distribution: { x: number; count: number }[];
   samples_count: number;
+  throughput_reliability?: {
+    cv: number;
+    iqr_ratio: number;
+    slope_norm: number;
+    label: "fiable" | "incertain" | "fragile" | "non fiable";
+    samples_count: number;
+  };
 };
 
 export type SimulationHistoryItem = {
@@ -44,6 +51,7 @@ export type SimulationHistoryItem = {
   done_states?: string[];
   types?: string[];
   include_zero_weeks?: boolean;
+  throughput_reliability?: SimulateResponse["throughput_reliability"];
 };
 
 export async function postSimulate(payload: SimulateRequest): Promise<SimulateResponse> {
