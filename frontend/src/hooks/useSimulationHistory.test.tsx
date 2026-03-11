@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useSimulationHistory } from "./useSimulationHistory";
-import { getSimulationHistory } from "../api";
+import { getSimulationHistory, type SimulationHistoryItem } from "../api";
 import { storageGetItem, storageRemoveItem, storageSetItem } from "../storage";
 
 vi.mock("../api", () => ({
@@ -14,7 +14,7 @@ vi.mock("../storage", () => ({
   storageSetItem: vi.fn(),
 }));
 
-function buildRemoteItem(overrides = {}) {
+function buildRemoteItem(overrides: Partial<SimulationHistoryItem> = {}): SimulationHistoryItem {
   return {
     created_at: "2026-02-26T10:00:00Z",
     last_seen: "2026-02-26T10:00:00Z",
@@ -22,7 +22,6 @@ function buildRemoteItem(overrides = {}) {
     backlog_size: 70,
     target_weeks: null,
     n_sims: 2000,
-    capacity_percent: 100,
     samples_count: 24,
     percentiles: { P50: 7, P70: 9, P90: 12 },
     distribution: [{ x: 7, count: 5 }],
@@ -52,7 +51,7 @@ describe("useSimulationHistory", () => {
       expect(result.current.simulationHistory).toEqual([]);
     });
 
-    expect(storageSetItem).toHaveBeenCalledWith("mc_simulation_history_v1", "[]");
+    expect(storageSetItem).toHaveBeenCalledWith("mc_simulation_history_v2", "[]");
   });
 
   it("keeps local history when remote history also exists", async () => {
@@ -69,8 +68,6 @@ describe("useSimulationHistory", () => {
       backlogSize: 0,
       targetWeeks: 12,
       nSims: 4000,
-      capacityPercent: 100,
-      reducedCapacityWeeks: 0,
       types: ["Bug"],
       doneStates: ["Done"],
       sampleStats: { totalWeeks: 30, zeroWeeks: 1, usedWeeks: 29 },
@@ -123,21 +120,20 @@ describe("useSimulationHistory", () => {
     vi.mocked(getSimulationHistory).mockResolvedValue([
       buildRemoteItem({
         mode: "weeks_to_items",
-        backlog_size: null,
+        backlog_size: undefined,
         target_weeks: 6,
-        n_sims: null,
-        capacity_percent: null,
-        samples_count: null,
+        n_sims: undefined,
+        samples_count: 0,
         selected_org: null,
         selected_project: null,
         selected_team: null,
         start_date: null,
         end_date: null,
-        done_states: null,
-        types: null,
+        done_states: undefined,
+        types: undefined,
         include_zero_weeks: true,
         percentiles: { P50: 21, P70: 34, P90: 55 },
-        distribution: null,
+        distribution: undefined,
       }),
     ]);
 
@@ -157,7 +153,6 @@ describe("useSimulationHistory", () => {
       backlogSize: 0,
       targetWeeks: 6,
       nSims: 20000,
-      capacityPercent: 100,
       includeZeroWeeks: true,
       types: [],
       doneStates: [],
@@ -204,8 +199,6 @@ describe("useSimulationHistory", () => {
       backlogSize: 70,
       targetWeeks: 0,
       nSims: 2000,
-      capacityPercent: 100,
-      reducedCapacityWeeks: 0,
       types: ["Bug"],
       doneStates: ["Done"],
       sampleStats: { totalWeeks: 24, zeroWeeks: 0, usedWeeks: 24 },
@@ -231,7 +224,7 @@ describe("useSimulationHistory", () => {
   });
 
   it("ignores late remote data after unmount", async () => {
-    let resolveRemote;
+    let resolveRemote: ((value: SimulationHistoryItem[]) => void) | undefined;
     vi.mocked(getSimulationHistory).mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -266,8 +259,6 @@ describe("useSimulationHistory", () => {
           backlogSize: 70,
           targetWeeks: 0,
           nSims: 2000,
-          capacityPercent: 100,
-          reducedCapacityWeeks: 0,
           types: ["Bug"],
           doneStates: ["Done"],
           sampleStats: { totalWeeks: 24, zeroWeeks: 0, usedWeeks: 24 },
@@ -292,6 +283,6 @@ describe("useSimulationHistory", () => {
     });
 
     expect(result.current.simulationHistory).toEqual([]);
-    expect(storageRemoveItem).toHaveBeenCalledWith("mc_simulation_history_v1");
+    expect(storageRemoveItem).toHaveBeenCalledWith("mc_simulation_history_v2");
   });
 });

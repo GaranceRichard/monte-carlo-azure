@@ -139,7 +139,6 @@ class SimulationStore:
                 "backlog_size": req.backlog_size,
                 "target_weeks": req.target_weeks,
                 "n_sims": req.n_sims,
-                "capacity_percent": req.capacity_percent,
                 "samples_count": response.samples_count,
                 "percentiles": response.result_percentiles,
                 "distribution": [bucket.model_dump() for bucket in response.result_distribution],

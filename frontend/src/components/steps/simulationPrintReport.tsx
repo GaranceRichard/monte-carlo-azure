@@ -31,8 +31,6 @@ export function exportSimulationPrintReport({
   backlogSize,
   targetWeeks,
   nSims,
-  capacityPercent,
-  reducedCapacityWeeks,
   resultKind,
   displayPercentiles,
   throughputPoints,
@@ -49,8 +47,6 @@ export function exportSimulationPrintReport({
   backlogSize: number | string;
   targetWeeks: number | string;
   nSims: number | string;
-  capacityPercent: number | string;
-  reducedCapacityWeeks: number | string;
   resultKind: "items" | "weeks";
   displayPercentiles: Record<string, number>;
   throughputPoints: ThroughputExportPoint[];
@@ -127,7 +123,6 @@ export function exportSimulationPrintReport({
             <div class="meta-row"><b>Tickets:</b> ${escapeHtml(typeSummary)}</div>
             <div class="meta-row"><b>Etats:</b> ${escapeHtml(stateSummary)}</div>
             <div class="meta-row"><b>Echantillon:</b> ${escapeHtml(modeZeroLabel)}</div>
-            <div class="meta-row"><b>Capacite reduite:</b> ${escapeHtml(`${String(capacityPercent)}% pendant ${String(reducedCapacityWeeks)} semaines`)}</div>
             <div class="meta-row"><b>Simulations:</b> ${escapeHtml(String(nSims))}</div>
           </div>
         </header>

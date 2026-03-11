@@ -63,8 +63,6 @@ export default function SimulationChartTabs() {
       backlogSize: s.backlogSize,
       targetWeeks: s.targetWeeks,
       nSims: s.nSims,
-      capacityPercent: s.capacityPercent,
-      reducedCapacityWeeks: s.reducedCapacityWeeks,
       resultKind: s.result.result_kind,
       displayPercentiles: s.displayPercentiles,
       throughputPoints: throughputWithMovingAverage,

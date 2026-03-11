@@ -20,7 +20,6 @@ class SimulateRequest(BaseModel):
     backlog_size: Optional[int] = Field(default=None, ge=1)
     target_weeks: Optional[int] = Field(default=None, ge=1)
     n_sims: int = Field(default=20000, ge=1000, le=200000)
-    capacity_percent: int = Field(default=100, ge=1, le=100)
     client_context: Optional[ClientContext] = None
 
 
@@ -44,7 +43,6 @@ class SimulationHistoryItem(BaseModel):
     backlog_size: Optional[int] = None
     target_weeks: Optional[int] = None
     n_sims: int
-    capacity_percent: int
     samples_count: int
     percentiles: Dict[str, int]
     distribution: List[DistributionBucket]

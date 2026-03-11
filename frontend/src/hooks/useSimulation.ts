@@ -94,10 +94,6 @@ export function useSimulation({
     setTargetWeeks,
     nSims,
     setNSims,
-    capacityPercent,
-    setCapacityPercent,
-    reducedCapacityWeeks,
-    setReducedCapacityWeeks,
   } = useSimulationPrefs();
   const { simulationHistory, pushSimulationHistory, clearSimulationHistory } = useSimulationHistory();
 
@@ -228,8 +224,6 @@ export function useSimulation({
         backlogSize,
         targetWeeks,
         nSims,
-        capacityPercent,
-        reducedCapacityWeeks,
       });
       setSampleStats(forecast.sampleStats);
       setWeeklyThroughput(forecast.weeklyThroughput);
@@ -246,7 +240,6 @@ export function useSimulation({
     }
   }, [
     backlogSize,
-    capacityPercent,
     clearComputedSimulationState,
     doneStates,
     endDate,
@@ -257,7 +250,6 @@ export function useSimulation({
     pat,
     serverUrl,
     pushSimulationHistory,
-    reducedCapacityWeeks,
     selectedOrg,
     selectedProject,
     selectedTeam,
@@ -275,8 +267,6 @@ export function useSimulation({
       endDate,
       simulationMode,
       includeZeroWeeks,
-      capacityPercent,
-      reducedCapacityWeeks,
       backlogSize,
       targetWeeks,
       nSims,
@@ -315,8 +305,6 @@ export function useSimulation({
     setEndDate(entry.endDate);
     setSimulationMode(entry.simulationMode);
     setIncludeZeroWeeks(entry.includeZeroWeeks);
-    setCapacityPercent(entry.capacityPercent);
-    setReducedCapacityWeeks(entry.reducedCapacityWeeks);
     setBacklogSize(entry.backlogSize);
     setTargetWeeks(entry.targetWeeks);
     setNSims(entry.nSims);
@@ -352,10 +340,6 @@ export function useSimulation({
     setSimulationMode,
     includeZeroWeeks,
     setIncludeZeroWeeks,
-    capacityPercent,
-    setCapacityPercent,
-    reducedCapacityWeeks,
-    setReducedCapacityWeeks,
     sampleStats,
     warning,
     backlogSize,

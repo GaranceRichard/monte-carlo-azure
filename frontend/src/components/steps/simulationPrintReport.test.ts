@@ -54,8 +54,6 @@ function buildBaseArgs() {
     backlogSize: 120,
     targetWeeks: 12,
     nSims: 20000,
-    capacityPercent: 100,
-    reducedCapacityWeeks: 0,
     resultKind: "weeks" as const,
     displayPercentiles: { P50: 8, P70: 10, P90: 13 },
     throughputPoints: [

@@ -37,9 +37,11 @@ Outil de prevision base sur une simulation Monte Carlo. L'application aide a tra
 - historique local des dernieres simulations
 - cookie client `IDMontecarlo` pour relier un client anonyme a ses simulations persistees
 - persistence MongoDB des simulations et restitution des 10 dernieres via `/simulations/history`
-- parametre de capacite reduite
 - configuration rapide des filtres (types + etats) memorisee localement
 - rapport portefeuille PDF avec progression et tolerance aux echecs partiels
+
+Le contrat de simulation ne transporte plus de parametre de capacite reduite:
+les projections reposent uniquement sur l'historique de throughput observe.
 
 ---
 

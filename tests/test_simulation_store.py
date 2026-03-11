@@ -109,7 +109,6 @@ def _req_resp():
         mode="backlog_to_weeks",
         backlog_size=20,
         n_sims=2000,
-        capacity_percent=95,
         client_context=ClientContext(
             selected_org="org-demo",
             selected_project="Projet A",
@@ -212,7 +211,6 @@ def test_save_simulation_inserts_and_updates(monkeypatch):
     assert fake_coll.index_calls[1][1]["expireAfterSeconds"] == 30 * 24 * 3600
     assert len(fake_coll.inserted) == 1
     assert fake_coll.inserted[0]["mc_client_id"] == "c1"
-    assert fake_coll.inserted[0]["capacity_percent"] == 95
     assert fake_coll.inserted[0]["selected_org"] == "org-demo"
     assert fake_coll.inserted[0]["distribution"] == [{"x": 8, "count": 12}]
     assert len(fake_coll.updated) == 1
@@ -309,7 +307,6 @@ def test_save_and_list_recent_with_real_mongo():
         row = rows[0]
         assert row["mode"] == "backlog_to_weeks"
         assert row["samples_count"] == 6
-        assert row["capacity_percent"] == 95
         assert row["percentiles"]["P50"] == 10
 
         indexes = list(client[db_name][collection_name].list_indexes())

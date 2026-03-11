@@ -22,8 +22,6 @@ describe("SimulationResultsPanel history list", () => {
       backlogSize: 12,
       targetWeeks: 3,
       nSims: 20000,
-      capacityPercent: 100,
-      reducedCapacityWeeks: 0,
       types: ["Bug"],
       doneStates: ["Done"],
       sampleStats: { totalWeeks: 8, zeroWeeks: 1, usedWeeks: 7 },

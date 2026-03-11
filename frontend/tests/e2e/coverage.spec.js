@@ -116,7 +116,6 @@ test.describe("e2e istanbul coverage", () => {
             backlog_size: 70,
             target_weeks: null,
             n_sims: 2000,
-            capacity_percent: 100,
             samples_count: 24,
             percentiles: { P50: 7, P70: 9, P90: 12 },
             distribution: [
@@ -405,19 +404,7 @@ test.describe("e2e istanbul coverage", () => {
         result_distribution: [{ x: 8, count: 10 }],
         samples_count: 6,
       };
-      simulationMod.applyCapacityReductionToResult(baseResponse, "backlog_to_weeks", 0, 100, 0);
-      simulationMod.applyCapacityReductionToResult(baseResponse, "backlog_to_weeks", 0, 70, 6);
-      simulationMod.applyCapacityReductionToResult(
-        {
-          ...baseResponse,
-          result_kind: "items",
-          result_distribution: [{ x: 50, count: 8 }],
-        },
-        "weeks_to_items",
-        12,
-        70,
-        6,
-      );
+      void baseResponse;
 
       const adoErrorMod = await import("/src/adoErrors.ts");
       adoErrorMod.formatAdoHttpErrorMessage(401, { operation: "profile" });
@@ -686,8 +673,6 @@ test.describe("e2e istanbul coverage", () => {
           backlogSize: 120,
           targetWeeks: 12,
           nSims: 2000,
-          capacityPercent: 85,
-          reducedCapacityWeeks: 4,
         });
 
         await forecastMod.simulateForecastFromSamples({
@@ -697,8 +682,6 @@ test.describe("e2e istanbul coverage", () => {
           backlogSize: 120,
           targetWeeks: 12,
           nSims: 2000,
-          capacityPercent: 100,
-          reducedCapacityWeeks: 0,
         });
       } finally {
         window.fetch = originalFetch;
@@ -752,7 +735,7 @@ test.describe("e2e istanbul coverage", () => {
 
     await page.evaluate(async () => {
       const { React, createRoot, sortTeams, useSimulationHistory } = await import("/src/e2e/runtime.ts");
-      const simHistoryKey = "mc_simulation_history_v1";
+      const simHistoryKey = "mc_simulation_history_v2";
 
       sortTeams([
         { id: "3", name: "Zulu - Beta" },
@@ -793,8 +776,6 @@ test.describe("e2e istanbul coverage", () => {
         backlogSize: 70,
         targetWeeks: 0,
         nSims: 2000,
-        capacityPercent: 100,
-        reducedCapacityWeeks: 0,
         types: ["Bug"],
         doneStates: ["Done"],
         sampleStats: { totalWeeks: 24, zeroWeeks: 0, usedWeeks: 24 },
@@ -897,7 +878,6 @@ test.describe("e2e istanbul coverage", () => {
             backlog_size: 70,
             target_weeks: null,
             n_sims: 2000,
-            capacity_percent: 100,
             samples_count: 24,
             percentiles: { P50: 7, P70: 9, P90: 12 },
             distribution: [{ x: 7, count: 5 }],
@@ -921,7 +901,6 @@ test.describe("e2e istanbul coverage", () => {
             backlog_size: 70,
             target_weeks: null,
             n_sims: 2000,
-            capacity_percent: 100,
             samples_count: 24,
             percentiles: { P50: 7, P70: 9, P90: 12 },
             distribution: [{ x: 7, count: 5 }],
@@ -940,7 +919,6 @@ test.describe("e2e istanbul coverage", () => {
             backlog_size: null,
             target_weeks: 6,
             n_sims: null,
-            capacity_percent: null,
             samples_count: null,
             percentiles: { P50: 21, P70: 34, P90: 55 },
             distribution: null,

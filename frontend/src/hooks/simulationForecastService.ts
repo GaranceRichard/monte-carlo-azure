@@ -7,8 +7,8 @@ import type {
   ForecastResponse,
 } from "../types";
 import type { SampleStats, SimulationHistoryEntry } from "./simulationTypes";
-import { clamp, toSafeNumber } from "../utils/math";
-import { applyCapacityReductionToResult, computeRiskScoreFromPercentiles } from "../utils/simulation";
+import { toSafeNumber } from "../utils/math";
+import { computeRiskScoreFromPercentiles } from "../utils/simulation";
 
 type RunSimulationForecastParams = {
   selectedOrg: string;
@@ -25,8 +25,6 @@ type RunSimulationForecastParams = {
   backlogSize: number | string;
   targetWeeks: number | string;
   nSims: number | string;
-  capacityPercent: number | string;
-  reducedCapacityWeeks: number | string;
 };
 
 type RunSimulationForecastResult = {
@@ -64,8 +62,6 @@ type SimulateFromSamplesParams = {
   backlogSize: number | string;
   targetWeeks: number | string;
   nSims: number | string;
-  capacityPercent: number | string;
-  reducedCapacityWeeks: number | string;
   selectedOrg?: string;
   selectedProject?: string;
   selectedTeam?: string;
@@ -131,8 +127,6 @@ export async function simulateForecastFromSamples(params: SimulateFromSamplesPar
     backlogSize,
     targetWeeks,
     nSims,
-    capacityPercent,
-    reducedCapacityWeeks,
     selectedOrg,
     selectedProject,
     selectedTeam,
@@ -149,7 +143,6 @@ export async function simulateForecastFromSamples(params: SimulateFromSamplesPar
     backlog_size: simulationMode === "backlog_to_weeks" ? Number(backlogSize) : undefined,
     target_weeks: simulationMode === "weeks_to_items" ? Number(targetWeeks) : undefined,
     n_sims: Number(nSims),
-    capacity_percent: Number(capacityPercent),
     client_context: {
       selected_org: selectedOrg,
       selected_project: selectedProject,
@@ -170,13 +163,7 @@ export async function simulateForecastFromSamples(params: SimulateFromSamplesPar
     result_distribution: (response.result_distribution ?? []) as ForecastHistogramBucket[],
   };
 
-  return applyCapacityReductionToResult(
-    normalized,
-    simulationMode,
-    toSafeNumber(targetWeeks, 12),
-    toSafeNumber(capacityPercent, 100),
-    toSafeNumber(reducedCapacityWeeks, 0),
-  );
+  return normalized;
 }
 
 export async function runSimulationForecast(params: RunSimulationForecastParams): Promise<RunSimulationForecastResult> {
@@ -195,8 +182,6 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     backlogSize,
     targetWeeks,
     nSims,
-    capacityPercent,
-    reducedCapacityWeeks,
   } = params;
 
   const throughputData = await fetchTeamThroughput({
@@ -219,8 +204,6 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     backlogSize,
     targetWeeks,
     nSims,
-    capacityPercent,
-    reducedCapacityWeeks,
     selectedOrg,
     selectedProject,
     selectedTeam,
@@ -243,8 +226,6 @@ export async function runSimulationForecast(params: RunSimulationForecastParams)
     backlogSize: toSafeNumber(backlogSize, 120),
     targetWeeks: toSafeNumber(targetWeeks, 12),
     nSims: toSafeNumber(nSims, 20_000),
-    capacityPercent: clamp(toSafeNumber(capacityPercent, 100), 1, 100),
-    reducedCapacityWeeks: clamp(toSafeNumber(reducedCapacityWeeks, 0), 0, 260),
     types: [...types],
     doneStates: [...doneStates],
     sampleStats: throughputData.sampleStats,

@@ -36,7 +36,6 @@ def test_simulate_persists_when_cookie_present(monkeypatch):
             "mode": "backlog_to_weeks",
             "backlog_size": 20,
             "n_sims": 2000,
-            "capacity_percent": 90,
             "client_context": {
                 "selected_org": "org-demo",
                 "selected_project": "Projet A",
@@ -49,7 +48,7 @@ def test_simulate_persists_when_cookie_present(monkeypatch):
     assert len(fake.saved) == 1
     saved_id, saved_req, saved_resp = fake.saved[0]
     assert saved_id.startswith("f47ac10b")
-    assert saved_req["capacity_percent"] == 90
+    assert "capacity_percent" not in saved_req
     assert "result_percentiles" in saved_resp
 
 
@@ -64,7 +63,6 @@ def test_simulation_history_reads_last_items_from_store(monkeypatch):
                 "backlog_size": 80,
                 "target_weeks": None,
                 "n_sims": 20000,
-                "capacity_percent": 100,
                 "samples_count": 24,
                 "percentiles": {"P50": 10, "P70": 12, "P90": 14},
                 "distribution": [{"x": 8, "count": 120}],
@@ -150,7 +148,6 @@ def test_simulate_returns_503_when_store_unavailable(monkeypatch):
             "mode": "backlog_to_weeks",
             "backlog_size": 20,
             "n_sims": 2000,
-            "capacity_percent": 90,
         },
     )
     assert r.status_code == 503

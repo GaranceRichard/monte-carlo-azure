@@ -25,8 +25,6 @@ export type StoredSimulationPrefs = {
   backlogSize?: number;
   targetWeeks?: number;
   nSims?: number;
-  capacityPercent?: number;
-  reducedCapacityWeeks?: number;
 };
 
 export type SimulationHistoryEntry = {
@@ -42,8 +40,6 @@ export type SimulationHistoryEntry = {
   backlogSize: number;
   targetWeeks: number;
   nSims: number;
-  capacityPercent: number;
-  reducedCapacityWeeks: number;
   types: string[];
   doneStates: string[];
   sampleStats: SampleStats | null;
@@ -63,10 +59,6 @@ export type SimulationForecastControls = {
   setSimulationMode: (value: ForecastMode) => void;
   includeZeroWeeks: boolean;
   setIncludeZeroWeeks: (value: boolean) => void;
-  capacityPercent: number | string;
-  setCapacityPercent: (value: number | string) => void;
-  reducedCapacityWeeks: number | string;
-  setReducedCapacityWeeks: (value: number | string) => void;
 };
 
 export type SimulationDateRange = {

@@ -8,8 +8,6 @@ type SimulationAutoRunParams = {
   endDate: string;
   simulationMode: ForecastMode;
   includeZeroWeeks: boolean;
-  capacityPercent: number | string;
-  reducedCapacityWeeks: number | string;
   backlogSize: number | string;
   targetWeeks: number | string;
   nSims: number | string;
@@ -32,8 +30,6 @@ function buildAutoRunKey({
   endDate,
   simulationMode,
   includeZeroWeeks,
-  capacityPercent,
-  reducedCapacityWeeks,
   backlogSize,
   targetWeeks,
   nSims,
@@ -47,8 +43,6 @@ function buildAutoRunKey({
     endDate,
     simulationMode,
     includeZeroWeeks ? "1" : "0",
-    String(capacityPercent),
-    String(reducedCapacityWeeks),
     String(backlogSize),
     String(targetWeeks),
     String(nSims),
@@ -71,8 +65,6 @@ export function useSimulationAutoRun({
   endDate,
   simulationMode,
   includeZeroWeeks,
-  capacityPercent,
-  reducedCapacityWeeks,
   backlogSize,
   targetWeeks,
   nSims,
@@ -90,8 +82,6 @@ export function useSimulationAutoRun({
       endDate,
       simulationMode,
       includeZeroWeeks,
-      capacityPercent,
-      reducedCapacityWeeks,
       backlogSize,
       targetWeeks,
       nSims,
@@ -131,8 +121,6 @@ export function useSimulationAutoRun({
     endDate,
     simulationMode,
     includeZeroWeeks,
-    capacityPercent,
-    reducedCapacityWeeks,
     backlogSize,
     targetWeeks,
     nSims,

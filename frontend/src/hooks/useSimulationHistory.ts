@@ -4,7 +4,7 @@ import { storageGetItem, storageRemoveItem, storageSetItem } from "../storage";
 import type { SimulationHistoryEntry } from "./simulationTypes";
 import { computeRiskScoreFromPercentiles } from "../utils/simulation";
 
-const SIM_HISTORY_KEY = "mc_simulation_history_v1";
+const SIM_HISTORY_KEY = "mc_simulation_history_v2";
 const MAX_SIM_HISTORY = 10;
 
 function readSimulationHistory(): SimulationHistoryEntry[] {
@@ -33,8 +33,6 @@ function mapRemoteHistoryItem(item: SimulationHistoryItem, index: number): Simul
     backlogSize: Number(item.backlog_size ?? 0),
     targetWeeks: Number(item.target_weeks ?? 0),
     nSims: Number(item.n_sims ?? 20000),
-    capacityPercent: Number(item.capacity_percent ?? 100),
-    reducedCapacityWeeks: 0,
     types: item.types ?? [],
     doneStates: item.done_states ?? [],
     sampleStats: {

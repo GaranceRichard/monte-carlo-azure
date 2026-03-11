@@ -4,7 +4,7 @@ import { nWeeksAgo, today } from "../date";
 import { storageGetItem, storageSetItem } from "../storage";
 import type { StoredSimulationPrefs } from "./simulationTypes";
 
-const SIM_PREFS_KEY = "mc_simulation_prefs_v1";
+const SIM_PREFS_KEY = "mc_simulation_prefs_v2";
 
 function readStoredSimulationPrefs(): StoredSimulationPrefs {
   const raw = storageGetItem(SIM_PREFS_KEY);
@@ -33,10 +33,6 @@ export type SimulationPrefsState = {
   setTargetWeeks: (value: number | string) => void;
   nSims: number | string;
   setNSims: (value: number | string) => void;
-  capacityPercent: number | string;
-  setCapacityPercent: (value: number | string) => void;
-  reducedCapacityWeeks: number | string;
-  setReducedCapacityWeeks: (value: number | string) => void;
 };
 
 export function useSimulationPrefs(): SimulationPrefsState {
@@ -45,8 +41,6 @@ export function useSimulationPrefs(): SimulationPrefsState {
   const [endDate, setEndDate] = useState(() => prefs.endDate || today());
   const [simulationMode, setSimulationMode] = useState<ForecastMode>(() => prefs.simulationMode || "backlog_to_weeks");
   const [includeZeroWeeks, setIncludeZeroWeeks] = useState(() => prefs.includeZeroWeeks ?? true);
-  const [capacityPercent, setCapacityPercent] = useState<number | string>(prefs.capacityPercent ?? 100);
-  const [reducedCapacityWeeks, setReducedCapacityWeeks] = useState<number | string>(prefs.reducedCapacityWeeks ?? 0);
   const [backlogSize, setBacklogSize] = useState<number | string>(prefs.backlogSize ?? 120);
   const [targetWeeks, setTargetWeeks] = useState<number | string>(prefs.targetWeeks ?? 12);
   const [nSims, setNSims] = useState<number | string>(prefs.nSims ?? 20000);
@@ -59,8 +53,6 @@ export function useSimulationPrefs(): SimulationPrefsState {
         endDate,
         simulationMode,
         includeZeroWeeks,
-        capacityPercent: Number(capacityPercent) || 100,
-        reducedCapacityWeeks: Number(reducedCapacityWeeks) || 0,
         backlogSize: Number(backlogSize) || 0,
         targetWeeks: Number(targetWeeks) || 0,
         nSims: Number(nSims) || 0,
@@ -71,8 +63,6 @@ export function useSimulationPrefs(): SimulationPrefsState {
     endDate,
     simulationMode,
     includeZeroWeeks,
-    capacityPercent,
-    reducedCapacityWeeks,
     backlogSize,
     targetWeeks,
     nSims,
@@ -93,9 +83,5 @@ export function useSimulationPrefs(): SimulationPrefsState {
     setTargetWeeks,
     nSims,
     setNSims,
-    capacityPercent,
-    setCapacityPercent,
-    reducedCapacityWeeks,
-    setReducedCapacityWeeks,
   };
 }
