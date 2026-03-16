@@ -141,6 +141,24 @@ def _compute_simulation_result(
     )
 
 
+def _persist_simulation(
+    request: Request,
+    req: SimulateRequest,
+    response_model: SimulateResponse,
+) -> None:
+    mc_client_id = (request.cookies.get(cfg.client_cookie_name) or "").strip()
+    if not simulation_store.enabled or not mc_client_id:
+        return
+
+    try:
+        simulation_store.save_simulation(mc_client_id, req, response_model)
+    except Exception as exc:
+        raise HTTPException(
+            503,
+            "Persistence Mongo indisponible. Reessayez plus tard.",
+        ) from exc
+
+
 @router.post("/simulate", response_model=SimulateResponse)
 @limiter.limit(cfg.rate_limit_simulate)
 async def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
@@ -201,15 +219,7 @@ async def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
         throughput_reliability=reliability,
     )
 
-    mc_client_id = (request.cookies.get(cfg.client_cookie_name) or "").strip()
-    if simulation_store.enabled and mc_client_id:
-        try:
-            simulation_store.save_simulation(mc_client_id, req, response_model)
-        except Exception as exc:
-            raise HTTPException(
-                503,
-                "Persistence Mongo indisponible. Reessayez plus tard.",
-            ) from exc
+    _persist_simulation(request, req, response_model)
 
     logger.info(
         json.dumps(

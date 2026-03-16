@@ -7,7 +7,12 @@ from starlette.requests import Request
 
 from backend.api import app
 from backend.api_config import ApiConfig
-from backend.api_routes_simulate import _client_key_from_request, limiter
+from backend.api_models import SimulateRequest, SimulateResponse, ThroughputReliability
+from backend.api_routes_simulate import (
+    _client_key_from_request,
+    _persist_simulation,
+    limiter,
+)
 
 
 def test_simulate_backlog_to_weeks_success():
@@ -215,6 +220,121 @@ def test_simulate_returns_503_when_forecast_timeout_is_exceeded(monkeypatch):
 
     assert response.status_code == 503
     assert "Simulation trop longue" in response.json()["detail"]
+
+
+class _FakeStore:
+    def __init__(self, enabled: bool, fail: bool = False):
+        self.enabled = enabled
+        self.fail = fail
+        self.saved: list[tuple[str, dict, dict]] = []
+
+    def save_simulation(self, mc_client_id, req, response):
+        if self.fail:
+            raise RuntimeError("mongo down")
+        self.saved.append((mc_client_id, req.model_dump(), response.model_dump()))
+
+
+def _build_request_with_cookie(cookie_name: str, cookie_value: str | None = None) -> Request:
+    headers: list[tuple[bytes, bytes]] = []
+    if cookie_value is not None:
+        headers.append((b"cookie", f"{cookie_name}={cookie_value}".encode()))
+    return Request({"type": "http", "headers": headers})
+
+
+def _build_response_model() -> SimulateResponse:
+    return SimulateResponse(
+        result_kind="weeks",
+        result_percentiles={"P50": 10, "P70": 12, "P90": 15},
+        risk_score=0.5,
+        result_distribution=[{"x": 10, "count": 4}],
+        samples_count=6,
+        throughput_reliability=ThroughputReliability(
+            cv=0.2,
+            iqr_ratio=0.3,
+            slope_norm=0.1,
+            label="fiable",
+            samples_count=6,
+        ),
+    )
+
+
+def test_persist_simulation_saves_when_cookie_present_and_store_enabled(monkeypatch):
+    from backend import api_routes_simulate
+
+    fake = _FakeStore(enabled=True)
+    monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
+    request = _build_request_with_cookie(api_routes_simulate.cfg.client_cookie_name, "client-123")
+    req = SimulateRequest(
+        throughput_samples=[1, 2, 3, 4, 5, 6],
+        mode="backlog_to_weeks",
+        backlog_size=20,
+        n_sims=2000,
+    )
+
+    _persist_simulation(request, req, _build_response_model())
+
+    assert len(fake.saved) == 1
+    saved_id, saved_req, saved_resp = fake.saved[0]
+    assert saved_id == "client-123"
+    assert saved_req["backlog_size"] == 20
+    assert saved_resp["result_kind"] == "weeks"
+
+
+def test_persist_simulation_skips_when_cookie_missing(monkeypatch):
+    from backend import api_routes_simulate
+
+    fake = _FakeStore(enabled=True)
+    monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
+    request = _build_request_with_cookie(api_routes_simulate.cfg.client_cookie_name)
+    req = SimulateRequest(
+        throughput_samples=[1, 2, 3, 4, 5, 6],
+        mode="backlog_to_weeks",
+        backlog_size=20,
+        n_sims=2000,
+    )
+
+    _persist_simulation(request, req, _build_response_model())
+
+    assert fake.saved == []
+
+
+def test_persist_simulation_skips_when_store_disabled(monkeypatch):
+    from backend import api_routes_simulate
+
+    fake = _FakeStore(enabled=False)
+    monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
+    request = _build_request_with_cookie(api_routes_simulate.cfg.client_cookie_name, "client-123")
+    req = SimulateRequest(
+        throughput_samples=[1, 2, 3, 4, 5, 6],
+        mode="backlog_to_weeks",
+        backlog_size=20,
+        n_sims=2000,
+    )
+
+    _persist_simulation(request, req, _build_response_model())
+
+    assert fake.saved == []
+
+
+def test_persist_simulation_raises_503_when_store_fails(monkeypatch):
+    from backend import api_routes_simulate
+    from fastapi import HTTPException
+
+    fake = _FakeStore(enabled=True, fail=True)
+    monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
+    request = _build_request_with_cookie(api_routes_simulate.cfg.client_cookie_name, "client-123")
+    req = SimulateRequest(
+        throughput_samples=[1, 2, 3, 4, 5, 6],
+        mode="backlog_to_weeks",
+        backlog_size=20,
+        n_sims=2000,
+    )
+
+    with pytest.raises(HTTPException) as exc_info:
+        _persist_simulation(request, req, _build_response_model())
+
+    assert exc_info.value.status_code == 503
+    assert "Persistence Mongo indisponible" in exc_info.value.detail
 
 
 def test_client_key_prefers_first_forwarded_ip():

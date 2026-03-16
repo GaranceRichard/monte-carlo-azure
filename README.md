@@ -42,6 +42,8 @@ Outil de prevision base sur une simulation Monte Carlo. L'application aide a tra
 
 Le contrat de simulation ne transporte plus de parametre de capacite reduite:
 les projections reposent uniquement sur l'historique de throughput observe.
+La route `POST /simulate` isole aussi la persistance Mongo dans un helper dedie pour garder
+le flux principal plus simple a tester et a faire evoluer.
 
 ---
 
