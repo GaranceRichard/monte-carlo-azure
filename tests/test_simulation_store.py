@@ -54,7 +54,11 @@ class _FakeCollection:
 
     def create_index(self, spec, **kwargs):
         self.index_calls.append((spec, kwargs))
-        if self.raise_on_ttl_create and spec == [("last_seen", 1)] and "expireAfterSeconds" in kwargs:
+        if (
+            self.raise_on_ttl_create
+            and spec == [("last_seen", 1)]
+            and "expireAfterSeconds" in kwargs
+        ):
             self.raise_on_ttl_create = False
             raise OperationFailure(
                 "An equivalent index already exists with the same name but different options.",
