@@ -1,4 +1,4 @@
-export type PublicAppMode = "standard" | "landing" | "demo" | "connect";
+export type PublicAppMode = "standard" | "demo" | "connect";
 
 export type AppRuntime = {
   isPagesBuild: boolean;
@@ -21,7 +21,7 @@ export function resolveAppRuntime(search = window.location.search): AppRuntime {
   let mode: PublicAppMode = "standard";
   if (isDemoMode) mode = "demo";
   else if (isPagesBuild && isConnectInfoMode) mode = "connect";
-  else if (isPagesBuild) mode = "landing";
+  else if (isPagesBuild) mode = "demo";
 
   return {
     isPagesBuild,

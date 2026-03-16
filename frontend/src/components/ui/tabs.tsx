@@ -23,7 +23,7 @@ type TabsContentProps = {
 
 export function TabsRoot({ children, value, onValueChange }: TabsRootProps) {
   return (
-    <TabsPrimitive.Root value={value} onValueChange={onValueChange}>
+    <TabsPrimitive.Root value={value} onValueChange={onValueChange} className="flex min-h-0 min-w-0 flex-col">
       {children}
     </TabsPrimitive.Root>
   );
@@ -50,7 +50,7 @@ export function TabsTrigger({ children, value }: TabsTriggerProps) {
 
 export function TabsContent({ children, value }: TabsContentProps) {
   return (
-    <TabsPrimitive.Content value={value} className="mt-4">
+    <TabsPrimitive.Content value={value} className="mt-4 min-h-0 min-w-0">
       {children}
     </TabsPrimitive.Content>
   );

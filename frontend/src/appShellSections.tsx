@@ -1,14 +1,12 @@
 import PublicConnectNotice from "./components/PublicConnectNotice";
-import PublicLandingPage from "./components/PublicLandingPage";
 
-type RuntimeMode = "standard" | "landing" | "demo" | "connect";
+type RuntimeMode = "standard" | "demo" | "connect";
 type OnboardingStep = "pat" | "org" | "projects" | "teams" | "simulation" | "portfolio";
 type DeploymentTarget = "cloud" | "onprem";
 
 const ONBOARDING_ORDER = ["pat", "org", "projects", "teams"] as const;
 
 export function renderPublicMode(mode: RuntimeMode): JSX.Element | null {
-  if (mode === "landing") return <PublicLandingPage />;
   if (mode === "connect") return <PublicConnectNotice />;
   return null;
 }
@@ -26,13 +24,10 @@ export function PublicModeGate({
 export function DemoBanner({ isDemoMode }: { isDemoMode: boolean }): JSX.Element | null {
   if (!isDemoMode) return null;
   return (
-    <div className="mb-3 flex flex-col gap-2 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950 md:flex-row md:items-center md:justify-between">
+    <div className="mb-3 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950">
       <div>
         <b>Vous êtes en mode démo</b> - les données sont fictives.
       </div>
-      <a href="?connect=true" className="font-semibold text-sky-900 underline underline-offset-4">
-        Connecter un vrai compte
-      </a>
     </div>
   );
 }
@@ -60,7 +55,7 @@ export function OnboardingStepper({
   return (
     <div className="flow-stepper">
       <div className="flow-stepper-row">
-        {ONBOARDING_ORDER.map((entry, idx) => (
+        {ONBOARDING_ORDER.map((entry, idx) =>
           idx < currentOnboardingIndex ? (
             <button
               key={entry}
@@ -75,8 +70,8 @@ export function OnboardingStepper({
             <div key={entry} className={`flow-step ${idx === currentOnboardingIndex ? "flow-step--active" : ""}`}>
               {idx + 1}. {onboardingLabels[entry]}
             </div>
-          )
-        ))}
+          ),
+        )}
       </div>
       <div className="flow-stepper-caption">
         Étape {currentOnboardingIndex + 1} / {ONBOARDING_ORDER.length}

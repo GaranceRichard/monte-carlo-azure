@@ -34,7 +34,7 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
         )}
 
         <div className="grid flex-1 min-h-0 grid-cols-1 gap-3 xl:grid-cols-12">
-          <div className="min-h-0 space-y-3 xl:col-span-4 xl:grid xl:grid-rows-[auto_minmax(0,1fr)] xl:space-y-0 xl:gap-3">
+          <div className="min-h-0 min-w-0 space-y-3 xl:col-span-4 xl:grid xl:grid-rows-[auto_minmax(0,1fr)] xl:space-y-0 xl:gap-3">
             <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-3">
               <SimulationControlPanel onExpansionChange={setControlExpanded} />
             </div>
@@ -44,7 +44,7 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
               </div>
             )}
           </div>
-          <div className="min-h-0 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 xl:col-span-8">
+          <div className="min-h-0 min-w-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 xl:col-span-8">
             <SimulationChartTabs />
           </div>
         </div>

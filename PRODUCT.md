@@ -82,9 +82,9 @@ Le produit propose un parcours de demonstration publique via GitHub Pages pour p
 
 Processus cible :
 
-- l'utilisateur arrive sur une page publique de presentation
-- il choisit soit le mode demo, soit la notice de connexion Azure DevOps
-- le mode demo permet d'explorer le flux et les ecrans avec des donnees preconfigurees
+- l'utilisateur arrive directement sur la demo publique
+- il peut ensuite ouvrir la notice de connexion Azure DevOps
+- la demo permet d'explorer le flux et les ecrans avec des donnees preconfigurees
 - la notice publique explique ensuite comment basculer vers un usage reel avec Azure DevOps
 
 Objectif produit :

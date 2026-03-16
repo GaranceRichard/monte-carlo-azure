@@ -97,7 +97,6 @@ test.describe("e2e istanbul coverage", () => {
 
     const results = await page.evaluate(async () => {
       const { React, createRoot } = await import("/src/e2e/runtime.ts");
-      const landingModule = await import("/src/components/PublicLandingPage.tsx");
       const connectModule = await import("/src/components/PublicConnectNotice.tsx");
 
       const host = document.createElement("div");
@@ -108,7 +107,6 @@ test.describe("e2e istanbul coverage", () => {
         React.createElement(
           React.Fragment,
           null,
-          React.createElement(landingModule.default),
           React.createElement(connectModule.default),
         ),
       );
@@ -117,10 +115,7 @@ test.describe("e2e istanbul coverage", () => {
       await new Promise((resolve) => window.setTimeout(resolve, 0));
 
       const payload = {
-        demoLinks: Array.from(document.querySelectorAll('a[href="?demo=true"]')).map((node) => node.textContent || ""),
-        connectLinks: Array.from(document.querySelectorAll('a[href="?connect=true"]')).map((node) => node.textContent || ""),
-        homeLinks: Array.from(document.querySelectorAll('a[href="?"]')).map((node) => node.textContent || ""),
-        hasLandingHeading: document.body.textContent?.includes("Décidez plus vite") ?? false,
+        demoLinks: Array.from(document.querySelectorAll('a[href="?"]')).map((node) => node.textContent || ""),
         hasConnectHeading: document.body.textContent?.includes("La connexion à un environnement Azure DevOps réel") ?? false,
       };
 
@@ -129,10 +124,7 @@ test.describe("e2e istanbul coverage", () => {
       return payload;
     });
 
-    expect(results.demoLinks.length).toBeGreaterThanOrEqual(2);
-    expect(results.connectLinks).toContain("Connecter votre Azure DevOps");
-    expect(results.homeLinks).toContain("Retour à l’accueil");
-    expect(results.hasLandingHeading).toBe(true);
+    expect(results.demoLinks).toContain("Voir la démo");
     expect(results.hasConnectHeading).toBe(true);
   });
 
@@ -2055,10 +2047,10 @@ test.describe("e2e istanbul coverage", () => {
   });
 
   test("coverage: app demo mode", async ({ page }) => {
-    await page.goto("/?demo=true");
+    await page.goto("/");
 
     await expect(page.getByText(/Vous êtes en mode démo/i)).toBeVisible();
-    await expect(page.getByRole("link", { name: /Connecter un vrai compte/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Connecter un vrai compte/i })).toHaveCount(0);
     await expect(page.getByTestId("selected-team-card")).toBeVisible();
     await expect(page.getByTestId("selected-team-name")).toHaveText("Alpha");
 

@@ -246,16 +246,24 @@ describe("App", () => {
     expect(await screen.findByText("Chargement du portefeuille...")).toBeTruthy();
   });
 
-  it("renders the public landing page on GitHub Pages root", () => {
+  it("renders demo mode on GitHub Pages root", () => {
     vi.mocked(resolveAppRuntime).mockReturnValue({
       isPagesBuild: true,
-      mode: "landing",
-      isDemoMode: false,
+      mode: "demo",
+      isDemoMode: true,
       isConnectInfoMode: false,
     });
+    vi.mocked(useOnboarding).mockReturnValue({
+      state: { ...buildState("simulation"), step: "simulation" },
+      actions: buildActions(),
+    } as never);
+    vi.mocked(useSimulation).mockReturnValue({
+      resetForTeamSelection: vi.fn(),
+      resetAll: vi.fn(),
+    } as never);
     render(<App />);
-    expect(screen.getByRole("link", { name: "Voir la démo" }).getAttribute("href")).toBe("?demo=true");
-    expect(screen.getByRole("link", { name: "Connecter votre Azure DevOps" }).getAttribute("href")).toBe("?connect=true");
+    expect(screen.getByText(/mode démo/i)).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /Connecter un vrai compte/i })).toBeNull();
   });
 
   it("renders the public connect notice on GitHub Pages connect mode", () => {

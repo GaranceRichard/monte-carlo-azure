@@ -13,7 +13,7 @@ export default function PublicConnectNotice() {
           </p>
           <div className="mt-8 flex flex-col gap-4 sm:flex-row">
             <a
-              href="?demo=true"
+              href="?"
               className="inline-flex min-h-12 items-center justify-center rounded-full bg-sky-300 px-6 py-3 text-base font-bold text-slate-950 transition hover:bg-sky-200"
             >
               Voir la démo

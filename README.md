@@ -7,7 +7,6 @@ Outil de prevision base sur une simulation Monte Carlo. L'application aide a tra
 Demo GitHub Pages:
 
 - page publique: [https://garancerichard.github.io/monte-carlo-azure/](https://garancerichard.github.io/monte-carlo-azure/)
-- mode demo: [https://garancerichard.github.io/monte-carlo-azure/?demo=true](https://garancerichard.github.io/monte-carlo-azure/?demo=true)
 - notice de connexion Azure DevOps: [https://garancerichard.github.io/monte-carlo-azure/?connect=true](https://garancerichard.github.io/monte-carlo-azure/?connect=true)
 
 ## En bref

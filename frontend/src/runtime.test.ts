@@ -43,14 +43,14 @@ describe("resolveAppRuntime", () => {
     });
   });
 
-  it("resolves landing mode on pages builds without query flags", async () => {
+  it("resolves demo mode on pages builds without query flags", async () => {
     import.meta.env.GITHUB_PAGES = "true";
     const { resolveAppRuntime } = await import("./runtime");
 
     expect(resolveAppRuntime("")).toEqual({
       isPagesBuild: true,
-      mode: "landing",
-      isDemoMode: false,
+      mode: "demo",
+      isDemoMode: true,
       isConnectInfoMode: false,
     });
   });
