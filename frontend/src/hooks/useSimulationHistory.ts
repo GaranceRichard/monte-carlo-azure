@@ -5,10 +5,11 @@ import type { SimulationHistoryEntry } from "./simulationTypes";
 import { computeRiskScoreFromPercentiles } from "../utils/simulation";
 
 const SIM_HISTORY_KEY = "mc_simulation_history_v2";
+const DEMO_SIM_HISTORY_KEY = "mc_demo_simulation_history_v1";
 const MAX_SIM_HISTORY = 10;
 
-function readSimulationHistory(): SimulationHistoryEntry[] {
-  const raw = storageGetItem(SIM_HISTORY_KEY);
+function readSimulationHistory(storageKey: string): SimulationHistoryEntry[] {
+  const raw = storageGetItem(storageKey);
   if (!raw) return [];
   try {
     const parsed = JSON.parse(raw);
@@ -52,10 +53,12 @@ function mapRemoteHistoryItem(item: SimulationHistoryItem, index: number): Simul
   };
 }
 
-export function useSimulationHistory() {
-  const [simulationHistory, setSimulationHistory] = useState<SimulationHistoryEntry[]>(() => readSimulationHistory());
+export function useSimulationHistory({ demoMode = false }: { demoMode?: boolean } = {}) {
+  const storageKey = demoMode ? DEMO_SIM_HISTORY_KEY : SIM_HISTORY_KEY;
+  const [simulationHistory, setSimulationHistory] = useState<SimulationHistoryEntry[]>(() => readSimulationHistory(storageKey));
 
   useEffect(() => {
+    if (demoMode) return;
     let active = true;
     (async () => {
       try {
@@ -72,11 +75,11 @@ export function useSimulationHistory() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [demoMode]);
 
   useEffect(() => {
-    storageSetItem(SIM_HISTORY_KEY, JSON.stringify(simulationHistory));
-  }, [simulationHistory]);
+    storageSetItem(storageKey, JSON.stringify(simulationHistory));
+  }, [simulationHistory, storageKey]);
 
   function pushSimulationHistory(entry: SimulationHistoryEntry): void {
     setSimulationHistory((prev) => [entry, ...prev].slice(0, MAX_SIM_HISTORY));
@@ -84,7 +87,7 @@ export function useSimulationHistory() {
 
   function clearSimulationHistory(): void {
     setSimulationHistory([]);
-    storageRemoveItem(SIM_HISTORY_KEY);
+    storageRemoveItem(storageKey);
   }
 
   return {

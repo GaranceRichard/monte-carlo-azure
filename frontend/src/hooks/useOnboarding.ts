@@ -8,6 +8,7 @@ import {
 } from "../adoPlatform";
 import type { AppStep, NamedEntity } from "../types";
 import { sortTeams } from "../utils/teamSort";
+import { DEMO_CONFIG } from "../demoData";
 
 function sortNamedEntities(items: NamedEntity[]): NamedEntity[] {
   return [...items].sort((a, b) => (a.name || "").localeCompare(b.name || "", "fr", { sensitivity: "base" }));
@@ -50,23 +51,23 @@ type OnboardingActions = {
   setErr: (value: string) => void;
 };
 
-export function useOnboarding(): { state: OnboardingState; actions: OnboardingActions } {
+export function useOnboarding({ demoMode = false }: { demoMode?: boolean } = {}): { state: OnboardingState; actions: OnboardingActions } {
   const [patInput, setPatInput] = useState("");
   const [serverUrlInput, setServerUrlInput] = useState("");
-  const [sessionPat, setSessionPat] = useState("");
+  const [sessionPat, setSessionPat] = useState(demoMode ? "demo-session" : "");
   const [sessionServerUrl, setSessionServerUrl] = useState("");
   const [deploymentTarget, setDeploymentTarget] = useState<AdoDeploymentTarget>("cloud");
-  const [step, setStep] = useState<AppStep>("pat");
+  const [step, setStep] = useState<AppStep>(demoMode ? "simulation" : "pat");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
-  const [userName, setUserName] = useState("Utilisateur");
-  const [orgHint, setOrgHint] = useState("");
-  const [orgs, setOrgs] = useState<NamedEntity[]>([]);
-  const [selectedOrg, setSelectedOrg] = useState("");
-  const [projects, setProjects] = useState<NamedEntity[]>([]);
-  const [selectedProject, setSelectedProject] = useState("");
-  const [teams, setTeams] = useState<NamedEntity[]>([]);
-  const [selectedTeam, setSelectedTeam] = useState("");
+  const [userName, setUserName] = useState(demoMode ? "Visiteur" : "Utilisateur");
+  const [orgHint, setOrgHint] = useState(demoMode ? "Donnees de demonstration prechargees." : "");
+  const [orgs, setOrgs] = useState<NamedEntity[]>(demoMode ? DEMO_CONFIG.orgs : []);
+  const [selectedOrg, setSelectedOrg] = useState(demoMode ? DEMO_CONFIG.org : "");
+  const [projects, setProjects] = useState<NamedEntity[]>(demoMode ? DEMO_CONFIG.projects : []);
+  const [selectedProject, setSelectedProject] = useState(demoMode ? DEMO_CONFIG.selectedProject : "");
+  const [teams, setTeams] = useState<NamedEntity[]>(demoMode ? DEMO_CONFIG.teams : []);
+  const [selectedTeam, setSelectedTeam] = useState(demoMode ? DEMO_CONFIG.selectedTeam : "");
   const submitInFlightRef = useRef(false);
 
   const failPatValidation = (message: string) => {
@@ -75,6 +76,11 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   };
 
   async function submitPat(): Promise<void> {
+    if (demoMode) {
+      setErr("");
+      setStep("simulation");
+      return;
+    }
     if (submitInFlightRef.current) return;
     const clean = patInput.trim();
     const normalizedServerUrl = normalizeAdoServerUrl(serverUrlInput);
@@ -158,6 +164,14 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   }
 
   async function goToProjects(): Promise<boolean> {
+    if (demoMode) {
+      setErr("");
+      setSelectedOrg(DEMO_CONFIG.org);
+      setProjects(DEMO_CONFIG.projects);
+      setSelectedProject(DEMO_CONFIG.selectedProject);
+      setStep("simulation");
+      return true;
+    }
     const org = selectedOrg.trim();
     if (!org) {
       setErr(deploymentTarget === "onprem" ? "Selectionnez une collection." : "Selectionnez une organisation.");
@@ -191,6 +205,15 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   }
 
   async function goToTeams(): Promise<boolean> {
+    if (demoMode) {
+      setErr("");
+      setSelectedOrg(DEMO_CONFIG.org);
+      setSelectedProject(DEMO_CONFIG.selectedProject);
+      setTeams(DEMO_CONFIG.teams);
+      setSelectedTeam(DEMO_CONFIG.selectedTeam);
+      setStep("simulation");
+      return true;
+    }
     const org = selectedOrg.trim();
     const project = selectedProject.trim();
     if (!org || !project) {
@@ -243,6 +266,10 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   }
 
   function goBack(): void {
+    if (demoMode) {
+      if (step === "simulation" || step === "portfolio") setStep("teams");
+      return;
+    }
     if (step === "org") setStep("pat");
     else if (step === "projects") setStep("org");
     else if (step === "teams") setStep("projects");
@@ -251,11 +278,29 @@ export function useOnboarding(): { state: OnboardingState; actions: OnboardingAc
   }
 
   function goToStep(target: "pat" | "org" | "projects" | "teams"): void {
+    if (demoMode) {
+      if (target === "teams") setStep("teams");
+      return;
+    }
     setErr("");
     setStep(target);
   }
 
   function disconnect(): void {
+    if (demoMode) {
+      setErr("");
+      setUserName("Visiteur");
+      setOrgHint("Donnees de demonstration prechargees.");
+      setOrgs(DEMO_CONFIG.orgs);
+      setSelectedOrg(DEMO_CONFIG.org);
+      setProjects(DEMO_CONFIG.projects);
+      setSelectedProject(DEMO_CONFIG.selectedProject);
+      setTeams(DEMO_CONFIG.teams);
+      setSelectedTeam(DEMO_CONFIG.selectedTeam);
+      setStep("simulation");
+      setLoading(false);
+      return;
+    }
     setSessionPat("");
     setServerUrlInput("");
     setSessionServerUrl("");

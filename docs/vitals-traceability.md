@@ -15,8 +15,11 @@ Ce document relie chaque point vital officiel a ses preuves de test et a ses con
 - Definition: aucune donnee d'identification Azure DevOps (`PAT`, `UUID`, `ORG`, `Team`) ne transite par un serveur applicatif.
 - Tests cibles:
   - `frontend/src/hooks/Simulationforecastservice.test.tsx`
+  - `frontend/src/hooks/simulationForecastCore.ts`
   - `frontend/tests/e2e/onboarding.spec.js`
   - `frontend/tests/e2e/coverage.spec.js`
+  - `docs/vitals-coverage-map.json`
+  - Note de mapping: le wrapper `frontend/src/hooks/simulationForecastService.ts` reste dans le perimetre vital, mais la logique de branches frontend_unit est maintenant portee par `frontend/src/hooks/simulationForecastCore.ts`.
 
 ### Cookie IDMontecarlo
 
@@ -39,6 +42,9 @@ Ce document relie chaque point vital officiel a ses preuves de test et a ses con
   - `frontend/tests/e2e/onboarding.spec.js`
   - `frontend/tests/e2e/selection.spec.js`
   - `frontend/src/hooks/useOnboarding.test.tsx`
+  - `frontend/src/App.test.tsx`
+  - `frontend/src/AppFlowContent.test.tsx`
+  - `frontend/tests/e2e/coverage.spec.js`
 
 ### Export rapport simulation (SVG/PDF)
 
@@ -48,4 +54,7 @@ Ce document relie chaque point vital officiel a ses preuves de test et a ses con
   - `frontend/src/components/steps/simulationExportModules.test.ts`
   - `frontend/src/components/steps/portfolioPrintReport.test.ts`
 - Controle local recommande: utiliser `npm --prefix frontend run test:unit:coverage`, `python Scripts/report_vitals_coverage.py` et `powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\run-vitals-compliance.ps1 -WorkspaceRoot .`.
-- Reference actuelle: frontend_unit / branches = 95.78%
+- Reference actuelle apres recalcul local:
+  - `SLA Identite`: frontend_unit / branches = `100%`, e2e / branches = `100%`
+  - `Flux onboarding critique`: frontend_unit / branches = `96.43%`, e2e / branches = `100%`
+  - `Export rapport simulation (SVG/PDF)`: frontend_unit / branches = `96.25%`

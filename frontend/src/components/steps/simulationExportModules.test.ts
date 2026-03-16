@@ -155,6 +155,20 @@ describe("simulationPdfDownload", () => {
     expect(pdf.save).toHaveBeenCalledWith(expect.stringMatching(/^simulation-equipe-\d{2}_\d{2}_\d{4}\.pdf$/));
   });
 
+  it("uses the chart heading preceding the chart wrapper as title", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo</h1>
+      <h2>Titre personnalise</h2>
+      <div class="chart-wrap"><svg viewBox="0 0 960 360"></svg></div>
+    `;
+
+    await downloadSimulationPdf(reportDoc, "Equipe A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.text).toHaveBeenCalledWith("Titre personnalise", 8, expect.any(Number));
+  });
+
   it("handles missing meta and kpi text nodes", async () => {
     const reportDoc = document.implementation.createHTMLDocument("report");
     reportDoc.body.innerHTML = `
@@ -526,6 +540,30 @@ describe("simulationPdfDownload", () => {
     expect(pdf.save).toHaveBeenCalled();
   });
 
+  it("handles summary tables with a non-standard column count", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page">
+        <h1>Synthese - Simulation Portefeuille</h1>
+        <table class="summary-table">
+          <thead>
+            <tr><th>Scenario</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Optimiste</td></tr>
+          </tbody>
+        </table>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.rect).toHaveBeenCalled();
+    expect(pdf.text).toHaveBeenCalledWith(["Scenario"], expect.any(Number), expect.any(Number), { align: "left" });
+    expect(pdf.text).toHaveBeenCalledWith(["Optimiste"], expect.any(Number), expect.any(Number), { align: "left" });
+  });
+
   it("handles missing summary header and row cell text", async () => {
     const reportDoc = document.implementation.createHTMLDocument("portfolio");
     reportDoc.body.innerHTML = `
@@ -605,6 +643,20 @@ describe("simulationPdfDownload", () => {
     expect(pdf.text).toHaveBeenCalledWith("Simulation Portefeuille", 8, 8);
     expect(pdf.text).toHaveBeenCalledWith(["Risk Score :"], 8, expect.any(Number));
     expect(pdf.save).toHaveBeenCalledWith(expect.stringMatching(/^simulation-Portefeuille-\d{2}_\d{2}_\d{4}\.pdf$/));
+  });
+
+  it("adds a demo footer when exporting a demo portfolio pdf", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page">
+        <h1>Simulation Portefeuille</h1>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A", true);
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.text).toHaveBeenCalledWith("Données de démonstration — Monte Carlo Azure", 8, 292);
   });
 
   it("renders hypothesis branches for body-only and lead-only cases outside summary tables", async () => {

@@ -148,6 +148,7 @@ def main() -> int:
         violations.extend(_scan_file(path))
 
     if not violations:
+        print("No violations : Naming compliance is ok")
         return 0
 
     print("ERROR: naming convention check failed.", file=sys.stderr)

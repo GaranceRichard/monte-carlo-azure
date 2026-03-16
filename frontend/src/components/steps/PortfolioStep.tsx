@@ -3,6 +3,7 @@ import type { NamedEntity } from "../../types";
 import { usePortfolio } from "../../hooks/usePortfolio";
 
 type PortfolioStepProps = {
+  demoMode?: boolean;
   selectedOrg: string;
   selectedProject: string;
   teams: NamedEntity[];
@@ -10,8 +11,15 @@ type PortfolioStepProps = {
   serverUrl: string;
 };
 
-export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat, serverUrl }: PortfolioStepProps) {
-  const portfolio = usePortfolio({ selectedOrg, selectedProject, teams, pat, serverUrl });
+export default function PortfolioStep({
+  demoMode = false,
+  selectedOrg,
+  selectedProject,
+  teams,
+  pat,
+  serverUrl,
+}: PortfolioStepProps) {
+  const portfolio = usePortfolio({ demoMode, selectedOrg, selectedProject, teams, pat, serverUrl });
 
   return (
     <div className="space-y-4">
@@ -139,14 +147,16 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
 
       <section className="sim-control-section">
         <h3 className="sim-control-heading">Équipes du portefeuille</h3>
-        <button
-          type="button"
-          className="ui-primary-btn"
-          disabled={portfolio.availableTeamNames.length === 0}
-          onClick={portfolio.openAddModal}
-        >
-          Ajouter équipe
-        </button>
+        {!portfolio.demoMode && (
+          <button
+            type="button"
+            className="ui-primary-btn"
+            disabled={portfolio.availableTeamNames.length === 0}
+            onClick={portfolio.openAddModal}
+          >
+            Ajouter équipe
+          </button>
+        )}
 
         <div className="space-y-2">
           {portfolio.teamConfigs.map((cfg) => (
@@ -158,6 +168,7 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
                 <button
                   type="button"
                   className="sim-advanced-toggle"
+                  disabled={portfolio.demoMode}
                   onClick={() => portfolio.removeTeam(cfg.teamName)}
                 >
                   Retirer

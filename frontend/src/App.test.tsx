@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { useOnboarding } from "./hooks/useOnboarding";
 import { useSimulation } from "./hooks/useSimulation";
+import { resolveAppRuntime } from "./runtime";
 import { storageGetItem, storageSetItem } from "./storage";
 
 vi.mock("./hooks/useOnboarding", () => ({
@@ -11,6 +12,14 @@ vi.mock("./hooks/useOnboarding", () => ({
 
 vi.mock("./hooks/useSimulation", () => ({
   useSimulation: vi.fn(),
+}));
+vi.mock("./runtime", () => ({
+  resolveAppRuntime: vi.fn(() => ({
+    isPagesBuild: false,
+    mode: "standard",
+    isDemoMode: false,
+    isConnectInfoMode: false,
+  })),
 }));
 vi.mock("./storage", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./storage")>();
@@ -71,6 +80,16 @@ function buildState(step: "pat" | "org" | "projects" | "teams" | "simulation") {
   };
 }
 
+function setStandardRuntime(overrides: Partial<ReturnType<typeof resolveAppRuntime>> = {}) {
+  vi.mocked(resolveAppRuntime).mockReturnValue({
+    isPagesBuild: false,
+    mode: "standard",
+    isDemoMode: false,
+    isConnectInfoMode: false,
+    ...overrides,
+  });
+}
+
 function buildActions(goToSimulationReturn = true) {
   return {
     setPatInput: vi.fn(),
@@ -92,6 +111,7 @@ function buildActions(goToSimulationReturn = true) {
 
 describe("App", () => {
   it("calls resetForTeamSelection only when goToSimulation succeeds", () => {
+    setStandardRuntime();
     const actionsOk = buildActions(true);
     const resetForTeamSelection = vi.fn();
     vi.mocked(useOnboarding).mockReturnValue({
@@ -120,6 +140,7 @@ describe("App", () => {
   });
 
   it("handles stepper navigation actions", () => {
+    setStandardRuntime();
     const actions = buildActions();
     const resetAll = vi.fn();
     vi.mocked(useOnboarding).mockReturnValue({
@@ -141,6 +162,7 @@ describe("App", () => {
   });
 
   it("shows Collection as step 2 label when onboarding targets on-prem", () => {
+    setStandardRuntime();
     vi.mocked(useOnboarding).mockReturnValue({
       state: { ...buildState("org"), deploymentTarget: "onprem", orgs: [] },
       actions: buildActions(),
@@ -155,6 +177,7 @@ describe("App", () => {
   });
 
   it("toggles theme and updates document attribute", () => {
+    setStandardRuntime();
     vi.mocked(useOnboarding).mockReturnValue({
       state: buildState("pat"),
       actions: buildActions(),
@@ -192,6 +215,7 @@ describe("App", () => {
   });
 
   it("calls goToPortfolio when portfolio action is triggered from team step", () => {
+    setStandardRuntime();
     const actions = buildActions();
     vi.mocked(useOnboarding).mockReturnValue({
       state: buildState("teams"),
@@ -208,6 +232,7 @@ describe("App", () => {
   });
 
   it("renders portfolio step when onboarding is in portfolio mode", async () => {
+    setStandardRuntime();
     vi.mocked(useOnboarding).mockReturnValue({
       state: { ...buildState("teams"), step: "portfolio" },
       actions: buildActions(),
@@ -220,4 +245,49 @@ describe("App", () => {
     render(<App />);
     expect(await screen.findByText("Chargement du portefeuille...")).toBeTruthy();
   });
+
+  it("renders the public landing page on GitHub Pages root", () => {
+    vi.mocked(resolveAppRuntime).mockReturnValue({
+      isPagesBuild: true,
+      mode: "landing",
+      isDemoMode: false,
+      isConnectInfoMode: false,
+    });
+    render(<App />);
+    expect(screen.getByRole("link", { name: "Voir la démo" }).getAttribute("href")).toBe("?demo=true");
+    expect(screen.getByRole("link", { name: "Connecter votre Azure DevOps" }).getAttribute("href")).toBe("?connect=true");
+  });
+
+  it("renders the public connect notice on GitHub Pages connect mode", () => {
+    vi.mocked(resolveAppRuntime).mockReturnValue({
+      isPagesBuild: true,
+      mode: "connect",
+      isDemoMode: false,
+      isConnectInfoMode: true,
+    });
+    render(<App />);
+    expect(screen.getByText(/instance publique github pages/i)).toBeTruthy();
+  });
+
+  it("shows the demo banner and hides disconnect in demo mode", () => {
+    vi.mocked(resolveAppRuntime).mockReturnValue({
+      isPagesBuild: true,
+      mode: "demo",
+      isDemoMode: true,
+      isConnectInfoMode: false,
+    });
+    vi.mocked(useOnboarding).mockReturnValue({
+      state: { ...buildState("simulation"), step: "simulation" },
+      actions: buildActions(),
+    } as never);
+    vi.mocked(useSimulation).mockReturnValue({
+      resetForTeamSelection: vi.fn(),
+      resetAll: vi.fn(),
+    } as never);
+
+    render(<App />);
+    expect(screen.getByText(/mode démo/i)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Se déconnecter/i })).toBeNull();
+  });
 });
+    setStandardRuntime();

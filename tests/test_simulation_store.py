@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 import pytest
 from pymongo import MongoClient
-from pymongo.errors import AutoReconnect, PyMongoError
+from pymongo.errors import AutoReconnect, OperationFailure, PyMongoError
 
 from backend.api_config import ApiConfig
 from backend.api_models import (
@@ -49,9 +49,20 @@ class _FakeCollection:
         self.inserted = []
         self.updated = []
         self.find_calls = []
+        self.dropped_indexes = []
+        self.raise_on_ttl_create = False
 
     def create_index(self, spec, **kwargs):
         self.index_calls.append((spec, kwargs))
+        if self.raise_on_ttl_create and spec == [("last_seen", 1)] and "expireAfterSeconds" in kwargs:
+            self.raise_on_ttl_create = False
+            raise OperationFailure(
+                "An equivalent index already exists with the same name but different options.",
+                code=85,
+            )
+
+    def drop_index(self, name):
+        self.dropped_indexes.append(name)
 
     def insert_one(self, doc):
         self.inserted.append(doc)
@@ -182,6 +193,20 @@ def test_connect_initializes_indexes_and_pool(monkeypatch):
     assert mongo_calls[0]["retryWrites"] is True
     assert mongo_calls[0]["retryReads"] is True
     assert len(fake_coll.index_calls) == 2
+
+
+def test_connect_repairs_conflicting_last_seen_ttl_index(monkeypatch):
+    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    fake_coll = _FakeCollection()
+    fake_coll.raise_on_ttl_create = True
+    fake_client = _FakeMongoClient(fake_coll)
+    monkeypatch.setattr("backend.simulation_store.MongoClient", lambda *_a, **_kw: fake_client)
+
+    store.connect()
+
+    assert fake_coll.dropped_indexes == ["last_seen_1"]
+    assert fake_coll.index_calls[-1][0] == [("last_seen", 1)]
+    assert fake_coll.index_calls[-1][1]["expireAfterSeconds"] == 30 * 24 * 3600
 
 
 def test_save_simulation_reconnects_once_after_pymongo_error(monkeypatch):

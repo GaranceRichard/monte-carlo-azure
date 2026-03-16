@@ -1,4 +1,12 @@
-﻿const API_BASE = import.meta.env.VITE_API_BASE ?? "";
+import {
+  getApiBase,
+  normalizeSimulationHistory,
+  normalizeSimulateResponse,
+  readJsonOr,
+  toApiErrorMessage,
+} from "./apiHelpers";
+
+const API_BASE = getApiBase();
 
 export type SimulateRequest = {
   throughput_samples: number[];
@@ -55,23 +63,23 @@ export type SimulationHistoryItem = {
 };
 
 export async function postSimulate(payload: SimulateRequest): Promise<SimulateResponse> {
-  const r = await fetch(`${API_BASE}/simulate`, {
+  const response = await fetch(`${API_BASE}/simulate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
     body: JSON.stringify(payload),
   });
-  const data = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error((data as { detail?: string }).detail ?? `HTTP ${r.status}`);
-  return data as SimulateResponse;
+  const data = await readJsonOr(response, {} as { detail?: string } & SimulateResponse);
+  if (!response.ok) throw new Error(toApiErrorMessage(response.status, data));
+  return normalizeSimulateResponse(data);
 }
 
 export async function getSimulationHistory(): Promise<SimulationHistoryItem[]> {
-  const r = await fetch(`${API_BASE}/simulations/history`, {
+  const response = await fetch(`${API_BASE}/simulations/history`, {
     method: "GET",
     credentials: "include",
   });
-  const data = await r.json().catch(() => []);
-  if (!r.ok) throw new Error((data as { detail?: string }).detail ?? `HTTP ${r.status}`);
-  return Array.isArray(data) ? (data as SimulationHistoryItem[]) : [];
+  const data = await readJsonOr(response, [] as SimulationHistoryItem[] | { detail?: string });
+  if (!response.ok) throw new Error(toApiErrorMessage(response.status, data as { detail?: string }));
+  return normalizeSimulationHistory(data);
 }

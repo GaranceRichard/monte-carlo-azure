@@ -88,7 +88,9 @@ export function exportSimulationPrintReport({
   const resultLabel = resultKind === "items" ? "items" : "semaines (au plus)";
   const effectiveRiskScore = computeRiskScoreFromPercentiles(simulationMode, displayPercentiles);
   const effectiveReliability =
-    throughputReliability ?? computeThroughputReliability(throughputPoints.map((point) => Number(point.throughput ?? 0)));
+    throughputReliability ??
+    computeThroughputReliability(throughputPoints.map((point) => Number(point.throughput ?? 0))) ??
+    undefined;
   const riskLegend =
     effectiveRiskScore <= 0.2 ? "fiable" : effectiveRiskScore <= 0.5 ? "incertain" : effectiveRiskScore <= 0.8 ? "fragile" : "eleve";
   const riskScoreLabel = formatMetric(effectiveRiskScore);
@@ -238,5 +240,4 @@ export function exportSimulationPrintReport({
     printWindow.onload = wireDownloadButton;
   }
 }
-
 

@@ -247,7 +247,11 @@ export async function downloadSimulationPdf(reportWindowDocument: Document, sele
   pdf.save(filename);
 }
 
-export async function downloadPortfolioPdf(reportWindowDocument: Document, selectedProject: string): Promise<void> {
+export async function downloadPortfolioPdf(
+  reportWindowDocument: Document,
+  selectedProject: string,
+  isDemo = false,
+): Promise<void> {
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
@@ -550,6 +554,13 @@ export async function downloadPortfolioPdf(reportWindowDocument: Document, selec
         }
       });
       cursorY += 2;
+    }
+
+    if (isDemo) {
+      pdf.setFont("helvetica", "italic");
+      pdf.setFontSize(8);
+      pdf.setTextColor(107, 114, 128);
+      pdf.text("Données de démonstration — Monte Carlo Azure", margin, pageH - 5);
     }
   }
 

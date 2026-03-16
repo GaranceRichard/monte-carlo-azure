@@ -45,7 +45,7 @@ export default function SimulationChartTabs() {
     if (s.result?.throughput_reliability) {
       return s.result.throughput_reliability;
     }
-    return computeThroughputReliability((s.throughputData ?? []).map((point) => point.throughput));
+    return computeThroughputReliability((s.throughputData ?? []).map((point) => point.throughput)) ?? undefined;
   }, [s.result?.throughput_reliability, s.throughputData]);
 
   const reliabilityTone = useMemo(() => getReliabilityTone(reliability?.label), [reliability?.label]);

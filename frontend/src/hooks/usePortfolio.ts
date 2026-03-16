@@ -13,10 +13,12 @@ import {
 } from "../storage";
 import { getPortfolioErrorMessage, usePortfolioReport, type TeamPortfolioConfig } from "./usePortfolioReport";
 import type { AdoErrorContext } from "../adoErrors";
+import { DEMO_CONFIG, DEMO_PORTFOLIO_TEAM_CONFIGS, DEMO_TEAM_OPTIONS } from "../demoData";
 
 export type { TeamPortfolioConfig } from "./usePortfolioReport";
 
 type UsePortfolioParams = {
+  demoMode?: boolean;
   selectedOrg: string;
   selectedProject: string;
   teams: NamedEntity[];
@@ -48,10 +50,10 @@ function getValidQuickFilterSelection(
   return { types, doneStates };
 }
 
-export function usePortfolio({ selectedOrg, selectedProject, teams, pat, serverUrl }: UsePortfolioParams) {
+export function usePortfolio({ demoMode = false, selectedOrg, selectedProject, teams, pat, serverUrl }: UsePortfolioParams) {
   const portfolioPrefs = useMemo(() => readStoredPortfolioPrefs(), []);
-  const [startDate, setStartDate] = useState<string>(nWeeksAgo(26));
-  const [endDate, setEndDate] = useState<string>(today());
+  const [startDate, setStartDate] = useState<string>(demoMode ? DEMO_CONFIG.startDate : nWeeksAgo(26));
+  const [endDate, setEndDate] = useState<string>(demoMode ? DEMO_CONFIG.endDate : today());
   const [simulationMode, setSimulationMode] = useState<ForecastMode>("backlog_to_weeks");
   const [includeZeroWeeks, setIncludeZeroWeeks] = useState<boolean>(true);
   const [backlogSize, setBacklogSize] = useState<number>(120);
@@ -60,7 +62,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat, serverU
   const [alignmentRate, setAlignmentRate] = useState<number>(Number(portfolioPrefs.alignmentRate ?? 100));
 
   const [modalErr, setModalErr] = useState<string>("");
-  const [teamConfigs, setTeamConfigs] = useState<TeamPortfolioConfig[]>([]);
+  const [teamConfigs, setTeamConfigs] = useState<TeamPortfolioConfig[]>(demoMode ? DEMO_PORTFOLIO_TEAM_CONFIGS : []);
 
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [modalLoading, setModalLoading] = useState<boolean>(false);
@@ -72,7 +74,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat, serverU
   const [modalHasQuickFilterConfig, setModalHasQuickFilterConfig] = useState<boolean>(false);
   const teamOptionsCacheRef = useRef<Map<string, TeamOptionsCacheEntry>>(new Map());
 
-  const sortedTeams = useMemo(() => sortTeams(teams), [teams]);
+  const sortedTeams = useMemo(() => sortTeams(demoMode ? DEMO_CONFIG.teams : teams), [demoMode, teams]);
   const availableTeamNames = useMemo(() => {
     const selected = new Set(teamConfigs.map((t) => t.teamName));
     return sortedTeams.map((t) => t.name || "").filter((name) => !!name && !selected.has(name));
@@ -99,6 +101,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat, serverU
     clearReportErrors,
     clearReportErr,
   } = usePortfolioReport({
+    demoMode,
     selectedOrg,
     selectedProject,
     pat,
@@ -146,6 +149,14 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat, serverU
   }
 
   async function loadTeamOptions(teamName: string): Promise<void> {
+    if (demoMode) {
+      setModalTypeOptions(DEMO_TEAM_OPTIONS.workItemTypes);
+      setModalStatesByType(DEMO_TEAM_OPTIONS.statesByType);
+      setModalTypes([...DEMO_TEAM_OPTIONS.defaultTypes]);
+      setModalDoneStates([...DEMO_TEAM_OPTIONS.defaultDoneStates]);
+      setModalHasQuickFilterConfig(false);
+      return;
+    }
     if (!teamName) {
       setModalTypeOptions([]);
       setModalStatesByType({});
@@ -281,6 +292,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat, serverU
   }
 
   return {
+    demoMode,
     startDate,
     setStartDate,
     endDate,

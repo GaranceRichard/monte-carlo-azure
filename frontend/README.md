@@ -52,11 +52,14 @@ Scripts disponibles :
 - `npm run test:unit:coverage` : tests unitaires avec coverage
 - `npm run test:e2e` : tests Playwright
 - `npm run test:e2e:coverage:console` : execution e2e avec reporting console
+- `python ../Scripts/report_vitals_coverage.py` : synthese locale des couvertures vitals a partir des artefacts generes
 
 Couverture critique frontend :
 
 ```powershell
 npm run test:unit:coverage
+python ..\Scripts\report_vitals_coverage.py
+powershell -NoProfile -ExecutionPolicy Bypass -File ..\.vscode\scripts\run-vitals-compliance.ps1 -WorkspaceRoot ..
 ```
 
 ## Capacites frontend
@@ -70,6 +73,16 @@ Le frontend couvre notamment :
 - mode portefeuille multi-equipes
 - export PDF des restitutions simulation et portefeuille
 - persistance locale de certaines preferences et quick filters
+
+## Notes de structure recentes
+
+- `src/App.tsx` orchestre des modules plus petits:
+  - `src/AppFlowContent.tsx` pour le rendu des etapes
+  - `src/appNavigation.ts` pour la navigation retour
+  - `src/appShellSections.tsx` pour le shell et les modes publics
+  - `src/appTheme.ts` pour le theme
+- `src/api.ts` reste un wrapper fin; les normalisations et fallbacks vivent dans `src/apiHelpers.ts`
+- `src/hooks/simulationForecastService.ts` reste la facade forecast publique; les branches metier sont dans `src/hooks/simulationForecastCore.ts`
 
 ## Contraintes d'architecture
 

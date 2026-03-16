@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { runSimulationForecast } from "./simulationForecastService";
+import { fetchTeamThroughput, runSimulationForecast, simulateForecastFromSamples } from "./simulationForecastService";
 import { getWeeklyThroughputDirect } from "../adoClient";
 import { postSimulate } from "../api";
 
@@ -71,7 +71,111 @@ beforeEach(() => {
   vi.mocked(postSimulate).mockResolvedValue(API_RESPONSE_WEEKS);
 });
 
+describe("demo mode et normalisation", () => {
+  it("uses the demo throughput source without network calls", async () => {
+    const result = await fetchTeamThroughput({
+      demoMode: true,
+      selectedOrg: "Acme Corp",
+      selectedProject: "Programme Titan",
+      selectedTeam: "Alpha",
+      pat: "",
+      serverUrl: "",
+      startDate: "2025-11-24",
+      endDate: "2026-03-09",
+      doneStates: ["Done"],
+      types: ["Bug"],
+      includeZeroWeeks: true,
+    });
+
+    expect(result.weeklyThroughput.length).toBeGreaterThan(0);
+    expect(result.sampleStats.totalWeeks).toBe(result.weeklyThroughput.length);
+    expect(result.sampleStats.zeroWeeks).toBe(0);
+    expect(vi.mocked(getWeeklyThroughputDirect)).not.toHaveBeenCalled();
+  });
+
+  it("filters out zero weeks in demo mode when includeZeroWeeks is false", async () => {
+    const result = await fetchTeamThroughput({
+      demoMode: true,
+      selectedOrg: "Acme Corp",
+      selectedProject: "Programme Titan",
+      selectedTeam: "Alpha",
+      pat: "",
+      serverUrl: "",
+      startDate: "2025-11-24",
+      endDate: "2026-03-09",
+      doneStates: ["Done"],
+      types: ["Bug"],
+      includeZeroWeeks: false,
+    });
+
+    expect(result.sampleStats.usedWeeks).toBe(result.throughputSamples.length);
+    expect(result.throughputSamples.every((value) => value > 0)).toBe(true);
+  });
+
+  it("uses local simulation in demo mode without API calls", async () => {
+    const result = await simulateForecastFromSamples({
+      demoMode: true,
+      throughputSamples: [3, 4, 5, 6, 7, 8],
+      includeZeroWeeks: true,
+      simulationMode: "weeks_to_items",
+      backlogSize: 120,
+      targetWeeks: 6,
+      nSims: 500,
+    });
+
+    expect(result.result_kind).toBe("items");
+    expect(result.result_percentiles.P50).toBeGreaterThan(0);
+    expect(vi.mocked(postSimulate)).not.toHaveBeenCalled();
+  });
+
+  it("uses local simulation in demo backlog mode without API calls", async () => {
+    const result = await simulateForecastFromSamples({
+      demoMode: true,
+      throughputSamples: [3, 4, 5, 6, 7, 8],
+      includeZeroWeeks: true,
+      simulationMode: "backlog_to_weeks",
+      backlogSize: 120,
+      targetWeeks: 6,
+      nSims: 500,
+    });
+
+    expect(result.result_kind).toBe("weeks");
+    expect(result.result_percentiles.P50).toBeGreaterThan(0);
+    expect(vi.mocked(postSimulate)).not.toHaveBeenCalled();
+  });
+
+  it("calcule risk_score localement si le backend ne le renvoie pas", async () => {
+    vi.mocked(postSimulate).mockResolvedValue({
+      ...API_RESPONSE_WEEKS,
+      risk_score: undefined,
+    } as never);
+
+    const result = await simulateForecastFromSamples({
+      throughputSamples: [5, 7, 4, 6, 8, 5],
+      simulationMode: "backlog_to_weeks",
+      backlogSize: 80,
+      targetWeeks: 12,
+      nSims: 20000,
+    });
+
+    expect(result.risk_score).toBeCloseTo((13 - 8) / 8);
+  });
+});
+
 describe("appels réseau", () => {
+  it("utilise la forme objet weeklyThroughput + warning quand ADO renvoie un warning", async () => {
+    vi.mocked(getWeeklyThroughputDirect).mockResolvedValue({
+      weeklyThroughput: WEEKLY_6,
+      warning: "lots partiellement ignores",
+    } as never);
+
+    const result = await runSimulationForecast(baseParams());
+
+    expect(result.warning).toBe("lots partiellement ignores");
+    expect(result.weeklyThroughput).toEqual(WEEKLY_6);
+    expect(result.sampleStats.usedWeeks).toBe(6);
+  });
+
   it("appelle getWeeklyThroughputDirect avec les bons paramètres", async () => {
     await runSimulationForecast(baseParams());
 
@@ -113,6 +217,44 @@ describe("appels réseau", () => {
         mode: "weeks_to_items",
         target_weeks: 12,
         backlog_size: undefined,
+      }),
+    );
+  });
+
+  it("couvre directement backlog_size pour simulateForecastFromSamples", async () => {
+    await simulateForecastFromSamples({
+      throughputSamples: [5, 7, 4, 6, 8, 5],
+      simulationMode: "backlog_to_weeks",
+      backlogSize: 80,
+      targetWeeks: 12,
+      nSims: 20000,
+    });
+
+    expect(postSimulate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: "backlog_to_weeks",
+        backlog_size: 80,
+        target_weeks: undefined,
+      }),
+    );
+  });
+
+  it("couvre directement target_weeks pour simulateForecastFromSamples", async () => {
+    vi.mocked(postSimulate).mockResolvedValue(API_RESPONSE_ITEMS);
+
+    await simulateForecastFromSamples({
+      throughputSamples: [5, 7, 4, 6, 8, 5],
+      simulationMode: "weeks_to_items",
+      backlogSize: 80,
+      targetWeeks: 12,
+      nSims: 20000,
+    });
+
+    expect(postSimulate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: "weeks_to_items",
+        backlog_size: undefined,
+        target_weeks: 12,
       }),
     );
   });
@@ -242,6 +384,18 @@ describe("sampleStats", () => {
 });
 
 describe("historyEntry", () => {
+  it("utilise le projet demo comme fallback quand selectedProject est vide", async () => {
+    await runSimulationForecast(baseParams({ selectedProject: "" }));
+
+    expect(postSimulate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        client_context: expect.objectContaining({
+          selected_project: "Programme Titan",
+        }),
+      }),
+    );
+  });
+
   it("contient les métadonnées de session correctes", async () => {
     const { historyEntry } = await runSimulationForecast(
       baseParams({

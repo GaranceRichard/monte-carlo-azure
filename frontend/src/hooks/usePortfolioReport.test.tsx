@@ -367,6 +367,87 @@ describe("usePortfolioReport", () => {
 
     expect(result.current.reportErr).toBe("");
   });
+
+  it("returns immediately when no team is configured", async () => {
+    const { result } = setupReportHook({ teamConfigs: [] });
+
+    await act(async () => {
+      await result.current.handleGenerateReport();
+    });
+
+    expect(vi.mocked(fetchTeamThroughput)).not.toHaveBeenCalled();
+    expect(result.current.reportErr).toBe("");
+    expect(result.current.generationProgress).toEqual({ done: 0, total: 0 });
+  });
+
+  it("falls back to effective scenario risk_score when scenario result omits it", async () => {
+    vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
+    vi.mocked(simulateForecastFromSamples).mockResolvedValue({
+      ...simulationResult,
+      risk_score: undefined,
+      result_kind: "items",
+      result_distribution: [
+        { x: 10, count: 10 },
+        { x: 20, count: 80 },
+        { x: 30, count: 10 },
+      ],
+    } as never);
+
+    const { result } = setupReportHook({ simulationMode: "weeks_to_items" });
+
+    await act(async () => {
+      await result.current.handleGenerateReport();
+    });
+
+    const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
+    expect(exportArgs.scenarios[0].riskScore).toBe(
+      computeRiskScoreFromPercentiles(
+        "weeks_to_items",
+        buildAtLeastPercentiles(
+          [
+            { x: 10, count: 10 },
+            { x: 20, count: 80 },
+            { x: 30, count: 10 },
+          ],
+          [50, 70, 90],
+        ),
+      ),
+    );
+  });
+
+  it("falls back to 'Equipe inconnue' when a throughput rejection has no teamName", async () => {
+    const originalAllSettled = Promise.allSettled.bind(Promise);
+    vi.spyOn(Promise, "allSettled")
+      .mockImplementationOnce(async () => ([
+        {
+          status: "rejected",
+          reason: { error: new Error("collect-failure") },
+        },
+      ] as PromiseSettledResult<unknown>[]))
+      .mockImplementation(originalAllSettled);
+
+    const { result } = setupReportHook({
+      teamConfigs: [
+        {
+          teamName: "Team A",
+          workItemTypeOptions: ["Bug"],
+          statesByType: { Bug: ["Done"] },
+          types: ["Bug"],
+          doneStates: ["Done"],
+        },
+      ],
+    });
+
+    await act(async () => {
+      await result.current.handleGenerateReport();
+    });
+
+    expect(result.current.reportErrors).toEqual([
+      expect.objectContaining({
+        teamName: "Equipe inconnue",
+      }),
+    ]);
+  });
 });
 
 describe("getPortfolioErrorMessage", () => {

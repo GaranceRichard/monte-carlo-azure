@@ -40,6 +40,6 @@ describe("SimulationContext", () => {
       </SimulationProvider>,
     );
 
-    expect(screen.getByText("Contenu du provider")).toBeInTheDocument();
+    expect(screen.getByText("Contenu du provider")).toBeTruthy();
   });
 });

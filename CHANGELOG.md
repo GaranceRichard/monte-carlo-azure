@@ -4,6 +4,11 @@
 
 ### Frontend
 
+- refactor de `App.tsx` en modules dedies: `AppFlowContent.tsx`, `appNavigation.ts`, `appShellSections.tsx`, `appTheme.ts`
+- extraction des helpers API dans `src/apiHelpers.ts` pour separer les branches de normalisation du wrapper `api.ts`
+- extraction du coeur forecast vers `src/hooks/simulationForecastCore.ts`, `simulationForecastService.ts` restant une facade mince
+- ajout d'un jeu de tests unitaires et E2E cible pour remonter la couverture vitale (`coverage.spec.js`, `AppFlowContent.test.tsx`, `simulation.test.ts`, hooks/tests associes)
+- alignement du mapping vital `SLA Identite` sur les fichiers reels apres refactor (`docs/vitals-coverage-map.json`)
 - utilitaires centralises `src/date.ts`, `src/storage.ts`, `src/utils/math.ts`, `src/utils/simulation.ts`
 - gestion granulaire des erreurs Azure DevOps (`401/403/404/429/5xx`) via `src/adoErrors.ts`
 - avertissement explicite en cas de chargement partiel des batches de work items
@@ -40,6 +45,7 @@
 
 ### Backend et tests
 
+- auto-reparation de l'index TTL Mongo `last_seen_1` au demarrage en cas de conflit d'options historique
 - tri des imports `slowapi` dans `backend/api.py` pour conformite Ruff/isort
 - decoupage d'une comprehension de liste dans `tests/test_api_simulate.py` pour respecter la limite de longueur de ligne
 - DoD et garde-fous repo alignes sur `pytest` / FastAPI plutot que `manage.py test`

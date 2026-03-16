@@ -46,6 +46,7 @@ export type PortfolioReportSection = {
 };
 
 type UsePortfolioReportParams = {
+  demoMode?: boolean;
   selectedOrg: string;
   selectedProject: string;
   pat: string;
@@ -145,6 +146,7 @@ function toScenarioResult(
 }
 
 export function usePortfolioReport({
+  demoMode = false,
   selectedOrg,
   selectedProject,
   pat,
@@ -185,6 +187,7 @@ export function usePortfolioReport({
         teamConfigs.map(async (cfg) => {
           try {
             const data = await fetchTeamThroughput({
+              demoMode,
               selectedOrg,
               selectedProject,
               selectedTeam: cfg.teamName,
@@ -253,6 +256,7 @@ export function usePortfolioReport({
         ...successfulTeams.map(async ({ cfg, data }) => {
           try {
             const result = await simulateForecastFromSamples({
+              demoMode,
               throughputSamples: data.throughputSamples,
               includeZeroWeeks,
               simulationMode,
@@ -301,6 +305,7 @@ export function usePortfolioReport({
         (async () => {
           try {
             const result = await simulateForecastFromSamples({
+              demoMode,
               throughputSamples: scenarioSamples.optimistic,
               includeZeroWeeks: true,
               simulationMode,
@@ -333,6 +338,7 @@ export function usePortfolioReport({
         (async () => {
           try {
             const result = await simulateForecastFromSamples({
+              demoMode,
               throughputSamples: scenarioSamples.aligned,
               includeZeroWeeks: true,
               simulationMode,
@@ -365,6 +371,7 @@ export function usePortfolioReport({
         (async () => {
           try {
             const result = await simulateForecastFromSamples({
+              demoMode,
               throughputSamples: scenarioSamples.friction,
               includeZeroWeeks: true,
               simulationMode,
@@ -397,6 +404,7 @@ export function usePortfolioReport({
         (async () => {
           try {
             const result = await simulateForecastFromSamples({
+              demoMode,
               throughputSamples: scenarioSamples.conservative,
               includeZeroWeeks: true,
               simulationMode,
@@ -461,6 +469,7 @@ export function usePortfolioReport({
 
       const { exportPortfolioPrintReport } = await import("../components/steps/portfolioPrintReport");
       exportPortfolioPrintReport({
+        isDemo: demoMode,
         selectedProject,
         startDate,
         endDate,

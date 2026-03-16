@@ -35,10 +35,16 @@ export type SimulationPrefsState = {
   setNSims: (value: number | string) => void;
 };
 
-export function useSimulationPrefs(): SimulationPrefsState {
+export function useSimulationPrefs(
+  defaults: { startDate?: string; endDate?: string; forceDefaults?: boolean } = {},
+): SimulationPrefsState {
   const prefs = readStoredSimulationPrefs();
-  const [startDate, setStartDate] = useState(() => prefs.startDate || nWeeksAgo(52));
-  const [endDate, setEndDate] = useState(() => prefs.endDate || today());
+  const [startDate, setStartDate] = useState(() =>
+    defaults.forceDefaults ? defaults.startDate || nWeeksAgo(52) : prefs.startDate || defaults.startDate || nWeeksAgo(52),
+  );
+  const [endDate, setEndDate] = useState(() =>
+    defaults.forceDefaults ? defaults.endDate || today() : prefs.endDate || defaults.endDate || today(),
+  );
   const [simulationMode, setSimulationMode] = useState<ForecastMode>(() => prefs.simulationMode || "backlog_to_weeks");
   const [includeZeroWeeks, setIncludeZeroWeeks] = useState(() => prefs.includeZeroWeeks ?? true);
   const [backlogSize, setBacklogSize] = useState<number | string>(prefs.backlogSize ?? 120);

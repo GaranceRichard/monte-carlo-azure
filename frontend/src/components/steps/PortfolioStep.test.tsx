@@ -9,6 +9,7 @@ vi.mock("../../hooks/usePortfolio", () => ({
 
 function basePortfolioMock() {
   return {
+    demoMode: false,
     err: "",
     reportErrors: [],
     clearReportErrors: vi.fn(),
@@ -131,5 +132,17 @@ describe("PortfolioStep", () => {
     render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" serverUrl="" />);
 
     expect((screen.getByRole("button", { name: /G.n.rer rapport portefeuille/i }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("hides the add-team action in demo mode", () => {
+    vi.mocked(usePortfolio).mockReturnValue({
+      ...basePortfolioMock(),
+      demoMode: true,
+      teamConfigs: [{ teamName: "Alpha", workItemTypeOptions: [], statesByType: {}, types: ["Bug"], doneStates: ["Done"] }],
+    });
+
+    render(<PortfolioStep demoMode selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Alpha" }]} pat="pat" serverUrl="" />);
+
+    expect(screen.queryByRole("button", { name: /Ajouter équipe/i })).toBeNull();
   });
 });

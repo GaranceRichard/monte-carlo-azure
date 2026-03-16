@@ -45,6 +45,11 @@ frontend/
   src/
     adoClient.ts        # appels directs Azure DevOps
     api.ts              # appel backend /simulate uniquement
+    apiHelpers.ts       # normalisation/fallbacks API hors wrapper vital
+    AppFlowContent.tsx  # rendu des etapes onboarding/simulation
+    appNavigation.ts    # navigation/backspace et helpers de retour
+    appShellSections.tsx # sections shell, mode public et stepper
+    appTheme.ts         # resolution/persistance du theme
     hooks/
       useOnboarding.ts  # PAT en state local
       useSimulation.ts             # orchestrateur simulation
@@ -56,6 +61,8 @@ frontend/
       useTeamOptions.ts            # chargement options equipe (types + etats)
       usePortfolio.ts              # logique mode portefeuille
       usePortfolioReport.ts        # generation rapport portefeuille
+      simulationForecastService.ts # facade forecast exposee au reste du front
+      simulationForecastCore.ts    # logique forecast extraite et testee
     components/steps/
       SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
       simulationPrintReport.tsx    # rapport imprimable
@@ -184,6 +191,9 @@ Frontend:
 
 - ecran simulation charge en lazy (`React.lazy`)
 - erreurs Azure DevOps unifiees via `src/adoErrors.ts`
+- orchestration App allegée via `src/AppFlowContent.tsx`, `src/appNavigation.ts`, `src/appShellSections.tsx` et `src/appTheme.ts`
+- facade API allegee via `src/apiHelpers.ts` pour conserver des perimetres vitals plus stables
+- logique forecast scindee entre facade `src/hooks/simulationForecastService.ts` et coeur `src/hooks/simulationForecastCore.ts`
 - quick filters persistants par scope `org::project::team`
 - mode portefeuille avec rapport PDF multi-scenarios
 - generation de rapport parallelisee avec tolerance aux echecs partiels

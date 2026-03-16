@@ -310,4 +310,37 @@ describe("useTeamOptions quick filters", () => {
     expect(vi.mocked(getTeamOptionsDirect)).not.toHaveBeenCalled();
     expect(result.current.loadingTeamOptions).toBe(false);
   });
+
+  it("hydrates demo team options and defaults without fetching ADO", async () => {
+    const setTypes = vi.fn();
+    const setDoneStates = vi.fn();
+    const onTeamOptionsReset = vi.fn();
+
+    const { result } = renderHook(() =>
+      useTeamOptions({
+        demoMode: true,
+        step: "simulation",
+        selectedOrg: "Acme Corp",
+        selectedProject: "Programme Titan",
+        selectedTeam: "Alpha",
+        pat: "",
+        serverUrl: "",
+        quickFiltersScopeKey: buildQuickFiltersScopeKey("Acme Corp", "Programme Titan", "Alpha"),
+        setTypes,
+        setDoneStates,
+        onTeamOptionsReset,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(result.current.workItemTypeOptions).toEqual(["User Story", "Bug", "Product Backlog Item"]);
+    });
+
+    expect(result.current.statesByType.Bug).toEqual(["Done", "Closed", "Resolved"]);
+    expect(result.current.hasQuickFilterConfig).toBe(false);
+    expect(setTypes).toHaveBeenCalledWith(["User Story", "Bug", "Product Backlog Item"]);
+    expect(setDoneStates).toHaveBeenCalledWith(["Done", "Closed", "Resolved"]);
+    expect(onTeamOptionsReset).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(getTeamOptionsDirect)).not.toHaveBeenCalled();
+  });
 });

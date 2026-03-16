@@ -639,7 +639,7 @@ describe("exportPortfolioPrintReport", () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(pdfModuleMocks.downloadPortfolioPdf).toHaveBeenCalledWith(fakeWindow.document, "Projet A");
+    expect(pdfModuleMocks.downloadPortfolioPdf).toHaveBeenCalledWith(fakeWindow.document, "Projet A", false);
     expect(fakeButton.addEventListener).toHaveBeenCalledTimes(1);
     expect(fakeButton.disabled).toBe(false);
     expect(fakeButton.textContent).toBe("Telecharger PDF");
@@ -809,6 +809,107 @@ describe("exportPortfolioPrintReport", () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(pdfModuleMocks.downloadPortfolioPdf).toHaveBeenCalledWith(fakeWindow.document, "Projet A");
+    expect(pdfModuleMocks.downloadPortfolioPdf).toHaveBeenCalledWith(fakeWindow.document, "Projet A", false);
+  });
+
+  it("passes the demo flag to the PDF export when requested", async () => {
+    let clickHandler: null | (() => void) = null;
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    const fakeButton = {
+      disabled: false,
+      textContent: "Telecharger PDF",
+      addEventListener: vi.fn((_event: string, handler: () => void) => {
+        clickHandler = handler;
+      }),
+    };
+    const fakeWindow = {
+      document: Object.assign(reportDoc, {
+        open: vi.fn(),
+        write: vi.fn(),
+        close: vi.fn(),
+        getElementById: vi.fn(() => fakeButton),
+      }),
+      addEventListener: vi.fn(),
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+
+    exportPortfolioPrintReport({ ...baseArgs(), isDemo: true });
+    const loadHandler = fakeWindow.addEventListener.mock.calls[0]?.[1];
+    loadHandler?.();
+    await (clickHandler as (() => void | Promise<void>) | null)?.();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(pdfModuleMocks.downloadPortfolioPdf).toHaveBeenCalledWith(fakeWindow.document, "Projet A", true);
+  });
+
+  it("escapes html-sensitive values in generated pages", () => {
+    let writtenHtml = "";
+    const fakeWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          writtenHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+      addEventListener: vi.fn(),
+    };
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+
+    const args: any = baseArgs();
+    args.selectedProject = `Projet <A> & "B"`;
+    args.scenarios[0] = {
+      ...args.scenarios[0],
+      hypothesis: `hyp <unsafe> & "quoted"`,
+      label: "Optimiste",
+    };
+    args.sections[0] = {
+      ...args.sections[0],
+      selectedTeam: "Team <One>",
+      types: [`Bug & Story`, `Feature "A"`],
+      doneStates: [`Done <ok>`],
+    };
+
+    exportPortfolioPrintReport(args);
+
+    expect(writtenHtml).toContain("Projet &lt;A&gt; &amp; &quot;B&quot;");
+    expect(writtenHtml).toContain("hyp &lt;unsafe&gt; &amp; &quot;quoted&quot;");
+    expect(writtenHtml).toContain("Team &lt;One&gt;");
+    expect(writtenHtml).toContain("Bug &amp; Story, Feature &quot;A&quot;");
+    expect(writtenHtml).toContain("Done &lt;ok&gt;");
+  });
+
+  it("normalizes invalid scenario risk scores in summary rows", () => {
+    let writtenHtml = "";
+    const fakeWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          writtenHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+      addEventListener: vi.fn(),
+    };
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+
+    const args: any = baseArgs();
+    args.scenarios = [
+      { ...args.scenarios[0], label: "Optimiste", riskScore: Number.POSITIVE_INFINITY },
+      { ...args.scenarios[1], label: "Arrime (80%)", riskScore: -0.4 },
+      { ...args.scenarios[2], label: "Friction (64%)", riskScore: 0.7 },
+      { ...args.scenarios[3], label: "Conservateur", riskScore: 0.95 },
+    ];
+
+    exportPortfolioPrintReport(args);
+
+    expect(writtenHtml).toMatch(/Optimiste[\s\S]*?0,00 \(fiable\)/);
+    expect(writtenHtml).toMatch(/Arrim. \(80%\)[\s\S]*?0,00 \(fiable\)/);
   });
 });

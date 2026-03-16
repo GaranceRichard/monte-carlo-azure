@@ -59,6 +59,16 @@ describe("useOnboarding", () => {
     expect(resolvePatOrganizationScopeDirect).not.toHaveBeenCalled();
   });
 
+  it("bootstraps directly into demo simulation mode without network calls", () => {
+    const { result } = renderHook(() => useOnboarding({ demoMode: true }));
+
+    expect(result.current.state.step).toBe("simulation");
+    expect(result.current.state.selectedOrg).toBe("Acme Corp");
+    expect(result.current.state.selectedProject).toBe("Programme Titan");
+    expect(result.current.state.selectedTeam).toBe("Alpha");
+    expect(resolvePatOrganizationScopeDirect).not.toHaveBeenCalled();
+  });
+
   it("resolves global PAT and preselects first accessible organization", async () => {
     vi.mocked(resolvePatOrganizationScopeDirect).mockResolvedValue({
       displayName: "User",
@@ -719,6 +729,71 @@ describe("useOnboarding", () => {
     });
 
     expect(result.current.state.backLabel).toBe("Changer collection");
+  });
+
+  it("supports demo-mode navigation shortcuts and reset", async () => {
+    const { result } = renderHook(() => useOnboarding({ demoMode: true }));
+
+    await act(async () => {
+      const moved = await result.current.actions.goToProjects();
+      expect(moved).toBe(true);
+    });
+    expect(result.current.state.step).toBe("simulation");
+
+    act(() => {
+      result.current.actions.goToStep("org");
+    });
+    expect(result.current.state.step).toBe("simulation");
+
+    act(() => {
+      result.current.actions.goToStep("teams");
+    });
+    expect(result.current.state.step).toBe("teams");
+
+    act(() => {
+      result.current.actions.goBack();
+    });
+    expect(result.current.state.step).toBe("teams");
+
+    await act(async () => {
+      const moved = await result.current.actions.goToTeams();
+      expect(moved).toBe(true);
+    });
+    expect(result.current.state.step).toBe("simulation");
+
+    act(() => {
+      result.current.actions.goToPortfolio();
+    });
+    expect(result.current.state.step).toBe("portfolio");
+
+    act(() => {
+      result.current.actions.goBack();
+    });
+    expect(result.current.state.step).toBe("teams");
+
+    act(() => {
+      result.current.actions.disconnect();
+    });
+    expect(result.current.state.userName).toBe("Visiteur");
+    expect(result.current.state.selectedOrg).toBe("Acme Corp");
+    expect(result.current.state.selectedProject).toBe("Programme Titan");
+    expect(result.current.state.selectedTeam).toBe("Alpha");
+    expect(result.current.state.step).toBe("simulation");
+  });
+
+  it("keeps demo mode on simulation when submitPat is called", async () => {
+    const { result } = renderHook(() => useOnboarding({ demoMode: true }));
+
+    act(() => {
+      result.current.actions.setErr("ancienne-erreur");
+    });
+
+    await act(async () => {
+      await result.current.actions.submitPat();
+    });
+
+    expect(result.current.state.err).toBe("");
+    expect(result.current.state.step).toBe("simulation");
   });
 });
 

@@ -22,6 +22,7 @@ import { useSimulationHistory } from "./useSimulationHistory";
 import { useSimulationPrefs } from "./useSimulationPrefs";
 import { useSimulationQuickFilters } from "./useSimulationQuickFilters";
 import { useTeamOptions } from "./useTeamOptions";
+import { DEMO_CONFIG } from "../demoData";
 
 const TOOLTIP_BASE_PROPS: TooltipBaseProps = {
   cursor: false,
@@ -65,6 +66,7 @@ export type SimulationViewModel = SimulationForecastControls &
 };
 
 export function useSimulation({
+  demoMode = false,
   step,
   selectedOrg,
   selectedProject,
@@ -72,6 +74,7 @@ export function useSimulation({
   pat,
   serverUrl,
 }: {
+  demoMode?: boolean;
   step: AppStep;
   selectedOrg: string;
   selectedProject: string;
@@ -94,8 +97,12 @@ export function useSimulation({
     setTargetWeeks,
     nSims,
     setNSims,
-  } = useSimulationPrefs();
-  const { simulationHistory, pushSimulationHistory, clearSimulationHistory } = useSimulationHistory();
+  } = useSimulationPrefs({
+    startDate: demoMode ? DEMO_CONFIG.startDate : undefined,
+    endDate: demoMode ? DEMO_CONFIG.endDate : undefined,
+    forceDefaults: demoMode,
+  });
+  const { simulationHistory, pushSimulationHistory, clearSimulationHistory } = useSimulationHistory({ demoMode });
 
   const [loading, setLoading] = useState(false);
   const [loadingStageMessage, setLoadingStageMessage] = useState("");
@@ -133,6 +140,7 @@ export function useSimulation({
     applyQuickFilterConfig,
     resetTeamOptions,
   } = useTeamOptions({
+    demoMode,
     step,
     selectedOrg,
     selectedProject,
@@ -210,6 +218,7 @@ export function useSimulation({
 
     try {
       const forecast = await runSimulationForecast({
+        demoMode,
         selectedOrg,
         selectedProject,
         selectedTeam,
@@ -242,6 +251,7 @@ export function useSimulation({
     backlogSize,
     clearComputedSimulationState,
     doneStates,
+    demoMode,
     endDate,
     includeZeroWeeks,
     loading,
@@ -258,6 +268,12 @@ export function useSimulation({
     targetWeeks,
     types,
   ]);
+
+  useEffect(() => {
+    if (!demoMode || step !== "simulation" || hasLaunchedOnce || loading) return;
+    if (!selectedTeam || !types.length || !doneStates.length) return;
+    void runForecast();
+  }, [demoMode, doneStates, hasLaunchedOnce, loading, runForecast, selectedTeam, step, types]);
 
   const { resetAutoRunState } = useSimulationAutoRun({
     params: {

@@ -1,4 +1,4 @@
-import type { ForecastMode, ThroughputReliability } from "../types";
+import type { ForecastMode, ForecastResponse, ThroughputReliability } from "../types";
 import { clamp } from "./math";
 
 export type ScenarioSamples = {
@@ -32,6 +32,130 @@ function percentile(values: number[], p: number): number {
   const lowerValue = sorted[lower] ?? 0;
   const upperValue = sorted[upper] ?? lowerValue;
   return lowerValue + (upperValue - lowerValue) * weight;
+}
+
+function createSeededRandom(seed: number): () => number {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) | 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function buildSeed(
+  throughputSamples: number[],
+  mode: ForecastMode,
+  nSims: number,
+  targetValue: number,
+  includeZeroWeeks: boolean,
+): number {
+  const seedBase = throughputSamples.reduce((sum, value, index) => sum + value * (index + 3), 17);
+  const modeOffset = mode === "backlog_to_weeks" ? 101 : 211;
+  const includeOffset = includeZeroWeeks ? 307 : 401;
+  return (seedBase + modeOffset + includeOffset + nSims * 13 + targetValue * 17) >>> 0;
+}
+
+function normalizeSamples(samples: number[], includeZeroWeeks: boolean): number[] {
+  const normalized = samples.filter((value) => Number.isFinite(value) && (includeZeroWeeks ? value >= 0 : value > 0));
+  if (!normalized.length) {
+    throw new Error(
+      includeZeroWeeks
+        ? "throughput_samples ne contient aucune valeur >= 0"
+        : "throughput_samples ne contient aucune valeur > 0",
+    );
+  }
+  return normalized.map((value) => Math.floor(value));
+}
+
+function histogramBuckets(values: number[], maxBuckets = 100): { x: number; count: number }[] {
+  if (!values.length) return [];
+
+  const counts = new Map<number, number>();
+  values.forEach((value) => {
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  });
+  const unique = Array.from(counts.entries()).sort((a, b) => a[0] - b[0]);
+  if (unique.length <= maxBuckets) {
+    return unique.map(([x, count]) => ({ x, count }));
+  }
+
+  const minValue = unique[0]?.[0] ?? 0;
+  const maxValue = unique[unique.length - 1]?.[0] ?? 0;
+  const bucketWidth = Math.max(1, Math.ceil((maxValue - minValue + 1) / maxBuckets));
+  const buckets = new Map<number, number>();
+
+  values.forEach((value) => {
+    const bucketIndex = Math.floor((value - minValue) / bucketWidth);
+    const left = minValue + bucketIndex * bucketWidth;
+    const center = Math.round(left + bucketWidth / 2);
+    buckets.set(center, (buckets.get(center) ?? 0) + 1);
+  });
+
+  return Array.from(buckets.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map(([x, count]) => ({ x, count }));
+}
+
+function discretePercentiles(values: number[], ps: number[]): Record<string, number> {
+  return Object.fromEntries(ps.map((p) => [`P${p}`, Math.floor(percentile(values, p))]));
+}
+
+export function simulateMonteCarloLocal({
+  throughputSamples,
+  includeZeroWeeks = true,
+  mode,
+  backlogSize,
+  targetWeeks,
+  nSims,
+}: {
+  throughputSamples: number[];
+  includeZeroWeeks?: boolean;
+  mode: ForecastMode;
+  backlogSize?: number;
+  targetWeeks?: number;
+  nSims: number;
+}): ForecastResponse {
+  const samples = normalizeSamples(throughputSamples, includeZeroWeeks);
+  const safeNSims = Math.max(1, Math.floor(nSims));
+  const safeBacklog = Math.max(1, Math.floor(backlogSize ?? 0));
+  const safeWeeks = Math.max(1, Math.floor(targetWeeks ?? 0));
+  const seed = buildSeed(samples, mode, safeNSims, mode === "backlog_to_weeks" ? safeBacklog : safeWeeks, includeZeroWeeks);
+  const random = createSeededRandom(seed);
+  const results = new Array<number>(safeNSims);
+
+  for (let i = 0; i < safeNSims; i += 1) {
+    if (mode === "backlog_to_weeks") {
+      let remaining = safeBacklog;
+      let weeks = 0;
+      while (remaining > 0 && weeks < 521) {
+        const nextSample = samples[Math.floor(random() * samples.length)] ?? 0;
+        remaining -= nextSample;
+        weeks += 1;
+      }
+      results[i] = weeks || 521;
+      continue;
+    }
+
+    let delivered = 0;
+    for (let week = 0; week < safeWeeks; week += 1) {
+      delivered += samples[Math.floor(random() * samples.length)] ?? 0;
+    }
+    results[i] = delivered;
+  }
+
+  const resultPercentiles = discretePercentiles(results, [50, 70, 90]);
+  return {
+    result_kind: mode === "backlog_to_weeks" ? "weeks" : "items",
+    samples_count: samples.length,
+    result_percentiles: resultPercentiles,
+    risk_score: Number(
+      computeRiskScoreFromPercentiles(mode, resultPercentiles).toFixed(4),
+    ),
+    result_distribution: histogramBuckets(results),
+    throughput_reliability: computeThroughputReliability(samples) ?? undefined,
+  };
 }
 
 export function buildScenarioSamples(teamSamples: number[][], alignmentRate: number): ScenarioSamples {

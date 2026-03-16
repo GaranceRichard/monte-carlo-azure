@@ -4,7 +4,9 @@ import {
   computeRiskLegend,
   computeRiskScoreFromPercentiles,
   computeThroughputReliability,
+  simulateMonteCarloLocal,
 } from "./simulation";
+import { DEMO_TEAM_SAMPLES } from "../demoData";
 
 describe("computeRiskScoreFromPercentiles", () => {
   it("returns 0 when P50 is missing or non-positive", () => {
@@ -120,6 +122,11 @@ describe("buildScenarioSamples", () => {
 });
 
 describe("computeRiskLegend", () => {
+  it("covers fiable and incertain ranges", () => {
+    expect(computeRiskLegend(0.1)).toBe("fiable");
+    expect(computeRiskLegend(0.4)).toBe("incertain");
+  });
+
   it("covers fragile and non fiable ranges", () => {
     expect(computeRiskLegend(0.7)).toBe("fragile");
     expect(computeRiskLegend(0.95)).toBe("non fiable");
@@ -172,5 +179,135 @@ describe("computeThroughputReliability", () => {
       iqr_ratio: 0,
       slope_norm: 0,
     });
+  });
+
+  it("handles a single finite sample without slope computation", () => {
+    const reliability = computeThroughputReliability([7]);
+
+    expect(reliability).toMatchObject({
+      label: "non fiable",
+      samples_count: 1,
+      cv: 0,
+      iqr_ratio: 0,
+      slope_norm: 0,
+    });
+  });
+
+  it("handles zero-only histories with zero mean and quartiles", () => {
+    const reliability = computeThroughputReliability([0, 0, 0, 0, 0, 0]);
+
+    expect(reliability).toMatchObject({
+      label: "non fiable",
+      samples_count: 6,
+      cv: 0,
+      iqr_ratio: 0,
+      slope_norm: 0,
+    });
+  });
+
+  it("matches the expected reliability labels for demo teams", () => {
+    expect(computeThroughputReliability(DEMO_TEAM_SAMPLES.Alpha)?.label).toBe("fiable");
+    expect(computeThroughputReliability(DEMO_TEAM_SAMPLES.Beta)?.label).toBe("fragile");
+    expect(computeThroughputReliability(DEMO_TEAM_SAMPLES.Gamma)?.label).toBe("incertain");
+  });
+});
+
+describe("simulateMonteCarloLocal", () => {
+  it("returns a backend-compatible structure in backlog mode", () => {
+    const result = simulateMonteCarloLocal({
+      throughputSamples: DEMO_TEAM_SAMPLES.Alpha,
+      includeZeroWeeks: true,
+      mode: "backlog_to_weeks",
+      backlogSize: 120,
+      nSims: 5000,
+    });
+
+    expect(result.result_kind).toBe("weeks");
+    expect(result.samples_count).toBe(16);
+    expect(Object.keys(result.result_percentiles)).toEqual(["P50", "P70", "P90"]);
+    expect(result.result_distribution.length).toBeGreaterThan(0);
+    expect(typeof result.risk_score).toBe("number");
+    expect(result.throughput_reliability?.label).toBe("fiable");
+  });
+
+  it("returns a backend-compatible structure in target-weeks mode", () => {
+    const result = simulateMonteCarloLocal({
+      throughputSamples: DEMO_TEAM_SAMPLES.Gamma,
+      includeZeroWeeks: true,
+      mode: "weeks_to_items",
+      targetWeeks: 12,
+      nSims: 5000,
+    });
+
+    expect(result.result_kind).toBe("items");
+    expect(result.result_percentiles.P50).toBeGreaterThan(0);
+    expect(result.result_distribution.length).toBeGreaterThan(0);
+    expect(result.throughput_reliability?.label).toBe("incertain");
+  });
+
+  it("rejects empty normalized samples for both zero-week modes", () => {
+    expect(() =>
+      simulateMonteCarloLocal({
+        throughputSamples: [Number.NaN, Number.POSITIVE_INFINITY],
+        includeZeroWeeks: true,
+        mode: "backlog_to_weeks",
+        backlogSize: 10,
+        nSims: 10,
+      }),
+    ).toThrow(">= 0");
+
+    expect(() =>
+      simulateMonteCarloLocal({
+        throughputSamples: [0, -1],
+        includeZeroWeeks: false,
+        mode: "backlog_to_weeks",
+        backlogSize: 10,
+        nSims: 10,
+      }),
+    ).toThrow("> 0");
+  });
+
+  it("aggregates histogram buckets when too many unique outcomes are produced", () => {
+    const result = simulateMonteCarloLocal({
+      throughputSamples: Array.from({ length: 250 }, (_value, index) => index),
+      includeZeroWeeks: true,
+      mode: "weeks_to_items",
+      targetWeeks: 1,
+      nSims: 1000,
+    });
+
+    expect(result.result_distribution.length).toBeLessThanOrEqual(100);
+    expect(result.result_distribution.every((bucket) => Number.isInteger(bucket.x) && bucket.count > 0)).toBe(true);
+    expect(result.result_distribution.reduce((sum, bucket) => sum + bucket.count, 0)).toBe(1000);
+  });
+
+  it("falls back to 521 weeks when zero throughput never burns backlog", () => {
+    const result = simulateMonteCarloLocal({
+      throughputSamples: [0, 0, 0],
+      includeZeroWeeks: true,
+      mode: "backlog_to_weeks",
+      backlogSize: 5,
+      nSims: 3,
+    });
+
+    expect(result.result_kind).toBe("weeks");
+    expect(result.result_percentiles).toEqual({ P50: 521, P70: 521, P90: 521 });
+    expect(result.result_distribution).toEqual([{ x: 521, count: 3 }]);
+    expect(result.throughput_reliability?.label).toBe("non fiable");
+  });
+
+  it("normalizes negative and fractional inputs for simulation guards", () => {
+    const result = simulateMonteCarloLocal({
+      throughputSamples: [1.9, 2.2, 3.8],
+      includeZeroWeeks: false,
+      mode: "weeks_to_items",
+      targetWeeks: -3.4,
+      nSims: 0.4,
+    });
+
+    expect(result.result_kind).toBe("items");
+    expect(result.samples_count).toBe(3);
+    expect(result.result_distribution.reduce((sum, bucket) => sum + bucket.count, 0)).toBe(1);
+    expect(result.result_percentiles.P50).toBeGreaterThanOrEqual(1);
   });
 });

@@ -520,6 +520,7 @@ function buildSummaryPage({
 }
 
 export function exportPortfolioPrintReport({
+  isDemo = false,
   selectedProject,
   startDate,
   endDate,
@@ -528,6 +529,7 @@ export function exportPortfolioPrintReport({
   sections,
   scenarios,
 }: {
+  isDemo?: boolean;
   selectedProject: string;
   startDate: string;
   endDate: string;
@@ -688,7 +690,7 @@ export function exportPortfolioPrintReport({
       button.disabled = true;
       button.textContent = "Generation...";
     }
-    void downloadPortfolioPdf(printWindow.document, selectedProject)
+    void downloadPortfolioPdf(printWindow.document, selectedProject, isDemo)
       .catch((err) => {
         console.error(err);
         const message = err instanceof Error ? err.message : String(err);

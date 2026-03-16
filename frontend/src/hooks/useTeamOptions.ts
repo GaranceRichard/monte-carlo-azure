@@ -3,6 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { getTeamOptionsDirect } from "../adoClient";
 import type { AppStep } from "../types";
 import { readStoredQuickFilters } from "../storage";
+import { DEMO_CONFIG, DEMO_TEAM_OPTIONS } from "../demoData";
 
 const DEFAULT_WORK_ITEM_TYPE_OPTIONS = ["User Story", "Product Backlog Item", "Bug"];
 const DEFAULT_STATES_BY_TYPE: Record<string, string[]> = {
@@ -13,6 +14,7 @@ const DEFAULT_STATES_BY_TYPE: Record<string, string[]> = {
 const DEFAULT_DONE_STATES = ["Done", "Closed", "Resolved"];
 
 type UseTeamOptionsParams = {
+  demoMode?: boolean;
   step: AppStep;
   selectedOrg: string;
   selectedProject: string;
@@ -66,6 +68,7 @@ function withFallbackStatesByType(
 }
 
 export function useTeamOptions({
+  demoMode = false,
   step,
   selectedOrg,
   selectedProject,
@@ -106,6 +109,16 @@ export function useTeamOptions({
   }, [quickFiltersScopeKey]);
 
   useEffect(() => {
+    if (demoMode) {
+      setLoadingTeamOptions(false);
+      setWorkItemTypeOptions(DEMO_TEAM_OPTIONS.workItemTypes);
+      setStatesByType(DEMO_TEAM_OPTIONS.statesByType);
+      onTeamOptionsReset();
+      setHasQuickFilterConfig(false);
+      setTypes([...DEMO_CONFIG.defaultTypes]);
+      setDoneStates([...DEMO_CONFIG.defaultDoneStates]);
+      return;
+    }
     if (step !== "simulation" || !selectedOrg || !selectedProject || !selectedTeam || !pat) return;
     let active = true;
 
@@ -165,6 +178,7 @@ export function useTeamOptions({
     setDoneStates,
     setTypes,
     step,
+    demoMode,
   ]);
 
   return {

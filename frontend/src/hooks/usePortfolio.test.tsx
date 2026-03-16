@@ -398,4 +398,87 @@ describe("usePortfolio", () => {
 
     expect(result.current.modalDoneStates).toEqual([]);
   });
+
+  it("loads demo modal defaults without calling ADO", async () => {
+    const { result } = renderHook(() =>
+      usePortfolio({
+        demoMode: true,
+        selectedOrg: "Acme Corp",
+        selectedProject: "Programme Titan",
+        teams: [],
+        pat: "",
+        serverUrl: "",
+      }),
+    );
+
+    await act(async () => {
+      result.current.openAddModal();
+    });
+
+    await waitFor(() => {
+      expect(result.current.modalTypeOptions.length).toBeGreaterThan(0);
+    });
+
+    expect(result.current.modalTypes).toEqual(["User Story", "Bug", "Product Backlog Item"]);
+    expect(result.current.modalDoneStates).toEqual(["Done", "Closed", "Resolved"]);
+    expect(result.current.modalHasQuickFilterConfig).toBe(false);
+    expect(vi.mocked(getTeamOptionsDirect)).not.toHaveBeenCalled();
+  });
+
+  it("clears modal options when the selected modal team becomes empty", async () => {
+    const { result } = setup([{ name: "Team A" }]);
+
+    await act(async () => {
+      result.current.openAddModal();
+    });
+    await waitFor(() => {
+      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
+    });
+
+    act(() => {
+      result.current.onModalTeamNameChange("");
+    });
+
+    expect(result.current.modalTypeOptions).toEqual([]);
+    expect(result.current.modalAvailableStates).toEqual([]);
+    expect(result.current.modalTypes).toEqual([]);
+    expect(result.current.modalDoneStates).toEqual([]);
+  });
+
+  it("reuses cached team options and refreshes quick-filter availability without refetching", async () => {
+    const scopeKey = buildQuickFiltersScopeKey("Org A", "Project A", "Team A");
+    writeStoredQuickFilters(scopeKey, { types: ["Bug"], doneStates: ["Done"] });
+    const { result } = setup([{ name: "Team A" }, { name: "Team B" }]);
+
+    await act(async () => {
+      result.current.openAddModal();
+    });
+    await waitFor(() => {
+      expect(result.current.modalTypeOptions).toEqual(["Bug"]);
+    });
+    expect(vi.mocked(getTeamOptionsDirect)).toHaveBeenCalledTimes(1);
+
+    vi.mocked(getTeamOptionsDirect).mockClear();
+    act(() => {
+      result.current.onModalTeamNameChange("Team A");
+    });
+
+    expect(result.current.modalTypeOptions).toEqual(["Bug"]);
+    expect(result.current.modalHasQuickFilterConfig).toBe(true);
+    expect(vi.mocked(getTeamOptionsDirect)).not.toHaveBeenCalled();
+  });
+
+  it("opens an empty modal when no team remains available", async () => {
+    const { result } = setup([{ name: "Team A" }]);
+    await addTeam(result);
+
+    await act(async () => {
+      result.current.openAddModal();
+    });
+
+    expect(result.current.modalTeamName).toBe("");
+    expect(result.current.modalTypeOptions).toEqual([]);
+    expect(result.current.modalHasQuickFilterConfig).toBe(false);
+    expect(vi.mocked(getTeamOptionsDirect)).toHaveBeenCalledTimes(1);
+  });
 });

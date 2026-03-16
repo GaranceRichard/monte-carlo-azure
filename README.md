@@ -197,7 +197,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\run-vitals
 
 Reference actuelle apres recalcul local:
 
-- `Export rapport simulation (SVG/PDF)` / `frontend_unit` / `branches`: `95.78%`
+- `SLA Identite`: frontend_unit / branches = `100%`, e2e / branches = `100%`
+- `Flux onboarding critique`: frontend_unit / branches = `96.43%`, e2e / branches = `100%`
+- `Export rapport simulation (SVG/PDF)`: frontend_unit / branches = `96.25%`
 
 ### Variables d'environnement Mongo / purge
 

@@ -6,7 +6,7 @@ from typing import Any
 
 from pymongo import DESCENDING, MongoClient
 from pymongo.collection import Collection
-from pymongo.errors import PyMongoError
+from pymongo.errors import OperationFailure, PyMongoError
 
 from .api_config import ApiConfig
 from .api_models import SimulateRequest, SimulateResponse
@@ -17,6 +17,9 @@ def _to_iso_z(value: datetime) -> str:
 
 
 class SimulationStore:
+    _LAST_SEEN_INDEX_NAME = "last_seen_1"
+    _LAST_SEEN_TTL_SECONDS = 30 * 24 * 3600
+
     def __init__(self, cfg: ApiConfig) -> None:
         self._mongo_url = cfg.mongo_url
         self._mongo_db = cfg.mongo_db
@@ -69,17 +72,29 @@ class SimulationStore:
             client = self._build_client()
             try:
                 collection = client[self._mongo_db][self._collection_name]
-                collection.create_index([("mc_client_id", 1), ("created_at", DESCENDING)])
-                collection.create_index(
-                    [("last_seen", 1)],
-                    expireAfterSeconds=30 * 24 * 3600,
-                )
+                self._ensure_indexes(collection)
                 client.admin.command("ping")
             except Exception:
                 client.close()
                 raise
             self._client = client
             self._collection = collection
+
+    def _ensure_indexes(self, collection: Collection[Any]) -> None:
+        collection.create_index([("mc_client_id", 1), ("created_at", DESCENDING)])
+        try:
+            collection.create_index(
+                [("last_seen", 1)],
+                expireAfterSeconds=self._LAST_SEEN_TTL_SECONDS,
+            )
+        except OperationFailure as exc:
+            if exc.code != 85:
+                raise
+            collection.drop_index(self._LAST_SEEN_INDEX_NAME)
+            collection.create_index(
+                [("last_seen", 1)],
+                expireAfterSeconds=self._LAST_SEEN_TTL_SECONDS,
+            )
 
     def close(self) -> None:
         self._reset_client()
