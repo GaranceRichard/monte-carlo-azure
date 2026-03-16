@@ -275,6 +275,7 @@ Le hook `pre-commit` execute:
 - validation que `README.md` ne contient pas de mojibake (accents casses)
 - `python Scripts/check_no_secrets.py`
   - bloque aussi les valeurs Azure DevOps non factices (`ADO_ORG`, `ADO_PROJECT`, etc.) dans la CI et les tests
+  - refuse aussi les changements non documentes sur ce controle via le garde README du pre-commit
 - `python Scripts/check_dod_compliance.py`
   - ce controle verifie la conformite DoD au niveau referentiel (docs, CI, seuils, tasks)
   - les verifications de tasks VS Code sont appliquees seulement si `.vscode/tasks.json` est present

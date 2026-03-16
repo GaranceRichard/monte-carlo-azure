@@ -286,7 +286,10 @@ def main() -> int:
         all_findings.extend(scan_ado_non_prod_values(path, text))
 
     if all_findings:
-        print("\nPotential secrets or disallowed test data detected in staged files.\n", file=sys.stderr)
+        print(
+            "\nPotential secrets or disallowed test data detected in staged files.\n",
+            file=sys.stderr,
+        )
         for f in all_findings:
             print(f"- {f.path}:{f.line_no} | {f.rule} | {f.excerpt}", file=sys.stderr)
 
