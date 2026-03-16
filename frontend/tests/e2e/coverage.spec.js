@@ -2047,7 +2047,7 @@ test.describe("e2e istanbul coverage", () => {
   });
 
   test("coverage: app demo mode", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/?demo=true");
 
     await expect(page.getByText(/Vous êtes en mode démo/i)).toBeVisible();
     await expect(page.getByRole("link", { name: /Connecter un vrai compte/i })).toHaveCount(0);
