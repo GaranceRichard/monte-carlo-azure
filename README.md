@@ -4,6 +4,12 @@
 
 Outil de prevision base sur une simulation Monte Carlo. L'application aide a transformer un historique Azure DevOps en projection probabiliste, sans exposer le PAT Azure DevOps au backend.
 
+Demo GitHub Pages:
+
+- page publique: `https://garancerichard.github.io/monte-carlo-azure/`
+- mode demo: `https://garancerichard.github.io/monte-carlo-azure/?demo=true`
+- notice de connexion Azure DevOps: `https://garancerichard.github.io/monte-carlo-azure/?connect=true`
+
 ## En bref
 
 - cible: directeur de projet, PMO, responsables delivery et portefeuille

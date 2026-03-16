@@ -56,6 +56,9 @@ Valeur attendue :
 
 Fonctionnalites actuellement presentes dans le produit :
 
+- page publique GitHub Pages pour decouvrir le produit sans backend
+- mode demo accessible publiquement pour illustrer le parcours et les restitutions
+- notice publique de connexion pour expliquer le mode Azure DevOps reel
 - connexion Azure DevOps avec PAT cote navigateur
 - selection organisation -> projet -> equipe
 - simulation Monte Carlo cote backend via `POST /simulate`
@@ -72,6 +75,23 @@ Fonctionnalites actuellement presentes dans le produit :
 - configuration rapide des filtres types + etats, memorisee localement
 - mode `Portefeuille` multi-equipes
 - rapport PDF portefeuille avec synthese decisionnelle et pages detaillees
+
+## Parcours de demo
+
+Le produit propose un parcours de demonstration publique via GitHub Pages pour permettre une prise en main immediate sans prerequis technique ni backend actif.
+
+Processus cible :
+
+- l'utilisateur arrive sur une page publique de presentation
+- il choisit soit le mode demo, soit la notice de connexion Azure DevOps
+- le mode demo permet d'explorer le flux et les ecrans avec des donnees preconfigurees
+- la notice publique explique ensuite comment basculer vers un usage reel avec Azure DevOps
+
+Objectif produit :
+
+- rendre la valeur du produit visible avant toute configuration
+- montrer le flux complet sans demander de `PAT`
+- separer clairement la decouverte produit du mode reel connecte a Azure DevOps
 
 ## Cas d'usage
 
