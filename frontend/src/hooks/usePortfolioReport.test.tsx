@@ -43,7 +43,7 @@ function setupReportHook(overrides: Partial<Parameters<typeof usePortfolioReport
       backlogSize: 120,
       targetWeeks: 12,
       nSims: 20000,
-      arrimageRate: 80,
+      alignmentRate: 80,
       teamConfigs: [
         {
           teamName: "Team A",

@@ -8,6 +8,7 @@ Checks:
 2) README text does not contain common mojibake artifacts.
 3) Secret scan via Scripts/check_no_secrets.py.
 4) DoD compliance guard via Scripts/check_dod_compliance.py.
+5) Naming convention guard via Scripts/check_naming_convention.py.
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 README_PATH = REPO_ROOT / "README.md"
 SECRET_CHECK_PATH = REPO_ROOT / "Scripts" / "check_no_secrets.py"
 DOD_CHECK_PATH = REPO_ROOT / "Scripts" / "check_dod_compliance.py"
+NAMING_CHECK_PATH = REPO_ROOT / "Scripts" / "check_naming_convention.py"
 
 # If one of these paths changes in the index, README.md must also be staged.
 README_REQUIRED_PREFIXES = (
@@ -146,6 +148,20 @@ def check_dod_compliance() -> int:
     return 0
 
 
+def check_naming_convention() -> int:
+    if not NAMING_CHECK_PATH.exists():
+        print("ERROR: Scripts/check_naming_convention.py is missing.", file=sys.stderr)
+        return 1
+    p = run([sys.executable, str(NAMING_CHECK_PATH)])
+    if p.returncode != 0:
+        if p.stdout:
+            print(p.stdout, file=sys.stderr, end="")
+        if p.stderr:
+            print(p.stderr, file=sys.stderr, end="")
+        return p.returncode
+    return 0
+
+
 def main() -> int:
     paths = staged_files()
     if not paths:
@@ -156,6 +172,7 @@ def main() -> int:
         check_readme_encoding(),
         check_no_secrets(),
         check_dod_compliance(),
+        check_naming_convention(),
     )
     return 1 if any(code != 0 for code in checks) else 0
 

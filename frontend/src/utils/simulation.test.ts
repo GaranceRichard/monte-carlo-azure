@@ -25,7 +25,7 @@ describe("computeRiskScoreFromPercentiles", () => {
 });
 
 describe("buildScenarioSamples", () => {
-  it("builds optimistic, arrime, friction and conservative samples for 2 teams", () => {
+  it("builds optimistic, aligned, friction and conservative samples for 2 teams", () => {
     const randomSpy = vi.spyOn(Math, "random");
     randomSpy
       .mockReturnValueOnce(0.1) // team1 -> 10
@@ -43,14 +43,14 @@ describe("buildScenarioSamples", () => {
       80,
     );
 
-    expect(scenarios.optimiste).toEqual([210, 120, 210]);
-    expect(scenarios.arrime).toEqual([168, 96, 168]);
+    expect(scenarios.optimistic).toEqual([210, 120, 210]);
+    expect(scenarios.aligned).toEqual([168, 96, 168]);
     expect(scenarios.friction).toEqual([134, 76, 134]);
-    expect(scenarios.conservateur).toEqual([210, 120, 210]);
-    expect(scenarios.optimiste).toHaveLength(3);
-    expect(scenarios.arrime).toHaveLength(3);
+    expect(scenarios.conservative).toEqual([210, 120, 210]);
+    expect(scenarios.optimistic).toHaveLength(3);
+    expect(scenarios.aligned).toHaveLength(3);
     expect(scenarios.friction).toHaveLength(3);
-    expect(scenarios.conservateur).toHaveLength(3);
+    expect(scenarios.conservative).toHaveLength(3);
     randomSpy.mockRestore();
   });
 
@@ -60,9 +60,9 @@ describe("buildScenarioSamples", () => {
 
     const scenarios = buildScenarioSamples([[5, 8, 13]], 20);
 
-    expect(scenarios.optimiste).toEqual(scenarios.arrime);
-    expect(scenarios.arrime).toEqual(scenarios.friction);
-    expect(scenarios.optimiste).toEqual(scenarios.conservateur);
+    expect(scenarios.optimistic).toEqual(scenarios.aligned);
+    expect(scenarios.aligned).toEqual(scenarios.friction);
+    expect(scenarios.optimistic).toEqual(scenarios.conservative);
     randomSpy.mockRestore();
   });
 
@@ -82,7 +82,7 @@ describe("buildScenarioSamples", () => {
       80,
     );
 
-    expect(scenarios.conservateur).toEqual([60]); // median(10,20,30)=20, *3 => 60
+    expect(scenarios.conservative).toEqual([60]); // median(10,20,30)=20, *3 => 60
     randomSpy.mockRestore();
   });
 
@@ -104,7 +104,7 @@ describe("buildScenarioSamples", () => {
       80,
     );
 
-    expect(scenarios.conservateur).toEqual([120]); // median=(20+40)/2=30, *4 =>120
+    expect(scenarios.conservative).toEqual([120]); // median=(20+40)/2=30, *4 =>120
     randomSpy.mockRestore();
   });
 

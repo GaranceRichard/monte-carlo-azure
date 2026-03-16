@@ -26,8 +26,8 @@ function basePortfolioMock() {
     setNSims: vi.fn(),
     includeZeroWeeks: true,
     setIncludeZeroWeeks: vi.fn(),
-    arrimageRate: 100,
-    setArrimageRate: vi.fn(),
+    alignmentRate: 100,
+    setAlignmentRate: vi.fn(),
     teamConfigs: [],
     availableTeamNames: [],
     openAddModal: vi.fn(),
@@ -85,11 +85,11 @@ describe("PortfolioStep", () => {
   });
 
   it("updates arrimage rate through input", () => {
-    const setArrimageRate = vi.fn();
+    const setAlignmentRate = vi.fn();
     vi.mocked(usePortfolio).mockReturnValue({
       ...basePortfolioMock(),
-      arrimageRate: 80,
-      setArrimageRate,
+      alignmentRate: 80,
+      setAlignmentRate,
       teamConfigs: [
         { teamName: "Team A", workItemTypeOptions: [], statesByType: {}, types: [], doneStates: [] },
         { teamName: "Team B", workItemTypeOptions: [], statesByType: {}, types: [], doneStates: [] },
@@ -99,7 +99,7 @@ describe("PortfolioStep", () => {
     render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[{ name: "Team A" }]} pat="pat" serverUrl="" />);
 
     fireEvent.change(screen.getByLabelText("Taux d'arrimage"), { target: { value: "75" } });
-    expect(setArrimageRate).toHaveBeenCalledWith(75);
+    expect(setAlignmentRate).toHaveBeenCalledWith(75);
   });
 
   it("passes the raw simulations input value without forcing 20000", () => {

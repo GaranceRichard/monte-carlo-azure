@@ -28,7 +28,7 @@ export type StoredQuickFilters = {
 };
 
 export type StoredPortfolioPrefs = {
-  arrimageRate?: number;
+  alignmentRate?: number;
 };
 
 const QUICK_FILTERS_KEY_PREFIX = "mc_quick_filters_v1::";
@@ -73,9 +73,15 @@ export function readStoredPortfolioPrefs(): StoredPortfolioPrefs {
   const raw = storageGetItem(PORTFOLIO_PREFS_KEY);
   if (!raw) return {};
   try {
-    const parsed = JSON.parse(raw) as StoredPortfolioPrefs;
+    const parsed = JSON.parse(raw) as StoredPortfolioPrefs & { "arrimageRate"?: unknown };
     if (!parsed || typeof parsed !== "object") return {};
-    return parsed;
+    const alignmentRate =
+      typeof parsed.alignmentRate === "number"
+        ? parsed.alignmentRate
+        : typeof parsed["arrimageRate"] === "number"
+          ? parsed["arrimageRate"]
+          : undefined;
+    return alignmentRate === undefined ? {} : { alignmentRate };
   } catch {
     return {};
   }

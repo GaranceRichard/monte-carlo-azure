@@ -2,10 +2,10 @@ import type { ForecastMode, ThroughputReliability } from "../types";
 import { clamp } from "./math";
 
 export type ScenarioSamples = {
-  optimiste: number[];
-  arrime: number[];
+  optimistic: number[];
+  aligned: number[];
   friction: number[];
-  conservateur: number[];
+  conservative: number[];
 };
 
 function pickBootstrapSample(samples: number[]): number {
@@ -34,7 +34,7 @@ function percentile(values: number[], p: number): number {
   return lowerValue + (upperValue - lowerValue) * weight;
 }
 
-export function buildScenarioSamples(teamSamples: number[][], arrimageRate: number): ScenarioSamples {
+export function buildScenarioSamples(teamSamples: number[][], alignmentRate: number): ScenarioSamples {
   if (!teamSamples.length) {
     throw new Error("buildScenarioSamples: teamSamples ne peut pas etre vide.");
   }
@@ -43,26 +43,26 @@ export function buildScenarioSamples(teamSamples: number[][], arrimageRate: numb
   }
 
   const maxLength = Math.max(...teamSamples.map((samples) => samples.length));
-  const safeRate = clamp(arrimageRate, 0, 100) / 100;
+  const safeRate = clamp(alignmentRate, 0, 100) / 100;
   const teamCount = teamSamples.length;
-  const optimiste: number[] = [];
-  const arrime: number[] = [];
+  const optimistic: number[] = [];
+  const aligned: number[] = [];
   const friction: number[] = [];
-  const conservateur: number[] = [];
+  const conservative: number[] = [];
 
   for (let index = 0; index < maxLength; index += 1) {
     const draws = teamSamples.map((samples) => pickBootstrapSample(samples));
     const optimisticValue = draws.reduce((sum, value) => sum + value, 0);
     const conservativeValue = teamCount === 1 ? optimisticValue : median(draws) * teamCount;
-    const arrimeValue = teamCount === 1 ? optimisticValue : Math.floor(optimisticValue * safeRate);
-    const frictionValue = teamCount === 1 ? arrimeValue : Math.floor(optimisticValue * safeRate ** teamCount);
-    optimiste.push(optimisticValue);
-    conservateur.push(conservativeValue);
-    arrime.push(arrimeValue);
+    const alignedValue = teamCount === 1 ? optimisticValue : Math.floor(optimisticValue * safeRate);
+    const frictionValue = teamCount === 1 ? alignedValue : Math.floor(optimisticValue * safeRate ** teamCount);
+    optimistic.push(optimisticValue);
+    conservative.push(conservativeValue);
+    aligned.push(alignedValue);
     friction.push(frictionValue);
   }
 
-  return { optimiste, arrime, friction, conservateur };
+  return { optimistic, aligned, friction, conservative };
 }
 
 export function computeRiskLegend(score: number): "fiable" | "incertain" | "fragile" | "non fiable" {

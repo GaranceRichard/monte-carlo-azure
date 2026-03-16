@@ -21,12 +21,12 @@ function baseArgs() {
     selectedProject: "Projet A",
     startDate: "2026-01-01",
     endDate: "2026-03-01",
-    arrimageRate: 80,
+    alignmentRate: 80,
     includedTeams: ["Team A", "Team B"],
     scenarios: [
       {
         label: "Optimiste" as const,
-        hypothese: "hyp optimiste",
+        hypothesis: "hyp optimistic",
         samples: [3, 4, 5],
         weeklyData: [
           { week: "2026-01-01", throughput: 3 },
@@ -40,7 +40,7 @@ function baseArgs() {
       },
       {
         label: "Arrime (80%)" as const,
-        hypothese: "hyp arrime",
+        hypothesis: "hyp aligned",
         samples: [2, 3, 4],
         weeklyData: [
           { week: "2026-01-01", throughput: 2 },
@@ -54,7 +54,7 @@ function baseArgs() {
       },
       {
         label: "Friction (64%)" as const,
-        hypothese: "hyp friction",
+        hypothesis: "hyp friction",
         samples: [1.5, 2, 2.5],
         weeklyData: [
           { week: "2026-01-01", throughput: 1.5 },
@@ -68,7 +68,7 @@ function baseArgs() {
       },
       {
         label: "Conservateur" as const,
-        hypothese: "hyp conservateur",
+        hypothesis: "hyp conservative",
         samples: [1, 2, 3],
         weeklyData: [
           { week: "2026-01-01", throughput: 1 },

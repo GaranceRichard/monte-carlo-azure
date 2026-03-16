@@ -23,7 +23,7 @@ function escapeHtml(value: string): string {
     .replaceAll("'", "&#39;");
 }
 
-function getScenarioDisplayLabel(label: string): string {
+function formatScenarioDisplayLabel(label: string): string {
   return label.startsWith("Arrime") ? label.replace("Arrime", "Arrim\u00E9") : label;
 }
 
@@ -348,7 +348,7 @@ function buildSummaryPage({
   startDate,
   endDate,
   includedTeams,
-  arrimageRate,
+  alignmentRate,
   simulationMode,
   backlogSize,
   targetWeeks,
@@ -358,7 +358,7 @@ function buildSummaryPage({
   startDate: string;
   endDate: string;
   includedTeams: string[];
-  arrimageRate: number;
+  alignmentRate: number;
   simulationMode: "backlog_to_weeks" | "weeks_to_items";
   backlogSize: number;
   targetWeeks: number;
@@ -367,7 +367,7 @@ function buildSummaryPage({
   const orderedScenarios = [...scenarios].sort((a, b) => getScenarioOrder(a.label) - getScenarioOrder(b.label));
   const effectiveFrictionLabel =
     orderedScenarios.find((scenario) => scenario.label.startsWith("Friction"))?.label ??
-    `Friction (${Math.round((Math.max(0, Math.min(100, arrimageRate)) / 100) ** includedTeams.length * 100)}%)`;
+    `Friction (${Math.round((Math.max(0, Math.min(100, alignmentRate)) / 100) ** includedTeams.length * 100)}%)`;
 
   const rows = orderedScenarios
     .map((scenario) => {
@@ -387,7 +387,7 @@ function buildSummaryPage({
       const reliability = formatReliabilityScore(scenario.throughputReliability);
       return `
         <tr>
-          <td>${escapeHtml(getScenarioDisplayLabel(scenario.label))}</td>
+          <td>${escapeHtml(formatScenarioDisplayLabel(scenario.label))}</td>
           <td>${Number(effectivePercentiles.P50 ?? 0).toFixed(0)}</td>
           <td>${Number(effectivePercentiles.P70 ?? 0).toFixed(0)}</td>
           <td>${Number(effectivePercentiles.P90 ?? 0).toFixed(0)}</td>
@@ -413,14 +413,14 @@ function buildSummaryPage({
           ? "#d97706"
           : "#dc2626";
     return {
-      label: getScenarioDisplayLabel(scenario.label),
+      label: formatScenarioDisplayLabel(scenario.label),
       color,
       points,
     };
   });
   const overlaySvg = renderOverlayProbabilityChart(overlaySeries);
 
-  const hypotheses: HypothesisBlock[] = [
+  const hypothesisBlocks: HypothesisBlock[] = [
     {
       kind: "paragraph",
       lead: "Optimiste :",
@@ -433,11 +433,11 @@ function buildSummaryPage({
       lead: "Arrim\u00E9 :",
       emphasizedLead: true,
       body:
-        ` ${String(arrimageRate)}% de la capacit\u00E9 combin\u00E9e. Hypoth\u00E8se : co\u00FBts de synchronisation (c\u00E9r\u00E9monies, d\u00E9pendances, alignement) absorb\u00E9s sur le d\u00E9bit global.`,
+        ` ${String(alignmentRate)}% de la capacit\u00E9 combin\u00E9e. Hypoth\u00E8se : co\u00FBts de synchronisation (c\u00E9r\u00E9monies, d\u00E9pendances, alignement) absorb\u00E9s sur le d\u00E9bit global.`,
     },
     {
       kind: "paragraph",
-      lead: `${getScenarioDisplayLabel(effectiveFrictionLabel)} :`,
+      lead: `${formatScenarioDisplayLabel(effectiveFrictionLabel)} :`,
       emphasizedLead: true,
       body:
         ` ${effectiveFrictionLabel.replace("Friction ", "")} de la capacit\u00E9 combin\u00E9e. Hypoth\u00E8se : chaque \u00E9quipe suppl\u00E9mentaire absorbe un co\u00FBt d'alignement identique.`,
@@ -482,7 +482,7 @@ function buildSummaryPage({
               : `Semaines vers items - cible: ${String(targetWeeks)} semaines`,
           )}</div>
           <div class="meta-row"><b>\u00C9quipes incluses:</b> ${escapeHtml(includedTeams.join(", ") || "Aucune")}</div>
-          <div class="meta-row"><b>Taux d'arrimage:</b> ${escapeHtml(String(arrimageRate))}%</div>
+          <div class="meta-row"><b>Taux d'arrimage:</b> ${escapeHtml(String(alignmentRate))}%</div>
         </div>
       </header>
 
@@ -513,7 +513,7 @@ function buildSummaryPage({
 
       <section class="section section--hypotheses">
         <h2>Hypoth\u00E8ses</h2>
-        ${hypotheses.map((block) => renderHypothesisBlock(block)).join("")}
+        ${hypothesisBlocks.map((block) => renderHypothesisBlock(block)).join("")}
       </section>
     </section>
   `;
@@ -523,7 +523,7 @@ export function exportPortfolioPrintReport({
   selectedProject,
   startDate,
   endDate,
-  arrimageRate,
+  alignmentRate,
   includedTeams,
   sections,
   scenarios,
@@ -531,7 +531,7 @@ export function exportPortfolioPrintReport({
   selectedProject: string;
   startDate: string;
   endDate: string;
-  arrimageRate: number;
+  alignmentRate: number;
   includedTeams: string[];
   sections: PortfolioSectionInput[];
   scenarios: PortfolioScenarioResult[];
@@ -547,7 +547,7 @@ export function exportPortfolioPrintReport({
     startDate,
     endDate,
     includedTeams,
-    arrimageRate,
+    alignmentRate,
     simulationMode,
     backlogSize: sections[0]?.backlogSize ?? 0,
     targetWeeks: sections[0]?.targetWeeks ?? 0,
@@ -557,8 +557,8 @@ export function exportPortfolioPrintReport({
   const scenarioPages = orderedScenarios
     .map((scenario, idx) =>
       buildTeamLikePageHtml({
-        title: `Scénario - ${getScenarioDisplayLabel(scenario.label)}`,
-        subtitle: scenario.hypothese,
+        title: `Scénario - ${formatScenarioDisplayLabel(scenario.label)}`,
+        subtitle: scenario.hypothesis,
         selectedProject,
         startDate,
         endDate,

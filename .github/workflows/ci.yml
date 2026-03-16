@@ -43,6 +43,10 @@ jobs:
         run: |
           python Scripts/check_identity_boundary.py
 
+      - name: Enforce Naming Convention
+        run: |
+          python Scripts/check_naming_convention.py
+
       - name: Run tests
         env:
           # Evite toute dependance a un .env inexistant cote CI

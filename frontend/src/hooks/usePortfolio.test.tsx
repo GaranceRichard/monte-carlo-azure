@@ -129,23 +129,23 @@ describe("usePortfolio", () => {
     expect(vi.mocked(exportPortfolioPrintReport)).not.toHaveBeenCalled();
   });
 
-  it("keeps arrimageRate when returning to a single team", async () => {
+  it("keeps alignmentRate when returning to a single team", async () => {
     const { result } = setup();
     await addTeam(result);
     await addTeam(result);
 
     act(() => {
-      result.current.setArrimageRate(75);
+      result.current.setAlignmentRate(75);
     });
-    expect(result.current.arrimageRate).toBe(75);
+    expect(result.current.alignmentRate).toBe(75);
 
     act(() => {
       result.current.removeTeam("Team B");
     });
     await waitFor(() => {
-      expect(result.current.arrimageRate).toBe(75);
+      expect(result.current.alignmentRate).toBe(75);
     });
-    expect(readStoredPortfolioPrefs().arrimageRate).toBe(75);
+    expect(readStoredPortfolioPrefs().alignmentRate).toBe(75);
   });
 
   it("disables report generation while nSims is empty, then reenables it once valid", async () => {

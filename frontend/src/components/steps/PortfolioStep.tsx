@@ -130,8 +130,8 @@ export default function PortfolioStep({ selectedOrg, selectedProject, teams, pat
               min={0}
               max={100}
               step={5}
-              value={portfolio.arrimageRate}
-              onChange={(e) => portfolio.setArrimageRate(Math.max(0, Math.min(100, Number(e.target.value) || 0)))}
+              value={portfolio.alignmentRate}
+              onChange={(e) => portfolio.setAlignmentRate(Math.max(0, Math.min(100, Number(e.target.value) || 0)))}
             />
           </label>
         </div>

@@ -101,9 +101,9 @@ export function buildSimulationPdfFileName(selectedTeam: string, date = new Date
   return `simulation-${teamPart}-${day}_${month}_${year}.pdf`;
 }
 
-function estimateHypothesisSectionHeight(pdf: jsPDF, hypotheses: HTMLElement[], contentW: number): number {
+function estimateHypothesisSectionHeight(pdf: jsPDF, hypothesisBlocks: HTMLElement[], contentW: number): number {
   let total = 10 + 7 + 2;
-  hypotheses.forEach((hypothesis) => {
+  hypothesisBlocks.forEach((hypothesis) => {
     const { lead, body } = extractHypothesisParts(hypothesis);
     if (!lead && !body) return;
     const leadLines = lead ? splitPdfText(pdf, lead, contentW) : [];
@@ -416,11 +416,11 @@ export async function downloadPortfolioPdf(reportWindowDocument: Document, selec
       cursorY += 2;
     }
 
-    const hypotheses = Array.from(section.querySelectorAll<HTMLElement>(".hypothesis"));
-    if (hypotheses.length && !summaryTable) {
+    const hypothesisBlocks = Array.from(section.querySelectorAll<HTMLElement>(".hypothesis"));
+    if (hypothesisBlocks.length && !summaryTable) {
       cursorY += 10;
-      const hypothesesHeight = estimateHypothesisSectionHeight(pdf, hypotheses, contentW);
-      ensureSpace(hypothesesHeight);
+      const hypothesisSectionHeight = estimateHypothesisSectionHeight(pdf, hypothesisBlocks, contentW);
+      ensureSpace(hypothesisSectionHeight);
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(...BLUE);
@@ -429,7 +429,7 @@ export async function downloadPortfolioPdf(reportWindowDocument: Document, selec
 
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(8);
-      hypotheses.forEach((hypothesis) => {
+      hypothesisBlocks.forEach((hypothesis) => {
         const { lead, body } = extractHypothesisParts(hypothesis);
         if (!lead && !body) return;
 
@@ -480,15 +480,19 @@ export async function downloadPortfolioPdf(reportWindowDocument: Document, selec
     const svgElements = section.querySelectorAll<SVGSVGElement>(".chart-wrap svg");
     for (let i = 0; i < svgElements.length; i += 1) {
       const svg = svgElements[i];
-      const isSummaryChart = Boolean(summaryTable) && hypotheses.length > 0;
+      const isSummaryChart = Boolean(summaryTable) && hypothesisBlocks.length > 0;
 
       const svgW = svg.viewBox?.baseVal?.width || CHART_WIDTH;
       const svgH = svg.viewBox?.baseVal?.height || CHART_HEIGHT;
       const ratio = svgH / svgW;
       const chartsLeft = svgElements.length - i;
       const reservedForTitlesAndSpacing = chartsLeft * (4 + 1.5 + 2);
-      const reservedForHypotheses = summaryTable && hypotheses.length ? estimateHypothesisSectionHeight(pdf, hypotheses, contentW) : 0;
-      const availableChartH = (pageH - margin - cursorY - reservedForTitlesAndSpacing - reservedForHypotheses) / chartsLeft;
+      const reservedForHypothesisSection =
+        summaryTable && hypothesisBlocks.length
+          ? estimateHypothesisSectionHeight(pdf, hypothesisBlocks, contentW)
+          : 0;
+      const availableChartH =
+        (pageH - margin - cursorY - reservedForTitlesAndSpacing - reservedForHypothesisSection) / chartsLeft;
       const desiredFullWidthH = contentW * ratio;
       const minChartH = isSummaryChart ? Math.max(summaryTableHeight, 24) : 24;
       const minimumChartHeight = isSummaryChart ? minChartH : 24;
@@ -510,10 +514,10 @@ export async function downloadPortfolioPdf(reportWindowDocument: Document, selec
       cursorY += renderH + 2;
     }
 
-    if (hypotheses.length && summaryTable) {
+    if (hypothesisBlocks.length && summaryTable) {
       cursorY += 6;
-      const hypothesesHeight = estimateHypothesisSectionHeight(pdf, hypotheses, contentW);
-      ensureSpace(hypothesesHeight);
+      const hypothesisSectionHeight = estimateHypothesisSectionHeight(pdf, hypothesisBlocks, contentW);
+      ensureSpace(hypothesisSectionHeight);
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(...BLUE);
@@ -522,7 +526,7 @@ export async function downloadPortfolioPdf(reportWindowDocument: Document, selec
 
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(8);
-      hypotheses.forEach((hypothesis) => {
+      hypothesisBlocks.forEach((hypothesis) => {
         const { lead, body } = extractHypothesisParts(hypothesis);
         if (!lead && !body) return;
 

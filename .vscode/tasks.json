@@ -1,0 +1,371 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev: 5 terminaux",
+      "dependsOn": [
+        "Mongo (local dev)",
+        "Front",
+        "Back",
+        "Health (recurrent)",
+        "Health Mongo (recurrent)"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Mongo (local dev)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\.vscode\\scripts\\start-mongo-dev.ps1",
+        "-DbPath",
+        "${workspaceFolder}\\.local-mongo\\db",
+        "-Port",
+        "27017"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Front",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "dev"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Back",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": [
+        "run_app.py",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8000",
+        "--no-browser"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "APP_MONGO_URL": "mongodb://127.0.0.1:27017",
+          "APP_MONGO_DB": "montecarlo",
+          "APP_MONGO_COLLECTION_SIMULATIONS": "simulations",
+          "APP_SIMULATION_HISTORY_LIMIT": "10",
+          "APP_CLIENT_COOKIE_NAME": "IDMontecarlo"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Health (recurrent)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\.vscode\\scripts\\health-watch.ps1",
+        "-Url",
+        "http://127.0.0.1:8000/health",
+        "-IntervalSeconds",
+        "5"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "COVERAGE_FILE": "${workspaceFolder}/.coverage.back-full",
+          "APP_MONGO_URL": "mongodb://127.0.0.1:27017",
+          "APP_MONGO_DB": "montecarlo_test"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Health Mongo (recurrent)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\.vscode\\scripts\\health-watch.ps1",
+        "-Url",
+        "http://127.0.0.1:8000/health/mongo",
+        "-IntervalSeconds",
+        "5"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "COVERAGE_FILE": "${workspaceFolder}/.coverage.back-integration",
+          "APP_MONGO_URL": "mongodb://127.0.0.1:27017",
+          "APP_MONGO_DB": "montecarlo_test"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Coverage: 8 terminaux",
+      "dependsOn": [
+        "Coverage (Staged)",
+        "Coverage Naming Convention"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    },
+    {
+      "label": "Coverage (Staged)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\.vscode\\scripts\\run-coverage-staged.ps1",
+        "-WorkspaceRoot",
+        "${workspaceFolder}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Coverage Front (Staged)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\.vscode\\scripts\\run-front-coverage-staged.ps1",
+        "-WorkspaceRoot",
+        "${workspaceFolder}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Coverage Front (Unit)",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "--prefix",
+        "frontend",
+        "run",
+        "test:unit:coverage"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "COVERAGE_FILE": "${workspaceFolder}/.coverage.repo-compliance"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Coverage Back (Full)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "pytest",
+        "--cov=backend",
+        "--cov-branch",
+        "--cov-report=json:.coverage.backend.json",
+        "--cov-fail-under=80",
+        "--cov-report=term-missing",
+        "-q"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Coverage E2E (Playwright)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\.vscode\\scripts\\run-e2e-coverage.ps1",
+        "-workspaceRoot",
+        "${workspaceFolder}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Coverage Vitals Compliance",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\.vscode\\scripts\\run-vitals-compliance.ps1",
+        "-WorkspaceRoot",
+        "${workspaceFolder}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Coverage Vitals Rates",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\.vscode\\scripts\\run-vitals-coverage.ps1",
+        "-WorkspaceRoot",
+        "${workspaceFolder}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Coverage Naming Convention",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": [
+        "Scripts/check_naming_convention.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Coverage Front (Lint)",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "--prefix",
+        "frontend",
+        "run",
+        "lint"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "clear": true
+      }
+    },
+    {
+      "label": "Coverage Front (Build)",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "--prefix",
+        "frontend",
+        "run",
+        "build"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "clear": true
+      }
+    }
+  ]
+}

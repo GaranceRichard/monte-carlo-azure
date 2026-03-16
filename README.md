@@ -14,6 +14,7 @@ Outil de prevision base sur une simulation Monte Carlo. L'application aide a tra
 
 - vision produit et valeur: [`PRODUCT.md`](PRODUCT.md)
 - architecture, securite, API, CI: [`ARCHITECTURE.md`](ARCHITECTURE.md)
+  - inclut la convention de nommage: identifiants de code en anglais, textes utilisateur en francais
 - historique des evolutions: [`CHANGELOG.md`](CHANGELOG.md)
 - guide frontend: [`frontend/README.md`](frontend/README.md)
 - definition of done: [`docs/definition-of-done.md`](docs/definition-of-done.md)
@@ -242,6 +243,7 @@ La task VS Code `Coverage: 8 terminaux` execute aussi:
 
 - `Scripts/check_vitals_compliance.py` pour verifier la traceabilite des points vitaux vers leurs tests cibles
 - `Scripts/report_vitals_coverage.py` pour afficher les taux de couverture par vital a partir des artefacts backend/frontend/e2e
+- `Scripts/check_naming_convention.py` en fin de sequence pour bloquer la reintroduction d'identifiants hors convention
 - `frontend/coverage/coverage-final.json` comme artefact frontend unique pour le global et les vitals
 
 Ces scripts Python de coverage vitals font partie du lint backend et doivent rester conformes a `ruff check .`, y compris la limite de 100 caracteres par ligne.
@@ -281,3 +283,5 @@ Le hook `pre-commit` execute:
 - `python Scripts/check_dod_compliance.py`
   - ce controle verifie la conformite DoD au niveau referentiel (docs, CI, seuils, tasks)
   - les verifications de tasks VS Code sont appliquees seulement si `.vscode/tasks.json` est present
+- `python Scripts/check_naming_convention.py`
+  - bloque les identifiants de code contenant les termes francais explicitement bannis par la convention repo

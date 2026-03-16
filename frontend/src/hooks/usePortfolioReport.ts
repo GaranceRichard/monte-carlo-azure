@@ -57,7 +57,7 @@ type UsePortfolioReportParams = {
   backlogSize: number;
   targetWeeks: number;
   nSims: number;
-  arrimageRate: number;
+  alignmentRate: number;
   teamConfigs: TeamPortfolioConfig[];
 };
 
@@ -77,14 +77,14 @@ type UsePortfolioReportResult = {
   clearReportErr: () => void;
 };
 
-const SCENARIO_HYPOTHESES = {
-  optimiste:
+const SCENARIO_HYPOTHESIS_TEXT = {
+  optimistic:
     "Somme des debits de toutes les equipes. Hypothese : livraison independante, aucun cout de synchronisation inter-equipes.",
-  arrime:
+  aligned:
     "N% de la capacite combinee. Hypothese : couts de synchronisation (ceremonies, dependances, alignement) absorbes sur le debit global.",
   friction:
     "X% de la capacite combinee. Hypothese : chaque equipe supplementaire absorbe un cout d'alignement identique.",
-  conservateur:
+  conservative:
     "Debit median des equipes x nb equipes. Hypothese : le portefeuille est contraint par l'equipe mediane, pas par la pire.",
 } as const;
 
@@ -117,7 +117,7 @@ function buildSyntheticWeeklyData(samples: number[], startDate: string): WeeklyT
 
 function toScenarioResult(
   label: PortfolioScenarioResult["label"],
-  hypothese: string,
+  hypothesis: string,
   samples: number[],
   simulationMode: ForecastMode,
   result: Awaited<ReturnType<typeof simulateForecastFromSamples>>,
@@ -133,7 +133,7 @@ function toScenarioResult(
   );
   return {
     label,
-    hypothese,
+    hypothesis,
     samples,
     weeklyData: buildSyntheticWeeklyData(samples, startDate),
     percentiles,
@@ -156,7 +156,7 @@ export function usePortfolioReport({
   backlogSize,
   targetWeeks,
   nSims,
-  arrimageRate,
+  alignmentRate,
   teamConfigs,
 }: UsePortfolioReportParams): UsePortfolioReportResult {
   const [loadingReport, setLoadingReport] = useState<boolean>(false);
@@ -237,9 +237,9 @@ export function usePortfolioReport({
       // Phase 2: run team + portfolio scenario simulations in parallel.
       const scenarioSamples = buildScenarioSamples(
         successfulTeams.map((team) => team.data.throughputSamples),
-        arrimageRate,
+        alignmentRate,
       );
-      const effectiveFrictionRate = Math.round((Math.max(0, Math.min(100, arrimageRate)) / 100) ** successfulTeams.length * 100);
+      const effectiveFrictionRate = Math.round((Math.max(0, Math.min(100, alignmentRate)) / 100) ** successfulTeams.length * 100);
 
       const totalSimulations = successfulTeams.length + 4;
       setGenerationProgress({ done: 0, total: totalSimulations });
@@ -301,7 +301,7 @@ export function usePortfolioReport({
         (async () => {
           try {
             const result = await simulateForecastFromSamples({
-              throughputSamples: scenarioSamples.optimiste,
+              throughputSamples: scenarioSamples.optimistic,
               includeZeroWeeks: true,
               simulationMode,
               backlogSize,
@@ -317,8 +317,8 @@ export function usePortfolioReport({
               kind: "scenario" as const,
               scenario: toScenarioResult(
                 "Optimiste",
-                SCENARIO_HYPOTHESES.optimiste,
-                scenarioSamples.optimiste,
+                SCENARIO_HYPOTHESIS_TEXT.optimistic,
+                scenarioSamples.optimistic,
                 simulationMode,
                 result,
                 startDate,
@@ -333,7 +333,7 @@ export function usePortfolioReport({
         (async () => {
           try {
             const result = await simulateForecastFromSamples({
-              throughputSamples: scenarioSamples.arrime,
+              throughputSamples: scenarioSamples.aligned,
               includeZeroWeeks: true,
               simulationMode,
               backlogSize,
@@ -341,16 +341,16 @@ export function usePortfolioReport({
               nSims,
               selectedOrg,
               selectedProject,
-              selectedTeam: `Arrime (${String(arrimageRate)}%)`,
+              selectedTeam: `Arrime (${String(alignmentRate)}%)`,
               startDate,
               endDate,
             });
             return {
               kind: "scenario" as const,
               scenario: toScenarioResult(
-                `Arrime (${Number(arrimageRate)}%)`,
-                SCENARIO_HYPOTHESES.arrime.replace("N%", `${String(arrimageRate)}%`),
-                scenarioSamples.arrime,
+                `Arrime (${Number(alignmentRate)}%)`,
+                SCENARIO_HYPOTHESIS_TEXT.aligned.replace("N%", `${String(alignmentRate)}%`),
+                scenarioSamples.aligned,
                 simulationMode,
                 result,
                 startDate,
@@ -381,7 +381,7 @@ export function usePortfolioReport({
               kind: "scenario" as const,
               scenario: toScenarioResult(
                 `Friction (${effectiveFrictionRate}%)`,
-                SCENARIO_HYPOTHESES.friction.replace("X%", `${String(effectiveFrictionRate)}%`),
+                SCENARIO_HYPOTHESIS_TEXT.friction.replace("X%", `${String(effectiveFrictionRate)}%`),
                 scenarioSamples.friction,
                 simulationMode,
                 result,
@@ -397,7 +397,7 @@ export function usePortfolioReport({
         (async () => {
           try {
             const result = await simulateForecastFromSamples({
-              throughputSamples: scenarioSamples.conservateur,
+              throughputSamples: scenarioSamples.conservative,
               includeZeroWeeks: true,
               simulationMode,
               backlogSize,
@@ -413,8 +413,8 @@ export function usePortfolioReport({
               kind: "scenario" as const,
               scenario: toScenarioResult(
                 "Conservateur",
-                SCENARIO_HYPOTHESES.conservateur,
-                scenarioSamples.conservateur,
+                SCENARIO_HYPOTHESIS_TEXT.conservative,
+                scenarioSamples.conservative,
                 simulationMode,
                 result,
                 startDate,
@@ -464,7 +464,7 @@ export function usePortfolioReport({
         selectedProject,
         startDate,
         endDate,
-        arrimageRate,
+        alignmentRate,
         includedTeams: sections.map((section) => section.selectedTeam),
         sections,
         scenarios,

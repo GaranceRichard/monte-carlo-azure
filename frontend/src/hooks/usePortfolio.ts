@@ -57,7 +57,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat, serverU
   const [backlogSize, setBacklogSize] = useState<number>(120);
   const [targetWeeks, setTargetWeeks] = useState<number>(12);
   const [nSims, setNSims] = useState<number | string>(20000);
-  const [arrimageRate, setArrimageRate] = useState<number>(Number(portfolioPrefs.arrimageRate ?? 100));
+  const [alignmentRate, setAlignmentRate] = useState<number>(Number(portfolioPrefs.alignmentRate ?? 100));
 
   const [modalErr, setModalErr] = useState<string>("");
   const [teamConfigs, setTeamConfigs] = useState<TeamPortfolioConfig[]>([]);
@@ -110,7 +110,7 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat, serverU
     backlogSize,
     targetWeeks,
     nSims: hasValidNSims ? normalizedNSims : 20000,
-    arrimageRate,
+    alignmentRate,
     teamConfigs,
   });
 
@@ -121,8 +121,8 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat, serverU
   }, [selectedOrg, selectedProject]);
 
   useEffect(() => {
-    writeStoredPortfolioPrefs({ arrimageRate: Number(arrimageRate) || 100 });
-  }, [arrimageRate]);
+    writeStoredPortfolioPrefs({ alignmentRate: Number(alignmentRate) || 100 });
+  }, [alignmentRate]);
 
   function getTeamCacheKey(teamName: string): string {
     return `${selectedOrg}::${selectedProject}::${teamName}`;
@@ -295,8 +295,8 @@ export function usePortfolio({ selectedOrg, selectedProject, teams, pat, serverU
     setTargetWeeks,
     nSims,
     setNSims,
-    arrimageRate,
-    setArrimageRate,
+    alignmentRate,
+    setAlignmentRate,
     loadingReport,
     reportProgressLabel,
     generationProgress,

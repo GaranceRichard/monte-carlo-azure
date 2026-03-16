@@ -21,6 +21,7 @@ Le SLA identite est non negociable:
 Controles associes:
 
 - CI execute `python Scripts/check_identity_boundary.py`
+- CI execute `python Scripts/check_naming_convention.py`
 - toute proxyfication serveur (`/ado`, `/vssps`) ou resolution locale de PAT fait echouer la CI
 
 Le backend ne recoit que:
@@ -67,6 +68,23 @@ backend/
   api_models.py          # SimulateRequest / SimulateResponse
   mc_core.py             # coeur Monte Carlo
 ```
+
+## Convention de nommage
+
+Regle repo:
+
+- tous les identifiants de code sont en anglais: variables, fonctions, types, props, cles d'objet et constantes
+- toutes les chaines affichees a l'utilisateur restent en francais: libelles UI, messages, textes de rapport, erreurs metier
+
+Objectif:
+
+- eviter les identifiants mixtes francais/anglais dans une meme zone du code
+- garder une separation nette entre langage d'implementation et langage produit
+
+Controle:
+
+- CI et pre-commit executent `python Scripts/check_naming_convention.py`
+- le controle bloque les termes francais deja identifies comme dette dans les identifiants de code
 
 ## API
 

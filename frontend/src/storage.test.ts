@@ -88,8 +88,13 @@ describe("storage helpers", () => {
   });
 
   it("writes and reads portfolio prefs", () => {
-    writeStoredPortfolioPrefs({ arrimageRate: 75 });
-    expect(readStoredPortfolioPrefs()).toEqual({ arrimageRate: 75 });
+    writeStoredPortfolioPrefs({ alignmentRate: 75 });
+    expect(readStoredPortfolioPrefs()).toEqual({ alignmentRate: 75 });
+  });
+
+  it("reads legacy arrimageRate portfolio prefs", () => {
+    storageSetItem("mc_portfolio_prefs_v1", JSON.stringify({ "arrimageRate": 80 }));
+    expect(readStoredPortfolioPrefs()).toEqual({ alignmentRate: 80 });
   });
 
   it("returns empty object when portfolio prefs JSON is invalid", () => {

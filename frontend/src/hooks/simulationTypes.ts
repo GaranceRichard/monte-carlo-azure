@@ -82,7 +82,7 @@ export type ChartTab = "throughput" | "distribution" | "probability";
 
 export type PortfolioScenarioResult = {
   label: "Optimiste" | `Arrime (${number}%)` | `Friction (${number}%)` | "Conservateur";
-  hypothese: string;
+  hypothesis: string;
   samples: number[];
   weeklyData: WeeklyThroughputRow[];
   percentiles: Record<string, number>;

@@ -1351,7 +1351,7 @@ test.describe("e2e istanbul coverage", () => {
             backlogSize: 120,
             targetWeeks: 12,
             nSims: 2000,
-            arrimageRate: 80,
+            alignmentRate: 80,
             teamConfigs,
           });
           React.useEffect(() => {
