@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 check_no_secrets.py
-Fail fast if staged files contain obvious secrets (ADO PAT, tokens, private keys, etc.)
+Fail fast if staged files contain obvious secrets or non-fake ADO test data.
 
 - Scans only staged files (git index), not the whole repo.
 - Ignores binaries and large files.
@@ -30,6 +30,32 @@ SKIP_EXTENSIONS = {
 }
 SKIP_PATH_PARTS = {
     ".git", ".venv", "venv", "node_modules", "dist", "build", "__pycache__"
+}
+ADO_NON_PROD_PATH_PREFIXES = (
+    ".github/workflows/",
+    "tests/",
+)
+ADO_NON_PROD_ENV_NAMES = (
+    "ADO_ORG",
+    "ADO_PROJECT",
+    "ADO_TEAM",
+    "ADO_UUID",
+)
+ADO_ALLOWED_PLACEHOLDER_PREFIXES = (
+    "FAKE_",
+    "TEST_",
+    "DUMMY_",
+    "EXAMPLE_",
+    "SAMPLE_",
+)
+ADO_ALLOWED_PLACEHOLDER_VALUES = {
+    "",
+    "<SET_ME>",
+    "SET_ME",
+    "CHANGE_ME",
+    "CHANGEME",
+    "YOUR_VALUE",
+    "PASTE_VALUE_HERE",
 }
 
 
@@ -143,6 +169,55 @@ def compile_rules() -> List[Tuple[str, re.Pattern]]:
     return [(name, re.compile(pattern)) for name, pattern in rules]
 
 
+def is_allowed_ado_placeholder(value: str) -> bool:
+    normalized = value.strip().strip("'\"").upper()
+    if normalized in ADO_ALLOWED_PLACEHOLDER_VALUES:
+        return True
+    return any(normalized.startswith(prefix) for prefix in ADO_ALLOWED_PLACEHOLDER_PREFIXES)
+
+
+def scan_ado_non_prod_values(path: str, text: str) -> List[Finding]:
+    if not any(path.startswith(prefix) for prefix in ADO_NON_PROD_PATH_PREFIXES):
+        return []
+
+    findings: List[Finding] = []
+    patterns = [
+        r'^\s*(?P<name>ADO_(?:ORG|PROJECT|TEAM|UUID))\s*[:=]\s*["\']?(?P<value>[^"\']+?)["\']?\s*$',
+        r'^\s*(?P<name>ADO_(?:ORG|PROJECT|TEAM|UUID))\s*:\s*(?P<value>[^#\n]+?)\s*$',
+        r'(?P<name>ADO_(?:ORG|PROJECT|TEAM|UUID))["\']?\s*,\s*["\'](?P<value>[^"\']+)["\']',
+        r'setenv\(\s*["\'](?P<name>ADO_(?:ORG|PROJECT|TEAM|UUID))["\']\s*,\s*["\'](?P<value>[^"\']+)["\']\s*\)',
+    ]
+
+    for i, line in enumerate(text.splitlines(), start=1):
+        stripped = line.lstrip()
+        if stripped.startswith("#") or stripped.startswith("//"):
+            continue
+
+        for pattern in patterns:
+            match = re.search(pattern, line)
+            if not match:
+                continue
+
+            name = match.group("name")
+            value = match.group("value").strip().strip("'\"")
+            if name not in ADO_NON_PROD_ENV_NAMES:
+                continue
+            if is_allowed_ado_placeholder(value):
+                continue
+
+            findings.append(
+                Finding(
+                    path=path,
+                    line_no=i,
+                    rule=f"{name} must use a fake placeholder in CI/tests",
+                    excerpt=mask_excerpt(line),
+                )
+            )
+            break
+
+    return findings
+
+
 def mask_excerpt(line: str) -> str:
     """
     Avoid printing full secrets.
@@ -208,15 +283,16 @@ def main() -> int:
             continue
 
         all_findings.extend(scan_text(path, text, rules))
+        all_findings.extend(scan_ado_non_prod_values(path, text))
 
     if all_findings:
-        print("\nPotential secrets detected in staged files.\n", file=sys.stderr)
+        print("\nPotential secrets or disallowed test data detected in staged files.\n", file=sys.stderr)
         for f in all_findings:
             print(f"- {f.path}:{f.line_no} | {f.rule} | {f.excerpt}", file=sys.stderr)
 
         print(
             "\nActions:\n"
-            "  1) Remove/replace the secret (use .env.example, env vars, or keyring)\n"
+            "  1) Remove/replace the secret or use a fake placeholder value\n"
             "  2) Re-stage files: git add -A\n"
             "  3) Re-try commit\n",
             file=sys.stderr,

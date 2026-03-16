@@ -47,8 +47,8 @@ jobs:
         env:
           # Evite toute dependance a un .env inexistant cote CI
           ADO_PAT: "FAKE_PAT"
-          ADO_ORG: "messqc"
-          ADO_PROJECT: "Projet-700"
+          ADO_ORG: "FAKE_ORG"
+          ADO_PROJECT: "FAKE_PROJECT"
           APP_MONGO_URL: mongodb://localhost:27017
           APP_MONGO_DB: montecarlo_test
         run: |
