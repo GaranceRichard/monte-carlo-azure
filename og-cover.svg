@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Monte Carlo Studio">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f4f8fb" />
+      <stop offset="100%" stop-color="#e6f0f8" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <rect x="72" y="72" width="1056" height="486" rx="28" fill="#ffffff" stroke="#d1dbe7" />
+  <text x="120" y="195" fill="#0f3d5e" font-size="54" font-family="Segoe UI, Arial, sans-serif" font-weight="700">
+    Monte Carlo Studio
+  </text>
+  <text x="120" y="255" fill="#23435d" font-size="36" font-family="Segoe UI, Arial, sans-serif">
+    Delivery Forecast by Percentiles
+  </text>
+  <rect x="120" y="320" width="230" height="100" rx="14" fill="#e8f5f2" stroke="#1f7a6b" />
+  <rect x="380" y="320" width="230" height="100" rx="14" fill="#fff6e8" stroke="#b7791f" />
+  <rect x="640" y="320" width="230" height="100" rx="14" fill="#e9f0fb" stroke="#1f5aa6" />
+  <text x="145" y="372" fill="#1f7a6b" font-size="34" font-family="Segoe UI, Arial, sans-serif" font-weight="700">P50</text>
+  <text x="405" y="372" fill="#b7791f" font-size="34" font-family="Segoe UI, Arial, sans-serif" font-weight="700">P70</text>
+  <text x="665" y="372" fill="#1f5aa6" font-size="34" font-family="Segoe UI, Arial, sans-serif" font-weight="700">P90</text>
+  <path d="M922 403h190" stroke="#0f3d5e" stroke-width="6" stroke-linecap="round" />
+  <path d="M922 403l45-74 45 44 48-103 52 133" fill="none" stroke="#1f7a6b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
