@@ -36,6 +36,7 @@ function baseArgs() {
         riskScore: 0.2,
         riskLegend: "fiable" as const,
         distribution: [{ x: 10, count: 10 }],
+        throughputReliability: { cv: 0.22, iqr_ratio: 0.3, slope_norm: -0.02, label: "fiable" as const, samples_count: 8 },
       },
       {
         label: "Arrime (80%)" as const,
@@ -49,6 +50,7 @@ function baseArgs() {
         riskScore: 0.25,
         riskLegend: "incertain" as const,
         distribution: [{ x: 8, count: 10 }],
+        throughputReliability: { cv: 0.51, iqr_ratio: 0.55, slope_norm: -0.03, label: "incertain" as const, samples_count: 8 },
       },
       {
         label: "Friction (64%)" as const,
@@ -62,6 +64,7 @@ function baseArgs() {
         riskScore: 0.28,
         riskLegend: "incertain" as const,
         distribution: [{ x: 7, count: 10 }],
+        throughputReliability: { cv: 1.01, iqr_ratio: 0.7, slope_norm: -0.11, label: "fragile" as const, samples_count: 8 },
       },
       {
         label: "Conservateur" as const,
@@ -75,6 +78,7 @@ function baseArgs() {
         riskScore: 0.3,
         riskLegend: "incertain" as const,
         distribution: [{ x: 6, count: 10 }],
+        throughputReliability: { cv: 1.6, iqr_ratio: 1.2, slope_norm: -0.2, label: "non fiable" as const, samples_count: 5 },
       },
     ],
     sections: [
@@ -85,8 +89,11 @@ function baseArgs() {
         backlogSize: 120,
         targetWeeks: 12,
         nSims: 20000,
+        types: ["Bug"],
+        doneStates: ["Done"],
         resultKind: "weeks" as const,
         riskScore: 0.3,
+        throughputReliability: { cv: 0.62, iqr_ratio: 0.55, slope_norm: -0.07, label: "incertain" as const, samples_count: 10 },
         distribution: [{ x: 10, count: 20 }],
         weeklyThroughput: [{ week: "2026-01-01", throughput: 3 }],
         displayPercentiles: { P50: 10, P70: 12, P90: 15 },
@@ -137,6 +144,12 @@ describe("exportPortfolioPrintReport", () => {
     expect(idxArr).toBeLessThan(idxFriction);
     expect(idxFriction).toBeLessThan(idxCons);
     expect(idxCons).toBeLessThan(idxTeam);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Tickets:<\/b> Bug/);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Etats:<\/b> Done/);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<h2 class="diagnostic-title">Diagnostic<\/h2>/);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Lecture:<\/b> Throughput en baisse sur les dernieres semaines\./);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<section class="kpis">[\s\S]*?P50[\s\S]*?P70[\s\S]*?P90/);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<section class="kpis">[\s\S]*?Risk Score[\s\S]*?Fiabilite/);
   });
 
   it("includes 4-line summary, overlay probability svg and risk score definition on synthesis page", () => {
@@ -161,9 +174,25 @@ describe("exportPortfolioPrintReport", () => {
     expect(writtenHtml).toMatch(/<td>Arrim. \(80%\)<\/td>/);
     expect(writtenHtml).toContain("<td>Friction (64%)</td>");
     expect(writtenHtml).toContain("<td>Conservateur</td>");
-    expect(writtenHtml).toMatch(/courbes de probabilit.s compar.es/i);
+    expect(writtenHtml).toContain("0,22 (fiable)");
+    expect(writtenHtml).toContain("1,60 (non fiable)");
+    expect(writtenHtml).toContain("<th>Fiabilité</th>");
+    expect(writtenHtml).not.toContain("Fiabilité historique");
+    expect(writtenHtml).toContain('<col class="summary-col summary-col--reliability" />');
+    expect(writtenHtml).toContain(".summary-table { width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; }");
+    expect(writtenHtml).toContain(".summary-table--compact .summary-col--reliability { width: 26%; }");
+    expect(writtenHtml).toContain("Courbes de probabilités comparées");
     expect(writtenHtml).toContain('aria-label="Comparaison des probabilites"');
-    expect(writtenHtml).toContain("Risk Score : (P90 - P50) / P50");
+    expect(writtenHtml).toContain("<strong>Optimiste :</strong>");
+    expect(writtenHtml).toContain("<strong>Arrimé :</strong>");
+    expect(writtenHtml).toContain("<strong>Friction (64%) :</strong>");
+    expect(writtenHtml).toContain("<strong>Risk Score :</strong>");
+    expect(writtenHtml).toContain("<strong>Fiabilité de l&#39;historique :</strong>");
+    expect(writtenHtml).toContain('<p class="hypothesis reading-rule"><strong>Règle de lecture :</strong><br />');
+    expect(writtenHtml).toContain("Commencer par la fiabilité de l&#39;historique");
+    expect(writtenHtml).toContain("<strong>Risk Score :</strong>");
+    expect(writtenHtml).toContain("(P90 - P50) / P50");
+    expect(writtenHtml).not.toContain("Throughput hebdomadaire");
   });
 
   it("uses weeks_to_items effective percentiles for summary risk score", () => {
@@ -261,7 +290,6 @@ describe("exportPortfolioPrintReport", () => {
       .toFixed(2)
       .replace(".", ",");
 
-    expect(writtenHtml).toContain("Risk Score : (P50 - P90) / P50");
     expect(writtenHtml).toMatch(new RegExp(`Sc.nario - Optimiste[\\s\\S]*?Risk Score[\\s\\S]*?${expectedRisk}`));
     expect(writtenHtml).toMatch(new RegExp(`Simulation Portefeuille - Team A[\\s\\S]*?Risk Score[\\s\\S]*?${expectedRisk}`));
   });
@@ -335,8 +363,10 @@ describe("exportPortfolioPrintReport", () => {
     expect(writtenHtml).toMatch(/<td>Arrim. \(80%\)<\/td>/);
     expect(writtenHtml).toContain("<td>Conservateur</td>");
     expect(writtenHtml).toContain("<b>Équipes incluses:</b> Aucune");
-    expect(writtenHtml).toContain("3. Friction (100%)");
-    expect(writtenHtml).toContain("Risk Score : (P90 - P50) / P50");
+    expect(writtenHtml).toContain("Friction (100%) :</strong>");
+    expect(writtenHtml).toContain("(100%) de la capacité combinée");
+    expect(writtenHtml).toContain("<strong>Risk Score :</strong>");
+    expect(writtenHtml).toContain("(P90 - P50) / P50");
   });
 
   it("renders fragile risk color and unknown risk color fallback", () => {
@@ -494,6 +524,82 @@ describe("exportPortfolioPrintReport", () => {
     expect(writtenHtml).toContain("Semaines 0 exclues");
     expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?>0 semaines \(au plus\)</);
     expect(writtenHtml).toMatch(/Sc.nario - Optimiste[\s\S]*?>0 semaines \(au plus\)</);
+  });
+
+  it("renders reliability summary branches and team metadata fallbacks", () => {
+    let writtenHtml = "";
+    const fakeWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          writtenHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+      addEventListener: vi.fn(),
+    };
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+
+    const args: any = baseArgs();
+    args.sections = [
+      {
+        ...args.sections[0],
+        selectedTeam: "Team Short",
+        types: undefined,
+        doneStates: undefined,
+        throughputReliability: { cv: 0.21, iqr_ratio: 0.31, slope_norm: 0, label: "fiable", samples_count: 5 },
+      },
+      {
+        ...args.sections[0],
+        selectedTeam: "Team Down",
+        throughputReliability: { cv: 0.3, iqr_ratio: 0.25, slope_norm: -0.16, label: "fiable", samples_count: 9 },
+      },
+      {
+        ...args.sections[0],
+        selectedTeam: "Team Up",
+        throughputReliability: { cv: 0.33, iqr_ratio: 0.28, slope_norm: 0.12, label: "fiable", samples_count: 9 },
+      },
+      {
+        ...args.sections[0],
+        selectedTeam: "Team Slight Up",
+        throughputReliability: { cv: 0.34, iqr_ratio: 0.29, slope_norm: 0.06, label: "fiable", samples_count: 9 },
+      },
+      {
+        ...args.sections[0],
+        selectedTeam: "Team Spread",
+        throughputReliability: { cv: 1.2, iqr_ratio: 0.4, slope_norm: 0, label: "non fiable", samples_count: 9 },
+      },
+      {
+        ...args.sections[0],
+        selectedTeam: "Team Limited",
+        throughputReliability: { cv: 0.41, iqr_ratio: 0.39, slope_norm: 0, label: "incertain", samples_count: 7 },
+      },
+      {
+        ...args.sections[0],
+        selectedTeam: "Team Missing",
+        throughputReliability: undefined,
+      },
+    ];
+    args.scenarios[0] = {
+      ...args.scenarios[0],
+      throughputReliability: undefined,
+    };
+
+    exportPortfolioPrintReport(args);
+
+    expect(writtenHtml).toContain("<td>Non disponible</td>");
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Short[\s\S]*?<b>Tickets:<\/b> Agr.g. portefeuille/);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Short[\s\S]*?<b>Etats:<\/b> Agr.g. portefeuille/);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Short[\s\S]*?<b>Lecture:<\/b> Historique trop court pour projeter avec confiance\./);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Down[\s\S]*?<b>Lecture:<\/b> Throughput en forte baisse sur les dernieres semaines\./);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Up[\s\S]*?<b>Lecture:<\/b> Throughput en forte hausse sur les dernieres semaines\./);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Slight Up[\s\S]*?<b>Lecture:<\/b> Throughput en hausse sur les dernieres semaines\./);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Spread[\s\S]*?<b>Lecture:<\/b> Dispersion elevee du throughput historique\./);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Limited[\s\S]*?<b>Lecture:<\/b> Volume historique encore limite\./);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Missing[\s\S]*?<b>Lecture:<\/b> Non disponible/);
+    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Missing[\s\S]*?<span class="kpi-value">Non disponible<\/span>/);
   });
 
   it("returns early when popup opening is blocked", () => {
@@ -679,5 +785,30 @@ describe("exportPortfolioPrintReport", () => {
 
     expect(alert).toHaveBeenCalledWith("Echec generation PDF: raw failure");
     expect(errorSpy).toHaveBeenCalled();
+  });
+
+  it("handles successful PDF export when download button is absent", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    const fakeWindow = {
+      document: Object.assign(reportDoc, {
+        open: vi.fn(),
+        write: vi.fn(),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      }),
+      addEventListener: vi.fn(),
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+
+    exportPortfolioPrintReport(baseArgs());
+    const loadHandler = fakeWindow.addEventListener.mock.calls[0]?.[1];
+    loadHandler?.();
+    const popup = fakeWindow as unknown as Window & { __downloadPdf?: () => void | Promise<void> };
+    await popup.__downloadPdf?.();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(pdfModuleMocks.downloadPortfolioPdf).toHaveBeenCalledWith(fakeWindow.document, "Projet A");
   });
 });

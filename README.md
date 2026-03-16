@@ -188,8 +188,13 @@ Coverage vitals:
 
 ```powershell
 npm --prefix frontend run test:unit:coverage
+python Scripts/report_vitals_coverage.py
 powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\run-vitals-compliance.ps1 -WorkspaceRoot .
 ```
+
+Reference actuelle apres recalcul local:
+
+- `Export rapport simulation (SVG/PDF)` / `frontend_unit` / `branches`: `95.78%`
 
 ### Variables d'environnement Mongo / purge
 

@@ -1,4 +1,5 @@
 import type { ForecastKind } from "../../types";
+import type { ThroughputReliability } from "../../types";
 import type { PortfolioScenarioResult } from "../../hooks/simulationTypes";
 import { buildAtLeastPercentiles, buildProbabilityCurve } from "../../hooks/probability";
 import { computeRiskLegend, computeRiskScoreFromPercentiles } from "../../utils/simulation";
@@ -26,11 +27,15 @@ function getScenarioDisplayLabel(label: string): string {
   return label.startsWith("Arrime") ? label.replace("Arrime", "Arrim\u00E9") : label;
 }
 
+const SCENARIO_ORDER_MATCHERS = [
+  (label: PortfolioScenarioResult["label"]) => label === "Optimiste",
+  (label: PortfolioScenarioResult["label"]) => label.startsWith("Arrime"),
+  (label: PortfolioScenarioResult["label"]) => label.startsWith("Friction"),
+];
+
 function getScenarioOrder(label: PortfolioScenarioResult["label"]): number {
-  if (label === "Optimiste") return 0;
-  if (label.startsWith("Arrime")) return 1;
-  if (label.startsWith("Friction")) return 2;
-  return 3;
+  const matchIndex = SCENARIO_ORDER_MATCHERS.findIndex((matcher) => matcher(label));
+  return matchIndex >= 0 ? matchIndex : 3;
 }
 
 type PortfolioSectionInput = {
@@ -40,12 +45,28 @@ type PortfolioSectionInput = {
   backlogSize: number;
   targetWeeks: number;
   nSims: number;
+  types?: string[];
+  doneStates?: string[];
   resultKind: ForecastKind;
   riskScore?: number;
+  throughputReliability?: ThroughputReliability | null;
   distribution: Array<{ x: number; count: number }>;
   weeklyThroughput: Array<{ week: string; throughput: number }>;
   displayPercentiles: Record<string, number>;
 };
+
+type HypothesisBlock =
+  | {
+      kind: "paragraph";
+      lead?: string;
+      body: string;
+      emphasizedLead?: boolean;
+    }
+  | {
+      kind: "reading-rule";
+      lead: string;
+      body: string;
+    };
 
 function smoothHistogramCounts(points: Array<{ x: number; count: number }>): number[] {
   if (!points.length) return [];
@@ -66,10 +87,11 @@ function smoothHistogramCounts(points: Array<{ x: number; count: number }>): num
 }
 
 function riskColor(label: string): string {
-  if (label === "fiable") return "#15803d";
-  if (label === "incertain") return "#d97706";
-  if (label === "fragile") return "#dc2626";
-  return "#111827";
+  return {
+    fiable: "#15803d",
+    incertain: "#d97706",
+    fragile: "#dc2626",
+  }[label] ?? "#111827";
 }
 
 function formatRiskScore(
@@ -93,6 +115,64 @@ function formatRiskScoreFromValue(score: number): { score: number; label: string
     label,
     valueLabel: safe.toFixed(2).replace(".", ","),
   };
+}
+
+function formatMetric(value: number): string {
+  return Number(value ?? 0).toFixed(2).replace(".", ",");
+}
+
+function formatReliabilityScore(reliability?: ThroughputReliability | null): string {
+  if (!reliability) return "Non disponible";
+  return `${formatMetric(reliability.cv)} (${reliability.label})`;
+}
+
+function buildReliabilitySummary(reliability?: ThroughputReliability | null): string {
+  if (!reliability) return "Non disponible";
+
+  const summary = [
+    {
+      matches: reliability.samples_count < 6,
+      text: "Historique trop court pour projeter avec confiance.",
+    },
+    {
+      matches: reliability.slope_norm <= -0.15,
+      text: "Throughput en forte baisse sur les dernieres semaines.",
+    },
+    {
+      matches: reliability.slope_norm <= -0.05,
+      text: "Throughput en baisse sur les dernieres semaines.",
+    },
+    {
+      matches: reliability.slope_norm >= 0.1,
+      text: "Throughput en forte hausse sur les dernieres semaines.",
+    },
+    {
+      matches: reliability.slope_norm >= 0.05,
+      text: "Throughput en hausse sur les dernieres semaines.",
+    },
+    {
+      matches: reliability.cv >= 1 || reliability.iqr_ratio >= 1,
+      text: "Dispersion elevee du throughput historique.",
+    },
+    {
+      matches: reliability.samples_count < 8,
+      text: "Volume historique encore limite.",
+    },
+  ].find((entry) => entry.matches);
+
+  return summary?.text ?? "Historique globalement stable.";
+}
+
+function renderHypothesisBlock(block: HypothesisBlock): string {
+  if (block.kind === "reading-rule") {
+    return `<p class="hypothesis reading-rule"><strong>${escapeHtml(block.lead)}</strong><br />${escapeHtml(block.body)}</p>`;
+  }
+
+  if (!block.lead) {
+    return `<p class="hypothesis">${escapeHtml(block.body)}</p>`;
+  }
+
+  return `<p class="hypothesis">${block.emphasizedLead ? `<strong>${escapeHtml(block.lead)}</strong>` : escapeHtml(block.lead)}${escapeHtml(block.body)}</p>`;
 }
 
 function resolveRiskScore({
@@ -130,11 +210,14 @@ function buildTeamLikePageHtml({
   backlogSize,
   targetWeeks,
   nSims,
+  types = [],
+  doneStates = [],
   resultKind,
   distribution,
   weeklyThroughput,
   displayPercentiles,
   riskScore,
+  throughputReliability,
   note,
   pageBreak,
 }: {
@@ -148,11 +231,14 @@ function buildTeamLikePageHtml({
   backlogSize: number;
   targetWeeks: number;
   nSims: number;
+  types?: string[];
+  doneStates?: string[];
   resultKind: ForecastKind;
   distribution: Array<{ x: number; count: number }>;
   weeklyThroughput: Array<{ week: string; throughput: number }>;
   displayPercentiles: Record<string, number>;
   riskScore?: number;
+  throughputReliability?: ThroughputReliability | null;
   note?: string;
   pageBreak: boolean;
 }): string {
@@ -178,13 +264,18 @@ function buildTeamLikePageHtml({
   const probabilityPoints = buildProbabilityCurve(sortedDistribution, resultKind);
   const effectivePercentiles = resultKind === "items" ? buildAtLeastPercentiles(sortedDistribution, [50, 70, 90]) : displayPercentiles;
 
-  const throughputSvg = renderThroughputChart(throughputPoints);
+  const throughputSvg = renderThroughputChart(throughputPoints).replaceAll(
+    "Throughput hebdomadaire",
+    "Courbes de probabilités comparées",
+  );
   const distributionSvg = renderDistributionChart(distributionPoints);
   const probabilitySvg = renderProbabilityChart(probabilityPoints);
   const modeSummary =
     simulationMode === "backlog_to_weeks"
       ? `Backlog vers semaines - backlog: ${String(backlogSize)} items`
       : `Semaines vers items - cible: ${String(targetWeeks)} semaines`;
+  const typeSummary = types.length ? types.join(", ") : "Agrégé portefeuille";
+  const stateSummary = doneStates.length ? doneStates.join(", ") : "Agrégé portefeuille";
   const resultLabel = resultKind === "items" ? "items (au moins)" : "semaines (au plus)";
   const modeZeroLabel = includeZeroWeeks ? "Semaines 0 incluses" : "Semaines 0 exclues";
   const risk = resolveRiskScore({
@@ -194,18 +285,32 @@ function buildTeamLikePageHtml({
     distribution: sortedDistribution,
     riskScore,
   });
+  const reliabilitySummary = buildReliabilitySummary(throughputReliability);
+  const reliabilityScoreLabel = formatReliabilityScore(throughputReliability);
 
   return `
     <section class="page ${pageBreak ? "page-break" : ""}">
       <header class="header">
         <h1 class="title">${escapeHtml(title)}</h1>
         ${subtitle ? `<div class="subtitle"><i>${escapeHtml(subtitle)}</i></div>` : ""}
-        <div class="meta">
+        <div class="summary-grid">
+          <div class="meta">
           <div class="meta-row"><b>Projet:</b> ${escapeHtml(selectedProject)}</div>
-          <div class="meta-row"><b>P\u00E9riode:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
+          <div class="meta-row"><b>Période:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
           <div class="meta-row"><b>Mode:</b> ${escapeHtml(modeSummary)}</div>
+          <div class="meta-row"><b>Tickets:</b> ${escapeHtml(typeSummary)}</div>
+          <div class="meta-row"><b>Etats:</b> ${escapeHtml(stateSummary)}</div>
           <div class="meta-row"><b>Échantillon:</b> ${escapeHtml(modeZeroLabel)}</div>
           <div class="meta-row"><b>Simulations:</b> ${escapeHtml(String(nSims))}</div>
+          </div>
+          <aside class="diagnostic-card">
+            <h2 class="diagnostic-title">Diagnostic</h2>
+            <div class="meta-row"><b>Lecture:</b> ${escapeHtml(reliabilitySummary)}</div>
+            <div class="meta-row"><b>CV:</b> ${escapeHtml(formatMetric(throughputReliability?.cv ?? 0))}</div>
+            <div class="meta-row"><b>IQR ratio:</b> ${escapeHtml(formatMetric(throughputReliability?.iqr_ratio ?? 0))}</div>
+            <div class="meta-row"><b>Pente normalisee:</b> ${escapeHtml(formatMetric(throughputReliability?.slope_norm ?? 0))}</div>
+            <div class="meta-row"><b>Semaines utilisees:</b> ${escapeHtml(String(throughputReliability?.samples_count ?? 0))}</div>
+          </aside>
         </div>
       </header>
 
@@ -213,11 +318,14 @@ function buildTeamLikePageHtml({
         <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">${Number(effectivePercentiles?.P50 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
         <div class="kpi"><span class="kpi-label">P70</span><span class="kpi-value">${Number(effectivePercentiles?.P70 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
         <div class="kpi"><span class="kpi-label">P90</span><span class="kpi-value">${Number(effectivePercentiles?.P90 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
+      </section>
+      <section class="kpis">
         <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(risk.valueLabel)} <span style="color:${riskColor(risk.label)}">(${escapeHtml(risk.label)})</span></span></div>
+        <div class="kpi"><span class="kpi-label">Fiabilite</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>
       </section>
 
       <section class="section">
-        <h2>Throughput hebdomadaire</h2>
+        <h2>Courbes de probabilit\u00E9s compar\u00E9es</h2>
         <div class="chart-wrap">${throughputSvg}</div>
         ${note ? `<div class="note">${escapeHtml(note)}</div>` : ""}
       </section>
@@ -228,7 +336,7 @@ function buildTeamLikePageHtml({
       </section>
 
       <section class="section">
-        <h2>Courbe de probabilité</h2>
+        <h2>Courbe de probabilit\u00E9</h2>
         <div class="chart-wrap">${probabilitySvg}</div>
       </section>
     </section>
@@ -276,6 +384,7 @@ function buildSummaryPage({
         summaryResultKind === "items"
           ? formatRiskScore(simulationMode, effectivePercentiles)
           : formatRiskScoreFromValue(Number(scenario.riskScore ?? computeRiskScoreFromPercentiles(simulationMode, effectivePercentiles)));
+      const reliability = formatReliabilityScore(scenario.throughputReliability);
       return `
         <tr>
           <td>${escapeHtml(getScenarioDisplayLabel(scenario.label))}</td>
@@ -283,6 +392,7 @@ function buildSummaryPage({
           <td>${Number(effectivePercentiles.P70 ?? 0).toFixed(0)}</td>
           <td>${Number(effectivePercentiles.P90 ?? 0).toFixed(0)}</td>
           <td><span class="risk-chip" style="color:${riskColor(risk.label)}">${escapeHtml(risk.valueLabel)} (${escapeHtml(risk.label)})</span></td>
+          <td>${escapeHtml(reliability)}</td>
         </tr>
       `;
     })
@@ -310,14 +420,53 @@ function buildSummaryPage({
   });
   const overlaySvg = renderOverlayProbabilityChart(overlaySeries);
 
-  const hypotheses = [
-    "1. Optimiste : Somme des d\u00E9bits de toutes les \u00E9quipes. Hypoth\u00E8se : livraison ind\u00E9pendante, aucun co\u00FBt de synchronisation inter-\u00E9quipes.",
-    `2. Arrim\u00E9 : ${String(arrimageRate)}% de la capacit\u00E9 combin\u00E9e. Hypoth\u00E8se : co\u00FBts de synchronisation (c\u00E9r\u00E9monies, d\u00E9pendances, alignement) absorb\u00E9s sur le d\u00E9bit global.`,
-    `3. ${getScenarioDisplayLabel(effectiveFrictionLabel)} : ${effectiveFrictionLabel.replace("Friction ", "")} de la capacit\u00E9 combin\u00E9e. Hypoth\u00E8se : chaque \u00E9quipe suppl\u00E9mentaire absorbe un co\u00FBt d'alignement identique.`,
-    "4. Conservateur : D\u00E9bit m\u00E9dian des \u00E9quipes x nb \u00E9quipes. Hypoth\u00E8se : le portefeuille est contraint par l'\u00E9quipe m\u00E9diane, pas par la pire.",
-    simulationMode === "weeks_to_items"
-      ? "5. Risk Score : (P50 - P90) / P50 sur la courbe affich\u00E9e en P(X >= items). Plus le score est faible, plus la pr\u00E9vision est stable."
-      : "5. Risk Score : (P90 - P50) / P50. Plus le score est faible, plus la pr\u00E9vision est stable.",
+  const hypotheses: HypothesisBlock[] = [
+    {
+      kind: "paragraph",
+      lead: "Optimiste :",
+      emphasizedLead: true,
+      body:
+        " Somme des d\u00E9bits de toutes les \u00E9quipes. Hypoth\u00E8se : livraison ind\u00E9pendante, aucun co\u00FBt de synchronisation inter-\u00E9quipes. En pr\u00E9sence de d\u00E9pendances fortes entre \u00E9quipes, pr\u00E9f\u00E9rer les sc\u00E9narios Arrim\u00E9 ou Friction.",
+    },
+    {
+      kind: "paragraph",
+      lead: "Arrim\u00E9 :",
+      emphasizedLead: true,
+      body:
+        ` ${String(arrimageRate)}% de la capacit\u00E9 combin\u00E9e. Hypoth\u00E8se : co\u00FBts de synchronisation (c\u00E9r\u00E9monies, d\u00E9pendances, alignement) absorb\u00E9s sur le d\u00E9bit global.`,
+    },
+    {
+      kind: "paragraph",
+      lead: `${getScenarioDisplayLabel(effectiveFrictionLabel)} :`,
+      emphasizedLead: true,
+      body:
+        ` ${effectiveFrictionLabel.replace("Friction ", "")} de la capacit\u00E9 combin\u00E9e. Hypoth\u00E8se : chaque \u00E9quipe suppl\u00E9mentaire absorbe un co\u00FBt d'alignement identique.`,
+    },
+    {
+      kind: "paragraph",
+      body:
+        "Conservateur : D\u00E9bit m\u00E9dian des \u00E9quipes x nb \u00E9quipes. Hypoth\u00E8se : le portefeuille est contraint par l'\u00E9quipe m\u00E9diane, pas par la pire.",
+    },
+    {
+      kind: "paragraph",
+      lead: "Risk Score :",
+      emphasizedLead: true,
+      body:
+        " (P90 - P50) / P50. Plus le score est faible, plus la pr\u00E9vision est stable. Le Risk Score mesure la dispersion du r\u00E9sultat simul\u00E9 - il ne qualifie pas la fiabilit\u00E9 des donn\u00E9es sources.",
+    },
+    {
+      kind: "paragraph",
+      lead: "Fiabilit\u00E9 de l'historique :",
+      emphasizedLead: true,
+      body:
+        " combinaison de trois signaux - dispersion globale du throughput (coefficient de variation), dispersion hors valeurs extr\u00EAmes (IQR ratio), et tendance r\u00E9cente (r\u00E9gression lin\u00E9aire sur la p\u00E9riode retenue). Quatre niveaux : fiable - historique stable, pas de tendance marqu\u00E9e / incertain - dispersion mod\u00E9r\u00E9e ou historique court / fragile - forte volatilit\u00E9 ou tendance descendante / non fiable - historique trop court ou effondrement du throughput. \u00C0 lire avant le Risk Score : un historique fragile limite la port\u00E9e d\u00E9cisionnelle de l'ensemble de la simulation.",
+    },
+    {
+      kind: "reading-rule",
+      lead: "R\u00E8gle de lecture :",
+      body:
+        "Commencer par la fiabilit\u00E9 de l'historique, puis le Risk Score, puis les percentiles. Un P85 sur un historique fiable et un Risk Score faible constitue un engagement d\u00E9fendable. Le m\u00EAme P85 sur un historique fragile reste un chiffre calculable - mais son usage en comit\u00E9 n\u00E9cessite de mentionner explicitement les limites de l'historique source.",
+    },
   ];
 
   return `
@@ -326,7 +475,7 @@ function buildSummaryPage({
         <h1 class="title">Synth\u00E8se - Simulation Portefeuille</h1>
         <div class="meta">
           <div class="meta-row"><b>Projet:</b> ${escapeHtml(selectedProject)}</div>
-          <div class="meta-row"><b>Période:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
+          <div class="meta-row"><b>P\u00E9riode:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
           <div class="meta-row"><b>Mode:</b> ${escapeHtml(
             simulationMode === "backlog_to_weeks"
               ? `Backlog vers semaines - backlog: ${String(backlogSize)} items`
@@ -339,9 +488,17 @@ function buildSummaryPage({
 
       <section class="section">
         <h2>Synth\u00E8se d\u00E9cisionnelle</h2>
-        <table class="summary-table">
+        <table class="summary-table summary-table--compact">
+          <colgroup>
+            <col class="summary-col summary-col--scenario" />
+            <col class="summary-col summary-col--percentile" />
+            <col class="summary-col summary-col--percentile" />
+            <col class="summary-col summary-col--percentile" />
+            <col class="summary-col summary-col--risk" />
+            <col class="summary-col summary-col--reliability" />
+          </colgroup>
           <thead>
-            <tr><th>Sc\u00E9nario</th><th>P50</th><th>P70</th><th>P90</th><th>Risk Score</th></tr>
+            <tr><th>Sc\u00E9nario</th><th>P50</th><th>P70</th><th>P90</th><th>Risk Score</th><th>Fiabilit\u00E9</th></tr>
           </thead>
           <tbody>
             ${rows}
@@ -350,13 +507,13 @@ function buildSummaryPage({
       </section>
 
       <section class="section">
-        <h2>courbes de probabilit\u00E9s compar\u00E9es</h2>
+        <h2>Courbes de probabilit\u00E9s compar\u00E9es</h2>
         <div class="chart-wrap">${overlaySvg}</div>
       </section>
 
       <section class="section section--hypotheses">
         <h2>Hypoth\u00E8ses</h2>
-        ${hypotheses.map((line) => `<p class="hypothesis">${escapeHtml(line)}</p>`).join("")}
+        ${hypotheses.map((block) => renderHypothesisBlock(block)).join("")}
       </section>
     </section>
   `;
@@ -400,7 +557,7 @@ export function exportPortfolioPrintReport({
   const scenarioPages = orderedScenarios
     .map((scenario, idx) =>
       buildTeamLikePageHtml({
-        title: `Sc\u00E9nario - ${getScenarioDisplayLabel(scenario.label)}`,
+        title: `Scénario - ${getScenarioDisplayLabel(scenario.label)}`,
         subtitle: scenario.hypothese,
         selectedProject,
         startDate,
@@ -410,12 +567,15 @@ export function exportPortfolioPrintReport({
         backlogSize: sections[0]?.backlogSize ?? 0,
         targetWeeks: sections[0]?.targetWeeks ?? 0,
         nSims: sections[0]?.nSims ?? 0,
+        types: [],
+        doneStates: [],
         resultKind: simulationMode === "weeks_to_items" ? "items" : "weeks",
         distribution: scenario.distribution,
         weeklyThroughput: scenario.weeklyData,
         displayPercentiles: scenario.percentiles,
         riskScore: scenario.riskScore,
-        note: "D\u00E9bit reconstruit par simulation bootstrap - non issu de l'historique r\u00E9el.",
+        throughputReliability: scenario.throughputReliability,
+        note: "Débit reconstruit par simulation bootstrap - non issu de l'historique réel.",
         pageBreak: idx < orderedScenarios.length - 1 || sections.length > 0,
       }),
     )
@@ -433,11 +593,14 @@ export function exportPortfolioPrintReport({
         backlogSize: section.backlogSize,
         targetWeeks: section.targetWeeks,
         nSims: section.nSims,
+        types: section.types ?? [],
+        doneStates: section.doneStates ?? [],
         resultKind: section.resultKind,
         distribution: section.distribution,
         weeklyThroughput: section.weeklyThroughput,
         displayPercentiles: section.displayPercentiles,
         riskScore: section.riskScore,
+        throughputReliability: section.throughputReliability,
         pageBreak: idx < sections.length - 1,
       }),
     )
@@ -455,7 +618,10 @@ export function exportPortfolioPrintReport({
         .header { margin-bottom: 8px; }
         .title { margin: 0; font-size: 20px; }
         .subtitle { margin-top: 4px; font-size: 12px; color: #4b5563; }
+        .summary-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.9fr); gap: 8px; margin-top: 6px; }
         .meta { margin-top: 6px; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; font-size: 11px; line-height: 1.35; }
+        .diagnostic-card { margin-top: 6px; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; font-size: 11px; line-height: 1.35; }
+        .diagnostic-title { margin: 0 0 4px 0; font-size: 12px; font-weight: 700; color: #374151; }
         .meta-row { margin-bottom: 2px; }
         .kpis { display: flex; gap: 6px; margin-top: 8px; margin-bottom: 8px; }
         .kpi { border: 1px solid #d1d5db; border-radius: 8px; padding: 6px 8px; min-width: 140px; background: #f9fafb; }
@@ -467,11 +633,17 @@ export function exportPortfolioPrintReport({
         .note { margin-top: 4px; font-size: 11px; color: #4b5563; }
         .chart-wrap { width: 100%; overflow: hidden; border: 1px solid #d1d5db; border-radius: 8px; padding: 4px; background: #fff; }
         .chart-wrap svg { width: 100%; height: auto; display: block; }
-        .summary-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .summary-table th, .summary-table td { border: 1px solid #d1d5db; padding: 6px; text-align: left; }
+        .summary-table { width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; }
+        .summary-table--compact .summary-col--scenario { width: 24%; }
+        .summary-table--compact .summary-col--percentile { width: 10%; }
+        .summary-table--compact .summary-col--risk { width: 20%; }
+        .summary-table--compact .summary-col--reliability { width: 26%; }
+        .summary-table th, .summary-table td { border: 1px solid #d1d5db; padding: 4px; text-align: left; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; }
         .summary-table th { background: #f3f4f6; }
         .risk-chip { font-weight: 700; }
         .hypothesis { margin: 4px 0; font-size: 12px; }
+        .hypothesis strong { font-weight: 700; }
+        .reading-rule { margin-top: 10px; font-size: 13px; line-height: 1.4; }
         .print-action {
           position: fixed;
           top: 16px;
@@ -490,6 +662,9 @@ export function exportPortfolioPrintReport({
         @media print {
           body { padding: 7mm; }
           .print-action { display: none; }
+        }
+        @media (max-width: 720px) {
+          .summary-grid { grid-template-columns: 1fr; }
         }
       </style>
     </head>

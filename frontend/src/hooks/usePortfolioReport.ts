@@ -8,7 +8,12 @@ import {
 } from "./simulationForecastService";
 import type { PortfolioScenarioResult } from "./simulationTypes";
 import { buildAtLeastPercentiles } from "./probability";
-import { buildScenarioSamples, computeRiskLegend, computeRiskScoreFromPercentiles } from "../utils/simulation";
+import {
+  buildScenarioSamples,
+  computeRiskLegend,
+  computeRiskScoreFromPercentiles,
+  computeThroughputReliability,
+} from "../utils/simulation";
 
 export type TeamPortfolioConfig = {
   teamName: string;
@@ -30,8 +35,11 @@ export type PortfolioReportSection = {
   backlogSize: number;
   targetWeeks: number;
   nSims: number;
+  types: string[];
+  doneStates: string[];
   resultKind: "items" | "weeks";
   riskScore?: number;
+  throughputReliability?: ReturnType<typeof computeThroughputReliability>;
   distribution: { x: number; count: number }[];
   weeklyThroughput: { week: string; throughput: number }[];
   displayPercentiles: Record<string, number>;
@@ -132,6 +140,7 @@ function toScenarioResult(
     riskScore,
     riskLegend: computeRiskLegend(riskScore),
     distribution: result.result_distribution,
+    throughputReliability: computeThroughputReliability(samples),
   };
 }
 
@@ -267,6 +276,8 @@ export function usePortfolioReport({
                 backlogSize: Number(backlogSize),
                 targetWeeks: Number(targetWeeks),
                 nSims: Number(nSims),
+                types: [...cfg.types],
+                doneStates: [...cfg.doneStates],
                 resultKind: result.result_kind,
                 riskScore:
                   result.result_kind === "items"
@@ -275,6 +286,7 @@ export function usePortfolioReport({
                         buildAtLeastPercentiles(result.result_distribution, [50, 70, 90]),
                       )
                     : result.risk_score,
+                throughputReliability: computeThroughputReliability(data.throughputSamples),
                 distribution: result.result_distribution,
                 weeklyThroughput: data.weeklyThroughput,
                 displayPercentiles: result.result_percentiles,

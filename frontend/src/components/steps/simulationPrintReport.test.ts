@@ -118,7 +118,7 @@ describe("exportSimulationPrintReport", () => {
     expect(writtenHtml).toContain('class="diagnostic-card"');
     expect(writtenHtml).toContain("Diagnostic");
     expect(writtenHtml).toContain('<span class="kpi-label">Risk Score</span>');
-    expect(writtenHtml).toContain('<span class="kpi-label">Fiabilite historique</span>');
+    expect(writtenHtml).toContain('<span class="kpi-label">Fiabilite</span>');
     expect(writtenHtml).toContain('<span class="kpi-value">0,63 (fragile)</span>');
     expect(writtenHtml).toContain('<span class="kpi-value">0,62 (incertain)</span>');
     expect(writtenHtml).toContain("Throughput en baisse sur les dernieres semaines.");
@@ -157,6 +157,39 @@ describe("exportSimulationPrintReport", () => {
     expect(writtenHtml).toContain("&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;");
     expect(writtenHtml).not.toContain(`<script>alert("x")</script>`);
     expect(writtenHtml).toContain("Non disponible");
+  });
+
+  it("falls back to zero when throughput points contain nullish values", () => {
+    let writtenHtml = "";
+    const fakeWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((html: string) => {
+          writtenHtml = html;
+        }),
+        close: vi.fn(),
+        getElementById: vi.fn(() => null),
+      },
+      onload: null as null | (() => void),
+    };
+    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+
+    exportSimulationPrintReport({
+      ...buildBaseArgs(),
+      throughputReliability: {
+        cv: undefined as unknown as number,
+        iqr_ratio: 0.2,
+        slope_norm: 0,
+        label: "incertain",
+        samples_count: 8,
+      },
+      throughputPoints: [
+        { week: "2025-01-06", throughput: undefined as unknown as number, movingAverage: 0 },
+        { week: "2025-01-13", throughput: 4, movingAverage: 2 },
+      ],
+    });
+
+    expect(writtenHtml).toContain('<span class="kpi-value">0,00 (incertain)</span>');
   });
 
   it("computes reliability from throughput points when API reliability is absent", () => {
@@ -720,7 +753,7 @@ describe("downloadSimulationPdf", () => {
       </section>
       <section class="kpis">
         <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">0,20 (fiable)</span></div>
-        <div class="kpi"><span class="kpi-label">Fiabilite historique</span><span class="kpi-value">0,62 (incertain)</span></div>
+        <div class="kpi"><span class="kpi-label">Fiabilite</span><span class="kpi-value">0,62 (incertain)</span></div>
       </section>
       <div class="chart-wrap"><svg viewBox="0 0 960 300"></svg></div>
     `;

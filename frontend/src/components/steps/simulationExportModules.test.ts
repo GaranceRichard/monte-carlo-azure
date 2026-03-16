@@ -16,6 +16,7 @@ const pdfMocks = vi.hoisted(() => ({
     setFontSize: ReturnType<typeof vi.fn>;
     setTextColor: ReturnType<typeof vi.fn>;
     setDrawColor: ReturnType<typeof vi.fn>;
+    setLineWidth: ReturnType<typeof vi.fn>;
     setFillColor: ReturnType<typeof vi.fn>;
     roundedRect: ReturnType<typeof vi.fn>;
     rect: ReturnType<typeof vi.fn>;
@@ -35,6 +36,7 @@ vi.mock("jspdf", () => ({
       setFontSize: vi.fn().mockReturnThis(),
       setTextColor: vi.fn().mockReturnThis(),
       setDrawColor: vi.fn().mockReturnThis(),
+      setLineWidth: vi.fn().mockReturnThis(),
       setFillColor: vi.fn().mockReturnThis(),
       roundedRect: vi.fn().mockReturnThis(),
       rect: vi.fn().mockReturnThis(),
@@ -228,7 +230,7 @@ describe("simulationPdfDownload", () => {
       </div>
       <div class="kpis">
         <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">0,21 (incertain)</span></div>
-        <div class="kpi"><span class="kpi-label">Fiabilite historique</span><span class="kpi-value">0,62 (incertain)</span></div>
+        <div class="kpi"><span class="kpi-label">Fiabilite</span><span class="kpi-value">0,62 (incertain)</span></div>
       </div>
     `;
 
@@ -236,11 +238,12 @@ describe("simulationPdfDownload", () => {
     const pdf = pdfMocks.instances.at(-1)!;
 
     expect(pdf.roundedRect).toHaveBeenCalledTimes(2);
+    expect(pdf.setLineWidth).toHaveBeenCalledWith(0.26);
     expect(pdf.splitTextToSize).toHaveBeenCalledWith("Lecture: Historique globalement stable.", expect.any(Number));
     expect(pdf.text).toHaveBeenCalledWith("Diagnostic", expect.any(Number), expect.any(Number));
-    expect(pdf.text).toHaveBeenCalledWith("P50: 82 items", 8, expect.any(Number));
-    expect(pdf.text).toHaveBeenCalledWith("Risk Score: 0,21 (incertain)", 8, expect.any(Number));
-    expect(pdf.text).toHaveBeenCalledWith("Fiabilite historique: 0,62 (incertain)", expect.any(Number), expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith("P50: 82 items", expect.any(Number), expect.any(Number), { align: "center" });
+    expect(pdf.text).toHaveBeenCalledWith("Risk Score: 0,21 (incertain)", expect.any(Number), expect.any(Number), { align: "center" });
+    expect(pdf.text).toHaveBeenCalledWith("Fiabilite: 0,62 (incertain)", expect.any(Number), expect.any(Number), { align: "center" });
   });
 
   it("renders a boxed scoped metadata block without diagnostic card", async () => {
@@ -277,6 +280,7 @@ describe("simulationPdfDownload", () => {
         setFontSize: vi.fn().mockReturnThis(),
         setTextColor: vi.fn().mockReturnThis(),
         setDrawColor: vi.fn().mockReturnThis(),
+        setLineWidth: vi.fn().mockReturnThis(),
         setFillColor: vi.fn().mockReturnThis(),
         rect: vi.fn().mockReturnThis(),
         splitTextToSize: vi.fn((text: string) => [text]),
@@ -293,6 +297,50 @@ describe("simulationPdfDownload", () => {
     const pdf = pdfMocks.instances.at(-1)!;
 
     expect(pdf.rect).toHaveBeenCalledWith(8, expect.any(Number), expect.any(Number), expect.any(Number), "S");
+  });
+
+  it("handles missing draw helpers and nullish scoped metadata text", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo</h1>
+      <div class="meta"><div class="meta-row"></div></div>
+      <aside class="diagnostic-card"><div class="meta-row"></div></aside>
+    `;
+    const scopedMetaRow = reportDoc.querySelector(".meta .meta-row");
+    const diagnosticRow = reportDoc.querySelector(".diagnostic-card .meta-row");
+    if (scopedMetaRow) {
+      Object.defineProperty(scopedMetaRow, "textContent", { value: null, configurable: true });
+    }
+    if (diagnosticRow) {
+      Object.defineProperty(diagnosticRow, "textContent", { value: null, configurable: true });
+    }
+
+    pdfMocks.instances.length = 0;
+    const { jsPDF } = await import("jspdf");
+    (jsPDF as unknown as { mockImplementationOnce: (impl: () => unknown) => void }).mockImplementationOnce(function MockJsPdfCtor() {
+      const instance = {
+        internal: { pageSize: { getWidth: () => 210, getHeight: () => 297 } },
+        setFont: vi.fn().mockReturnThis(),
+        setFontSize: vi.fn().mockReturnThis(),
+        setTextColor: vi.fn().mockReturnThis(),
+        setFillColor: vi.fn().mockReturnThis(),
+        roundedRect: vi.fn().mockReturnThis(),
+        rect: vi.fn().mockReturnThis(),
+        splitTextToSize: vi.fn(() => "wrapped"),
+        text: vi.fn().mockReturnThis(),
+        addPage: vi.fn().mockReturnThis(),
+        svg: vi.fn(async () => undefined),
+        save: vi.fn(),
+      };
+      pdfMocks.instances.push(instance as never);
+      return instance as never;
+    });
+
+    await downloadSimulationPdf(reportDoc, "Equipe A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.text).toHaveBeenCalledWith("", 11, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(["wrapped"], expect.any(Number), expect.any(Number));
   });
 
   it("falls back to default chart dimensions when svg viewBox is missing", async () => {
@@ -347,23 +395,57 @@ describe("simulationPdfDownload", () => {
               <th>P70</th>
               <th>P90</th>
               <th>Risk Score</th>
+              <th>Fiabilite</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td>Optimiste</td><td>200</td><td>180</td><td>160</td><td>0,12 (fiable)</td></tr>
-            <tr><td>Arrime</td><td>180</td><td>170</td><td>150</td><td>0,24 (incertain)</td></tr>
-            <tr><td>Friction</td><td>120</td><td>110</td><td>100</td><td>0,70 (fragile)</td></tr>
-            <tr><td>Conservateur</td><td>90</td><td>80</td><td>70</td><td>0,95 (non fiable)</td></tr>
+            <tr><td>Optimiste</td><td>200</td><td>180</td><td>160</td><td>0,12 (fiable)</td><td>0,13 (fiable)</td></tr>
+            <tr><td>Arrime</td><td>180</td><td>170</td><td>150</td><td>0,24 (incertain)</td><td>0,24 (incertain)</td></tr>
+            <tr><td>Friction</td><td>120</td><td>110</td><td>100</td><td>0,70 (fragile)</td><td>0,70 (fragile)</td></tr>
+            <tr><td>Conservateur</td><td>90</td><td>80</td><td>70</td><td>0,95 (non fiable)</td><td>0,95 (non fiable)</td></tr>
           </tbody>
         </table>
-        <div class="hypothesis">Hypothese longue a renvoyer sur plusieurs lignes si necessaire.</div>
+        <div class="hypothesis"><strong>Optimiste :</strong> Somme des débits de toutes les équipes.</div>
+        <div class="hypothesis"><strong>Arrimé :</strong> 90% de la capacité combinée.</div>
+        <div class="hypothesis">Friction (81%) : Hypothèse de friction portefeuille.</div>
+        <div class="hypothesis">Conservateur : Débit médian des équipes.</div>
+        <div class="hypothesis"><strong>Risk Score :</strong> Plus le score est faible, plus la prévision est stable.</div>
+        <div class="hypothesis"><strong>Fiabilité de l'historique :</strong> Historique stable.</div>
+        <p class="hypothesis reading-rule"><strong>Règle de lecture :</strong><br />Commencer par la fiabilité.</p>
         <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">176 items</span></div>
+        <h2>Courbes de probabilités comparées</h2>
         <div class="chart-wrap"><svg viewBox="0 0 960 360"></svg></div>
       </section>
       <section class="page">
         <h1>Simulation Portefeuille - Team A</h1>
-        <div class="meta-row">Equipe: Team A</div>
-        <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">60 items</span></div>
+        <div class="summary-grid">
+          <div class="meta">
+            <div class="meta-row">Periode: 2026-01-01 au 2026-03-01</div>
+            <div class="meta-row">Mode: Semaines vers items - cible: 3 semaines</div>
+            <div class="meta-row">Tickets: Product Backlog Item</div>
+            <div class="meta-row">Etats: Done, Removed</div>
+            <div class="meta-row">Echantillon: Semaines 0 exclues</div>
+            <div class="meta-row">Simulations: 150000</div>
+          </div>
+          <aside class="diagnostic-card">
+            <h2 class="diagnostic-title">Diagnostic</h2>
+            <div class="meta-row">Lecture: Throughput en forte hausse sur les dernieres semaines.</div>
+            <div class="meta-row">CV: 0,45</div>
+            <div class="meta-row">IQR ratio: 0,75</div>
+            <div class="meta-row">Pente normalisee: 0,11</div>
+            <div class="meta-row">Semaines utilisees: 8</div>
+          </aside>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">60 items</span></div>
+          <div class="kpi"><span class="kpi-label">P70</span><span class="kpi-value">55 items</span></div>
+          <div class="kpi"><span class="kpi-label">P90</span><span class="kpi-value">50 items</span></div>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">0,15 (fiable)</span></div>
+          <div class="kpi"><span class="kpi-label">Fiabilite</span><span class="kpi-value">0,45 (incertain)</span></div>
+        </div>
+        <h2>Throughput hebdomadaire</h2>
         <div class="chart-wrap"><svg viewBox="0 0 960 360"></svg></div>
       </section>
     `;
@@ -372,11 +454,37 @@ describe("simulationPdfDownload", () => {
     const pdf = pdfMocks.instances.at(-1)!;
 
     expect(pdf.setDrawColor).toHaveBeenCalled();
+    expect(pdf.setDrawColor).toHaveBeenCalledWith(0, 0, 0);
+    expect(pdf.setLineWidth).toHaveBeenCalledWith(0.26);
     expect(pdf.setFillColor).toHaveBeenCalled();
+    expect(pdf.setTextColor).toHaveBeenCalledWith(0, 0, 0);
+    expect(pdf.setTextColor).toHaveBeenCalledWith(30, 58, 138);
     expect(pdf.rect).toHaveBeenCalled();
     expect(pdf.splitTextToSize).toHaveBeenCalled();
+    expect(pdf.text).toHaveBeenCalledWith("Courbes de probabilités comparées", 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(["Optimiste :"], 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(["Arrimé :"], 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(["Friction (81%) :"], 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(["Conservateur :"], 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(["Risk Score :"], 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(["Fiabilité de l'historique :"], 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(["Règle de lecture :"], 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(expect.arrayContaining(["Fiabilite"]), expect.any(Number), expect.any(Number), { align: "center" });
+    expect(pdf.text).toHaveBeenCalledWith("Diagnostic", expect.any(Number), expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(expect.arrayContaining(["Lecture: Throughput en forte hausse sur les dernieres semaines."]), expect.any(Number), expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(expect.arrayContaining(["CV: 0,45"]), expect.any(Number), expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith("P50: 60 items", expect.any(Number), expect.any(Number), { align: "center" });
+    expect(pdf.text).toHaveBeenCalledWith("Risk Score: 0,15 (fiable)", expect.any(Number), expect.any(Number), { align: "center" });
+    expect(pdf.text).toHaveBeenCalledWith("Fiabilite: 0,45 (incertain)", expect.any(Number), expect.any(Number), { align: "center" });
+    const textCalls = pdf.text.mock.calls.map((call) => call[0]);
+    expect(textCalls.indexOf("Synthèse décisionnelle")).toBeLessThan(textCalls.indexOf("Courbes de probabilités comparées"));
+    expect(textCalls.indexOf("Courbes de probabilités comparées")).toBeLessThan(textCalls.indexOf("Hypothèses"));
     expect(pdf.svg).toHaveBeenCalledTimes(2);
-    expect(pdf.addPage).toHaveBeenCalled();
+    expect(pdf.addPage).toHaveBeenCalledTimes(1);
+    const firstChartCall = pdf.svg.mock.calls[0];
+    expect(firstChartCall?.[1]).toMatchObject({ width: expect.any(Number), height: expect.any(Number) });
+    expect((firstChartCall?.[1] as { width: number }).width).toBeGreaterThan(150);
+    expect((firstChartCall?.[1] as { height: number }).height).toBeGreaterThan(40);
     expect(pdf.save).toHaveBeenCalledWith(expect.stringMatching(/^simulation-Portefeuille-Projet-A-\d{2}_\d{2}_\d{4}\.pdf$/));
   });
 
@@ -392,7 +500,7 @@ describe("simulationPdfDownload", () => {
     await downloadPortfolioPdf(reportDoc, "Projet A");
     const pdf = pdfMocks.instances.at(-1)!;
 
-    expect(pdf.rect).not.toHaveBeenCalled();
+    expect(pdf.rect).toHaveBeenCalled();
     expect(pdf.svg).not.toHaveBeenCalled();
     expect(pdf.save).toHaveBeenCalled();
   });
@@ -438,8 +546,8 @@ describe("simulationPdfDownload", () => {
     await downloadPortfolioPdf(reportDoc, "Projet A");
     const pdf = pdfMocks.instances.at(-1)!;
 
-    expect(pdf.text).toHaveBeenCalledWith("", expect.any(Number), expect.any(Number), { align: "left" });
-    expect(pdf.text).toHaveBeenCalledWith("", expect.any(Number), expect.any(Number), { align: "center" });
+    expect(pdf.text).toHaveBeenCalledWith([""], expect.any(Number), expect.any(Number), { align: "left" });
+    expect(pdf.text).toHaveBeenCalledWith([""], expect.any(Number), expect.any(Number), { align: "center" });
   });
 
   it("uses fallback risk cell style for unrecognized risk labels", async () => {
@@ -487,7 +595,7 @@ describe("simulationPdfDownload", () => {
     reportDoc.body.innerHTML = `
       <h1>Simulation Portefeuille</h1>
       <div class="meta-row">Periode: 2026-01-01 au 2026-03-01</div>
-      <div class="hypothesis">Hypothese simple</div>
+      <div class="hypothesis"><strong>Risk Score :</strong> Hypothese simple</div>
       <div class="chart-wrap"><svg viewBox="0 0 960 360"></svg></div>
     `;
 
@@ -495,7 +603,51 @@ describe("simulationPdfDownload", () => {
     const pdf = pdfMocks.instances.at(-1)!;
 
     expect(pdf.text).toHaveBeenCalledWith("Simulation Portefeuille", 8, 8);
+    expect(pdf.text).toHaveBeenCalledWith(["Risk Score :"], 8, expect.any(Number));
     expect(pdf.save).toHaveBeenCalledWith(expect.stringMatching(/^simulation-Portefeuille-\d{2}_\d{2}_\d{4}\.pdf$/));
+  });
+
+  it("renders hypothesis branches for body-only and lead-only cases outside summary tables", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page">
+        <h1>Simulation Portefeuille</h1>
+        <div class="hypothesis"></div>
+        <div class="hypothesis">Hypothese simple</div>
+        <div class="hypothesis"><strong>Risk Score :</strong></div>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.text).toHaveBeenCalledWith(["Hypothese simple"], 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(["Risk Score :"], 8, expect.any(Number));
+  });
+
+  it("renders hypothesis branches for empty and lead-only blocks after a summary table", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page">
+        <h1>Synthese - Simulation Portefeuille</h1>
+        <table class="summary-table">
+          <thead>
+            <tr><th>Scenario</th><th>P50</th><th>P70</th><th>P90</th><th>Risk Score</th><th>Fiabilite</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Optimiste</td><td>1</td><td>2</td><td>3</td><td>0,10 (fiable)</td><td>0,11 (fiable)</td></tr>
+          </tbody>
+        </table>
+        <div class="hypothesis"></div>
+        <div class="hypothesis"><strong>Risk Score :</strong></div>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.text).toHaveBeenCalledWith("Hypothèses", 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(["Risk Score :"], 8, expect.any(Number));
   });
 
   it("covers nullish simulation export fallbacks with synthetic nodes", async () => {
@@ -513,7 +665,7 @@ describe("simulationPdfDownload", () => {
     const pdf = pdfMocks.instances.at(-1)!;
 
     expect(pdf.text).toHaveBeenCalledWith("Simulation Monte Carlo", 8, 8);
-    expect(pdf.text).toHaveBeenCalledWith(": ", 8, expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(": ", expect.any(Number), expect.any(Number), { align: "center" });
     expect(pdf.svg).toHaveBeenCalledTimes(1);
   });
 
@@ -571,6 +723,7 @@ describe("simulationPdfDownload", () => {
         setFontSize: vi.fn().mockReturnThis(),
         setTextColor: vi.fn().mockReturnThis(),
         setDrawColor: vi.fn().mockReturnThis(),
+        setLineWidth: vi.fn().mockReturnThis(),
         setFillColor: vi.fn().mockReturnThis(),
         roundedRect: vi.fn().mockReturnThis(),
         rect: vi.fn().mockReturnThis(),

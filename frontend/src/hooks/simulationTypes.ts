@@ -1,4 +1,4 @@
-import type { ForecastMode, ForecastResponse, WeeklyThroughputRow } from "../types";
+import type { ForecastMode, ForecastResponse, ThroughputReliability, WeeklyThroughputRow } from "../types";
 
 export type ChartPoint = { x: number; count: number; gauss: number };
 export type ProbabilityPoint = { x: number; probability: number };
@@ -89,6 +89,7 @@ export type PortfolioScenarioResult = {
   riskScore: number;
   riskLegend: "fiable" | "incertain" | "fragile" | "non fiable";
   distribution: DistributionBucket[];
+  throughputReliability?: ThroughputReliability | null;
 };
 
 type DistributionBucket = {

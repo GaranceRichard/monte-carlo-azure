@@ -47,3 +47,9 @@ Ce document relie chaque point vital officiel a ses preuves de test et a ses con
   - `frontend/src/components/steps/simulationPrintReport.test.ts`
   - `frontend/src/components/steps/simulationExportModules.test.ts`
   - `frontend/src/components/steps/portfolioPrintReport.test.ts`
+- Controle local recommande:
+  - `npm --prefix frontend run test:unit:coverage`
+  - `python Scripts/report_vitals_coverage.py`
+  - `powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\run-vitals-compliance.ps1 -WorkspaceRoot .`
+- Reference actuelle:
+  - `frontend_unit` / `branches`: `95.78%`

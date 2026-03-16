@@ -175,7 +175,7 @@ export function exportSimulationPrintReport({
         </section>
         <section class="kpis">
           <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(riskScoreLabel)} (${escapeHtml(riskLegend)})</span></div>
-          <div class="kpi"><span class="kpi-label">Fiabilite historique</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>
+          <div class="kpi"><span class="kpi-label">Fiabilite</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>
         </section>
         <section class="section">
           <h2>Throughput hebdomadaire</h2>
@@ -238,6 +238,5 @@ export function exportSimulationPrintReport({
     printWindow.onload = wireDownloadButton;
   }
 }
-
 
 
