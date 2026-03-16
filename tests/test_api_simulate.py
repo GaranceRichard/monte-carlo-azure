@@ -1,6 +1,7 @@
 import time
 
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from slowapi.errors import RateLimitExceeded
 from starlette.requests import Request
@@ -318,7 +319,6 @@ def test_persist_simulation_skips_when_store_disabled(monkeypatch):
 
 def test_persist_simulation_raises_503_when_store_fails(monkeypatch):
     from backend import api_routes_simulate
-    from fastapi import HTTPException
 
     fake = _FakeStore(enabled=True, fail=True)
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
