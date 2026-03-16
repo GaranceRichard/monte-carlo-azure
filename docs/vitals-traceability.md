@@ -54,7 +54,9 @@ Ce document relie chaque point vital officiel a ses preuves de test et a ses con
   - `frontend/src/components/steps/simulationExportModules.test.ts`
   - `frontend/src/components/steps/portfolioPrintReport.test.ts`
 - Controle local recommande: utiliser `npm --prefix frontend run test:unit:coverage`, `python Scripts/report_vitals_coverage.py` et `powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\run-vitals-compliance.ps1 -WorkspaceRoot .`.
-- Reference actuelle apres recalcul local:
-  - `SLA Identite`: frontend_unit / branches = `100%`, e2e / branches = `100%`
-  - `Flux onboarding critique`: frontend_unit / branches = `96.43%`, e2e / branches = `100%`
-  - `Export rapport simulation (SVG/PDF)`: frontend_unit / branches = `96.25%`
+
+Reference actuelle apres recalcul local:
+
+SLA Identite: frontend_unit / branches = 100%, e2e / branches = 100%
+Flux onboarding critique: frontend_unit / branches = 96.43%, e2e / branches = 100%
+Export rapport simulation (SVG/PDF): frontend_unit / branches = 96.25%
