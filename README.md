@@ -45,6 +45,7 @@ Comportement attendu de l'instance publique:
 - simulation Monte Carlo cote backend (`POST /simulate`)
 - visualisation des percentiles et distributions
 - badge `Démo` integre a l'en-tete des ecrans demo GitHub Pages (choix d'equipe et simulation)
+- lisibilite renforcee des graphes de simulation, y compris les etiquettes de l'axe X
 - affichage d'un `Risk Score` avec code couleur
 - export CSV du throughput hebdomadaire
 - historique local des dernieres simulations

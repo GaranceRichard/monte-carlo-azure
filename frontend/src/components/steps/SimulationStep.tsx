@@ -44,7 +44,7 @@ export default function SimulationStep({ selectedTeam, simulation }: SimulationS
               </div>
             )}
           </div>
-          <div className="min-h-0 min-w-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 xl:col-span-8">
+          <div className="min-h-0 min-w-0 overflow-visible rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 xl:col-span-8">
             <SimulationChartTabs />
           </div>
         </div>

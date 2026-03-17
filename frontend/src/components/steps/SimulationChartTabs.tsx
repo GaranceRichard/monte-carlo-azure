@@ -104,7 +104,7 @@ export default function SimulationChartTabs() {
   }
 
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden">
+    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-visible pb-2">
       {s.result ? (
         <TabsRoot value={s.activeChartTab} onValueChange={(value) => s.setActiveChartTab(value as typeof s.activeChartTab)}>
           <div className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
@@ -156,7 +156,7 @@ export default function SimulationChartTabs() {
             <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
               Chaque point représente le nombre d&apos;items terminés sur une semaine historique.
             </p>
-            <div className="h-[52vh] min-h-[320px] w-full min-w-0 overflow-hidden">
+            <div className="h-[52vh] min-h-[320px] w-full min-w-0 overflow-visible pb-6">
               <ResponsiveContainer>
                 <ComposedChart data={throughputWithMovingAverage} margin={chartMargin}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
@@ -189,7 +189,7 @@ export default function SimulationChartTabs() {
             <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
               Chaque barre représente la fréquence d&apos;une durée simulée sur l&apos;ensemble des runs.
             </p>
-            <div className="h-[52vh] min-h-[320px] w-full min-w-0 overflow-hidden">
+            <div className="h-[52vh] min-h-[320px] w-full min-w-0 overflow-visible pb-6">
               <ResponsiveContainer>
                 <ComposedChart data={s.mcHistData} margin={chartMargin}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
@@ -220,7 +220,7 @@ export default function SimulationChartTabs() {
             <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
               Cette courbe indique la probabilité cumulée pour chaque valeur possible.
             </p>
-            <div className="h-[52vh] min-h-[320px] w-full min-w-0 overflow-hidden">
+            <div className="h-[52vh] min-h-[320px] w-full min-w-0 overflow-visible pb-6">
               <ResponsiveContainer>
                 <LineChart data={s.probabilityCurveData} margin={chartMargin}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
