@@ -13,7 +13,7 @@ import {
   useAppBackspaceNavigation,
 } from "./appNavigation";
 import { applyTheme, persistTheme, resolveInitialTheme, type ThemeMode } from "./appTheme";
-import { DemoBanner, OnboardingStepper, PublicModeGate } from "./appShellSections";
+import { OnboardingStepper, PublicModeGate } from "./appShellSections";
 import "./App.css";
 
 export default function App() {
@@ -87,9 +87,9 @@ export default function App() {
           onDisconnect={handleDisconnect}
           backLabel={backLabel}
           onBack={onboardingActions.goBack}
+          showDemoBadge={runtime.isDemoMode && onboardingState.step === "simulation"}
         />
 
-        <DemoBanner isDemoMode={runtime.isDemoMode} />
         <OnboardingStepper
           isDemoMode={runtime.isDemoMode}
           step={onboardingState.step}

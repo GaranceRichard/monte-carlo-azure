@@ -113,7 +113,7 @@ jobs:
 
       - name: Build frontend for GitHub Pages
         env:
-          GITHUB_PAGES: "true"
+          VITE_GITHUB_PAGES: "true"
         run: npm run build
 
       - name: Upload GitHub Pages artifact

@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly GITHUB_PAGES?: string;
+  readonly VITE_GITHUB_PAGES?: string | boolean;
 }
 
 interface ImportMeta {

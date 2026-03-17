@@ -261,8 +261,9 @@ describe("App", () => {
       resetForTeamSelection: vi.fn(),
       resetAll: vi.fn(),
     } as never);
+
     render(<App />);
-    expect(screen.getByText(/mode démo/i)).toBeTruthy();
+    expect(screen.getByText("Démo")).toBeTruthy();
     expect(screen.queryByRole("link", { name: /Connecter un vrai compte/i })).toBeNull();
   });
 
@@ -277,7 +278,7 @@ describe("App", () => {
     expect(screen.getByText(/instance publique github pages/i)).toBeTruthy();
   });
 
-  it("shows the demo banner and hides disconnect in demo mode", () => {
+  it("shows the demo badge and hides disconnect in demo mode", () => {
     vi.mocked(resolveAppRuntime).mockReturnValue({
       isPagesBuild: true,
       mode: "demo",
@@ -294,8 +295,7 @@ describe("App", () => {
     } as never);
 
     render(<App />);
-    expect(screen.getByText(/mode démo/i)).toBeTruthy();
-    expect(screen.queryByRole("button", { name: /Se déconnecter/i })).toBeNull();
+    expect(screen.getByText("Démo")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Se dÃ©connecter/i })).toBeNull();
   });
 });
-    setStandardRuntime();

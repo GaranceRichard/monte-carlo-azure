@@ -5,6 +5,7 @@ type AppHeaderProps = {
   onDisconnect: () => void;
   backLabel?: string;
   onBack?: (() => void) | null;
+  showDemoBadge?: boolean;
 };
 
 export default function AppHeader({
@@ -14,6 +15,7 @@ export default function AppHeader({
   onDisconnect,
   backLabel = "",
   onBack = null,
+  showDemoBadge = false,
 }: AppHeaderProps) {
   return (
     <div className="mb-2 flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] px-4 py-3">
@@ -28,7 +30,14 @@ export default function AppHeader({
         </button>
         <div>
           <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Monte Carlo Studio</div>
-          <h2 className="m-0 text-lg font-extrabold text-[var(--brand-strong)]">Simulation Delivery Forecast</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="m-0 text-lg font-extrabold text-[var(--brand-strong)]">Simulation Delivery Forecast</h2>
+            {showDemoBadge && (
+              <span className="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-sky-900">
+                Démo
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

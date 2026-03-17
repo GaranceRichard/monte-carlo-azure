@@ -21,17 +21,6 @@ export function PublicModeGate({
   return renderPublicMode(mode) ?? children;
 }
 
-export function DemoBanner({ isDemoMode }: { isDemoMode: boolean }): JSX.Element | null {
-  if (!isDemoMode) return null;
-  return (
-    <div className="mb-3 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950">
-      <div>
-        <b>Vous êtes en mode démo</b> - les données sont fictives.
-      </div>
-    </div>
-  );
-}
-
 export function OnboardingStepper({
   isDemoMode,
   step,
@@ -47,7 +36,7 @@ export function OnboardingStepper({
     pat: "Connexion",
     org: deploymentTarget === "onprem" ? "Collection" : "Organisation",
     projects: "Projet",
-    teams: "Équipe",
+    teams: "Ã‰quipe",
   };
   const currentOnboardingIndex = ONBOARDING_ORDER.findIndex((entry) => entry === step);
   if (isDemoMode || currentOnboardingIndex < 0) return null;
@@ -62,7 +51,7 @@ export function OnboardingStepper({
               type="button"
               className="flow-step flow-step-btn"
               onClick={() => onStepBack(entry)}
-              title={entry === "pat" ? "Revenir au début (déconnexion)" : "Revenir à cette étape"}
+              title={entry === "pat" ? "Revenir au dÃ©but (dÃ©connexion)" : "Revenir Ã  cette Ã©tape"}
             >
               {idx + 1}. {onboardingLabels[entry]}
             </button>
@@ -74,7 +63,7 @@ export function OnboardingStepper({
         )}
       </div>
       <div className="flow-stepper-caption">
-        Étape {currentOnboardingIndex + 1} / {ONBOARDING_ORDER.length}
+        Ã‰tape {currentOnboardingIndex + 1} / {ONBOARDING_ORDER.length}
       </div>
     </div>
   );

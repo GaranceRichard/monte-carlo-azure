@@ -14,7 +14,7 @@ function readBooleanEnvFlag(value: string | boolean | undefined): boolean {
 
 export function resolveAppRuntime(search = window.location.search): AppRuntime {
   const params = new URLSearchParams(search);
-  const isPagesBuild = readBooleanEnvFlag(import.meta.env.GITHUB_PAGES);
+  const isPagesBuild = readBooleanEnvFlag(import.meta.env.VITE_GITHUB_PAGES);
   const isDemoMode = params.get("demo") === "true";
   const isConnectInfoMode = params.get("connect") === "true";
 

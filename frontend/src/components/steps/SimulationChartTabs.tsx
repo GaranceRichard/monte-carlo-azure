@@ -27,6 +27,11 @@ function getReliabilityTone(label?: string): string {
   return "border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]";
 }
 
+export function getThroughputYAxisMax(dataMax: number): number {
+  if (!Number.isFinite(dataMax) || dataMax <= 0) return 1;
+  return Math.max(1, Math.ceil(dataMax * 1.1), dataMax + 1);
+}
+
 export default function SimulationChartTabs() {
   const { selectedTeam, simulation } = useSimulationContext();
   const s = simulation;
@@ -152,7 +157,11 @@ export default function SimulationChartTabs() {
                 <ComposedChart data={throughputWithMovingAverage} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
                   <XAxis dataKey="week" tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
-                  <YAxis allowDecimals={false} tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
+                  <YAxis
+                    domain={[0, getThroughputYAxisMax]}
+                    allowDecimals={false}
+                    tick={{ fill: "var(--chart-axis)", fontSize: 12 }}
+                  />
                   <Tooltip {...s.tooltipBaseProps} content={renderThroughputTooltip} />
                   <Legend />
                   <Bar dataKey="throughput" name="Throughput" fill="var(--p90)" radius={[5, 5, 0, 0]} />
@@ -181,7 +190,7 @@ export default function SimulationChartTabs() {
                 <ComposedChart data={s.mcHistData} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
                   <XAxis dataKey="x" tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
-                  <YAxis allowDecimals={false} tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
+                  <YAxis domain={[0, "auto"]} allowDecimals={false} tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
                   <Tooltip
                     {...s.tooltipBaseProps}
                     formatter={(v, name) => {

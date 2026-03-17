@@ -1,4 +1,4 @@
-﻿import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import AppHeader from "./AppHeader";
 
 describe("AppHeader", () => {
@@ -15,6 +15,7 @@ describe("AppHeader", () => {
         onDisconnect={onDisconnect}
         backLabel="Retour"
         onBack={onBack}
+        showDemoBadge
       />,
     );
 
@@ -26,6 +27,7 @@ describe("AppHeader", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Se déconnecter" }));
     expect(onDisconnect).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Démo")).toBeInTheDocument();
   });
 
   it("does not render right-side actions when hidden", () => {
@@ -33,5 +35,6 @@ describe("AppHeader", () => {
 
     expect(screen.getByTitle("Passer en mode nuit")).toBeInTheDocument();
     expect(screen.queryByText("Se déconnecter")).not.toBeInTheDocument();
+    expect(screen.queryByText("Démo")).not.toBeInTheDocument();
   });
 });

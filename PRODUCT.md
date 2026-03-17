@@ -85,6 +85,7 @@ Processus cible :
 - l'utilisateur arrive directement sur la demo publique
 - il peut ensuite ouvrir la notice de connexion Azure DevOps
 - la demo permet d'explorer le flux et les ecrans avec des donnees preconfigurees
+- l'ecran simulation signale explicitement ce contexte via un badge `Démo` dans l'en-tete
 - la notice publique explique ensuite comment basculer vers un usage reel avec Azure DevOps
 
 Objectif produit :

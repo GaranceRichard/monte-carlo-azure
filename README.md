@@ -9,6 +9,12 @@ Demo GitHub Pages:
 - page publique: [https://garancerichard.github.io/monte-carlo-azure/](https://garancerichard.github.io/monte-carlo-azure/)
 - notice de connexion Azure DevOps: [https://garancerichard.github.io/monte-carlo-azure/?connect=true](https://garancerichard.github.io/monte-carlo-azure/?connect=true)
 
+Comportement attendu de l'instance publique:
+
+- `/` charge directement la demo publique
+- `?demo=true` force explicitement la demo publique
+- `?connect=true` affiche la notice publique de connexion Azure DevOps reelle
+
 ## En bref
 
 - cible: directeur de projet, PMO, responsables delivery et portefeuille
@@ -38,6 +44,7 @@ Demo GitHub Pages:
 - mode `Portefeuille` multi-equipes
 - simulation Monte Carlo cote backend (`POST /simulate`)
 - visualisation des percentiles et distributions
+- badge `Démo` integre a l'en-tete de simulation sur GitHub Pages
 - affichage d'un `Risk Score` avec code couleur
 - export CSV du throughput hebdomadaire
 - historique local des dernieres simulations
@@ -121,6 +128,13 @@ npm run dev
 ```
 
 UI: `http://localhost:5173`
+
+Pour emuler le build GitHub Pages localement:
+
+```powershell
+$env:VITE_GITHUB_PAGES="true"
+npm run build
+```
 
 Le frontend detecte automatiquement le mode Azure DevOps a partir de l'URL saisie :
 
