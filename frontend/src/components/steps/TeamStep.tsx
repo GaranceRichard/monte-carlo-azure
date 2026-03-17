@@ -40,6 +40,19 @@ export default function TeamStep({
       <p className="flow-text">
         Projet sélectionné: <b>{selectedProject}</b>
       </p>
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-sm text-[var(--text)]">
+        <p className="m-0">
+          Cette démo vous laisse choisir votre point d&apos;entrée. Sélectionnez une équipe puis ouvrez soit la
+          simulation détaillée, soit la vue portefeuille.
+        </p>
+        <p className="mt-3 mb-0">
+          <b>Simulation</b> : throughput hebdomadaire, percentiles, distributions, probabilités, export CSV et
+          rapport.
+        </p>
+        <p className="mt-2 mb-0">
+          <b>Portefeuille</b> : comparaison multi-équipes, scénarios consolidés et rapport PDF de synthèse.
+        </p>
+      </div>
       {err && (
         <div className="ui-alert ui-alert--danger">
           <b>Erreur :</b> {err}

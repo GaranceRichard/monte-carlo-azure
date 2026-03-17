@@ -15,6 +15,10 @@ import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "../ui/tabs";
 import { useSimulationContext } from "../../hooks/SimulationContext";
 import { computeThroughputReliability } from "../../utils/simulation";
 
+const chartMargin = { top: 8, right: 12, left: 4, bottom: 22 };
+const xAxisTick = { fill: "var(--chart-axis)", fontSize: 12 };
+const yAxisTick = { fill: "var(--chart-axis)", fontSize: 12 };
+
 function formatReliabilityMetric(value: number): string {
   return value.toFixed(2).replace(".", ",");
 }
@@ -154,13 +158,13 @@ export default function SimulationChartTabs() {
             </p>
             <div className="h-[52vh] min-h-[320px] w-full min-w-0 overflow-hidden">
               <ResponsiveContainer>
-                <ComposedChart data={throughputWithMovingAverage} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
+                <ComposedChart data={throughputWithMovingAverage} margin={chartMargin}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
-                  <XAxis dataKey="week" tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
+                  <XAxis dataKey="week" tick={xAxisTick} tickMargin={10} minTickGap={24} />
                   <YAxis
                     domain={[0, getThroughputYAxisMax]}
                     allowDecimals={false}
-                    tick={{ fill: "var(--chart-axis)", fontSize: 12 }}
+                    tick={yAxisTick}
                   />
                   <Tooltip {...s.tooltipBaseProps} content={renderThroughputTooltip} />
                   <Legend />
@@ -187,10 +191,10 @@ export default function SimulationChartTabs() {
             </p>
             <div className="h-[52vh] min-h-[320px] w-full min-w-0 overflow-hidden">
               <ResponsiveContainer>
-                <ComposedChart data={s.mcHistData} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
+                <ComposedChart data={s.mcHistData} margin={chartMargin}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
-                  <XAxis dataKey="x" tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
-                  <YAxis domain={[0, "auto"]} allowDecimals={false} tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
+                  <XAxis dataKey="x" tick={xAxisTick} tickMargin={10} minTickGap={24} />
+                  <YAxis domain={[0, "auto"]} allowDecimals={false} tick={yAxisTick} />
                   <Tooltip
                     {...s.tooltipBaseProps}
                     formatter={(v, name) => {
@@ -218,10 +222,10 @@ export default function SimulationChartTabs() {
             </p>
             <div className="h-[52vh] min-h-[320px] w-full min-w-0 overflow-hidden">
               <ResponsiveContainer>
-                <LineChart data={s.probabilityCurveData} margin={{ top: 8, right: 12, left: 4, bottom: 8 }}>
+                <LineChart data={s.probabilityCurveData} margin={chartMargin}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
-                  <XAxis dataKey="x" tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
-                  <YAxis domain={[0, 100]} tick={{ fill: "var(--chart-axis)", fontSize: 12 }} />
+                  <XAxis dataKey="x" tick={xAxisTick} tickMargin={10} minTickGap={24} />
+                  <YAxis domain={[0, 100]} tick={yAxisTick} />
                   <Tooltip
                     {...s.tooltipBaseProps}
                     formatter={(v) => [

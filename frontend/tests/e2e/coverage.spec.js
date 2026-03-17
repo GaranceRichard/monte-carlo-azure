@@ -2049,9 +2049,11 @@ test.describe("e2e istanbul coverage", () => {
   test("coverage: app demo mode", async ({ page }) => {
     await page.goto("/?demo=true");
 
-    await expect(page.getByRole("heading", { name: /Simulation Delivery Forecast/i })).toBeVisible();
-    await expect(page.getByText("Démo")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Choix de l'équipe/i })).toBeVisible();
+    await expect(page.getByText(/Cette démo vous laisse choisir votre point d'entrée/i)).toBeVisible();
     await expect(page.getByRole("link", { name: /Connecter un vrai compte/i })).toHaveCount(0);
+    await expect(page.locator("select").first()).toBeVisible();
+    await page.getByRole("button", { name: /Choisir cette équipe/i }).click();
     await expect(page.getByTestId("selected-team-card")).toBeVisible();
     await expect(page.getByTestId("selected-team-name")).toHaveText("Alpha");
 

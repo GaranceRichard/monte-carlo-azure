@@ -254,7 +254,7 @@ describe("App", () => {
       isConnectInfoMode: false,
     });
     vi.mocked(useOnboarding).mockReturnValue({
-      state: { ...buildState("simulation"), step: "simulation" },
+      state: { ...buildState("teams"), step: "teams" },
       actions: buildActions(),
     } as never);
     vi.mocked(useSimulation).mockReturnValue({
@@ -263,6 +263,7 @@ describe("App", () => {
     } as never);
 
     render(<App />);
+    expect(screen.getByRole("button", { name: "Continue Team" })).toBeTruthy();
     expect(screen.getByText("Démo")).toBeTruthy();
     expect(screen.queryByRole("link", { name: /Connecter un vrai compte/i })).toBeNull();
   });
@@ -278,7 +279,7 @@ describe("App", () => {
     expect(screen.getByText(/instance publique github pages/i)).toBeTruthy();
   });
 
-  it("shows the demo badge and hides disconnect in demo mode", () => {
+  it("shows the demo badge and hides disconnect before entering simulation in demo mode", () => {
     vi.mocked(resolveAppRuntime).mockReturnValue({
       isPagesBuild: true,
       mode: "demo",
@@ -286,7 +287,7 @@ describe("App", () => {
       isConnectInfoMode: false,
     });
     vi.mocked(useOnboarding).mockReturnValue({
-      state: { ...buildState("simulation"), step: "simulation" },
+      state: { ...buildState("teams"), step: "teams" },
       actions: buildActions(),
     } as never);
     vi.mocked(useSimulation).mockReturnValue({
@@ -296,6 +297,6 @@ describe("App", () => {
 
     render(<App />);
     expect(screen.getByText("Démo")).toBeTruthy();
-    expect(screen.queryByRole("button", { name: /Se dÃ©connecter/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Se déconnecter/i })).toBeNull();
   });
 });

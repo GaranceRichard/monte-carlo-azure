@@ -4,11 +4,13 @@ import SimulationChartTabs, { getThroughputYAxisMax } from "./SimulationChartTab
 
 const {
   yAxisCalls,
+  xAxisCalls,
   tooltipCalls,
   exportSimulationPrintReport,
   computeThroughputReliability,
 } = vi.hoisted(() => ({
   yAxisCalls: [] as Array<Record<string, unknown>>,
+  xAxisCalls: [] as Array<Record<string, unknown>>,
   tooltipCalls: [] as Array<Record<string, unknown>>,
   exportSimulationPrintReport: vi.fn(),
   computeThroughputReliability: vi.fn(),
@@ -35,7 +37,10 @@ vi.mock("recharts", () => {
     ComposedChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     LineChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     CartesianGrid: () => <div />,
-    XAxis: () => <div />,
+    XAxis: (props: Record<string, unknown>) => {
+      xAxisCalls.push(props);
+      return <div data-testid="x-axis" />;
+    },
     YAxis: (props: Record<string, unknown>) => {
       yAxisCalls.push(props);
       return <div data-testid="y-axis" />;
@@ -115,6 +120,7 @@ function buildSimulation(overrides: Partial<Record<string, unknown>> = {}) {
 describe("SimulationChartTabs", () => {
   beforeEach(() => {
     yAxisCalls.length = 0;
+    xAxisCalls.length = 0;
     tooltipCalls.length = 0;
     exportSimulationPrintReport.mockReset();
     computeThroughputReliability.mockReset();
@@ -140,10 +146,13 @@ describe("SimulationChartTabs", () => {
     render(<SimulationChartTabs />);
 
     expect(screen.getAllByTestId("y-axis")).toHaveLength(3);
+    expect(screen.getAllByTestId("x-axis")).toHaveLength(3);
     expect(yAxisCalls[0]?.domain?.[0]).toBe(0);
     expect(yAxisCalls[0]?.domain?.[1]).toBe(getThroughputYAxisMax);
     expect(yAxisCalls[1]?.domain).toEqual([0, "auto"]);
     expect(yAxisCalls[2]?.domain).toEqual([0, 100]);
+    expect(xAxisCalls[0]?.tickMargin).toBe(10);
+    expect(xAxisCalls[0]?.minTickGap).toBe(24);
   });
 
   it("renders reliability from the simulation result without recomputing it", () => {

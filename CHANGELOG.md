@@ -6,6 +6,8 @@
 
 - correction du runtime GitHub Pages via `VITE_GITHUB_PAGES` pour garantir la demo publique sur `/` et la notice sur `?connect=true`
 - remplacement du bandeau demo global par un badge `Démo` dans l'en-tete de l'ecran simulation
+- nouveau point d'entree demo sur l'ecran de choix d'equipe avec texte d'orientation simulation vs portefeuille
+- badge `Démo` visible aussi sur l'ecran de choix d'equipe en mode demo
 - axe Y des graphes throughput/distribution borne a `0` et ajout d'une marge haute sur le throughput pour eviter les barres collees au plafond
 - couverture unitaire renforcee sur `SimulationChartTabs.tsx` et scenario E2E demo aligne sur le nouveau badge
 - refactor de `App.tsx` en modules dedies: `AppFlowContent.tsx`, `appNavigation.ts`, `appShellSections.tsx`, `appTheme.ts`

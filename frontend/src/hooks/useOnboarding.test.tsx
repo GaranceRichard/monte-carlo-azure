@@ -59,10 +59,10 @@ describe("useOnboarding", () => {
     expect(resolvePatOrganizationScopeDirect).not.toHaveBeenCalled();
   });
 
-  it("bootstraps directly into demo simulation mode without network calls", () => {
+  it("bootstraps directly into demo team selection mode without network calls", () => {
     const { result } = renderHook(() => useOnboarding({ demoMode: true }));
 
-    expect(result.current.state.step).toBe("simulation");
+    expect(result.current.state.step).toBe("teams");
     expect(result.current.state.selectedOrg).toBe("Acme Corp");
     expect(result.current.state.selectedProject).toBe("Programme Titan");
     expect(result.current.state.selectedTeam).toBe("Alpha");
@@ -738,12 +738,12 @@ describe("useOnboarding", () => {
       const moved = await result.current.actions.goToProjects();
       expect(moved).toBe(true);
     });
-    expect(result.current.state.step).toBe("simulation");
+    expect(result.current.state.step).toBe("teams");
 
     act(() => {
       result.current.actions.goToStep("org");
     });
-    expect(result.current.state.step).toBe("simulation");
+    expect(result.current.state.step).toBe("teams");
 
     act(() => {
       result.current.actions.goToStep("teams");
@@ -759,7 +759,7 @@ describe("useOnboarding", () => {
       const moved = await result.current.actions.goToTeams();
       expect(moved).toBe(true);
     });
-    expect(result.current.state.step).toBe("simulation");
+    expect(result.current.state.step).toBe("teams");
 
     act(() => {
       result.current.actions.goToPortfolio();
@@ -778,10 +778,10 @@ describe("useOnboarding", () => {
     expect(result.current.state.selectedOrg).toBe("Acme Corp");
     expect(result.current.state.selectedProject).toBe("Programme Titan");
     expect(result.current.state.selectedTeam).toBe("Alpha");
-    expect(result.current.state.step).toBe("simulation");
+    expect(result.current.state.step).toBe("teams");
   });
 
-  it("keeps demo mode on simulation when submitPat is called", async () => {
+  it("keeps demo mode on team selection when submitPat is called", async () => {
     const { result } = renderHook(() => useOnboarding({ demoMode: true }));
 
     act(() => {
@@ -793,7 +793,7 @@ describe("useOnboarding", () => {
     });
 
     expect(result.current.state.err).toBe("");
-    expect(result.current.state.step).toBe("simulation");
+    expect(result.current.state.step).toBe("teams");
   });
 });
 

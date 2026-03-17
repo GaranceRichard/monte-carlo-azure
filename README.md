@@ -11,8 +11,8 @@ Demo GitHub Pages:
 
 Comportement attendu de l'instance publique:
 
-- `/` charge directement la demo publique
-- `?demo=true` force explicitement la demo publique
+- `/` charge directement la demo publique sur l'ecran de choix d'equipe
+- `?demo=true` force explicitement la demo publique sur l'ecran de choix d'equipe
 - `?connect=true` affiche la notice publique de connexion Azure DevOps reelle
 
 ## En bref
@@ -44,7 +44,7 @@ Comportement attendu de l'instance publique:
 - mode `Portefeuille` multi-equipes
 - simulation Monte Carlo cote backend (`POST /simulate`)
 - visualisation des percentiles et distributions
-- badge `Démo` integre a l'en-tete de simulation sur GitHub Pages
+- badge `Démo` integre a l'en-tete des ecrans demo GitHub Pages (choix d'equipe et simulation)
 - affichage d'un `Risk Score` avec code couleur
 - export CSV du throughput hebdomadaire
 - historique local des dernieres simulations
@@ -135,6 +135,11 @@ Pour emuler le build GitHub Pages localement:
 $env:VITE_GITHUB_PAGES="true"
 npm run build
 ```
+
+Sur GitHub Pages, la demo publique precharge les donnees puis laisse l'utilisateur choisir son point d'entree:
+
+- `Simulation` pour ouvrir une equipe et ses graphiques/detail
+- `Portefeuille` pour comparer plusieurs equipes et generer un rapport consolide
 
 Le frontend detecte automatiquement le mode Azure DevOps a partir de l'URL saisie :
 

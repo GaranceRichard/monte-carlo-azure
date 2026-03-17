@@ -57,7 +57,7 @@ export function useOnboarding({ demoMode = false }: { demoMode?: boolean } = {})
   const [sessionPat, setSessionPat] = useState(demoMode ? "demo-session" : "");
   const [sessionServerUrl, setSessionServerUrl] = useState("");
   const [deploymentTarget, setDeploymentTarget] = useState<AdoDeploymentTarget>("cloud");
-  const [step, setStep] = useState<AppStep>(demoMode ? "simulation" : "pat");
+  const [step, setStep] = useState<AppStep>(demoMode ? "teams" : "pat");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [userName, setUserName] = useState(demoMode ? "Visiteur" : "Utilisateur");
@@ -78,7 +78,7 @@ export function useOnboarding({ demoMode = false }: { demoMode?: boolean } = {})
   async function submitPat(): Promise<void> {
     if (demoMode) {
       setErr("");
-      setStep("simulation");
+      setStep("teams");
       return;
     }
     if (submitInFlightRef.current) return;
@@ -169,7 +169,9 @@ export function useOnboarding({ demoMode = false }: { demoMode?: boolean } = {})
       setSelectedOrg(DEMO_CONFIG.org);
       setProjects(DEMO_CONFIG.projects);
       setSelectedProject(DEMO_CONFIG.selectedProject);
-      setStep("simulation");
+      setTeams(DEMO_CONFIG.teams);
+      setSelectedTeam(DEMO_CONFIG.selectedTeam);
+      setStep("teams");
       return true;
     }
     const org = selectedOrg.trim();
@@ -211,7 +213,7 @@ export function useOnboarding({ demoMode = false }: { demoMode?: boolean } = {})
       setSelectedProject(DEMO_CONFIG.selectedProject);
       setTeams(DEMO_CONFIG.teams);
       setSelectedTeam(DEMO_CONFIG.selectedTeam);
-      setStep("simulation");
+      setStep("teams");
       return true;
     }
     const org = selectedOrg.trim();
@@ -297,7 +299,7 @@ export function useOnboarding({ demoMode = false }: { demoMode?: boolean } = {})
       setSelectedProject(DEMO_CONFIG.selectedProject);
       setTeams(DEMO_CONFIG.teams);
       setSelectedTeam(DEMO_CONFIG.selectedTeam);
-      setStep("simulation");
+      setStep("teams");
       setLoading(false);
       return;
     }

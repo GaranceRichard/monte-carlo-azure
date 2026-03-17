@@ -78,6 +78,9 @@ describe("TeamStep", () => {
     expect(screen.getByText("Projet s\u00E9lectionn\u00E9:")).toBeInTheDocument();
     expect(screen.getByText("\u00C9quipes disponibles")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Choisir cette \u00E9quipe" })).toBeInTheDocument();
+    expect(screen.getByText(/Cette démo vous laisse choisir votre point d'entrée/i)).toBeInTheDocument();
+    expect(screen.getAllByText((_, node) => node?.textContent?.includes("Simulation : throughput hebdomadaire") ?? false).length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, node) => node?.textContent?.includes("Portefeuille : comparaison multi-équipes") ?? false).length).toBeGreaterThan(0);
   });
 
   it("disables button while loading even with selected team", () => {

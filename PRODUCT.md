@@ -83,15 +83,17 @@ Le produit propose un parcours de demonstration publique via GitHub Pages pour p
 Processus cible :
 
 - l'utilisateur arrive directement sur la demo publique
+- il commence sur un ecran de choix d'equipe qui presente les deux parcours disponibles
 - il peut ensuite ouvrir la notice de connexion Azure DevOps
 - la demo permet d'explorer le flux et les ecrans avec des donnees preconfigurees
-- l'ecran simulation signale explicitement ce contexte via un badge `Démo` dans l'en-tete
+- les ecrans de choix d'equipe et de simulation signalent explicitement ce contexte via un badge `Démo` dans l'en-tete
 - la notice publique explique ensuite comment basculer vers un usage reel avec Azure DevOps
 
 Objectif produit :
 
 - rendre la valeur du produit visible avant toute configuration
 - montrer le flux complet sans demander de `PAT`
+- laisser l'utilisateur choisir explicitement entre une lecture equipe et une lecture portefeuille
 - separer clairement la decouverte produit du mode reel connecte a Azure DevOps
 
 ## Cas d'usage

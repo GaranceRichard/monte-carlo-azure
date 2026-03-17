@@ -87,7 +87,7 @@ export default function App() {
           onDisconnect={handleDisconnect}
           backLabel={backLabel}
           onBack={onboardingActions.goBack}
-          showDemoBadge={runtime.isDemoMode && onboardingState.step === "simulation"}
+          showDemoBadge={runtime.isDemoMode && (onboardingState.step === "teams" || onboardingState.step === "simulation")}
         />
 
         <OnboardingStepper
