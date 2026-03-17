@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import type { ForecastResponse, WeeklyThroughputRow } from "../types";
+import type { CycleTimePoint, ForecastResponse, WeeklyThroughputRow } from "../types";
 import { buildAtLeastPercentiles, buildProbabilityCurve } from "./probability";
 import type { ChartPoint, ProbabilityPoint, ThroughputPoint } from "./simulationTypes";
+import { buildCycleTimeTrendData, summarizeCycleTime } from "../utils/cycleTime";
 
 function smoothHistogramCounts(points: Array<{ x: number; count: number }>): number[] {
   if (!points.length) return [];
@@ -23,10 +24,12 @@ function smoothHistogramCounts(points: Array<{ x: number; count: number }>): num
 
 export function useSimulationChartData({
   weeklyThroughput,
+  cycleTimeData,
   includeZeroWeeks,
   result,
 }: {
   weeklyThroughput: WeeklyThroughputRow[];
+  cycleTimeData: CycleTimePoint[];
   includeZeroWeeks: boolean;
   result: ForecastResponse | null;
 }) {
@@ -37,6 +40,9 @@ export function useSimulationChartData({
       throughput: row.throughput,
     }));
   }, [weeklyThroughput, includeZeroWeeks]);
+
+  const cycleTimeTrendData = useMemo(() => buildCycleTimeTrendData(cycleTimeData), [cycleTimeData]);
+  const cycleTimeSummary = useMemo(() => summarizeCycleTime(cycleTimeData), [cycleTimeData]);
 
   const mcHistData = useMemo((): ChartPoint[] => {
     const buckets = result?.result_distribution;
@@ -84,6 +90,9 @@ export function useSimulationChartData({
 
   return {
     throughputData,
+    cycleTimeData,
+    cycleTimeTrendData,
+    cycleTimeSummary,
     mcHistData,
     probabilityCurveData,
     displayPercentiles,

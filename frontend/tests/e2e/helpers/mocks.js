@@ -41,6 +41,18 @@ export async function setupAppRoutes(page, options = {}) {
 
   const closedDates = makeClosedDates(30);
 
+  await page.route("**/simulations/history", async (route) => {
+    await route.fulfill({
+      status: 200,
+      headers: {
+        "access-control-allow-origin": "*",
+        "access-control-allow-credentials": "true",
+      },
+      contentType: "application/json",
+      body: JSON.stringify([]),
+    });
+  });
+
   await page.route("**/app.vssps.visualstudio.com/_apis/profile/profiles/me?*", async (route) => {
     counters.profileCalls += 1;
     if (cfg.profileFirstUnauthorized && counters.profileCalls === 1) {
@@ -214,6 +226,33 @@ export async function setupAppRoutes(page, options = {}) {
       fields: { "Microsoft.VSTS.Common.ClosedDate": closedDates[id - 1] || closedDates[0] },
     }));
     await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ value }) });
+  });
+
+  await page.route(/https:\/\/dev\.azure\.com\/.*\/_apis\/wit\/workItems\/\d+\/revisions\?.*/, async (route) => {
+    const match = route.request().url().match(/\/workItems\/(\d+)\/revisions/i);
+    const itemId = Number(match?.[1] ?? 1);
+    const closedDateIso = closedDates[itemId - 1] || closedDates[0];
+    const closedDate = new Date(closedDateIso);
+    const activeDate = new Date(closedDate);
+    activeDate.setUTCDate(activeDate.getUTCDate() - 8);
+    const createdDate = new Date(activeDate);
+    createdDate.setUTCDate(createdDate.getUTCDate() - 2);
+
+    await route.fulfill({
+      status: 200,
+      headers: {
+        "access-control-allow-origin": "*",
+        "access-control-allow-credentials": "true",
+      },
+      contentType: "application/json",
+      body: JSON.stringify({
+        value: [
+          { fields: { "System.State": "New", "System.ChangedDate": createdDate.toISOString() } },
+          { fields: { "System.State": "Active", "System.ChangedDate": activeDate.toISOString() } },
+          { fields: { "System.State": "Done", "System.ChangedDate": closedDate.toISOString() } },
+        ],
+      }),
+    });
   });
 
   await page.route("**/simulate", async (route) => {

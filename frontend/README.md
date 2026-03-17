@@ -83,6 +83,7 @@ Le frontend couvre notamment :
   - `src/appTheme.ts` pour le theme
 - `src/api.ts` reste un wrapper fin; les normalisations et fallbacks vivent dans `src/apiHelpers.ts`
 - `src/hooks/simulationForecastService.ts` reste la facade forecast publique; les branches metier sont dans `src/hooks/simulationForecastCore.ts`
+- `src/utils/cycleTime.ts` porte le calcul et les tendances du cycle time pour les onglets simulation et l'export
 
 ## Contraintes d'architecture
 

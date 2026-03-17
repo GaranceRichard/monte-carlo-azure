@@ -46,6 +46,7 @@ Comportement attendu de l'instance publique:
 - visualisation des percentiles et distributions
 - badge `Démo` integre a l'en-tete des ecrans demo GitHub Pages (choix d'equipe et simulation)
 - lisibilite renforcee des graphes de simulation, y compris les etiquettes de l'axe X
+- calcul du `cycleTime` extrait dans un utilitaire dedie avec couverture unitaire ciblee
 - affichage d'un `Risk Score` avec code couleur
 - export CSV du throughput hebdomadaire
 - historique local des dernieres simulations
@@ -155,6 +156,8 @@ En on-prem, l'URL attendue est l'URL serveur + collection, par exemple :
 - `https://devops700.itp.extra/700`
 
 Le detail du flux Cloud / on-prem est documente dans [`frontend/README.md`](frontend/README.md).
+
+En E2E local, Playwright force aussi `VITE_API_BASE=http://127.0.0.1:8000` pour garder les mocks backend coherents avec les appels `simulate` et `simulations/history`.
 
 ### Mode manuel en 5 terminaux
 

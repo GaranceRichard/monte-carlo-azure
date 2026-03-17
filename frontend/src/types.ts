@@ -24,6 +24,12 @@ export type WeeklyThroughputRow = {
   throughput: number;
 };
 
+export type CycleTimePoint = {
+  week: string;
+  cycleTime: number;
+  count: number;
+};
+
 export type ThroughputReliabilityLabel = "fiable" | "incertain" | "fragile" | "non fiable";
 
 export type ThroughputReliability = {

@@ -1,6 +1,6 @@
-import { getWeeklyThroughputDirect } from "../adoClient";
+import { getTeamDeliveryDataDirect } from "../adoClient";
 import { postSimulate } from "../api";
-import { DEMO_CONFIG, getDemoThroughputSamples, getDemoWeeklyThroughput } from "../demoData";
+import { DEMO_CONFIG, getDemoCycleTime, getDemoThroughputSamples, getDemoWeeklyThroughput } from "../demoData";
 import type {
   ForecastHistogramBucket,
   ForecastRequestPayload,
@@ -39,6 +39,7 @@ export async function fetchTeamThroughputCore(
     const throughputSamples = getDemoThroughputSamples(selectedTeam).filter((n) => (includeZeroWeeks ? n >= 0 : n > 0));
     return {
       weeklyThroughput: weekly,
+      cycleTimeData: getDemoCycleTime(selectedTeam),
       throughputSamples,
       sampleStats: {
         totalWeeks: weekly.length,
@@ -48,7 +49,7 @@ export async function fetchTeamThroughputCore(
     };
   }
 
-  const throughputResponse = await getWeeklyThroughputDirect(
+  const throughputResponse = await getTeamDeliveryDataDirect(
     selectedOrg,
     selectedProject,
     selectedTeam,
@@ -59,8 +60,8 @@ export async function fetchTeamThroughputCore(
     types,
     serverUrl,
   );
-  const weekly = Array.isArray(throughputResponse) ? throughputResponse : throughputResponse.weeklyThroughput;
-  const warning = Array.isArray(throughputResponse) ? undefined : throughputResponse.warning;
+  const weekly = throughputResponse.weeklyThroughput;
+  const warning = throughputResponse.warning;
   const throughputSamples = weekly.map((r) => r.throughput).filter((n) => (includeZeroWeeks ? n >= 0 : n > 0));
   const zeroWeeks = weekly.filter((r) => r.throughput === 0).length;
   const sampleStats: SampleStats = {
@@ -76,6 +77,7 @@ export async function fetchTeamThroughputCore(
 
   return {
     weeklyThroughput: weekly,
+    cycleTimeData: throughputResponse.cycleTimeData,
     throughputSamples,
     sampleStats,
     warning,
@@ -211,16 +213,17 @@ export async function runSimulationForecastCore(
     doneStates: [...doneStates],
     sampleStats: throughputData.sampleStats,
     weeklyThroughput: throughputData.weeklyThroughput,
+    cycleTimeData: throughputData.cycleTimeData,
     result: adjusted,
     warning: throughputData.warning,
   };
 
   return {
     weeklyThroughput: throughputData.weeklyThroughput,
+    cycleTimeData: throughputData.cycleTimeData,
     sampleStats: throughputData.sampleStats,
     result: adjusted,
     historyEntry,
     warning: throughputData.warning,
   };
 }
-

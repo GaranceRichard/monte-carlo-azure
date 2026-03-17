@@ -15,7 +15,7 @@ export default function SimulationModeAndParametersControls() {
             onMouseDown={keepSelectDropdownAtTop}
             onChange={(e) => {
               s.setSimulationMode(e.target.value as "backlog_to_weeks" | "weeks_to_items");
-              s.setActiveChartTab("throughput");
+              s.setActiveChartTab("cycle_time");
             }}
             className="sim-input sim-input--compact"
           >

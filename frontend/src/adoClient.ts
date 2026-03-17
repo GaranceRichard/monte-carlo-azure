@@ -1,4 +1,5 @@
 import { formatDateLocal } from "./date";
+import type { CycleTimePoint } from "./types";
 import {
   formatAdoHttpErrorMessage,
   toAdoHttpError,
@@ -12,6 +13,7 @@ import {
   listOnPremCollectionCandidates,
   normalizeAdoServerUrl,
 } from "./adoPlatform";
+import { calculateCycleTimeData } from "./utils/cycleTime";
 
 const ADO = "https://dev.azure.com";
 const VSSPS = "https://app.vssps.visualstudio.com";
@@ -33,6 +35,7 @@ type TeamFieldValue = { value?: string; includeChildren?: boolean };
 type ProfileMe = { id?: string; publicAlias?: string; displayName?: string };
 type WeeklyThroughputRow = { week: string; throughput: number };
 type WeeklyThroughputResponse = WeeklyThroughputRow[] | { weeklyThroughput: WeeklyThroughputRow[]; warning?: string };
+type TeamDeliveryDataResponse = { weeklyThroughput: WeeklyThroughputRow[]; cycleTimeData: CycleTimePoint[]; warning?: string };
 type ResolvedPatProfile = {
   displayName: string;
   id: string;
@@ -71,6 +74,14 @@ function buildCompletionDateFilter(startDate: string, endDate: string): string {
         AND [Microsoft.VSTS.Common.ResolvedDate] <= '${endDate}'
       )
     )`;
+}
+
+function toWeekKey(dateValue: string): string | null {
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return null;
+  const monday = new Date(date);
+  monday.setDate(date.getDate() - ((date.getDay() + 6) % 7));
+  return formatDateLocal(monday);
 }
 
 function getAdoRuntimeContext(serverUrl?: string, collectionName?: string): AdoRuntimeContext {
@@ -441,6 +452,36 @@ export async function getWeeklyThroughputDirect(
   workItemTypes: string[],
   serverUrl?: string,
 ): Promise<WeeklyThroughputResponse> {
+  const deliveryData = await getTeamDeliveryDataDirect(
+    org,
+    project,
+    team,
+    pat,
+    startDate,
+    endDate,
+    doneStates,
+    workItemTypes,
+    serverUrl,
+  );
+
+  if (!deliveryData.warning) return deliveryData.weeklyThroughput;
+  return {
+    weeklyThroughput: deliveryData.weeklyThroughput,
+    warning: deliveryData.warning,
+  };
+}
+
+export async function getTeamDeliveryDataDirect(
+  org: string,
+  project: string,
+  team: string,
+  pat: string,
+  startDate: string,
+  endDate: string,
+  doneStates: string[],
+  workItemTypes: string[],
+  serverUrl?: string,
+): Promise<TeamDeliveryDataResponse> {
   const runtime = getAdoRuntimeContext(serverUrl, org);
   const api = getApiVersionQuery(runtime);
   const teamAreaFilter = await getTeamAreaPathFilterClause(org, project, team, pat, serverUrl);
@@ -480,14 +521,16 @@ export async function getWeeklyThroughputDirect(
 
   const wiqlData = await wiqlResp.json();
   const items: { id: number }[] = wiqlData.workItems ?? [];
-  if (!items.length) return [];
+  if (!items.length) return { weeklyThroughput: [], cycleTimeData: [] };
 
   const ids = items.map((i) => i.id);
   const batches: number[][] = [];
   for (let i = 0; i < ids.length; i += 200) batches.push(ids.slice(i, i + 200));
 
   const allItems: { completionDate: string }[] = [];
+  const cycleTimeItems: Array<{ revisions: Array<{ changedDate: string; state: string }> }> = [];
   const batchFailures: { status: number | null; statusText: string }[] = [];
+  const cycleTimeFailures: { status: number | null; statusText: string }[] = [];
   await Promise.all(
     batches.map(async (batch) => {
       const itemContext: AdoErrorContext = {
@@ -516,21 +559,55 @@ export async function getWeeklyThroughputDirect(
       }
 
       const d = await r.json();
-      (d.value ?? []).forEach((item: { fields?: Record<string, string> }) => {
-        const completionDate =
-          item.fields?.["Microsoft.VSTS.Common.ClosedDate"] ||
-          item.fields?.["Microsoft.VSTS.Common.ResolvedDate"];
-        if (completionDate) allItems.push({ completionDate });
-      });
+      await Promise.all(
+        (d.value ?? []).map(async (item: { id?: number; fields?: Record<string, string> }) => {
+          const completionDate =
+            item.fields?.["Microsoft.VSTS.Common.ClosedDate"] ||
+            item.fields?.["Microsoft.VSTS.Common.ResolvedDate"];
+          if (completionDate) allItems.push({ completionDate });
+          if (!item.id) return;
+
+          const revisionContext: AdoErrorContext = {
+            operation: "chargement des revisions de work items",
+            org,
+            project,
+            team,
+            requiredScopes: ["Work Items (Read)"],
+          };
+
+          let revisionResponse: Response;
+          try {
+            revisionResponse = await adoFetch(
+              `${runtime.collectionUrl}/${encodeURIComponent(project)}/_apis/wit/workItems/${item.id}/revisions?fields=System.State,System.ChangedDate&${api}`,
+              { headers: adoHeaders(pat) },
+              revisionContext,
+            );
+          } catch {
+            cycleTimeFailures.push({ status: null, statusText: "erreur reseau" });
+            return;
+          }
+
+          if (!revisionResponse.ok) {
+            cycleTimeFailures.push({ status: revisionResponse.status, statusText: revisionResponse.statusText });
+            return;
+          }
+
+          const revisionData = await revisionResponse.json();
+          cycleTimeItems.push({
+            revisions: (revisionData.value ?? []).map((revision: { fields?: Record<string, string> }) => ({
+              changedDate: revision.fields?.["System.ChangedDate"] ?? "",
+              state: revision.fields?.["System.State"] ?? "",
+            })),
+          });
+        }),
+      );
     }),
   );
 
   const weekMap = new Map<string, number>();
   allItems.forEach(({ completionDate }) => {
-    const d = new Date(completionDate);
-    const monday = new Date(d);
-    monday.setDate(d.getDate() - ((d.getDay() + 6) % 7));
-    const key = formatDateLocal(monday);
+    const key = toWeekKey(completionDate);
+    if (!key) return;
     weekMap.set(key, (weekMap.get(key) ?? 0) + 1);
   });
 
@@ -545,27 +622,52 @@ export async function getWeeklyThroughputDirect(
     cursor.setDate(cursor.getDate() + 7);
   }
 
-  if (!batchFailures.length) return result;
-
-  const firstFailure = batchFailures[0];
-  const firstFailureDetail = firstFailure.status === null
-    ? "erreur reseau"
-    : formatAdoHttpErrorMessage(
-      firstFailure.status,
-      {
-        operation: "chargement des work items par lots",
-        org,
-        project,
-        team,
-        requiredScopes: ["Work Items (Read)"],
-      },
-      firstFailure.statusText,
+  const warnings: string[] = [];
+  if (batchFailures.length) {
+    const firstFailure = batchFailures[0];
+    const firstFailureDetail = firstFailure.status === null
+      ? "erreur reseau"
+      : formatAdoHttpErrorMessage(
+        firstFailure.status,
+        {
+          operation: "chargement des work items par lots",
+          org,
+          project,
+          team,
+          requiredScopes: ["Work Items (Read)"],
+        },
+        firstFailure.statusText,
+      );
+    warnings.push(
+      `${batchFailures.length}/${batches.length} lot(s) de work items n'ont pas pu etre charges. ` +
+        `La simulation utilise un historique partiel. Exemple: ${firstFailureDetail}`,
     );
+  }
+
+  if (cycleTimeFailures.length) {
+    const firstFailure = cycleTimeFailures[0];
+    const firstFailureDetail = firstFailure.status === null
+      ? "erreur reseau"
+      : formatAdoHttpErrorMessage(
+        firstFailure.status,
+        {
+          operation: "chargement des revisions de work items",
+          org,
+          project,
+          team,
+          requiredScopes: ["Work Items (Read)"],
+        },
+        firstFailure.statusText,
+      );
+    warnings.push(
+      `${cycleTimeFailures.length} revision(s) de work items n'ont pas pu etre chargees pour le cycle time. ` +
+        `Exemple: ${firstFailureDetail}`,
+    );
+  }
 
   return {
     weeklyThroughput: result,
-    warning:
-      `${batchFailures.length}/${batches.length} lot(s) de work items n'ont pas pu etre charges. ` +
-      `La simulation utilise un historique partiel. Exemple: ${firstFailureDetail}`,
+    cycleTimeData: calculateCycleTimeData(cycleTimeItems, doneStates),
+    warning: warnings.length ? warnings.join(" ") : undefined,
   };
 }

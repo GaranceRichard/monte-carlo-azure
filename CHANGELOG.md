@@ -4,6 +4,9 @@
 
 ### Frontend
 
+- extraction et tests dedies du calcul de `cycleTime` via `src/utils/cycleTime.ts`
+- harmonisation du rendu `Cycle Time` avec les autres onglets graphiques, y compris legendes et libelles metier
+- durcissement des mocks Playwright pour couvrir aussi l'historique client `/simulations/history` et les revisions Azure DevOps utilisees par le calcul de `cycleTime`
 - correction du runtime GitHub Pages via `VITE_GITHUB_PAGES` pour garantir la demo publique sur `/` et la notice sur `?connect=true`
 - remplacement du bandeau demo global par un badge `Démo` dans l'en-tete de l'ecran simulation
 - nouveau point d'entree demo sur l'ecran de choix d'equipe avec texte d'orientation simulation vs portefeuille

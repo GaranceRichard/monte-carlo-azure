@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type {
   AppStep,
+  CycleTimePoint,
   ForecastResponse,
   WeeklyThroughputRow,
 } from "../types";
@@ -113,11 +114,13 @@ export function useSimulation({
   const [types, setTypes] = useState<string[]>([]);
   const [result, setResult] = useState<ForecastResponse | null>(null);
   const [weeklyThroughput, setWeeklyThroughput] = useState<WeeklyThroughputRow[]>([]);
-  const [activeChartTab, setActiveChartTab] = useState<ChartTab>("throughput");
+  const [cycleTimeData, setCycleTimeData] = useState<CycleTimePoint[]>([]);
+  const [activeChartTab, setActiveChartTab] = useState<ChartTab>("cycle_time");
   const [hasLaunchedOnce, setHasLaunchedOnce] = useState(false);
 
-  const { throughputData, mcHistData, probabilityCurveData, displayPercentiles } = useSimulationChartData({
+  const { throughputData, cycleTimeData: cycleTimeChartData, cycleTimeTrendData, cycleTimeSummary, mcHistData, probabilityCurveData, displayPercentiles } = useSimulationChartData({
     weeklyThroughput,
+    cycleTimeData,
     includeZeroWeeks,
     result,
   });
@@ -181,9 +184,10 @@ export function useSimulation({
   const clearComputedSimulationState = useCallback(() => {
     setResult(null);
     setWeeklyThroughput([]);
+    setCycleTimeData([]);
     setSampleStats(null);
     setWarning("");
-    setActiveChartTab("throughput");
+    setActiveChartTab("cycle_time");
   }, []);
 
   const onInvalidFilters = useCallback(() => {
@@ -236,6 +240,7 @@ export function useSimulation({
       });
       setSampleStats(forecast.sampleStats);
       setWeeklyThroughput(forecast.weeklyThroughput);
+      setCycleTimeData(forecast.cycleTimeData);
       setResult(forecast.result);
       setWarning(forecast.warning ?? "");
       pushSimulationHistory(forecast.historyEntry);
@@ -328,8 +333,9 @@ export function useSimulation({
     setDoneStates(entry.doneStates);
     setSampleStats(entry.sampleStats);
     setWeeklyThroughput(entry.weeklyThroughput);
+    setCycleTimeData(entry.cycleTimeData ?? []);
     setResult(entry.result);
-    setActiveChartTab("throughput");
+    setActiveChartTab("cycle_time");
     setHasLaunchedOnce(true);
     resetAutoRunState();
   }
@@ -377,6 +383,9 @@ export function useSimulation({
     activeChartTab,
     setActiveChartTab,
     throughputData,
+    cycleTimeData: cycleTimeChartData,
+    cycleTimeTrendData,
+    cycleTimeSummary,
     mcHistData,
     probabilityCurveData,
     tooltipBaseProps: TOOLTIP_BASE_PROPS,

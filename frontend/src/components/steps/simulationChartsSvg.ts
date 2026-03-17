@@ -4,6 +4,20 @@ export type ThroughputExportPoint = {
   movingAverage: number;
 };
 
+export type CycleTimeExportPoint = {
+  week: string;
+  cycleTime: number;
+  count: number;
+};
+
+export type CycleTimeTrendExportPoint = {
+  week: string;
+  average: number;
+  lowerBound: number;
+  upperBound: number;
+  itemCount: number;
+};
+
 export type DistributionExportPoint = {
   x: number;
   count: number;
@@ -69,6 +83,22 @@ function linePathFromPoints(
   return points
     .map((point, index) => `${index === 0 ? "M" : "L"} ${xScale(point.x).toFixed(2)} ${yScale(point.y).toFixed(2)}`)
     .join(" ");
+}
+
+function areaPathFromRanges(
+  points: Array<{ x: number; lower: number; upper: number }>,
+  xScale: (value: number) => number,
+  yScale: (value: number) => number,
+): string {
+  if (!points.length) return "";
+  const upperPath = points
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${xScale(point.x).toFixed(2)} ${yScale(point.upper).toFixed(2)}`)
+    .join(" ");
+  const lowerPath = [...points]
+    .reverse()
+    .map((point) => `L ${xScale(point.x).toFixed(2)} ${yScale(point.lower).toFixed(2)}`)
+    .join(" ");
+  return `${upperPath} ${lowerPath} Z`;
 }
 
 function renderEmptyChart(title: string): string {
@@ -141,6 +171,66 @@ export function renderThroughputChart(points: ThroughputExportPoint[]): string {
       ${bars}
       <path d="${throughputPath}" fill="none" stroke="#2563eb" stroke-width="2" />
       <path d="${averagePath}" fill="none" stroke="#f97316" stroke-width="2.5" stroke-dasharray="8 4" />
+      ${xLabels}
+    </svg>
+  `;
+}
+
+export function renderCycleTimeChart(points: CycleTimeExportPoint[], trendPoints: CycleTimeTrendExportPoint[]): string {
+  if (!points.length || !trendPoints.length) return renderEmptyChart("Cycle Time");
+
+  const weeks = trendPoints.map((point) => point.week);
+  const weekIndex = new Map(weeks.map((week, index) => [week, index]));
+  const plotWidth = CHART_WIDTH - MARGIN.left - MARGIN.right;
+  const plotHeight = CHART_HEIGHT - MARGIN.top - MARGIN.bottom;
+  const maxY = niceMax(
+    Math.max(
+      ...points.map((point) => point.cycleTime),
+      ...trendPoints.map((point) => point.upperBound),
+    ),
+  );
+  const yScale = (value: number) => MARGIN.top + plotHeight - (Math.max(0, value) / maxY) * plotHeight;
+  const xStep = weeks.length > 1 ? plotWidth / (weeks.length - 1) : 0;
+  const xScale = (index: number) => MARGIN.left + index * xStep;
+  const yTicks = Array.from({ length: 5 }, (_, i) => (maxY * i) / 4);
+  const tickStep = Math.max(1, Math.ceil(weeks.length / 8));
+  const maxCount = Math.max(...points.map((point) => point.count), 1);
+
+  const bandPath = areaPathFromRanges(
+    trendPoints.map((point, index) => ({ x: index, lower: point.lowerBound, upper: point.upperBound })),
+    xScale,
+    yScale,
+  );
+  const averagePath = linePath(
+    trendPoints.map((point) => point.average),
+    yScale,
+    xScale,
+  );
+  const circles = points
+    .map((point) => {
+      const index = weekIndex.get(point.week);
+      if (index == null) return "";
+      const radius = 4 + (point.count / maxCount) * 7;
+      return `<circle cx="${xScale(index).toFixed(2)}" cy="${yScale(point.cycleTime).toFixed(2)}" r="${radius.toFixed(2)}" fill="#2563eb" fill-opacity="0.65" stroke="#1d4ed8" stroke-width="1.2" />`;
+    })
+    .join("");
+  const xLabels = weeks
+    .map((week, index) =>
+      index % tickStep === 0 || index === weeks.length - 1
+        ? `<text x="${xScale(index)}" y="${CHART_HEIGHT - 12}" text-anchor="middle" fill="#6b7280" font-size="10">${escapeHtml(week)}</text>`
+        : "",
+    )
+    .join("");
+
+  return `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" role="img" aria-label="Cycle Time">
+      <rect x="0" y="0" width="${CHART_WIDTH}" height="${CHART_HEIGHT}" fill="#ffffff" />
+      ${renderGridAndYAxis(yTicks, yScale)}
+      <line x1="${MARGIN.left}" y1="${MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
+      <line x1="${MARGIN.left}" y1="${MARGIN.top + plotHeight}" x2="${CHART_WIDTH - MARGIN.right}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
+      <path d="${bandPath}" fill="#93c5fd" fill-opacity="0.35" stroke="none" />
+      <path d="${averagePath}" fill="none" stroke="#f97316" stroke-width="2.5" />
+      ${circles}
       ${xLabels}
     </svg>
   `;

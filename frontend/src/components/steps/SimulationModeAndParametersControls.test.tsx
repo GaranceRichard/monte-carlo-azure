@@ -114,7 +114,7 @@ describe("SimulationModeAndParametersControls", () => {
 
     expect(selectTopMocks.keepSelectDropdownAtTop).toHaveBeenCalledTimes(2);
     expect(spies.setSimulationMode).toHaveBeenCalledWith("weeks_to_items");
-    expect(spies.setActiveChartTab).toHaveBeenCalledWith("throughput");
+    expect(spies.setActiveChartTab).toHaveBeenCalledWith("cycle_time");
     expect(spies.setIncludeZeroWeeks).toHaveBeenCalledWith(true);
     expect(spies.setNSims).toHaveBeenCalledWith("30000");
     expect(screen.getByText("Semaines ciblées")).not.toBeNull();

@@ -1,7 +1,10 @@
 import {
+  renderCycleTimeChart,
   renderDistributionChart,
   renderProbabilityChart,
   renderThroughputChart,
+  type CycleTimeExportPoint,
+  type CycleTimeTrendExportPoint,
   type DistributionExportPoint,
   type ProbabilityExportPoint,
   type ThroughputExportPoint,
@@ -51,6 +54,8 @@ export function exportSimulationPrintReport({
   resultKind,
   displayPercentiles,
   throughputReliability,
+  cycleTimePoints,
+  cycleTimeTrendPoints,
   throughputPoints,
   distributionPoints,
   probabilityPoints,
@@ -68,6 +73,8 @@ export function exportSimulationPrintReport({
   resultKind: "items" | "weeks";
   displayPercentiles: Record<string, number>;
   throughputReliability?: ThroughputReliability;
+  cycleTimePoints: CycleTimeExportPoint[];
+  cycleTimeTrendPoints: CycleTimeTrendExportPoint[];
   throughputPoints: ThroughputExportPoint[];
   distributionPoints: DistributionExportPoint[];
   probabilityPoints: ProbabilityExportPoint[];
@@ -75,6 +82,7 @@ export function exportSimulationPrintReport({
   const printWindow = window.open("about:blank", "_blank");
   if (!printWindow) return;
 
+  const cycleTimeSvg = renderCycleTimeChart(cycleTimePoints, cycleTimeTrendPoints);
   const throughputSvg = renderThroughputChart(throughputPoints);
   const distributionSvg = renderDistributionChart(distributionPoints);
   const probabilitySvg = renderProbabilityChart(probabilityPoints);
@@ -180,6 +188,11 @@ export function exportSimulationPrintReport({
           <div class="kpi"><span class="kpi-label">Fiabilite</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>
         </section>
         <section class="section">
+          <h2>Cycle Time</h2>
+          <div class="chart-wrap">${cycleTimeSvg}</div>
+        </section>
+
+        <section class="section">
           <h2>Throughput hebdomadaire</h2>
           <div class="chart-wrap">${throughputSvg}</div>
         </section>
@@ -240,4 +253,3 @@ export function exportSimulationPrintReport({
     printWindow.onload = wireDownloadButton;
   }
 }
-

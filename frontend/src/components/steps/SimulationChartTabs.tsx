@@ -1,5 +1,6 @@
 ﻿import { useMemo } from "react";
 import {
+  Area,
   Bar,
   CartesianGrid,
   ComposedChart,
@@ -23,6 +24,11 @@ function formatReliabilityMetric(value: number): string {
   return value.toFixed(2).replace(".", ",");
 }
 
+function formatCycleTimeMetric(value: number | null): string {
+  if (value == null || !Number.isFinite(value)) return "-";
+  return value.toFixed(2).replace(".", ",");
+}
+
 function getReliabilityTone(label?: string): string {
   if (label === "fiable") return "border-emerald-600 bg-emerald-50 text-emerald-700";
   if (label === "incertain") return "border-amber-500 bg-amber-50 text-amber-700";
@@ -34,6 +40,11 @@ function getReliabilityTone(label?: string): string {
 export function getThroughputYAxisMax(dataMax: number): number {
   if (!Number.isFinite(dataMax) || dataMax <= 0) return 1;
   return Math.max(1, Math.ceil(dataMax * 1.1), dataMax + 1);
+}
+
+export function getCycleTimeYAxisMax(dataMax: number): number {
+  if (!Number.isFinite(dataMax) || dataMax <= 0) return 1;
+  return Math.max(1, Number((dataMax * 1.1).toFixed(1)));
 }
 
 export default function SimulationChartTabs() {
@@ -58,6 +69,31 @@ export default function SimulationChartTabs() {
   }, [s.result?.throughput_reliability, s.throughputData]);
 
   const reliabilityTone = useMemo(() => getReliabilityTone(reliability?.label), [reliability?.label]);
+  const cycleTimeChartData = useMemo(() => {
+    const observedByWeek = new Map<string, { weightedSum: number; count: number }>();
+    s.cycleTimeData.forEach((point) => {
+      const current = observedByWeek.get(point.week) ?? { weightedSum: 0, count: 0 };
+      current.weightedSum += point.cycleTime * point.count;
+      current.count += point.count;
+      observedByWeek.set(point.week, current);
+    });
+
+    return s.cycleTimeTrendData.map((point) => {
+      const observed = observedByWeek.get(point.week);
+      const observedAverage =
+        observed && observed.count > 0 ? Number((observed.weightedSum / observed.count).toFixed(2)) : null;
+      return {
+        week: point.week,
+        average: point.average,
+        lowerBound: point.lowerBound,
+        upperBound: point.upperBound,
+        bandBase: point.lowerBound,
+        bandRange: Math.max(0, Number((point.upperBound - point.lowerBound).toFixed(2))),
+        observedAverage,
+        itemCount: point.itemCount,
+      };
+    });
+  }, [s.cycleTimeData, s.cycleTimeTrendData]);
 
   const renderThroughputTooltip = ({
     active,
@@ -80,6 +116,34 @@ export default function SimulationChartTabs() {
     );
   };
 
+  const renderCycleTimeTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
+    active?: boolean;
+    payload?: ReadonlyArray<{ dataKey?: string; value?: number | null; payload?: { itemCount?: number } }>;
+    label?: string | number;
+  }) => {
+    if (!active || !payload?.length) return null;
+    const averagePoint = payload.find((p) => p.dataKey === "average");
+    const observedPoint = payload.find((p) => p.dataKey === "observedAverage");
+    const itemCount = averagePoint?.payload?.itemCount ?? 0;
+
+    return (
+      <div style={{ background: "var(--panel)", border: "1px solid var(--border)", borderRadius: 10, padding: "8px 10px" }}>
+        <div style={{ color: "var(--muted)", fontWeight: 700, marginBottom: 4 }}>{label}</div>
+        <div style={{ color: "var(--text)", fontWeight: 700 }}>
+          moyenne glissante: {formatCycleTimeMetric(Number(averagePoint?.value ?? 0))} sem
+        </div>
+        <div style={{ color: "var(--text)", fontWeight: 700 }}>
+          cycle time observé: {formatCycleTimeMetric(observedPoint?.value == null ? null : Number(observedPoint.value))} sem
+        </div>
+        <div style={{ color: "var(--muted)", fontWeight: 700, marginTop: 4 }}>{itemCount} items</div>
+      </div>
+    );
+  };
+
   async function handleExportReport(): Promise<void> {
     if (!s.result) return;
     const { exportSimulationPrintReport } = await import("./simulationPrintReport");
@@ -97,6 +161,8 @@ export default function SimulationChartTabs() {
       resultKind: s.result.result_kind,
       displayPercentiles: s.displayPercentiles,
       throughputReliability: reliability,
+      cycleTimePoints: s.cycleTimeData,
+      cycleTimeTrendPoints: s.cycleTimeTrendData,
       throughputPoints: throughputWithMovingAverage,
       distributionPoints: s.mcHistData,
       probabilityPoints: s.probabilityCurveData,
@@ -109,6 +175,7 @@ export default function SimulationChartTabs() {
         <TabsRoot value={s.activeChartTab} onValueChange={(value) => s.setActiveChartTab(value as typeof s.activeChartTab)}>
           <div className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <TabsList>
+              <TabsTrigger value="cycle_time">Cycle Time</TabsTrigger>
               <TabsTrigger value="throughput">Throughput</TabsTrigger>
               <TabsTrigger value="distribution">Distribution</TabsTrigger>
               <TabsTrigger value="probability">Probabilités</TabsTrigger>
@@ -141,6 +208,75 @@ export default function SimulationChartTabs() {
             </div>
           </div>
 
+          <TabsContent value="cycle_time">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3 text-center">
+                <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Items</div>
+                <div className="mt-1 text-lg font-extrabold text-[var(--text)]">{s.cycleTimeSummary.itemCount}</div>
+              </div>
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3 text-center">
+                <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Cycle Time moyen</div>
+                <div className="mt-1 text-lg font-extrabold text-[var(--text)]">
+                  {formatCycleTimeMetric(s.cycleTimeSummary.average)} sem
+                </div>
+              </div>
+            </div>
+            {s.cycleTimeSummary.hasSufficientData ? (
+              <div className="sim-chart-wrap h-[52vh] min-h-[320px] pb-6">
+                <ResponsiveContainer>
+                  <ComposedChart data={cycleTimeChartData} margin={chartMargin}>
+                    <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
+                    <XAxis dataKey="week" tick={xAxisTick} tickMargin={10} minTickGap={24} />
+                    <YAxis domain={[0, getCycleTimeYAxisMax]} tick={yAxisTick} />
+                    <Tooltip {...s.tooltipBaseProps} content={renderCycleTimeTooltip} />
+                    <Legend />
+                    <Area
+                      type="monotone"
+                      dataKey="bandBase"
+                      stackId="cycle-band"
+                      stroke="transparent"
+                      fill="transparent"
+                      legendType="none"
+                      isAnimationActive={false}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="bandRange"
+                      stackId="cycle-band"
+                      name="Variabilité"
+                      stroke="transparent"
+                      fill="var(--p90)"
+                      fillOpacity={0.2}
+                      legendType="none"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="average"
+                      dot={false}
+                      strokeWidth={2.5}
+                      stroke="var(--brand)"
+                      name="Moyenne glissante"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="observedAverage"
+                      dot={{ r: 4, fill: "var(--p70)", stroke: "var(--p70)" }}
+                      strokeWidth={2}
+                      stroke="var(--p70)"
+                      strokeDasharray="8 4"
+                      name="Cycle time observé"
+                      connectNulls
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="grid h-[52vh] min-h-[320px] place-items-center rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface-2)] p-6 text-center text-[var(--muted)]">
+                Donnees insuffisantes pour afficher le cycle time. Au moins 2 semaines avec items termines sont requises.
+              </div>
+            )}
+          </TabsContent>
+
           <TabsContent value="throughput">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <h4 className="m-0 text-base font-bold">Throughput hebdomadaire</h4>
@@ -156,7 +292,7 @@ export default function SimulationChartTabs() {
             <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
               Chaque point représente le nombre d&apos;items terminés sur une semaine historique.
             </p>
-            <div className="h-[52vh] min-h-[320px] w-full min-w-0 overflow-visible pb-6">
+            <div className="sim-chart-wrap h-[52vh] min-h-[320px] pb-6">
               <ResponsiveContainer>
                 <ComposedChart data={throughputWithMovingAverage} margin={chartMargin}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
@@ -189,7 +325,7 @@ export default function SimulationChartTabs() {
             <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
               Chaque barre représente la fréquence d&apos;une durée simulée sur l&apos;ensemble des runs.
             </p>
-            <div className="h-[52vh] min-h-[320px] w-full min-w-0 overflow-visible pb-6">
+            <div className="sim-chart-wrap h-[52vh] min-h-[320px] pb-6">
               <ResponsiveContainer>
                 <ComposedChart data={s.mcHistData} margin={chartMargin}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />
@@ -220,7 +356,7 @@ export default function SimulationChartTabs() {
             <p className="mb-3 mt-1 text-sm text-[var(--muted)]">
               Cette courbe indique la probabilité cumulée pour chaque valeur possible.
             </p>
-            <div className="h-[52vh] min-h-[320px] w-full min-w-0 overflow-visible pb-6">
+            <div className="sim-chart-wrap h-[52vh] min-h-[320px] pb-6">
               <ResponsiveContainer>
                 <LineChart data={s.probabilityCurveData} margin={chartMargin}>
                   <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" />

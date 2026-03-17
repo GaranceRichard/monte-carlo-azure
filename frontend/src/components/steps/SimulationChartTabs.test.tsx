@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import SimulationChartTabs, { getThroughputYAxisMax } from "./SimulationChartTabs";
+import SimulationChartTabs, { getCycleTimeYAxisMax, getThroughputYAxisMax } from "./SimulationChartTabs";
 
 const {
   yAxisCalls,
@@ -36,6 +36,7 @@ vi.mock("recharts", () => {
     ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     ComposedChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     LineChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    Area: () => <div />,
     CartesianGrid: () => <div />,
     XAxis: (props: Record<string, unknown>) => {
       xAxisCalls.push(props);
@@ -49,7 +50,10 @@ vi.mock("recharts", () => {
       tooltipCalls.push(props);
       return <div data-testid="tooltip" />;
     },
-    Legend: () => <div />,
+    Legend: ({ content }: { content?: (() => React.ReactNode) | React.ReactNode }) => {
+      if (typeof content === "function") return <>{content()}</>;
+      return <div>{content}</div>;
+    },
     Bar: () => <div />,
     Line: () => <div />,
   };
@@ -85,11 +89,20 @@ function buildSimulation(overrides: Partial<Record<string, unknown>> = {}) {
         samples_count: 12,
       },
     },
-    activeChartTab: "throughput",
+    activeChartTab: "cycle_time",
     setActiveChartTab: vi.fn(),
     exportThroughputCsv: vi.fn(),
     resetForTeamSelection: vi.fn(),
     tooltipBaseProps: { cursor: false },
+    cycleTimeData: [
+      { week: "2026-W01", cycleTime: 1.2, count: 2 },
+      { week: "2026-W02", cycleTime: 1.8, count: 1 },
+    ],
+    cycleTimeTrendData: [
+      { week: "2026-W01", average: 1.2, lowerBound: 1.2, upperBound: 1.2, itemCount: 2 },
+      { week: "2026-W02", average: 1.4, lowerBound: 1.1, upperBound: 1.7, itemCount: 3 },
+    ],
+    cycleTimeSummary: { itemCount: 3, average: 1.4, hasSufficientData: true },
     throughputData: [
       { week: "2026-W01", throughput: 1 },
       { week: "2026-W02", throughput: 3 },
@@ -145,12 +158,14 @@ describe("SimulationChartTabs", () => {
   it("adds headroom to throughput while keeping zero-based Y axes", () => {
     render(<SimulationChartTabs />);
 
-    expect(screen.getAllByTestId("y-axis")).toHaveLength(3);
-    expect(screen.getAllByTestId("x-axis")).toHaveLength(3);
+    expect(screen.getAllByTestId("y-axis")).toHaveLength(4);
+    expect(screen.getAllByTestId("x-axis")).toHaveLength(4);
     expect(yAxisCalls[0]?.domain?.[0]).toBe(0);
-    expect(yAxisCalls[0]?.domain?.[1]).toBe(getThroughputYAxisMax);
-    expect(yAxisCalls[1]?.domain).toEqual([0, "auto"]);
-    expect(yAxisCalls[2]?.domain).toEqual([0, 100]);
+    expect(yAxisCalls[0]?.domain?.[1]).toBe(getCycleTimeYAxisMax);
+    expect(yAxisCalls[1]?.domain?.[0]).toBe(0);
+    expect(yAxisCalls[1]?.domain?.[1]).toBe(getThroughputYAxisMax);
+    expect(yAxisCalls[2]?.domain).toEqual([0, "auto"]);
+    expect(yAxisCalls[3]?.domain).toEqual([0, 100]);
     expect(xAxisCalls[0]?.tickMargin).toBe(10);
     expect(xAxisCalls[0]?.minTickGap).toBe(24);
   });
@@ -160,6 +175,22 @@ describe("SimulationChartTabs", () => {
 
     expect(screen.getByText(/Fiabilite fiable · CV 0,12/i)).toBeInTheDocument();
     expect(computeThroughputReliability).not.toHaveBeenCalled();
+  });
+
+  it("renders cycle time kpis in the first tab", () => {
+    render(<SimulationChartTabs />);
+
+    expect(screen.getByText("Cycle Time")).toBeInTheDocument();
+    expect(screen.getByText("Items")).toBeInTheDocument();
+    expect(screen.getByText("3")).toBeInTheDocument();
+    expect(screen.getByText("1,40 sem")).toBeInTheDocument();
+  });
+
+  it("renders the cycle time chart inside the shared chart wrapper", () => {
+    const { container } = render(<SimulationChartTabs />);
+
+    const cycleTimeWrap = container.querySelector(".sim-chart-wrap");
+    expect(cycleTimeWrap).not.toBeNull();
   });
 
   it("computes reliability from throughput data when missing from the result", () => {
@@ -225,6 +256,8 @@ describe("SimulationChartTabs", () => {
           targetWeeks: 4,
           nSims: 1000,
           resultKind: "weeks",
+          cycleTimePoints: simulation.cycleTimeData,
+          cycleTimeTrendPoints: simulation.cycleTimeTrendData,
           throughputPoints: expect.arrayContaining([
             expect.objectContaining({ week: "2026-W03", throughput: 5, movingAverage: 3 }),
           ]),
@@ -238,9 +271,22 @@ describe("SimulationChartTabs", () => {
   it("provides tooltip callbacks for throughput, distribution and probability charts", () => {
     render(<SimulationChartTabs />);
 
-    const throughputTooltip = tooltipCalls[0];
-    const distributionTooltip = tooltipCalls[1];
-    const probabilityTooltip = tooltipCalls[2];
+    const cycleTimeTooltip = tooltipCalls[0];
+    const throughputTooltip = tooltipCalls[1];
+    const distributionTooltip = tooltipCalls[2];
+    const probabilityTooltip = tooltipCalls[3];
+
+    expect(
+      cycleTimeTooltip.content({
+        active: true,
+        label: "2026-W02",
+        payload: [
+          { dataKey: "average", value: 1.4, payload: { itemCount: 3 } },
+          { dataKey: "observedAverage", value: 1.8 },
+        ],
+      }),
+    ).toBeTruthy();
+    expect(cycleTimeTooltip.content({ active: false, payload: [] })).toBeNull();
 
     expect(throughputTooltip.cursor).toBe(false);
     expect(
@@ -287,7 +333,22 @@ describe("SimulationChartTabs", () => {
     render(<SimulationChartTabs />);
 
     expect(screen.getByText("Probabilité d'atteindre au moins X items")).toBeInTheDocument();
-    expect(tooltipCalls[2].formatter(55.1)).toEqual(["55.1%", "P(X >= valeur)"]);
+    expect(tooltipCalls[3].formatter(55.1)).toEqual(["55.1%", "P(X >= valeur)"]);
+  });
+
+  it("renders an explicit message when cycle time data is insufficient", () => {
+    simulationContextValue = {
+      selectedTeam: "Team Alpha",
+      simulation: buildSimulation({
+        cycleTimeData: [{ week: "2026-W01", cycleTime: 1.2, count: 1 }],
+        cycleTimeTrendData: [{ week: "2026-W01", average: 1.2, lowerBound: 1.2, upperBound: 1.2, itemCount: 1 }],
+        cycleTimeSummary: { itemCount: 1, average: 1.2, hasSufficientData: false },
+      }),
+    };
+
+    render(<SimulationChartTabs />);
+
+    expect(screen.getByText(/Donnees insuffisantes pour afficher le cycle time/i)).toBeInTheDocument();
   });
 
   it("computes a readable upper bound for throughput", () => {
@@ -295,5 +356,12 @@ describe("SimulationChartTabs", () => {
     expect(getThroughputYAxisMax(3)).toBe(4);
     expect(getThroughputYAxisMax(10)).toBe(11);
     expect(getThroughputYAxisMax(Number.NaN)).toBe(1);
+  });
+
+  it("computes a readable upper bound for cycle time", () => {
+    expect(getCycleTimeYAxisMax(0)).toBe(1);
+    expect(getCycleTimeYAxisMax(2)).toBe(2.2);
+    expect(getCycleTimeYAxisMax(10)).toBe(11);
+    expect(getCycleTimeYAxisMax(Number.NaN)).toBe(1);
   });
 });

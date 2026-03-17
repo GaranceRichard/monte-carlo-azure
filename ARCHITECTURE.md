@@ -63,6 +63,8 @@ frontend/
       usePortfolioReport.ts        # generation rapport portefeuille
       simulationForecastService.ts # facade forecast exposee au reste du front
       simulationForecastCore.ts    # logique forecast extraite et testee
+    utils/
+      cycleTime.ts        # calcul et tendances du cycle time cote frontend
     components/steps/
       SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
       simulationPrintReport.tsx    # rapport imprimable
@@ -194,9 +196,11 @@ Frontend:
 - orchestration App allegée via `src/AppFlowContent.tsx`, `src/appNavigation.ts`, `src/appShellSections.tsx` et `src/appTheme.ts`
 - facade API allegee via `src/apiHelpers.ts` pour conserver des perimetres vitals plus stables
 - logique forecast scindee entre facade `src/hooks/simulationForecastService.ts` et coeur `src/hooks/simulationForecastCore.ts`
+- calcul du cycle time extrait dans `src/utils/cycleTime.ts` avec couverture unitaire ciblee
 - quick filters persistants par scope `org::project::team`
 - mode portefeuille avec rapport PDF multi-scenarios
 - generation de rapport parallelisee avec tolerance aux echecs partiels
+- mocks E2E Playwright elargis pour couvrir aussi `/simulations/history` et les revisions de work items
 
 Backend/tests:
 

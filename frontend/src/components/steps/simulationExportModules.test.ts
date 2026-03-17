@@ -1,9 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  renderCycleTimeChart,
   renderDistributionChart,
   renderOverlayProbabilityChart,
   renderProbabilityChart,
   renderThroughputChart,
+  type CycleTimeExportPoint,
+  type CycleTimeTrendExportPoint,
   type DistributionExportPoint,
   type ProbabilityExportPoint,
   type ThroughputExportPoint,
@@ -61,6 +64,24 @@ function buildThroughputPoints(count: number): ThroughputExportPoint[] {
   }));
 }
 
+function buildCycleTimePoints(count: number): CycleTimeExportPoint[] {
+  return Array.from({ length: count }, (_, i) => ({
+    week: `2025-01-${String((i % 6) + 1).padStart(2, "0")}`,
+    cycleTime: 1.2 + i * 0.35,
+    count: (i % 3) + 1,
+  }));
+}
+
+function buildCycleTimeTrendPoints(count: number): CycleTimeTrendExportPoint[] {
+  return Array.from({ length: count }, (_, i) => ({
+    week: `2025-01-${String(i + 1).padStart(2, "0")}`,
+    average: 1.5 + i * 0.2,
+    lowerBound: 1.2 + i * 0.2,
+    upperBound: 1.8 + i * 0.2,
+    itemCount: i + 2,
+  }));
+}
+
 function buildDistributionPoints(count: number): DistributionExportPoint[] {
   return Array.from({ length: count }, (_, i) => ({
     x: count - i,
@@ -78,9 +99,19 @@ function buildProbabilityPoints(count: number): ProbabilityExportPoint[] {
 
 describe("simulationChartsSvg", () => {
   it("renders empty state for all charts when no points", () => {
+    expect(renderCycleTimeChart([], [])).toContain("Donnees insuffisantes");
     expect(renderThroughputChart([])).toContain("Donnees insuffisantes");
     expect(renderDistributionChart([])).toContain("Donnees insuffisantes");
     expect(renderProbabilityChart([])).toContain("Donnees insuffisantes");
+  });
+
+  it("renders cycle time chart with scatter points and shaded band", () => {
+    const svg = renderCycleTimeChart(buildCycleTimePoints(6), buildCycleTimeTrendPoints(4));
+
+    expect(svg).toContain("Cycle Time");
+    expect(svg).toContain("<circle");
+    expect(svg).toContain("fill-opacity=\"0.35\"");
+    expect(svg).toContain("stroke=\"#f97316\"");
   });
 
   it("renders throughput chart with escaped x labels and sparse ticks", () => {

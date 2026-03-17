@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchTeamThroughput, runSimulationForecast, simulateForecastFromSamples } from "./simulationForecastService";
-import { getWeeklyThroughputDirect } from "../adoClient";
+import { getTeamDeliveryDataDirect } from "../adoClient";
 import { postSimulate } from "../api";
 
 vi.mock("../adoClient", () => ({
-  getWeeklyThroughputDirect: vi.fn(),
+  getTeamDeliveryDataDirect: vi.fn(),
 }));
 
 vi.mock("../api", () => ({
@@ -67,7 +67,7 @@ function baseParams(overrides: Partial<Parameters<typeof runSimulationForecast>[
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(getWeeklyThroughputDirect).mockResolvedValue(WEEKLY_6);
+  vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({ weeklyThroughput: WEEKLY_6, cycleTimeData: [] });
   vi.mocked(postSimulate).mockResolvedValue(API_RESPONSE_WEEKS);
 });
 
@@ -88,9 +88,10 @@ describe("demo mode et normalisation", () => {
     });
 
     expect(result.weeklyThroughput.length).toBeGreaterThan(0);
+    expect(result.cycleTimeData.length).toBeGreaterThan(0);
     expect(result.sampleStats.totalWeeks).toBe(result.weeklyThroughput.length);
     expect(result.sampleStats.zeroWeeks).toBe(0);
-    expect(vi.mocked(getWeeklyThroughputDirect)).not.toHaveBeenCalled();
+    expect(vi.mocked(getTeamDeliveryDataDirect)).not.toHaveBeenCalled();
   });
 
   it("filters out zero weeks in demo mode when includeZeroWeeks is false", async () => {
@@ -164,10 +165,11 @@ describe("demo mode et normalisation", () => {
 
 describe("appels réseau", () => {
   it("utilise la forme objet weeklyThroughput + warning quand ADO renvoie un warning", async () => {
-    vi.mocked(getWeeklyThroughputDirect).mockResolvedValue({
+    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({
       weeklyThroughput: WEEKLY_6,
+      cycleTimeData: [],
       warning: "lots partiellement ignores",
-    } as never);
+    });
 
     const result = await runSimulationForecast(baseParams());
 
@@ -176,11 +178,11 @@ describe("appels réseau", () => {
     expect(result.sampleStats.usedWeeks).toBe(6);
   });
 
-  it("appelle getWeeklyThroughputDirect avec les bons paramètres", async () => {
+  it("appelle getTeamDeliveryDataDirect avec les bons parametres", async () => {
     await runSimulationForecast(baseParams());
 
-    expect(getWeeklyThroughputDirect).toHaveBeenCalledOnce();
-    expect(getWeeklyThroughputDirect).toHaveBeenCalledWith(
+    expect(getTeamDeliveryDataDirect).toHaveBeenCalledOnce();
+    expect(getTeamDeliveryDataDirect).toHaveBeenCalledWith(
       "org-a",
       "Projet A",
       "Equipe Alpha",
@@ -282,7 +284,7 @@ describe("appels réseau", () => {
 
 describe("filtrage des throughput samples", () => {
   it("exclut les semaines à 0 quand includeZeroWeeks = false", async () => {
-    vi.mocked(getWeeklyThroughputDirect).mockResolvedValue([
+    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({ weeklyThroughput: [
       { week: "2025-01-06", throughput: 0 },
       { week: "2025-01-13", throughput: 5 },
       { week: "2025-01-20", throughput: 7 },
@@ -290,7 +292,7 @@ describe("filtrage des throughput samples", () => {
       { week: "2025-02-03", throughput: 6 },
       { week: "2025-02-10", throughput: 8 },
       { week: "2025-02-17", throughput: 5 },
-    ]);
+    ], cycleTimeData: [] });
 
     const result = await runSimulationForecast(baseParams({ includeZeroWeeks: false }));
 
@@ -305,14 +307,14 @@ describe("filtrage des throughput samples", () => {
   });
 
   it("inclut les semaines à 0 quand includeZeroWeeks = true", async () => {
-    vi.mocked(getWeeklyThroughputDirect).mockResolvedValue([
+    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({ weeklyThroughput: [
       { week: "2025-01-06", throughput: 0 },
       { week: "2025-01-13", throughput: 5 },
       { week: "2025-01-20", throughput: 7 },
       { week: "2025-01-27", throughput: 4 },
       { week: "2025-02-03", throughput: 6 },
       { week: "2025-02-10", throughput: 8 },
-    ]);
+    ], cycleTimeData: [] });
 
     const result = await runSimulationForecast(baseParams({ includeZeroWeeks: true }));
 
@@ -328,31 +330,31 @@ describe("filtrage des throughput samples", () => {
 
 describe("seuil d'historique insuffisant", () => {
   it("lève une erreur si moins de 6 semaines non nulles", async () => {
-    vi.mocked(getWeeklyThroughputDirect).mockResolvedValue([
+    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({ weeklyThroughput: [
       { week: "2025-01-06", throughput: 0 },
       { week: "2025-01-13", throughput: 5 },
       { week: "2025-01-20", throughput: 7 },
       { week: "2025-01-27", throughput: 4 },
       { week: "2025-02-03", throughput: 6 },
-    ]);
+    ], cycleTimeData: [] });
 
     await expect(runSimulationForecast(baseParams({ includeZeroWeeks: false }))).rejects.toThrow("Historique insuffisant");
     expect(postSimulate).not.toHaveBeenCalled();
   });
 
   it("lève une erreur si moins de 6 semaines au total", async () => {
-    vi.mocked(getWeeklyThroughputDirect).mockResolvedValue([
+    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({ weeklyThroughput: [
       { week: "2025-01-06", throughput: 3 },
       { week: "2025-01-13", throughput: 5 },
       { week: "2025-01-20", throughput: 4 },
-    ]);
+    ], cycleTimeData: [] });
 
     await expect(runSimulationForecast(baseParams({ includeZeroWeeks: true }))).rejects.toThrow("Historique insuffisant");
     expect(postSimulate).not.toHaveBeenCalled();
   });
 
   it("renvoie un message lisible", async () => {
-    vi.mocked(getWeeklyThroughputDirect).mockResolvedValue([{ week: "2025-01-06", throughput: 3 }]);
+    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({ weeklyThroughput: [{ week: "2025-01-06", throughput: 3 }], cycleTimeData: [] });
 
     await expect(runSimulationForecast(baseParams())).rejects.toThrow("Elargissez la periode");
   });
@@ -364,7 +366,7 @@ describe("seuil d'historique insuffisant", () => {
 
 describe("sampleStats", () => {
   it("calcule correctement totalWeeks, zeroWeeks et usedWeeks", async () => {
-    vi.mocked(getWeeklyThroughputDirect).mockResolvedValue([
+    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({ weeklyThroughput: [
       { week: "2025-01-06", throughput: 0 },
       { week: "2025-01-13", throughput: 0 },
       { week: "2025-01-20", throughput: 5 },
@@ -373,7 +375,7 @@ describe("sampleStats", () => {
       { week: "2025-02-10", throughput: 6 },
       { week: "2025-02-17", throughput: 8 },
       { week: "2025-02-24", throughput: 5 },
-    ]);
+    ], cycleTimeData: [] });
 
     const { sampleStats } = await runSimulationForecast(baseParams({ includeZeroWeeks: false }));
 
@@ -447,12 +449,13 @@ describe("historyEntry", () => {
 
     expect(historyEntry.types).toEqual(["Bug"]);
     expect(historyEntry.doneStates).toEqual(["Done"]);
+    expect(historyEntry.cycleTimeData).toEqual([]);
   });
 });
 
 describe("propagation des erreurs réseau", () => {
-  it("propage l'erreur si getWeeklyThroughputDirect échoue", async () => {
-    vi.mocked(getWeeklyThroughputDirect).mockRejectedValue(new Error("Erreur réseau ADO"));
+  it("propage l'erreur si getTeamDeliveryDataDirect echoue", async () => {
+    vi.mocked(getTeamDeliveryDataDirect).mockRejectedValue(new Error("Erreur réseau ADO"));
 
     await expect(runSimulationForecast(baseParams())).rejects.toThrow("Erreur réseau ADO");
     expect(postSimulate).not.toHaveBeenCalled();
@@ -488,8 +491,9 @@ describe("cohérence du résultat retourné", () => {
   });
 
   it("propage un warning de données partielles", async () => {
-    vi.mocked(getWeeklyThroughputDirect).mockResolvedValue({
+    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({
       weeklyThroughput: WEEKLY_6,
+      cycleTimeData: [],
       warning: "1/3 lot(s) de work items n'ont pas pu etre charges.",
     });
 

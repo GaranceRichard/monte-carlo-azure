@@ -1,5 +1,5 @@
 import { formatDateLocal } from "./date";
-import type { NamedEntity } from "./types";
+import type { CycleTimePoint, NamedEntity } from "./types";
 import type { TeamPortfolioConfig } from "./hooks/usePortfolioReport";
 
 const DEMO_START_DATE = "2025-11-24";
@@ -23,6 +23,29 @@ function buildWeeklyThroughputRows(startDate: string, samples: number[]) {
   });
 }
 
+function buildDemoCycleTimeRows(
+  weeklyRows: { week: string; throughput: number }[],
+  profile: {
+    base: number;
+    spread: number;
+    throughputWeight: number;
+  },
+): CycleTimePoint[] {
+  return weeklyRows.flatMap((row, index) => {
+    if (row.throughput <= 0) return [];
+    const baseCycleTime = Math.max(0.4, profile.base - row.throughput * profile.throughputWeight);
+    const lowCycleTime = Number(Math.max(0.2, baseCycleTime - profile.spread + ((index % 3) - 1) * 0.12).toFixed(2));
+    const highCycleTime = Number((baseCycleTime + profile.spread + ((index % 2) * 0.14)).toFixed(2));
+    const primaryCount = Math.max(1, Math.round(row.throughput * 0.65));
+    const secondaryCount = row.throughput - primaryCount;
+
+    return [
+      { week: row.week, cycleTime: lowCycleTime, count: primaryCount },
+      ...(secondaryCount > 0 ? [{ week: row.week, cycleTime: highCycleTime, count: secondaryCount }] : []),
+    ];
+  });
+}
+
 export const DEMO_ORG = "Acme Corp";
 export const DEMO_PROJECT = "Programme Titan";
 export const DEMO_TEAM_SAMPLES: Record<string, number[]> = {
@@ -37,6 +60,11 @@ export const DEMO_ORGS: NamedEntity[] = [{ name: DEMO_ORG }];
 export const DEMO_TEAM_WEEKLY: Record<string, { week: string; throughput: number }[]> = Object.fromEntries(
   Object.entries(DEMO_TEAM_SAMPLES).map(([teamName, samples]) => [teamName, buildWeeklyThroughputRows(DEMO_START_DATE, samples)]),
 );
+export const DEMO_TEAM_CYCLE_TIME: Record<string, CycleTimePoint[]> = {
+  Alpha: buildDemoCycleTimeRows(DEMO_TEAM_WEEKLY.Alpha, { base: 2.1, spread: 0.35, throughputWeight: 0.08 }),
+  Beta: buildDemoCycleTimeRows(DEMO_TEAM_WEEKLY.Beta, { base: 3.4, spread: 0.95, throughputWeight: 0.06 }),
+  Gamma: buildDemoCycleTimeRows(DEMO_TEAM_WEEKLY.Gamma, { base: 3.9, spread: 0.7, throughputWeight: 0.05 }),
+};
 
 export const DEMO_TEAM_OPTIONS = {
   workItemTypes: DEMO_WORK_ITEM_TYPES,
@@ -75,4 +103,8 @@ export function getDemoWeeklyThroughput(teamName: string): { week: string; throu
 
 export function getDemoThroughputSamples(teamName: string): number[] {
   return [...(DEMO_TEAM_SAMPLES[teamName] ?? [])];
+}
+
+export function getDemoCycleTime(teamName: string): CycleTimePoint[] {
+  return (DEMO_TEAM_CYCLE_TIME[teamName] ?? []).map((row) => ({ ...row }));
 }

@@ -65,6 +65,16 @@ function buildBaseArgs() {
     resultKind: "weeks" as const,
     displayPercentiles: { P50: 8, P70: 10, P90: 13 },
     throughputReliability: { cv: 0.62, iqr_ratio: 0.55, slope_norm: -0.07, label: "incertain" as const, samples_count: 10 },
+    cycleTimePoints: [
+      { week: "2025-01-06", cycleTime: 1.4, count: 2 },
+      { week: "2025-01-13", cycleTime: 1.9, count: 1 },
+      { week: "2025-01-20", cycleTime: 2.2, count: 2 },
+    ],
+    cycleTimeTrendPoints: [
+      { week: "2025-01-06", average: 1.4, lowerBound: 1.4, upperBound: 1.4, itemCount: 2 },
+      { week: "2025-01-13", average: 1.57, lowerBound: 1.33, upperBound: 1.8, itemCount: 3 },
+      { week: "2025-01-20", average: 1.8, lowerBound: 1.47, upperBound: 2.13, itemCount: 5 },
+    ],
     throughputPoints: [
       { week: "2025-01-06", throughput: 7, movingAverage: 7 },
       { week: "2025-01-13", throughput: 5, movingAverage: 6 },
@@ -90,7 +100,7 @@ describe("exportSimulationPrintReport", () => {
     pdfMocks.nextSvgError = null;
   });
 
-  it("writes report HTML containing 3 chart SVGs and a download button", () => {
+  it("writes report HTML containing 4 chart SVGs and a download button", () => {
     let writtenHtml = "";
     const openMock = vi.fn();
     const writeMock = vi.fn((html: string) => {
@@ -111,6 +121,7 @@ describe("exportSimulationPrintReport", () => {
     expect(openMock).toHaveBeenCalledTimes(1);
     expect(writeMock).toHaveBeenCalledTimes(1);
     expect(closeMock).toHaveBeenCalledTimes(1);
+    expect(writtenHtml).toContain("Cycle Time");
     expect(writtenHtml).toContain("Throughput hebdomadaire");
     expect(writtenHtml).toContain("Distribution Monte Carlo");
     expect(writtenHtml).toContain("Courbe de probabilite");
@@ -123,7 +134,7 @@ describe("exportSimulationPrintReport", () => {
     expect(writtenHtml).toContain('<span class="kpi-value">0,62 (incertain)</span>');
     expect(writtenHtml).toContain("Throughput en baisse sur les dernieres semaines.");
     expect(writtenHtml).toContain('id="download-pdf"');
-    expect((writtenHtml.match(/<svg/g) || []).length).toBeGreaterThanOrEqual(3);
+    expect((writtenHtml.match(/<svg/g) || []).length).toBeGreaterThanOrEqual(4);
     expect(typeof fakeWindow.onload).toBe("function");
   });
 
@@ -148,12 +159,14 @@ describe("exportSimulationPrintReport", () => {
       types: [],
       doneStates: [],
       throughputReliability: undefined,
+      cycleTimePoints: [],
+      cycleTimeTrendPoints: [],
       throughputPoints: [],
       distributionPoints: [],
       probabilityPoints: [],
     });
 
-    expect((writtenHtml.match(/Donnees insuffisantes pour afficher ce graphique/g) || []).length).toBe(3);
+    expect((writtenHtml.match(/Donnees insuffisantes pour afficher ce graphique/g) || []).length).toBe(4);
     expect(writtenHtml).toContain("&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;");
     expect(writtenHtml).not.toContain(`<script>alert("x")</script>`);
     expect(writtenHtml).toContain("Non disponible");

@@ -18,6 +18,10 @@ export default defineConfig({
   },
   webServer: {
     command: `npm run dev -- --host 127.0.0.1 --port ${webPort}`,
+    env: {
+      ...process.env,
+      VITE_API_BASE: process.env.VITE_API_BASE || "http://127.0.0.1:8000",
+    },
     port: webPort,
     reuseExistingServer,
     timeout: 60_000,

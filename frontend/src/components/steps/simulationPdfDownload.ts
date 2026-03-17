@@ -2,7 +2,7 @@ import { jsPDF } from "jspdf";
 import "svg2pdf.js";
 import { CHART_HEIGHT, CHART_WIDTH } from "./simulationChartsSvg";
 
-const SECTION_TITLES = ["Throughput hebdomadaire", "Distribution Monte Carlo", "Courbe de probabilité"];
+const SECTION_TITLES = ["Cycle Time", "Throughput hebdomadaire", "Distribution Monte Carlo", "Courbe de probabilité"];
 const SUMMARY_TABLE_COLUMN_RATIOS: Record<number, number[]> = {
   5: [0.28, 0.12, 0.12, 0.12, 0.36],
   6: [0.24, 0.12, 0.12, 0.12, 0.2, 0.2],

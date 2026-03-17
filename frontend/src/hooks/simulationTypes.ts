@@ -1,8 +1,20 @@
-import type { ForecastMode, ForecastResponse, ThroughputReliability, WeeklyThroughputRow } from "../types";
+import type { CycleTimePoint, ForecastMode, ForecastResponse, ThroughputReliability, WeeklyThroughputRow } from "../types";
 
 export type ChartPoint = { x: number; count: number; gauss: number };
 export type ProbabilityPoint = { x: number; probability: number };
 export type ThroughputPoint = { week: string; throughput: number };
+export type CycleTimeTrendPoint = {
+  week: string;
+  average: number;
+  lowerBound: number;
+  upperBound: number;
+  itemCount: number;
+};
+export type CycleTimeSummary = {
+  itemCount: number;
+  average: number | null;
+  hasSufficientData: boolean;
+};
 
 export type TooltipBaseProps = {
   cursor: boolean;
@@ -44,6 +56,7 @@ export type SimulationHistoryEntry = {
   doneStates: string[];
   sampleStats: SampleStats | null;
   weeklyThroughput: WeeklyThroughputRow[];
+  cycleTimeData?: CycleTimePoint[];
   result: ForecastResponse;
   warning?: string;
 };
@@ -72,13 +85,16 @@ export type SimulationResult = {
   result: ForecastResponse | null;
   displayPercentiles: Record<string, number>;
   throughputData: ThroughputPoint[];
+  cycleTimeData: CycleTimePoint[];
+  cycleTimeTrendData: CycleTimeTrendPoint[];
+  cycleTimeSummary: CycleTimeSummary;
   mcHistData: ChartPoint[];
   probabilityCurveData: ProbabilityPoint[];
   sampleStats: SampleStats | null;
   warning: string;
 };
 
-export type ChartTab = "throughput" | "distribution" | "probability";
+export type ChartTab = "cycle_time" | "throughput" | "distribution" | "probability";
 
 export type PortfolioScenarioResult = {
   label: "Optimiste" | `Arrime (${number}%)` | `Friction (${number}%)` | "Conservateur";

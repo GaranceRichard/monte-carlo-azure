@@ -26,6 +26,7 @@ export type RunSimulationForecastParams = {
 
 export type RunSimulationForecastResult = {
   weeklyThroughput: SimulationHistoryEntry["weeklyThroughput"];
+  cycleTimeData: NonNullable<SimulationHistoryEntry["cycleTimeData"]>;
   sampleStats: SampleStats;
   result: ForecastResponse;
   historyEntry: SimulationHistoryEntry;
@@ -34,6 +35,7 @@ export type RunSimulationForecastResult = {
 
 export type FetchTeamThroughputResult = {
   weeklyThroughput: SimulationHistoryEntry["weeklyThroughput"];
+  cycleTimeData: NonNullable<SimulationHistoryEntry["cycleTimeData"]>;
   throughputSamples: number[];
   sampleStats: SampleStats;
   warning?: string;
@@ -81,4 +83,3 @@ export function simulateForecastFromSamples(params: SimulateFromSamplesParams): 
 export function runSimulationForecast(params: RunSimulationForecastParams): Promise<RunSimulationForecastResult> {
   return runSimulationForecastCore(params);
 }
-

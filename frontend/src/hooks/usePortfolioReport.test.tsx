@@ -17,6 +17,7 @@ vi.mock("../components/steps/portfolioPrintReport", () => ({
 
 const throughputData = {
   weeklyThroughput: [{ week: "2026-01-05", throughput: 3 }],
+  cycleTimeData: [{ week: "2026-01-05", cycleTime: 1.5, count: 3 }],
   throughputSamples: [2, 3, 5, 8, 13, 21],
   sampleStats: { totalWeeks: 10, zeroWeeks: 1, usedWeeks: 9 },
 };
