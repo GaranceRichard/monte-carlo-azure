@@ -4,7 +4,7 @@ import logging
 import time
 
 import numpy as np
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from starlette.concurrency import run_in_threadpool
@@ -142,26 +142,35 @@ def _compute_simulation_result(
 
 
 def _persist_simulation(
-    request: Request,
+    mc_client_id: str,
     req: SimulateRequest,
     response_model: SimulateResponse,
 ) -> None:
-    mc_client_id = (request.cookies.get(cfg.client_cookie_name) or "").strip()
     if not simulation_store.enabled or not mc_client_id:
         return
 
     try:
         simulation_store.save_simulation(mc_client_id, req, response_model)
     except Exception as exc:
-        raise HTTPException(
-            503,
-            "Persistence Mongo indisponible. Reessayez plus tard.",
-        ) from exc
+        logger.warning(
+            "Simulation persistence failed; returning computed result without history entry.",
+            extra={
+                "event": "simulation_persistence_failed",
+                "mode": req.mode,
+                "n_sims": req.n_sims,
+                "client_id_prefix": mc_client_id[:8],
+            },
+            exc_info=exc,
+        )
 
 
 @router.post("/simulate", response_model=SimulateResponse)
 @limiter.limit(cfg.rate_limit_simulate)
-async def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
+async def simulate(
+    request: Request,
+    req: SimulateRequest,
+    background_tasks: BackgroundTasks,
+) -> SimulateResponse:
     started_at = time.perf_counter()
     samples = np.array(req.throughput_samples)
     if req.include_zero_weeks:
@@ -219,7 +228,9 @@ async def simulate(request: Request, req: SimulateRequest) -> SimulateResponse:
         throughput_reliability=reliability,
     )
 
-    _persist_simulation(request, req, response_model)
+    mc_client_id = (request.cookies.get(cfg.client_cookie_name) or "").strip()
+    if mc_client_id and simulation_store.enabled:
+        background_tasks.add_task(_persist_simulation, mc_client_id, req, response_model)
 
     logger.info(
         json.dumps(

@@ -155,7 +155,7 @@ def test_simulation_history_returns_503_on_malformed_store_row(monkeypatch):
     assert "Historique indisponible" in r.json()["detail"]
 
 
-def test_simulate_returns_503_when_store_unavailable(monkeypatch):
+def test_simulate_returns_result_when_store_unavailable(monkeypatch):
     fake = _FakeStore(enabled=True, fail=True)
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
     client_id = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
@@ -171,5 +171,5 @@ def test_simulate_returns_503_when_store_unavailable(monkeypatch):
             "n_sims": 2000,
         },
     )
-    assert r.status_code == 503
-    assert "Persistence Mongo indisponible" in r.json()["detail"]
+    assert r.status_code == 200
+    assert r.json()["result_kind"] == "weeks"

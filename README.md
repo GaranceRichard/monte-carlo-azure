@@ -56,8 +56,10 @@ Comportement attendu de l'instance publique:
 
 Le contrat de simulation ne transporte plus de parametre de capacite reduite:
 les projections reposent uniquement sur l'historique de throughput observe.
-La route `POST /simulate` isole aussi la persistance Mongo dans un helper dedie pour garder
-le flux principal plus simple a tester et a faire evoluer.
+La route `POST /simulate` isole aussi la persistance Mongo du calcul principal:
+la reponse utilisateur est retournee des que la simulation est prete, puis l'ecriture
+de l'historique part en arriere-plan. Si Mongo est indisponible, l'incident reste limite
+a l'historique et ne bloque plus le resultat de simulation.
 
 ---
 

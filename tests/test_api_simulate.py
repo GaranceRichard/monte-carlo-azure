@@ -1,7 +1,6 @@
 import time
 
 import pytest
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from slowapi.errors import RateLimitExceeded
 from starlette.requests import Request
@@ -264,7 +263,6 @@ def test_persist_simulation_saves_when_cookie_present_and_store_enabled(monkeypa
 
     fake = _FakeStore(enabled=True)
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
-    request = _build_request_with_cookie(api_routes_simulate.cfg.client_cookie_name, "client-123")
     req = SimulateRequest(
         throughput_samples=[1, 2, 3, 4, 5, 6],
         mode="backlog_to_weeks",
@@ -272,7 +270,7 @@ def test_persist_simulation_saves_when_cookie_present_and_store_enabled(monkeypa
         n_sims=2000,
     )
 
-    _persist_simulation(request, req, _build_response_model())
+    _persist_simulation("client-123", req, _build_response_model())
 
     assert len(fake.saved) == 1
     saved_id, saved_req, saved_resp = fake.saved[0]
@@ -286,7 +284,6 @@ def test_persist_simulation_skips_when_cookie_missing(monkeypatch):
 
     fake = _FakeStore(enabled=True)
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
-    request = _build_request_with_cookie(api_routes_simulate.cfg.client_cookie_name)
     req = SimulateRequest(
         throughput_samples=[1, 2, 3, 4, 5, 6],
         mode="backlog_to_weeks",
@@ -294,7 +291,7 @@ def test_persist_simulation_skips_when_cookie_missing(monkeypatch):
         n_sims=2000,
     )
 
-    _persist_simulation(request, req, _build_response_model())
+    _persist_simulation("", req, _build_response_model())
 
     assert fake.saved == []
 
@@ -304,7 +301,6 @@ def test_persist_simulation_skips_when_store_disabled(monkeypatch):
 
     fake = _FakeStore(enabled=False)
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
-    request = _build_request_with_cookie(api_routes_simulate.cfg.client_cookie_name, "client-123")
     req = SimulateRequest(
         throughput_samples=[1, 2, 3, 4, 5, 6],
         mode="backlog_to_weeks",
@@ -312,17 +308,16 @@ def test_persist_simulation_skips_when_store_disabled(monkeypatch):
         n_sims=2000,
     )
 
-    _persist_simulation(request, req, _build_response_model())
+    _persist_simulation("client-123", req, _build_response_model())
 
     assert fake.saved == []
 
 
-def test_persist_simulation_raises_503_when_store_fails(monkeypatch):
+def test_persist_simulation_logs_warning_when_store_fails(monkeypatch, caplog):
     from backend import api_routes_simulate
 
     fake = _FakeStore(enabled=True, fail=True)
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
-    request = _build_request_with_cookie(api_routes_simulate.cfg.client_cookie_name, "client-123")
     req = SimulateRequest(
         throughput_samples=[1, 2, 3, 4, 5, 6],
         mode="backlog_to_weeks",
@@ -330,11 +325,11 @@ def test_persist_simulation_raises_503_when_store_fails(monkeypatch):
         n_sims=2000,
     )
 
-    with pytest.raises(HTTPException) as exc_info:
-        _persist_simulation(request, req, _build_response_model())
+    with caplog.at_level("WARNING"):
+        _persist_simulation("client-123", req, _build_response_model())
 
-    assert exc_info.value.status_code == 503
-    assert "Persistence Mongo indisponible" in exc_info.value.detail
+    assert fake.saved == []
+    assert "Simulation persistence failed" in caplog.text
 
 
 def test_client_key_prefers_first_forwarded_ip():
