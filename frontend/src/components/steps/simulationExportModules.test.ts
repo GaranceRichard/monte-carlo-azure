@@ -827,4 +827,130 @@ describe("simulationPdfDownload", () => {
     expect(pdf.text).toHaveBeenCalledWith("Simulation Portefeuille", 8, 8);
     expect(pdf.svg).toHaveBeenCalledTimes(1);
   });
+
+  it("covers scoped portfolio meta and hypothesis nullish branches", async () => {
+    const fakeSummaryTable = {
+      querySelectorAll: (inner: string) => {
+        if (inner === "thead th") {
+          return [{ textContent: "Scenario" }];
+        }
+        if (inner === "tbody tr") {
+          return [];
+        }
+        return [];
+      },
+    };
+    const fakeSection = {
+      querySelector: vi.fn((selector: string) => {
+        if (selector === "h1") return { textContent: "Synthese - Simulation Portefeuille" };
+        if (selector === ".summary-table") return fakeSummaryTable;
+        return null;
+      }),
+      querySelectorAll: vi.fn((selector: string) => {
+        if (selector === ".meta .meta-row") return [{ textContent: null }];
+        if (selector === ".diagnostic-card .meta-row") return [{ textContent: null }];
+        if (selector === ".hypothesis") return [{ textContent: null }];
+        if (selector === ".kpi") return [];
+        if (selector === ".chart-wrap svg") return [];
+        return [];
+      }),
+    };
+
+    const fakeDoc = {
+      body: fakeSection,
+      querySelectorAll: vi.fn((selector: string) => (selector === ".page" ? [fakeSection] : [])),
+    } as unknown as Document;
+
+    await downloadPortfolioPdf(fakeDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.text).toHaveBeenCalledWith([""], expect.any(Number), expect.any(Number));
+  });
+
+  it("covers summary table fallbacks for missing headers, rows and widths", async () => {
+    const fakeSummaryTable = {
+      querySelectorAll: (inner: string) => {
+        if (inner === "thead th") return [];
+        if (inner === "tbody tr") return [];
+        return [];
+      },
+    };
+    const fakeSection = {
+      querySelector: vi.fn((selector: string) => {
+        if (selector === "h1") return { textContent: "Synthese - Simulation Portefeuille" };
+        if (selector === ".summary-table") return fakeSummaryTable;
+        return null;
+      }),
+      querySelectorAll: vi.fn((selector: string) => {
+        if (selector === ".meta-row") return [];
+        if (selector === ".hypothesis") return [];
+        if (selector === ".kpi") return [];
+        if (selector === ".chart-wrap svg") return [];
+        return [];
+      }),
+    };
+
+    const fakeDoc = {
+      body: fakeSection,
+      querySelectorAll: vi.fn((selector: string) => (selector === ".page" ? [fakeSection] : [])),
+    } as unknown as Document;
+
+    await downloadPortfolioPdf(fakeDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.save).toHaveBeenCalled();
+  });
+
+  it("covers portfolio title fallback with a sparse synthetic summary table", async () => {
+    const fakeSummaryTable = {
+      querySelectorAll: (inner: string) => {
+        if (inner === "thead th") {
+          return [{ textContent: "Scenario" }, { textContent: "P50" }, { textContent: "P70" }];
+        }
+        if (inner === "tbody tr") {
+          return [{ querySelectorAll: () => [] }];
+        }
+        return [];
+      },
+    };
+    const fakeSection = {
+      querySelector: vi.fn((selector: string) => {
+        if (selector === "h1") return null;
+        if (selector === ".summary-table") return fakeSummaryTable;
+        return null;
+      }),
+      querySelectorAll: vi.fn((selector: string) => {
+        if (selector === ".meta-row") return [];
+        if (selector === ".hypothesis") return [];
+        if (selector === ".kpi") return [];
+        if (selector === ".chart-wrap svg") return [];
+        return [];
+      }),
+    };
+    const fakeDoc = {
+      body: fakeSection,
+      querySelectorAll: vi.fn((selector: string) => (selector === ".page" ? [fakeSection] : [])),
+    } as unknown as Document;
+
+    await downloadPortfolioPdf(fakeDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.text).toHaveBeenCalledWith("Simulation Portefeuille", 8, 8);
+  });
+
+  it("skips empty kpi rows before rendering populated rows", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo</h1>
+      <section class="kpis"></section>
+      <section class="kpis">
+        <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">10 semaines</span></div>
+      </section>
+    `;
+
+    await downloadSimulationPdf(reportDoc, "Equipe A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.text).toHaveBeenCalledWith("P50: 10 semaines", expect.any(Number), expect.any(Number), { align: "center" });
+  });
 });

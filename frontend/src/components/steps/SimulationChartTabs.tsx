@@ -12,6 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useState } from "react";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "../ui/tabs";
 import { useSimulationContext } from "../../hooks/SimulationContext";
 import { computeThroughputReliability } from "../../utils/simulation";
@@ -51,6 +52,7 @@ export function getCycleTimeYAxisMax(dataMax: number): number {
 export default function SimulationChartTabs() {
   const { selectedTeam, simulation } = useSimulationContext();
   const s = simulation;
+  const [loadingReport, setLoadingReport] = useState(false);
 
   const throughputWithMovingAverage = useMemo(() => {
     const windowSize = 4;
@@ -179,28 +181,33 @@ export default function SimulationChartTabs() {
     };
 
   async function handleExportReport(): Promise<void> {
-    if (!s.result) return;
+    if (!s.result || loadingReport) return;
+    setLoadingReport(true);
     const { exportSimulationPrintReport } = await import("./simulationPrintReport");
-    exportSimulationPrintReport({
-      selectedTeam,
-      startDate: s.startDate,
-      endDate: s.endDate,
-      simulationMode: s.simulationMode,
-      includeZeroWeeks: s.includeZeroWeeks,
-      types: s.types,
-      doneStates: s.doneStates,
-      backlogSize: s.backlogSize,
-      targetWeeks: s.targetWeeks,
-      nSims: s.nSims,
-      resultKind: s.result.result_kind,
-      displayPercentiles: s.displayPercentiles,
-      throughputReliability: reliability,
-      cycleTimePoints: s.cycleTimeData,
-      cycleTimeTrendPoints: s.cycleTimeTrendData,
-      throughputPoints: throughputWithMovingAverage,
-      distributionPoints: s.mcHistData,
-      probabilityPoints: s.probabilityCurveData,
-    });
+    try {
+      await exportSimulationPrintReport({
+        selectedTeam,
+        startDate: s.startDate,
+        endDate: s.endDate,
+        simulationMode: s.simulationMode,
+        includeZeroWeeks: s.includeZeroWeeks,
+        types: s.types,
+        doneStates: s.doneStates,
+        backlogSize: s.backlogSize,
+        targetWeeks: s.targetWeeks,
+        nSims: s.nSims,
+        resultKind: s.result.result_kind,
+        displayPercentiles: s.displayPercentiles,
+        throughputReliability: reliability,
+        cycleTimePoints: s.cycleTimeData,
+        cycleTimeTrendPoints: s.cycleTimeTrendData,
+        throughputPoints: throughputWithMovingAverage,
+        distributionPoints: s.mcHistData,
+        probabilityPoints: s.probabilityCurveData,
+      });
+    } finally {
+      setLoadingReport(false);
+    }
   }
 
   return (
@@ -218,10 +225,11 @@ export default function SimulationChartTabs() {
               <button
                 type="button"
                 onClick={() => void handleExportReport()}
+                disabled={loadingReport}
                 className="whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-sm font-semibold text-[var(--text)]"
-                title="Ouvrir le rapport imprimable"
+                title="Telecharger le rapport PDF"
               >
-                Rapport
+                {loadingReport ? "Generation..." : "Rapport"}
               </button>
               <button
                 type="button"

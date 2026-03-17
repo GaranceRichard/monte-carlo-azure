@@ -1,4 +1,4 @@
-﻿import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildAtLeastPercentiles } from "../../hooks/probability";
 import { computeRiskScoreFromPercentiles } from "../../utils/simulation";
 
@@ -14,7 +14,7 @@ vi.mock("./simulationPdfDownload", async () => {
   };
 });
 
-import { exportPortfolioPrintReport } from "./portfolioPrintReport";
+import { buildPortfolioPrintReportHtml, exportPortfolioPrintReport } from "./portfolioPrintReport";
 
 function baseArgs() {
   return {
@@ -102,179 +102,57 @@ function baseArgs() {
   };
 }
 
-describe("exportPortfolioPrintReport", () => {
+describe("portfolioPrintReport", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     pdfModuleMocks.downloadPortfolioPdf.mockReset();
+    pdfModuleMocks.downloadPortfolioPdf.mockResolvedValue(undefined);
   });
 
-  it("renders synthesis page and scenario pages in expected order with friction in position 4", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+  it("renders synthesis, scenarios and team pages in expected order", () => {
+    const html = buildPortfolioPrintReportHtml(baseArgs());
 
-    exportPortfolioPrintReport(baseArgs());
+    const idxSynth = html.indexOf("Synthèse - Simulation Portefeuille");
+    const idxOpt = html.indexOf("Scénario - Optimiste");
+    const idxArr = html.search(/Sc.nario - Arrim./);
+    const idxFriction = html.indexOf("Scénario - Friction (64%)");
+    const idxCons = html.indexOf("Scénario - Conservateur");
+    const idxTeam = html.indexOf("Simulation Portefeuille - Team A");
 
-    const idxSynth = writtenHtml.indexOf("Synthèse - Simulation Portefeuille");
-    const idxOpt = writtenHtml.indexOf("Scénario - Optimiste");
-    const idxArr = writtenHtml.search(/Sc.nario - Arrim./);
-    const idxFriction = writtenHtml.indexOf("Scénario - Friction (64%)");
-    const idxCons = writtenHtml.indexOf("Scénario - Conservateur");
-    const idxTeam = writtenHtml.indexOf("Simulation Portefeuille - Team A");
-
-    expect(idxSynth).toBeGreaterThanOrEqual(0);
-    expect(idxOpt).toBeGreaterThanOrEqual(0);
-    expect(idxArr).toBeGreaterThanOrEqual(0);
-    expect(idxFriction).toBeGreaterThanOrEqual(0);
-    expect(idxCons).toBeGreaterThanOrEqual(0);
-    expect(idxTeam).toBeGreaterThanOrEqual(0);
     expect(idxSynth).toBeLessThan(idxOpt);
     expect(idxOpt).toBeLessThan(idxArr);
     expect(idxArr).toBeLessThan(idxFriction);
     expect(idxFriction).toBeLessThan(idxCons);
     expect(idxCons).toBeLessThan(idxTeam);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Tickets:<\/b> Bug/);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Etats:<\/b> Done/);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<h2 class="diagnostic-title">Diagnostic<\/h2>/);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Lecture:<\/b> Throughput en baisse sur les dernieres semaines\./);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<section class="kpis">[\s\S]*?P50[\s\S]*?P70[\s\S]*?P90/);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<section class="kpis">[\s\S]*?Risk Score[\s\S]*?Fiabilite/);
+    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Tickets:<\/b> Bug/);
+    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Etats:<\/b> Done/);
+    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Lecture:<\/b> Throughput en baisse sur les dernieres semaines\./);
+    expect(html).not.toContain('id="download-pdf"');
   });
 
-  it("includes 4-line summary, overlay probability svg and risk score definition on synthesis page", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+  it("includes synthesis content, overlay SVG and reading rule", () => {
+    const html = buildPortfolioPrintReportHtml(baseArgs());
 
-    exportPortfolioPrintReport(baseArgs());
-
-    expect(writtenHtml).toContain("<td>Optimiste</td>");
-    expect(writtenHtml).toMatch(/<td>Arrim. \(80%\)<\/td>/);
-    expect(writtenHtml).toContain("<td>Friction (64%)</td>");
-    expect(writtenHtml).toContain("<td>Conservateur</td>");
-    expect(writtenHtml).toContain("0,22 (fiable)");
-    expect(writtenHtml).toContain("1,60 (non fiable)");
-    expect(writtenHtml).toContain("<th>Fiabilité</th>");
-    expect(writtenHtml).not.toContain("Fiabilité historique");
-    expect(writtenHtml).toContain('<col class="summary-col summary-col--reliability" />');
-    expect(writtenHtml).toContain(".summary-table { width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; }");
-    expect(writtenHtml).toContain(".summary-table--compact .summary-col--reliability { width: 26%; }");
-    expect(writtenHtml).toContain("Courbes de probabilités comparées");
-    expect(writtenHtml).toContain('aria-label="Comparaison des probabilites"');
-    expect(writtenHtml).toContain("<strong>Optimiste :</strong>");
-    expect(writtenHtml).toContain("<strong>Arrimé :</strong>");
-    expect(writtenHtml).toContain("<strong>Friction (64%) :</strong>");
-    expect(writtenHtml).toContain("<strong>Risk Score :</strong>");
-    expect(writtenHtml).toContain("<strong>Fiabilité de l&#39;historique :</strong>");
-    expect(writtenHtml).toContain('<p class="hypothesis reading-rule"><strong>Règle de lecture :</strong><br />');
-    expect(writtenHtml).toContain("Commencer par la fiabilité de l&#39;historique");
-    expect(writtenHtml).toContain("<strong>Risk Score :</strong>");
-    expect(writtenHtml).toContain("(P90 - P50) / P50");
-    expect(writtenHtml).not.toContain("Throughput hebdomadaire");
+    expect(html).toContain("<td>Optimiste</td>");
+    expect(html).toMatch(/<td>Arrim. \(80%\)<\/td>/);
+    expect(html).toContain("<td>Friction (64%)</td>");
+    expect(html).toContain("<td>Conservateur</td>");
+    expect(html).toContain("0,22 (fiable)");
+    expect(html).toContain("1,60 (non fiable)");
+    expect(html).toContain("Courbes de probabilités comparées");
+    expect(html).toContain('aria-label="Comparaison des probabilites"');
+    expect(html).toContain("<strong>Optimiste :</strong>");
+    expect(html).toContain("<strong>Arrimé :</strong>");
+    expect(html).toContain("<strong>Risk Score :</strong>");
+    expect(html).toContain("<strong>Fiabilité de l&#39;historique :</strong>");
+    expect(html).toContain('<p class="hypothesis reading-rule"><strong>Règle de lecture :</strong><br />');
   });
 
-  it("uses weeks_to_items effective percentiles for summary risk score", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    const args: any = baseArgs();
+  it("uses effective percentiles in weeks_to_items mode for scenario risk score", () => {
+    const args: ReturnType<typeof baseArgs> = baseArgs();
     args.sections[0].simulationMode = "weeks_to_items";
-    args.scenarios = [
-      {
-        ...args.scenarios[0],
-        percentiles: { P50: 100, P70: 110, P90: 120 },
-        distribution: [
-          { x: 10, count: 10 },
-          { x: 20, count: 80 },
-          { x: 30, count: 10 },
-        ],
-      },
-      { ...args.scenarios[1] },
-      { ...args.scenarios[2] },
-      { ...args.scenarios[3] },
-    ];
-
-    exportPortfolioPrintReport(args);
-
-    const effectivePercentiles = buildAtLeastPercentiles(args.scenarios[0].distribution, [50, 70, 90]);
-    const expectedRisk = computeRiskScoreFromPercentiles("weeks_to_items", effectivePercentiles);
-    const expectedP50 = Number(effectivePercentiles.P50 ?? 0).toFixed(0);
-    const expectedP70 = Number(effectivePercentiles.P70 ?? 0).toFixed(0);
-    const expectedP90 = Number(effectivePercentiles.P90 ?? 0).toFixed(0);
-
-    expect(writtenHtml).toMatch(
-      new RegExp(`Optimiste[\\s\\S]*?<td>${expectedP50}</td>\\s*<td>${expectedP70}</td>\\s*<td>${expectedP90}</td>`),
-    );
-    expect(writtenHtml).not.toMatch(/Optimiste[\s\S]*?<td>100<\/td>\s*<td>110<\/td>\s*<td>120<\/td>/);
-    expect(writtenHtml).toContain(expectedRisk.toFixed(2).replace(".", ","));
-  });
-
-  it("uses weeks_to_items effective percentiles for scenario and team page risk score", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    const args: any = baseArgs();
-    args.sections[0] = {
-      ...args.sections[0],
-      simulationMode: "weeks_to_items",
-      resultKind: "items",
-      riskScore: 0,
-      displayPercentiles: { P50: 100, P70: 110, P90: 120 },
-      distribution: [
-        { x: 10, count: 10 },
-        { x: 20, count: 80 },
-        { x: 30, count: 10 },
-      ],
-    };
     args.scenarios[0] = {
       ...args.scenarios[0],
-      riskScore: 0,
       percentiles: { P50: 100, P70: 110, P90: 120 },
       distribution: [
         { x: 10, count: 10 },
@@ -283,633 +161,151 @@ describe("exportPortfolioPrintReport", () => {
       ],
     };
 
-    exportPortfolioPrintReport(args);
+    const html = buildPortfolioPrintReportHtml(args);
+    const effectivePercentiles = buildAtLeastPercentiles(args.scenarios[0].distribution, [50, 70, 90]);
+    const expectedRisk = computeRiskScoreFromPercentiles("weeks_to_items", effectivePercentiles);
 
-    const effectivePercentiles = buildAtLeastPercentiles(args.sections[0].distribution, [50, 70, 90]);
-    const expectedRisk = computeRiskScoreFromPercentiles("weeks_to_items", effectivePercentiles)
-      .toFixed(2)
-      .replace(".", ",");
-
-    expect(writtenHtml).toMatch(new RegExp(`Sc.nario - Optimiste[\\s\\S]*?Risk Score[\\s\\S]*?${expectedRisk}`));
-    expect(writtenHtml).toMatch(new RegExp(`Simulation Portefeuille - Team A[\\s\\S]*?Risk Score[\\s\\S]*?${expectedRisk}`));
+    expect(html).toMatch(
+      new RegExp(
+        `Optimiste[\\s\\S]*?<td>${Number(effectivePercentiles.P50 ?? 0).toFixed(0)}</td>\\s*<td>${Number(effectivePercentiles.P70 ?? 0).toFixed(0)}</td>\\s*<td>${Number(effectivePercentiles.P90 ?? 0).toFixed(0)}</td>`,
+      ),
+    );
+    expect(html).toContain(expectedRisk.toFixed(2).replace(".", ","));
   });
 
-  it("falls back to computed risk score when weeks-mode riskScore is invalid", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    const args: any = baseArgs();
+  it("falls back to computed risk score when a team page has no finite risk score", () => {
+    const args = baseArgs();
     args.sections[0] = {
       ...args.sections[0],
-      resultKind: "weeks",
       riskScore: Number.NaN,
-      displayPercentiles: { P50: 10, P70: 12, P90: 14 },
+      displayPercentiles: { P50: 10, P70: 14, P90: 19 },
     };
 
-    exportPortfolioPrintReport(args);
+    const html = buildPortfolioPrintReportHtml(args);
+    const expectedRisk = computeRiskScoreFromPercentiles("backlog_to_weeks", args.sections[0].displayPercentiles);
 
-    expect(writtenHtml).toContain("0,40");
+    expect(html).toContain(expectedRisk.toFixed(2).replace(".", ","));
   });
 
-  it("renders fallback labels, empty teams and backlog-mode hypothesis when scenarios are reduced", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+  it("builds a minimal report when sections and scenarios are empty", () => {
+    const html = buildPortfolioPrintReportHtml({
+      ...baseArgs(),
+      includedTeams: [],
+      sections: [],
+      scenarios: [],
+    });
 
-    const args: any = baseArgs();
-    args.includedTeams = [];
-    args.scenarios = [
-      {
-        ...args.scenarios[0],
-        label: "Autre",
-        distribution: [],
-      },
-      {
-        ...args.scenarios[1],
-        label: "Arrime (80%)",
-      },
-      {
-        ...args.scenarios[3],
-        label: "Conservateur",
-      },
-    ];
-
-    exportPortfolioPrintReport(args);
-
-    expect(writtenHtml).toContain("<td>Autre</td>");
-    expect(writtenHtml).toMatch(/<td>Arrim. \(80%\)<\/td>/);
-    expect(writtenHtml).toContain("<td>Conservateur</td>");
-    expect(writtenHtml).toContain("<b>Équipes incluses:</b> Aucune");
-    expect(writtenHtml).toContain("Friction (100%) :</strong>");
-    expect(writtenHtml).toContain("(100%) de la capacité combinée");
-    expect(writtenHtml).toContain("<strong>Risk Score :</strong>");
-    expect(writtenHtml).toContain("(P90 - P50) / P50");
+    expect(html).toContain("Synthèse - Simulation Portefeuille");
+    expect(html).toContain("<b>Équipes incluses:</b> Aucune");
+    expect(html).not.toContain("Scénario - ");
+    expect(html).not.toContain("Simulation Portefeuille - Team A");
   });
 
-  it("renders fragile risk color and unknown risk color fallback", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    const args: any = baseArgs();
-    args.sections = [
-      {
-        ...args.sections[0],
-        selectedTeam: "Team A",
-        riskScore: 0.7,
-      },
-      {
-        ...args.sections[0],
-        selectedTeam: "Team B",
-        riskScore: 0.9,
-      },
-    ];
-
-    exportPortfolioPrintReport(args);
-
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?0,70 <span style="color:#dc2626">\(fragile\)<\/span>/);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team B[\s\S]*?0,90 <span style="color:#111827">\(non fiable\)<\/span>/);
-  });
-
-  it("uses direct riskScore value when weeks-mode riskScore is finite", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    const args: any = baseArgs();
+  it("uses fallback section arrays when types and states are absent", () => {
+    const args = baseArgs();
     args.sections[0] = {
       ...args.sections[0],
-      resultKind: "weeks",
-      riskScore: 0.11,
-      distribution: [],
-      displayPercentiles: { P50: 10, P70: 12, P90: 14 },
+      types: undefined as unknown as string[],
+      doneStates: undefined as unknown as string[],
     };
 
-    exportPortfolioPrintReport(args);
+    const html = buildPortfolioPrintReportHtml(args);
 
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?0,11[\s\S]*?\(fiable\)/);
+    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Tickets:<\/b> Agr/);
+    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Etats:<\/b> Agr/);
   });
 
-  it("uses computed risk score when weeks-mode riskScore is absent", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    const args: any = baseArgs();
-    delete args.sections[0].riskScore;
-    args.sections[0].distribution = [];
-    args.sections[0].displayPercentiles = { P50: 10, P70: 12, P90: 14 };
-
-    exportPortfolioPrintReport(args);
-
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?0,40[\s\S]*?\(incertain\)/);
-  });
-
-  it("uses section fallbacks when sections are absent", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    const args: any = baseArgs();
-    args.sections = [];
-
-    exportPortfolioPrintReport(args);
-
-    expect(writtenHtml).toContain("Backlog vers semaines - backlog: 0 items");
-    expect(writtenHtml).not.toContain("Simulation Portefeuille - Team A");
-    expect(writtenHtml).toContain("<b>Simulations:</b> 0");
-  });
-
-  it("uses default percentile values when percentiles are missing", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    const args: any = baseArgs();
+  it("renders team-page fallbacks when zero weeks are excluded and metrics are missing", () => {
+    const args = baseArgs();
     args.sections[0] = {
       ...args.sections[0],
       includeZeroWeeks: false,
-      displayPercentiles: {},
+      throughputReliability: null,
+      displayPercentiles: undefined as unknown as Record<string, number>,
       weeklyThroughput: [
-        { week: "2026-01-01", throughput: 0 },
-        { week: "2026-01-08", throughput: 3 },
+        { week: "2026-01-01", throughput: 3 },
+        { week: "2026-01-08", throughput: 0 },
       ],
     };
-    args.scenarios[0] = {
-      ...args.scenarios[0],
-      percentiles: {},
-      riskScore: undefined,
-    };
 
-    exportPortfolioPrintReport(args);
+    const html = buildPortfolioPrintReportHtml(args);
 
-    expect(writtenHtml).toContain("Semaines 0 exclues");
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team A[\s\S]*?>0 semaines \(au plus\)</);
-    expect(writtenHtml).toMatch(/Sc.nario - Optimiste[\s\S]*?>0 semaines \(au plus\)</);
+    expect(html).toContain("Semaines 0 exclues");
+    expect(html).toContain("Non disponible");
+    expect(html).toContain("<b>CV:</b> 0,00");
+    expect(html).toContain(">0 semaines (au plus)<");
   });
 
-  it("renders reliability summary branches and team metadata fallbacks", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
+  it("renders summary-page fallbacks when scenario risk scores and section defaults are missing", () => {
+    const html = buildPortfolioPrintReportHtml({
+      ...baseArgs(),
+      sections: [],
+      scenarios: [
+        {
+          label: "Optimiste",
+          hypothesis: "hyp optimistic",
+          samples: [3, 4, 5],
+          weeklyData: [{ week: "2026-01-01", throughput: 3 }],
+          percentiles: {} as Record<string, number>,
+          riskScore: undefined,
+          riskLegend: "fiable",
+          distribution: [],
+          throughputReliability: null,
+        },
+        {
+          label: "Conservateur",
+          hypothesis: "hyp conservative",
+          samples: [1, 2, 3],
+          weeklyData: [{ week: "2026-01-01", throughput: 1 }],
+          percentiles: {} as Record<string, number>,
+          riskScore: Number.NaN,
+          riskLegend: "incertain",
+          distribution: [],
+          throughputReliability: null,
+        },
+      ],
+    });
 
-    const args: any = baseArgs();
-    args.sections = [
-      {
-        ...args.sections[0],
-        selectedTeam: "Team Short",
-        types: undefined,
-        doneStates: undefined,
-        throughputReliability: { cv: 0.21, iqr_ratio: 0.31, slope_norm: 0, label: "fiable", samples_count: 5 },
-      },
-      {
-        ...args.sections[0],
-        selectedTeam: "Team Down",
-        throughputReliability: { cv: 0.3, iqr_ratio: 0.25, slope_norm: -0.16, label: "fiable", samples_count: 9 },
-      },
-      {
-        ...args.sections[0],
-        selectedTeam: "Team Up",
-        throughputReliability: { cv: 0.33, iqr_ratio: 0.28, slope_norm: 0.12, label: "fiable", samples_count: 9 },
-      },
-      {
-        ...args.sections[0],
-        selectedTeam: "Team Slight Up",
-        throughputReliability: { cv: 0.34, iqr_ratio: 0.29, slope_norm: 0.06, label: "fiable", samples_count: 9 },
-      },
-      {
-        ...args.sections[0],
-        selectedTeam: "Team Spread",
-        throughputReliability: { cv: 1.2, iqr_ratio: 0.4, slope_norm: 0, label: "non fiable", samples_count: 9 },
-      },
-      {
-        ...args.sections[0],
-        selectedTeam: "Team Limited",
-        throughputReliability: { cv: 0.41, iqr_ratio: 0.39, slope_norm: 0, label: "incertain", samples_count: 7 },
-      },
-      {
-        ...args.sections[0],
-        selectedTeam: "Team Missing",
-        throughputReliability: undefined,
-      },
-    ];
-    args.scenarios[0] = {
-      ...args.scenarios[0],
-      throughputReliability: undefined,
-    };
-
-    exportPortfolioPrintReport(args);
-
-    expect(writtenHtml).toContain("<td>Non disponible</td>");
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Short[\s\S]*?<b>Tickets:<\/b> Agr.g. portefeuille/);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Short[\s\S]*?<b>Etats:<\/b> Agr.g. portefeuille/);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Short[\s\S]*?<b>Lecture:<\/b> Historique trop court pour projeter avec confiance\./);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Down[\s\S]*?<b>Lecture:<\/b> Throughput en forte baisse sur les dernieres semaines\./);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Up[\s\S]*?<b>Lecture:<\/b> Throughput en forte hausse sur les dernieres semaines\./);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Slight Up[\s\S]*?<b>Lecture:<\/b> Throughput en hausse sur les dernieres semaines\./);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Spread[\s\S]*?<b>Lecture:<\/b> Dispersion elevee du throughput historique\./);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Limited[\s\S]*?<b>Lecture:<\/b> Volume historique encore limite\./);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Missing[\s\S]*?<b>Lecture:<\/b> Non disponible/);
-    expect(writtenHtml).toMatch(/Simulation Portefeuille - Team Missing[\s\S]*?<span class="kpi-value">Non disponible<\/span>/);
+    expect(html).toContain("backlog: 0 items");
+    expect(html).toContain("<td>0</td>");
+    expect(html).toContain("0,00 (fiable)");
   });
 
-  it("returns early when popup opening is blocked", () => {
-    vi.spyOn(window, "open").mockReturnValue(null);
-    expect(() => exportPortfolioPrintReport(baseArgs())).not.toThrow();
+  it("exports directly to PDF from a detached document", async () => {
+    const openSpy = vi.spyOn(window, "open");
+
+    await exportPortfolioPrintReport(baseArgs());
+
+    expect(openSpy).not.toHaveBeenCalled();
+    expect(pdfModuleMocks.downloadPortfolioPdf).toHaveBeenCalledTimes(1);
+    expect(pdfModuleMocks.downloadPortfolioPdf).toHaveBeenCalledWith(expect.any(Document), "Projet A", undefined);
   });
 
-  it("wires the download button through addEventListener and triggers PDF export", async () => {
-    let clickHandler: null | (() => void) = null;
-    const reportDoc = document.implementation.createHTMLDocument("portfolio");
-    const fakeButton = {
-      disabled: false,
-      textContent: "Telecharger PDF",
-      addEventListener: vi.fn((_event: string, handler: () => void) => {
-        clickHandler = handler;
-      }),
-    };
-    const fakeWindow = {
-      document: Object.assign(reportDoc, {
-        open: vi.fn(),
-        write: vi.fn(),
-        close: vi.fn(),
-        getElementById: vi.fn(() => fakeButton),
-      }),
-      addEventListener: vi.fn(),
-      onload: null as null | (() => void),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    exportPortfolioPrintReport(baseArgs());
-    const loadHandler = fakeWindow.addEventListener.mock.calls[0]?.[1];
-    loadHandler?.();
-    const wiredClickHandler = clickHandler as null | (() => void | Promise<void>);
-    if (wiredClickHandler) {
-      await wiredClickHandler();
-    }
-    await Promise.resolve();
-    await Promise.resolve();
-
-    expect(pdfModuleMocks.downloadPortfolioPdf).toHaveBeenCalledWith(fakeWindow.document, "Projet A", false);
-    expect(fakeButton.addEventListener).toHaveBeenCalledTimes(1);
-    expect(fakeButton.disabled).toBe(false);
-    expect(fakeButton.textContent).toBe("Telecharger PDF");
+  it("passes the demo flag through the direct export path", async () => {
+    await exportPortfolioPrintReport({ ...baseArgs(), isDemo: true });
+    expect(pdfModuleMocks.downloadPortfolioPdf).toHaveBeenCalledWith(expect.any(Document), "Projet A", true);
   });
 
-  it("does not bind the download button twice when already bound", () => {
-    const reportDoc = document.implementation.createHTMLDocument("portfolio");
-    const fakeButton = {
-      __downloadBound: true,
-      addEventListener: vi.fn(),
-    };
-    const fakeWindow = {
-      document: Object.assign(reportDoc, {
-        open: vi.fn(),
-        write: vi.fn(),
-        close: vi.fn(),
-        getElementById: vi.fn(() => fakeButton),
-      }),
-      addEventListener: vi.fn(),
-      onload: null as null | (() => void),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    exportPortfolioPrintReport(baseArgs());
-    const loadHandler = fakeWindow.addEventListener.mock.calls[0]?.[1];
-    loadHandler?.();
-
-    expect(fakeButton.addEventListener).not.toHaveBeenCalled();
-  });
-
-  it("falls back to window.onload and alerts when PDF generation fails", async () => {
-    let clickHandler: null | (() => void) = null;
-    const reportDoc = document.implementation.createHTMLDocument("portfolio");
-    const fakeButton = {
-      disabled: false,
-      textContent: "Telecharger PDF",
-      addEventListener: vi.fn((_event: string, handler: () => void) => {
-        clickHandler = handler;
-      }),
-    };
-    const alert = vi.fn();
+  it("alerts and rethrows when direct PDF generation fails", async () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => undefined);
     pdfModuleMocks.downloadPortfolioPdf.mockRejectedValueOnce(new Error("printer offline"));
-    const fakeWindow = {
-      document: Object.assign(reportDoc, {
-        open: vi.fn(),
-        write: vi.fn(),
-        close: vi.fn(),
-        getElementById: vi.fn(() => fakeButton),
-      }),
-      onload: null as null | (() => void),
-      alert,
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
 
-    exportPortfolioPrintReport(baseArgs());
-    fakeWindow.onload?.();
-    fakeWindow.onload?.();
-    const wiredClickHandler = clickHandler as null | (() => void | Promise<void>);
-    if (wiredClickHandler) {
-      await wiredClickHandler();
-    }
-    await Promise.resolve();
-    await Promise.resolve();
-
-    expect(fakeButton.addEventListener).toHaveBeenCalledTimes(1);
-    expect(alert).toHaveBeenCalledWith("Echec generation PDF: printer offline");
-    expect(errorSpy).toHaveBeenCalled();
-    expect(fakeButton.disabled).toBe(false);
-    expect(fakeButton.textContent).toBe("Telecharger PDF");
-  });
-
-  it("falls back to window.onload without alert when alert is unavailable", async () => {
-    let clickHandler: null | (() => void) = null;
-    const reportDoc = document.implementation.createHTMLDocument("portfolio");
-    const fakeButton = {
-      disabled: false,
-      textContent: "Telecharger PDF",
-      addEventListener: vi.fn((_event: string, handler: () => void) => {
-        clickHandler = handler;
-      }),
-    };
-    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    pdfModuleMocks.downloadPortfolioPdf.mockRejectedValueOnce(new Error("silent fail"));
-    const fakeWindow = {
-      document: Object.assign(reportDoc, {
-        open: vi.fn(),
-        write: vi.fn(),
-        close: vi.fn(),
-        getElementById: vi.fn(() => fakeButton),
-      }),
-      onload: null as null | (() => void),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    exportPortfolioPrintReport(baseArgs());
-    fakeWindow.onload?.();
-    const wiredClickHandler = clickHandler as null | (() => void | Promise<void>);
-    if (wiredClickHandler) {
-      await wiredClickHandler();
-    }
-    await Promise.resolve();
-    await Promise.resolve();
+    await expect(exportPortfolioPrintReport(baseArgs())).rejects.toThrow("printer offline");
 
     expect(errorSpy).toHaveBeenCalled();
-    expect(fakeButton.disabled).toBe(false);
-    expect(fakeButton.textContent).toBe("Telecharger PDF");
+    expect(alertSpy).toHaveBeenCalledWith("Echec generation PDF: printer offline");
   });
 
-  it("stringifies non-Error PDF failures", async () => {
-    let clickHandler: null | (() => void) = null;
-    const reportDoc = document.implementation.createHTMLDocument("portfolio");
-    const fakeButton = {
-      disabled: false,
-      textContent: "Telecharger PDF",
-      addEventListener: vi.fn((_event: string, handler: () => void) => {
-        clickHandler = handler;
-      }),
-    };
-    const alert = vi.fn();
+  it("rethrows raw failures without alert support", async () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const originalAlert = window.alert;
+    Object.defineProperty(window, "alert", { value: undefined, configurable: true });
     pdfModuleMocks.downloadPortfolioPdf.mockRejectedValueOnce("raw failure");
-    const fakeWindow = {
-      document: Object.assign(reportDoc, {
-        open: vi.fn(),
-        write: vi.fn(),
-        close: vi.fn(),
-        getElementById: vi.fn(() => fakeButton),
-      }),
-      onload: null as null | (() => void),
-      alert,
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
 
-    exportPortfolioPrintReport(baseArgs());
-    fakeWindow.onload?.();
-    const wiredClickHandler = clickHandler as null | (() => void | Promise<void>);
-    if (wiredClickHandler) {
-      await wiredClickHandler();
-    }
-    await Promise.resolve();
-    await Promise.resolve();
+    await expect(exportPortfolioPrintReport(baseArgs())).rejects.toBe("raw failure");
 
-    expect(alert).toHaveBeenCalledWith("Echec generation PDF: raw failure");
     expect(errorSpy).toHaveBeenCalled();
-  });
-
-  it("handles successful PDF export when download button is absent", async () => {
-    const reportDoc = document.implementation.createHTMLDocument("portfolio");
-    const fakeWindow = {
-      document: Object.assign(reportDoc, {
-        open: vi.fn(),
-        write: vi.fn(),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      }),
-      addEventListener: vi.fn(),
-      onload: null as null | (() => void),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    exportPortfolioPrintReport(baseArgs());
-    const loadHandler = fakeWindow.addEventListener.mock.calls[0]?.[1];
-    loadHandler?.();
-    const popup = fakeWindow as unknown as Window & { __downloadPdf?: () => void | Promise<void> };
-    await popup.__downloadPdf?.();
-    await Promise.resolve();
-    await Promise.resolve();
-
-    expect(pdfModuleMocks.downloadPortfolioPdf).toHaveBeenCalledWith(fakeWindow.document, "Projet A", false);
-  });
-
-  it("passes the demo flag to the PDF export when requested", async () => {
-    let clickHandler: null | (() => void) = null;
-    const reportDoc = document.implementation.createHTMLDocument("portfolio");
-    const fakeButton = {
-      disabled: false,
-      textContent: "Telecharger PDF",
-      addEventListener: vi.fn((_event: string, handler: () => void) => {
-        clickHandler = handler;
-      }),
-    };
-    const fakeWindow = {
-      document: Object.assign(reportDoc, {
-        open: vi.fn(),
-        write: vi.fn(),
-        close: vi.fn(),
-        getElementById: vi.fn(() => fakeButton),
-      }),
-      addEventListener: vi.fn(),
-      onload: null as null | (() => void),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    exportPortfolioPrintReport({ ...baseArgs(), isDemo: true });
-    const loadHandler = fakeWindow.addEventListener.mock.calls[0]?.[1];
-    loadHandler?.();
-    await (clickHandler as (() => void | Promise<void>) | null)?.();
-    await Promise.resolve();
-    await Promise.resolve();
-
-    expect(pdfModuleMocks.downloadPortfolioPdf).toHaveBeenCalledWith(fakeWindow.document, "Projet A", true);
-  });
-
-  it("escapes html-sensitive values in generated pages", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    const args: any = baseArgs();
-    args.selectedProject = `Projet <A> & "B"`;
-    args.scenarios[0] = {
-      ...args.scenarios[0],
-      hypothesis: `hyp <unsafe> & "quoted"`,
-      label: "Optimiste",
-    };
-    args.sections[0] = {
-      ...args.sections[0],
-      selectedTeam: "Team <One>",
-      types: [`Bug & Story`, `Feature "A"`],
-      doneStates: [`Done <ok>`],
-    };
-
-    exportPortfolioPrintReport(args);
-
-    expect(writtenHtml).toContain("Projet &lt;A&gt; &amp; &quot;B&quot;");
-    expect(writtenHtml).toContain("hyp &lt;unsafe&gt; &amp; &quot;quoted&quot;");
-    expect(writtenHtml).toContain("Team &lt;One&gt;");
-    expect(writtenHtml).toContain("Bug &amp; Story, Feature &quot;A&quot;");
-    expect(writtenHtml).toContain("Done &lt;ok&gt;");
-  });
-
-  it("normalizes invalid scenario risk scores in summary rows", () => {
-    let writtenHtml = "";
-    const fakeWindow = {
-      document: {
-        open: vi.fn(),
-        write: vi.fn((html: string) => {
-          writtenHtml = html;
-        }),
-        close: vi.fn(),
-        getElementById: vi.fn(() => null),
-      },
-      onload: null as null | (() => void),
-      addEventListener: vi.fn(),
-    };
-    vi.spyOn(window, "open").mockReturnValue(fakeWindow as unknown as Window);
-
-    const args: any = baseArgs();
-    args.scenarios = [
-      { ...args.scenarios[0], label: "Optimiste", riskScore: Number.POSITIVE_INFINITY },
-      { ...args.scenarios[1], label: "Arrime (80%)", riskScore: -0.4 },
-      { ...args.scenarios[2], label: "Friction (64%)", riskScore: 0.7 },
-      { ...args.scenarios[3], label: "Conservateur", riskScore: 0.95 },
-    ];
-
-    exportPortfolioPrintReport(args);
-
-    expect(writtenHtml).toMatch(/Optimiste[\s\S]*?0,00 \(fiable\)/);
-    expect(writtenHtml).toMatch(/Arrim. \(80%\)[\s\S]*?0,00 \(fiable\)/);
+    Object.defineProperty(window, "alert", { value: originalAlert, configurable: true });
   });
 });

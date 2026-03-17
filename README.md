@@ -50,11 +50,12 @@ Comportement attendu de l'instance publique:
 - calcul du `cycleTime` extrait dans un utilitaire dedie avec couverture unitaire ciblee
 - affichage d'un `Risk Score` avec code couleur
 - export CSV du throughput hebdomadaire
+- telechargement direct du rapport PDF simulation sans fenetre intermediaire
 - historique local des dernieres simulations
 - cookie client `IDMontecarlo` pour relier un client anonyme a ses simulations persistees
 - persistence MongoDB des simulations et restitution des 10 dernieres via `/simulations/history`
 - configuration rapide des filtres (types + etats) memorisee localement
-- rapport portefeuille PDF avec progression et tolerance aux echecs partiels
+- rapport portefeuille PDF direct avec progression et tolerance aux echecs partiels
 
 Le contrat de simulation ne transporte plus de parametre de capacite reduite:
 les projections reposent uniquement sur l'historique de throughput observe.
@@ -229,8 +230,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\run-vitals
 Reference actuelle apres recalcul local:
 
 - `SLA Identite`: frontend_unit / branches = `100%`, e2e / branches = `100%`
-- `Flux onboarding critique`: frontend_unit / branches = `96.43%`, e2e / branches = `100%`
-- `Export rapport simulation (SVG/PDF)`: frontend_unit / branches = `96.25%`
+- `Flux onboarding critique`: frontend_unit / branches = `95.80%`, e2e / branches = `100%`
+- `Export rapport simulation (SVG/PDF)`: frontend_unit / branches = `96.27%`
 
 ### Variables d'environnement Mongo / purge
 

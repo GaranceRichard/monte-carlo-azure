@@ -40,7 +40,11 @@ function buildReliabilitySummary(reliability?: ThroughputReliability): string {
   return "Historique globalement stable.";
 }
 
-export function exportSimulationPrintReport({
+function buildDetachedReportDocument(html: string): Document {
+  return new DOMParser().parseFromString(html, "text/html");
+}
+
+export function buildSimulationPrintReportHtml({
   selectedTeam,
   startDate,
   endDate,
@@ -78,10 +82,7 @@ export function exportSimulationPrintReport({
   throughputPoints: ThroughputExportPoint[];
   distributionPoints: DistributionExportPoint[];
   probabilityPoints: ProbabilityExportPoint[];
-}): void {
-  const printWindow = window.open("about:blank", "_blank");
-  if (!printWindow) return;
-
+}): string {
   const cycleTimeSvg = renderCycleTimeChart(cycleTimePoints, cycleTimeTrendPoints);
   const throughputSvg = renderThroughputChart(throughputPoints);
   const distributionSvg = renderDistributionChart(distributionPoints);
@@ -106,7 +107,7 @@ export function exportSimulationPrintReport({
   const reliabilityScoreLabel = effectiveReliability ? `${formatMetric(effectiveReliability.cv)} (${reliabilityLegend})` : "Non disponible";
   const reliabilitySummary = buildReliabilitySummary(effectiveReliability);
 
-  const html = `
+  return `
       <!doctype html>
       <html lang="fr">
       <head>
@@ -155,7 +156,6 @@ export function exportSimulationPrintReport({
         </style>
       </head>
       <body>
-        <button type="button" id="download-pdf" class="print-action">Telecharger PDF</button>
         <header class="header">
           <h1 class="title">Simulation Monte Carlo - ${escapeHtml(selectedTeam)}</h1>
           <div class="summary-grid">
@@ -209,47 +209,20 @@ export function exportSimulationPrintReport({
       </body>
       </html>
     `;
+}
 
-  printWindow.document.open();
-  printWindow.document.write(html);
-  printWindow.document.close();
-
-  const popup = printWindow as Window & { __downloadPdf?: () => void };
-  popup.__downloadPdf = () => {
-    const button = printWindow.document.getElementById("download-pdf") as HTMLButtonElement | null;
-    if (button) {
-      button.disabled = true;
-      button.textContent = "Generation...";
+export async function exportSimulationPrintReport(
+  args: Parameters<typeof buildSimulationPrintReportHtml>[0],
+): Promise<void> {
+  const reportDocument = buildDetachedReportDocument(buildSimulationPrintReportHtml(args));
+  try {
+    await downloadSimulationPdf(reportDocument, args.selectedTeam);
+  } catch (err) {
+    console.error(err);
+    const message = err instanceof Error ? err.message : String(err);
+    if (typeof window.alert === "function") {
+      window.alert(`Echec generation PDF: ${message}`);
     }
-    void downloadSimulationPdf(printWindow.document, selectedTeam)
-      .catch((err) => {
-        console.error(err);
-        const message = err instanceof Error ? err.message : String(err);
-        if (typeof printWindow.alert === "function") {
-          printWindow.alert(`Echec generation PDF: ${message}`);
-        }
-      })
-      .finally(() => {
-        if (button) {
-          button.disabled = false;
-          button.textContent = "Telecharger PDF";
-        }
-      });
-  };
-
-  const wireDownloadButton = () => {
-    const button = printWindow.document.getElementById("download-pdf");
-    const bindableButton = button as (HTMLElement & { __downloadBound?: boolean }) | null;
-    if (!bindableButton || bindableButton.__downloadBound) return;
-    bindableButton.__downloadBound = true;
-    bindableButton.addEventListener("click", () => {
-      popup.__downloadPdf?.();
-    });
-  };
-  wireDownloadButton();
-  if (typeof printWindow.addEventListener === "function") {
-    printWindow.addEventListener("load", wireDownloadButton, { once: true });
-  } else {
-    printWindow.onload = wireDownloadButton;
+    throw err;
   }
 }

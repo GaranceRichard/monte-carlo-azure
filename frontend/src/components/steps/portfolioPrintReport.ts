@@ -27,6 +27,10 @@ function formatScenarioDisplayLabel(label: string): string {
   return label.startsWith("Arrime") ? label.replace("Arrime", "Arrim\u00E9") : label;
 }
 
+function buildDetachedReportDocument(html: string): Document {
+  return new DOMParser().parseFromString(html, "text/html");
+}
+
 const SCENARIO_ORDER_MATCHERS = [
   (label: PortfolioScenarioResult["label"]) => label === "Optimiste",
   (label: PortfolioScenarioResult["label"]) => label.startsWith("Arrime"),
@@ -519,7 +523,7 @@ function buildSummaryPage({
   `;
 }
 
-export function exportPortfolioPrintReport({
+export function buildPortfolioPrintReportHtml({
   isDemo = false,
   selectedProject,
   startDate,
@@ -537,10 +541,7 @@ export function exportPortfolioPrintReport({
   includedTeams: string[];
   sections: PortfolioSectionInput[];
   scenarios: PortfolioScenarioResult[];
-}): void {
-  const printWindow = window.open("about:blank", "_blank");
-  if (!printWindow) return;
-
+}): string {
   const simulationMode = sections[0]?.simulationMode ?? "backlog_to_weeks";
   const orderedScenarios = [...scenarios].sort((a, b) => getScenarioOrder(a.label) - getScenarioOrder(b.label));
 
@@ -608,7 +609,7 @@ export function exportPortfolioPrintReport({
     )
     .join("");
 
-  const html = `
+  return `
     <!doctype html>
     <html lang="fr">
     <head>
@@ -671,54 +672,26 @@ export function exportPortfolioPrintReport({
       </style>
     </head>
     <body>
-      <button type="button" id="download-pdf" class="print-action">Telecharger PDF</button>
       ${summaryPage}
       ${scenarioPages}
       ${teamPages}
     </body>
     </html>
   `;
+}
 
-  printWindow.document.open();
-  printWindow.document.write(html);
-  printWindow.document.close();
-
-  const popup = printWindow as Window & { __downloadPdf?: () => void };
-  popup.__downloadPdf = () => {
-    const button = printWindow.document.getElementById("download-pdf") as HTMLButtonElement | null;
-    if (button) {
-      button.disabled = true;
-      button.textContent = "Generation...";
+export async function exportPortfolioPrintReport(
+  args: Parameters<typeof buildPortfolioPrintReportHtml>[0],
+): Promise<void> {
+  const reportDocument = buildDetachedReportDocument(buildPortfolioPrintReportHtml(args));
+  try {
+    await downloadPortfolioPdf(reportDocument, args.selectedProject, args.isDemo);
+  } catch (err) {
+    console.error(err);
+    const message = err instanceof Error ? err.message : String(err);
+    if (typeof window.alert === "function") {
+      window.alert(`Echec generation PDF: ${message}`);
     }
-    void downloadPortfolioPdf(printWindow.document, selectedProject, isDemo)
-      .catch((err) => {
-        console.error(err);
-        const message = err instanceof Error ? err.message : String(err);
-        if (typeof printWindow.alert === "function") {
-          printWindow.alert(`Echec generation PDF: ${message}`);
-        }
-      })
-      .finally(() => {
-        if (button) {
-          button.disabled = false;
-          button.textContent = "Telecharger PDF";
-        }
-      });
-  };
-
-  const wireDownloadButton = () => {
-    const button = printWindow.document.getElementById("download-pdf");
-    const bindableButton = button as (HTMLElement & { __downloadBound?: boolean }) | null;
-    if (!bindableButton || bindableButton.__downloadBound) return;
-    bindableButton.__downloadBound = true;
-    bindableButton.addEventListener("click", () => {
-      popup.__downloadPdf?.();
-    });
-  };
-  wireDownloadButton();
-  if (typeof printWindow.addEventListener === "function") {
-    printWindow.addEventListener("load", wireDownloadButton, { once: true });
-  } else {
-    printWindow.onload = wireDownloadButton;
+    throw err;
   }
 }

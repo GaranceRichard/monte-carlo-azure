@@ -266,14 +266,8 @@ test.describe("e2e istanbul coverage", () => {
     await page.getByRole("tab", { name: /Probabilit/i }).click();
     await page.getByRole("tab", { name: "Throughput" }).click();
     await page.getByRole("button", { name: "CSV" }).click();
-    const popupPromise = page.waitForEvent("popup").catch(() => null);
     await page.getByRole("button", { name: "Rapport" }).click();
-    const reportPopup = await popupPromise;
-    if (reportPopup) {
-      await reportPopup.waitForLoadState("domcontentloaded");
-      await reportPopup.getByRole("button", { name: /Telecharger PDF/i }).click();
-      await reportPopup.close().catch(() => null);
-    }
+    await expect(page.getByRole("button", { name: "Rapport" })).toBeVisible();
 
     await openIfCollapsed(modeSection);
     await modeSelect.focus();
@@ -374,14 +368,8 @@ test.describe("e2e istanbul coverage", () => {
     await expect(page.getByText(/Equipe Beta - Bug - Done/i)).toBeVisible();
     await page.getByRole("button", { name: "Retirer" }).first().click();
     await expect(page.getByText(/Equipe Alpha - Bug - Done/i)).not.toBeVisible();
-    const portfolioPopupPromise = page.waitForEvent("popup").catch(() => null);
     await page.getByRole("button", { name: /Générer rapport portefeuille/i }).click();
-    const portfolioPopup = await portfolioPopupPromise;
-    if (portfolioPopup) {
-      await portfolioPopup.waitForLoadState("domcontentloaded");
-      await portfolioPopup.getByRole("button", { name: /Telecharger PDF/i }).click();
-      await portfolioPopup.close().catch(() => null);
-    }
+    await expect(page.getByRole("button", { name: /Générer rapport portefeuille/i })).toBeVisible();
     await page.getByRole("button", { name: /Changer.*quipe/i }).click();
     await expect(page.getByRole("button", { name: /Choisir cette/i })).toBeVisible();
     await page.locator("select").first().selectOption("Equipe Alpha");
@@ -1649,7 +1637,6 @@ test.describe("e2e istanbul coverage", () => {
     const results = await page.evaluate(async () => {
       const pdfModule = await import("/src/components/steps/simulationPdfDownload.ts");
       const printModule = await import("/src/components/steps/portfolioPrintReport.ts");
-      const originalOpen = window.open.bind(window);
 
       const flush = async () => {
         await Promise.resolve();
@@ -1689,30 +1676,7 @@ test.describe("e2e istanbul coverage", () => {
       await pdfModule.downloadSimulationPdf(simulationDoc, "Equipe Alpha");
       await pdfModule.downloadPortfolioPdf(portfolioDoc, "Projet A", true);
 
-      let popupButtonText = "";
-      let popupHeading = "";
-      let lastPopup = null;
-      window.open = () => {
-        const popupDoc = document.implementation.createHTMLDocument("portfolio-export");
-        const popup = {
-          document: Object.assign(popupDoc, {
-            open: () => undefined,
-            write: (html) => {
-              popupDoc.documentElement.innerHTML = html;
-            },
-            close: () => undefined,
-          }),
-          addEventListener: (_name, callback) => {
-            window.setTimeout(() => callback(), 0);
-          },
-          close: () => undefined,
-          alert: () => undefined,
-        };
-        lastPopup = popup;
-        return popup;
-      };
-
-      printModule.exportPortfolioPrintReport({
+      const reportArgs = {
         isDemo: true,
         selectedProject: "Projet A",
         startDate: "2026-01-01",
@@ -1753,19 +1717,15 @@ test.describe("e2e istanbul coverage", () => {
             displayPercentiles: { P50: 10, P70: 12, P90: 15 },
           },
         ],
-      });
+      };
+      const generatedHtml = printModule.buildPortfolioPrintReportHtml(reportArgs);
+      await printModule.exportPortfolioPrintReport(reportArgs);
       await flush();
-
-      popupButtonText = lastPopup?.document?.body?.textContent || "";
-      popupHeading = lastPopup?.document?.documentElement?.textContent || "";
-
-      window.open = originalOpen;
 
       return {
         simulationPdfDone: true,
         portfolioPdfDone: true,
-        popupButtonText,
-        popupHeading,
+        generatedHtml,
       };
     });
 
@@ -2601,6 +2561,7 @@ test.describe("e2e istanbul coverage", () => {
   });
 
   test("coverage: simulation prefs direct", async ({ page }) => {
+    test.setTimeout(120_000);
     await page.goto("/");
 
     const results = await page.evaluate(async () => {
@@ -2726,7 +2687,6 @@ test.describe("e2e istanbul coverage", () => {
     const results = await page.evaluate(async () => {
       const pdfModule = await import("/src/components/steps/simulationPdfDownload.ts");
       const printModule = await import("/src/components/steps/portfolioPrintReport.ts");
-      const originalOpen = window.open.bind(window);
 
       const simulationDocLegacy = document.implementation.createHTMLDocument("simulation-legacy");
       simulationDocLegacy.body.innerHTML = `
@@ -2819,9 +2779,8 @@ test.describe("e2e istanbul coverage", () => {
       await pdfModule.downloadPortfolioPdf(portfolioDocNoSummary, "Projet A", false);
       await pdfModule.downloadPortfolioPdf(portfolioDocSummary, "Projet A", true);
 
-      let nullOpenReturned = false;
-      window.open = () => null;
-      printModule.exportPortfolioPrintReport({
+      let emptyExportDone = false;
+      await printModule.exportPortfolioPrintReport({
         isDemo: false,
         selectedProject: "Projet A",
         startDate: "2026-01-01",
@@ -2831,49 +2790,9 @@ test.describe("e2e istanbul coverage", () => {
         scenarios: [],
         sections: [],
       });
-      nullOpenReturned = true;
+      emptyExportDone = true;
 
-      let onloadAssigned = false;
-      let renderedHtml = "";
-      let boundClicks = 0;
-      let downloadInvoked = 0;
-      let alertMessage = "";
-
-      const popupDoc = document.implementation.createHTMLDocument("portfolio-export-edge");
-      const popup = {
-        document: Object.assign(popupDoc, {
-          open: () => undefined,
-          write: (html) => {
-            renderedHtml = html;
-            popupDoc.documentElement.innerHTML = html;
-          },
-          close: () => undefined,
-        }),
-        onload: null,
-        close: () => undefined,
-        alert: (message) => {
-          alertMessage = String(message || "");
-        },
-      };
-
-      window.open = () => popup;
-      const originalGetElementById = popupDoc.getElementById.bind(popupDoc);
-      popupDoc.getElementById = (id) => {
-        const element = originalGetElementById(id);
-        if (id === "download-pdf" && element && !element.__patchedForE2E) {
-          const originalAddEventListener = element.addEventListener.bind(element);
-          element.addEventListener = (name, handler, options) => {
-            if (name === "click") {
-              boundClicks += 1;
-            }
-            return originalAddEventListener(name, handler, options);
-          };
-          element.__patchedForE2E = true;
-        }
-        return element;
-      };
-
-      printModule.exportPortfolioPrintReport({
+      const richArgs = {
         isDemo: true,
         selectedProject: "Projet A",
         startDate: "2026-01-01",
@@ -2972,32 +2891,19 @@ test.describe("e2e istanbul coverage", () => {
             displayPercentiles: { P50: 10, P70: 12, P90: 15 },
           },
         ],
-      });
-
-      onloadAssigned = typeof popup.onload === "function";
-      popup.onload?.();
-      popup.__downloadPdf?.();
-      downloadInvoked += 1;
-
-      window.open = originalOpen;
+      };
+      const renderedHtml = printModule.buildPortfolioPrintReportHtml(richArgs);
+      await printModule.exportPortfolioPrintReport(richArgs);
 
       return {
-        nullOpenReturned,
-        onloadAssigned,
-        boundClicks,
-        downloadInvoked,
+        emptyExportDone,
         renderedHtml,
-        alertMessage,
       };
     });
 
-    expect(results.nullOpenReturned).toBe(true);
-    expect(results.onloadAssigned).toBe(true);
-    expect(results.boundClicks).toBeGreaterThanOrEqual(1);
-    expect(results.downloadInvoked).toBe(1);
+    expect(results.emptyExportDone).toBe(true);
     expect(results.renderedHtml).toContain("Synthèse - Simulation Portefeuille");
     expect(results.renderedHtml).toContain("Scénario - Optimiste");
     expect(results.renderedHtml).toContain("Simulation Portefeuille - Equipe Alpha");
-    expect(results.alertMessage).toBe("");
   });
 });

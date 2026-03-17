@@ -51,7 +51,21 @@ vi.mock("recharts", () => {
       return <div data-testid="tooltip" />;
     },
     Legend: ({ content }: { content?: (() => React.ReactNode) | React.ReactNode }) => {
-      if (typeof content === "function") return <>{content()}</>;
+      if (typeof content === "function") {
+        return (
+          <>
+            {content({
+              payload: [
+                { value: "", dataKey: "ignored-empty", color: "#000" },
+                { value: "Moyenne glissante", dataKey: "average", color: "#123" },
+                { value: "Cycle time observé", dataKey: "observedAverage", color: "#456" },
+                { value: "Throughput", dataKey: "throughput", color: "#789" },
+                { value: "Moyenne mobile", dataKey: "movingAverage", color: "#abc" },
+              ],
+            })}
+          </>
+        );
+      }
       return <div>{content}</div>;
     },
     Bar: () => <div />,
@@ -193,6 +207,17 @@ describe("SimulationChartTabs", () => {
     expect(cycleTimeWrap).not.toBeNull();
   });
 
+  it("renders filtered legend items and dashed styles for observed series", () => {
+    const { container } = render(<SimulationChartTabs />);
+
+    expect(screen.getAllByText("Moyenne glissante").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Cycle time observé").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Throughput").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Moyenne mobile").length).toBeGreaterThan(0);
+    expect(container.textContent).not.toContain("ignored-empty");
+    expect(container.querySelector('[style*="dashed"]')).not.toBeNull();
+  });
+
   it("computes reliability from throughput data when missing from the result", () => {
     computeThroughputReliability.mockReturnValue({
       label: "fragile",
@@ -265,6 +290,26 @@ describe("SimulationChartTabs", () => {
           probabilityPoints: simulation.probabilityCurveData,
         }),
       );
+    });
+  });
+
+  it("shows a loading label during direct PDF generation", async () => {
+    let resolveExport: (() => void) | null = null;
+    exportSimulationPrintReport.mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveExport = resolve;
+      }),
+    );
+
+    render(<SimulationChartTabs />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Rapport" }));
+    expect(screen.getByRole("button", { name: "Generation..." })).toBeDisabled();
+
+    resolveExport?.();
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Rapport" })).not.toBeDisabled();
     });
   });
 

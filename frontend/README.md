@@ -71,7 +71,7 @@ Le frontend couvre notamment :
 - ecran de simulation avec percentiles, distributions et `Risk Score`
 - historique local des simulations
 - mode portefeuille multi-equipes
-- export PDF des restitutions simulation et portefeuille
+- export PDF direct des restitutions simulation et portefeuille, sans previsualisation SVG utilisateur
 - persistance locale de certaines preferences et quick filters
 
 ## Notes de structure recentes

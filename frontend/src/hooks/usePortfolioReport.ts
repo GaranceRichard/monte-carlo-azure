@@ -468,7 +468,7 @@ export function usePortfolioReport({
       }
 
       const { exportPortfolioPrintReport } = await import("../components/steps/portfolioPrintReport");
-      exportPortfolioPrintReport({
+      await exportPortfolioPrintReport({
         isDemo: demoMode,
         selectedProject,
         startDate,
