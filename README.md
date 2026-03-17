@@ -46,6 +46,7 @@ Comportement attendu de l'instance publique:
 - visualisation des percentiles et distributions
 - badge `Démo` integre a l'en-tete des ecrans demo GitHub Pages (choix d'equipe et simulation)
 - lisibilite renforcee des graphes de simulation, y compris les etiquettes de l'axe X
+- legendes de graphiques harmonisees, affichees seulement quand utiles et sans debordement en bas du panneau
 - calcul du `cycleTime` extrait dans un utilitaire dedie avec couverture unitaire ciblee
 - affichage d'un `Risk Score` avec code couleur
 - export CSV du throughput hebdomadaire

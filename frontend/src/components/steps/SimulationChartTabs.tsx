@@ -19,6 +19,7 @@ import { computeThroughputReliability } from "../../utils/simulation";
 const chartMargin = { top: 8, right: 12, left: 4, bottom: 22 };
 const xAxisTick = { fill: "var(--chart-axis)", fontSize: 12 };
 const yAxisTick = { fill: "var(--chart-axis)", fontSize: 12 };
+const sharedLegendProps = { verticalAlign: "bottom" as const, align: "center" as const, height: 44 };
 
 function formatReliabilityMetric(value: number): string {
   return value.toFixed(2).replace(".", ",");
@@ -144,6 +145,39 @@ export default function SimulationChartTabs() {
     );
   };
 
+  const renderChartLegend =
+    (allowedKeys?: ReadonlyArray<string>) =>
+    ({
+      payload,
+    }: {
+      payload?: ReadonlyArray<{ value?: string; color?: string; dataKey?: string }>;
+    } = {}) => {
+      const items = (payload ?? []).filter((entry) => {
+        if (!entry.value) return false;
+        if (!allowedKeys?.length) return true;
+        return !!entry.dataKey && allowedKeys.includes(entry.dataKey);
+      });
+    if (!items.length) return null;
+
+    return (
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-2 text-sm font-medium text-[var(--text)]">
+        {items.map((item) => (
+          <div key={item.dataKey ?? item.value} className="flex items-center gap-2 whitespace-nowrap">
+            <span
+              aria-hidden="true"
+              className="inline-block w-5 shrink-0 border-t-2"
+              style={{
+                borderColor: item.color,
+                borderTopStyle: item.dataKey === "observedAverage" || item.dataKey === "movingAverage" ? "dashed" : "solid",
+              }}
+            />
+            <span>{item.value}</span>
+          </div>
+        ))}
+      </div>
+    );
+    };
+
   async function handleExportReport(): Promise<void> {
     if (!s.result) return;
     const { exportSimulationPrintReport } = await import("./simulationPrintReport");
@@ -229,7 +263,7 @@ export default function SimulationChartTabs() {
                     <XAxis dataKey="week" tick={xAxisTick} tickMargin={10} minTickGap={24} />
                     <YAxis domain={[0, getCycleTimeYAxisMax]} tick={yAxisTick} />
                     <Tooltip {...s.tooltipBaseProps} content={renderCycleTimeTooltip} />
-                    <Legend />
+                    <Legend {...sharedLegendProps} content={renderChartLegend(["average", "observedAverage"])} />
                     <Area
                       type="monotone"
                       dataKey="bandBase"
@@ -303,7 +337,7 @@ export default function SimulationChartTabs() {
                     tick={yAxisTick}
                   />
                   <Tooltip {...s.tooltipBaseProps} content={renderThroughputTooltip} />
-                  <Legend />
+                  <Legend {...sharedLegendProps} content={renderChartLegend()} />
                   <Bar dataKey="throughput" name="Throughput" fill="var(--p90)" radius={[5, 5, 0, 0]} />
                   <Line type="monotone" dataKey="throughput" dot={false} strokeWidth={2} stroke="var(--brand)" name="Courbe" />
                   <Line
@@ -339,7 +373,6 @@ export default function SimulationChartTabs() {
                       return [Number(v).toFixed(1), name];
                     }}
                   />
-                  <Legend />
                   <Bar dataKey="count" fill="var(--p90)" radius={[5, 5, 0, 0]} />
                   <Line type="monotone" dataKey="gauss" dot={false} strokeWidth={2.5} stroke="var(--brand)" />
                 </ComposedChart>
@@ -369,7 +402,6 @@ export default function SimulationChartTabs() {
                       s.result?.result_kind === "items" ? "P(X >= valeur)" : "P(X <= valeur)",
                     ]}
                   />
-                  <Legend />
                   <Line type="monotone" dataKey="probability" dot={false} strokeWidth={2.5} stroke="var(--brand)" />
                 </LineChart>
               </ResponsiveContainer>
