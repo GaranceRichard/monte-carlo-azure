@@ -6,14 +6,7 @@ Outil de prevision base sur une simulation Monte Carlo. L'application aide a tra
 
 Demo GitHub Pages:
 
-- page publique: [https://garancerichard.github.io/monte-carlo-azure/](https://garancerichard.github.io/monte-carlo-azure/)
-- notice de connexion Azure DevOps: [https://garancerichard.github.io/monte-carlo-azure/?connect=true](https://garancerichard.github.io/monte-carlo-azure/?connect=true)
-
-Comportement attendu de l'instance publique:
-
-- `/` charge directement la demo publique sur l'ecran de choix d'equipe
-- `?demo=true` force explicitement la demo publique sur l'ecran de choix d'equipe
-- `?connect=true` affiche la notice publique de connexion Azure DevOps reelle
+- Démo publique: [https://garancerichard.github.io/monte-carlo-azure/](https://garancerichard.github.io/monte-carlo-azure/)
 
 ## En bref
 
