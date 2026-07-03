@@ -123,12 +123,39 @@ def mc_items_done_for_weeks(
     return draws.sum(axis=1).astype(int)
 
 
-def percentiles(arr: np.ndarray, ps: Tuple[int, ...] = (50, 80, 90)) -> Dict[str, int]:
+def _discrete_quantile(
+    arr: np.ndarray,
+    q: float,
+    method: Literal["higher", "lower"],
+) -> int:
+    values = np.asarray(arr, dtype=int)
+    if values.size == 0:
+        raise ValueError("arr est vide")
+    return int(np.quantile(values, q, method=method))
+
+
+def percentiles(
+    arr: np.ndarray,
+    mode: Literal["backlog_to_weeks", "weeks_to_items"],
+    ps: Tuple[int, ...] = (50, 80, 90),
+) -> Dict[str, int]:
     """
-    Calcule des percentiles (P50/P80/P90...) sur un array.
+    Calcule des percentiles metier entiers selon le mode de simulation.
+
+    - backlog_to_weeks: quantile empirique discret conservateur "higher"
+      pour lire "X% des simulations finissent en PXX semaines ou moins".
+    - weeks_to_items: quantile de survie discret "lower" pour lire
+      "X% des simulations livrent au moins PXX items".
     """
-    a = np.asarray(arr)
-    return {f"P{p}": int(np.percentile(a, p)) for p in ps}
+    out: Dict[str, int] = {}
+    for p in ps:
+        if mode == "weeks_to_items":
+            q = max(0.0, min(1.0, (100 - p) / 100))
+            out[f"P{p}"] = _discrete_quantile(arr, q, method="lower")
+        else:
+            q = max(0.0, min(1.0, p / 100))
+            out[f"P{p}"] = _discrete_quantile(arr, q, method="higher")
+    return out
 
 
 def risk_score(

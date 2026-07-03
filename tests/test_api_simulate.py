@@ -1,5 +1,6 @@
 import time
 
+import numpy as np
 import pytest
 from slowapi.errors import RateLimitExceeded
 from starlette.requests import Request
@@ -35,6 +36,11 @@ def test_simulate_backlog_to_weeks_success():
     assert "risk_score" in body
     assert isinstance(body["risk_score"], float)
     assert body["throughput_reliability"]["samples_count"] == 6
+    assert (
+        body["result_percentiles"]["P50"]
+        <= body["result_percentiles"]["P70"]
+        <= body["result_percentiles"]["P90"]
+    )
     assert set(body["throughput_reliability"].keys()) == {
         "cv",
         "iqr_ratio",
@@ -74,6 +80,11 @@ def test_simulate_weeks_to_items_success():
     assert "risk_score" in body
     assert isinstance(body["risk_score"], float)
     assert body["throughput_reliability"]["samples_count"] == 6
+    assert (
+        body["result_percentiles"]["P50"]
+        >= body["result_percentiles"]["P70"]
+        >= body["result_percentiles"]["P90"]
+    )
     expected = (
         (body["result_percentiles"]["P50"] - body["result_percentiles"]["P90"])
         / body["result_percentiles"]["P50"]
@@ -220,6 +231,39 @@ def test_simulate_returns_503_when_forecast_timeout_is_exceeded(monkeypatch):
 
     assert response.status_code == 503
     assert "Simulation trop longue" in response.json()["detail"]
+
+
+def test_simulate_returns_business_percentiles_for_known_discrete_results(monkeypatch):
+    client = ApiTestClient(app)
+    backlog_payload = {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000,
+    }
+    items_payload = {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "mode": "weeks_to_items",
+        "target_weeks": 5,
+        "n_sims": 1000,
+    }
+    known_backlog = np.array([3, 4, 6, 8, 10], dtype=int)
+    known_items = np.array([18, 22, 24, 25, 27], dtype=int)
+
+    def fake_compute(req, _samples):
+        if req.mode == "backlog_to_weeks":
+            return known_backlog, "weeks"
+        return known_items, "items"
+
+    monkeypatch.setattr("backend.api_routes_simulate._compute_simulation_result", fake_compute)
+
+    backlog_response = client.post("/simulate", json=backlog_payload)
+    items_response = client.post("/simulate", json=items_payload)
+
+    assert backlog_response.status_code == 200
+    assert backlog_response.json()["result_percentiles"] == {"P50": 6, "P70": 8, "P90": 10}
+    assert items_response.status_code == 200
+    assert items_response.json()["result_percentiles"] == {"P50": 24, "P70": 22, "P90": 18}
 
 
 class _FakeStore:

@@ -22,6 +22,13 @@ function smoothHistogramCounts(points: Array<{ x: number; count: number }>): num
   });
 }
 
+function isLegacyItemsPercentiles(percentiles: Record<string, number>): boolean {
+  const p50 = Number(percentiles.P50);
+  const p70 = Number(percentiles.P70);
+  const p90 = Number(percentiles.P90);
+  return Number.isFinite(p50) && Number.isFinite(p70) && Number.isFinite(p90) && p50 <= p70 && p70 <= p90;
+}
+
 export function useSimulationChartData({
   weeklyThroughput,
   cycleTimeData,
@@ -78,6 +85,7 @@ export function useSimulationChartData({
   const displayPercentiles = useMemo((): Record<string, number> => {
     if (!result) return {};
     if (result.result_kind !== "items") return result.result_percentiles;
+    if (!isLegacyItemsPercentiles(result.result_percentiles)) return result.result_percentiles;
 
     const points = result.result_distribution
       .map((b) => ({ x: Number(b.x), count: Number(b.count) }))

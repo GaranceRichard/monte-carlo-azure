@@ -75,4 +75,18 @@ describe("buildAtLeastPercentiles", () => {
     expect(p.P70).toBe(49);
     expect(p.P90).toBe(49);
   });
+
+  it("matches the conservative survival percentiles for a known discrete distribution", () => {
+    const points = [
+      { x: 18, count: 1 },
+      { x: 22, count: 1 },
+      { x: 24, count: 1 },
+      { x: 25, count: 1 },
+      { x: 27, count: 1 },
+    ];
+
+    const p = buildAtLeastPercentiles(points, [50, 70, 90]);
+
+    expect(p).toEqual({ P50: 24, P70: 22, P90: 18 });
+  });
 });

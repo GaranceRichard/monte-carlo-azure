@@ -4,6 +4,9 @@
 
 ### Frontend
 
+- `weeks_to_items` n'effectue plus de double recalcul systematique des percentiles:
+  les nouvelles reponses API utilisent directement `result_percentiles`, avec fallback
+  histogramme conserve uniquement pour les historiques legacy detectes
 - durcissement du workflow GitHub Pages avec une seconde tentative de `actions/deploy-pages` quand GitHub renvoie un echec transitoire apres creation du deploiement
 - correction de la CI Playwright: le job `frontend-tests` installe aussi les dependances Python backend requises par `run_app.py` (`uvicorn`, FastAPI, etc.) avant `npm run test:e2e`
 - stabilisation de `vitest run --coverage` sous Windows via `pool: "forks"` et `coverage.processingConcurrency: 1` pour eviter les erreurs V8 `ENOENT` sur `frontend/coverage/.tmp/coverage-*.json`
@@ -58,6 +61,9 @@
 
 ### Backend et tests
 
+- correction de la semantique des percentiles Monte Carlo selon le mode:
+  `backlog_to_weeks` utilise un quantile discret conservateur `higher`, `weeks_to_items`
+  un quantile de survie `lower`, avec tests discrets cibles sur l'API et `mc_core`
 - remplacement du client de test `fastapi.testclient.TestClient` par un helper local base sur `httpx` pour eviter le warning de depreciation Starlette/FastAPI dans les tests API
 - auto-reparation de l'index TTL Mongo `last_seen_1` au demarrage en cas de conflit d'options historique
 - tri des imports `slowapi` dans `backend/api.py` pour conformite Ruff/isort

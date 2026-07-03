@@ -110,6 +110,7 @@ Restitution attendue :
 
 - `P50` pour une lecture mediane
 - `P85` ou `P90` pour une lecture prudente
+  - en `backlog_to_weeks`, prudent = plus de semaines
 - `Risk Score` pour objectiver la dispersion
 
 Decision supportee :
@@ -125,6 +126,12 @@ Question metier :
 "Combien d'items peut-on livrer en N semaines avec un niveau de confiance donne ?"
 
 Le produit repond a cette question via le mode `weeks_to_items`.
+
+Lecture attendue :
+
+- `P50` pour une lecture mediane
+- `P90` pour une lecture prudente
+  - en `weeks_to_items`, prudent = moins d'items garantis
 
 ### 3. Piloter un portefeuille
 
@@ -152,6 +159,8 @@ Le coeur du produit repose sur :
 - la simulation Monte Carlo
 - l'agregation des iterations simulees
 - le recalcul des percentiles selon le mode utilise
+  - `backlog_to_weeks`: quantile discret conservateur sur `P(X <= semaines)`
+  - `weeks_to_items`: quantile de survie sur `P(X >= items)`
 
 En mode portefeuille, le produit compare plusieurs hypotheses d'agregation plutot que de masquer l'incertitude derriere une seule projection.
 

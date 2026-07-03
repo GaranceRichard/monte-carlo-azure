@@ -209,7 +209,7 @@ async def simulate(
             "Simulation trop longue. Reessayez avec moins de simulations ou plus tard.",
         ) from exc
 
-    simulation_percentiles = percentiles(result, ps=(50, 70, 90))
+    simulation_percentiles = percentiles(result, req.mode, ps=(50, 70, 90))
     reliability = ThroughputReliability(**throughput_reliability(samples))
     response_model = SimulateResponse(
         result_kind=kind,

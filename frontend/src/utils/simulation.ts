@@ -98,8 +98,27 @@ function histogramBuckets(values: number[], maxBuckets = 100): { x: number; coun
     .map(([x, count]) => ({ x, count }));
 }
 
-function discretePercentiles(values: number[], ps: number[]): Record<string, number> {
-  return Object.fromEntries(ps.map((p) => [`P${p}`, Math.floor(percentile(values, p))]));
+function discreteQuantile(values: number[], q: number, mode: "higher" | "lower"): number {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const rawIndex = q * (sorted.length - 1);
+  const index = mode === "higher" ? Math.ceil(rawIndex) : Math.floor(rawIndex);
+  return sorted[Math.max(0, Math.min(sorted.length - 1, index))] ?? 0;
+}
+
+function discretePercentiles(
+  values: number[],
+  simulationMode: ForecastMode,
+  ps: number[],
+): Record<string, number> {
+  return Object.fromEntries(
+    ps.map((p) => {
+      if (simulationMode === "weeks_to_items") {
+        return [`P${p}`, discreteQuantile(values, (100 - p) / 100, "lower")];
+      }
+      return [`P${p}`, discreteQuantile(values, p / 100, "higher")];
+    }),
+  );
 }
 
 export function simulateMonteCarloLocal({
@@ -145,7 +164,7 @@ export function simulateMonteCarloLocal({
     results[i] = delivered;
   }
 
-  const resultPercentiles = discretePercentiles(results, [50, 70, 90]);
+  const resultPercentiles = discretePercentiles(results, mode, [50, 70, 90]);
   return {
     result_kind: mode === "backlog_to_weeks" ? "weeks" : "items",
     samples_count: samples.length,

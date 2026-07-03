@@ -156,12 +156,30 @@ def test_histogram_buckets_aggregated_skips_zero_count_bins():
 
 def test_percentiles_default_and_custom():
     arr = np.array([1, 2, 3, 4, 5], dtype=int)
-    p = percentiles(arr)
+    p = percentiles(arr, "backlog_to_weeks")
     assert set(p.keys()) == {"P50", "P80", "P90"}
     assert p["P50"] == 3
 
-    p2 = percentiles(arr, ps=(25, 75))
+    p2 = percentiles(arr, "backlog_to_weeks", ps=(25, 75))
     assert set(p2.keys()) == {"P25", "P75"}
+
+
+def test_percentiles_backlog_to_weeks_use_conservative_higher_quantiles():
+    arr = np.array([3, 4, 6, 8, 10], dtype=int)
+
+    p = percentiles(arr, "backlog_to_weeks", ps=(50, 70, 90))
+
+    assert p == {"P50": 6, "P70": 8, "P90": 10}
+    assert p["P50"] <= p["P70"] <= p["P90"]
+
+
+def test_percentiles_weeks_to_items_use_survival_lower_quantiles():
+    arr = np.array([18, 22, 24, 25, 27], dtype=int)
+
+    p = percentiles(arr, "weeks_to_items", ps=(50, 70, 90))
+
+    assert p == {"P50": 24, "P70": 22, "P90": 18}
+    assert p["P50"] >= p["P70"] >= p["P90"]
 
 
 def test_risk_score_basic_and_guardrails():

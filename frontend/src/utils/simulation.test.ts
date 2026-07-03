@@ -295,6 +295,8 @@ describe("simulateMonteCarloLocal", () => {
 
     expect(result.result_kind).toBe("items");
     expect(result.result_percentiles.P50).toBeGreaterThan(0);
+    expect(result.result_percentiles.P50).toBeGreaterThanOrEqual(result.result_percentiles.P70);
+    expect(result.result_percentiles.P70).toBeGreaterThanOrEqual(result.result_percentiles.P90);
     expect(result.result_distribution.length).toBeGreaterThan(0);
     expect(result.throughput_reliability?.label).toBe("incertain");
   });

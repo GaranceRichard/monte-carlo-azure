@@ -37,6 +37,9 @@ Demo GitHub Pages:
 - mode `Portefeuille` multi-equipes
 - simulation Monte Carlo cote backend (`POST /simulate`)
 - visualisation des percentiles et distributions
+- semantique metier des percentiles alignee sur le mode de simulation:
+  - `backlog_to_weeks`: `P90` = 90% des simulations finissent en `P90` semaines ou moins
+  - `weeks_to_items`: `P90` = 90% des simulations livrent au moins `P90` items
 - badge `Démo` integre a l'en-tete des ecrans demo GitHub Pages (choix d'equipe et simulation)
 - lisibilite renforcee des graphes de simulation, y compris les etiquettes de l'axe X
 - legendes de graphiques harmonisees, affichees seulement quand utiles et sans debordement en bas du panneau
@@ -56,6 +59,9 @@ La route `POST /simulate` isole aussi la persistance Mongo du calcul principal:
 la reponse utilisateur est retournee des que la simulation est prete, puis l'ecriture
 de l'historique part en arriere-plan. Si Mongo est indisponible, l'incident reste limite
 a l'historique et ne bloque plus le resultat de simulation.
+Pour `weeks_to_items`, le frontend consomme directement les `result_percentiles`
+renvoyes par l'API et ne recalcule depuis l'histogramme que pour d'anciens historiques
+detectes par un ordre legacy `P50 <= P70 <= P90`.
 
 ---
 

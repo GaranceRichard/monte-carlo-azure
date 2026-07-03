@@ -159,10 +159,18 @@ Le backend persiste aussi la simulation dans MongoDB (collection `simulations`) 
 - mode `backlog_to_weeks`
   - question: "en combien de semaines terminer le backlog ?"
   - lecture: `P(X <= semaines)`
+  - percentiles API: quantile empirique discret conservateur `higher`
+  - ordre attendu: `P50 <= P70 <= P90`
+  - exemple de lecture: `P90 = 90%` des simulations finissent en `P90` semaines ou moins
   - formule `risk_score`: `(P90 - P50) / P50`
 - mode `weeks_to_items`
   - question: "combien d'items livrer en N semaines ?"
-  - en UI, la courbe est affichee en `P(X >= items)`
+  - percentiles API: quantile de survie discret `lower`
+  - niveaux utilises: `P90 -> q10`, `P70 -> q30`, `P50 -> q50`
+  - ordre attendu: `P50 >= P70 >= P90`
+  - lecture percentiles et courbe UI: `P(X >= items)`
+  - compatibilite historique: le frontend ne recalcule depuis l'histogramme que pour
+    d'anciennes reponses detectees par l'ordre legacy `P50 <= P70 <= P90`
   - formule `risk_score`: `(P50 - P90) / P50`
 
 ## Qualite technique
