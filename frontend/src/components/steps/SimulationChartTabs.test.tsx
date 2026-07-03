@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import SimulationChartTabs, { getCycleTimeYAxisMax, getThroughputYAxisMax } from "./SimulationChartTabs";
@@ -9,9 +10,9 @@ const {
   exportSimulationPrintReport,
   computeThroughputReliability,
 } = vi.hoisted(() => ({
-  yAxisCalls: [] as Array<Record<string, unknown>>,
-  xAxisCalls: [] as Array<Record<string, unknown>>,
-  tooltipCalls: [] as Array<Record<string, unknown>>,
+  yAxisCalls: [] as any[],
+  xAxisCalls: [] as any[],
+  tooltipCalls: [] as any[],
   exportSimulationPrintReport: vi.fn(),
   computeThroughputReliability: vi.fn(),
 }));
@@ -30,12 +31,10 @@ vi.mock("../../utils/simulation", () => ({
 }));
 
 vi.mock("recharts", () => {
-  const React = require("react");
-
   return {
-    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    ComposedChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    LineChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    ResponsiveContainer: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    ComposedChart: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    LineChart: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     Area: () => <div />,
     CartesianGrid: () => <div />,
     XAxis: (props: Record<string, unknown>) => {
@@ -50,7 +49,7 @@ vi.mock("recharts", () => {
       tooltipCalls.push(props);
       return <div data-testid="tooltip" />;
     },
-    Legend: ({ content }: { content?: (() => React.ReactNode) | React.ReactNode }) => {
+    Legend: ({ content }: { content?: ((props: { payload: Array<Record<string, string>> }) => ReactNode) | ReactNode }) => {
       if (typeof content === "function") {
         return (
           <>
@@ -74,7 +73,7 @@ vi.mock("recharts", () => {
 });
 
 vi.mock("../ui/tabs", () => ({
-  TabsRoot: ({ children, onValueChange }: { children: React.ReactNode; onValueChange?: (value: string) => void }) => (
+  TabsRoot: ({ children, onValueChange }: { children: ReactNode; onValueChange?: (value: string) => void }) => (
     <div>
       <button type="button" onClick={() => onValueChange?.("distribution")}>
         trigger-tab-change
@@ -82,9 +81,9 @@ vi.mock("../ui/tabs", () => ({
       {children}
     </div>
   ),
-  TabsList: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  TabsTrigger: ({ children, value }: { children: React.ReactNode; value: string }) => <button data-value={value}>{children}</button>,
-  TabsContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  TabsList: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  TabsTrigger: ({ children, value }: { children: ReactNode; value: string }) => <button data-value={value}>{children}</button>,
+  TabsContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
 vi.mock("../../hooks/SimulationContext", () => ({
@@ -294,7 +293,7 @@ describe("SimulationChartTabs", () => {
   });
 
   it("shows a loading label during direct PDF generation", async () => {
-    let resolveExport: (() => void) | null = null;
+    let resolveExport: (() => void) | undefined;
     exportSimulationPrintReport.mockReturnValue(
       new Promise<void>((resolve) => {
         resolveExport = resolve;
@@ -306,7 +305,9 @@ describe("SimulationChartTabs", () => {
     fireEvent.click(screen.getByRole("button", { name: "Rapport" }));
     expect(screen.getByRole("button", { name: "Generation..." })).toBeDisabled();
 
-    resolveExport?.();
+    if (resolveExport) {
+      resolveExport();
+    }
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Rapport" })).not.toBeDisabled();

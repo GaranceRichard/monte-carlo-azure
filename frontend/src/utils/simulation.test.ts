@@ -4,6 +4,7 @@ import {
   computeRiskLegend,
   computeRiskScoreFromPercentiles,
   computeThroughputReliability,
+  getProjectionReliabilityNotice,
   simulateMonteCarloLocal,
 } from "./simulation";
 import { DEMO_TEAM_SAMPLES } from "../demoData";
@@ -209,6 +210,59 @@ describe("computeThroughputReliability", () => {
     expect(computeThroughputReliability(DEMO_TEAM_SAMPLES.Alpha)?.label).toBe("fiable");
     expect(computeThroughputReliability(DEMO_TEAM_SAMPLES.Beta)?.label).toBe("fragile");
     expect(computeThroughputReliability(DEMO_TEAM_SAMPLES.Gamma)?.label).toBe("incertain");
+  });
+});
+
+describe("getProjectionReliabilityNotice", () => {
+  it("returns null when reliability is absent", () => {
+    expect(getProjectionReliabilityNotice()).toBeNull();
+    expect(getProjectionReliabilityNotice(null)).toBeNull();
+  });
+
+  it("returns the volatility notice when cv or iqr_ratio is high", () => {
+    expect(
+      getProjectionReliabilityNotice({
+        cv: 1,
+        iqr_ratio: 0.2,
+        slope_norm: 0,
+        label: "fragile",
+        samples_count: 8,
+      }),
+    ).toContain("Historique trop volatil");
+
+    expect(
+      getProjectionReliabilityNotice({
+        cv: 0.2,
+        iqr_ratio: 1,
+        slope_norm: 0,
+        label: "fragile",
+        samples_count: 8,
+      }),
+    ).toContain("Historique trop volatil");
+  });
+
+  it("returns the non fiable notice when the label is non fiable without high volatility", () => {
+    expect(
+      getProjectionReliabilityNotice({
+        cv: 0.2,
+        iqr_ratio: 0.3,
+        slope_norm: 0,
+        label: "non fiable",
+        samples_count: 5,
+      }),
+    ).toContain("Projection non fiable");
+  });
+
+  it("returns null for reliable or uncertain non-volatile histories", () => {
+    expect(
+      getProjectionReliabilityNotice({
+        cv: 0.2,
+        iqr_ratio: 0.3,
+        slope_norm: 0,
+        label: "fiable",
+        samples_count: 12,
+      }),
+    ).toBeNull();
   });
 });
 

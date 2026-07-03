@@ -29,7 +29,6 @@ export default function OrgStep({
   const welcomeTitle = userName && userName !== "Utilisateur" ? `Bienvenue ${userName}` : "Bienvenue";
   const manualOrgInputRef = useRef<HTMLInputElement | null>(null);
   const orgSelectRef = useRef<HTMLSelectElement | null>(null);
-  const entityLabel = deploymentTarget === "onprem" ? "collection" : "organisation";
   const entityLabelTitle = deploymentTarget === "onprem" ? "Collection Azure DevOps Server" : "Organisation Azure DevOps";
   const entityPlaceholder = deploymentTarget === "onprem" ? "Nom de la collection" : "Nom de l'organisation";
   const buttonLabel = deploymentTarget === "onprem" ? "Choisir cette collection" : "Choisir cette organisation";

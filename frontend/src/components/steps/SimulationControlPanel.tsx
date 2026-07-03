@@ -60,14 +60,10 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
   }
 
   useEffect(() => {
-    if (hasRequiredFilters && validationMessage) {
-      setValidationMessage("");
-    }
-  }, [hasRequiredFilters, validationMessage]);
-
-  useEffect(() => {
     onExpansionChange?.(openSection !== null);
   }, [openSection, onExpansionChange]);
+
+  const effectiveValidationMessage = hasRequiredFilters ? "" : validationMessage;
 
   return (
     <>
@@ -142,8 +138,7 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
           {s.loading ? "Calcul..." : "Lancer la simulation"}
         </button>
       )}
-      {validationMessage && <div className="sim-validation-error">{validationMessage}</div>}
+      {effectiveValidationMessage && <div className="sim-validation-error">{effectiveValidationMessage}</div>}
     </>
   );
 }
-

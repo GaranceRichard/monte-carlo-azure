@@ -257,3 +257,14 @@ export function computeThroughputReliability(samples: number[]): ThroughputRelia
     samples_count: sampleCount,
   };
 }
+
+export function getProjectionReliabilityNotice(reliability?: ThroughputReliability | null): string | null {
+  if (!reliability) return null;
+  if (reliability.cv >= 1 || reliability.iqr_ratio >= 1) {
+    return "Historique trop volatil pour fonder une projection fiable. Les percentiles restent utiles pour explorer des scenarios, pas pour soutenir un engagement.";
+  }
+  if (reliability.label === "non fiable") {
+    return "Projection non fiable: l'historique disponible est trop court ou trop degrade pour soutenir un engagement.";
+  }
+  return null;
+}

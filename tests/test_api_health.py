@@ -1,18 +1,17 @@
-from fastapi.testclient import TestClient
-
 from backend import api
 from backend.api import app
+from tests.http_client import ApiTestClient
 
 
 def test_health():
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.get("/health")
     assert r.status_code == 200
     assert r.json() == {"status": "ok"}
 
 
 def test_health_cors_preflight_allows_get():
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.options(
         "/health",
         headers={
@@ -30,7 +29,7 @@ def test_health_mongo_disabled_returns_disabled(monkeypatch):
         enabled = False
 
     monkeypatch.setattr(api, "simulation_store", _DisabledStore())
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.get("/health/mongo")
     assert r.status_code == 200
     assert r.json() == {"status": "disabled"}
@@ -45,7 +44,7 @@ def test_health_mongo_enabled_returns_ok(monkeypatch):
             return True
 
     monkeypatch.setattr(api, "simulation_store", _EnabledStore())
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.get("/health/mongo")
     assert r.status_code == 200
     assert r.json() == {"status": "ok"}
@@ -60,7 +59,7 @@ def test_health_mongo_enabled_but_unreachable_returns_503(monkeypatch):
             raise RuntimeError("down")
 
     monkeypatch.setattr(api, "simulation_store", _FailingStore())
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.get("/health/mongo")
     assert r.status_code == 503
     assert r.json()["detail"] == "mongo_unreachable"

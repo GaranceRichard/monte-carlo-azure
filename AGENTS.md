@@ -26,6 +26,14 @@ For every task:
    - DoD compliant / Not DoD compliant
    - Publishable / Not publishable
 
+## Known validation memory
+
+- In this repo, a red uncovered line in a coverage report is considered invalid and must be covered before the task is acceptable, even if global thresholds are green.
+- In this local Codex environment, frontend Vitest coverage can fail inside the sandbox with `esbuild` errors like `Cannot read directory "../../../..": Access is denied.` or `Could not resolve ... vitest.config.js`.
+- When that exact sandbox-only failure appears, do not re-diagnose the frontend code or relax the gate: rerun the same validation outside the sandbox and continue from the real result.
+- Frontend Vitest coverage on Windows must stay on a stable execution path. If `vitest run --coverage` passes all tests and then crashes with `ENOENT ... frontend\\coverage\\.tmp\\coverage-*.json`, treat it as a coverage aggregation instability, not a test failure regression.
+- Preserve the stable fix for this repo: `frontend/vitest.config.js` uses `pool: "forks"` and `coverage.processingConcurrency: 1` to avoid losing temporary V8 coverage files during report generation.
+
 ## Forbidden behaviors
 
 - No skipped validation presented as complete.

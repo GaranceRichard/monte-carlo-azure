@@ -1,7 +1,6 @@
 import time
 
 import pytest
-from fastapi.testclient import TestClient
 from slowapi.errors import RateLimitExceeded
 from starlette.requests import Request
 
@@ -13,10 +12,11 @@ from backend.api_routes_simulate import (
     _persist_simulation,
     limiter,
 )
+from tests.http_client import ApiTestClient
 
 
 def test_simulate_backlog_to_weeks_success():
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.post(
         "/simulate",
         json={
@@ -56,7 +56,7 @@ def test_simulate_backlog_to_weeks_success():
 
 
 def test_simulate_weeks_to_items_success():
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.post(
         "/simulate",
         json={
@@ -82,7 +82,7 @@ def test_simulate_weeks_to_items_success():
 
 
 def test_simulate_include_zero_weeks_keeps_zero_samples():
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.post(
         "/simulate",
         json={
@@ -101,7 +101,7 @@ def test_simulate_include_zero_weeks_keeps_zero_samples():
 
 
 def test_simulate_requires_backlog_size_for_backlog_mode():
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.post(
         "/simulate",
         json={
@@ -116,7 +116,7 @@ def test_simulate_requires_backlog_size_for_backlog_mode():
 
 
 def test_simulate_requires_target_weeks_for_weeks_mode():
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.post(
         "/simulate",
         json={
@@ -131,7 +131,7 @@ def test_simulate_requires_target_weeks_for_weeks_mode():
 
 
 def test_simulate_rejects_insufficient_non_zero_history():
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.post(
         "/simulate",
         json={
@@ -147,7 +147,7 @@ def test_simulate_rejects_insufficient_non_zero_history():
 
 
 def test_simulate_rejects_short_raw_samples_list():
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.post(
         "/simulate",
         json={
@@ -162,7 +162,7 @@ def test_simulate_rejects_short_raw_samples_list():
 
 
 def test_simulate_rate_limit_returns_429():
-    client = TestClient(app)
+    client = ApiTestClient(app)
     payload = {
         "throughput_samples": [1, 2, 3, 4, 5, 6],
         "mode": "backlog_to_weeks",
@@ -181,7 +181,7 @@ def test_simulate_rate_limit_returns_429():
 
 
 def test_simulate_returns_503_when_forecast_timeout_is_exceeded(monkeypatch):
-    client = TestClient(app)
+    client = ApiTestClient(app)
     payload = {
         "throughput_samples": [1, 2, 3, 4, 5, 6],
         "mode": "backlog_to_weeks",
@@ -370,7 +370,7 @@ def test_client_key_returns_unknown_without_forwarded_or_client():
 def test_simulate_logs_warning_and_stays_permissive_when_rate_limit_storage_fails(
     monkeypatch, caplog
 ):
-    client = TestClient(app)
+    client = ApiTestClient(app)
     payload = {
         "throughput_samples": [1, 2, 3, 4, 5, 6],
         "mode": "backlog_to_weeks",

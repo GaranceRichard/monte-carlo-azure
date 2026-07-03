@@ -343,7 +343,6 @@ export async function downloadPortfolioPdf(
       const colRatios = getSummaryTableColumnRatios(headerCells.length);
       const colWidths = colRatios.map((ratio) => ratio * contentW);
       const cellPaddingX = 2;
-      const lineHeight = 4;
       const getWrappedLines = (text: string, width: number): string[] => {
         return splitPdfText(pdf, text, Math.max(width - cellPaddingX * 2, 8));
       };

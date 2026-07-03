@@ -1,8 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import ProgressBar from "../ui/progress";
 import { useSimulationContext } from "../../hooks/SimulationContext";
 import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
-import { computeRiskScoreFromPercentiles, computeThroughputReliability } from "../../utils/simulation";
+import {
+  computeRiskScoreFromPercentiles,
+  computeThroughputReliability,
+  getProjectionReliabilityNotice,
+} from "../../utils/simulation";
 
 function formatHistoryEntryLabel(entry: {
   createdAt: string;
@@ -49,11 +53,7 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
         ? "simulation enregistrée"
         : "simulations enregistrées";
 
-  useEffect(() => {
-    if (!teamHistory.length || !teamHistory.some((item) => item.id === selectedHistoryId)) {
-      setSelectedHistoryId("");
-    }
-  }, [teamHistory, selectedHistoryId]);
+  const effectiveSelectedHistoryId = teamHistory.some((item) => item.id === selectedHistoryId) ? selectedHistoryId : "";
 
   const kpiToneByLabel: Record<string, string> = {
     P50: "border-[var(--p50)] bg-[var(--p50-soft)]",
@@ -86,12 +86,10 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
     return "non fiable";
   }, [riskScoreValue]);
 
-  const reliability = useMemo(() => {
-    if (s.result?.throughput_reliability) {
-      return s.result.throughput_reliability;
-    }
-    return computeThroughputReliability((s.throughputData ?? []).map((point) => point.throughput));
-  }, [s.result?.throughput_reliability, s.throughputData]);
+  const reliability =
+    s.result?.throughput_reliability ??
+    computeThroughputReliability((s.throughputData ?? []).map((point) => point.throughput));
+  const reliabilityNotice = getProjectionReliabilityNotice(reliability);
 
   const combinedIndicatorTone = useMemo(() => {
     const labels = [riskLegend, reliability?.label].filter(Boolean);
@@ -128,6 +126,12 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
       {s.warning && (
         <div className="rounded-xl border border-[var(--warningBorder)] bg-[var(--warningBg)] p-3 text-xs text-[var(--text)]">
           <b>Avertissement:</b> {s.warning}
+        </div>
+      )}
+
+      {reliabilityNotice && (
+        <div className="rounded-xl border border-red-300 bg-red-50 p-3 text-xs text-red-900">
+          <b>Projection a cadrer:</b> {reliabilityNotice}
         </div>
       )}
 
@@ -187,7 +191,7 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
           ) : (
             <div className="space-y-2">
               <select
-                value={selectedHistoryId}
+                value={effectiveSelectedHistoryId}
                 onFocus={keepSelectDropdownAtTop}
                 onMouseDown={keepSelectDropdownAtTop}
                 onChange={(e) => {

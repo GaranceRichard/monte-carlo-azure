@@ -1,7 +1,6 @@
-from fastapi.testclient import TestClient
-
 from backend import api_routes_simulate
 from backend.api import app
+from tests.http_client import ApiTestClient
 
 
 class _FakeStore:
@@ -27,7 +26,7 @@ def test_simulate_persists_when_cookie_present(monkeypatch):
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
     client_id = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
 
-    client = TestClient(app)
+    client = ApiTestClient(app)
     client.cookies.set(api_routes_simulate.cfg.client_cookie_name, client_id)
     r = client.post(
         "/simulate",
@@ -88,7 +87,7 @@ def test_simulation_history_reads_last_items_from_store(monkeypatch):
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
     client_id = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
 
-    client = TestClient(app)
+    client = ApiTestClient(app)
     client.cookies.set(api_routes_simulate.cfg.client_cookie_name, client_id)
     r = client.get(
         "/simulations/history",
@@ -104,7 +103,7 @@ def test_simulation_history_reads_last_items_from_store(monkeypatch):
 def test_simulation_history_returns_empty_without_cookie(monkeypatch):
     fake = _FakeStore(enabled=True)
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
-    client = TestClient(app)
+    client = ApiTestClient(app)
     r = client.get("/simulations/history")
     assert r.status_code == 200
     assert r.json() == []
@@ -115,7 +114,7 @@ def test_simulation_history_returns_empty_when_store_disabled(monkeypatch):
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
     client_id = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
 
-    client = TestClient(app)
+    client = ApiTestClient(app)
     client.cookies.set(api_routes_simulate.cfg.client_cookie_name, client_id)
     r = client.get("/simulations/history")
     assert r.status_code == 200
@@ -127,7 +126,7 @@ def test_simulation_history_returns_503_when_store_unavailable(monkeypatch):
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
     client_id = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
 
-    client = TestClient(app)
+    client = ApiTestClient(app)
     client.cookies.set(api_routes_simulate.cfg.client_cookie_name, client_id)
     r = client.get("/simulations/history")
     assert r.status_code == 503
@@ -148,7 +147,7 @@ def test_simulation_history_returns_503_on_malformed_store_row(monkeypatch):
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
     client_id = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
 
-    client = TestClient(app)
+    client = ApiTestClient(app)
     client.cookies.set(api_routes_simulate.cfg.client_cookie_name, client_id)
     r = client.get("/simulations/history")
     assert r.status_code == 503
@@ -160,7 +159,7 @@ def test_simulate_returns_result_when_store_unavailable(monkeypatch):
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
     client_id = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
 
-    client = TestClient(app)
+    client = ApiTestClient(app)
     client.cookies.set(api_routes_simulate.cfg.client_cookie_name, client_id)
     r = client.post(
         "/simulate",

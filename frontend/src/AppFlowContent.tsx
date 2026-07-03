@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ReactElement } from "react";
 import OrgStep from "./components/steps/OrgStep";
 import PatStep from "./components/steps/PatStep";
 import ProjectStep from "./components/steps/ProjectStep";
@@ -23,7 +23,7 @@ export function AppFlowContent({
   runtime,
   onGoToSimulation,
   onGoToPortfolio,
-}: AppFlowContentProps): JSX.Element | null {
+}: AppFlowContentProps): ReactElement | null {
   if (onboardingState.step === "pat") {
     return (
       <div className="flow-card flow-card--animated">
@@ -120,4 +120,3 @@ export function AppFlowContent({
 
   return null;
 }
-

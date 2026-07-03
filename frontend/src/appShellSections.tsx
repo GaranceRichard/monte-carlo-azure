@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import PublicConnectNotice from "./components/PublicConnectNotice";
 
 type RuntimeMode = "standard" | "demo" | "connect";
@@ -6,7 +7,7 @@ type DeploymentTarget = "cloud" | "onprem";
 
 const ONBOARDING_ORDER = ["pat", "org", "projects", "teams"] as const;
 
-export function renderPublicMode(mode: RuntimeMode): JSX.Element | null {
+export function renderPublicMode(mode: RuntimeMode): ReactElement | null {
   if (mode === "connect") return <PublicConnectNotice />;
   return null;
 }
@@ -16,8 +17,8 @@ export function PublicModeGate({
   children,
 }: {
   mode: RuntimeMode;
-  children: JSX.Element;
-}): JSX.Element {
+  children: ReactElement;
+}): ReactElement {
   return renderPublicMode(mode) ?? children;
 }
 
@@ -31,7 +32,7 @@ export function OnboardingStepper({
   step: OnboardingStep;
   deploymentTarget: DeploymentTarget;
   onStepBack: (target: (typeof ONBOARDING_ORDER)[number]) => void;
-}): JSX.Element | null {
+}): ReactElement | null {
   const onboardingLabels: Record<(typeof ONBOARDING_ORDER)[number], string> = {
     pat: "Connexion",
     org: deploymentTarget === "onprem" ? "Collection" : "Organisation",

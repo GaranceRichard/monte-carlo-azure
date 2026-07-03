@@ -4,6 +4,8 @@
 
 ### Frontend
 
+- stabilisation de `vitest run --coverage` sous Windows via `pool: "forks"` et `coverage.processingConcurrency: 1` pour eviter les erreurs V8 `ENOENT` sur `frontend/coverage/.tmp/coverage-*.json`
+- couverture unitaire completee sur `getProjectionReliabilityNotice` dans `src/utils/simulation.ts` pour supprimer la ligne rouge restante dans le rapport
 - extraction et tests dedies du calcul de `cycleTime` via `src/utils/cycleTime.ts`
 - harmonisation du rendu `Cycle Time` avec les autres onglets graphiques, y compris legendes et libelles metier
 - durcissement des mocks Playwright pour couvrir aussi l'historique client `/simulations/history` et les revisions Azure DevOps utilisees par le calcul de `cycleTime`
@@ -54,6 +56,7 @@
 
 ### Backend et tests
 
+- remplacement du client de test `fastapi.testclient.TestClient` par un helper local base sur `httpx` pour eviter le warning de depreciation Starlette/FastAPI dans les tests API
 - auto-reparation de l'index TTL Mongo `last_seen_1` au demarrage en cas de conflit d'options historique
 - tri des imports `slowapi` dans `backend/api.py` pour conformite Ruff/isort
 - decoupage d'une comprehension de liste dans `tests/test_api_simulate.py` pour respecter la limite de longueur de ligne

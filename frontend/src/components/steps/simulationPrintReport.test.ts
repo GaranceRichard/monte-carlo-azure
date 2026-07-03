@@ -195,6 +195,22 @@ describe("simulationPrintReport", () => {
     }
   });
 
+  it("adds an explicit decision notice when volatility is too high", () => {
+    const html = buildSimulationPrintReportHtml({
+      ...buildBaseArgs(),
+      throughputReliability: {
+        cv: 1.2,
+        iqr_ratio: 1.1,
+        slope_norm: 0.01,
+        label: "fragile",
+        samples_count: 12,
+      },
+    });
+
+    expect(html).toContain("<b>Decision:</b> Historique trop volatil pour fonder une projection fiable.");
+    expect(html).toContain("pas pour soutenir un engagement.");
+  });
+
   it("renders items mode and zero-week exclusion labels", () => {
     const html = buildSimulationPrintReportHtml({
       ...buildBaseArgs(),

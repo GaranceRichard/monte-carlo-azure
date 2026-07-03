@@ -60,7 +60,7 @@ function buildProps() {
 
 describe("AppFlowContent", () => {
   it("returns null for an unknown onboarding step", () => {
-    const { container } = render(<AppFlowContent {...(buildProps() as never)} />);
+    const { container } = render(<AppFlowContent {...buildProps()} />);
 
     expect(container.firstChild).toBeNull();
   });

@@ -16,7 +16,9 @@ vi.mock("./simulationPdfDownload", async () => {
 
 import { buildPortfolioPrintReportHtml, exportPortfolioPrintReport } from "./portfolioPrintReport";
 
-function baseArgs() {
+type PortfolioPrintReportArgs = Parameters<typeof buildPortfolioPrintReportHtml>[0];
+
+function baseArgs(): PortfolioPrintReportArgs {
   return {
     selectedProject: "Projet A",
     startDate: "2026-01-01",

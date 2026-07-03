@@ -84,6 +84,10 @@ jobs:
         run: |
           npm run lint -- --max-warnings 0
 
+      - name: Typecheck frontend (TypeScript)
+        run: |
+          npm run typecheck
+
       - name: Run unit tests (Vitest)
         run: |
           npm run test:unit:coverage

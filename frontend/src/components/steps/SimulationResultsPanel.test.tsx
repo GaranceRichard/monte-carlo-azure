@@ -332,6 +332,32 @@ describe("SimulationResultsPanel history list", () => {
     expect(screen.getByText(/^F : fiable$/i)).not.toBeNull();
   });
 
+  it("renders an explicit notice when history is too volatile for a reliable projection", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        throughputData: [],
+        result: {
+          result_kind: "weeks",
+          risk_score: 0.9,
+          throughput_reliability: { cv: 1.2, iqr_ratio: 1.1, slope_norm: 0.01, label: "fragile", samples_count: 12 },
+        },
+        displayPercentiles: { P50: 10, P70: 14, P90: 20 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+    expect(screen.getByText(/Projection a cadrer:/i)).not.toBeNull();
+    expect(screen.getByText(/Historique trop volatil pour fonder une projection fiable/i)).not.toBeNull();
+  });
+
   it("formats history option labels for both simulation modes", () => {
     const backlogEntry = {
       ...baseEntry("h1", "Alpha-Team"),

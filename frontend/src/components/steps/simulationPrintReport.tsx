@@ -10,7 +10,11 @@ import {
   type ThroughputExportPoint,
 } from "./simulationChartsSvg";
 import { buildSimulationPdfFileName, downloadSimulationPdf } from "./simulationPdfDownload";
-import { computeRiskScoreFromPercentiles, computeThroughputReliability } from "../../utils/simulation";
+import {
+  computeRiskScoreFromPercentiles,
+  computeThroughputReliability,
+  getProjectionReliabilityNotice,
+} from "../../utils/simulation";
 import type { ThroughputReliability } from "../../types";
 
 function escapeHtml(value: string): string {
@@ -106,6 +110,7 @@ export function buildSimulationPrintReportHtml({
   const reliabilityLegend = effectiveReliability?.label ?? "Non disponible";
   const reliabilityScoreLabel = effectiveReliability ? `${formatMetric(effectiveReliability.cv)} (${reliabilityLegend})` : "Non disponible";
   const reliabilitySummary = buildReliabilitySummary(effectiveReliability);
+  const reliabilityNotice = getProjectionReliabilityNotice(effectiveReliability);
 
   return `
       <!doctype html>
@@ -174,6 +179,11 @@ export function buildSimulationPrintReportHtml({
               <div class="meta-row"><b>IQR ratio:</b> ${escapeHtml(formatMetric(effectiveReliability?.iqr_ratio ?? 0))}</div>
               <div class="meta-row"><b>Pente normalisee:</b> ${escapeHtml(formatMetric(effectiveReliability?.slope_norm ?? 0))}</div>
               <div class="meta-row"><b>Semaines utilisees:</b> ${escapeHtml(String(effectiveReliability?.samples_count ?? 0))}</div>
+              ${
+                reliabilityNotice
+                  ? `<div class="meta-row"><b>Decision:</b> ${escapeHtml(reliabilityNotice)}</div>`
+                  : ""
+              }
             </aside>
           </div>
         </header>

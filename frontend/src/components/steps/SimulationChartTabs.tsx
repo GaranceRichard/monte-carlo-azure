@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "../ui/tabs";
 import { useSimulationContext } from "../../hooks/SimulationContext";
 import { computeThroughputReliability } from "../../utils/simulation";
@@ -152,32 +152,33 @@ export default function SimulationChartTabs() {
     ({
       payload,
     }: {
-      payload?: ReadonlyArray<{ value?: string; color?: string; dataKey?: string }>;
-    } = {}) => {
+      payload?: ReadonlyArray<{ value?: string | number; color?: string; dataKey?: unknown }>;
+    } = {}): ReactNode => {
       const items = (payload ?? []).filter((entry) => {
         if (!entry.value) return false;
         if (!allowedKeys?.length) return true;
-        return !!entry.dataKey && allowedKeys.includes(entry.dataKey);
+        return typeof entry.dataKey === "string" && allowedKeys.includes(entry.dataKey);
       });
-    if (!items.length) return null;
+      if (!items.length) return null;
 
-    return (
-      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-2 text-sm font-medium text-[var(--text)]">
-        {items.map((item) => (
-          <div key={item.dataKey ?? item.value} className="flex items-center gap-2 whitespace-nowrap">
-            <span
-              aria-hidden="true"
-              className="inline-block w-5 shrink-0 border-t-2"
-              style={{
-                borderColor: item.color,
-                borderTopStyle: item.dataKey === "observedAverage" || item.dataKey === "movingAverage" ? "dashed" : "solid",
-              }}
-            />
-            <span>{item.value}</span>
-          </div>
-        ))}
-      </div>
-    );
+      return (
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-2 text-sm font-medium text-[var(--text)]">
+          {items.map((item) => (
+            <div key={String(item.dataKey ?? item.value)} className="flex items-center gap-2 whitespace-nowrap">
+              <span
+                aria-hidden="true"
+                className="inline-block w-5 shrink-0 border-t-2"
+                style={{
+                  borderColor: item.color,
+                  borderTopStyle:
+                    item.dataKey === "observedAverage" || item.dataKey === "movingAverage" ? "dashed" : "solid",
+                }}
+              />
+              <span>{item.value}</span>
+            </div>
+          ))}
+        </div>
+      );
     };
 
   async function handleExportReport(): Promise<void> {
@@ -424,4 +425,3 @@ export default function SimulationChartTabs() {
     </div>
   );
 }
-

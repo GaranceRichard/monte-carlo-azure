@@ -266,6 +266,8 @@ Suite E2E decoupee:
 
 Sous Windows/VS Code, les taches `pytest --cov` paralleles utilisent des fichiers coverage distincts via `COVERAGE_FILE` pour eviter les conflits de verrouillage.
 Le projet desactive aussi le cacheprovider pytest via `pytest.ini` (`-p no:cacheprovider`) pour supprimer les warnings d'ecriture `.pytest_cache` en environnement restreint.
+Pour la couverture frontend Vitest sous Windows, le projet utilise une execution stable (`pool: "forks"` et `coverage.processingConcurrency: 1` dans `frontend/vitest.config.js`) afin d'eviter les pannes d'agregation V8 de type `ENOENT ... frontend\coverage\.tmp\coverage-*.json`.
+Dans ce repo, une ligne rouge dans le detail d'un rapport de coverage est consideree comme invalide et doit etre couverte avant de considerer la tache acceptable, meme si les seuils globaux restent verts.
 La task VS Code `Coverage: 8 terminaux` execute aussi:
 
 - `Scripts/check_vitals_compliance.py` pour verifier la traceabilite des points vitaux vers leurs tests cibles

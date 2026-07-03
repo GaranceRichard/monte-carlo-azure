@@ -523,16 +523,7 @@ function buildSummaryPage({
   `;
 }
 
-export function buildPortfolioPrintReportHtml({
-  isDemo = false,
-  selectedProject,
-  startDate,
-  endDate,
-  alignmentRate,
-  includedTeams,
-  sections,
-  scenarios,
-}: {
+type PortfolioPrintReportArgs = {
   isDemo?: boolean;
   selectedProject: string;
   startDate: string;
@@ -541,7 +532,17 @@ export function buildPortfolioPrintReportHtml({
   includedTeams: string[];
   sections: PortfolioSectionInput[];
   scenarios: PortfolioScenarioResult[];
-}): string {
+};
+
+export function buildPortfolioPrintReportHtml({
+  selectedProject,
+  startDate,
+  endDate,
+  alignmentRate,
+  includedTeams,
+  sections,
+  scenarios,
+}: PortfolioPrintReportArgs): string {
   const simulationMode = sections[0]?.simulationMode ?? "backlog_to_weeks";
   const orderedScenarios = [...scenarios].sort((a, b) => getScenarioOrder(a.label) - getScenarioOrder(b.label));
 

@@ -7,6 +7,14 @@ import { env } from 'node:process'
 export default defineConfig({
   base: env.VITE_GITHUB_PAGES === "true" ? "/monte-carlo-azure/" : "/",
   plugins: [tailwindcss(), react()],
+  server: {
+    proxy: {
+      "/simulate": "http://127.0.0.1:8000",
+      "/simulations": "http://127.0.0.1:8000",
+      "/health": "http://127.0.0.1:8000",
+      "/openapi.json": "http://127.0.0.1:8000",
+    },
+  },
   build: {
     rollupOptions: {
       output: {
