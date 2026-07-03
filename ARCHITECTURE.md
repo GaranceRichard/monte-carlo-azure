@@ -176,7 +176,9 @@ CI GitHub Actions:
   - `python Scripts/check_identity_boundary.py`
   - `python -m pytest --cov=backend --cov-fail-under=80 -q`
 - job `frontend-tests`
+  - `actions/setup-python@v6` (`python-version: "3.12"`)
   - `npm ci`
+  - `pip install -r ../requirements.txt` pour demarrer `run_app.py` pendant les E2E Playwright
   - `npm run lint -- --max-warnings 0`
   - `npm run test:unit:coverage`
   - `npm run test:e2e`

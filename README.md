@@ -153,6 +153,7 @@ En on-prem, l'URL attendue est l'URL serveur + collection, par exemple :
 Le detail du flux Cloud / on-prem est documente dans [`frontend/README.md`](frontend/README.md).
 
 En E2E local, Playwright force aussi `VITE_API_BASE=http://127.0.0.1:8000` pour garder les mocks backend coherents avec les appels `simulate` et `simulations/history`.
+En CI GitHub Actions, le job `frontend-tests` installe aussi `requirements.txt` avant `npm run test:e2e`, car Playwright demarre `run_app.py` et a donc besoin de `uvicorn` et des dependances backend.
 
 ### Mode manuel en 5 terminaux
 
