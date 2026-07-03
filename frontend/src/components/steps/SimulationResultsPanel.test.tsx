@@ -278,6 +278,32 @@ describe("SimulationResultsPanel history list", () => {
     expect(screen.getByText(/^0,42 \/ -$/i)).not.toBeNull();
   });
 
+  it("recomputes a non-zero weeks_to_items risk score from display percentiles when API score is stale", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        throughputData: [],
+        simulationMode: "weeks_to_items",
+        result: {
+          result_kind: "items",
+          risk_score: 0,
+          throughput_reliability: { cv: 0.42, iqr_ratio: 0.3, slope_norm: -0.02, label: "incertain", samples_count: 10 },
+        },
+        displayPercentiles: { P50: 24, P70: 22, P90: 18 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+    expect(screen.getByText(/^0,25 \/ 0,42$/i)).not.toBeNull();
+  });
+
   it("falls back to computed risk score when percentiles are incomplete and API score is missing", () => {
     vi.mocked(useSimulationContext).mockReturnValue({
       selectedTeam: "Alpha-Team",

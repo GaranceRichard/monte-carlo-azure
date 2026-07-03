@@ -22,8 +22,15 @@ describe("computeRiskScoreFromPercentiles", () => {
   });
 
   it("computes normalized spread in weeks_to_items mode", () => {
+    expect(computeRiskScoreFromPercentiles("weeks_to_items", { P50: 24, P90: 18 })).toBe(0.25);
     expect(computeRiskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: 6 })).toBe(0.4);
     expect(computeRiskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: 12 })).toBe(0);
+  });
+
+  it("returns 0 when percentiles are incoherent or non-finite", () => {
+    expect(computeRiskScoreFromPercentiles("backlog_to_weeks", { P50: 10, P90: 8 })).toBe(0);
+    expect(computeRiskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: 12 })).toBe(0);
+    expect(computeRiskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: Number.NaN })).toBe(0);
   });
 });
 
@@ -211,6 +218,16 @@ describe("computeThroughputReliability", () => {
     expect(computeThroughputReliability(DEMO_TEAM_SAMPLES.Beta)?.label).toBe("fragile");
     expect(computeThroughputReliability(DEMO_TEAM_SAMPLES.Gamma)?.label).toBe("incertain");
   });
+
+  it("returns the expected rounded ratio values for the reference series", () => {
+    expect(computeThroughputReliability([10, 20, 30, 40, 50, 60, 70, 80])).toEqual({
+      cv: 0.5092,
+      iqr_ratio: 0.7778,
+      slope_norm: 0.2222,
+      label: "fragile",
+      samples_count: 8,
+    });
+  });
 });
 
 describe("getProjectionReliabilityNotice", () => {
@@ -299,6 +316,30 @@ describe("simulateMonteCarloLocal", () => {
     expect(result.result_percentiles.P70).toBeGreaterThanOrEqual(result.result_percentiles.P90);
     expect(result.result_distribution.length).toBeGreaterThan(0);
     expect(result.throughput_reliability?.label).toBe("incertain");
+  });
+
+  it("keeps risk_score consistent with the returned business percentiles in both modes", () => {
+    const backlogResult = simulateMonteCarloLocal({
+      throughputSamples: DEMO_TEAM_SAMPLES.Alpha,
+      includeZeroWeeks: true,
+      mode: "backlog_to_weeks",
+      backlogSize: 120,
+      nSims: 2000,
+    });
+    const itemsResult = simulateMonteCarloLocal({
+      throughputSamples: DEMO_TEAM_SAMPLES.Gamma,
+      includeZeroWeeks: true,
+      mode: "weeks_to_items",
+      targetWeeks: 12,
+      nSims: 2000,
+    });
+
+    expect(backlogResult.risk_score).toBe(
+      Number(computeRiskScoreFromPercentiles("backlog_to_weeks", backlogResult.result_percentiles).toFixed(4)),
+    );
+    expect(itemsResult.risk_score).toBe(
+      Number(computeRiskScoreFromPercentiles("weeks_to_items", itemsResult.result_percentiles).toFixed(4)),
+    );
   });
 
   it("rejects empty normalized samples for both zero-week modes", () => {

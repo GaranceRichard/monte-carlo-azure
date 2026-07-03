@@ -45,6 +45,9 @@ Demo GitHub Pages:
 - legendes de graphiques harmonisees, affichees seulement quand utiles et sans debordement en bas du panneau
 - calcul du `cycleTime` extrait dans un utilitaire dedie avec couverture unitaire ciblee
 - affichage d'un `Risk Score` avec code couleur
+  - `backlog_to_weeks`: `(P90 - P50) / P50`
+  - `weeks_to_items`: `(P50 - P90) / P50`
+  - toujours borne a `0` si `P50 <= 0` ou si une ancienne reponse est incoherente
 - export CSV du throughput hebdomadaire
 - telechargement direct du rapport PDF simulation sans fenetre intermediaire
 - historique local des dernieres simulations
@@ -62,6 +65,8 @@ a l'historique et ne bloque plus le resultat de simulation.
 Pour `weeks_to_items`, le frontend consomme directement les `result_percentiles`
 renvoyes par l'API et ne recalcule depuis l'histogramme que pour d'anciens historiques
 detectes par un ordre legacy `P50 <= P70 <= P90`.
+Le `Risk Score`, lui, est maintenant calcule partout a partir des percentiles metier
+effectivement exposes par l'API et affiches a l'ecran, y compris dans les exports PDF.
 
 ---
 

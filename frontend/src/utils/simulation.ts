@@ -220,8 +220,8 @@ export function computeRiskScoreFromPercentiles(
   percentiles: Record<string, number>,
 ): number {
   const p50 = Number(percentiles?.P50 ?? 0);
-  if (p50 <= 0) return 0;
   const p90 = Number(percentiles?.P90 ?? 0);
+  if (!Number.isFinite(p50) || !Number.isFinite(p90) || p50 <= 0) return 0;
   if (mode === "weeks_to_items") {
     return Math.max(0, (p50 - p90) / p50);
   }

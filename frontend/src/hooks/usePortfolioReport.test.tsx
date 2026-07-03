@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchTeamThroughput, simulateForecastFromSamples } from "./simulationForecastService";
 import { exportPortfolioPrintReport } from "../components/steps/portfolioPrintReport";
 import { getPortfolioErrorMessage, usePortfolioReport } from "./usePortfolioReport";
-import { buildAtLeastPercentiles } from "./probability";
 import { computeRiskScoreFromPercentiles } from "../utils/simulation";
 
 vi.mock("./simulationForecastService", () => ({
@@ -200,13 +199,13 @@ describe("usePortfolioReport", () => {
     expect(result.current.reportErr).toBe("export-failure");
   });
 
-  it("computes section riskScore from effective percentiles when result_kind is items", async () => {
+  it("computes section riskScore from business percentiles when result_kind is items", async () => {
     vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
     vi.mocked(simulateForecastFromSamples).mockResolvedValue({
       result_kind: "items",
       samples_count: 100,
       risk_score: 0,
-      result_percentiles: { P50: 100, P70: 110, P90: 120 },
+      result_percentiles: { P50: 24, P70: 22, P90: 18 },
       result_distribution: [
         { x: 10, count: 10 },
         { x: 20, count: 80 },
@@ -225,15 +224,7 @@ describe("usePortfolioReport", () => {
 
     expect(vi.mocked(exportPortfolioPrintReport)).toHaveBeenCalledTimes(1);
     const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
-    const expectedPercentiles = buildAtLeastPercentiles(
-      [
-        { x: 10, count: 10 },
-        { x: 20, count: 80 },
-        { x: 30, count: 10 },
-      ],
-      [50, 70, 90],
-    );
-    const expectedRisk = computeRiskScoreFromPercentiles("weeks_to_items", expectedPercentiles);
+    const expectedRisk = computeRiskScoreFromPercentiles("weeks_to_items", { P50: 24, P70: 22, P90: 18 });
 
     expect(exportArgs.sections[0].resultKind).toBe("items");
     expect(exportArgs.sections[0].riskScore).toBe(expectedRisk);
@@ -387,6 +378,7 @@ describe("usePortfolioReport", () => {
       ...simulationResult,
       risk_score: undefined,
       result_kind: "items",
+      result_percentiles: { P50: 24, P70: 22, P90: 18 },
       result_distribution: [
         { x: 10, count: 10 },
         { x: 20, count: 80 },
@@ -402,17 +394,7 @@ describe("usePortfolioReport", () => {
 
     const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
     expect(exportArgs.scenarios[0].riskScore).toBe(
-      computeRiskScoreFromPercentiles(
-        "weeks_to_items",
-        buildAtLeastPercentiles(
-          [
-            { x: 10, count: 10 },
-            { x: 20, count: 80 },
-            { x: 30, count: 10 },
-          ],
-          [50, 70, 90],
-        ),
-      ),
+      computeRiskScoreFromPercentiles("weeks_to_items", { P50: 24, P70: 22, P90: 18 }),
     );
   });
 

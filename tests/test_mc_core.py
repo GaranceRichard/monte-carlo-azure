@@ -182,12 +182,14 @@ def test_percentiles_weeks_to_items_use_survival_lower_quantiles():
     assert p["P50"] >= p["P70"] >= p["P90"]
 
 
-def test_risk_score_basic_and_guardrails():
+def test_risk_score_matches_expected_formulas_and_guardrails():
     assert risk_score("backlog_to_weeks", 10, 14) == 0.4
+    assert risk_score("weeks_to_items", 24, 18) == 0.25
     assert risk_score("backlog_to_weeks", 10, 8) == 0.0
     assert risk_score("weeks_to_items", 10, 6) == 0.4
     assert risk_score("weeks_to_items", 10, 12) == 0.0
     assert risk_score("backlog_to_weeks", 0, 5) == 0.0
+    assert risk_score("weeks_to_items", 0, 18) == 0.0
 
 
 def test_throughput_reliability_marks_stable_history_as_fiable():
@@ -218,3 +220,15 @@ def test_throughput_reliability_marks_short_history_as_non_fiable():
 
     assert result["label"] == "non fiable"
     assert result["samples_count"] == 5
+
+
+def test_throughput_reliability_returns_expected_ratio_values_for_reference_series():
+    result = throughput_reliability(np.array([10, 20, 30, 40, 50, 60, 70, 80], dtype=int))
+
+    assert result == {
+        "cv": 0.5092,
+        "iqr_ratio": 0.7778,
+        "slope_norm": 0.2222,
+        "label": "fragile",
+        "samples_count": 8,
+    }

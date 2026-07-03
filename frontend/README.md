@@ -71,6 +71,9 @@ Le frontend couvre notamment :
 - ecran de simulation avec percentiles, distributions et `Risk Score`
   - `weeks_to_items` consomme directement les percentiles metier renvoyes par l'API
   - recalcul depuis l'histogramme reserve aux anciens historiques detectes en ordre legacy
+  - formule centralisee dans `src/utils/simulation.ts`
+  - `backlog_to_weeks`: `(P90 - P50) / P50`
+  - `weeks_to_items`: `(P50 - P90) / P50`
 - historique local des simulations
 - mode portefeuille multi-equipes
 - export PDF direct des restitutions simulation et portefeuille, sans previsualisation SVG utilisateur

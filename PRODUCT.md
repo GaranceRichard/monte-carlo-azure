@@ -132,6 +132,10 @@ Lecture attendue :
 - `P50` pour une lecture mediane
 - `P90` pour une lecture prudente
   - en `weeks_to_items`, prudent = moins d'items garantis
+- `Risk Score` calcule sur les percentiles metier du mode
+  - `backlog_to_weeks`: `(P90 - P50) / P50`
+  - `weeks_to_items`: `(P50 - P90) / P50`
+  - si `P50 <= 0`, le score vaut `0`
 
 ### 3. Piloter un portefeuille
 
@@ -209,6 +213,8 @@ Les evolutions recentes les plus structurantes sont :
 
 - refonte du mode portefeuille autour de 4 scenarios explicites
 - harmonisation du calcul du `Risk Score` avec les percentiles affiches
+- suppression des divergences restantes entre backend, interface et export PDF
+- ajout de tests de coherence dedies sur `Risk Score`, `cv`, `iqr_ratio` et `slope_norm`
 - generation parallele du rapport portefeuille avec progression visible
 - tolerance aux echecs partiels lors de l'agregation portefeuille
 - enrichissement du rapport PDF avec une page de synthese orientee decision

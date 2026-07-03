@@ -4,6 +4,13 @@
 
 ### Frontend
 
+- correction P0 du `Risk Score` pour garantir la meme formule metier entre backend, ecran et PDF:
+  `backlog_to_weeks` utilise `(P90 - P50) / P50`, `weeks_to_items` utilise
+  `(P50 - P90) / P50`, avec borne `0` si `P50 <= 0` ou si une ancienne reponse est incoherente
+- suppression des derniers recalculs divergents du `Risk Score` dans le rapport portefeuille:
+  les pages detail et la synthese PDF utilisent maintenant les percentiles metier exposes
+- ajout de tests de coherence sur le `Risk Score` et les autres ratios (`cv`, `iqr_ratio`,
+  `slope_norm`) pour verifier la parite backend/frontend et les gardes-fous d'affichage
 - `weeks_to_items` n'effectue plus de double recalcul systematique des percentiles:
   les nouvelles reponses API utilisent directement `result_percentiles`, avec fallback
   histogramme conserve uniquement pour les historiques legacy detectes

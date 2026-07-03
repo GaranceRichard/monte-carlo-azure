@@ -1,7 +1,7 @@
 import type { ForecastKind } from "../../types";
 import type { ThroughputReliability } from "../../types";
 import type { PortfolioScenarioResult } from "../../hooks/simulationTypes";
-import { buildAtLeastPercentiles, buildProbabilityCurve } from "../../hooks/probability";
+import { buildProbabilityCurve } from "../../hooks/probability";
 import { computeRiskLegend, computeRiskScoreFromPercentiles } from "../../utils/simulation";
 import {
   renderDistributionChart,
@@ -181,26 +181,17 @@ function renderHypothesisBlock(block: HypothesisBlock): string {
 
 function resolveRiskScore({
   simulationMode,
-  resultKind,
   displayPercentiles,
-  distribution,
   riskScore,
 }: {
   simulationMode: "backlog_to_weeks" | "weeks_to_items";
-  resultKind: ForecastKind;
   displayPercentiles: Record<string, number>;
-  distribution: Array<{ x: number; count: number }>;
   riskScore?: number;
 }): { score: number; label: string; valueLabel: string } {
-  const effectivePercentiles =
-    resultKind === "items" ? buildAtLeastPercentiles(distribution, [50, 70, 90]) : displayPercentiles;
-  if (resultKind === "items") {
-    return formatRiskScore(simulationMode, effectivePercentiles);
-  }
   if (typeof riskScore === "number" && Number.isFinite(riskScore)) {
     return formatRiskScoreFromValue(riskScore);
   }
-  return formatRiskScore(simulationMode, effectivePercentiles);
+  return formatRiskScore(simulationMode, displayPercentiles);
 }
 
 function buildTeamLikePageHtml({
@@ -266,7 +257,7 @@ function buildTeamLikePageHtml({
     gauss: smoothed[i],
   }));
   const probabilityPoints = buildProbabilityCurve(sortedDistribution, resultKind);
-  const effectivePercentiles = resultKind === "items" ? buildAtLeastPercentiles(sortedDistribution, [50, 70, 90]) : displayPercentiles;
+  const effectivePercentiles = displayPercentiles;
 
   const throughputSvg = renderThroughputChart(throughputPoints).replaceAll(
     "Throughput hebdomadaire",
@@ -284,9 +275,7 @@ function buildTeamLikePageHtml({
   const modeZeroLabel = includeZeroWeeks ? "Semaines 0 incluses" : "Semaines 0 exclues";
   const risk = resolveRiskScore({
     simulationMode,
-    resultKind,
     displayPercentiles: effectivePercentiles,
-    distribution: sortedDistribution,
     riskScore,
   });
   const reliabilitySummary = buildReliabilitySummary(throughputReliability);
@@ -375,19 +364,10 @@ function buildSummaryPage({
 
   const rows = orderedScenarios
     .map((scenario) => {
-      const summaryResultKind: ForecastKind = simulationMode === "weeks_to_items" ? "items" : "weeks";
-      const sortedDistribution = [...scenario.distribution]
-        .map((p) => ({ x: Number(p.x), count: Number(p.count) }))
-        .filter((p) => Number.isFinite(p.x) && Number.isFinite(p.count) && p.count > 0)
-        .sort((a, b) => a.x - b.x);
-      const effectivePercentiles =
-        summaryResultKind === "items"
-          ? buildAtLeastPercentiles(sortedDistribution, [50, 70, 90])
-          : scenario.percentiles;
-      const risk =
-        summaryResultKind === "items"
-          ? formatRiskScore(simulationMode, effectivePercentiles)
-          : formatRiskScoreFromValue(Number(scenario.riskScore ?? computeRiskScoreFromPercentiles(simulationMode, effectivePercentiles)));
+      const effectivePercentiles = scenario.percentiles;
+      const risk = formatRiskScoreFromValue(
+        Number(scenario.riskScore ?? computeRiskScoreFromPercentiles(simulationMode, effectivePercentiles)),
+      );
       const reliability = formatReliabilityScore(scenario.throughputReliability);
       return `
         <tr>
@@ -456,7 +436,9 @@ function buildSummaryPage({
       lead: "Risk Score :",
       emphasizedLead: true,
       body:
-        " (P90 - P50) / P50. Plus le score est faible, plus la pr\u00E9vision est stable. Le Risk Score mesure la dispersion du r\u00E9sultat simul\u00E9 - il ne qualifie pas la fiabilit\u00E9 des donn\u00E9es sources.",
+        ` ${
+          simulationMode === "weeks_to_items" ? "(P50 - P90) / P50." : "(P90 - P50) / P50."
+        } Plus le score est faible, plus la pr\u00E9vision est stable. Le Risk Score mesure la dispersion du r\u00E9sultat simul\u00E9 - il ne qualifie pas la fiabilit\u00E9 des donn\u00E9es sources.`,
     },
     {
       kind: "paragraph",

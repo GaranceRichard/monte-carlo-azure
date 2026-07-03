@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { buildAtLeastPercentiles } from "../../hooks/probability";
 import { computeRiskScoreFromPercentiles } from "../../utils/simulation";
 
 const pdfModuleMocks = vi.hoisted(() => ({
@@ -150,12 +149,12 @@ describe("portfolioPrintReport", () => {
     expect(html).toContain('<p class="hypothesis reading-rule"><strong>Règle de lecture :</strong><br />');
   });
 
-  it("uses effective percentiles in weeks_to_items mode for scenario risk score", () => {
+  it("uses business percentiles in weeks_to_items mode for scenario risk score", () => {
     const args: ReturnType<typeof baseArgs> = baseArgs();
     args.sections[0].simulationMode = "weeks_to_items";
     args.scenarios[0] = {
       ...args.scenarios[0],
-      percentiles: { P50: 100, P70: 110, P90: 120 },
+      percentiles: { P50: 24, P70: 22, P90: 18 },
       distribution: [
         { x: 10, count: 10 },
         { x: 20, count: 80 },
@@ -164,15 +163,23 @@ describe("portfolioPrintReport", () => {
     };
 
     const html = buildPortfolioPrintReportHtml(args);
-    const effectivePercentiles = buildAtLeastPercentiles(args.scenarios[0].distribution, [50, 70, 90]);
-    const expectedRisk = computeRiskScoreFromPercentiles("weeks_to_items", effectivePercentiles);
+    const expectedRisk = computeRiskScoreFromPercentiles("weeks_to_items", args.scenarios[0].percentiles);
 
     expect(html).toMatch(
       new RegExp(
-        `Optimiste[\\s\\S]*?<td>${Number(effectivePercentiles.P50 ?? 0).toFixed(0)}</td>\\s*<td>${Number(effectivePercentiles.P70 ?? 0).toFixed(0)}</td>\\s*<td>${Number(effectivePercentiles.P90 ?? 0).toFixed(0)}</td>`,
+        `Optimiste[\\s\\S]*?<td>${Number(args.scenarios[0].percentiles.P50 ?? 0).toFixed(0)}</td>\\s*<td>${Number(args.scenarios[0].percentiles.P70 ?? 0).toFixed(0)}</td>\\s*<td>${Number(args.scenarios[0].percentiles.P90 ?? 0).toFixed(0)}</td>`,
       ),
     );
     expect(html).toContain(expectedRisk.toFixed(2).replace(".", ","));
+  });
+
+  it("documents the weeks_to_items risk formula in the synthesis", () => {
+    const args = baseArgs();
+    args.sections[0].simulationMode = "weeks_to_items";
+
+    const html = buildPortfolioPrintReportHtml(args);
+
+    expect(html).toContain("(P50 - P90) / P50.");
   });
 
   it("falls back to computed risk score when a team page has no finite risk score", () => {

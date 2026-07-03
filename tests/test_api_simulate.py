@@ -262,8 +262,10 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
 
     assert backlog_response.status_code == 200
     assert backlog_response.json()["result_percentiles"] == {"P50": 6, "P70": 8, "P90": 10}
+    assert backlog_response.json()["risk_score"] == pytest.approx((10 - 6) / 6)
     assert items_response.status_code == 200
     assert items_response.json()["result_percentiles"] == {"P50": 24, "P70": 22, "P90": 18}
+    assert items_response.json()["risk_score"] == 0.25
 
 
 class _FakeStore:
