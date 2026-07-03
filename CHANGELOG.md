@@ -4,6 +4,7 @@
 
 ### Frontend
 
+- durcissement du workflow GitHub Pages avec une seconde tentative de `actions/deploy-pages` quand GitHub renvoie un echec transitoire apres creation du deploiement
 - correction de la CI Playwright: le job `frontend-tests` installe aussi les dependances Python backend requises par `run_app.py` (`uvicorn`, FastAPI, etc.) avant `npm run test:e2e`
 - stabilisation de `vitest run --coverage` sous Windows via `pool: "forks"` et `coverage.processingConcurrency: 1` pour eviter les erreurs V8 `ENOENT` sur `frontend/coverage/.tmp/coverage-*.json`
 - couverture unitaire completee sur `getProjectionReliabilityNotice` dans `src/utils/simulation.ts` pour supprimer la ligne rouge restante dans le rapport

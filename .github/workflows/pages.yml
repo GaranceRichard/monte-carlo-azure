@@ -90,7 +90,7 @@ jobs:
     needs: wait-for-ci
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deploy_retry.outputs.page_url || steps.deploy_first.outputs.page_url }}
     defaults:
       run:
         working-directory: frontend
@@ -122,5 +122,15 @@ jobs:
           path: frontend/dist
 
       - name: Deploy GitHub Pages
-        id: deployment
+        id: deploy_first
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: Wait before retrying GitHub Pages deployment
+        if: steps.deploy_first.outcome == 'failure'
+        run: sleep 15
+
+      - name: Retry GitHub Pages deployment
+        id: deploy_retry
+        if: steps.deploy_first.outcome == 'failure'
         uses: actions/deploy-pages@v4

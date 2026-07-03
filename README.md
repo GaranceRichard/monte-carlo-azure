@@ -135,6 +135,8 @@ $env:VITE_GITHUB_PAGES="true"
 npm run build
 ```
 
+Le workflow GitHub Pages retente une fois `actions/deploy-pages` si GitHub retourne un echec transitoire apres creation de l'artefact de deploiement.
+
 Sur GitHub Pages, la demo publique precharge les donnees puis laisse l'utilisateur choisir son point d'entree:
 
 - `Simulation` pour ouvrir une equipe et ses graphiques/detail
