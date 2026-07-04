@@ -71,7 +71,6 @@ Fonctionnalites actuellement presentes dans le produit :
 - historique local des simulations recentes, contextualise par equipe dans le navigateur
 - cookie client `IDMontecarlo` pour relier un client anonyme a son historique persiste
 - persistence MongoDB et restitution des 10 dernieres simulations statistiques anonymes via `/simulations/history`
-- parametre de capacite reduite
 - configuration rapide des filtres types + etats, memorisee localement
 - mode `Portefeuille` multi-equipes
 - rapport PDF portefeuille avec synthese decisionnelle et pages detaillees
