@@ -172,6 +172,7 @@ class SimulationStore:
                 "distribution": [bucket.model_dump() for bucket in response.result_distribution],
                 "throughput_reliability": response.throughput_reliability.model_dump(),
                 "include_zero_weeks": req.include_zero_weeks,
+                "seed": response.seed,
             }
             coll.insert_one(doc)
             coll.update_many({"mc_client_id": mc_client_id}, {"$set": {"last_seen": now}})

@@ -3,15 +3,18 @@ import OrgStep from "./components/steps/OrgStep";
 import PatStep from "./components/steps/PatStep";
 import ProjectStep from "./components/steps/ProjectStep";
 import TeamStep from "./components/steps/TeamStep";
+import type { OnboardingActions, OnboardingState } from "./hooks/useOnboarding";
+import type { SimulationViewModel } from "./hooks/useSimulation";
+import type { AppRuntime } from "./runtime";
 
 const SimulationStep = lazy(() => import("./components/steps/SimulationStep"));
 const PortfolioStep = lazy(() => import("./components/steps/PortfolioStep"));
 
 type AppFlowContentProps = {
-  onboardingState: any;
-  onboardingActions: any;
-  simulation: any;
-  runtime: { isDemoMode: boolean };
+  onboardingState: OnboardingState;
+  onboardingActions: OnboardingActions;
+  simulation: SimulationViewModel;
+  runtime: Pick<AppRuntime, "isDemoMode">;
   onGoToSimulation: () => void;
   onGoToPortfolio: () => void;
 };

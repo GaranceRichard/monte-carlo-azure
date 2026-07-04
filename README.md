@@ -36,6 +36,7 @@ Demo GitHub Pages:
 - selection organisation -> projet -> equipe
 - mode `Portefeuille` multi-equipes
 - simulation Monte Carlo cote backend (`POST /simulate`)
+- support optionnel d'un `seed` de simulation pour rejouer exactement un tirage Monte Carlo
 - visualisation des percentiles et distributions
 - semantique metier des percentiles alignee sur le mode de simulation:
   - `backlog_to_weeks`: `P90` = 90% des simulations finissent en `P90` semaines ou moins
@@ -117,7 +118,7 @@ Les invariants techniques et les controles CI associes sont documentes dans [`AR
 Frontiere d'identite Azure DevOps :
 
 - le navigateur conserve le `PAT`, l'URL serveur, l'organisation, le projet, l'equipe, la periode, les types, les etats `Done`, l'historique hebdomadaire brut, le cycle time brut et l'historique utilisateur contextualise
-- `POST /simulate` transmet uniquement `throughput_samples`, `include_zero_weeks`, `mode`, `backlog_size`, `target_weeks` et `n_sims`
+- `POST /simulate` transmet uniquement `throughput_samples`, `include_zero_weeks`, `mode`, `backlog_size`, `target_weeks`, `n_sims` et un `seed` optionnel
 - MongoDB ne persiste que `mc_client_id`, `created_at`, `last_seen`, les parametres Monte Carlo et les resultats statistiques anonymes
 - `mc_client_id` est un identifiant anonyme non derive d'Azure DevOps
 - `Scripts/check_identity_boundary.py` bloque en CI toute reintroduction d'un champ Azure DevOps dans le payload de simulation, les modeles backend, la persistence Mongo, l'historique serveur, les proxies locaux ou les appels Azure DevOps cote backend
@@ -310,6 +311,13 @@ Variable d'environnement simulation:
 - `APP_FORECAST_TIMEOUT_SECONDS` (defaut: `30`)
   - applique un timeout de reponse sur `POST /simulate`
   - le calcul NumPy continue jusqu'a sa fin dans son thread si le delai est depasse, mais l'API rend immediatement un `503`
+
+Comportement du `seed` de simulation:
+
+- `POST /simulate` accepte un `seed` entier optionnel entre `0` et `4294967295`
+- a payload identique, renvoyer le meme `seed` reproduit strictement le meme resultat de simulation
+- si aucun `seed` n'est fourni, le backend en genere un automatiquement et le renvoie dans la reponse
+- l'historique Mongo persiste aussi ce `seed` pour faciliter l'analyse a posteriori d'une simulation
 
 Purge planifiee:
 

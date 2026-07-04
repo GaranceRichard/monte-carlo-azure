@@ -14,7 +14,7 @@ function sortNamedEntities(items: NamedEntity[]): NamedEntity[] {
   return [...items].sort((a, b) => (a.name || "").localeCompare(b.name || "", "fr", { sensitivity: "base" }));
 }
 
-type OnboardingState = {
+export type OnboardingState = {
   patInput: string;
   serverUrlInput: string;
   sessionPat: string;
@@ -34,7 +34,9 @@ type OnboardingState = {
   backLabel: string;
 };
 
-type OnboardingActions = {
+export type OnboardingStepTarget = Extract<AppStep, "pat" | "org" | "projects" | "teams">;
+
+export type OnboardingActions = {
   setPatInput: (value: string) => void;
   setServerUrlInput: (value: string) => void;
   setSelectedOrg: (value: string) => void;
@@ -45,13 +47,18 @@ type OnboardingActions = {
   goToTeams: () => Promise<boolean>;
   goToSimulation: () => boolean;
   goToPortfolio: () => boolean;
-  goToStep: (target: "pat" | "org" | "projects" | "teams") => void;
+  goToStep: (target: OnboardingStepTarget) => void;
   goBack: () => void;
   disconnect: () => void;
   setErr: (value: string) => void;
 };
 
-export function useOnboarding({ demoMode = false }: { demoMode?: boolean } = {}): { state: OnboardingState; actions: OnboardingActions } {
+export type OnboardingViewModel = {
+  state: OnboardingState;
+  actions: OnboardingActions;
+};
+
+export function useOnboarding({ demoMode = false }: { demoMode?: boolean } = {}): OnboardingViewModel {
   const [patInput, setPatInput] = useState("");
   const [serverUrlInput, setServerUrlInput] = useState("");
   const [sessionPat, setSessionPat] = useState(demoMode ? "demo-session" : "");
@@ -279,7 +286,7 @@ export function useOnboarding({ demoMode = false }: { demoMode?: boolean } = {})
     else if (step === "simulation") setStep("teams");
   }
 
-  function goToStep(target: "pat" | "org" | "projects" | "teams"): void {
+  function goToStep(target: OnboardingStepTarget): void {
     if (demoMode) {
       if (target === "teams") setStep("teams");
       return;

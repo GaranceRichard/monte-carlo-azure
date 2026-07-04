@@ -7,10 +7,16 @@ from starlette.requests import Request
 
 from backend.api import app
 from backend.api_config import ApiConfig
-from backend.api_models import SimulateRequest, SimulateResponse, ThroughputReliability
+from backend.api_models import (
+    SIMULATION_SEED_MAX,
+    SimulateRequest,
+    SimulateResponse,
+    ThroughputReliability,
+)
 from backend.api_routes_simulate import (
     _client_key_from_request,
     _persist_simulation,
+    _resolve_simulation_seed,
     limiter,
 )
 from tests.http_client import ApiTestClient
@@ -36,6 +42,8 @@ def test_simulate_backlog_to_weeks_success():
     assert "risk_score" in body
     assert isinstance(body["risk_score"], float)
     assert body["throughput_reliability"]["samples_count"] == 6
+    assert isinstance(body["seed"], int)
+    assert 0 <= body["seed"] <= SIMULATION_SEED_MAX
     assert (
         body["result_percentiles"]["P50"]
         <= body["result_percentiles"]["P70"]
@@ -77,6 +85,7 @@ def test_simulate_weeks_to_items_success():
     body = r.json()
     assert body["result_kind"] == "items"
     assert body["samples_count"] == 6
+    assert isinstance(body["seed"], int)
     assert "risk_score" in body
     assert isinstance(body["risk_score"], float)
     assert body["throughput_reliability"]["samples_count"] == 6
@@ -250,7 +259,7 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
     known_backlog = np.array([3, 4, 6, 8, 10], dtype=int)
     known_items = np.array([18, 22, 24, 25, 27], dtype=int)
 
-    def fake_compute(req, _samples):
+    def fake_compute(req, _samples, _seed):
         if req.mode == "backlog_to_weeks":
             return known_backlog, "weeks"
         return known_items, "items"
@@ -263,9 +272,76 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
     assert backlog_response.status_code == 200
     assert backlog_response.json()["result_percentiles"] == {"P50": 6, "P70": 8, "P90": 10}
     assert backlog_response.json()["risk_score"] == pytest.approx((10 - 6) / 6)
+    assert isinstance(backlog_response.json()["seed"], int)
     assert items_response.status_code == 200
     assert items_response.json()["result_percentiles"] == {"P50": 24, "P70": 22, "P90": 18}
     assert items_response.json()["risk_score"] == 0.25
+    assert isinstance(items_response.json()["seed"], int)
+
+
+def test_simulate_returns_same_result_for_same_seed():
+    client = ApiTestClient(app)
+    payload = {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "mode": "backlog_to_weeks",
+        "backlog_size": 20,
+        "n_sims": 2000,
+        "seed": 123456,
+    }
+
+    first = client.post("/simulate", json=payload)
+    second = client.post("/simulate", json=payload)
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert first.json() == second.json()
+
+
+def test_simulate_uses_requested_seed():
+    client = ApiTestClient(app)
+    response = client.post(
+        "/simulate",
+        json={
+            "throughput_samples": [1, 2, 3, 4, 5, 6],
+            "mode": "weeks_to_items",
+            "target_weeks": 8,
+            "n_sims": 2000,
+            "seed": 98765,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["seed"] == 98765
+
+
+@pytest.mark.parametrize(
+    "seed",
+    [-1, SIMULATION_SEED_MAX + 1],
+)
+def test_simulate_rejects_invalid_seed(seed):
+    client = ApiTestClient(app)
+    response = client.post(
+        "/simulate",
+        json={
+            "throughput_samples": [1, 2, 3, 4, 5, 6],
+            "mode": "backlog_to_weeks",
+            "backlog_size": 20,
+            "n_sims": 2000,
+            "seed": seed,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_resolve_simulation_seed_returns_requested_value():
+    assert _resolve_simulation_seed(321) == 321
+
+
+def test_resolve_simulation_seed_generates_value_in_range(monkeypatch):
+    monkeypatch.setattr("backend.api_routes_simulate.secrets.randbelow", lambda limit: limit - 1)
+
+    assert _resolve_simulation_seed(None) == SIMULATION_SEED_MAX
 
 
 class _FakeStore:
@@ -301,6 +377,7 @@ def _build_response_model() -> SimulateResponse:
             label="fiable",
             samples_count=6,
         ),
+        seed=123,
     )
 
 
@@ -323,6 +400,7 @@ def test_persist_simulation_saves_when_cookie_present_and_store_enabled(monkeypa
     assert saved_id == "client-123"
     assert saved_req["backlog_size"] == 20
     assert saved_resp["result_kind"] == "weeks"
+    assert saved_resp["seed"] == 123
 
 
 def test_persist_simulation_skips_when_cookie_missing(monkeypatch):

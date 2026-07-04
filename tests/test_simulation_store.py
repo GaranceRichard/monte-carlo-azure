@@ -130,6 +130,7 @@ def _req_resp():
         mode="backlog_to_weeks",
         backlog_size=20,
         n_sims=2000,
+        seed=98765,
     )
     resp = SimulateResponse(
         result_kind="weeks",
@@ -144,6 +145,7 @@ def _req_resp():
             label="fiable",
             samples_count=6,
         ),
+        seed=98765,
     )
     return req, resp
 
@@ -334,6 +336,7 @@ def test_save_simulation_inserts_and_updates(monkeypatch):
     assert fake_coll.index_calls[1][1]["expireAfterSeconds"] == 30 * 24 * 3600
     assert len(fake_coll.inserted) == 1
     assert fake_coll.inserted[0]["mc_client_id"] == "c1"
+    assert fake_coll.inserted[0]["seed"] == 98765
     assert fake_coll.inserted[0]["distribution"] == [{"x": 8, "count": 12}]
     assert "selected_org" not in fake_coll.inserted[0]
     assert "client_context" not in fake_coll.inserted[0]
@@ -463,6 +466,7 @@ def test_save_and_list_recent_with_real_mongo():
         row = rows[0]
         assert row["mode"] == "backlog_to_weeks"
         assert row["samples_count"] == 6
+        assert row["seed"] == 98765
         assert row["percentiles"]["P50"] == 10
 
         indexes = list(client[db_name][collection_name].list_indexes())

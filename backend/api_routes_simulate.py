@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import secrets
 import time
 
 import numpy as np
@@ -11,6 +12,7 @@ from starlette.concurrency import run_in_threadpool
 
 from .api_config import get_api_config
 from .api_models import (
+    SIMULATION_SEED_MAX,
     SimulateRequest,
     SimulateResponse,
     SimulationHistoryItem,
@@ -114,6 +116,7 @@ limiter = ObservableLimiter(
 def _compute_simulation_result(
     req: SimulateRequest,
     samples: np.ndarray,
+    seed: int,
 ) -> tuple[np.ndarray, str]:
     if req.mode == "backlog_to_weeks":
         if not req.backlog_size:
@@ -124,6 +127,7 @@ def _compute_simulation_result(
                 samples,
                 req.n_sims,
                 include_zero_weeks=req.include_zero_weeks,
+                seed=seed,
             ),
             "weeks",
         )
@@ -136,9 +140,16 @@ def _compute_simulation_result(
             samples,
             req.n_sims,
             include_zero_weeks=req.include_zero_weeks,
+            seed=seed,
         ),
         "items",
     )
+
+
+def _resolve_simulation_seed(requested_seed: int | None) -> int:
+    if requested_seed is not None:
+        return requested_seed
+    return secrets.randbelow(SIMULATION_SEED_MAX + 1)
 
 
 def _persist_simulation(
@@ -172,6 +183,7 @@ async def simulate(
     background_tasks: BackgroundTasks,
 ) -> SimulateResponse:
     started_at = time.perf_counter()
+    seed = _resolve_simulation_seed(req.seed)
     samples = np.array(req.throughput_samples)
     if req.include_zero_weeks:
         samples = samples[samples >= 0]
@@ -187,7 +199,7 @@ async def simulate(
 
     try:
         result, kind = await asyncio.wait_for(
-            run_in_threadpool(_compute_simulation_result, req, samples),
+            run_in_threadpool(_compute_simulation_result, req, samples, seed),
             timeout=cfg.forecast_timeout_seconds,
         )
     except TimeoutError as exc:
@@ -226,6 +238,7 @@ async def simulate(
         result_distribution=histogram_buckets(result),
         samples_count=int(len(samples)),
         throughput_reliability=reliability,
+        seed=seed,
     )
 
     mc_client_id = (request.cookies.get(cfg.client_cookie_name) or "").strip()

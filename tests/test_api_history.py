@@ -45,6 +45,7 @@ def test_simulate_persists_when_cookie_present(monkeypatch):
     assert "capacity_percent" not in saved_req
     assert "client_context" not in saved_req
     assert "result_percentiles" in saved_resp
+    assert "seed" in saved_resp
     assert saved_resp["throughput_reliability"]["samples_count"] == 6
 
 
@@ -83,6 +84,7 @@ def test_simulation_history_reads_last_items_from_store(monkeypatch):
                 "percentiles": {"P50": 10, "P70": 12, "P90": 14},
                 "distribution": [{"x": 8, "count": 120}],
                 "include_zero_weeks": False,
+                "seed": 123456,
                 "throughput_reliability": {
                     "cv": 0.2,
                     "iqr_ratio": 0.3,
@@ -106,8 +108,36 @@ def test_simulation_history_reads_last_items_from_store(monkeypatch):
     assert len(body) == 1
     assert body[0]["mode"] == "backlog_to_weeks"
     assert body[0]["samples_count"] == 24
+    assert body[0]["seed"] == 123456
     assert body[0]["throughput_reliability"]["label"] == "fiable"
     assert "selected_team" not in body[0]
+
+
+def test_simulation_history_accepts_legacy_rows_without_seed(monkeypatch):
+    fake = _FakeStore(
+        enabled=True,
+        rows=[
+            {
+                "created_at": "2026-02-26T10:00:00Z",
+                "last_seen": "2026-02-26T10:00:00Z",
+                "mode": "backlog_to_weeks",
+                "backlog_size": 80,
+                "n_sims": 20000,
+                "samples_count": 24,
+                "percentiles": {"P50": 10, "P70": 12, "P90": 14},
+                "distribution": [{"x": 8, "count": 120}],
+                "include_zero_weeks": False,
+            }
+        ],
+    )
+    monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
+    client = ApiTestClient(app)
+    client.cookies.set(api_routes_simulate.cfg.client_cookie_name, "legacy-client")
+
+    response = client.get("/simulations/history")
+
+    assert response.status_code == 200
+    assert response.json()[0]["seed"] is None
 
 
 def test_simulation_history_returns_empty_without_cookie(monkeypatch):

@@ -4,6 +4,7 @@
 
 ### Frontend
 
+- typage explicite de `AppFlowContent` sur `OnboardingState`, `OnboardingActions` et `SimulationViewModel`, avec test du rendu nominal de l'etape PAT et garde runtime conservee pour une etape inattendue
 - suppression de `client_context` du contrat frontend/backend de simulation: `POST /simulate` transporte maintenant uniquement les donnees Monte Carlo statistiques
 - l'historique detaille contextualise par equipe reste strictement local au navigateur; le frontend ne remappe plus l'historique Mongo dans `useSimulationHistory`
 - le mode portefeuille et les scenarios agreges n'envoient plus de noms d'equipe ou de scenario au backend
@@ -90,6 +91,8 @@
 
 ### Backend et tests
 
+- ajout d'un `seed` Monte Carlo optionnel sur `POST /simulate`, valide entre `0` et `4294967295`, renvoye dans la reponse et persiste dans l'historique Mongo pour rejouer un tirage a l'identique
+- ajout de tests API et store pour garantir la reproductibilite avec un `seed` fourni, la generation automatique d'un `seed` valide, et la compatibilite des lignes d'historique legacy depourvues de `seed`
 - refonte de `Scripts/check_identity_boundary.py` autour des regles explicites `IDENTITY-001` a `IDENTITY-008`, avec collecte testable des violations sur les contrats `POST /simulate`, la persistance Mongo, l'historique backend, les proxies locaux et les appels Azure DevOps cote serveur
 - ajout de `tests/test_identity_boundary.py` avec depots temporaires synthetiques pour verrouiller les cas conformes et les regressions interdites, sans dependre du repertoire `AppData\Local\Temp\pytest-of-*` sous Windows
 - renommage de l'etape CI en `Enforce Azure DevOps identity boundary` et maintien de son caractere bloquant avant les tests backend

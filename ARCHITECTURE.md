@@ -26,7 +26,7 @@ Le backend ne recoit que:
 
 - `throughput_samples`
 - `include_zero_weeks`
-- les parametres de simulation (`mode`, `backlog_size` / `target_weeks`, `n_sims`)
+- les parametres de simulation (`mode`, `backlog_size` / `target_weeks`, `n_sims`, `seed` optionnel)
 - un cookie anonyme `IDMontecarlo` pour relier un historique statistique non contextualise
 
 Champs explicitement interdits a la frontiere backend/payload:
@@ -180,7 +180,8 @@ Swagger:
   "throughput_samples": [3, 5, 2, 4, 6, 3],
   "mode": "backlog_to_weeks",
   "backlog_size": 120,
-  "n_sims": 20000
+  "n_sims": 20000,
+  "seed": 123456
 }
 ```
 
@@ -193,7 +194,8 @@ ou
   "throughput_samples": [3, 5, 2, 4, 6, 3],
   "mode": "weeks_to_items",
   "target_weeks": 12,
-  "n_sims": 20000
+  "n_sims": 20000,
+  "seed": 123456
 }
 ```
 
@@ -205,9 +207,16 @@ ou
   "result_percentiles": { "P50": 10, "P70": 12, "P90": 15 },
   "risk_score": 0.5,
   "result_distribution": [{ "x": 10, "count": 123 }],
-  "samples_count": 30
+  "samples_count": 30,
+  "seed": 123456
 }
 ```
+
+Comportement du `seed`:
+
+- `seed` est optionnel et borne a l'intervalle entier `0..4294967295`
+- a payload identique, un meme `seed` reproduit strictement la meme simulation
+- si aucun `seed` n'est fourni, le backend en genere un et le renvoie pour rendre le tirage rejouable
 
 Le backend persiste aussi la simulation dans MongoDB (collection `simulations`) quand le cookie `IDMontecarlo` est present.
 Les champs autorises en base sont:
@@ -224,6 +233,7 @@ Les champs autorises en base sont:
 - `distribution`
 - `throughput_reliability`
 - `include_zero_weeks`
+- `seed`
 
 ### Historique client `GET /simulations/history`
 

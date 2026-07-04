@@ -2,6 +2,9 @@ from typing import Dict, List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+SIMULATION_SEED_MIN = 0
+SIMULATION_SEED_MAX = 4_294_967_295
+
 
 class SimulateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -12,6 +15,7 @@ class SimulateRequest(BaseModel):
     backlog_size: Optional[int] = Field(default=None, ge=1)
     target_weeks: Optional[int] = Field(default=None, ge=1)
     n_sims: int = Field(default=20000, ge=1000, le=200000)
+    seed: Optional[int] = Field(default=None, ge=SIMULATION_SEED_MIN, le=SIMULATION_SEED_MAX)
 
 
 class DistributionBucket(BaseModel):
@@ -34,6 +38,7 @@ class SimulateResponse(BaseModel):
     result_distribution: List[DistributionBucket]
     samples_count: int
     throughput_reliability: ThroughputReliability
+    seed: int = Field(ge=SIMULATION_SEED_MIN, le=SIMULATION_SEED_MAX)
 
 
 class SimulationHistoryItem(BaseModel):
@@ -48,3 +53,4 @@ class SimulationHistoryItem(BaseModel):
     distribution: List[DistributionBucket]
     include_zero_weeks: bool = False
     throughput_reliability: Optional[ThroughputReliability] = None
+    seed: Optional[int] = Field(default=None, ge=SIMULATION_SEED_MIN, le=SIMULATION_SEED_MAX)
