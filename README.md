@@ -336,3 +336,17 @@ Le hook `pre-commit` execute:
   - les verifications de tasks VS Code sont appliquees seulement si `.vscode/tasks.json` est present
 - `python Scripts/check_naming_convention.py`
   - bloque les identifiants de code contenant les termes francais explicitement bannis par la convention repo
+
+## Licence
+
+Monte Carlo Azure est distribue sous licence
+[Apache License 2.0](LICENSE).
+
+Le projet a ete initialement concu et developpe par **Garance Richard**.
+
+Les organisations qui creent, modifient ou exploitent un fork sont seules
+responsables de sa gouvernance, de sa maintenance, de sa securite, de son
+support et des modifications qu'elles y apportent.
+
+Les informations d'attribution sont precisees dans le fichier
+[`NOTICE`](NOTICE).
