@@ -120,6 +120,8 @@ Frontiere d'identite Azure DevOps :
 - `POST /simulate` transmet uniquement `throughput_samples`, `include_zero_weeks`, `mode`, `backlog_size`, `target_weeks` et `n_sims`
 - MongoDB ne persiste que `mc_client_id`, `created_at`, `last_seen`, les parametres Monte Carlo et les resultats statistiques anonymes
 - `mc_client_id` est un identifiant anonyme non derive d'Azure DevOps
+- `Scripts/check_identity_boundary.py` bloque en CI toute reintroduction d'un champ Azure DevOps dans le payload de simulation, les modeles backend, la persistence Mongo, l'historique serveur, les proxies locaux ou les appels Azure DevOps cote backend
+- `tests/test_identity_boundary.py` construit ses depots temporaires dans le workspace du repo pour rester stable sous Windows, meme si `AppData\Local\Temp\pytest-of-*` est verrouille
 
 ---
 

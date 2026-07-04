@@ -12,17 +12,15 @@ Monte Carlo Azure suit une architecture a frontiere d'identite stricte:
 
 Le SLA identite est non negociable:
 
-- 0 donnee d'identification Azure DevOps (`PAT`, `UUID`, `ORG`, `Team`) ne doit transiter par un serveur applicatif
+- les donnees Azure DevOps peuvent exister dans le navigateur pour les appels directs a Azure DevOps
+- elles sont interdites dans le payload `POST /simulate`, les modeles backend, les routes backend, la persistance Mongo, les reponses `GET /simulations/history` et tout proxy ou relais serveur
+- le cookie `IDMontecarlo` et le champ `mc_client_id` restent autorises car ils sont generes independamment d'Azure DevOps et ne contiennent ni organisation, ni projet, ni equipe
+- la politique ne bloque pas "tous les UUID": elle bloque les donnees d'identite Azure DevOps et les secrets associes quand ils franchissent la frontiere serveur
 - le cookie `IDMontecarlo` ne doit jamais etre envoye vers `https://dev.azure.com` ni `https://app.vssps.visualstudio.com`
 - les appels Azure DevOps partent directement du navigateur vers:
   - `https://dev.azure.com`
   - `https://app.vssps.visualstudio.com`
-
-Controles associes:
-
-- CI execute `python Scripts/check_identity_boundary.py`
-- CI execute `python Scripts/check_naming_convention.py`
-- toute proxyfication serveur (`/ado`, `/vssps`) ou resolution locale de PAT fait echouer la CI
+  - ou une URL Azure DevOps Server saisie localement dans le navigateur
 
 Le backend ne recoit que:
 
@@ -30,6 +28,64 @@ Le backend ne recoit que:
 - `include_zero_weeks`
 - les parametres de simulation (`mode`, `backlog_size` / `target_weeks`, `n_sims`)
 - un cookie anonyme `IDMontecarlo` pour relier un historique statistique non contextualise
+
+Champs explicitement interdits a la frontiere backend/payload:
+
+- `client_context`
+- `selected_org`
+- `selected_project`
+- `selected_team`
+- `organization_name`
+- `project_name`
+- `team_name`
+- `pat`
+- `ado_pat`
+- `personal_access_token`
+- `server_url`
+- `azure_devops_url`
+- `ado_server_url`
+
+Regles bloquees par CI:
+
+- `IDENTITY-001`: aucun proxy local `/ado` ou `/vssps`
+- `IDENTITY-002`: aucun endpoint local ou backend recevant un PAT Azure DevOps
+- `IDENTITY-003`: les appels ADO du navigateur utilisent les URL officielles ou une URL on-premise saisie localement
+- `IDENTITY-004`: `ForecastRequestPayload` et `SimulateRequest` ne contiennent aucun contexte Azure DevOps
+- `IDENTITY-005`: `postSimulate` et les modules de construction du payload n'envoient aucun champ Azure DevOps
+- `IDENTITY-006`: `SimulationStore` ne persiste aucun champ Azure DevOps
+- `IDENTITY-007`: `SimulationHistoryItem` et `GET /simulations/history` n'exposent aucun contexte Azure DevOps
+- `IDENTITY-008`: aucun code backend ne contacte `dev.azure.com`, `visualstudio.com` ou un serveur ADO fourni par le client
+
+Chemins surveilles par `Scripts/check_identity_boundary.py`:
+
+- `frontend/src/types.ts`
+- `frontend/src/api.ts`
+- `frontend/src/hooks/simulationForecastCore.ts`
+- `frontend/src/hooks/simulationForecastService.ts`
+- tout fichier `frontend/src/` qui construit un `ForecastRequestPayload` ou appelle `postSimulate`
+- `backend/api_models.py`
+- `backend/api_routes_simulate.py`
+- `backend/simulation_store.py`
+- tout fichier `backend/` pour detecter un appel reseau Azure DevOps cote serveur
+- `frontend/vite.config.js`
+- toute configuration proxy/Nginx ajoutee au depot
+
+Exceptions explicitement autorisees:
+
+- `selectedOrg` dans `useOnboarding.ts`
+- `selectedProject` dans `ProjectStep.tsx`
+- `selectedTeam` dans `TeamStep.tsx` et dans l'historique local navigateur
+- `pat` dans `frontend/src/adoClient.ts` et dans le parcours local navigateur
+- `serverUrl` dans le navigateur pour Azure DevOps Server
+- les tests qui verifient l'interdiction de ces champs
+- la documentation qui explique cette politique
+
+Controles associes:
+
+- CI execute `python Scripts/check_identity_boundary.py` avant les tests backend
+- CI execute `python Scripts/check_naming_convention.py`
+- toute proxyfication serveur (`/ado`, `/vssps`), reintroduction d'un champ ADO dans `POST /simulate`, persistance Mongo contextuelle ou exposition via `/simulations/history` fait echouer la CI
+- l'echec reste bloquant: aucun warning, aucun `continue-on-error`, aucun masquage du code de sortie
 
 Invariants de preparation du throughput cote frontend:
 

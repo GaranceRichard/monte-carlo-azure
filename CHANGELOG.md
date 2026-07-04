@@ -86,6 +86,9 @@
 
 ### Backend et tests
 
+- refonte de `Scripts/check_identity_boundary.py` autour des regles explicites `IDENTITY-001` a `IDENTITY-008`, avec collecte testable des violations sur les contrats `POST /simulate`, la persistance Mongo, l'historique backend, les proxies locaux et les appels Azure DevOps cote serveur
+- ajout de `tests/test_identity_boundary.py` avec depots temporaires synthetiques pour verrouiller les cas conformes et les regressions interdites, sans dependre du repertoire `AppData\Local\Temp\pytest-of-*` sous Windows
+- renommage de l'etape CI en `Enforce Azure DevOps identity boundary` et maintien de son caractere bloquant avant les tests backend
 - suppression de `ClientContext` du modele API backend et persistance Mongo limitee aux seules donnees statistiques anonymes
 - alignement du smoke test Docker CI sur le contrat courant de `POST /simulate`:
   le workflow n'envoie plus l'ancien champ `capacity_percent`, ce qui evite les `422`

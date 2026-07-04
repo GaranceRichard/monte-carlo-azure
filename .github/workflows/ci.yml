@@ -39,7 +39,7 @@ jobs:
         run: |
           python Scripts/check_dod_compliance.py
 
-      - name: Enforce Identity Boundary SLA
+      - name: Enforce Azure DevOps identity boundary
         run: |
           python Scripts/check_identity_boundary.py
 
