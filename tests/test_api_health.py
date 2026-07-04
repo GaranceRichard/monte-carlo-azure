@@ -1,8 +1,10 @@
+import asyncio
+
+from fastapi import FastAPI
+
 from backend import api
 from backend.api import app
 from tests.http_client import ApiTestClient
-import asyncio
-from fastapi import FastAPI
 
 
 def test_lifespan_connects_checks_storage_and_closes_store(monkeypatch):
