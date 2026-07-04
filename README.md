@@ -284,7 +284,7 @@ Reference actuelle apres recalcul local:
 
 - `SLA Identite`: frontend_unit / branches = `100%`, e2e / branches = `100%`
 - `Flux onboarding critique`: frontend_unit / branches = `95.80%`, e2e / branches = `100%`
-- `Export rapport simulation (SVG/PDF)`: frontend_unit / branches = `96.27%`
+- `Export rapport simulation (SVG/PDF)`: frontend_unit / branches = `95.94%`
 
 ### Variables d'environnement Mongo / purge
 

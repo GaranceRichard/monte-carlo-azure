@@ -81,6 +81,14 @@ describe("adoPlatform", () => {
     expect(buildOnPremCollectionUrl("https://dev.azure.com/mon-org", "ignored")).toBe("");
   });
 
+  it("handles blank and malformed collection inputs defensively", () => {
+    expect(normalizeAdoServerUrl("   ")).toBe("");
+    expect(extractOnPremCollectionName("https://serveur.local/_apis")).toBe("");
+    expect(buildOnPremCollectionUrl("https://serveur.local/_apis", "Collection A")).toBe(
+      "https://serveur.local/_apis/Collection%20A",
+    );
+  });
+
   it("falls back to Cloud when the server URL is invalid", () => {
     expect(isOnPremAdoServer("not-a-url")).toBe(false);
     expect(getAdoDeploymentTarget("not-a-url")).toBe("cloud");

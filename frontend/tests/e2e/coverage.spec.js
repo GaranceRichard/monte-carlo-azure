@@ -1021,6 +1021,7 @@ test.describe("e2e istanbul coverage", () => {
       let throughputMode = "empty";
       let profileMode = "cloud-ok";
       let projectMode = "ok";
+      let statesMode = "mixed";
 
       const jsonResponse = (payload, status = 200, statusText = "OK") =>
         new Response(JSON.stringify(payload), {
@@ -1079,6 +1080,9 @@ test.describe("e2e istanbul coverage", () => {
         }
 
         if (url.includes("/workitemtypes/Bug/states?")) {
+          if (statesMode === "http-error") {
+            return new Response("{}", { status: 503, statusText: "Service Unavailable" });
+          }
           return jsonResponse({ value: [{ name: "Done" }] });
         }
 
@@ -1126,7 +1130,21 @@ test.describe("e2e istanbul coverage", () => {
                   Date.UTC(2026, 0, 1 + ((id - 1) % 6) * 7, 12, 0, 0, 0),
                 ).toISOString(),
               },
+              id,
             })),
+          });
+        }
+
+        if (url.includes("/revisions?fields=System.State,System.ChangedDate")) {
+          if (throughputMode === "cycle-warning") {
+            return new Response("revision-failure", { status: 500, statusText: "Server Error" });
+          }
+          return jsonResponse({
+            value: [
+              { fields: { "System.ChangedDate": "2026-01-06T10:00:00Z", "System.State": "New" } },
+              { fields: { "System.ChangedDate": "2026-01-08T10:00:00Z", "System.State": "Active" } },
+              { fields: { "System.ChangedDate": "2026-01-15T10:00:00Z", "System.State": "Done" } },
+            ],
           });
         }
 
@@ -1174,6 +1192,15 @@ test.describe("e2e istanbul coverage", () => {
           "pat-j",
           "https://serveur/tfs/collection",
         );
+        statesMode = "http-error";
+        const degradedTeamOptions = await adoClient.getTeamOptionsDirect(
+          "collection",
+          "Projet A",
+          "Equipe A",
+          "pat-j2",
+          "https://serveur/tfs/collection",
+        );
+        statesMode = "mixed";
 
         teamFieldMode = "fallback";
         throughputMode = "empty";
@@ -1217,6 +1244,35 @@ test.describe("e2e istanbul coverage", () => {
           "https://serveur/tfs/collection",
         );
 
+        throughputMode = "cycle-warning";
+        const cycleWarningThroughput = await adoClient.getWeeklyThroughputDirect(
+          "collection",
+          "Projet A",
+          "Equipe A",
+          "pat-m2",
+          "2026-01-01",
+          "2026-03-01",
+          ["Done"],
+          ["Bug"],
+          "https://serveur/tfs/collection",
+        );
+
+        const incompleteWeekWarning = await adoClient.getWeeklyThroughputDirect(
+          "collection",
+          "Projet A",
+          "Equipe A",
+          "pat-m3",
+          "2026-01-07",
+          "2026-01-09",
+          ["Done"],
+          ["Bug"],
+          "https://serveur/tfs/collection",
+        );
+
+        const missingCollectionError = await adoClient
+          .listProjectsDirect("", "pat-m4", "https://serveur/tfs")
+          .catch((error) => error instanceof Error);
+
         projectMode = "network-error";
         const projectNetworkError = await adoClient
           .listProjectsDirect("collection", "pat-n", "https://serveur/tfs/collection")
@@ -1233,9 +1289,13 @@ test.describe("e2e istanbul coverage", () => {
           teams,
           missingTeamProject,
           teamOptions,
+          degradedTeamOptions,
           emptyThroughput,
           warningThroughput,
           recoveredThroughput,
+          cycleWarningThroughput,
+          incompleteWeekWarning,
+          missingCollectionError,
           projectNetworkError,
         };
       } finally {
@@ -1253,10 +1313,60 @@ test.describe("e2e istanbul coverage", () => {
     expect(results.teams).toEqual([{ id: "t1", name: "Equipe A" }]);
     expect(results.missingTeamProject).toBe(true);
     expect(results.teamOptions.workItemTypes).toEqual(["Bug", "Task"]);
+    expect(results.degradedTeamOptions.statesByType.Bug).toBeUndefined();
     expect(Array.isArray(results.emptyThroughput)).toBe(true);
     expect(results.warningThroughput.warning).toContain("historique partiel");
     expect(Array.isArray(results.recoveredThroughput)).toBe(true);
+    expect(results.cycleWarningThroughput.warning).toContain("cycle time");
+    expect(results.incompleteWeekWarning.warning).toContain("Aucune semaine complete");
+    expect(results.missingCollectionError).toBe(true);
     expect(results.projectNetworkError).toBe(true);
+  });
+
+  test("coverage: cycle time utility direct branches", async ({ page }) => {
+    await page.goto("/");
+
+    const results = await page.evaluate(async () => {
+      const cycleTime = await import("/src/utils/cycleTime.ts");
+
+      return {
+        noDoneStates: cycleTime.calculateCycleTimeData(
+          [
+            {
+              revisions: [
+                { changedDate: "2026-01-06T09:00:00Z", state: "New" },
+                { changedDate: "2026-01-08T09:00:00Z", state: "Active" },
+                { changedDate: "2026-01-15T09:00:00Z", state: "Done" },
+              ],
+            },
+          ],
+          [],
+        ),
+        invalidOrdering: cycleTime.calculateCycleTimeData(
+          [
+            {
+              revisions: [
+                { changedDate: "2026-01-10T09:00:00Z", state: "Done" },
+                { changedDate: "2026-01-12T09:00:00Z", state: "Done" },
+                { changedDate: "2026-01-15T09:00:00Z", state: "Active" },
+              ],
+            },
+          ],
+          ["Done"],
+        ),
+        zeroLowerBoundTrend: cycleTime.buildCycleTimeTrendData(
+          [
+            { week: "2026-01-05", cycleTime: 0.1, count: 1 },
+            { week: "2026-01-12", cycleTime: 5, count: 1 },
+          ],
+          2,
+        ),
+      };
+    });
+
+    expect(results.noDoneStates).toEqual([]);
+    expect(results.invalidOrdering).toEqual([]);
+    expect(results.zeroLowerBoundTrend[0].lowerBound).toBeGreaterThanOrEqual(0);
   });
 
   test("coverage: branches usePortfolioReport direct", async ({ page }) => {

@@ -40,6 +40,24 @@ describe("computeRiskScoreFromPercentiles", () => {
 });
 
 describe("buildScenarioSamples", () => {
+  it("clamps alignment rate before computing aligned and friction samples", () => {
+    const randomSpy = vi.spyOn(Math, "random");
+    randomSpy.mockReturnValue(0);
+
+    expect(buildScenarioSamples([[5], [7]], -25)).toEqual({
+      optimistic: [12],
+      aligned: [0],
+      friction: [0],
+    });
+    expect(buildScenarioSamples([[5], [7]], 140)).toEqual({
+      optimistic: [12],
+      aligned: [12],
+      friction: [12],
+    });
+
+    randomSpy.mockRestore();
+  });
+
   it("builds optimistic, aligned and friction samples for 2 teams", () => {
     const randomSpy = vi.spyOn(Math, "random");
     randomSpy
@@ -361,6 +379,13 @@ describe("computeRiskLegend", () => {
 });
 
 describe("computeThroughputReliability", () => {
+  it("marks steep downward trends as non fiable", () => {
+    const reliability = computeThroughputReliability([20, 18, 16, 14, 12, 10, 8, 6]);
+
+    expect(reliability?.label).toBe("non fiable");
+    expect(reliability?.slope_norm).toBeLessThanOrEqual(-0.15);
+  });
+
   it("returns null for empty or non-finite samples", () => {
     expect(computeThroughputReliability([])).toBeNull();
     expect(computeThroughputReliability([Number.NaN, Number.POSITIVE_INFINITY])).toBeNull();
@@ -503,6 +528,18 @@ describe("getProjectionReliabilityNotice", () => {
 });
 
 describe("simulateMonteCarloLocal", () => {
+  it("keeps compact histograms unchanged when there are few unique outcomes", () => {
+    const result = simulateMonteCarloLocal({
+      throughputSamples: [2],
+      includeZeroWeeks: false,
+      mode: "backlog_to_weeks",
+      backlogSize: 4,
+      nSims: 3,
+    });
+
+    expect(result.result_distribution).toEqual([{ x: 2, count: 3 }]);
+  });
+
   it("returns a backend-compatible structure in backlog mode", () => {
     const result = simulateMonteCarloLocal({
       throughputSamples: DEMO_TEAM_SAMPLES.Alpha,

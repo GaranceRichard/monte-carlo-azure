@@ -359,6 +359,46 @@ describe("SimulationChartTabs", () => {
     expect(probabilityTooltip.formatter(82.34)).toEqual(["82.3%", "P(X <= valeur)"]);
   });
 
+  it("covers tooltip fallbacks, legend filtering and default reliability tone", () => {
+    simulationContextValue = {
+      selectedTeam: "Team Alpha",
+      simulation: buildSimulation({
+        result: {
+          result_kind: "weeks",
+          throughput_reliability: {
+            label: "mystere",
+            cv: 0.33,
+            iqr_ratio: 0.22,
+            slope_norm: 0.11,
+            samples_count: 7,
+          },
+        },
+        cycleTimeData: [{ week: "2026-W01", cycleTime: 1.2, count: 0 }],
+      }),
+    };
+
+    const { container } = render(<SimulationChartTabs />);
+    const cycleTimeTooltip = tooltipCalls[0];
+    const throughputTooltip = tooltipCalls[1];
+
+    expect(
+      cycleTimeTooltip.content({
+        active: true,
+        label: "2026-W01",
+        payload: [{ dataKey: "average", value: undefined, payload: {} }],
+      }),
+    ).toBeTruthy();
+    expect(
+      throughputTooltip.content({
+        active: true,
+        label: "2026-W01",
+        payload: [{ dataKey: "other", value: 7 }],
+      }),
+    ).toBeTruthy();
+    expect(container.querySelector(".border-\\[var\\(--border\\)\\]")).not.toBeNull();
+    expect(screen.queryByText("ignored-empty")).toBeNull();
+  });
+
   it("uses the items-specific probability label when the result kind is items", () => {
     simulationContextValue = {
       selectedTeam: "Team Alpha",
@@ -409,5 +449,29 @@ describe("SimulationChartTabs", () => {
     expect(getCycleTimeYAxisMax(2)).toBe(2.2);
     expect(getCycleTimeYAxisMax(10)).toBe(11);
     expect(getCycleTimeYAxisMax(Number.NaN)).toBe(1);
+  });
+
+  it("does not export a report twice while the first export is still pending", async () => {
+    let resolveExport: (() => void) | undefined;
+    exportSimulationPrintReport.mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveExport = resolve;
+      }),
+    );
+
+    render(<SimulationChartTabs />);
+
+    const button = screen.getByRole("button", { name: "Rapport" });
+    fireEvent.click(button);
+    fireEvent.click(screen.getByRole("button", { name: "Generation..." }));
+
+    await waitFor(() => {
+      expect(exportSimulationPrintReport).toHaveBeenCalledTimes(1);
+    });
+
+    resolveExport?.();
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Rapport" })).not.toBeDisabled();
+    });
   });
 });

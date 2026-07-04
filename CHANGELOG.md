@@ -45,6 +45,10 @@
 - badge `Démo` visible aussi sur l'ecran de choix d'equipe en mode demo
 - axe Y des graphes throughput/distribution borne a `0` et ajout d'une marge haute sur le throughput pour eviter les barres collees au plafond
 - couverture unitaire renforcee sur `SimulationChartTabs.tsx` et scenario E2E demo aligne sur le nouveau badge
+- couverture unitaire completee sur `adoPlatform.ts`, `ProjectStep.tsx`, `SimulationChartTabs.tsx`,
+  `SimulationResultsPanel.tsx`, `src/utils/simulation.ts` et `src/utils/cycleTime.ts`
+- couverture E2E durcie sur l'onboarding demo / deconnexion / theme et sur les branches directes
+  `adoClient.ts`, avec stabilisation des scenarios Playwright associes
 - refactor de `App.tsx` en modules dedies: `AppFlowContent.tsx`, `appNavigation.ts`, `appShellSections.tsx`, `appTheme.ts`
 - extraction des helpers API dans `src/apiHelpers.ts` pour separer les branches de normalisation du wrapper `api.ts`
 - extraction du coeur forecast vers `src/hooks/simulationForecastCore.ts`, `simulationForecastService.ts` restant une facade mince
@@ -103,4 +107,7 @@
 - auto-reparation de l'index TTL Mongo `last_seen_1` au demarrage en cas de conflit d'options historique
 - tri des imports `slowapi` dans `backend/api.py` pour conformite Ruff/isort
 - decoupage d'une comprehension de liste dans `tests/test_api_simulate.py` pour respecter la limite de longueur de ligne
+- ajout de `tests/test_api_static.py` et couverture completee de `backend/api.py` / `backend/api_static.py`
+  sur le `lifespan` FastAPI et le montage du frontend statique, avec repertoires temporaires locaux
+  au workspace pour rester stables sous Windows
 - DoD et garde-fous repo alignes sur `pytest` / FastAPI plutot que `manage.py test`

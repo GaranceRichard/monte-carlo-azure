@@ -80,6 +80,57 @@ describe("ProjectStep", () => {
     expect(onContinue).toHaveBeenCalledTimes(1);
   });
 
+  it("does not submit on Enter when loading or when no project is selected", () => {
+    const onContinue = vi.fn();
+    const { rerender } = render(
+      <ProjectStep
+        err=""
+        selectedOrg="org-a"
+        projects={[{ id: "p1", name: "Projet A" }]}
+        selectedProject=""
+        setSelectedProject={vi.fn()}
+        loading={false}
+        onContinue={onContinue}
+      />,
+    );
+
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
+    expect(onContinue).not.toHaveBeenCalled();
+
+    rerender(
+      <ProjectStep
+        err=""
+        selectedOrg="org-a"
+        projects={[{ id: "p1", name: "Projet A" }]}
+        selectedProject="Projet A"
+        setSelectedProject={vi.fn()}
+        loading
+        onContinue={onContinue}
+      />,
+    );
+
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
+    expect(onContinue).not.toHaveBeenCalled();
+  });
+
+  it("renders fallback option values when project names are missing", () => {
+    render(
+      <ProjectStep
+        err=""
+        selectedOrg="org-a"
+        projects={[{ id: "p1", name: "" }, { id: "", name: "Projet B" }]}
+        selectedProject=""
+        setSelectedProject={vi.fn()}
+        loading={false}
+        onContinue={vi.fn()}
+      />,
+    );
+
+    const options = screen.getAllByRole("option");
+    expect(options[0]).toHaveValue("");
+    expect(options[1]).toHaveValue("Projet B");
+  });
+
   it("focuses projects select on mount", async () => {
     render(
       <ProjectStep

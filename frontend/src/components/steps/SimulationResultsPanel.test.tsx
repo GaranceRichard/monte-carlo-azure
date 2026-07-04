@@ -418,6 +418,53 @@ describe("SimulationResultsPanel history list", () => {
     expect(screen.getByRole("option", { name: "2026_02_27_Alpha-1 semaine" })).not.toBeNull();
   });
 
+  it("falls back to 'Equipe' when the team prefix contains no letters", () => {
+    const entry = {
+      ...baseEntry("h1", "--- 123 ---"),
+      simulationMode: "backlog_to_weeks" as const,
+      backlogSize: 8,
+    };
+
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "--- 123 ---",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        result: null,
+        displayPercentiles: {},
+        simulationHistory: [entry],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+    expect(screen.getByRole("option", { name: "2026_02_25_Equipe-8 items" })).not.toBeNull();
+  });
+
+  it("does not render the risk indicator when there is no simulation result", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        throughputData: [],
+        result: null,
+        displayPercentiles: { P50: 10, P90: 12 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+    expect(screen.queryByText(/^Risque \/ Fiabilite$/i)).toBeNull();
+  });
+
   it("ignores unknown history ids", () => {
     const applyHistoryEntry = vi.fn();
     vi.mocked(useSimulationContext).mockReturnValue({

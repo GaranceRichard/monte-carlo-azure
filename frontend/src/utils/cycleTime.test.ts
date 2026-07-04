@@ -2,6 +2,23 @@ import { describe, expect, it } from "vitest";
 import { buildCycleTimeTrendData, calculateCycleTimeData, summarizeCycleTime } from "./cycleTime";
 
 describe("calculateCycleTimeData", () => {
+  it("returns an empty array when no done state is selected", () => {
+    expect(
+      calculateCycleTimeData(
+        [
+          {
+            revisions: [
+              { changedDate: "2026-01-06T09:00:00Z", state: "New" },
+              { changedDate: "2026-01-08T09:00:00Z", state: "Active" },
+              { changedDate: "2026-01-15T09:00:00Z", state: "Done" },
+            ],
+          },
+        ],
+        [],
+      ),
+    ).toEqual([]);
+  });
+
   it("calculates nominal cycle time points and aggregates identical coordinates", () => {
     const result = calculateCycleTimeData(
       [
@@ -108,6 +125,23 @@ describe("calculateCycleTimeData", () => {
     );
 
     expect(result).toEqual([{ week: "2026-01-12", cycleTime: 1.29, count: 1 }]);
+  });
+
+  it("ignores items whose done transition happens before activation", () => {
+    const result = calculateCycleTimeData(
+      [
+        {
+          revisions: [
+            { changedDate: "2026-01-10T09:00:00Z", state: "Done" },
+            { changedDate: "2026-01-12T09:00:00Z", state: "Done" },
+            { changedDate: "2026-01-15T09:00:00Z", state: "Active" },
+          ],
+        },
+      ],
+      ["Done"],
+    );
+
+    expect(result).toEqual([]);
   });
 });
 
