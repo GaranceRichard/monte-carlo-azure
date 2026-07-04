@@ -1,4 +1,4 @@
-import { formatDateLocal } from "./date";
+import { formatDateLocal, getCompleteWeekRange, parseLocalIsoDate, startOfIsoWeek } from "./date";
 import type { CycleTimePoint } from "./types";
 import {
   formatAdoHttpErrorMessage,
@@ -79,9 +79,7 @@ function buildCompletionDateFilter(startDate: string, endDate: string): string {
 function toWeekKey(dateValue: string): string | null {
   const date = new Date(dateValue);
   if (Number.isNaN(date.getTime())) return null;
-  const monday = new Date(date);
-  monday.setDate(date.getDate() - ((date.getDay() + 6) % 7));
-  return formatDateLocal(monday);
+  return formatDateLocal(startOfIsoWeek(date));
 }
 
 function getAdoRuntimeContext(serverUrl?: string, collectionName?: string): AdoRuntimeContext {
@@ -482,6 +480,17 @@ export async function getTeamDeliveryDataDirect(
   workItemTypes: string[],
   serverUrl?: string,
 ): Promise<TeamDeliveryDataResponse> {
+  const completeWeekRange = getCompleteWeekRange(startDate, endDate);
+  if (!completeWeekRange) {
+    return {
+      weeklyThroughput: [],
+      cycleTimeData: [],
+      warning: "Aucune semaine complete n'est disponible sur la periode selectionnee.",
+    };
+  }
+
+  const alignedStartDate = completeWeekRange.startDate;
+  const alignedEndDate = completeWeekRange.endDate;
   const runtime = getAdoRuntimeContext(serverUrl, org);
   const api = getApiVersionQuery(runtime);
   const teamAreaFilter = await getTeamAreaPathFilterClause(org, project, team, pat, serverUrl);
@@ -497,7 +506,7 @@ export async function getTeamDeliveryDataDirect(
       SELECT [System.Id], [Microsoft.VSTS.Common.ClosedDate], [Microsoft.VSTS.Common.ResolvedDate]
       FROM WorkItems
       WHERE [System.TeamProject] = '${escWiql(project)}'
-      ${buildCompletionDateFilter(startDate, endDate)}
+      ${buildCompletionDateFilter(alignedStartDate, alignedEndDate)}
       ${teamAreaFilter}
       ${typeFilter}
       ${stateFilter}
@@ -521,88 +530,88 @@ export async function getTeamDeliveryDataDirect(
 
   const wiqlData = await wiqlResp.json();
   const items: { id: number }[] = wiqlData.workItems ?? [];
-  if (!items.length) return { weeklyThroughput: [], cycleTimeData: [] };
-
-  const ids = items.map((i) => i.id);
-  const batches: number[][] = [];
-  for (let i = 0; i < ids.length; i += 200) batches.push(ids.slice(i, i + 200));
-
   const allItems: { completionDate: string }[] = [];
   const cycleTimeItems: Array<{ revisions: Array<{ changedDate: string; state: string }> }> = [];
   const batchFailures: { status: number | null; statusText: string }[] = [];
   const cycleTimeFailures: { status: number | null; statusText: string }[] = [];
-  await Promise.all(
-    batches.map(async (batch) => {
-      const itemContext: AdoErrorContext = {
-        operation: "chargement des work items par lots",
-        org,
-        project,
-        team,
-        requiredScopes: ["Work Items (Read)"],
-      };
+  const ids = items.map((i) => i.id);
+  const batches: number[][] = [];
+  for (let i = 0; i < ids.length; i += 200) batches.push(ids.slice(i, i + 200));
 
-      let r: Response;
-      try {
-        r = await adoFetch(
-          `${runtime.collectionUrl}/${encodeURIComponent(project)}/_apis/wit/workitems?ids=${batch.join(",")}&fields=Microsoft.VSTS.Common.ClosedDate,Microsoft.VSTS.Common.ResolvedDate&${api}`,
-          { headers: adoHeaders(pat) },
-          itemContext,
+  if (batches.length) {
+    await Promise.all(
+      batches.map(async (batch) => {
+        const itemContext: AdoErrorContext = {
+          operation: "chargement des work items par lots",
+          org,
+          project,
+          team,
+          requiredScopes: ["Work Items (Read)"],
+        };
+
+        let r: Response;
+        try {
+          r = await adoFetch(
+            `${runtime.collectionUrl}/${encodeURIComponent(project)}/_apis/wit/workitems?ids=${batch.join(",")}&fields=Microsoft.VSTS.Common.ClosedDate,Microsoft.VSTS.Common.ResolvedDate&${api}`,
+            { headers: adoHeaders(pat) },
+            itemContext,
+          );
+        } catch {
+          batchFailures.push({ status: null, statusText: "erreur reseau" });
+          return;
+        }
+
+        if (!r.ok) {
+          batchFailures.push({ status: r.status, statusText: r.statusText });
+          return;
+        }
+
+        const d = await r.json();
+        await Promise.all(
+          (d.value ?? []).map(async (item: { id?: number; fields?: Record<string, string> }) => {
+            const completionDate =
+              item.fields?.["Microsoft.VSTS.Common.ClosedDate"] ||
+              item.fields?.["Microsoft.VSTS.Common.ResolvedDate"];
+            if (completionDate) allItems.push({ completionDate });
+            if (!item.id) return;
+
+            const revisionContext: AdoErrorContext = {
+              operation: "chargement des revisions de work items",
+              org,
+              project,
+              team,
+              requiredScopes: ["Work Items (Read)"],
+            };
+
+            let revisionResponse: Response;
+            try {
+              revisionResponse = await adoFetch(
+                `${runtime.collectionUrl}/${encodeURIComponent(project)}/_apis/wit/workItems/${item.id}/revisions?fields=System.State,System.ChangedDate&${api}`,
+                { headers: adoHeaders(pat) },
+                revisionContext,
+              );
+            } catch {
+              cycleTimeFailures.push({ status: null, statusText: "erreur reseau" });
+              return;
+            }
+
+            if (!revisionResponse.ok) {
+              cycleTimeFailures.push({ status: revisionResponse.status, statusText: revisionResponse.statusText });
+              return;
+            }
+
+            const revisionData = await revisionResponse.json();
+            cycleTimeItems.push({
+              revisions: (revisionData.value ?? []).map((revision: { fields?: Record<string, string> }) => ({
+                changedDate: revision.fields?.["System.ChangedDate"] ?? "",
+                state: revision.fields?.["System.State"] ?? "",
+              })),
+            });
+          }),
         );
-      } catch {
-        batchFailures.push({ status: null, statusText: "erreur reseau" });
-        return;
-      }
-
-      if (!r.ok) {
-        batchFailures.push({ status: r.status, statusText: r.statusText });
-        return;
-      }
-
-      const d = await r.json();
-      await Promise.all(
-        (d.value ?? []).map(async (item: { id?: number; fields?: Record<string, string> }) => {
-          const completionDate =
-            item.fields?.["Microsoft.VSTS.Common.ClosedDate"] ||
-            item.fields?.["Microsoft.VSTS.Common.ResolvedDate"];
-          if (completionDate) allItems.push({ completionDate });
-          if (!item.id) return;
-
-          const revisionContext: AdoErrorContext = {
-            operation: "chargement des revisions de work items",
-            org,
-            project,
-            team,
-            requiredScopes: ["Work Items (Read)"],
-          };
-
-          let revisionResponse: Response;
-          try {
-            revisionResponse = await adoFetch(
-              `${runtime.collectionUrl}/${encodeURIComponent(project)}/_apis/wit/workItems/${item.id}/revisions?fields=System.State,System.ChangedDate&${api}`,
-              { headers: adoHeaders(pat) },
-              revisionContext,
-            );
-          } catch {
-            cycleTimeFailures.push({ status: null, statusText: "erreur reseau" });
-            return;
-          }
-
-          if (!revisionResponse.ok) {
-            cycleTimeFailures.push({ status: revisionResponse.status, statusText: revisionResponse.statusText });
-            return;
-          }
-
-          const revisionData = await revisionResponse.json();
-          cycleTimeItems.push({
-            revisions: (revisionData.value ?? []).map((revision: { fields?: Record<string, string> }) => ({
-              changedDate: revision.fields?.["System.ChangedDate"] ?? "",
-              state: revision.fields?.["System.State"] ?? "",
-            })),
-          });
-        }),
-      );
-    }),
-  );
+      }),
+    );
+  }
 
   const weekMap = new Map<string, number>();
   allItems.forEach(({ completionDate }) => {
@@ -612,10 +621,9 @@ export async function getTeamDeliveryDataDirect(
   });
 
   const result: WeeklyThroughputRow[] = [];
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+  const start = parseLocalIsoDate(alignedStartDate);
+  const end = parseLocalIsoDate(alignedEndDate);
   const cursor = new Date(start);
-  cursor.setDate(cursor.getDate() - ((cursor.getDay() + 6) % 7));
   while (cursor <= end) {
     const key = formatDateLocal(cursor);
     result.push({ week: key, throughput: weekMap.get(key) ?? 0 });

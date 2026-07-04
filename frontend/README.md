@@ -74,6 +74,11 @@ Le frontend couvre notamment :
   - formule centralisee dans `src/utils/simulation.ts`
   - `backlog_to_weeks`: `(P90 - P50) / P50`
   - `weeks_to_items`: `(P50 - P90) / P50`
+- historique throughput aligne sur des semaines ISO completes uniquement
+  - debut aligne sur le premier lundi complet inclus ou suivant `startDate`
+  - fin alignee sur le dernier dimanche complet inclus ou precedent `endDate`
+  - exclusion systematique de la semaine courante tant qu'elle n'est pas terminee
+  - message explicite si la plage choisie ne contient aucune semaine exploitable
 - historique local des simulations
 - mode portefeuille multi-equipes
 - export PDF direct des restitutions simulation et portefeuille, sans previsualisation SVG utilisateur
@@ -88,6 +93,7 @@ Le frontend couvre notamment :
   - `src/appTheme.ts` pour le theme
 - `src/api.ts` reste un wrapper fin; les normalisations et fallbacks vivent dans `src/apiHelpers.ts`
 - `src/hooks/simulationForecastService.ts` reste la facade forecast publique; les branches metier sont dans `src/hooks/simulationForecastCore.ts`
+- `src/date.ts` centralise les utilitaires de dates locales et l'alignement des semaines completes sans parser `YYYY-MM-DD` en UTC
 - `src/utils/cycleTime.ts` porte le calcul et les tendances du cycle time pour les onglets simulation et l'export
 
 ## Contraintes d'architecture

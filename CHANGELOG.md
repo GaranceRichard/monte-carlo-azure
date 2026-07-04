@@ -4,6 +4,14 @@
 
 ### Frontend
 
+- le throughput hebdomadaire Azure DevOps n'integre plus de semaines calendaires incompletes:
+  seules les semaines ISO completes du lundi au dimanche, entierement contenues dans la periode
+  selectionnee et deja ecoulees au moment du calcul, alimentent desormais l'historique de simulation
+- extraction des utilitaires calendaires dans `src/date.ts` (`parseLocalIsoDate`, `startOfIsoWeek`,
+  `nextMonday`, `previousSunday`, `getCompleteWeekRange`) pour fiabiliser l'alignement local des dates
+  sans derive UTC sur les chaines `YYYY-MM-DD`
+- alignement des stats `totalWeeks` / `usedWeeks`, des graphes throughput et des scenarios E2E sur ce
+  nouveau filtre de semaines completes, avec message explicite quand aucune semaine exploitable n'est disponible
 - correction P0 du `Risk Score` pour garantir la meme formule metier entre backend, ecran et PDF:
   `backlog_to_weeks` utilise `(P90 - P50) / P50`, `weeks_to_items` utilise
   `(P50 - P90) / P50`, avec borne `0` si `P50 <= 0` ou si une ancienne reponse est incoherente

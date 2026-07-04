@@ -229,6 +229,8 @@ test.describe("e2e istanbul coverage", () => {
     await openIfCollapsed(filtersSection);
     await page.getByLabel("Bug").check();
     await page.getByLabel("Done").check();
+    await openIfCollapsed(modeSection);
+    await page.getByLabel(/Inclure les semaines.*0/i).uncheck();
 
     await page.getByRole("button", { name: "Lancer la simulation" }).click();
     await expect(page.getByText(/Historique insuffisant/i)).toBeVisible();
@@ -1352,7 +1354,7 @@ test.describe("e2e istanbul coverage", () => {
         return originalFetch(input, init);
       };
 
-      const runScenario = async (teamConfigs) => {
+      const runScenario = async (teamConfigs, options = {}) => {
         const container = document.createElement("div");
         document.body.appendChild(container);
         const root = createRoot(container);
@@ -1370,7 +1372,7 @@ test.describe("e2e istanbul coverage", () => {
             serverUrl: "https://serveur/tfs/collection",
             startDate: "2026-01-01",
             endDate: "2026-03-01",
-            includeZeroWeeks: true,
+            includeZeroWeeks: options.includeZeroWeeks ?? true,
             simulationMode: "backlog_to_weeks",
             backlogSize: 120,
             targetWeeks: 12,
@@ -1414,7 +1416,7 @@ test.describe("e2e istanbul coverage", () => {
             types: ["Bug"],
             doneStates: ["Done"],
           },
-        ]);
+        ], { includeZeroWeeks: false });
 
         portfolioMode = "phase2-fail";
         const phase2Fail = await runScenario([

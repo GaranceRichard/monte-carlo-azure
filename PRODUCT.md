@@ -76,6 +76,13 @@ Fonctionnalites actuellement presentes dans le produit :
 - mode `Portefeuille` multi-equipes
 - rapport PDF portefeuille avec synthese decisionnelle et pages detaillees
 
+Regle produit sur l'historique hebdomadaire :
+
+- une semaine utilisable est une semaine complete du lundi au dimanche
+- elle doit etre entierement comprise dans la periode selectionnee
+- elle doit etre deja completement ecoulee au moment du calcul
+- la semaine courante n'est donc jamais injectee partiellement dans la simulation
+
 ## Parcours de demo
 
 Le produit propose un parcours de demonstration publique via GitHub Pages pour permettre une prise en main immediate sans prerequis technique ni backend actif.

@@ -56,6 +56,14 @@ Demo GitHub Pages:
 - configuration rapide des filtres (types + etats) memorisee localement
 - rapport portefeuille PDF direct avec progression et tolerance aux echecs partiels
 
+Regle calendrier throughput:
+
+- l'historique hebdomadaire utilise uniquement des semaines ISO completes
+- une semaine est retenue seulement si elle commence un lundi, se termine un dimanche,
+  est entierement comprise dans la periode selectionnee et est deja totalement ecoulee
+- la semaine courante n'entre jamais dans la simulation tant que son dimanche n'est pas passe
+- si la periode ne contient aucune semaine complete, le frontend renvoie un message explicite
+
 Le contrat de simulation ne transporte plus de parametre de capacite reduite:
 les projections reposent uniquement sur l'historique de throughput observe.
 La route `POST /simulate` isole aussi la persistance Mongo du calcul principal:

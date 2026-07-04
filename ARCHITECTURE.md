@@ -29,6 +29,13 @@ Le backend ne recoit que:
 - `throughput_samples`
 - les parametres de simulation (`mode`, `backlog_size` / `target_weeks`, `n_sims`)
 
+Invariants de preparation du throughput cote frontend:
+
+- l'historique Azure DevOps est regroupe par semaines ISO du lundi au dimanche
+- seules les semaines completes, entierement incluses dans la plage demandee, sont conservees
+- la semaine courante est exclue tant qu'elle n'est pas entierement ecoulee
+- les chaines `YYYY-MM-DD` sont traitees comme dates locales (`src/date.ts`) pour eviter toute derive UTC d'un jour
+
 Garde-fous serveur:
 
 - rate limiting sur `POST /simulate` via `slowapi`

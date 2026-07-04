@@ -167,6 +167,88 @@ describe("adoClient on-prem api-version", () => {
     expect(result.cycleTimeData).toEqual([{ week: "2026-01-12", cycleTime: 1, count: 2 }]);
   });
 
+  it("includes a week when startDate is monday and endDate is a completed sunday", async () => {
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify({ values: [] }), { status: 200, headers: { "Content-Type": "application/json" } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ workItems: [] }), { status: 200, headers: { "Content-Type": "application/json" } }));
+
+    const result = await getTeamDeliveryDataDirect(
+      "700",
+      "Projet A",
+      "Equipe A",
+      "pat-token-abcdefghijklmnopqrstuvwxyz",
+      "2026-01-05",
+      "2026-01-11",
+      ["Done"],
+      ["Bug"],
+      "https://devops700.itp.extra/700",
+    );
+
+    expect(result.weeklyThroughput).toEqual([{ week: "2026-01-05", throughput: 0 }]);
+  });
+
+  it("excludes the partial week at the beginning when startDate is midweek", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify({ values: [] }), { status: 200, headers: { "Content-Type": "application/json" } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ workItems: [] }), { status: 200, headers: { "Content-Type": "application/json" } }));
+
+    const result = await getTeamDeliveryDataDirect(
+      "700",
+      "Projet A",
+      "Equipe A",
+      "pat-token-abcdefghijklmnopqrstuvwxyz",
+      "2026-01-07",
+      "2026-01-25",
+      ["Done"],
+      ["Bug"],
+      "https://devops700.itp.extra/700",
+    );
+
+    expect(String(fetchMock.mock.calls[1]?.[1]?.body ?? "")).toContain("[Microsoft.VSTS.Common.ClosedDate] >= '2026-01-12'");
+    expect(result.weeklyThroughput.map((row) => row.week)).toEqual(["2026-01-12", "2026-01-19"]);
+  });
+
+  it("excludes the partial week at the end when endDate is midweek", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify({ values: [] }), { status: 200, headers: { "Content-Type": "application/json" } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ workItems: [] }), { status: 200, headers: { "Content-Type": "application/json" } }));
+
+    const result = await getTeamDeliveryDataDirect(
+      "700",
+      "Projet A",
+      "Equipe A",
+      "pat-token-abcdefghijklmnopqrstuvwxyz",
+      "2026-01-05",
+      "2026-01-23",
+      ["Done"],
+      ["Bug"],
+      "https://devops700.itp.extra/700",
+    );
+
+    expect(String(fetchMock.mock.calls[1]?.[1]?.body ?? "")).toContain("[Microsoft.VSTS.Common.ClosedDate] <= '2026-01-18'");
+    expect(result.weeklyThroughput.map((row) => row.week)).toEqual(["2026-01-05", "2026-01-12"]);
+  });
+
+  it("returns an explicit warning when no complete week is available", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch");
+
+    const result = await getTeamDeliveryDataDirect(
+      "700",
+      "Projet A",
+      "Equipe A",
+      "pat-token-abcdefghijklmnopqrstuvwxyz",
+      "2026-01-07",
+      "2026-01-09",
+      ["Done"],
+      ["Bug"],
+      "https://devops700.itp.extra/700",
+    );
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(result.weeklyThroughput).toEqual([]);
+    expect(result.warning).toContain("Aucune semaine complete");
+  });
+
   it("discovers the first valid on-prem collection from left to right", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch");
     fetchMock
