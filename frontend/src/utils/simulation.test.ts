@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  buildCorrelatedPortfolioSamples,
+  buildCorrelatedPortfolioWeeklyThroughputs,
   buildScenarioSamples,
   computeFrictionExponent,
   computeFrictionFactor,
@@ -38,7 +40,7 @@ describe("computeRiskScoreFromPercentiles", () => {
 });
 
 describe("buildScenarioSamples", () => {
-  it("builds optimistic, aligned, friction and conservative samples for 2 teams", () => {
+  it("builds optimistic, aligned and friction samples for 2 teams", () => {
     const randomSpy = vi.spyOn(Math, "random");
     randomSpy
       .mockReturnValueOnce(0.1) // team1 -> 10
@@ -59,11 +61,9 @@ describe("buildScenarioSamples", () => {
     expect(scenarios.optimistic).toEqual([210, 120, 210]);
     expect(scenarios.aligned).toEqual([168, 96, 168]);
     expect(scenarios.friction).toEqual([168, 96, 168]);
-    expect(scenarios.conservative).toEqual([210, 120, 210]);
     expect(scenarios.optimistic).toHaveLength(3);
     expect(scenarios.aligned).toHaveLength(3);
     expect(scenarios.friction).toHaveLength(3);
-    expect(scenarios.conservative).toHaveLength(3);
     randomSpy.mockRestore();
   });
 
@@ -75,49 +75,6 @@ describe("buildScenarioSamples", () => {
 
     expect(scenarios.optimistic).toEqual(scenarios.aligned);
     expect(scenarios.aligned).toEqual(scenarios.friction);
-    expect(scenarios.optimistic).toEqual(scenarios.conservative);
-    randomSpy.mockRestore();
-  });
-
-  it("uses median * team count for conservative scenario with odd team count", () => {
-    const randomSpy = vi.spyOn(Math, "random");
-    randomSpy
-      .mockReturnValueOnce(0.1) // 10
-      .mockReturnValueOnce(0.1) // 30
-      .mockReturnValueOnce(0.1); // 20
-
-    const scenarios = buildScenarioSamples(
-      [
-        [10],
-        [30],
-        [20],
-      ],
-      80,
-    );
-
-    expect(scenarios.conservative).toEqual([60]); // median(10,20,30)=20, *3 => 60
-    randomSpy.mockRestore();
-  });
-
-  it("uses median * team count for conservative scenario with even team count", () => {
-    const randomSpy = vi.spyOn(Math, "random");
-    randomSpy
-      .mockReturnValueOnce(0.1) // 10
-      .mockReturnValueOnce(0.1) // 20
-      .mockReturnValueOnce(0.1) // 40
-      .mockReturnValueOnce(0.1); // 80
-
-    const scenarios = buildScenarioSamples(
-      [
-        [10],
-        [20],
-        [40],
-        [80],
-      ],
-      80,
-    );
-
-    expect(scenarios.conservative).toEqual([120]); // median=(20+40)/2=30, *4 =>120
     randomSpy.mockRestore();
   });
 
@@ -168,6 +125,226 @@ describe("buildScenarioSamples", () => {
     expect(() => buildScenarioSamples([[1, 2], []], 100)).toThrow(
       "chaque equipe doit contenir au moins un sample",
     );
+  });
+});
+
+describe("buildCorrelatedPortfolioSamples", () => {
+  it("sums aligned weekly throughput for two teams", () => {
+    const weekly = buildCorrelatedPortfolioWeeklyThroughputs(
+      [
+        [
+          { week: "2026-01-05", throughput: 10 },
+          { week: "2026-01-12", throughput: 20 },
+          { week: "2026-01-19", throughput: 30 },
+        ],
+        [
+          { week: "2026-01-05", throughput: 5 },
+          { week: "2026-01-12", throughput: 10 },
+          { week: "2026-01-19", throughput: 15 },
+        ],
+      ],
+      true,
+    );
+
+    expect(weekly).toEqual([
+      { week: "2026-01-05", throughput: 15 },
+      { week: "2026-01-12", throughput: 30 },
+      { week: "2026-01-19", throughput: 45 },
+    ]);
+    expect(buildCorrelatedPortfolioSamples([weekly], true)).toEqual([15, 30, 45]);
+  });
+
+  it("keeps only the intersection of aligned weeks", () => {
+    expect(
+      buildCorrelatedPortfolioWeeklyThroughputs(
+        [
+          [
+            { week: "2026-01-05", throughput: 10 },
+            { week: "2026-01-12", throughput: 20 },
+            { week: "2026-01-19", throughput: 30 },
+          ],
+          [
+            { week: "2026-01-05", throughput: 5 },
+            { week: "2026-01-19", throughput: 15 },
+          ],
+        ],
+        true,
+      ),
+    ).toEqual([
+      { week: "2026-01-05", throughput: 15 },
+      { week: "2026-01-19", throughput: 45 },
+    ]);
+  });
+
+  it("returns the same history for a single team", () => {
+    const samples = buildCorrelatedPortfolioSamples(
+      [[
+        { week: "2026-01-05", throughput: 0 },
+        { week: "2026-01-12", throughput: 3 },
+        { week: "2026-01-19", throughput: 5 },
+      ]],
+      true,
+    );
+
+    expect(samples).toEqual([0, 3, 5]);
+  });
+
+  it("applies includeZeroWeeks after aggregating the portfolio total", () => {
+    const teamWeekly = [
+      [
+        { week: "2026-01-05", throughput: 0 },
+        { week: "2026-01-12", throughput: 2 },
+      ],
+      [
+        { week: "2026-01-05", throughput: 0 },
+        { week: "2026-01-12", throughput: 3 },
+      ],
+    ];
+
+    expect(buildCorrelatedPortfolioSamples(teamWeekly, true)).toEqual([0, 5]);
+    expect(buildCorrelatedPortfolioSamples(teamWeekly, false)).toEqual([5]);
+  });
+
+  it("is not mathematically forced to match optimistic independent draws", () => {
+    const randomSpy = vi.spyOn(Math, "random");
+    randomSpy
+      .mockReturnValueOnce(0.99)
+      .mockReturnValueOnce(0.01)
+      .mockReturnValueOnce(0.99)
+      .mockReturnValueOnce(0.01);
+
+    const scenarios = buildScenarioSamples(
+      [
+        [1, 100],
+        [50, 60],
+      ],
+      80,
+    );
+    const correlated = buildCorrelatedPortfolioSamples(
+      [
+        [
+          { week: "2026-01-05", throughput: 1 },
+          { week: "2026-01-12", throughput: 100 },
+        ],
+        [
+          { week: "2026-01-05", throughput: 50 },
+          { week: "2026-01-12", throughput: 60 },
+        ],
+      ],
+      true,
+    );
+
+    expect(scenarios.optimistic).toEqual([150, 150]);
+    expect(correlated).toEqual([51, 160]);
+    expect(correlated).not.toEqual(scenarios.optimistic);
+
+    randomSpy.mockRestore();
+  });
+
+  it("throws an explicit error when no complete common week exists", () => {
+    expect(() =>
+      buildCorrelatedPortfolioSamples(
+        [
+          [{ week: "2026-01-05", throughput: 10 }],
+          [{ week: "2026-01-12", throughput: 12 }],
+        ],
+        true,
+      ),
+    ).toThrow("aucune semaine commune complete");
+  });
+
+  it("throws when the correlated portfolio input is empty", () => {
+    expect(() => buildCorrelatedPortfolioWeeklyThroughputs([], true)).toThrow("teamWeeklyThroughputs ne peut pas etre vide");
+  });
+
+  it("throws when one team has no usable weekly history", () => {
+    expect(() =>
+      buildCorrelatedPortfolioWeeklyThroughputs(
+        [
+          [{ week: "2026-01-05", throughput: 10 }],
+          [],
+        ],
+        true,
+      ),
+    ).toThrow("n'a aucune semaine exploitable");
+  });
+
+  it("throws when a weekly row has an invalid week or throughput", () => {
+    expect(() =>
+      buildCorrelatedPortfolioWeeklyThroughputs(
+        [
+          [{ week: "", throughput: 10 }],
+        ],
+        true,
+      ),
+    ).toThrow("semaine invalide");
+
+    expect(() =>
+      buildCorrelatedPortfolioWeeklyThroughputs(
+        [
+          [{ week: "2026-01-05", throughput: Number.NaN }],
+        ],
+        true,
+      ),
+    ).toThrow("throughput invalide");
+  });
+
+  it("throws when one team contains the same week twice", () => {
+    expect(() =>
+      buildCorrelatedPortfolioWeeklyThroughputs(
+        [
+          [
+            { week: "2026-01-05", throughput: 10 },
+            { week: "2026-01-05", throughput: 12 },
+          ],
+        ],
+        true,
+      ),
+    ).toThrow("semaine dupliquee");
+  });
+
+  it("throws when zero-week filtering removes every common weekly total", () => {
+    const teamWeekly = [
+      [
+        { week: "2026-01-05", throughput: 0 },
+        { week: "2026-01-12", throughput: 0 },
+      ],
+      [
+        { week: "2026-01-05", throughput: 0 },
+        { week: "2026-01-12", throughput: 0 },
+      ],
+    ];
+
+    expect(buildCorrelatedPortfolioWeeklyThroughputs(teamWeekly, true)).toEqual([
+      { week: "2026-01-05", throughput: 0 },
+      { week: "2026-01-12", throughput: 0 },
+    ]);
+    expect(() => buildCorrelatedPortfolioWeeklyThroughputs(teamWeekly, false)).toThrow("total portefeuille > 0");
+  });
+
+  it("keeps ISO week timestamps aligned after normalization", () => {
+    const teams = [
+      [
+        { week: "2026-01-05", throughput: 10 },
+      ],
+      [
+        { week: "2026-01-05T00:00:00.000Z", throughput: 12 },
+      ],
+    ];
+
+    expect(buildCorrelatedPortfolioWeeklyThroughputs(teams, true)).toEqual([{ week: "2026-01-05", throughput: 22 }]);
+  });
+
+  it("throws when includeZeroWeeks keeps only negative common totals", () => {
+    expect(() =>
+      buildCorrelatedPortfolioWeeklyThroughputs(
+        [
+          [{ week: "2026-01-05", throughput: -2 }],
+          [{ week: "2026-01-05", throughput: -3 }],
+        ],
+        true,
+      ),
+    ).toThrow("total portefeuille >= 0");
   });
 });
 

@@ -158,7 +158,14 @@ Les scenarios actuellement proposes sont :
 - `Optimiste`
 - `Arrime`
 - `Friction`
-- `Conservateur`
+- `Historique corrélé`
+
+Lecture produit du scenario `Historique corrélé` :
+
+- il ne s'agit pas d'un tirage independant par equipe
+- le portefeuille additionne les throughputs observes sur les memes semaines pour toutes les equipes
+- seules les semaines communes completes sont conservees
+- ce scenario preserve les effets reels partages: vacances, incidents, ralentissements, dependances temporelles
 
 Le rapport portefeuille gere aussi la progression de generation et la tolerance aux echecs partiels par equipe.
 

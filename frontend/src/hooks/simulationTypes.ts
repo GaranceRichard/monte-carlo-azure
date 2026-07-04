@@ -97,7 +97,7 @@ export type SimulationResult = {
 export type ChartTab = "cycle_time" | "throughput" | "distribution" | "probability";
 
 export type PortfolioScenarioResult = {
-  label: "Optimiste" | `Arrime (${number}%)` | `Friction (${number}%)` | "Conservateur";
+  label: "Optimiste" | `Arrime (${number}%)` | `Friction (${number}%)` | "Historique corr\u00E9l\u00E9";
   hypothesis: string;
   samples: number[];
   weeklyData: WeeklyThroughputRow[];
@@ -112,3 +112,4 @@ type DistributionBucket = {
   x: number;
   count: number;
 };
+

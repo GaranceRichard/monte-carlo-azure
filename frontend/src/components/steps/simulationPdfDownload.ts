@@ -2,7 +2,7 @@ import { jsPDF } from "jspdf";
 import "svg2pdf.js";
 import { CHART_HEIGHT, CHART_WIDTH } from "./simulationChartsSvg";
 
-const SECTION_TITLES = ["Cycle Time", "Throughput hebdomadaire", "Distribution Monte Carlo", "Courbe de probabilité"];
+const SECTION_TITLES = ["Cycle Time", "Throughput hebdomadaire", "Distribution Monte Carlo", "Courbe de probabilitÃ©"];
 const SUMMARY_TABLE_COLUMN_RATIOS: Record<number, number[]> = {
   5: [0.28, 0.12, 0.12, 0.12, 0.36],
   6: [0.24, 0.12, 0.12, 0.12, 0.2, 0.2],
@@ -81,7 +81,7 @@ function extractHypothesisParts(hypothesis: HTMLElement): { lead: string; body: 
   }
 
   const prefixedMatch = fullText.match(
-    /^((?:Optimiste|Arrimé|Arrime|Conservateur|Friction(?:\s*\([^)]+\))?|Risk Score|Fiabilité de l'historique|Règle de lecture)\s*:)\s*(.*)$/u,
+    /^((?:Optimiste|ArrimÃ©|Arrime|Historique corrélé|Friction(?:\s*\([^)]+\))?|Risk Score|FiabilitÃ© de l'historique|RÃ¨gle de lecture)\s*:)\s*(.*)$/u,
   );
   if (prefixedMatch) {
     return {
@@ -363,7 +363,7 @@ export async function downloadPortfolioPdf(
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(12);
       pdf.setTextColor(...BLUE);
-      pdf.text("Synthèse décisionnelle", margin, cursorY);
+      pdf.text("SynthÃ¨se dÃ©cisionnelle", margin, cursorY);
       cursorY += 4;
 
       let x = margin;
@@ -427,7 +427,7 @@ export async function downloadPortfolioPdf(
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(...BLUE);
-      pdf.text("Hypothèses", margin, cursorY);
+      pdf.text("HypothÃ¨ses", margin, cursorY);
       cursorY += 7;
 
       pdf.setFont("helvetica", "normal");
@@ -524,7 +524,7 @@ export async function downloadPortfolioPdf(
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(...BLUE);
-      pdf.text("Hypothèses", margin, cursorY);
+      pdf.text("HypothÃ¨ses", margin, cursorY);
       cursorY += 7;
 
       pdf.setFont("helvetica", "normal");
@@ -559,10 +559,11 @@ export async function downloadPortfolioPdf(
       pdf.setFont("helvetica", "italic");
       pdf.setFontSize(8);
       pdf.setTextColor(107, 114, 128);
-      pdf.text("Données de démonstration — Monte Carlo Azure", margin, pageH - 5);
+      pdf.text("DonnÃ©es de dÃ©monstration â€” Monte Carlo Azure", margin, pageH - 5);
     }
   }
 
   const filename = buildSimulationPdfFileName(`Portefeuille-${selectedProject}`);
   pdf.save(filename);
 }
+

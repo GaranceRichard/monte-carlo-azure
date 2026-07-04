@@ -1,11 +1,10 @@
-import type { ForecastMode, ForecastResponse, ThroughputReliability } from "../types";
+import type { ForecastMode, ForecastResponse, ThroughputReliability, WeeklyThroughputRow } from "../types";
 import { clamp } from "./math";
 
 export type ScenarioSamples = {
   optimistic: number[];
   aligned: number[];
   friction: number[];
-  conservative: number[];
 };
 
 function normalizeAlignmentRate(alignmentRate: number): number {
@@ -27,14 +26,6 @@ export function computeFrictionRatePercent(teamCount: number, alignmentRate: num
 function pickBootstrapSample(samples: number[]): number {
   const randomIndex = Math.floor(Math.random() * samples.length);
   return samples[randomIndex] ?? 0;
-}
-
-function median(values: number[]): number {
-  if (!values.length) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const middle = Math.floor(sorted.length / 2);
-  if (sorted.length % 2 === 1) return sorted[middle] ?? 0;
-  return ((sorted[middle - 1] ?? 0) + (sorted[middle] ?? 0)) / 2;
 }
 
 function percentile(values: number[], p: number): number {
@@ -208,21 +199,95 @@ export function buildScenarioSamples(teamSamples: number[][], alignmentRate: num
   const optimistic: number[] = [];
   const aligned: number[] = [];
   const friction: number[] = [];
-  const conservative: number[] = [];
 
   for (let index = 0; index < maxLength; index += 1) {
     const draws = teamSamples.map((samples) => pickBootstrapSample(samples));
     const optimisticValue = draws.reduce((sum, value) => sum + value, 0);
-    const conservativeValue = teamCount === 1 ? optimisticValue : median(draws) * teamCount;
     const alignedValue = teamCount === 1 ? optimisticValue : Math.floor(optimisticValue * safeRate);
     const frictionValue = Math.floor(optimisticValue * frictionFactor);
     optimistic.push(optimisticValue);
-    conservative.push(conservativeValue);
     aligned.push(alignedValue);
     friction.push(frictionValue);
   }
 
-  return { optimistic, aligned, friction, conservative };
+  return { optimistic, aligned, friction };
+}
+
+function normalizeWeeklyThroughputRow(row: WeeklyThroughputRow, teamIndex: number): { week: string; throughput: number } {
+  const week = String(row.week ?? "").slice(0, 10);
+  const throughput = Number(row.throughput);
+
+  if (!week) {
+    throw new Error(`buildCorrelatedPortfolioSamples: semaine invalide pour l'equipe ${String(teamIndex + 1)}.`);
+  }
+  if (!Number.isFinite(throughput)) {
+    throw new Error(`buildCorrelatedPortfolioSamples: throughput invalide pour la semaine ${week}.`);
+  }
+
+  return { week, throughput: Math.floor(throughput) };
+}
+
+export function buildCorrelatedPortfolioWeeklyThroughputs(
+  teamWeeklyThroughputs: WeeklyThroughputRow[][],
+  includeZeroWeeks: boolean,
+): WeeklyThroughputRow[] {
+  if (!teamWeeklyThroughputs.length) {
+    throw new Error("buildCorrelatedPortfolioSamples: teamWeeklyThroughputs ne peut pas etre vide.");
+  }
+
+  const normalizedTeams = teamWeeklyThroughputs.map((rows, teamIndex) => {
+    if (!rows.length) {
+      throw new Error(`Historique corr\u00E9l\u00E9 indisponible: l'equipe ${String(teamIndex + 1)} n'a aucune semaine exploitable.`);
+    }
+
+    const seenWeeks = new Set<string>();
+    return rows.map((row) => {
+      const normalized = normalizeWeeklyThroughputRow(row, teamIndex);
+      if (seenWeeks.has(normalized.week)) {
+        throw new Error(`Historique corr\u00E9l\u00E9 indisponible: semaine dupliquee detectee (${normalized.week}).`);
+      }
+      seenWeeks.add(normalized.week);
+      return normalized;
+    });
+  });
+
+  const commonWeeks = normalizedTeams.reduce<Set<string>>((intersection, rows, teamIndex) => {
+    const teamWeeks = new Set(rows.map((row) => row.week));
+    if (teamIndex === 0) return teamWeeks;
+    return new Set(Array.from(intersection).filter((week) => teamWeeks.has(week)));
+  }, new Set<string>());
+
+  if (!commonWeeks.size) {
+    throw new Error("Historique corr\u00E9l\u00E9 indisponible: aucune semaine commune complete n'est disponible pour toutes les equipes.");
+  }
+
+  const orderedWeeks = normalizedTeams[0]
+    .map((row) => row.week)
+    .filter((week) => commonWeeks.has(week));
+
+  const weeklyMaps = normalizedTeams.map((rows) => new Map(rows.map((row) => [row.week, row.throughput])));
+  const alignedWeeklyTotals = orderedWeeks.map((week) => ({
+    week,
+    throughput: weeklyMaps.reduce((sum, teamMap) => sum + (teamMap.get(week) ?? 0), 0),
+  }));
+
+  const filteredWeeklyTotals = alignedWeeklyTotals.filter((row) => (includeZeroWeeks ? row.throughput >= 0 : row.throughput > 0));
+
+  if (!filteredWeeklyTotals.length) {
+    if (includeZeroWeeks) {
+      throw new Error("Historique corr\u00E9l\u00E9 indisponible: aucune semaine commune complete ne produit un total portefeuille >= 0.");
+    }
+    throw new Error("Historique corr\u00E9l\u00E9 indisponible: aucune semaine commune complete ne produit un total portefeuille > 0.");
+  }
+
+  return filteredWeeklyTotals;
+}
+
+export function buildCorrelatedPortfolioSamples(
+  teamWeeklyThroughputs: WeeklyThroughputRow[][],
+  includeZeroWeeks: boolean,
+): number[] {
+  return buildCorrelatedPortfolioWeeklyThroughputs(teamWeeklyThroughputs, includeZeroWeeks).map((row) => row.throughput);
 }
 
 export function computeRiskLegend(score: number): "fiable" | "incertain" | "fragile" | "non fiable" {
@@ -304,3 +369,4 @@ export function getProjectionReliabilityNotice(reliability?: ThroughputReliabili
   }
   return null;
 }
+

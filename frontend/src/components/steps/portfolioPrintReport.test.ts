@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+﻿import { afterEach, describe, expect, it, vi } from "vitest";
 import { computeRiskScoreFromPercentiles } from "../../utils/simulation";
 
 const pdfModuleMocks = vi.hoisted(() => ({
@@ -68,8 +68,8 @@ function baseArgs(): PortfolioPrintReportArgs {
         throughputReliability: { cv: 1.01, iqr_ratio: 0.7, slope_norm: -0.11, label: "fragile" as const, samples_count: 8 },
       },
       {
-        label: "Conservateur" as const,
-        hypothesis: "hyp conservative",
+        label: "Historique corr\u00E9l\u00E9" as const,
+        hypothesis: "hyp correlated",
         samples: [1, 2, 3],
         weeklyData: [
           { week: "2026-01-01", throughput: 1 },
@@ -113,11 +113,11 @@ describe("portfolioPrintReport", () => {
   it("renders synthesis, scenarios and team pages in expected order", () => {
     const html = buildPortfolioPrintReportHtml(baseArgs());
 
-    const idxSynth = html.indexOf("Synthèse - Simulation Portefeuille");
-    const idxOpt = html.indexOf("Scénario - Optimiste");
+    const idxSynth = html.indexOf("SynthÃƒÂ¨se - Simulation Portefeuille");
+    const idxOpt = html.search(/Sc.nario - Optimiste/);
     const idxArr = html.search(/Sc.nario - Arrim./);
-    const idxFriction = html.indexOf("Scénario - Friction (80%)");
-    const idxCons = html.indexOf("Scénario - Conservateur");
+    const idxFriction = html.search(/Sc.nario - Friction \(80%\)/);
+    const idxCons = html.search(/Sc.nario - Historique corr.l./);
     const idxTeam = html.indexOf("Simulation Portefeuille - Team A");
 
     expect(idxSynth).toBeLessThan(idxOpt);
@@ -137,16 +137,28 @@ describe("portfolioPrintReport", () => {
     expect(html).toContain("<td>Optimiste</td>");
     expect(html).toMatch(/<td>Arrim. \(80%\)<\/td>/);
     expect(html).toContain("<td>Friction (80%)</td>");
-    expect(html).toContain("<td>Conservateur</td>");
+    expect(html).toMatch(/<td>Historique corr.l.<\/td>/);
     expect(html).toContain("0,22 (fiable)");
     expect(html).toContain("1,60 (non fiable)");
-    expect(html).toContain("Courbes de probabilités comparées");
+    expect(html).toMatch(/Courbes de probabilit.s compar.es/);
     expect(html).toContain('aria-label="Comparaison des probabilites"');
     expect(html).toContain("<strong>Optimiste :</strong>");
-    expect(html).toContain("<strong>Arrimé :</strong>");
+    expect(html).toMatch(/<strong>Arrim. :<\/strong>/);
     expect(html).toContain("<strong>Risk Score :</strong>");
-    expect(html).toContain("<strong>Fiabilité de l&#39;historique :</strong>");
-    expect(html).toContain('<p class="hypothesis reading-rule"><strong>Règle de lecture :</strong><br />');
+    expect(html).toMatch(/<strong>Fiabilit. de l&#39;historique :<\/strong>/);
+    expect(html).toMatch(/<p class="hypothesis reading-rule"><strong>R.gle de lecture :<\/strong><br \/>/);
+  });
+
+  it("renders a plain scenario subtitle when no lead prefix is detected", () => {
+    const args = baseArgs();
+    args.scenarios[0] = {
+      ...args.scenarios[0],
+      hypothesis: "Observed common slowdowns remained visible in the shared history.",
+    };
+
+    const html = buildPortfolioPrintReportHtml(args);
+
+    expect(html).toContain("<div class=\"subtitle\"><i>Observed common slowdowns remained visible in the shared history.</i></div>");
   });
 
   it("uses business percentiles in weeks_to_items mode for scenario risk score", () => {
@@ -204,9 +216,9 @@ describe("portfolioPrintReport", () => {
       scenarios: [],
     });
 
-    expect(html).toContain("Synthèse - Simulation Portefeuille");
-    expect(html).toContain("<b>Équipes incluses:</b> Aucune");
-    expect(html).not.toContain("Scénario - ");
+    expect(html).toMatch(/Synth.se - Simulation Portefeuille/);
+    expect(html).toMatch(/<b>.quipes incluses:<\/b> Aucune/);
+    expect(html).not.toMatch(/Sc.nario - /);
     expect(html).not.toContain("Simulation Portefeuille - Team A");
   });
 
@@ -273,8 +285,8 @@ describe("portfolioPrintReport", () => {
           throughputReliability: null,
         },
         {
-          label: "Conservateur",
-          hypothesis: "hyp conservative",
+          label: "Historique corr\u00E9l\u00E9",
+          hypothesis: "hyp correlated",
           samples: [1, 2, 3],
           weeklyData: [{ week: "2026-01-01", throughput: 1 }],
           percentiles: {} as Record<string, number>,
@@ -329,3 +341,6 @@ describe("portfolioPrintReport", () => {
     Object.defineProperty(window, "alert", { value: originalAlert, configurable: true });
   });
 });
+
+
+

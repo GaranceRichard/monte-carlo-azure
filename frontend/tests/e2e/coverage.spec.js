@@ -1,4 +1,4 @@
-﻿import fs from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
 import { cwd } from "node:process";
 import { test, expect } from "@playwright/test";
@@ -783,7 +783,6 @@ test.describe("e2e istanbul coverage", () => {
         await Promise.resolve();
         await new Promise((resolve) => window.setTimeout(resolve, 0));
       };
-
       const buildResponse = (payload) =>
         new Response(JSON.stringify(payload), {
           status: 200,
@@ -1292,7 +1291,6 @@ test.describe("e2e istanbul coverage", () => {
         await Promise.resolve();
         await new Promise((resolve) => window.setTimeout(resolve, 0));
       };
-
       const jsonResponse = (payload, status = 200, statusText = "OK") =>
         new Response(JSON.stringify(payload), {
           status,
@@ -1466,7 +1464,6 @@ test.describe("e2e istanbul coverage", () => {
         await Promise.resolve();
         await new Promise((resolve) => window.setTimeout(resolve, 0));
       };
-
       const jsonResponse = (payload, status = 200, statusText = "OK") =>
         new Response(JSON.stringify(payload), {
           status,
@@ -1628,9 +1625,593 @@ test.describe("e2e istanbul coverage", () => {
     expect(typeof results.invalidNSims).toBe("boolean");
     expect(typeof results.validNSims).toBe("boolean");
     expect(Array.isArray(results.teamsAfterRemove)).toBe(true);
-    expect(typeof results.failureMessage).toBe("string");
-    expect(typeof results.demoDefaults.typeCount).toBe("number");
-    expect(Array.isArray(results.demoDefaults.doneStates)).toBe(true);
+  expect(typeof results.failureMessage).toBe("string");
+  expect(typeof results.demoDefaults.typeCount).toBe("number");
+  expect(Array.isArray(results.demoDefaults.doneStates)).toBe(true);
+  });
+
+  test("coverage: onboarding hook direct", async ({ page }) => {
+    await page.goto("/");
+
+    const results = await page.evaluate(async () => {
+      const { React, createRoot } = await import("/src/e2e/runtime.ts");
+      const onboardingModule = await import("/src/hooks/useOnboarding.ts");
+      const originalFetch = window.fetch.bind(window);
+      let fetchMode = "global";
+
+      const flush = async () => {
+        await Promise.resolve();
+        await new Promise((resolve) => window.setTimeout(resolve, 0));
+      };
+      const settle = async (work) => {
+        const result = work();
+        if (result && typeof result.then === "function") {
+          await result;
+        }
+        await flush();
+        await flush();
+      };
+
+      const jsonResponse = (payload, status = 200, statusText = "OK") =>
+        new Response(JSON.stringify(payload), {
+          status,
+          statusText,
+          headers: { "Content-Type": "application/json" },
+        });
+
+      window.fetch = async (input, init) => {
+        const url = String(input);
+
+        if (url.includes("/_apis/profile/profiles/me")) {
+          if (fetchMode === "profile-error") {
+            throw new Error("profile unavailable");
+          }
+          if (fetchMode === "local") {
+            return new Response("{}", {
+              status: 401,
+              statusText: "Unauthorized",
+              headers: { "x-vss-userdata": "aad.member-1:Scoped User" },
+            });
+          }
+          return jsonResponse({ displayName: "Global User", id: "member-1", publicAlias: "alias-1" });
+        }
+
+        if (url.includes("/_apis/accounts?memberId=")) {
+          if (fetchMode === "global") {
+            return jsonResponse({ value: [{ accountName: "org-demo" }, { accountName: "org-empty" }] });
+          }
+          return jsonResponse({ value: [] });
+        }
+
+        if (url.includes("ado.local") && url.includes("/_apis/projects?")) {
+          return jsonResponse({ value: [{ id: "proj-a", name: "Projet A" }] });
+        }
+
+        if (url.includes("/_apis/projects?")) {
+          if (fetchMode === "projects-error") {
+            return new Response("projects-down", {
+              status: 500,
+              statusText: "Server Error",
+              headers: { "Content-Type": "text/plain" },
+            });
+          }
+          return jsonResponse({
+            value: [
+              { id: "proj-a", name: "Projet A" },
+              { id: "proj-empty", name: "Projet Vide" },
+            ],
+          });
+        }
+
+        if (url.includes("/_apis/projects/proj-a/teams?")) {
+          return jsonResponse({
+            value: [
+              { id: "team-a", name: "Equipe Alpha" },
+              { id: "team-b", name: "Equipe Beta" },
+            ],
+          });
+        }
+
+        if (url.includes("/_apis/projects/proj-empty/teams?")) {
+          return jsonResponse({ value: [] });
+        }
+
+        return originalFetch(input, init);
+      };
+
+      const mountHarness = async (demoMode = false) => {
+        const container = document.createElement("div");
+        document.body.appendChild(container);
+        const root = createRoot(container);
+        let latest;
+        let readyResolve;
+        const ready = new Promise((resolve) => {
+          readyResolve = resolve;
+        });
+
+        function Harness() {
+          const value = onboardingModule.useOnboarding({ demoMode });
+          React.useEffect(() => {
+            latest = value;
+            readyResolve?.(value);
+          }, [value]);
+          return null;
+        }
+
+        root.render(React.createElement(Harness));
+        await ready;
+
+        return {
+          getValue: () => latest,
+          cleanup: () => {
+            root.unmount();
+            container.remove();
+          },
+        };
+      };
+
+      try {
+        const standard = await mountHarness(false);
+
+        await settle(() => standard.getValue().actions.submitPat());
+        const missingPatError = standard.getValue().state.err;
+
+        await settle(() => standard.getValue().actions.setPatInput("abcd efgh"));
+        await settle(() => standard.getValue().actions.submitPat());
+        const invalidFormatError = standard.getValue().state.err;
+
+        await settle(() => standard.getValue().actions.setPatInput("short-pat"));
+        await settle(() => standard.getValue().actions.submitPat());
+        const shortPatError = standard.getValue().state.err;
+
+        await settle(() => standard.getValue().actions.setPatInput("abcdefghijklmnopqrstuvwxyz123456"));
+        fetchMode = "global";
+        await settle(() => standard.getValue().actions.submitPat());
+        const globalState = {
+          step: standard.getValue().state.step,
+          selectedOrg: standard.getValue().state.selectedOrg,
+          orgCount: standard.getValue().state.orgs.length,
+        };
+
+        await settle(() => standard.getValue().actions.goToProjects());
+        const projectState = {
+          step: standard.getValue().state.step,
+          selectedProject: standard.getValue().state.selectedProject,
+        };
+
+        await settle(() => standard.getValue().actions.goToTeams());
+        const teamState = {
+          step: standard.getValue().state.step,
+          selectedTeam: standard.getValue().state.selectedTeam,
+        };
+
+        await settle(() => standard.getValue().actions.setSelectedTeam(""));
+        const simulationRejected = standard.getValue().actions.goToSimulation();
+        await flush();
+        const emptyTeamError = standard.getValue().state.err;
+
+        await settle(() => standard.getValue().actions.setSelectedTeam("Equipe Alpha"));
+        const simulationAccepted = standard.getValue().actions.goToSimulation();
+        await flush();
+        const simulationStep = standard.getValue().state.step;
+        await settle(() => standard.getValue().actions.goBack());
+        const backToTeamsStep = standard.getValue().state.step;
+        const portfolioAccepted = standard.getValue().actions.goToPortfolio();
+        await flush();
+        const portfolioStep = standard.getValue().state.step;
+        await settle(() => standard.getValue().actions.goToStep("projects"));
+        const manualStep = standard.getValue().state.step;
+        await settle(() => standard.getValue().actions.disconnect());
+        const disconnectedStep = standard.getValue().state.step;
+        standard.cleanup();
+
+        const localCloud = await mountHarness(false);
+        await settle(() => localCloud.getValue().actions.setPatInput("abcdefghijklmnopqrstuvwxyz123456"));
+        fetchMode = "local";
+        await settle(() => localCloud.getValue().actions.submitPat());
+        const localCloudHint = localCloud.getValue().state.orgHint;
+        localCloud.cleanup();
+
+        const onPrem = await mountHarness(false);
+        await settle(() => onPrem.getValue().actions.setServerUrlInput("https://ado.local/tfs/DefaultCollection"));
+        await settle(() => onPrem.getValue().actions.setPatInput("abcdefghijklmnopqrstuvwxyz123456"));
+        fetchMode = "local";
+        await settle(() => onPrem.getValue().actions.submitPat());
+        const onPremState = {
+          step: onPrem.getValue().state.step,
+          deploymentTarget: onPrem.getValue().state.deploymentTarget,
+          selectedOrg: onPrem.getValue().state.selectedOrg,
+        };
+        onPrem.cleanup();
+
+        const failure = await mountHarness(false);
+        await settle(() => failure.getValue().actions.setPatInput("abcdefghijklmnopqrstuvwxyz123456"));
+        fetchMode = "profile-error";
+        await settle(() => failure.getValue().actions.submitPat());
+        const fallbackHint = failure.getValue().state.orgHint;
+        failure.cleanup();
+
+        const demo = await mountHarness(true);
+        const demoInitialStep = demo.getValue().state.step;
+        await settle(() => demo.getValue().actions.setSelectedTeam(""));
+        const demoPortfolioAccepted = demo.getValue().actions.goToPortfolio();
+        await flush();
+        const demoTeamError = demo.getValue().state.err;
+        await settle(() => demo.getValue().actions.disconnect());
+        const demoDisconnectedStep = demo.getValue().state.step;
+        demo.cleanup();
+
+        return {
+          missingPatError,
+          invalidFormatError,
+          shortPatError,
+          globalState,
+          projectState,
+          teamState,
+          simulationRejected,
+          emptyTeamError,
+          simulationAccepted,
+          simulationStep,
+          backToTeamsStep,
+          portfolioAccepted,
+          portfolioStep,
+          manualStep,
+          disconnectedStep,
+          localCloudHint,
+          onPremState,
+          fallbackHint,
+          demoInitialStep,
+          demoPortfolioAccepted,
+          demoTeamError,
+          demoDisconnectedStep,
+        };
+      } finally {
+        window.fetch = originalFetch;
+      }
+    });
+
+    expect(typeof results.missingPatError).toBe("string");
+    expect(typeof results.invalidFormatError).toBe("string");
+    expect(typeof results.shortPatError).toBe("string");
+    expect(results.globalState.step).toBe("org");
+    expect(results.globalState.selectedOrg).toBe("org-demo");
+    expect(results.globalState.orgCount).toBeGreaterThan(0);
+    expect(results.projectState.step).toBe("projects");
+    expect(results.projectState.selectedProject).toBe("Projet A");
+    expect(results.teamState.step).toBe("teams");
+    expect(results.teamState.selectedTeam).toBe("Equipe Alpha");
+    expect(results.simulationRejected).toBe(false);
+    expect(typeof results.emptyTeamError).toBe("string");
+    expect(results.simulationAccepted).toBe(true);
+    expect(results.simulationStep).toBe("simulation");
+    expect(results.backToTeamsStep).toBe("teams");
+    expect(results.portfolioAccepted).toBe(true);
+    expect(results.portfolioStep).toBe("portfolio");
+    expect(results.manualStep).toBe("projects");
+    expect(results.disconnectedStep).toBe("pat");
+    expect(typeof results.localCloudHint).toBe("string");
+    expect(results.onPremState.step).toBe("org");
+    expect(results.onPremState.deploymentTarget).toBe("onprem");
+    expect(typeof results.onPremState.selectedOrg).toBe("string");
+    expect(typeof results.fallbackHint).toBe("string");
+    expect(results.demoInitialStep).toBe("teams");
+    expect(typeof results.demoPortfolioAccepted).toBe("boolean");
+    expect(typeof results.demoTeamError).toBe("string");
+    expect(results.demoDisconnectedStep).toBe("teams");
+  });
+
+  test("coverage: entry and portfolio components direct", async ({ page }) => {
+    await page.goto("/");
+
+    const results = await page.evaluate(async () => {
+      const { React, createRoot } = await import("/src/e2e/runtime.ts");
+      const portfolioStepModule = await import("/src/components/steps/PortfolioStep.tsx");
+      const patStepModule = await import("/src/components/steps/PatStep.tsx");
+      const controlsModule = await import("/src/components/steps/SimulationModeAndParametersControls.tsx");
+      const simulationContextModule = await import("/src/hooks/SimulationContext.tsx");
+      const originalFetch = window.fetch.bind(window);
+
+      const flush = async () => {
+        await Promise.resolve();
+        await new Promise((resolve) => window.setTimeout(resolve, 0));
+      };
+
+      const jsonResponse = (payload, status = 200, statusText = "OK") =>
+        new Response(JSON.stringify(payload), {
+          status,
+          statusText,
+          headers: { "Content-Type": "application/json" },
+        });
+
+      window.fetch = async (input, init) => {
+        const url = String(input);
+        const decoded = decodeURIComponent(url);
+
+        if (decoded.includes("/_apis/wit/workitemtypes?")) {
+          return jsonResponse({ value: [{ name: "Bug" }, { name: "User Story" }] });
+        }
+
+        if (decoded.includes("/workitemtypes/Bug/states?")) {
+          return jsonResponse({ value: [{ name: "Done" }] });
+        }
+
+        if (decoded.includes("/workitemtypes/User Story/states?")) {
+          return jsonResponse({ value: [{ name: "Done" }, { name: "Closed" }] });
+        }
+
+        return originalFetch(input, init);
+      };
+
+      try {
+        let submitCount = 0;
+        let serverUrlValue = "";
+        let patValue = "";
+
+        const patContainer = document.createElement("div");
+        document.body.appendChild(patContainer);
+        const patRoot = createRoot(patContainer);
+
+        function PatHarness() {
+          const [err, setErr] = React.useState("Erreur initiale");
+          const [serverUrlInput, setServerUrlInput] = React.useState("");
+          const [patInput, setPatInput] = React.useState("");
+          const [submitCountState, setSubmitCountState] = React.useState(0);
+
+          React.useEffect(() => {
+            serverUrlValue = serverUrlInput;
+            patValue = patInput;
+            submitCount = submitCountState;
+          }, [serverUrlInput, patInput, submitCountState]);
+
+          return React.createElement(patStepModule.default, {
+            err,
+            patInput,
+            serverUrlInput,
+            setPatInput,
+            setServerUrlInput,
+            loading: false,
+            onSubmit: () => {
+              setSubmitCountState((count) => count + 1);
+              setErr("");
+            },
+          });
+        }
+
+        patRoot.render(React.createElement(PatHarness));
+        await flush();
+
+        const patInputs = patContainer.querySelectorAll("input");
+        const serverInput = patInputs[0];
+        const patInput = patInputs[1];
+        const patButton = patContainer.querySelector("button");
+
+        serverInput.value = "https://ado.local/tfs/DefaultCollection";
+        serverInput.dispatchEvent(new Event("input", { bubbles: true }));
+        serverInput.dispatchEvent(new Event("change", { bubbles: true }));
+        serverInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+
+        patInput.value = "token-value-at-least-20-chars";
+        patInput.dispatchEvent(new Event("input", { bubbles: true }));
+        patInput.dispatchEvent(new Event("change", { bubbles: true }));
+        patInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+
+        patButton.click();
+        await flush();
+
+        const patResults = {
+          submitCount,
+          serverUrlValue,
+          patValue,
+          focusedTag: patContainer.ownerDocument.activeElement?.tagName || "",
+        };
+
+        patRoot.unmount();
+        patContainer.remove();
+
+        const controlsContainer = document.createElement("div");
+        document.body.appendChild(controlsContainer);
+        const controlsRoot = createRoot(controlsContainer);
+        const controlsCalls = [];
+
+        function ControlsHarness() {
+          const [simulationMode, setSimulationMode] = React.useState("backlog_to_weeks");
+          const [includeZeroWeeks, setIncludeZeroWeeks] = React.useState(false);
+          const [backlogSize, setBacklogSize] = React.useState("120");
+          const [targetWeeks, setTargetWeeks] = React.useState("12");
+          const [nSims, setNSims] = React.useState("20000");
+
+          const value = {
+            selectedTeam: "Equipe Alpha",
+            simulation: {
+              simulationMode,
+              includeZeroWeeks,
+              backlogSize,
+              targetWeeks,
+              nSims,
+              setSimulationMode: (value) => {
+                controlsCalls.push(`mode:${value}`);
+                setSimulationMode(value);
+              },
+              setActiveChartTab: (value) => controlsCalls.push(`tab:${value}`),
+              setIncludeZeroWeeks: (value) => {
+                controlsCalls.push(`zero:${value}`);
+                setIncludeZeroWeeks(value);
+              },
+              setBacklogSize: (value) => {
+                controlsCalls.push(`backlog:${value}`);
+                setBacklogSize(value);
+              },
+              setTargetWeeks: (value) => {
+                controlsCalls.push(`weeks:${value}`);
+                setTargetWeeks(value);
+              },
+              setNSims: (value) => {
+                controlsCalls.push(`sims:${value}`);
+                setNSims(value);
+              },
+            },
+          };
+
+          return React.createElement(
+            simulationContextModule.SimulationProvider,
+            { value },
+            React.createElement(controlsModule.default),
+          );
+        }
+
+        controlsRoot.render(React.createElement(ControlsHarness));
+        await flush();
+
+        const controlsSelect = controlsContainer.querySelector("select");
+        const controlsCheckbox = controlsContainer.querySelector('input[type="checkbox"]');
+        let controlsNumbers = controlsContainer.querySelectorAll('input[type="number"]');
+
+        controlsSelect.dispatchEvent(new FocusEvent("focus", { bubbles: true }));
+        controlsSelect.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+        controlsSelect.value = "weeks_to_items";
+        controlsSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        controlsCheckbox.checked = true;
+        controlsCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
+        controlsNumbers[0].value = "16";
+        controlsNumbers[0].dispatchEvent(new Event("input", { bubbles: true }));
+        controlsNumbers[0].dispatchEvent(new Event("change", { bubbles: true }));
+        controlsNumbers[1].value = "30000";
+        controlsNumbers[1].dispatchEvent(new Event("input", { bubbles: true }));
+        controlsNumbers[1].dispatchEvent(new Event("change", { bubbles: true }));
+        await flush();
+
+        controlsSelect.value = "backlog_to_weeks";
+        controlsSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        await flush();
+        controlsNumbers = controlsContainer.querySelectorAll('input[type="number"]');
+        controlsNumbers[0].value = "150";
+        controlsNumbers[0].dispatchEvent(new Event("input", { bubbles: true }));
+        controlsNumbers[0].dispatchEvent(new Event("change", { bubbles: true }));
+        await flush();
+
+        const controlsResults = {
+          controlsCalls: [...controlsCalls],
+          hasBacklogLabel: controlsContainer.textContent.includes("Backlog (items)"),
+        };
+
+        controlsRoot.unmount();
+        controlsContainer.remove();
+
+        const portfolioContainer = document.createElement("div");
+        document.body.appendChild(portfolioContainer);
+        const portfolioRoot = createRoot(portfolioContainer);
+
+        portfolioRoot.render(
+          React.createElement(portfolioStepModule.default, {
+            demoMode: false,
+            selectedOrg: "org-demo",
+            selectedProject: "Projet A",
+            teams: [{ name: "Equipe Alpha" }, { name: "Equipe Beta" }],
+            pat: "token-value-at-least-20-chars",
+            serverUrl: "",
+          }),
+        );
+        await flush();
+
+        const portfolioDateInputs = portfolioContainer.querySelectorAll('input[type="date"]');
+        const portfolioSelects = portfolioContainer.querySelectorAll("select");
+        portfolioDateInputs[0].value = "2026-01-08";
+        portfolioDateInputs[0].dispatchEvent(new Event("input", { bubbles: true }));
+        portfolioDateInputs[0].dispatchEvent(new Event("change", { bubbles: true }));
+        portfolioDateInputs[1].value = "2026-02-08";
+        portfolioDateInputs[1].dispatchEvent(new Event("input", { bubbles: true }));
+        portfolioDateInputs[1].dispatchEvent(new Event("change", { bubbles: true }));
+        portfolioSelects[0].value = "0";
+        portfolioSelects[0].dispatchEvent(new Event("change", { bubbles: true }));
+        portfolioSelects[1].value = "weeks_to_items";
+        portfolioSelects[1].dispatchEvent(new Event("change", { bubbles: true }));
+        await flush();
+
+        let portfolioNumbers = portfolioContainer.querySelectorAll('input[type="number"]');
+        portfolioNumbers[0].value = "16";
+        portfolioNumbers[0].dispatchEvent(new Event("input", { bubbles: true }));
+        portfolioNumbers[0].dispatchEvent(new Event("change", { bubbles: true }));
+        portfolioNumbers[1].value = "30000";
+        portfolioNumbers[1].dispatchEvent(new Event("input", { bubbles: true }));
+        portfolioNumbers[1].dispatchEvent(new Event("change", { bubbles: true }));
+        portfolioNumbers[2].value = "75";
+        portfolioNumbers[2].dispatchEvent(new Event("input", { bubbles: true }));
+        portfolioNumbers[2].dispatchEvent(new Event("change", { bubbles: true }));
+        await flush();
+
+        const addTeamButton = Array.from(portfolioContainer.querySelectorAll("button")).find((button) =>
+          /Ajouter/.test(button.textContent || ""),
+        );
+        addTeamButton.click();
+        await flush();
+
+        const modalRoot = portfolioContainer.querySelector("div.fixed.inset-0");
+        const modalSelect = modalRoot?.querySelector("select");
+        if (modalSelect) {
+          modalSelect.value = "Equipe Alpha";
+          modalSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+        const quickConfigButton = Array.from(modalRoot?.querySelectorAll("button") ?? []).find((button) =>
+          /Configuration rapide/.test(button.textContent || ""),
+        );
+        if (quickConfigButton) {
+          quickConfigButton.click();
+        } else {
+          const bugCheckbox = Array.from(modalRoot?.querySelectorAll('input[type="checkbox"]') ?? [])[0];
+          if (bugCheckbox) {
+            bugCheckbox.checked = true;
+            bugCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+          await flush();
+          const doneCheckbox = Array.from(modalRoot?.querySelectorAll('input[type="checkbox"]') ?? [])[1];
+          if (doneCheckbox) {
+            doneCheckbox.checked = true;
+            doneCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+        }
+        await flush();
+
+        const validateButton = Array.from(modalRoot?.querySelectorAll("button") ?? []).find((button) =>
+          /Valider/.test(button.textContent || ""),
+        );
+        validateButton?.click();
+        await flush();
+
+        const removeButton = Array.from(portfolioContainer.querySelectorAll("button")).find((button) =>
+          /Retirer/.test(button.textContent || ""),
+        );
+        removeButton?.click();
+        await flush();
+
+        const portfolioResults = {
+          text: portfolioContainer.textContent || "",
+          teamRows: portfolioContainer.querySelectorAll(".sim-history-row").length,
+        };
+
+        portfolioRoot.unmount();
+        portfolioContainer.remove();
+
+        return {
+          patResults,
+          controlsResults,
+          portfolioResults,
+        };
+      } finally {
+        window.fetch = originalFetch;
+      }
+    });
+
+    expect(results.patResults.submitCount).toBeGreaterThanOrEqual(3);
+    expect(typeof results.patResults.serverUrlValue).toBe("string");
+    expect(typeof results.patResults.patValue).toBe("string");
+    expect(results.patResults.focusedTag).toBe("INPUT");
+    expect(results.controlsResults.controlsCalls).toContain("mode:weeks_to_items");
+    expect(results.controlsResults.controlsCalls).toContain("tab:cycle_time");
+    expect(Array.isArray(results.controlsResults.controlsCalls)).toBe(true);
+    expect(results.controlsResults.controlsCalls.length).toBeGreaterThanOrEqual(2);
+    expect(results.controlsResults.hasBacklogLabel).toBe(true);
+    expect(results.portfolioResults.text).toContain("Simulation Portefeuille");
+    expect(typeof results.portfolioResults.teamRows).toBe("number");
   });
 
   test("coverage: branches print and pdf direct", async ({ page }) => {
@@ -2124,7 +2705,7 @@ test.describe("e2e istanbul coverage", () => {
       }
 
       const singleTeam = simulationMod.buildScenarioSamples([[5, 8, 13]], 20);
-      const multiTeam = simulationMod.buildScenarioSamples(
+      const _multiTeam = simulationMod.buildScenarioSamples(
         [
           [10],
           [20],
@@ -2215,7 +2796,10 @@ test.describe("e2e istanbul coverage", () => {
         riskScores,
         reliabilities,
         singleTeamLengths: Object.values(singleTeam).map((values) => values.length),
-        multiTeamConservative: multiTeam.conservative[0],
+        multiTeamCorrelated: simulationMod.buildCorrelatedPortfolioSamples([
+          [{ week: "2026-01-05", throughput: 10 }, { week: "2026-01-12", throughput: 20 }],
+          [{ week: "2026-01-05", throughput: 5 }, { week: "2026-01-12", throughput: 15 }],
+        ], true)[0],
         backlogKind: backlogResult.result_kind,
         itemsKind: itemsResult.result_kind,
         histogramBuckets: histogramResult.result_distribution.length,
@@ -2232,8 +2816,8 @@ test.describe("e2e istanbul coverage", () => {
     expect(results.reliabilities).toContain("fragile");
     expect(results.reliabilities).toContain("incertain");
     expect(results.reliabilities).toContain("fiable");
-    expect(results.singleTeamLengths).toEqual([3, 3, 3, 3]);
-    expect(results.multiTeamConservative).toBeGreaterThan(0);
+    expect(results.singleTeamLengths).toEqual([3, 3, 3]);
+    expect(results.multiTeamCorrelated).toBeGreaterThan(0);
     expect(results.backlogKind).toBe("weeks");
     expect(results.itemsKind).toBe("items");
     expect(results.histogramBuckets).toBeLessThanOrEqual(100);
@@ -2734,7 +3318,7 @@ test.describe("e2e istanbul coverage", () => {
             <div class="meta-row">Projet: Projet A</div>
           </div>
           <div class="hypothesis"><strong>Risk Score :</strong> Lecture synthetique</div>
-          <div class="hypothesis">Conservateur : marge defensive</div>
+          <div class="hypothesis">Historique corrélé : somme historique alignée</div>
           <div class="kpis">
             <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">10 semaines</span></div>
           </div>
@@ -2803,8 +3387,8 @@ test.describe("e2e istanbul coverage", () => {
         includedTeams: ["Equipe Alpha", "Equipe Beta"],
         scenarios: [
           {
-            label: "Conservateur",
-            hypothesis: "hyp conservative",
+            label: "Historique corrélé",
+            hypothesis: "hyp correlated",
             samples: [1, 2, 3],
             weeklyData: [{ week: "2026-01-01", throughput: 1 }],
             percentiles: { P50: 6, P70: 7, P90: 9 },
@@ -2909,3 +3493,9 @@ test.describe("e2e istanbul coverage", () => {
     expect(results.renderedHtml).toContain("Simulation Portefeuille - Equipe Alpha");
   });
 });
+
+
+
+
+
+

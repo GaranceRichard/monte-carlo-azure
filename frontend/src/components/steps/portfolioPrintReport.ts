@@ -176,11 +176,12 @@ function renderHypothesisBlock(block: HypothesisBlock): string {
     return `<p class="hypothesis reading-rule"><strong>${escapeHtml(block.lead)}</strong><br />${escapeHtml(block.body)}</p>`;
   }
 
-  if (!block.lead) {
-    return `<p class="hypothesis">${escapeHtml(block.body)}</p>`;
-  }
-
-  return `<p class="hypothesis">${block.emphasizedLead ? `<strong>${escapeHtml(block.lead)}</strong>` : escapeHtml(block.lead)}${escapeHtml(block.body)}</p>`;
+  const renderedLead = block.lead
+    ? block.emphasizedLead
+      ? `<strong>${escapeHtml(block.lead)}</strong>`
+      : escapeHtml(block.lead)
+    : "";
+  return `<p class="hypothesis">${renderedLead}${escapeHtml(block.body)}</p>`;
 }
 
 function resolveRiskScore({
@@ -242,6 +243,10 @@ function buildTeamLikePageHtml({
   pageBreak: boolean;
 }): string {
   const throughputRows = includeZeroWeeks ? weeklyThroughput : weeklyThroughput.filter((row) => row.throughput > 0);
+  const effectiveNote =
+    title.includes("Historique corr\u00E9l\u00E9")
+      ? "D\u00E9bit portefeuille issu des semaines historiques communes observ\u00E9es."
+      : note;
   const throughputPoints: ThroughputExportPoint[] = throughputRows.map((point, index, arr) => {
     const windowSize = 4;
     const start = Math.max(0, index - windowSize + 1);
@@ -324,7 +329,7 @@ function buildTeamLikePageHtml({
       <section class="section">
         <h2>Courbes de probabilit\u00E9s compar\u00E9es</h2>
         <div class="chart-wrap">${throughputSvg}</div>
-        ${note ? `<div class="note">${escapeHtml(note)}</div>` : ""}
+        ${effectiveNote ? `<div class="note">${escapeHtml(effectiveNote)}</div>` : ""}
       </section>
 
       <section class="section">
@@ -432,8 +437,10 @@ function buildSummaryPage({
     },
     {
       kind: "paragraph",
+      lead: "Historique corr\u00E9l\u00E9 :",
+      emphasizedLead: true,
       body:
-        "Conservateur : D\u00E9bit m\u00E9dian des \u00E9quipes x nb \u00E9quipes. Hypoth\u00E8se : le portefeuille est contraint par l'\u00E9quipe m\u00E9diane, pas par la pire.",
+        " Somme des throughputs observ\u00E9s sur les m\u00EAmes semaines pour toutes les \u00E9quipes. Cette approche conserve les variations et contraintes communes r\u00E9ellement observ\u00E9es dans l'historique.",
     },
     {
       kind: "paragraph",
@@ -682,3 +689,4 @@ export async function exportPortfolioPrintReport(
     throw err;
   }
 }
+

@@ -85,6 +85,9 @@ describe("usePortfolioReport", () => {
     expect(result.current.reportErr).toBe("");
     expect(result.current.generationProgress).toEqual({ done: 6, total: 6 });
     expect(vi.mocked(exportPortfolioPrintReport)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0].scenarios.map((scenario) => scenario.label)).toContain(
+      "Historique corr\u00E9l\u00E9",
+    );
   });
 
   it("excludes failed teams from phase 1 and still exports", async () => {
@@ -398,6 +401,27 @@ describe("usePortfolioReport", () => {
     );
   });
 
+  it("reports an explicit correlated-history error when teams share no complete week", async () => {
+    vi.mocked(fetchTeamThroughput)
+      .mockResolvedValueOnce({
+        ...throughputData,
+        weeklyThroughput: [{ week: "2026-01-05", throughput: 3 }],
+      })
+      .mockResolvedValueOnce({
+        ...throughputData,
+        weeklyThroughput: [{ week: "2026-01-12", throughput: 5 }],
+      });
+
+    const { result } = setupReportHook();
+
+    await act(async () => {
+      await result.current.handleGenerateReport();
+    });
+
+    expect(result.current.reportErr).toBe("Historique corr\u00E9l\u00E9 indisponible: aucune semaine commune complete n'est disponible pour toutes les equipes.");
+    expect(vi.mocked(exportPortfolioPrintReport)).not.toHaveBeenCalled();
+  });
+
   it("falls back to 'Equipe inconnue' when a throughput rejection has no teamName", async () => {
     const originalAllSettled = Promise.allSettled.bind(Promise);
     vi.spyOn(Promise, "allSettled")
@@ -448,3 +472,4 @@ describe("getPortfolioErrorMessage", () => {
     expect(message).toBe('Erreur inattendue pendant "fallback-op".');
   });
 });
+

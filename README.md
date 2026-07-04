@@ -56,6 +56,14 @@ Demo GitHub Pages:
 - configuration rapide des filtres (types + etats) memorisee localement
 - rapport portefeuille PDF direct avec progression et tolerance aux echecs partiels
 
+Scenarios portefeuille:
+
+- `Optimiste`: somme des throughputs tires independamment pour chaque equipe
+- `Arrime`: `Optimiste` reduit au facteur d'arrimage configure
+- `Friction`: application d'un cout d'alignement identique par equipe supplementaire
+- `Historique corrélé`: somme des throughputs observes sur les memes semaines pour toutes les equipes
+  afin de conserver les variations communes reellement observees
+
 Regle scenario portefeuille `Friction`:
 
 - le facteur applique est `alignmentRate^(teamCount - 1)`
@@ -63,6 +71,15 @@ Regle scenario portefeuille `Friction`:
 - `1` equipe => aucune penalite (`100%` de capacite conservee)
 - la penalite commence a partir de la `2e` equipe
 - le pourcentage affiche dans le rapport correspond exactement au facteur utilise pour la simulation
+
+Regle scenario portefeuille `Historique corrélé`:
+
+- l'echantillon est construit a partir des `weeklyThroughput` reels de chaque equipe
+- seules les semaines calendaires communes a toutes les equipes sont conservees
+- le throughput portefeuille d'une semaine est la somme des throughputs observes cette meme semaine
+- `includeZeroWeeks=true` conserve les totaux `>= 0`
+- `includeZeroWeeks=false` conserve uniquement les totaux `> 0`
+- si aucune semaine commune complete n'est disponible, le frontend renvoie une erreur explicite
 
 Regle calendrier throughput:
 

@@ -4,6 +4,9 @@
 
 ### Frontend
 
+- remplacement du scenario portefeuille `Conservateur` par `Historique corrélé`, construit a partir
+  des semaines reelles communes a toutes les equipes pour conserver les variations partagees
+  (vacances, incidents, ralentissements, dependances temporelles) dans le moteur Monte Carlo
 - correction de la formule du scenario portefeuille `Friction` pour l'aligner sur l'explication metier:
   une seule equipe conserve 100% de sa capacite, puis chaque equipe supplementaire applique
   le meme cout d'alignement (`optimistic * alignmentRate^(teamCount - 1)`, expose avec borne
@@ -69,7 +72,7 @@
 - resumes du panneau simulation reformules en libelles metier
 - mode portefeuille recompose pour une lecture plus claire des criteres generaux
 - rapport portefeuille PDF enrichi avec page de synthese decisionnelle
-- refonte des scenarios portefeuille: `Optimiste`, `Arrime`, `Friction`, `Conservateur`
+- refonte des scenarios portefeuille: `Optimiste`, `Arrime`, `Friction`, `Historique corrélé`
 - ajout d'un graphe comparatif des 4 courbes de probabilite dans le PDF
 - alignement CI front sur les 4 scenarios portefeuille
 - ordre des scenarios harmonise partout

@@ -8,6 +8,8 @@ import {
 } from "./simulationForecastService";
 import type { PortfolioScenarioResult } from "./simulationTypes";
 import {
+  buildCorrelatedPortfolioSamples,
+  buildCorrelatedPortfolioWeeklyThroughputs,
   buildScenarioSamples,
   computeFrictionRatePercent,
   computeRiskLegend,
@@ -85,8 +87,8 @@ const SCENARIO_HYPOTHESIS_TEXT = {
     "N% de la capacite combinee. Hypothese : couts de synchronisation (ceremonies, dependances, alignement) absorbes sur le debit global.",
   friction:
     "X% de la capacite combinee. Hypothese : chaque equipe supplementaire absorbe un cout d'alignement identique.",
-  conservative:
-    "Debit median des equipes x nb equipes. Hypothese : le portefeuille est contraint par l'equipe mediane, pas par la pire.",
+  correlated:
+    "Somme des throughputs observes sur les memes semaines pour toutes les equipes. Cette approche conserve les variations et contraintes communes reellement observees dans l'historique.",
 } as const;
 
 export function getPortfolioErrorMessage(error: unknown, context: AdoErrorContext): string {
@@ -122,7 +124,7 @@ function toScenarioResult(
   samples: number[],
   simulationMode: ForecastMode,
   result: Awaited<ReturnType<typeof simulateForecastFromSamples>>,
-  startDate: string,
+  weeklyData: WeeklyThroughputRow[],
 ): PortfolioScenarioResult {
   const percentiles = result.result_percentiles;
   const riskScore =
@@ -133,7 +135,7 @@ function toScenarioResult(
     label,
     hypothesis,
     samples,
-    weeklyData: buildSyntheticWeeklyData(samples, startDate),
+    weeklyData,
     percentiles,
     riskScore,
     riskLegend: computeRiskLegend(riskScore),
@@ -239,6 +241,14 @@ export function usePortfolioReport({
         successfulTeams.map((team) => team.data.throughputSamples),
         alignmentRate,
       );
+      const correlatedWeeklyData = buildCorrelatedPortfolioWeeklyThroughputs(
+        successfulTeams.map((team) => team.data.weeklyThroughput),
+        includeZeroWeeks,
+      );
+      const correlatedSamples = buildCorrelatedPortfolioSamples(
+        successfulTeams.map((team) => team.data.weeklyThroughput),
+        includeZeroWeeks,
+      );
       const effectiveFrictionRate = computeFrictionRatePercent(successfulTeams.length, alignmentRate);
 
       const totalSimulations = successfulTeams.length + 4;
@@ -323,7 +333,7 @@ export function usePortfolioReport({
                 scenarioSamples.optimistic,
                 simulationMode,
                 result,
-                startDate,
+                buildSyntheticWeeklyData(scenarioSamples.optimistic, startDate),
               ),
             };
           } catch (error: unknown) {
@@ -356,7 +366,7 @@ export function usePortfolioReport({
                 scenarioSamples.aligned,
                 simulationMode,
                 result,
-                startDate,
+                buildSyntheticWeeklyData(scenarioSamples.aligned, startDate),
               ),
             };
           } catch (error: unknown) {
@@ -389,7 +399,7 @@ export function usePortfolioReport({
                 scenarioSamples.friction,
                 simulationMode,
                 result,
-                startDate,
+                buildSyntheticWeeklyData(scenarioSamples.friction, startDate),
               ),
             };
           } catch (error: unknown) {
@@ -402,7 +412,7 @@ export function usePortfolioReport({
           try {
             const result = await simulateForecastFromSamples({
               demoMode,
-              throughputSamples: scenarioSamples.conservative,
+              throughputSamples: correlatedSamples,
               includeZeroWeeks: true,
               simulationMode,
               backlogSize,
@@ -410,23 +420,23 @@ export function usePortfolioReport({
               nSims,
               selectedOrg,
               selectedProject,
-              selectedTeam: "Conservateur",
+              selectedTeam: "Historique corr\u00E9l\u00E9",
               startDate,
               endDate,
             });
             return {
               kind: "scenario" as const,
               scenario: toScenarioResult(
-                "Conservateur",
-                SCENARIO_HYPOTHESIS_TEXT.conservative,
-                scenarioSamples.conservative,
+                "Historique corr\u00E9l\u00E9",
+                SCENARIO_HYPOTHESIS_TEXT.correlated,
+                correlatedSamples,
                 simulationMode,
                 result,
-                startDate,
+                correlatedWeeklyData,
               ),
             };
           } catch (error: unknown) {
-            throw { kind: "scenario", teamName: "Conservateur", error };
+            throw { kind: "scenario", teamName: "Historique corr\u00E9l\u00E9", error };
           } finally {
             markSimulationDone();
           }
@@ -508,3 +518,4 @@ export function usePortfolioReport({
     clearReportErr,
   };
 }
+
