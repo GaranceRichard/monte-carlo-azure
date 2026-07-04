@@ -50,9 +50,9 @@ Demo GitHub Pages:
   - toujours borne a `0` si `P50 <= 0` ou si une ancienne reponse est incoherente
 - export CSV du throughput hebdomadaire
 - telechargement direct du rapport PDF simulation sans fenetre intermediaire
-- historique local des dernieres simulations
+- historique local des dernieres simulations, contextualise par equipe dans le navigateur
 - cookie client `IDMontecarlo` pour relier un client anonyme a ses simulations persistees
-- persistence MongoDB des simulations et restitution des 10 dernieres via `/simulations/history`
+- persistence MongoDB des simulations statistiques anonymes et restitution des 10 dernieres via `/simulations/history`
 - configuration rapide des filtres (types + etats) memorisee localement
 - rapport portefeuille PDF direct avec progression et tolerance aux echecs partiels
 
@@ -113,6 +113,13 @@ Le PAT Azure DevOps:
 - en mode Cloud, les appels partent directement vers `https://dev.azure.com` et `https://app.vssps.visualstudio.com`
 
 Les invariants techniques et les controles CI associes sont documentes dans [`ARCHITECTURE.md`](ARCHITECTURE.md).
+
+Frontiere d'identite Azure DevOps :
+
+- le navigateur conserve le `PAT`, l'URL serveur, l'organisation, le projet, l'equipe, la periode, les types, les etats `Done`, l'historique hebdomadaire brut, le cycle time brut et l'historique utilisateur contextualise
+- `POST /simulate` transmet uniquement `throughput_samples`, `include_zero_weeks`, `mode`, `backlog_size`, `target_weeks` et `n_sims`
+- MongoDB ne persiste que `mc_client_id`, `created_at`, `last_seen`, les parametres Monte Carlo et les resultats statistiques anonymes
+- `mc_client_id` est un identifiant anonyme non derive d'Azure DevOps
 
 ---
 
@@ -303,6 +310,15 @@ Purge planifiee:
 ```bash
 python Scripts/purge_inactive_clients.py
 ```
+
+Nettoyage des anciens champs d'identite Azure DevOps dans Mongo:
+
+```bash
+.venv\Scripts\python.exe Scripts/scrub_simulation_identity.py
+.venv\Scripts\python.exe Scripts/scrub_simulation_identity.py --apply
+```
+
+Le script est en `dry-run` par defaut et supprime uniquement les anciens champs sensibles via `$unset` en mode `--apply`.
 
 Suite E2E decoupee:
 

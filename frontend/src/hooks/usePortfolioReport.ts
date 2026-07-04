@@ -270,13 +270,6 @@ export function usePortfolioReport({
               backlogSize,
               targetWeeks,
               nSims,
-              selectedOrg,
-              selectedProject,
-              selectedTeam: cfg.teamName,
-              startDate,
-              endDate,
-              doneStates: cfg.doneStates,
-              types: cfg.types,
             });
             return {
               kind: "team" as const,
@@ -319,11 +312,6 @@ export function usePortfolioReport({
               backlogSize,
               targetWeeks,
               nSims,
-              selectedOrg,
-              selectedProject,
-              selectedTeam: "Optimiste",
-              startDate,
-              endDate,
             });
             return {
               kind: "scenario" as const,
@@ -352,11 +340,6 @@ export function usePortfolioReport({
               backlogSize,
               targetWeeks,
               nSims,
-              selectedOrg,
-              selectedProject,
-              selectedTeam: `Arrime (${String(alignmentRate)}%)`,
-              startDate,
-              endDate,
             });
             return {
               kind: "scenario" as const,
@@ -385,11 +368,6 @@ export function usePortfolioReport({
               backlogSize,
               targetWeeks,
               nSims,
-              selectedOrg,
-              selectedProject,
-              selectedTeam: `Friction (${String(effectiveFrictionRate)}%)`,
-              startDate,
-              endDate,
             });
             return {
               kind: "scenario" as const,
@@ -418,11 +396,6 @@ export function usePortfolioReport({
               backlogSize,
               targetWeeks,
               nSims,
-              selectedOrg,
-              selectedProject,
-              selectedTeam: "Historique corr\u00E9l\u00E9",
-              startDate,
-              endDate,
             });
             return {
               kind: "scenario" as const,

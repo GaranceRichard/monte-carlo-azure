@@ -56,14 +56,4 @@ export type ForecastRequestPayload = {
   backlog_size?: number;
   target_weeks?: number;
   n_sims: number;
-  client_context?: {
-    selected_org?: string;
-    selected_project?: string;
-    selected_team?: string;
-    start_date?: string;
-    end_date?: string;
-    done_states?: string[];
-    types?: string[];
-  };
 };
-

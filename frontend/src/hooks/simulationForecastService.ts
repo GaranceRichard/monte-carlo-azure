@@ -63,13 +63,6 @@ export type SimulateFromSamplesParams = {
   backlogSize: number | string;
   targetWeeks: number | string;
   nSims: number | string;
-  selectedOrg?: string;
-  selectedProject?: string;
-  selectedTeam?: string;
-  startDate?: string;
-  endDate?: string;
-  doneStates?: string[];
-  types?: string[];
 };
 
 export function fetchTeamThroughput(params: FetchTeamThroughputParams): Promise<FetchTeamThroughputResult> {

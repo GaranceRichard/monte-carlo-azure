@@ -88,6 +88,12 @@ describe("usePortfolioReport", () => {
     expect(vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0].scenarios.map((scenario) => scenario.label)).toContain(
       "Historique corr\u00E9l\u00E9",
     );
+    for (const call of vi.mocked(simulateForecastFromSamples).mock.calls) {
+      expect(call[0]).not.toHaveProperty("selectedTeam");
+      expect(call[0]).not.toHaveProperty("selectedOrg");
+      expect(call[0]).not.toHaveProperty("types");
+      expect(call[0]).not.toHaveProperty("doneStates");
+    }
   });
 
   it("excludes failed teams from phase 1 and still exports", async () => {

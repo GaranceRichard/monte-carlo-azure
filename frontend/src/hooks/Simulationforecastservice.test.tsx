@@ -207,6 +207,10 @@ describe("appels réseau", () => {
         n_sims: 20000,
       }),
     );
+    expect(vi.mocked(postSimulate).mock.calls[0]?.[0]).not.toHaveProperty("client_context");
+    expect(vi.mocked(postSimulate).mock.calls[0]?.[0]).not.toHaveProperty("selected_team");
+    expect(vi.mocked(postSimulate).mock.calls[0]?.[0]).not.toHaveProperty("pat");
+    expect(vi.mocked(postSimulate).mock.calls[0]?.[0]).not.toHaveProperty("server_url");
   });
 
   it("appelle postSimulate en mode weeks_to_items avec target_weeks", async () => {
@@ -386,18 +390,6 @@ describe("sampleStats", () => {
 });
 
 describe("historyEntry", () => {
-  it("utilise le projet demo comme fallback quand selectedProject est vide", async () => {
-    await runSimulationForecast(baseParams({ selectedProject: "" }));
-
-    expect(postSimulate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        client_context: expect.objectContaining({
-          selected_project: "Programme Titan",
-        }),
-      }),
-    );
-  });
-
   it("contient les métadonnées de session correctes", async () => {
     const { historyEntry } = await runSimulationForecast(
       baseParams({

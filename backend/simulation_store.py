@@ -11,6 +11,20 @@ from pymongo.errors import OperationFailure, PyMongoError
 from .api_config import ApiConfig
 from .api_models import SimulateRequest, SimulateResponse
 
+SENSITIVE_HISTORY_FIELDS = {
+    "selected_org": 0,
+    "selected_project": 0,
+    "selected_team": 0,
+    "start_date": 0,
+    "end_date": 0,
+    "done_states": 0,
+    "types": 0,
+    "client_context": 0,
+    "pat": 0,
+    "server_url": 0,
+    "azure_devops_url": 0,
+}
+
 
 def _to_iso_z(value: datetime) -> str:
     return value.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -144,7 +158,6 @@ class SimulationStore:
         def _op() -> None:
             coll = self._ensure_collection()
             now = datetime.now(timezone.utc)
-            context = req.client_context
 
             doc: dict[str, Any] = {
                 "mc_client_id": mc_client_id,
@@ -158,13 +171,6 @@ class SimulationStore:
                 "percentiles": response.result_percentiles,
                 "distribution": [bucket.model_dump() for bucket in response.result_distribution],
                 "throughput_reliability": response.throughput_reliability.model_dump(),
-                "selected_org": context.selected_org if context else None,
-                "selected_project": context.selected_project if context else None,
-                "selected_team": context.selected_team if context else None,
-                "start_date": context.start_date if context else None,
-                "end_date": context.end_date if context else None,
-                "done_states": context.done_states if context else [],
-                "types": context.types if context else [],
                 "include_zero_weeks": req.include_zero_weeks,
             }
             coll.insert_one(doc)
@@ -183,6 +189,7 @@ class SimulationStore:
                 {
                     "_id": 0,
                     "mc_client_id": 0,
+                    **SENSITIVE_HISTORY_FIELDS,
                 },
             ).sort("created_at", DESCENDING).limit(self._history_limit)
 

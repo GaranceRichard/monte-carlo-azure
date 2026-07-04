@@ -80,6 +80,7 @@ Le frontend couvre notamment :
   - exclusion systematique de la semaine courante tant qu'elle n'est pas terminee
   - message explicite si la plage choisie ne contient aucune semaine exploitable
 - historique local des simulations
+- historique local contextualise par equipe, conserve uniquement dans `localStorage`
 - mode portefeuille multi-equipes
   - scenario `Optimiste`: somme des tirages independants par equipe
   - scenario `Arrime`: reduction du scenario optimiste par le facteur d'arrimage
@@ -109,7 +110,8 @@ Le frontend couvre notamment :
 
 - le `PAT` Azure DevOps reste cote navigateur
 - aucun appel frontend ne doit envoyer de secret Azure DevOps au backend
-- les appels backend concernent uniquement la simulation et l'historique client
+- les appels backend concernent uniquement la simulation statistique et l'historique anonyme
+- `POST /simulate` n'envoie jamais `selectedOrg`, `selectedProject`, `selectedTeam`, `startDate`, `endDate`, `types`, `doneStates`, `pat` ou `serverUrl`
 
 ## Qualite
 

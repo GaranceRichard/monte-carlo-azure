@@ -1,6 +1,6 @@
 import { getTeamDeliveryDataDirect } from "../adoClient";
 import { postSimulate } from "../api";
-import { DEMO_CONFIG, getDemoCycleTime, getDemoThroughputSamples, getDemoWeeklyThroughput } from "../demoData";
+import { getDemoCycleTime, getDemoThroughputSamples, getDemoWeeklyThroughput } from "../demoData";
 import type {
   ForecastHistogramBucket,
   ForecastRequestPayload,
@@ -95,13 +95,6 @@ export async function simulateForecastFromSamplesCore(
     backlogSize,
     targetWeeks,
     nSims,
-    selectedOrg,
-    selectedProject,
-    selectedTeam,
-    startDate,
-    endDate,
-    doneStates = [],
-    types = [],
   } = params;
 
   if (demoMode) {
@@ -122,15 +115,6 @@ export async function simulateForecastFromSamplesCore(
     backlog_size: simulationMode === "backlog_to_weeks" ? Number(backlogSize) : undefined,
     target_weeks: simulationMode === "weeks_to_items" ? Number(targetWeeks) : undefined,
     n_sims: Number(nSims),
-    client_context: {
-      selected_org: selectedOrg,
-      selected_project: selectedProject,
-      selected_team: selectedTeam,
-      start_date: startDate,
-      end_date: endDate,
-      done_states: [...doneStates],
-      types: [...types],
-    },
   };
 
   const response = await postSimulate(payload);
@@ -187,13 +171,6 @@ export async function runSimulationForecastCore(
     backlogSize,
     targetWeeks,
     nSims,
-    selectedOrg,
-    selectedProject: selectedProject || DEMO_CONFIG.project,
-    selectedTeam,
-    startDate,
-    endDate,
-    doneStates,
-    types,
   });
 
   const historyEntry: SimulationHistoryEntry = {

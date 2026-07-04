@@ -101,7 +101,21 @@ docker compose logs -f backend
 docker compose logs -f redis
 ```
 
-### 6) Cron de purge
+### 6) Nettoyage des anciens champs Azure DevOps
+
+Le nettoyage des anciens champs d'identite Azure DevOps n'est jamais lance automatiquement au demarrage.
+Executer explicitement le script suivant :
+
+```bash
+python Scripts/scrub_simulation_identity.py
+python Scripts/scrub_simulation_identity.py --apply
+```
+
+- le mode par defaut est `dry-run`
+- `--apply` execute le `$unset`
+- `mc_client_id` reste un identifiant anonyme non derive du contexte Azure DevOps
+
+### 7) Cron de purge
 
 Planifier une execution quotidienne de `Scripts/purge_inactive_clients.py` sur l'hote.
 Exemple `crontab -e` :
@@ -112,7 +126,7 @@ Exemple `crontab -e` :
 
 Le script utilise `APP_MONGO_URL`, `APP_MONGO_DB` et `APP_PURGE_RETENTION_DAYS`.
 
-### 7) Commandes utiles
+### 8) Commandes utiles
 
 ```bash
 docker compose logs -f backend

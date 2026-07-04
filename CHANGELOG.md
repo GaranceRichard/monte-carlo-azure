@@ -4,6 +4,9 @@
 
 ### Frontend
 
+- suppression de `client_context` du contrat frontend/backend de simulation: `POST /simulate` transporte maintenant uniquement les donnees Monte Carlo statistiques
+- l'historique detaille contextualise par equipe reste strictement local au navigateur; le frontend ne remappe plus l'historique Mongo dans `useSimulationHistory`
+- le mode portefeuille et les scenarios agreges n'envoient plus de noms d'equipe ou de scenario au backend
 - remplacement du scenario portefeuille `Conservateur` par `Historique corrélé`, construit a partir
   des semaines reelles communes a toutes les equipes pour conserver les variations partagees
   (vacances, incidents, ralentissements, dependances temporelles) dans le moteur Monte Carlo
@@ -83,6 +86,10 @@
 
 ### Backend et tests
 
+- suppression de `ClientContext` du modele API backend et persistance Mongo limitee aux seules donnees statistiques anonymes
+- projection defensive de `/simulations/history` pour exclure explicitement les anciens champs sensibles Azure DevOps, meme sur des documents legacy
+- ajout du script `Scripts/scrub_simulation_identity.py` pour nettoyer les anciens champs d'identite Azure DevOps en `dry-run` par defaut puis `--apply`
+- couverture de `backend/simulation_store.py` completee sur les branches defensives (`connect`, `_ensure_collection`, `_run_with_reconnect`, `close`) pour supprimer la marge devenue trop juste autour de la persistence Mongo
 - correction de la semantique des percentiles Monte Carlo selon le mode:
   `backlog_to_weeks` utilise un quantile discret conservateur `higher`, `weeks_to_items`
   un quantile de survie `lower`, avec tests discrets cibles sur l'API et `mc_core`

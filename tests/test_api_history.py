@@ -35,11 +35,6 @@ def test_simulate_persists_when_cookie_present(monkeypatch):
             "mode": "backlog_to_weeks",
             "backlog_size": 20,
             "n_sims": 2000,
-            "client_context": {
-                "selected_org": "org-demo",
-                "selected_project": "Projet A",
-                "selected_team": "Equipe Alpha",
-            },
         },
     )
 
@@ -48,8 +43,29 @@ def test_simulate_persists_when_cookie_present(monkeypatch):
     saved_id, saved_req, saved_resp = fake.saved[0]
     assert saved_id.startswith("f47ac10b")
     assert "capacity_percent" not in saved_req
+    assert "client_context" not in saved_req
     assert "result_percentiles" in saved_resp
     assert saved_resp["throughput_reliability"]["samples_count"] == 6
+
+
+def test_simulate_rejects_legacy_client_context(monkeypatch):
+    fake = _FakeStore(enabled=True)
+    monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
+
+    client = ApiTestClient(app)
+    r = client.post(
+        "/simulate",
+        json={
+            "throughput_samples": [1, 2, 3, 4, 5, 6],
+            "mode": "backlog_to_weeks",
+            "backlog_size": 20,
+            "n_sims": 2000,
+            "client_context": {"selected_team": "Equipe Alpha"},
+        },
+    )
+
+    assert r.status_code == 422
+    assert fake.saved == []
 
 
 def test_simulation_history_reads_last_items_from_store(monkeypatch):
@@ -66,13 +82,6 @@ def test_simulation_history_reads_last_items_from_store(monkeypatch):
                 "samples_count": 24,
                 "percentiles": {"P50": 10, "P70": 12, "P90": 14},
                 "distribution": [{"x": 8, "count": 120}],
-                "selected_org": "org-demo",
-                "selected_project": "Projet A",
-                "selected_team": "Equipe Alpha",
-                "start_date": "2026-01-01",
-                "end_date": "2026-02-01",
-                "done_states": ["Done"],
-                "types": ["Bug"],
                 "include_zero_weeks": False,
                 "throughput_reliability": {
                     "cv": 0.2,
@@ -98,6 +107,7 @@ def test_simulation_history_reads_last_items_from_store(monkeypatch):
     assert body[0]["mode"] == "backlog_to_weeks"
     assert body[0]["samples_count"] == 24
     assert body[0]["throughput_reliability"]["label"] == "fiable"
+    assert "selected_team" not in body[0]
 
 
 def test_simulation_history_returns_empty_without_cookie(monkeypatch):

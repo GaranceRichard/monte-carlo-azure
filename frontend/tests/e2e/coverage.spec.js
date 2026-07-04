@@ -293,21 +293,20 @@ test.describe("e2e istanbul coverage", () => {
       const labels = await historySelect.locator("option").evaluateAll((options) =>
         options.map((option) => option.textContent || ""),
       );
-      return labels.some((label) => label.includes("2026_02_26_") && label.includes("70 items"));
+      return labels.some((label) => label.includes("12 semaines"));
     }).toBe(true);
-    const remoteHistoryValue = await historySelect.locator("option").evaluateAll((options) => {
+    const localHistoryValue = await historySelect.locator("option").evaluateAll((options) => {
       const match = options.find((option) => {
         const label = option.textContent || "";
-        return label.includes("2026_02_26_") && label.includes("70 items");
+        return label.includes("12 semaines");
       });
       return match?.getAttribute("value") || "";
     });
-    expect(remoteHistoryValue).toBeTruthy();
-    await historySelect.selectOption(remoteHistoryValue);
-    await expect(page.getByText(/Semaines utilisees:\s*24\/24/i)).toBeVisible();
-    await expect(page.getByText(/Mode:\s*0\s*exclues/i)).toBeVisible();
-    await expect(page.getByText(/Backlog de 70 items/i)).toBeVisible();
-    await expect(page.getByText(/2\s*000 simulations/i)).toBeVisible();
+    expect(localHistoryValue).toBeTruthy();
+    await historySelect.selectOption(localHistoryValue);
+    await expect(page.getByText(/Mode:\s*0\s*incluses/i)).toBeVisible();
+    await expect(page.getByText(/En 12 semaines/i)).toBeVisible();
+    await expect(page.getByText(/4\s*000 simulations/i)).toBeVisible();
     await historySection.getByRole("button", { name: "Vider" }).click();
     await expect(historySection.getByText(/pas de simulation pour l'équipe/i)).toBeVisible();
 
@@ -551,8 +550,6 @@ test.describe("e2e istanbul coverage", () => {
           backlog_size: 10,
           n_sims: 2000,
         }).catch(() => null);
-        await apiMod.getSimulationHistory();
-        await apiMod.getSimulationHistory();
 
         window.fetch = async (url, init) => {
           if (String(url).includes("/simulate")) {
@@ -566,12 +563,6 @@ test.describe("e2e istanbul coverage", () => {
               { status: 200, headers: { "content-type": "application/json" } },
             );
           }
-          if (String(url).includes("/simulations/history")) {
-            return new Response(JSON.stringify({ not: "an-array" }), {
-              status: 200,
-              headers: { "content-type": "application/json" },
-            });
-          }
           return originalFetch(url, init);
         };
         await apiMod.postSimulate({
@@ -580,20 +571,12 @@ test.describe("e2e istanbul coverage", () => {
           backlog_size: 10,
           n_sims: 2000,
         });
-        await apiMod.getSimulationHistory();
 
         window.fetch = async (url, init) => {
           if (String(url).includes("/simulate")) {
             return new Response("server-down", {
               status: 503,
               statusText: "Service Unavailable",
-              headers: { "content-type": "text/plain" },
-            });
-          }
-          if (String(url).includes("/simulations/history")) {
-            return new Response("history-down", {
-              status: 502,
-              statusText: "Bad Gateway",
               headers: { "content-type": "text/plain" },
             });
           }
@@ -605,7 +588,6 @@ test.describe("e2e istanbul coverage", () => {
           backlog_size: 10,
           n_sims: 2000,
         }).catch(() => null);
-        await apiMod.getSimulationHistory().catch(() => null);
 
         const forecastMod = await import("/src/hooks/simulationForecastService.ts");
         let throughputMode = "array";
@@ -2523,8 +2505,6 @@ test.describe("e2e istanbul coverage", () => {
           })
           .catch((error) => String(error?.message || error));
 
-        apiMode = "history-http-error";
-        const historyHttpError = await apiMod.getSimulationHistory().catch((error) => String(error?.message || error));
         apiMode = "simulate-http-error";
         const simulateHttpError = await apiMod
           .postSimulate({
@@ -2534,10 +2514,6 @@ test.describe("e2e istanbul coverage", () => {
             n_sims: 2000,
           })
           .catch((error) => String(error?.message || error));
-        apiMode = "history-detail-error";
-        const historyDetailError = await apiMod.getSimulationHistory().catch((error) => String(error?.message || error));
-        apiMode = "success";
-        const history = await apiMod.getSimulationHistory();
 
         return {
           objectThroughputWeeks: objectThroughput.weeklyThroughput.length,
@@ -2549,10 +2525,7 @@ test.describe("e2e istanbul coverage", () => {
           itemsKind: itemsResponse.result_kind,
           fallbackProject: forecast.historyEntry.result ? forecast.historyEntry.selectedProject : "",
           simulateDetailError,
-          historyHttpError,
           simulateHttpError,
-          historyDetailError,
-          historyLength: history.length,
         };
       } finally {
         window.fetch = originalFetch;
@@ -2568,10 +2541,7 @@ test.describe("e2e istanbul coverage", () => {
     expect(results.itemsKind).toBe("items");
     expect(results.fallbackProject).toBe("");
     expect(results.simulateDetailError).toContain("bad payload");
-    expect(results.historyHttpError).toContain("HTTP 502");
     expect(results.simulateHttpError).toContain("HTTP 503");
-    expect(results.historyDetailError).toContain("history exploded");
-    expect(results.historyLength).toBe(0);
   });
 
   test("coverage: app global org backspace", async ({ page }) => {

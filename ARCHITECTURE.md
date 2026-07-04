@@ -27,7 +27,9 @@ Controles associes:
 Le backend ne recoit que:
 
 - `throughput_samples`
+- `include_zero_weeks`
 - les parametres de simulation (`mode`, `backlog_size` / `target_weeks`, `n_sims`)
+- un cookie anonyme `IDMontecarlo` pour relier un historique statistique non contextualise
 
 Invariants de preparation du throughput cote frontend:
 
@@ -126,6 +128,8 @@ Swagger:
 }
 ```
 
+Le contrat interdit tout champ de contexte Azure DevOps (`PAT`, `server_url`, organisation, projet, equipe, plage de dates, types, etats `Done`).
+
 ou
 
 ```json
@@ -150,11 +154,32 @@ ou
 ```
 
 Le backend persiste aussi la simulation dans MongoDB (collection `simulations`) quand le cookie `IDMontecarlo` est present.
+Les champs autorises en base sont:
+
+- `mc_client_id`
+- `created_at`
+- `last_seen`
+- `mode`
+- `backlog_size`
+- `target_weeks`
+- `n_sims`
+- `samples_count`
+- `percentiles`
+- `distribution`
+- `throughput_reliability`
+- `include_zero_weeks`
 
 ### Historique client `GET /simulations/history`
 
 - le cookie `IDMontecarlo` est lu cote backend
-- reponse: jusqu'a 10 simulations recentes du client
+- reponse: jusqu'a 10 simulations recentes du client, limitees aux donnees statistiques anonymes
+- aucun champ Azure DevOps historique n'est reexpose, y compris pour d'anciens documents Mongo
+
+### Historique frontend local
+
+- `useSimulationHistory.ts` lit et ecrit uniquement `localStorage`
+- l'historique detaille reste contextualise par equipe dans le navigateur
+- le frontend ne recharge plus l'historique Mongo pour le melanger a cet historique local
 
 `result_distribution` contient des buckets `{ x, count }`:
 

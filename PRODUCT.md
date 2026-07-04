@@ -68,9 +68,9 @@ Fonctionnalites actuellement presentes dans le produit :
 - visualisation des percentiles et distributions
 - affichage d'un `Risk Score`
 - export CSV du throughput hebdomadaire
-- historique local des simulations recentes
+- historique local des simulations recentes, contextualise par equipe dans le navigateur
 - cookie client `IDMontecarlo` pour relier un client anonyme a son historique persiste
-- persistence MongoDB et restitution des 10 dernieres simulations via `/simulations/history`
+- persistence MongoDB et restitution des 10 dernieres simulations statistiques anonymes via `/simulations/history`
 - parametre de capacite reduite
 - configuration rapide des filtres types + etats, memorisee localement
 - mode `Portefeuille` multi-equipes
@@ -189,6 +189,7 @@ Principe non negociable :
 - le PAT Azure DevOps est utilise uniquement dans le navigateur
 - aucune donnee d'identification Azure DevOps ne doit transiter par le backend
 - le backend ne recoit que des donnees anonymisees de throughput et des parametres de simulation
+- `mc_client_id` est un identifiant anonyme et non derive du contexte Azure DevOps
 
 Cette frontiere d'identite est un invariant produit autant qu'un invariant d'architecture.
 Elle est protegee par des controles CI dedies.
