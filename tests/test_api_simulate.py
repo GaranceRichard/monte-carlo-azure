@@ -209,7 +209,7 @@ def test_simulate_returns_503_when_forecast_timeout_is_exceeded(monkeypatch):
         "n_sims": 2000,
     }
 
-    def slow_compute(req, samples):
+    def slow_compute(req, samples, seed):
         time.sleep(0.05)
         return [1, 2, 3], "weeks"
 
