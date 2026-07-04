@@ -187,6 +187,10 @@ npm run build
 ```
 
 Le workflow GitHub Pages retente une fois `actions/deploy-pages` si GitHub retourne un echec transitoire apres creation de l'artefact de deploiement.
+Le smoke test Docker de la CI utilise aussi un payload `POST /simulate` strictement aligne
+sur le contrat statistique courant (`throughput_samples`, `mode`, `backlog_size`, `target_weeks`,
+`n_sims`, `include_zero_weeks`) afin de detecter toute derive de contrat sans reintroduire
+d'ancien champ refuse par l'API.
 
 Sur GitHub Pages, la demo publique precharge les donnees puis laisse l'utilisateur choisir son point d'entree:
 
