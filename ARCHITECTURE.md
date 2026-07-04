@@ -226,6 +226,7 @@ CI GitHub Actions:
 - job `docker-smoke`
   - build image
   - smoke tests `/health` et `/health/mongo`
+  - payload `/simulate` strictement aligne sur le contrat statistique courant, sans champ legacy refuse
   - verification de persistance via `/simulate` puis `/simulations/history`
   - verification du `429` au-dela du seuil de `POST /simulate`
 

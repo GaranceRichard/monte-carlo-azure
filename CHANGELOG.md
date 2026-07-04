@@ -87,6 +87,9 @@
 ### Backend et tests
 
 - suppression de `ClientContext` du modele API backend et persistance Mongo limitee aux seules donnees statistiques anonymes
+- alignement du smoke test Docker CI sur le contrat courant de `POST /simulate`:
+  le workflow n'envoie plus l'ancien champ `capacity_percent`, ce qui evite les `422`
+  dus a `extra="forbid"` tout en gardant le garde-fou de derive de contrat
 - projection defensive de `/simulations/history` pour exclure explicitement les anciens champs sensibles Azure DevOps, meme sur des documents legacy
 - ajout du script `Scripts/scrub_simulation_identity.py` pour nettoyer les anciens champs d'identite Azure DevOps en `dry-run` par defaut puis `--apply`
 - couverture de `backend/simulation_store.py` completee sur les branches defensives (`connect`, `_ensure_collection`, `_run_with_reconnect`, `close`) pour supprimer la marge devenue trop juste autour de la persistence Mongo
