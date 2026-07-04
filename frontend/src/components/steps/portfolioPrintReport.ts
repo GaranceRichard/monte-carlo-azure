@@ -2,7 +2,11 @@ import type { ForecastKind } from "../../types";
 import type { ThroughputReliability } from "../../types";
 import type { PortfolioScenarioResult } from "../../hooks/simulationTypes";
 import { buildProbabilityCurve } from "../../hooks/probability";
-import { computeRiskLegend, computeRiskScoreFromPercentiles } from "../../utils/simulation";
+import {
+  computeFrictionRatePercent,
+  computeRiskLegend,
+  computeRiskScoreFromPercentiles,
+} from "../../utils/simulation";
 import {
   renderDistributionChart,
   renderOverlayProbabilityChart,
@@ -360,7 +364,7 @@ function buildSummaryPage({
   const orderedScenarios = [...scenarios].sort((a, b) => getScenarioOrder(a.label) - getScenarioOrder(b.label));
   const effectiveFrictionLabel =
     orderedScenarios.find((scenario) => scenario.label.startsWith("Friction"))?.label ??
-    `Friction (${Math.round((Math.max(0, Math.min(100, alignmentRate)) / 100) ** includedTeams.length * 100)}%)`;
+    `Friction (${computeFrictionRatePercent(includedTeams.length, alignmentRate)}%)`;
 
   const rows = orderedScenarios
     .map((scenario) => {

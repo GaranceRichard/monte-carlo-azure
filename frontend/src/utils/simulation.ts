@@ -8,6 +8,22 @@ export type ScenarioSamples = {
   conservative: number[];
 };
 
+function normalizeAlignmentRate(alignmentRate: number): number {
+  return clamp(alignmentRate, 0, 100) / 100;
+}
+
+export function computeFrictionExponent(teamCount: number): number {
+  return Math.max(0, Math.floor(teamCount) - 1);
+}
+
+export function computeFrictionFactor(teamCount: number, alignmentRate: number): number {
+  return normalizeAlignmentRate(alignmentRate) ** computeFrictionExponent(teamCount);
+}
+
+export function computeFrictionRatePercent(teamCount: number, alignmentRate: number): number {
+  return Math.round(computeFrictionFactor(teamCount, alignmentRate) * 100);
+}
+
 function pickBootstrapSample(samples: number[]): number {
   const randomIndex = Math.floor(Math.random() * samples.length);
   return samples[randomIndex] ?? 0;
@@ -186,8 +202,9 @@ export function buildScenarioSamples(teamSamples: number[][], alignmentRate: num
   }
 
   const maxLength = Math.max(...teamSamples.map((samples) => samples.length));
-  const safeRate = clamp(alignmentRate, 0, 100) / 100;
   const teamCount = teamSamples.length;
+  const safeRate = normalizeAlignmentRate(alignmentRate);
+  const frictionFactor = computeFrictionFactor(teamCount, alignmentRate);
   const optimistic: number[] = [];
   const aligned: number[] = [];
   const friction: number[] = [];
@@ -198,7 +215,7 @@ export function buildScenarioSamples(teamSamples: number[][], alignmentRate: num
     const optimisticValue = draws.reduce((sum, value) => sum + value, 0);
     const conservativeValue = teamCount === 1 ? optimisticValue : median(draws) * teamCount;
     const alignedValue = teamCount === 1 ? optimisticValue : Math.floor(optimisticValue * safeRate);
-    const frictionValue = teamCount === 1 ? alignedValue : Math.floor(optimisticValue * safeRate ** teamCount);
+    const frictionValue = Math.floor(optimisticValue * frictionFactor);
     optimistic.push(optimisticValue);
     conservative.push(conservativeValue);
     aligned.push(alignedValue);

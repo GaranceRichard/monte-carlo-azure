@@ -4,6 +4,10 @@
 
 ### Frontend
 
+- correction de la formule du scenario portefeuille `Friction` pour l'aligner sur l'explication metier:
+  une seule equipe conserve 100% de sa capacite, puis chaque equipe supplementaire applique
+  le meme cout d'alignement (`optimistic * alignmentRate^(teamCount - 1)`, expose avec borne
+  d'exposant a `0` et pourcentage affiche identique au facteur reellement simule)
 - le throughput hebdomadaire Azure DevOps n'integre plus de semaines calendaires incompletes:
   seules les semaines ISO completes du lundi au dimanche, entierement contenues dans la periode
   selectionnee et deja ecoulees au moment du calcul, alimentent desormais l'historique de simulation

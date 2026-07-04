@@ -9,6 +9,7 @@ import {
 import type { PortfolioScenarioResult } from "./simulationTypes";
 import {
   buildScenarioSamples,
+  computeFrictionRatePercent,
   computeRiskLegend,
   computeRiskScoreFromPercentiles,
   computeThroughputReliability,
@@ -238,7 +239,7 @@ export function usePortfolioReport({
         successfulTeams.map((team) => team.data.throughputSamples),
         alignmentRate,
       );
-      const effectiveFrictionRate = Math.round((Math.max(0, Math.min(100, alignmentRate)) / 100) ** successfulTeams.length * 100);
+      const effectiveFrictionRate = computeFrictionRatePercent(successfulTeams.length, alignmentRate);
 
       const totalSimulations = successfulTeams.length + 4;
       setGenerationProgress({ done: 0, total: totalSimulations });

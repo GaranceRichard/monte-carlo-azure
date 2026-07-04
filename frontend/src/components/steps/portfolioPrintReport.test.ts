@@ -54,7 +54,7 @@ function baseArgs(): PortfolioPrintReportArgs {
         throughputReliability: { cv: 0.51, iqr_ratio: 0.55, slope_norm: -0.03, label: "incertain" as const, samples_count: 8 },
       },
       {
-        label: "Friction (64%)" as const,
+        label: "Friction (80%)" as const,
         hypothesis: "hyp friction",
         samples: [1.5, 2, 2.5],
         weeklyData: [
@@ -116,7 +116,7 @@ describe("portfolioPrintReport", () => {
     const idxSynth = html.indexOf("Synthèse - Simulation Portefeuille");
     const idxOpt = html.indexOf("Scénario - Optimiste");
     const idxArr = html.search(/Sc.nario - Arrim./);
-    const idxFriction = html.indexOf("Scénario - Friction (64%)");
+    const idxFriction = html.indexOf("Scénario - Friction (80%)");
     const idxCons = html.indexOf("Scénario - Conservateur");
     const idxTeam = html.indexOf("Simulation Portefeuille - Team A");
 
@@ -136,7 +136,7 @@ describe("portfolioPrintReport", () => {
 
     expect(html).toContain("<td>Optimiste</td>");
     expect(html).toMatch(/<td>Arrim. \(80%\)<\/td>/);
-    expect(html).toContain("<td>Friction (64%)</td>");
+    expect(html).toContain("<td>Friction (80%)</td>");
     expect(html).toContain("<td>Conservateur</td>");
     expect(html).toContain("0,22 (fiable)");
     expect(html).toContain("1,60 (non fiable)");
@@ -208,6 +208,17 @@ describe("portfolioPrintReport", () => {
     expect(html).toContain("<b>Équipes incluses:</b> Aucune");
     expect(html).not.toContain("Scénario - ");
     expect(html).not.toContain("Simulation Portefeuille - Team A");
+  });
+
+  it("falls back to the real friction label computed from the team count", () => {
+    const args = baseArgs();
+    args.includedTeams = ["Team A", "Team B", "Team C"];
+    args.scenarios = [args.scenarios[0], args.scenarios[1], args.scenarios[3]];
+
+    const html = buildPortfolioPrintReportHtml(args);
+
+    expect(html).toContain("<strong>Friction (64%) :</strong>");
+    expect(html).toContain("64%) de la capacit");
   });
 
   it("uses fallback section arrays when types and states are absent", () => {

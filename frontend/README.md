@@ -81,6 +81,9 @@ Le frontend couvre notamment :
   - message explicite si la plage choisie ne contient aucune semaine exploitable
 - historique local des simulations
 - mode portefeuille multi-equipes
+  - scenario `Friction`: facteur `alignmentRate^(teamCount - 1)`
+  - `1` equipe conserve `100%` de capacite; la penalite commence a la `2e` equipe
+  - le pourcentage affiche dans le rapport reprend exactement le facteur applique
 - export PDF direct des restitutions simulation et portefeuille, sans previsualisation SVG utilisateur
 - persistance locale de certaines preferences et quick filters
 

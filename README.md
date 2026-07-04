@@ -56,6 +56,14 @@ Demo GitHub Pages:
 - configuration rapide des filtres (types + etats) memorisee localement
 - rapport portefeuille PDF direct avec progression et tolerance aux echecs partiels
 
+Regle scenario portefeuille `Friction`:
+
+- le facteur applique est `alignmentRate^(teamCount - 1)`
+- l'exposant est borne a `0`
+- `1` equipe => aucune penalite (`100%` de capacite conservee)
+- la penalite commence a partir de la `2e` equipe
+- le pourcentage affiche dans le rapport correspond exactement au facteur utilise pour la simulation
+
 Regle calendrier throughput:
 
 - l'historique hebdomadaire utilise uniquement des semaines ISO completes

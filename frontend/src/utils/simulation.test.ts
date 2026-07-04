@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   buildScenarioSamples,
+  computeFrictionExponent,
+  computeFrictionFactor,
+  computeFrictionRatePercent,
   computeRiskLegend,
   computeRiskScoreFromPercentiles,
   computeThroughputReliability,
@@ -55,7 +58,7 @@ describe("buildScenarioSamples", () => {
 
     expect(scenarios.optimistic).toEqual([210, 120, 210]);
     expect(scenarios.aligned).toEqual([168, 96, 168]);
-    expect(scenarios.friction).toEqual([134, 76, 134]);
+    expect(scenarios.friction).toEqual([168, 96, 168]);
     expect(scenarios.conservative).toEqual([210, 120, 210]);
     expect(scenarios.optimistic).toHaveLength(3);
     expect(scenarios.aligned).toHaveLength(3);
@@ -115,6 +118,45 @@ describe("buildScenarioSamples", () => {
     );
 
     expect(scenarios.conservative).toEqual([120]); // median=(20+40)/2=30, *4 =>120
+    randomSpy.mockRestore();
+  });
+
+  it("applies no friction penalty with one team, then starts at the second team", () => {
+    expect(computeFrictionExponent(1)).toBe(0);
+    expect(computeFrictionExponent(2)).toBe(1);
+    expect(computeFrictionExponent(3)).toBe(2);
+    expect(computeFrictionExponent(4)).toBe(3);
+
+    expect(computeFrictionFactor(1, 80)).toBe(1);
+    expect(computeFrictionFactor(2, 80)).toBe(0.8);
+    expect(computeFrictionFactor(3, 80)).toBeCloseTo(0.64);
+    expect(computeFrictionFactor(4, 80)).toBeCloseTo(0.512);
+
+    expect(computeFrictionRatePercent(1, 80)).toBe(100);
+    expect(computeFrictionRatePercent(2, 80)).toBe(80);
+    expect(computeFrictionRatePercent(3, 80)).toBe(64);
+    expect(computeFrictionRatePercent(4, 80)).toBe(51);
+  });
+
+  it("keeps the displayed friction percent aligned with the rounded sample factor", () => {
+    const randomSpy = vi.spyOn(Math, "random");
+    randomSpy.mockReturnValue(0.1);
+
+    const oneTeam = buildScenarioSamples([[101]], 80);
+    const twoTeams = buildScenarioSamples([[101], [100]], 80);
+    const threeTeams = buildScenarioSamples([[101], [100], [100]], 80);
+    const fourTeams = buildScenarioSamples([[101], [100], [100], [100]], 80);
+
+    expect(oneTeam.friction).toEqual([101]);
+    expect(twoTeams.friction).toEqual([160]);
+    expect(threeTeams.friction).toEqual([192]);
+    expect(fourTeams.friction).toEqual([205]);
+
+    expect(Math.round((oneTeam.friction[0] / oneTeam.optimistic[0]) * 100)).toBe(computeFrictionRatePercent(1, 80));
+    expect(Math.round((twoTeams.friction[0] / twoTeams.optimistic[0]) * 100)).toBe(computeFrictionRatePercent(2, 80));
+    expect(Math.round((threeTeams.friction[0] / threeTeams.optimistic[0]) * 100)).toBe(computeFrictionRatePercent(3, 80));
+    expect(Math.round((fourTeams.friction[0] / fourTeams.optimistic[0]) * 100)).toBe(computeFrictionRatePercent(4, 80));
+
     randomSpy.mockRestore();
   });
 
