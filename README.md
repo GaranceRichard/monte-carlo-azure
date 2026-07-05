@@ -43,11 +43,14 @@ Demo GitHub Pages:
 - visualisation des percentiles et distributions
 - semantique metier des percentiles alignee sur le mode de simulation:
   - `backlog_to_weeks`: `P90` = 90% des simulations finissent en `P90` semaines ou moins
+    seulement si assez de simulations sont terminees pour atteindre ce rang dans `n_sims`
   - `weeks_to_items`: `P90` = 90% des simulations livrent au moins `P90` items
 - en `backlog_to_weeks`, les simulations non terminees a l'horizon sont des censures explicites:
   - une fin exacte a `521` semaines reste une vraie fin, distincte d'une censure
   - la distribution et les percentiles ne couvrent que les simulations terminees
   - un percentile absent signifie qu'il n'est pas identifiable avant l'horizon
+  - la courbe de probabilite utilise `n_sims` comme denominateur et reste plafonnee
+    au taux reel de completion, sans retour artificiel a `100%`
 - badge `Démo` integre a l'en-tete des ecrans demo GitHub Pages (choix d'equipe et simulation)
 - lisibilite renforcee des graphes de simulation, y compris les etiquettes de l'axe X
 - legendes de graphiques harmonisees, affichees seulement quand utiles et sans debordement en bas du panneau

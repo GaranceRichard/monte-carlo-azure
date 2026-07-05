@@ -260,7 +260,7 @@ describe("SimulationResultsPanel history list", () => {
     expect(screen.queryByRole("tooltip")).toBeNull();
   });
 
-  it("uses API risk_score when display percentiles are incomplete", () => {
+  it("hides the risk indicator when display percentiles are incomplete", () => {
     vi.mocked(useSimulationContext).mockReturnValue({
       selectedTeam: "Alpha-Team",
       simulation: {
@@ -278,7 +278,7 @@ describe("SimulationResultsPanel history list", () => {
     } as never);
 
     render(<SimulationResultsPanel />);
-    expect(screen.getByText(/^0,42 \/ -$/i)).not.toBeNull();
+    expect(screen.queryByText(/^Risque \/ Fiabilite$/i)).toBeNull();
   });
 
   it("recomputes a non-zero weeks_to_items risk score from display percentiles when API score is stale", () => {

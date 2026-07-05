@@ -76,7 +76,11 @@ Le frontend couvre notamment :
   - `weeks_to_items`: `(P50 - P90) / P50`
   - en `backlog_to_weeks`, les censures a l'horizon sont exposees via `completion_summary`
   - la distribution n'affiche que les simulations terminees
+  - les percentiles `backlog_to_weeks` restent indexes sur le total `n_sims`; un `Pxx`
+    absent signifie que le rang n'est pas atteignable avec le nombre de simulations terminees
   - un percentile absent n'est pas remplace par `0` ou `521`
+  - la courbe de probabilite utilise le total simule comme denominateur et plafonne
+    au taux reel de completion
   - le `Risk Score` n'est pas affiche si `P50` ou `P90` manque
 - historique throughput aligne sur des semaines ISO completes uniquement
   - debut aligne sur le premier lundi complet inclus ou suivant `startDate`

@@ -9,6 +9,7 @@ import {
   computeRiskLegend,
   computeRiskScoreFromPercentiles,
   computeThroughputReliability,
+  discretePercentiles,
   generateSimulationSeed,
   getProjectionReliabilityNotice,
   simulateMonteCarloLocal,
@@ -546,6 +547,18 @@ describe("getProjectionReliabilityNotice", () => {
 });
 
 describe("simulateMonteCarloLocal", () => {
+  it("omits backlog percentiles whose rank is not reachable in the total simulation population", () => {
+    expect(discretePercentiles([521, 521], "backlog_to_weeks", [50, 70, 90], 3)).toEqual({ P50: 521 });
+  });
+
+  it("falls back to conservative backlog quantiles when the total simulation count is unavailable", () => {
+    expect(discretePercentiles([3, 4, 6, 8, 10], "backlog_to_weeks", [50, 70, 90])).toEqual({
+      P50: 6,
+      P70: 8,
+      P90: 10,
+    });
+  });
+
   it("keeps compact histograms unchanged when there are few unique outcomes", () => {
     const result = simulateMonteCarloLocal({
       seed: 123,

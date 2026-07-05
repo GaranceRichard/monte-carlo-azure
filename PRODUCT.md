@@ -120,6 +120,10 @@ Restitution attendue :
   - en `backlog_to_weeks`, prudent = plus de semaines
 - si certaines simulations n'atteignent pas le backlog avant l'horizon, elles sont comptees
   a part comme censures et n'entrent ni dans la distribution ni dans les percentiles
+  - mais l'identifiabilite d'un `Pxx` continue, elle, d'etre jugee sur le total de simulations
+    lancees: si le rang n'est pas atteignable dans `n_sims`, le percentile reste absent
+- la courbe de probabilite backlog reste plafonnee au taux reel de completion, sans remonter
+  artificiellement a `100%`
 - `Risk Score` pour objectiver la dispersion
 
 Decision supportee :

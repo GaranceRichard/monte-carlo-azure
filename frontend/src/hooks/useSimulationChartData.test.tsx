@@ -79,6 +79,7 @@ describe("useSimulationChartData", () => {
         { x: 15, count: 1 },
       ],
       "weeks",
+      undefined,
     );
   });
 

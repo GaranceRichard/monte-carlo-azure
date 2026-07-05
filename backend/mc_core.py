@@ -203,6 +203,7 @@ def percentiles(
     arr: np.ndarray,
     mode: Literal["backlog_to_weeks", "weeks_to_items"],
     ps: Tuple[int, ...] = (50, 80, 90),
+    total_count: Optional[int] = None,
 ) -> Dict[str, int]:
     """
     Calcule des percentiles metier entiers selon le mode de simulation.
@@ -222,6 +223,13 @@ def percentiles(
             q = max(0.0, min(1.0, (100 - p) / 100))
             out[f"P{p}"] = _discrete_quantile(values, q, method="lower")
         else:
+            if total_count is not None and total_count > 0:
+                rank = int(np.ceil((p / 100) * total_count))
+                if rank <= 0 or values.size < rank:
+                    continue
+                sorted_values = np.sort(values)
+                out[f"P{p}"] = int(sorted_values[rank - 1])
+                continue
             q = max(0.0, min(1.0, p / 100))
             out[f"P{p}"] = _discrete_quantile(values, q, method="higher")
     return out

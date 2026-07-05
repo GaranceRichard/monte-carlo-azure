@@ -132,9 +132,10 @@ function toScenarioResult(
   const percentiles = result.result_percentiles;
   const computedRiskScore = computeRiskScoreFromPercentiles(simulationMode, percentiles) ?? undefined;
   const riskScore =
-    result.result_kind === "items"
-      ? computedRiskScore
-      : result.risk_score ?? computedRiskScore;
+    computedRiskScore ??
+    (result.result_kind === "items" && typeof result.risk_score === "number" && Number.isFinite(result.risk_score)
+      ? result.risk_score
+      : undefined);
   return {
     label,
     hypothesis,
@@ -143,7 +144,7 @@ function toScenarioResult(
     weeklyData,
     percentiles,
     riskScore,
-    riskLegend: computeRiskLegend(riskScore ?? 0),
+    riskLegend: riskScore == null ? undefined : computeRiskLegend(riskScore),
     distribution: result.result_distribution,
     completionSummary: result.completion_summary,
     throughputReliability: computeThroughputReliability(samples),

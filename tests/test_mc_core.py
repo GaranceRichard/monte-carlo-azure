@@ -274,6 +274,27 @@ def test_percentiles_backlog_to_weeks_use_conservative_higher_quantiles():
     assert p["P50"] <= p["P70"] <= p["P90"]
 
 
+@pytest.mark.parametrize(
+    ("completed_count", "expected"),
+    [
+        (0, set()),
+        (10, {"P50"}),
+        (17, {"P50", "P70", "P85"}),
+        (18, {"P50", "P70", "P85", "P90"}),
+        (20, {"P50", "P70", "P85", "P90", "P100"}),
+    ],
+)
+def test_percentiles_backlog_to_weeks_require_completion_rank_in_total_population(
+    completed_count,
+    expected,
+):
+    arr = np.arange(1, completed_count + 1, dtype=int)
+
+    p = percentiles(arr, "backlog_to_weeks", ps=(50, 70, 85, 90, 100), total_count=20)
+
+    assert set(p.keys()) == expected
+
+
 def test_percentiles_weeks_to_items_use_survival_lower_quantiles():
     arr = np.array([18, 22, 24, 25, 27], dtype=int)
 

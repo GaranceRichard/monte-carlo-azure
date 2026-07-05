@@ -269,7 +269,10 @@ function buildTeamLikePageHtml({
     count: p.count,
     gauss: smoothed[i],
   }));
-  const probabilityPoints = buildProbabilityCurve(sortedDistribution, resultKind);
+  const totalSimulationCount = completionSummary
+    ? completionSummary.completed_count + completionSummary.censored_count
+    : undefined;
+  const probabilityPoints = buildProbabilityCurve(sortedDistribution, resultKind, totalSimulationCount);
   const effectivePercentiles = displayPercentiles;
 
   const throughputSvg = renderThroughputChart(throughputPoints).replaceAll(
@@ -418,7 +421,10 @@ function buildSummaryPage({
       .map((p) => ({ x: Number(p.x), count: Number(p.count) }))
       .filter((p) => Number.isFinite(p.x) && Number.isFinite(p.count) && p.count > 0)
       .sort((a, b) => a.x - b.x);
-    const points = buildProbabilityCurve(sortedDistribution, summaryResultKind);
+    const totalSimulationCount = scenario.completionSummary
+      ? scenario.completionSummary.completed_count + scenario.completionSummary.censored_count
+      : undefined;
+    const points = buildProbabilityCurve(sortedDistribution, summaryResultKind, totalSimulationCount);
     const color = scenario.label === "Optimiste"
       ? "#15803d"
       : scenario.label.startsWith("Arrime")

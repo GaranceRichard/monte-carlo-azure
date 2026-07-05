@@ -226,6 +226,7 @@ async def simulate(
     completion_summary = None
     distribution_values = result
     percentile_values = result
+    percentile_total_count = None
     if isinstance(result, FinishWeeksSimulation):
         completion_summary = CompletionSummary(
             completed_count=result.completed_count,
@@ -235,8 +236,14 @@ async def simulate(
         )
         distribution_values = result.completed_weeks
         percentile_values = result.completed_weeks
+        percentile_total_count = int(result.weeks_needed.size)
 
-    simulation_percentiles = percentiles(percentile_values, req.mode, ps=(50, 70, 90))
+    simulation_percentiles = percentiles(
+        percentile_values,
+        req.mode,
+        ps=(50, 70, 90),
+        total_count=percentile_total_count,
+    )
     p50 = simulation_percentiles.get("P50")
     p90 = simulation_percentiles.get("P90")
     reliability = ThroughputReliability(**throughput_reliability(samples))

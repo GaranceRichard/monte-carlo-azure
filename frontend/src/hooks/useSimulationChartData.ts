@@ -79,7 +79,10 @@ export function useSimulationChartData({
       .sort((a, b) => a.x - b.x);
     if (!points.length) return [];
 
-    return buildProbabilityCurve(points, result.result_kind);
+    const totalCount = result.completion_summary
+      ? result.completion_summary.completed_count + result.completion_summary.censored_count
+      : undefined;
+    return buildProbabilityCurve(points, result.result_kind, totalCount);
   }, [result]);
 
   const displayPercentiles = useMemo((): ForecastPercentiles => {

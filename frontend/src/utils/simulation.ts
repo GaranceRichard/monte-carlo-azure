@@ -117,18 +117,27 @@ function discreteQuantile(values: number[], q: number, mode: "higher" | "lower")
   return sorted[Math.max(0, Math.min(sorted.length - 1, index))] ?? 0;
 }
 
-function discretePercentiles(
+export function discretePercentiles(
   values: number[],
   simulationMode: ForecastMode,
   ps: number[],
+  totalCount?: number,
 ) : ForecastPercentiles {
   if (!values.length) return {};
   return Object.fromEntries(
-    ps.map((p) => {
+    ps.flatMap((p) => {
       if (simulationMode === "weeks_to_items") {
-        return [`P${p}`, discreteQuantile(values, (100 - p) / 100, "lower")];
+        return [[`P${p}`, discreteQuantile(values, (100 - p) / 100, "lower")]];
       }
-      return [`P${p}`, discreteQuantile(values, p / 100, "higher")];
+      if (typeof totalCount === "number" && Number.isFinite(totalCount) && totalCount > 0) {
+        const rank = Math.ceil((p / 100) * totalCount);
+        if (rank <= 0 || values.length < rank) {
+          return [];
+        }
+        const sorted = [...values].sort((a, b) => a - b);
+        return [[`P${p}`, sorted[rank - 1] ?? 0]];
+      }
+      return [[`P${p}`, discreteQuantile(values, p / 100, "higher")]];
     }),
   );
 }
@@ -181,11 +190,13 @@ export function simulateMonteCarloLocal({
   }
 
   let distributionValues = results;
+  let percentileTotalCount: number | undefined;
   if (mode === "backlog_to_weeks") {
     const horizonWeeks = 521;
     distributionValues = results.filter((_value, index) => completedFlags[index]);
     const completedCount = distributionValues.length;
     const censoredCount = results.length - completedCount;
+    percentileTotalCount = results.length;
     completionSummary = {
       completed_count: completedCount,
       censored_count: censoredCount,
@@ -198,6 +209,7 @@ export function simulateMonteCarloLocal({
     mode === "backlog_to_weeks" ? distributionValues : results,
     mode,
     [50, 70, 90],
+    percentileTotalCount,
   );
   const resolvedRiskScore = computeRiskScoreFromPercentiles(mode, resultPercentiles);
   return {

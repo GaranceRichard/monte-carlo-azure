@@ -286,10 +286,14 @@ En `backlog_to_weeks`, `completion_summary` peut aussi etre present:
   - percentiles API: quantile empirique discret conservateur `higher`
   - ordre attendu: `P50 <= P70 <= P90`
   - exemple de lecture: `P90 = 90%` des simulations finissent en `P90` semaines ou moins
+  - le rang d'un percentile est calcule sur la population totale `n_sims`, pas seulement
+    sur les simulations terminees
   - une simulation non terminee a l'horizon est comptee comme censure explicite
   - une fin exacte a l'horizon reste une vraie fin, distincte d'une censure
   - la distribution et les percentiles ne couvrent que les simulations terminees
   - un percentile absent signifie qu'il n'est pas identifiable avant l'horizon
+  - la courbe de probabilite UI utilise `n_sims` comme denominateur et reste bornee
+    par le taux reel de completion
   - `risk_score` est absent si `P50` ou `P90` manque
   - formule `risk_score`: `(P90 - P50) / P50`
 - mode `weeks_to_items`

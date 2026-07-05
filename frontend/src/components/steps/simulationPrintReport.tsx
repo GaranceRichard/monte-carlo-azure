@@ -10,6 +10,7 @@ import {
   type ThroughputExportPoint,
 } from "./simulationChartsSvg";
 import { buildSimulationPdfFileName, downloadSimulationPdf } from "./simulationPdfDownload";
+import { buildProbabilityCurve } from "../../hooks/probability";
 import {
   computeRiskScoreFromPercentiles,
   computeThroughputReliability,
@@ -102,7 +103,6 @@ export function buildSimulationPrintReportHtml({
   const cycleTimeSvg = renderCycleTimeChart(cycleTimePoints, cycleTimeTrendPoints);
   const throughputSvg = renderThroughputChart(throughputPoints);
   const distributionSvg = renderDistributionChart(distributionPoints);
-  const probabilitySvg = renderProbabilityChart(probabilityPoints);
   const modeSummary =
     simulationMode === "backlog_to_weeks"
       ? `Backlog vers semaines - backlog: ${String(backlogSize)} items`
@@ -131,6 +131,17 @@ export function buildSimulationPrintReportHtml({
   const reliabilityScoreLabel = effectiveReliability ? `${formatMetric(effectiveReliability.cv)} (${reliabilityLegend})` : "Non disponible";
   const reliabilitySummary = buildReliabilitySummary(effectiveReliability);
   const reliabilityNotice = getProjectionReliabilityNotice(effectiveReliability);
+  const totalSimulationCount = completionSummary
+    ? completionSummary.completed_count + completionSummary.censored_count
+    : undefined;
+  const effectiveProbabilityPoints = probabilityPoints.length
+    ? buildProbabilityCurve(
+        distributionPoints.map((point) => ({ x: Number(point.x), count: Number(point.count) })),
+        resultKind,
+        totalSimulationCount,
+      )
+    : probabilityPoints;
+  const probabilitySvg = renderProbabilityChart(effectiveProbabilityPoints);
 
   return `
       <!doctype html>

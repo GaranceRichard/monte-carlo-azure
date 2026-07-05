@@ -360,8 +360,8 @@ def test_simulate_backlog_to_weeks_keeps_exact_finish_at_horizon_distinct_from_c
         "censored_rate": 0.3333,
         "horizon_weeks": 521,
     }
-    assert body["result_percentiles"] == {"P50": 521, "P70": 521, "P90": 521}
-    assert body["risk_score"] == 0.0
+    assert body["result_percentiles"] == {"P50": 521}
+    assert "risk_score" not in body
 
 
 def test_simulate_returns_same_result_for_same_seed():

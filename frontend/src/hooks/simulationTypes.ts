@@ -114,7 +114,7 @@ export type PortfolioScenarioResult = {
   weeklyData: WeeklyThroughputRow[];
   percentiles: ForecastPercentiles;
   riskScore?: number;
-  riskLegend: "fiable" | "incertain" | "fragile" | "non fiable";
+  riskLegend?: "fiable" | "incertain" | "fragile" | "non fiable";
   distribution: DistributionBucket[];
   completionSummary?: CompletionSummary;
   throughputReliability?: ThroughputReliability | null;

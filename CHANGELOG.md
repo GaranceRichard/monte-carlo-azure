@@ -4,6 +4,9 @@
 
 ### Frontend
 
+- correction de la semantique des simulations `backlog_to_weeks` censurees:
+  percentiles identifies sur le rang dans `n_sims`, courbe de probabilite plafonnee
+  au vrai taux de completion, `Risk Score` masque si `P50` ou `P90` manque
 - `backlog_to_weeks` ne code plus une non-terminaison par `521` seul: le frontend consomme
   et produit un `completion_summary` explicite (`completed_count`, `censored_count`,
   `censored_rate`, `horizon_weeks`) pour distinguer les censures des fins exactes a l'horizon

@@ -32,6 +32,23 @@ describe("buildProbabilityCurve", () => {
     expect(curve[2].probability).toBeCloseTo(100, 5);
   });
 
+  it("caps week probabilities at the real completion rate when simulations are censored", () => {
+    const curve = buildProbabilityCurve(
+      [
+        { x: 10, count: 1 },
+        { x: 12, count: 1 },
+      ],
+      "weeks",
+      3,
+    );
+
+    expect(curve).toHaveLength(2);
+    expect(curve[0]).toMatchObject({ x: 10 });
+    expect(curve[1]).toMatchObject({ x: 12 });
+    expect(curve[0]?.probability).toBeCloseTo(100 / 3, 5);
+    expect(curve[1]?.probability).toBeCloseTo(200 / 3, 5);
+  });
+
   it("returns decreasing 'at least' probabilities for items", () => {
     const points = [
       { x: 49, count: 2 },
@@ -46,6 +63,24 @@ describe("buildProbabilityCurve", () => {
     expect(curve[0].probability).toBeCloseTo(100, 5);
     expect(curve[1].probability).toBeCloseTo(50, 5);
     expect(curve[2].probability).toBeCloseTo(25, 5);
+  });
+
+  it.each([
+    { visibleCount: 0, totalCount: 20, expectedMax: 0 },
+    { visibleCount: 10, totalCount: 20, expectedMax: 50 },
+    { visibleCount: 17, totalCount: 20, expectedMax: 85 },
+    { visibleCount: 18, totalCount: 20, expectedMax: 90 },
+    { visibleCount: 20, totalCount: 20, expectedMax: 100 },
+  ])("matches the completion rate ceiling for weeks at $expectedMax%", ({ visibleCount, totalCount, expectedMax }) => {
+    const points = visibleCount > 0 ? [{ x: 10, count: visibleCount }] : [];
+    const curve = buildProbabilityCurve(points, "weeks", totalCount);
+
+    if (expectedMax === 0) {
+      expect(curve).toEqual([]);
+      return;
+    }
+
+    expect(curve.at(-1)?.probability).toBeCloseTo(expectedMax, 5);
   });
 });
 

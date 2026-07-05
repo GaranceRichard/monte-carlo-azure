@@ -76,9 +76,6 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
     if (typeof s.displayPercentiles?.P50 === "number" && typeof s.displayPercentiles?.P90 === "number") {
       return computeRiskScoreFromPercentiles(s.simulationMode, s.displayPercentiles ?? {});
     }
-    if (typeof s.result.risk_score === "number" && Number.isFinite(s.result.risk_score)) {
-      return s.result.risk_score;
-    }
     return null;
   }, [s.result, s.displayPercentiles, s.simulationMode]);
 
