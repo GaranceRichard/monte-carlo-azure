@@ -15,6 +15,14 @@ import {
   simulateMonteCarloLocal,
 } from "./simulation";
 import { DEMO_TEAM_SAMPLES } from "../demoData";
+import {
+  SIMULATION_BACKLOG_SIZE_MAX,
+  SIMULATION_HORIZON_WEEKS_MAX,
+  SIMULATION_N_SIMS_MAX,
+  SIMULATION_N_SIMS_MIN,
+  SIMULATION_THROUGHPUT_SAMPLES_MAX,
+  validateSimulationInputContract,
+} from "../simulationLimits";
 
 describe("computeRiskScoreFromPercentiles", () => {
   it("returns null when P50 is missing or non-positive", () => {
@@ -547,6 +555,82 @@ describe("getProjectionReliabilityNotice", () => {
 });
 
 describe("simulateMonteCarloLocal", () => {
+  it("validates the shared contract boundaries", () => {
+    expect(
+      validateSimulationInputContract({
+        throughputSamples: [1, 2, 3, 4, 5, 6],
+        includeZeroWeeks: false,
+        mode: "backlog_to_weeks",
+        backlogSize: 10,
+        nSims: SIMULATION_N_SIMS_MIN,
+      }),
+    ).toEqual({
+      backlogSize: 10,
+      nSims: SIMULATION_N_SIMS_MIN,
+    });
+  });
+
+  it("rejects shared contract violations with explicit messages", () => {
+    expect(() =>
+      validateSimulationInputContract({
+        throughputSamples: [1, 2, 3, 4, 5, 6],
+        includeZeroWeeks: false,
+        mode: "backlog_to_weeks",
+        nSims: SIMULATION_N_SIMS_MIN,
+      }),
+    ).toThrow("backlog_size requis");
+
+    expect(() =>
+      validateSimulationInputContract({
+        throughputSamples: [1, 2, 3, 4, 5],
+        includeZeroWeeks: false,
+        mode: "backlog_to_weeks",
+        backlogSize: 10,
+        nSims: SIMULATION_N_SIMS_MIN,
+      }),
+    ).toThrow("throughput_samples");
+
+    expect(() =>
+      validateSimulationInputContract({
+        throughputSamples: [1, 2, 3, 4, 5, 6],
+        includeZeroWeeks: false,
+        mode: "backlog_to_weeks",
+        backlogSize: SIMULATION_BACKLOG_SIZE_MAX + 1,
+        nSims: SIMULATION_N_SIMS_MIN,
+      }),
+    ).toThrow("backlog_size");
+
+    expect(() =>
+      validateSimulationInputContract({
+        throughputSamples: [1, 2, 3, 4, 5, 6],
+        includeZeroWeeks: false,
+        mode: "weeks_to_items",
+        targetWeeks: SIMULATION_HORIZON_WEEKS_MAX + 1,
+        nSims: SIMULATION_N_SIMS_MIN,
+      }),
+    ).toThrow("target_weeks");
+
+    expect(() =>
+      validateSimulationInputContract({
+        throughputSamples: Array.from({ length: SIMULATION_THROUGHPUT_SAMPLES_MAX + 1 }, () => 1),
+        includeZeroWeeks: false,
+        mode: "weeks_to_items",
+        targetWeeks: 12,
+        nSims: SIMULATION_N_SIMS_MAX,
+      }),
+    ).toThrow("throughput_samples");
+
+    expect(() =>
+      validateSimulationInputContract({
+        throughputSamples: [0, 0, 1, 2, 3, -1],
+        includeZeroWeeks: true,
+        mode: "weeks_to_items",
+        targetWeeks: 12,
+        nSims: SIMULATION_N_SIMS_MIN,
+      }),
+    ).toThrow("Historique insuffisant (moins de 6 semaines).");
+  });
+
   it("omits backlog percentiles whose rank is not reachable in the total simulation population", () => {
     expect(discretePercentiles([521, 521], "backlog_to_weeks", [50, 70, 90], 3)).toEqual({ P50: 521 });
   });
@@ -562,14 +646,14 @@ describe("simulateMonteCarloLocal", () => {
   it("keeps compact histograms unchanged when there are few unique outcomes", () => {
     const result = simulateMonteCarloLocal({
       seed: 123,
-      throughputSamples: [2],
+      throughputSamples: [2, 2, 2, 2, 2, 2],
       includeZeroWeeks: false,
       mode: "backlog_to_weeks",
       backlogSize: 4,
-      nSims: 3,
+      nSims: 1000,
     });
 
-    expect(result.result_distribution).toEqual([{ x: 2, count: 3 }]);
+    expect(result.result_distribution).toEqual([{ x: 2, count: 1000 }]);
   });
 
   it("returns a backend-compatible structure in backlog mode", () => {
@@ -676,11 +760,11 @@ describe("simulateMonteCarloLocal", () => {
   it("reports a fully censored backlog when zero throughput never burns backlog", () => {
     const result = simulateMonteCarloLocal({
       seed: 123,
-      throughputSamples: [0, 0, 0],
+      throughputSamples: [0, 0, 0, 0, 0, 0],
       includeZeroWeeks: true,
       mode: "backlog_to_weeks",
       backlogSize: 5,
-      nSims: 3,
+      nSims: 1000,
     });
 
     expect(result.result_kind).toBe("weeks");
@@ -688,7 +772,7 @@ describe("simulateMonteCarloLocal", () => {
     expect(result.result_distribution).toEqual([]);
     expect(result.completion_summary).toEqual({
       completed_count: 0,
-      censored_count: 3,
+      censored_count: 1000,
       censored_rate: 1,
       horizon_weeks: 521,
     });
@@ -696,19 +780,16 @@ describe("simulateMonteCarloLocal", () => {
     expect(result.throughput_reliability?.label).toBe("non fiable");
   });
 
-  it("normalizes negative and fractional inputs for simulation guards", () => {
-    const result = simulateMonteCarloLocal({
-      seed: 123,
-      throughputSamples: [1.9, 2.2, 3.8],
-      includeZeroWeeks: false,
-      mode: "weeks_to_items",
-      targetWeeks: -3.4,
-      nSims: 0.4,
-    });
-
-    expect(result.result_kind).toBe("items");
-    expect(result.samples_count).toBe(3);
-    expect(result.result_distribution.reduce((sum, bucket) => sum + bucket.count, 0)).toBe(1);
-    expect(result.result_percentiles.P50).toBeGreaterThanOrEqual(1);
+  it("rejects negative or fractional contract inputs instead of correcting them silently", () => {
+    expect(() =>
+      simulateMonteCarloLocal({
+        seed: 123,
+        throughputSamples: [1.9, 2.2, 3.8, 4.1, 5.2, 6.7],
+        includeZeroWeeks: false,
+        mode: "weeks_to_items",
+        targetWeeks: -3.4,
+        nSims: 0.4,
+      }),
+    ).toThrow("n_sims");
   });
 });

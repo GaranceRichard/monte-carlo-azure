@@ -6,6 +6,10 @@ import type {
   ThroughputReliability,
   WeeklyThroughputRow,
 } from "../types";
+import {
+  SIMULATION_HORIZON_WEEKS_MAX,
+  validateSimulationInputContract,
+} from "../simulationLimits";
 import { clamp } from "./math";
 
 export type ScenarioSamples = {
@@ -160,9 +164,17 @@ export function simulateMonteCarloLocal({
   seed: number;
 }): ForecastResponse {
   const samples = normalizeSamples(throughputSamples, includeZeroWeeks);
-  const safeNSims = Math.max(1, Math.floor(nSims));
-  const safeBacklog = Math.max(1, Math.floor(backlogSize ?? 0));
-  const safeWeeks = Math.max(1, Math.floor(targetWeeks ?? 0));
+  const contract = validateSimulationInputContract({
+    throughputSamples,
+    includeZeroWeeks,
+    mode,
+    backlogSize,
+    targetWeeks,
+    nSims,
+  });
+  const safeNSims = contract.nSims;
+  const safeBacklog = contract.backlogSize;
+  const safeWeeks = contract.targetWeeks;
   const random = createSeededRandom(seed);
   const results = new Array<number>(safeNSims);
   const completedFlags = new Array<boolean>(safeNSims).fill(true);
@@ -170,20 +182,20 @@ export function simulateMonteCarloLocal({
 
   for (let i = 0; i < safeNSims; i += 1) {
     if (mode === "backlog_to_weeks") {
-      let remaining = safeBacklog;
+      let remaining = safeBacklog ?? 0;
       let weeks = 0;
-      while (remaining > 0 && weeks < 521) {
+      while (remaining > 0 && weeks < SIMULATION_HORIZON_WEEKS_MAX) {
         const nextSample = samples[Math.floor(random() * samples.length)] ?? 0;
         remaining -= nextSample;
         weeks += 1;
       }
-      results[i] = weeks || 521;
+      results[i] = weeks || SIMULATION_HORIZON_WEEKS_MAX;
       completedFlags[i] = remaining <= 0;
       continue;
     }
 
     let delivered = 0;
-    for (let week = 0; week < safeWeeks; week += 1) {
+    for (let week = 0; week < (safeWeeks ?? 0); week += 1) {
       delivered += samples[Math.floor(random() * samples.length)] ?? 0;
     }
     results[i] = delivered;
@@ -192,7 +204,7 @@ export function simulateMonteCarloLocal({
   let distributionValues = results;
   let percentileTotalCount: number | undefined;
   if (mode === "backlog_to_weeks") {
-    const horizonWeeks = 521;
+    const horizonWeeks = SIMULATION_HORIZON_WEEKS_MAX;
     distributionValues = results.filter((_value, index) => completedFlags[index]);
     const completedCount = distributionValues.length;
     const censoredCount = results.length - completedCount;

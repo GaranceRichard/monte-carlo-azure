@@ -14,6 +14,14 @@ from backend.api_models import (
     SimulateResponse,
     ThroughputReliability,
 )
+from backend.simulation_limits import (
+    SIMULATION_BACKLOG_SIZE_MAX,
+    SIMULATION_HORIZON_WEEKS_MAX,
+    SIMULATION_N_SIMS_MAX,
+    SIMULATION_N_SIMS_MIN,
+    SIMULATION_THROUGHPUT_SAMPLES_MAX,
+    SIMULATION_THROUGHPUT_SAMPLES_MIN,
+)
 from backend.api_routes_simulate import (
     _client_key_from_request,
     _persist_simulation,
@@ -139,8 +147,8 @@ def test_simulate_requires_backlog_size_for_backlog_mode():
         },
     )
 
-    assert r.status_code == 400
-    assert "backlog_size" in r.json()["detail"]
+    assert r.status_code == 422
+    assert "backlog_size" in str(r.json()["detail"])
 
 
 def test_simulate_requires_target_weeks_for_weeks_mode():
@@ -154,8 +162,8 @@ def test_simulate_requires_target_weeks_for_weeks_mode():
         },
     )
 
-    assert r.status_code == 400
-    assert "target_weeks" in r.json()["detail"]
+    assert r.status_code == 422
+    assert "target_weeks" in str(r.json()["detail"])
 
 
 def test_simulate_rejects_insufficient_non_zero_history():
@@ -187,6 +195,73 @@ def test_simulate_rejects_short_raw_samples_list():
     )
 
     assert r.status_code == 422
+
+
+def test_simulate_accepts_contract_boundaries():
+    client = ApiTestClient(app)
+    response = client.post(
+        "/simulate",
+        json={
+            "throughput_samples": [1] * SIMULATION_THROUGHPUT_SAMPLES_MIN,
+            "mode": "weeks_to_items",
+            "target_weeks": SIMULATION_HORIZON_WEEKS_MAX,
+            "n_sims": SIMULATION_N_SIMS_MIN,
+        },
+    )
+
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("n_sims", SIMULATION_N_SIMS_MIN - 1),
+        ("n_sims", SIMULATION_N_SIMS_MAX + 1),
+        ("target_weeks", 0),
+        ("target_weeks", SIMULATION_HORIZON_WEEKS_MAX + 1),
+        ("backlog_size", 0),
+        ("backlog_size", SIMULATION_BACKLOG_SIZE_MAX + 1),
+    ],
+)
+def test_simulate_rejects_out_of_range_numeric_contract_values(field, value):
+    client = ApiTestClient(app)
+    payload = {
+        "throughput_samples": [1] * SIMULATION_THROUGHPUT_SAMPLES_MIN,
+        "mode": "backlog_to_weeks" if field != "target_weeks" else "weeks_to_items",
+        "backlog_size": 10,
+        "target_weeks": 10,
+        "n_sims": SIMULATION_N_SIMS_MIN,
+    }
+    payload[field] = value
+    if payload["mode"] == "backlog_to_weeks":
+        payload.pop("target_weeks", None)
+    else:
+        payload.pop("backlog_size", None)
+
+    response = client.post("/simulate", json=payload)
+
+    assert response.status_code == 422
+    assert field in str(response.json()["detail"])
+
+
+@pytest.mark.parametrize(
+    "samples_count",
+    [SIMULATION_THROUGHPUT_SAMPLES_MIN - 1, SIMULATION_THROUGHPUT_SAMPLES_MAX + 1],
+)
+def test_simulate_rejects_out_of_range_throughput_samples_count(samples_count):
+    client = ApiTestClient(app)
+    response = client.post(
+        "/simulate",
+        json={
+            "throughput_samples": [1] * samples_count,
+            "mode": "backlog_to_weeks",
+            "backlog_size": 10,
+            "n_sims": SIMULATION_N_SIMS_MIN,
+        },
+    )
+
+    assert response.status_code == 422
+    assert "throughput_samples" in str(response.json()["detail"])
 
 
 def test_simulate_rate_limit_returns_429():

@@ -28,6 +28,7 @@ from .mc_core import (
     risk_score,
     throughput_reliability,
 )
+from .simulation_limits import SIMULATION_THROUGHPUT_SAMPLES_MIN
 from .simulation_store import SimulationStore
 
 router = APIRouter()
@@ -121,8 +122,7 @@ def _compute_simulation_result(
     seed: int,
 ) -> tuple[np.ndarray | FinishWeeksSimulation, str]:
     if req.mode == "backlog_to_weeks":
-        if not req.backlog_size:
-            raise HTTPException(400, "backlog_size requis.")
+        assert req.backlog_size is not None
         return (
             mc_finish_weeks(
                 req.backlog_size,
@@ -134,8 +134,7 @@ def _compute_simulation_result(
             "weeks",
         )
 
-    if not req.target_weeks:
-        raise HTTPException(400, "target_weeks requis.")
+    assert req.target_weeks is not None
     return (
         mc_items_done_for_weeks(
             req.target_weeks,
@@ -191,11 +190,11 @@ async def simulate(
         samples = samples[samples >= 0]
     else:
         samples = samples[samples > 0]
-    if len(samples) < 6:
+    if len(samples) < SIMULATION_THROUGHPUT_SAMPLES_MIN:
         detail = (
-            "Historique insuffisant (moins de 6 semaines)."
+            f"Historique insuffisant (moins de {SIMULATION_THROUGHPUT_SAMPLES_MIN} semaines)."
             if req.include_zero_weeks
-            else "Historique insuffisant (moins de 6 semaines non nulles)."
+            else f"Historique insuffisant (moins de {SIMULATION_THROUGHPUT_SAMPLES_MIN} semaines non nulles)."
         )
         raise HTTPException(422, detail)
 

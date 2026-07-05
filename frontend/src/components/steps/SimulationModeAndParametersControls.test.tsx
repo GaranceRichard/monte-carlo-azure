@@ -3,6 +3,13 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SimulationProvider } from "../../hooks/SimulationContext";
 import SimulationModeAndParametersControls from "./SimulationModeAndParametersControls";
+import {
+  SIMULATION_BACKLOG_SIZE_MAX,
+  SIMULATION_BACKLOG_SIZE_MIN,
+  SIMULATION_HORIZON_WEEKS_MAX,
+  SIMULATION_N_SIMS_MAX,
+  SIMULATION_N_SIMS_MIN,
+} from "../../simulationLimits";
 
 const selectTopMocks = vi.hoisted(() => ({
   keepSelectDropdownAtTop: vi.fn(),
@@ -143,5 +150,31 @@ describe("SimulationModeAndParametersControls", () => {
     numberInputs = container.querySelectorAll('input[type="number"]');
     fireEvent.change(numberInputs[0], { target: { value: "150" } });
     expect(spies.setBacklogSize).toHaveBeenCalledWith("150");
+  });
+
+  it("exposes the shared min/max limits on numeric inputs", () => {
+    const spies = createSpies();
+    const { container } = render(<TestHarness spies={spies} />);
+
+    const numberInputs = container.querySelectorAll('input[type="number"]');
+    if (numberInputs.length !== 2) {
+      throw new Error("Expected number inputs were not rendered");
+    }
+
+    expect(numberInputs[0]?.getAttribute("min")).toBe(String(SIMULATION_BACKLOG_SIZE_MIN));
+    expect(numberInputs[0]?.getAttribute("max")).toBe(String(SIMULATION_BACKLOG_SIZE_MAX));
+    expect(numberInputs[1]?.getAttribute("min")).toBe(String(SIMULATION_N_SIMS_MIN));
+    expect(numberInputs[1]?.getAttribute("max")).toBe(String(SIMULATION_N_SIMS_MAX));
+
+    const select = container.querySelector("select");
+    if (!select) {
+      throw new Error("Expected select control was not rendered");
+    }
+
+    fireEvent.change(select, { target: { value: "weeks_to_items" } });
+
+    const weeksInput = container.querySelectorAll('input[type="number"]')[0];
+    expect(weeksInput?.getAttribute("min")).toBe("1");
+    expect(weeksInput?.getAttribute("max")).toBe(String(SIMULATION_HORIZON_WEEKS_MAX));
   });
 });

@@ -10,6 +10,7 @@ from backend.mc_core import (
     risk_score,
     throughput_reliability,
 )
+from backend.simulation_limits import SIMULATION_HORIZON_WEEKS_MAX, SIMULATION_N_SIMS_MAX
 
 
 def test_mc_finish_weeks_shape_and_bounds():
@@ -19,8 +20,8 @@ def test_mc_finish_weeks_shape_and_bounds():
     assert out.weeks_needed.shape == (5000,)
     assert np.issubdtype(out.weeks_needed.dtype, np.integer)
     assert int(out.weeks_needed.min()) >= 1
-    assert int(out.weeks_needed.max()) <= 521
-    assert out.horizon_weeks == 521
+    assert int(out.weeks_needed.max()) <= SIMULATION_HORIZON_WEEKS_MAX
+    assert out.horizon_weeks == SIMULATION_HORIZON_WEEKS_MAX
 
 
 def test_mc_finish_weeks_reproducible_for_seed():
@@ -50,7 +51,7 @@ def test_mc_finish_weeks_single_value_samples():
 def test_mc_finish_weeks_large_backlog_hits_cap():
     samples = np.array([1], dtype=int)
     out = mc_finish_weeks(backlog_size=10_000, throughput_samples=samples, n_sims=50, seed=1)
-    assert np.all(out.weeks_needed == 521)
+    assert np.all(out.weeks_needed == SIMULATION_HORIZON_WEEKS_MAX)
     assert not np.any(out.completed_mask)
     assert out.completed_count == 0
     assert out.censored_count == 50
@@ -143,9 +144,38 @@ def test_mc_finish_weeks_processes_incomplete_last_batch(monkeypatch):
         batch_size=4,
     )
 
-    assert batch_sizes == [(4, 521), (4, 521), (2, 521)]
+    assert batch_sizes == [
+        (4, SIMULATION_HORIZON_WEEKS_MAX),
+        (4, SIMULATION_HORIZON_WEEKS_MAX),
+        (2, SIMULATION_HORIZON_WEEKS_MAX),
+    ]
     assert np.all(out.weeks_needed == 1)
     assert np.all(out.completed_mask)
+
+
+def test_mc_finish_weeks_keeps_batched_draw_shapes_at_max_contract(monkeypatch):
+    batch_shapes: list[tuple[int, int]] = []
+
+    class FakeGenerator:
+        def integers(self, low, high=None, size=None):
+            batch_shapes.append(size)
+            return np.zeros(size, dtype=np.int64)
+
+    monkeypatch.setattr("backend.mc_core.np.random.default_rng", lambda seed: FakeGenerator())
+
+    mc_finish_weeks(
+        backlog_size=1,
+        throughput_samples=np.array([1], dtype=int),
+        n_sims=SIMULATION_N_SIMS_MAX,
+        seed=123,
+        batch_size=4096,
+    )
+
+    assert batch_shapes[0] == (4096, SIMULATION_HORIZON_WEEKS_MAX)
+    assert batch_shapes[-1] == (
+        SIMULATION_N_SIMS_MAX % 4096 or 4096,
+        SIMULATION_HORIZON_WEEKS_MAX,
+    )
 
 
 def test_mc_items_done_for_weeks_processes_incomplete_last_batch(monkeypatch):

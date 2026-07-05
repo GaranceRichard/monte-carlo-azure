@@ -14,6 +14,11 @@ import {
 import { getPortfolioErrorMessage, usePortfolioReport, type TeamPortfolioConfig } from "./usePortfolioReport";
 import type { AdoErrorContext } from "../adoErrors";
 import { DEMO_CONFIG, DEMO_PORTFOLIO_TEAM_CONFIGS, DEMO_TEAM_OPTIONS } from "../demoData";
+import {
+  SIMULATION_N_SIMS_MAX,
+  SIMULATION_N_SIMS_MIN,
+  isBoundedIntegerValue,
+} from "../simulationLimits";
 
 export type { TeamPortfolioConfig } from "./usePortfolioReport";
 
@@ -89,7 +94,11 @@ export function usePortfolio({ demoMode = false, selectedOrg, selectedProject, t
   }, [modalTypes, modalStatesByType]);
 
   const normalizedNSims = typeof nSims === "string" && nSims.trim() === "" ? Number.NaN : Number(nSims);
-  const hasValidNSims = Number.isFinite(normalizedNSims) && normalizedNSims >= 1000;
+  const hasValidNSims = isBoundedIntegerValue(
+    normalizedNSims,
+    SIMULATION_N_SIMS_MIN,
+    SIMULATION_N_SIMS_MAX,
+  );
 
   const {
     loadingReport,
@@ -112,7 +121,7 @@ export function usePortfolio({ demoMode = false, selectedOrg, selectedProject, t
     simulationMode,
     backlogSize,
     targetWeeks,
-    nSims: hasValidNSims ? normalizedNSims : 20000,
+    nSims: normalizedNSims,
     alignmentRate,
     teamConfigs,
   });

@@ -2,6 +2,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchTeamThroughput, runSimulationForecast, simulateForecastFromSamples } from "./simulationForecastService";
 import { getTeamDeliveryDataDirect } from "../adoClient";
 import { postSimulate } from "../api";
+import {
+  SIMULATION_BACKLOG_SIZE_MAX,
+  SIMULATION_HORIZON_WEEKS_MAX,
+  SIMULATION_N_SIMS_MAX,
+  SIMULATION_THROUGHPUT_SAMPLES_MAX,
+} from "../simulationLimits";
 
 vi.mock("../adoClient", () => ({
   getTeamDeliveryDataDirect: vi.fn(),
@@ -123,7 +129,7 @@ describe("demo mode et normalisation", () => {
       simulationMode: "weeks_to_items",
       backlogSize: 120,
       targetWeeks: 6,
-      nSims: 500,
+      nSims: 1000,
     });
 
     expect(result.result_kind).toBe("items");
@@ -139,7 +145,7 @@ describe("demo mode et normalisation", () => {
       simulationMode: "backlog_to_weeks",
       backlogSize: 120,
       targetWeeks: 6,
-      nSims: 500,
+      nSims: 1000,
     });
 
     expect(result.result_kind).toBe("weeks");
@@ -386,6 +392,37 @@ describe("seuil d'historique insuffisant", () => {
 
   it("accepte exactement 6 semaines valides", async () => {
     await expect(runSimulationForecast(baseParams())).resolves.toBeDefined();
+  });
+
+  it("rejette un contrat hors bornes avant l'appel API", async () => {
+    await expect(
+      simulateForecastFromSamples({
+        throughputSamples: [5, 7, 4, 6, 8, 5],
+        simulationMode: "backlog_to_weeks",
+        backlogSize: SIMULATION_BACKLOG_SIZE_MAX + 1,
+        targetWeeks: 12,
+        nSims: 20_000,
+      }),
+    ).rejects.toThrow("backlog_size");
+
+    expect(postSimulate).not.toHaveBeenCalled();
+  });
+
+  it("accepte les bornes du contrat et les transmet telles quelles", async () => {
+    await simulateForecastFromSamples({
+      throughputSamples: Array.from({ length: SIMULATION_THROUGHPUT_SAMPLES_MAX }, () => 1),
+      simulationMode: "weeks_to_items",
+      backlogSize: 80,
+      targetWeeks: SIMULATION_HORIZON_WEEKS_MAX,
+      nSims: SIMULATION_N_SIMS_MAX,
+    });
+
+    expect(postSimulate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        target_weeks: SIMULATION_HORIZON_WEEKS_MAX,
+        n_sims: SIMULATION_N_SIMS_MAX,
+      }),
+    );
   });
 });
 

@@ -1,4 +1,12 @@
 ﻿import { useSimulationContext } from "../../hooks/SimulationContext";
+import {
+  SIMULATION_BACKLOG_SIZE_MAX,
+  SIMULATION_BACKLOG_SIZE_MIN,
+  SIMULATION_HORIZON_WEEKS_MAX,
+  SIMULATION_N_SIMS_MAX,
+  SIMULATION_N_SIMS_MIN,
+  SIMULATION_TARGET_WEEKS_MIN,
+} from "../../simulationLimits";
 import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
 
 export default function SimulationModeAndParametersControls() {
@@ -43,7 +51,8 @@ export default function SimulationModeAndParametersControls() {
           {s.simulationMode === "backlog_to_weeks" ? (
             <input
               type="number"
-              min="1"
+              min={SIMULATION_BACKLOG_SIZE_MIN}
+              max={SIMULATION_BACKLOG_SIZE_MAX}
               value={s.backlogSize}
               onChange={(e) => s.setBacklogSize(e.target.value)}
               className="sim-input sim-input--compact"
@@ -51,7 +60,8 @@ export default function SimulationModeAndParametersControls() {
           ) : (
             <input
               type="number"
-              min="1"
+              min={SIMULATION_TARGET_WEEKS_MIN}
+              max={SIMULATION_HORIZON_WEEKS_MAX}
               value={s.targetWeeks}
               onChange={(e) => s.setTargetWeeks(e.target.value)}
               className="sim-input sim-input--compact"
@@ -70,7 +80,8 @@ export default function SimulationModeAndParametersControls() {
           </label>
           <input
             type="number"
-            min="1000"
+            min={SIMULATION_N_SIMS_MIN}
+            max={SIMULATION_N_SIMS_MAX}
             step="1000"
             value={s.nSims}
             onChange={(e) => s.setNSims(e.target.value)}
@@ -81,5 +92,4 @@ export default function SimulationModeAndParametersControls() {
     </>
   );
 }
-
 

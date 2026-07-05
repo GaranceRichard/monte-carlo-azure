@@ -2824,7 +2824,7 @@ test.describe("e2e istanbul coverage", () => {
         includeZeroWeeks: true,
         mode: "backlog_to_weeks",
         backlogSize: 120,
-        nSims: 500,
+        nSims: 1000,
       });
 
       const itemsResult = simulationMod.simulateMonteCarloLocal({
@@ -2832,7 +2832,7 @@ test.describe("e2e istanbul coverage", () => {
         includeZeroWeeks: false,
         mode: "weeks_to_items",
         targetWeeks: 12,
-        nSims: 500,
+        nSims: 1000,
       });
 
       const histogramResult = simulationMod.simulateMonteCarloLocal({
@@ -2845,11 +2845,11 @@ test.describe("e2e istanbul coverage", () => {
 
       try {
         simulationMod.simulateMonteCarloLocal({
-          throughputSamples: [Number.NaN, Number.POSITIVE_INFINITY],
+          throughputSamples: [Number.NaN, Number.POSITIVE_INFINITY, -1, -2, -3, -4],
           includeZeroWeeks: true,
           mode: "backlog_to_weeks",
           backlogSize: 10,
-          nSims: 10,
+          nSims: 1000,
         });
       } catch (error) {
         invalidIncludeZeroError = String(error?.message || error);
@@ -2857,11 +2857,11 @@ test.describe("e2e istanbul coverage", () => {
 
       try {
         simulationMod.simulateMonteCarloLocal({
-          throughputSamples: [0, -1],
+          throughputSamples: [0, -1, -2, -3, -4, -5],
           includeZeroWeeks: false,
           mode: "backlog_to_weeks",
           backlogSize: 10,
-          nSims: 10,
+          nSims: 1000,
         });
       } catch (error) {
         invalidExcludeZeroError = String(error?.message || error);

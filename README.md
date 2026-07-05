@@ -39,6 +39,9 @@ Demo GitHub Pages:
 - support optionnel d'un `seed` de simulation pour rejouer exactement un tirage Monte Carlo
 - execution backend par lots pour borner la memoire sans allouer de matrice complete
   `n_sims x horizon`
+- contrat de simulation borne avant calcul: `n_sims` entre `1_000` et `200_000`,
+  `target_weeks` entre `1` et `521`, `throughput_samples` entre `6` et `521` valeurs,
+  `backlog_size` entre `1` et `1_000_000`
 - demo locale et simulations portefeuille reproductibles a `seed` identique
 - visualisation des percentiles et distributions
 - semantique metier des percentiles alignee sur le mode de simulation:

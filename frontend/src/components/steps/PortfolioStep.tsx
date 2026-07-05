@@ -1,4 +1,12 @@
 import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
+import {
+  SIMULATION_BACKLOG_SIZE_MAX,
+  SIMULATION_BACKLOG_SIZE_MIN,
+  SIMULATION_HORIZON_WEEKS_MAX,
+  SIMULATION_N_SIMS_MAX,
+  SIMULATION_N_SIMS_MIN,
+  SIMULATION_TARGET_WEEKS_MIN,
+} from "../../simulationLimits";
 import type { NamedEntity } from "../../types";
 import { usePortfolio } from "../../hooks/usePortfolio";
 
@@ -99,7 +107,8 @@ export default function PortfolioStep({
               <input
                 className="sim-input sim-input--center"
                 type="number"
-                min={1}
+                min={SIMULATION_BACKLOG_SIZE_MIN}
+                max={SIMULATION_BACKLOG_SIZE_MAX}
                 value={portfolio.backlogSize}
                 onChange={(e) => portfolio.setBacklogSize(Number(e.target.value) || 1)}
               />
@@ -110,7 +119,8 @@ export default function PortfolioStep({
               <input
                 className="sim-input sim-input--center"
                 type="number"
-                min={1}
+                min={SIMULATION_TARGET_WEEKS_MIN}
+                max={SIMULATION_HORIZON_WEEKS_MAX}
                 value={portfolio.targetWeeks}
                 onChange={(e) => portfolio.setTargetWeeks(Number(e.target.value) || 1)}
               />
@@ -121,8 +131,8 @@ export default function PortfolioStep({
             <input
               className="sim-input sim-input--center"
               type="number"
-              min={1000}
-              max={200000}
+              min={SIMULATION_N_SIMS_MIN}
+              max={SIMULATION_N_SIMS_MAX}
               value={portfolio.nSims}
               onChange={(e) => portfolio.setNSims(e.target.value)}
             />

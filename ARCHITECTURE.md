@@ -27,6 +27,9 @@ Le backend ne recoit que:
 - `throughput_samples`
 - `include_zero_weeks`
 - les parametres de simulation (`mode`, `backlog_size` / `target_weeks`, `n_sims`, `seed` optionnel)
+- bornes de contrat avant calcul: `throughput_samples` entre `6` et `521` valeurs,
+  `n_sims` entre `1_000` et `200_000`, `target_weeks` entre `1` et `521`,
+  `backlog_size` entre `1` et `1_000_000`
 - un cookie anonyme `IDMontecarlo` pour relier un historique statistique non contextualise
 
 Champs explicitement interdits a la frontiere backend/payload:

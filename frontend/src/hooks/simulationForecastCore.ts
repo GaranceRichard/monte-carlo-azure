@@ -8,6 +8,10 @@ import type {
 } from "../types";
 import { toSafeNumber } from "../utils/math";
 import {
+  SIMULATION_THROUGHPUT_SAMPLES_MIN,
+  validateSimulationInputContract,
+} from "../simulationLimits";
+import {
   computeRiskScoreFromPercentiles,
   generateSimulationSeed,
   simulateMonteCarloLocal,
@@ -73,7 +77,7 @@ export async function fetchTeamThroughputCore(
     zeroWeeks,
     usedWeeks: throughputSamples.length,
   };
-  if (throughputSamples.length < 6) {
+  if (throughputSamples.length < SIMULATION_THROUGHPUT_SAMPLES_MIN) {
     throw new Error(
       "Historique insuffisant pour une simulation fiable. Elargissez la periode selectionnee, verifiez les types et etats choisis, ou activez les semaines a 0 incluses.",
     );
@@ -102,6 +106,14 @@ export async function simulateForecastFromSamplesCore(
     nSims,
   } = params;
   const simulationSeed = seed ?? generateSimulationSeed();
+  const contract = validateSimulationInputContract({
+    throughputSamples,
+    includeZeroWeeks,
+    mode: simulationMode,
+    backlogSize,
+    targetWeeks,
+    nSims,
+  });
 
   if (demoMode) {
     return simulateMonteCarloLocal({
@@ -109,9 +121,9 @@ export async function simulateForecastFromSamplesCore(
       throughputSamples,
       includeZeroWeeks,
       mode: simulationMode,
-      backlogSize: simulationMode === "backlog_to_weeks" ? Number(backlogSize) : undefined,
-      targetWeeks: simulationMode === "weeks_to_items" ? Number(targetWeeks) : undefined,
-      nSims: Number(nSims),
+      backlogSize: contract.backlogSize,
+      targetWeeks: contract.targetWeeks,
+      nSims: contract.nSims,
     });
   }
 
@@ -119,9 +131,9 @@ export async function simulateForecastFromSamplesCore(
     throughput_samples: throughputSamples,
     include_zero_weeks: includeZeroWeeks,
     mode: simulationMode,
-    backlog_size: simulationMode === "backlog_to_weeks" ? Number(backlogSize) : undefined,
-    target_weeks: simulationMode === "weeks_to_items" ? Number(targetWeeks) : undefined,
-    n_sims: Number(nSims),
+    backlog_size: contract.backlogSize,
+    target_weeks: contract.targetWeeks,
+    n_sims: contract.nSims,
     seed: simulationSeed,
   };
 

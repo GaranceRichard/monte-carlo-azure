@@ -4,6 +4,10 @@
 
 ### Frontend
 
+- centralisation du contrat de bornes Monte Carlo dans `src/simulationLimits.ts` et alignement
+  des validations UI / simulation locale sur le backend: `n_sims` entre `1_000` et `200_000`,
+  `target_weeks` entre `1` et `521`, `throughput_samples` entre `6` et `521` valeurs,
+  `backlog_size` entre `1` et `1_000_000`, sans correction silencieuse des entrées invalides
 - correction de la semantique des simulations `backlog_to_weeks` censurees:
   percentiles identifies sur le rang dans `n_sims`, courbe de probabilite plafonnee
   au vrai taux de completion, `Risk Score` masque si `P50` ou `P90` manque
@@ -116,6 +120,10 @@
 
 ### Backend et tests
 
+- centralisation des bornes de contrat Monte Carlo dans `backend/simulation_limits.py` et
+  validation `422` explicite avant simulation pour `n_sims`, `target_weeks`,
+  `throughput_samples` et `backlog_size`, avec tests backend/frontend/E2E des bornes min/max
+  et maintien du moteur batché sans allocation globale `n_sims x horizon`
 - le moteur Monte Carlo backend n'alloue plus de matrice complete `n_sims x horizon`:
   les tirages sont maintenant executes par lots de taille centralisee avec un seul generateur
   pseudo-aleatoire par simulation, ce qui borne la memoire sans casser la reproductibilite

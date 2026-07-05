@@ -5,6 +5,8 @@ from typing import Dict, Literal, Optional, Tuple
 
 import numpy as np
 
+from .simulation_limits import SIMULATION_HORIZON_WEEKS_MAX
+
 SIMULATION_BATCH_SIZE = 2048
 
 
@@ -101,7 +103,7 @@ def mc_finish_weeks(
     rng = np.random.default_rng(seed)
 
     # Garde-fou historique: la version boucle stoppait au plus tard a 521 semaines.
-    max_weeks = 521
+    max_weeks = SIMULATION_HORIZON_WEEKS_MAX
     weeks_needed = np.full(n_sims, max_weeks, dtype=int)
     completed_mask = np.zeros(n_sims, dtype=bool)
 
