@@ -43,6 +43,7 @@ export type ThroughputReliability = {
 export type ForecastResponse = {
   result_kind: ForecastKind;
   samples_count: number;
+  seed: number;
   result_percentiles: Record<string, number>;
   risk_score?: number;
   result_distribution: ForecastHistogramBucket[];
@@ -56,4 +57,5 @@ export type ForecastRequestPayload = {
   backlog_size?: number;
   target_weeks?: number;
   n_sims: number;
+  seed?: number;
 };

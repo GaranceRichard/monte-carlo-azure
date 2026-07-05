@@ -4,6 +4,14 @@
 
 ### Frontend
 
+- propagation de la `seed` Monte Carlo dans tous les chemins de simulation frontend:
+  contrat `ForecastRequestPayload` / `ForecastResponse`, appel backend, moteur local demo,
+  rapport portefeuille, historique local et rejeu
+- generation d'une `seed` unique par execution logique frontend, conservee lors d'un rejeu
+  d'historique sans reutiliser l'identifiant d'entree comme graine
+- suppression des derniers `Math.random()` du moteur de simulation frontend au profit d'un
+  generateur pseudo-aleatoire deterministe seedé
+- compatibilite preservee avec les historiques locaux legacy depourvus de `seed`
 - `Cycle Time` exprime partout en jours calendaires cote frontend: calcul, types, noms de proprietes,
   graphiques, tooltips, cartes, demo et exports PDF
 - versionnement de l'historique local de simulation avec `schemaVersion`, migration idempotente

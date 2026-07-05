@@ -16,6 +16,7 @@ export type SimulationStatsHistoryItem = {
   created_at: string;
   last_seen: string;
   mode: "backlog_to_weeks" | "weeks_to_items";
+  seed?: number | null;
   backlog_size?: number | null;
   target_weeks?: number | null;
   n_sims: number;

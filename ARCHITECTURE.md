@@ -247,8 +247,12 @@ Les champs autorises en base sont:
 - l'historique detaille reste contextualise par equipe dans le navigateur
 - le frontend ne recharge plus l'historique Mongo pour le melanger a cet historique local
 - les entrees locales portent un `schemaVersion` explicite
+- les nouvelles entrees locales portent aussi la `seed` effectivement utilisee par l'execution
+  Monte Carlo frontend ou backend
+- un rejeu local reapplique cette meme `seed` tant que les parametres de simulation ne changent pas
 - la version courante migre les anciennes entrees sans version en interpretant leurs
   anciennes valeurs `Cycle Time` comme des semaines legacy a convertir en jours calendaires
+- les historiques legacy sans `seed` restent compatibles; ils sont restaures avec `seed = null`
 - la migration est idempotente: seules les entrees legacy sans version sont multipliees par `7`
 - cette migration ne modifie ni le throughput hebdomadaire, ni les modes Monte Carlo en semaines,
   ni `target_weeks`
@@ -311,6 +315,8 @@ Frontend:
 - orchestration App allegée via `src/AppFlowContent.tsx`, `src/appNavigation.ts`, `src/appShellSections.tsx` et `src/appTheme.ts`
 - facade API allegee via `src/apiHelpers.ts` pour conserver des perimetres vitals plus stables
 - logique forecast scindee entre facade `src/hooks/simulationForecastService.ts` et coeur `src/hooks/simulationForecastCore.ts`
+- moteur Monte Carlo frontend et scenarios portefeuille desormais pilotes par une `seed`
+  explicite unique par execution logique, sans `Math.random()` dans les calculs de simulation
 - calcul du cycle time extrait dans `src/utils/cycleTime.ts` avec couverture unitaire ciblee,
   en jours calendaires pour les restitutions frontend
 - quick filters persistants par scope `org::project::team`

@@ -37,6 +37,7 @@ Demo GitHub Pages:
 - mode `Portefeuille` multi-equipes
 - simulation Monte Carlo cote backend (`POST /simulate`)
 - support optionnel d'un `seed` de simulation pour rejouer exactement un tirage Monte Carlo
+- demo locale et simulations portefeuille reproductibles a `seed` identique
 - visualisation des percentiles et distributions
 - semantique metier des percentiles alignee sur le mode de simulation:
   - `backlog_to_weeks`: `P90` = 90% des simulations finissent en `P90` semaines ou moins
@@ -108,6 +109,11 @@ les modes `backlog_to_weeks` / `weeks_to_items` et `target_weeks` restent exprim
 L'historique local des simulations embarque aussi un `schemaVersion`; les anciennes entrees
 sans version sont migrees une seule fois au chargement en convertissant leurs anciennes
 valeurs `Cycle Time` stockees en semaines vers des jours calendaires (`* 7`).
+Les nouvelles entrees locales embarquent aussi leur `seed`: une nouvelle simulation frontend
+genere une seule `seed` par execution logique, la transmet au backend si besoin, l'utilise
+dans le moteur demo / portefeuille, puis la conserve lors d'un rejeu local. Les historiques
+plus anciens sans `seed` restent lisibles et rejouables, mais sans promesse de reproductibilite
+bit a bit.
 
 ---
 
@@ -325,6 +331,8 @@ Comportement du `seed` de simulation:
 - a payload identique, renvoyer le meme `seed` reproduit strictement le meme resultat de simulation
 - si aucun `seed` n'est fourni, le backend en genere un automatiquement et le renvoie dans la reponse
 - l'historique Mongo persiste aussi ce `seed` pour faciliter l'analyse a posteriori d'une simulation
+- cote frontend, une execution logique ne consomme qu'une seule `seed`; le rejeu d'une entree
+  locale reemploie cette meme `seed` tant que ses parametres restent inchanges
 
 Purge planifiee:
 

@@ -23,8 +23,28 @@ export function computeFrictionRatePercent(teamCount: number, alignmentRate: num
   return Math.round(computeFrictionFactor(teamCount, alignmentRate) * 100);
 }
 
-function pickBootstrapSample(samples: number[]): number {
-  const randomIndex = Math.floor(Math.random() * samples.length);
+export const SIMULATION_SEED_MAX = 0xffffffff;
+
+export function createSeededRandom(seed: number): () => number {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) | 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+export function generateSimulationSeed(): number {
+  const cryptoApi = globalThis.crypto;
+  if (cryptoApi?.getRandomValues) {
+    return cryptoApi.getRandomValues(new Uint32Array(1))[0] ?? 0;
+  }
+  return Date.now() >>> 0;
+}
+
+function pickBootstrapSample(samples: number[], random: () => number): number {
+  const randomIndex = Math.floor(random() * samples.length);
   return samples[randomIndex] ?? 0;
 }
 
@@ -39,29 +59,6 @@ function percentile(values: number[], p: number): number {
   const lowerValue = sorted[lower] ?? 0;
   const upperValue = sorted[upper] ?? lowerValue;
   return lowerValue + (upperValue - lowerValue) * weight;
-}
-
-function createSeededRandom(seed: number): () => number {
-  let state = seed >>> 0;
-  return () => {
-    state = (state + 0x6d2b79f5) | 0;
-    let t = Math.imul(state ^ (state >>> 15), 1 | state);
-    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function buildSeed(
-  throughputSamples: number[],
-  mode: ForecastMode,
-  nSims: number,
-  targetValue: number,
-  includeZeroWeeks: boolean,
-): number {
-  const seedBase = throughputSamples.reduce((sum, value, index) => sum + value * (index + 3), 17);
-  const modeOffset = mode === "backlog_to_weeks" ? 101 : 211;
-  const includeOffset = includeZeroWeeks ? 307 : 401;
-  return (seedBase + modeOffset + includeOffset + nSims * 13 + targetValue * 17) >>> 0;
 }
 
 function normalizeSamples(samples: number[], includeZeroWeeks: boolean): number[] {
@@ -135,6 +132,7 @@ export function simulateMonteCarloLocal({
   backlogSize,
   targetWeeks,
   nSims,
+  seed,
 }: {
   throughputSamples: number[];
   includeZeroWeeks?: boolean;
@@ -142,12 +140,12 @@ export function simulateMonteCarloLocal({
   backlogSize?: number;
   targetWeeks?: number;
   nSims: number;
+  seed: number;
 }): ForecastResponse {
   const samples = normalizeSamples(throughputSamples, includeZeroWeeks);
   const safeNSims = Math.max(1, Math.floor(nSims));
   const safeBacklog = Math.max(1, Math.floor(backlogSize ?? 0));
   const safeWeeks = Math.max(1, Math.floor(targetWeeks ?? 0));
-  const seed = buildSeed(samples, mode, safeNSims, mode === "backlog_to_weeks" ? safeBacklog : safeWeeks, includeZeroWeeks);
   const random = createSeededRandom(seed);
   const results = new Array<number>(safeNSims);
 
@@ -175,6 +173,7 @@ export function simulateMonteCarloLocal({
   return {
     result_kind: mode === "backlog_to_weeks" ? "weeks" : "items",
     samples_count: samples.length,
+    seed,
     result_percentiles: resultPercentiles,
     risk_score: Number(
       computeRiskScoreFromPercentiles(mode, resultPercentiles).toFixed(4),
@@ -184,7 +183,7 @@ export function simulateMonteCarloLocal({
   };
 }
 
-export function buildScenarioSamples(teamSamples: number[][], alignmentRate: number): ScenarioSamples {
+export function buildScenarioSamples(teamSamples: number[][], alignmentRate: number, seed: number): ScenarioSamples {
   if (!teamSamples.length) {
     throw new Error("buildScenarioSamples: teamSamples ne peut pas etre vide.");
   }
@@ -196,12 +195,13 @@ export function buildScenarioSamples(teamSamples: number[][], alignmentRate: num
   const teamCount = teamSamples.length;
   const safeRate = normalizeAlignmentRate(alignmentRate);
   const frictionFactor = computeFrictionFactor(teamCount, alignmentRate);
+  const random = createSeededRandom(seed);
   const optimistic: number[] = [];
   const aligned: number[] = [];
   const friction: number[] = [];
 
   for (let index = 0; index < maxLength; index += 1) {
-    const draws = teamSamples.map((samples) => pickBootstrapSample(samples));
+    const draws = teamSamples.map((samples) => pickBootstrapSample(samples, random));
     const optimisticValue = draws.reduce((sum, value) => sum + value, 0);
     const alignedValue = teamCount === 1 ? optimisticValue : Math.floor(optimisticValue * safeRate);
     const frictionValue = Math.floor(optimisticValue * frictionFactor);

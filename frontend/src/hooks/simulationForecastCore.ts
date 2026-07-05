@@ -7,7 +7,11 @@ import type {
   ForecastResponse,
 } from "../types";
 import { toSafeNumber } from "../utils/math";
-import { computeRiskScoreFromPercentiles, simulateMonteCarloLocal } from "../utils/simulation";
+import {
+  computeRiskScoreFromPercentiles,
+  generateSimulationSeed,
+  simulateMonteCarloLocal,
+} from "../utils/simulation";
 import type {
   FetchTeamThroughputParams,
   FetchTeamThroughputResult,
@@ -89,6 +93,7 @@ export async function simulateForecastFromSamplesCore(
 ): Promise<ForecastResponse> {
   const {
     demoMode = false,
+    seed,
     throughputSamples,
     includeZeroWeeks = true,
     simulationMode,
@@ -96,9 +101,11 @@ export async function simulateForecastFromSamplesCore(
     targetWeeks,
     nSims,
   } = params;
+  const simulationSeed = seed ?? generateSimulationSeed();
 
   if (demoMode) {
     return simulateMonteCarloLocal({
+      seed: simulationSeed,
       throughputSamples,
       includeZeroWeeks,
       mode: simulationMode,
@@ -115,12 +122,14 @@ export async function simulateForecastFromSamplesCore(
     backlog_size: simulationMode === "backlog_to_weeks" ? Number(backlogSize) : undefined,
     target_weeks: simulationMode === "weeks_to_items" ? Number(targetWeeks) : undefined,
     n_sims: Number(nSims),
+    seed: simulationSeed,
   };
 
   const response = await postSimulate(payload);
   return {
     result_kind: response.result_kind,
     samples_count: response.samples_count,
+    seed: response.seed,
     result_percentiles: response.result_percentiles,
     risk_score: Number(response.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, response.result_percentiles)),
     result_distribution: (response.result_distribution ?? []) as ForecastHistogramBucket[],
@@ -133,6 +142,7 @@ export async function runSimulationForecastCore(
 ): Promise<RunSimulationForecastResult> {
   const {
     demoMode = false,
+    seed,
     selectedOrg,
     selectedProject,
     selectedTeam,
@@ -165,6 +175,7 @@ export async function runSimulationForecastCore(
 
   const adjusted = await simulateForecastFromSamplesCore({
     demoMode,
+    seed,
     throughputSamples: throughputData.throughputSamples,
     includeZeroWeeks,
     simulationMode,
@@ -175,7 +186,8 @@ export async function runSimulationForecastCore(
 
   const historyEntry: SimulationHistoryEntry = {
     schemaVersion: 2,
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${adjusted.seed}-${generateSimulationSeed()}`,
+    seed: adjusted.seed,
     createdAt: new Date().toISOString(),
     selectedOrg,
     selectedProject,

@@ -50,6 +50,7 @@ describe("useSimulationChartData", () => {
         result: {
           result_kind: "weeks",
           samples_count: 4,
+          seed: 1,
           result_percentiles: { P50: 10, P70: 12, P90: 15 },
           result_distribution: [
             { x: 15, count: 1 },
@@ -93,6 +94,7 @@ describe("useSimulationChartData", () => {
         result: {
           result_kind: "items",
           samples_count: 3,
+          seed: 2,
           result_percentiles: { P50: 1, P70: 2, P90: 3 },
           result_distribution: [
             { x: Number.NaN, count: 1 },
@@ -121,6 +123,7 @@ describe("useSimulationChartData", () => {
         result: {
           result_kind: "items",
           samples_count: 5,
+          seed: 3,
           result_percentiles: { P50: 24, P70: 22, P90: 18 },
           result_distribution: [
             { x: 18, count: 1 },
@@ -148,6 +151,7 @@ describe("useSimulationChartData", () => {
         result: {
           result_kind: "items",
           samples_count: 5,
+          seed: 4,
           result_percentiles: { P50: 24, P70: 25, P90: 27 },
           result_distribution: [
             { x: 18, count: 1 },

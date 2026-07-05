@@ -66,6 +66,35 @@ export type SimulationViewModel = SimulationForecastControls &
   resetAll: () => void;
 };
 
+type SimulationReplayContext = {
+  seed: number;
+  fingerprint: string;
+};
+
+function buildSimulationFingerprint(params: {
+  selectedOrg: string;
+  selectedProject: string;
+  selectedTeam: string;
+  startDate: string;
+  endDate: string;
+  simulationMode: "backlog_to_weeks" | "weeks_to_items";
+  includeZeroWeeks: boolean;
+  backlogSize: number | string;
+  targetWeeks: number | string;
+  nSims: number | string;
+  types: string[];
+  doneStates: string[];
+}): string {
+  return JSON.stringify({
+    ...params,
+    backlogSize: Number(params.backlogSize),
+    targetWeeks: Number(params.targetWeeks),
+    nSims: Number(params.nSims),
+    types: [...params.types],
+    doneStates: [...params.doneStates],
+  });
+}
+
 export function useSimulation({
   demoMode = false,
   step,
@@ -117,6 +146,7 @@ export function useSimulation({
   const [cycleTimeDaysData, setCycleTimeDaysData] = useState<CycleTimePoint[]>([]);
   const [activeChartTab, setActiveChartTab] = useState<ChartTab>("cycle_time");
   const [hasLaunchedOnce, setHasLaunchedOnce] = useState(false);
+  const [replayContext, setReplayContext] = useState<SimulationReplayContext | null>(null);
 
   const { throughputData, cycleTimeDaysData: cycleTimeChartData, cycleTimeTrendData, cycleTimeSummary, mcHistData, probabilityCurveData, displayPercentiles } = useSimulationChartData({
     weeklyThroughput,
@@ -221,8 +251,23 @@ export function useSimulation({
     }, 1200);
 
     try {
+      const currentFingerprint = buildSimulationFingerprint({
+        selectedOrg,
+        selectedProject,
+        selectedTeam,
+        startDate,
+        endDate,
+        simulationMode,
+        includeZeroWeeks,
+        backlogSize,
+        targetWeeks,
+        nSims,
+        types,
+        doneStates,
+      });
       const forecast = await runSimulationForecast({
         demoMode,
+        seed: replayContext?.fingerprint === currentFingerprint ? replayContext.seed : undefined,
         selectedOrg,
         selectedProject,
         selectedTeam,
@@ -272,6 +317,7 @@ export function useSimulation({
     startDate,
     targetWeeks,
     types,
+    replayContext,
   ]);
 
   useEffect(() => {
@@ -306,6 +352,7 @@ export function useSimulation({
     clearComputedSimulationState();
     setHasLaunchedOnce(false);
     resetAutoRunState();
+    setReplayContext(null);
   }
 
   function resetAll(): void {
@@ -317,6 +364,7 @@ export function useSimulation({
     resetTeamOptions();
     setHasLaunchedOnce(false);
     resetAutoRunState();
+    setReplayContext(null);
   }
 
   function applyHistoryEntry(entry: SimulationHistoryEntry): void {
@@ -338,6 +386,27 @@ export function useSimulation({
     setActiveChartTab("cycle_time");
     setHasLaunchedOnce(true);
     resetAutoRunState();
+    if (entry.seed != null) {
+      setReplayContext({
+        seed: entry.seed,
+        fingerprint: buildSimulationFingerprint({
+          selectedOrg: entry.selectedOrg,
+          selectedProject: entry.selectedProject,
+          selectedTeam: entry.selectedTeam,
+          startDate: entry.startDate,
+          endDate: entry.endDate,
+          simulationMode: entry.simulationMode,
+          includeZeroWeeks: entry.includeZeroWeeks,
+          backlogSize: entry.backlogSize,
+          targetWeeks: entry.targetWeeks,
+          nSims: entry.nSims,
+          types: entry.types,
+          doneStates: entry.doneStates,
+        }),
+      });
+    } else {
+      setReplayContext(null);
+    }
   }
 
   function resetSimulationResults(): void {
@@ -346,6 +415,7 @@ export function useSimulation({
     clearComputedSimulationState();
     setHasLaunchedOnce(false);
     resetAutoRunState();
+    setReplayContext(null);
   }
 
   return {

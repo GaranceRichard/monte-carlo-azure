@@ -28,6 +28,7 @@ function baseArgs(): PortfolioPrintReportArgs {
       {
         label: "Optimiste" as const,
         hypothesis: "hyp optimistic",
+        seed: 101,
         samples: [3, 4, 5],
         weeklyData: [
           { week: "2026-01-01", throughput: 3 },
@@ -42,6 +43,7 @@ function baseArgs(): PortfolioPrintReportArgs {
       {
         label: "Arrime (80%)" as const,
         hypothesis: "hyp aligned",
+        seed: 102,
         samples: [2, 3, 4],
         weeklyData: [
           { week: "2026-01-01", throughput: 2 },
@@ -56,6 +58,7 @@ function baseArgs(): PortfolioPrintReportArgs {
       {
         label: "Friction (80%)" as const,
         hypothesis: "hyp friction",
+        seed: 103,
         samples: [1.5, 2, 2.5],
         weeklyData: [
           { week: "2026-01-01", throughput: 1.5 },
@@ -70,6 +73,7 @@ function baseArgs(): PortfolioPrintReportArgs {
       {
         label: "Historique corr\u00E9l\u00E9" as const,
         hypothesis: "hyp correlated",
+        seed: 104,
         samples: [1, 2, 3],
         weeklyData: [
           { week: "2026-01-01", throughput: 1 },
@@ -85,6 +89,7 @@ function baseArgs(): PortfolioPrintReportArgs {
     sections: [
       {
         selectedTeam: "Team A",
+        seed: 201,
         simulationMode: "backlog_to_weeks" as const,
         includeZeroWeeks: true,
         backlogSize: 120,
@@ -276,6 +281,7 @@ describe("portfolioPrintReport", () => {
         {
           label: "Optimiste",
           hypothesis: "hyp optimistic",
+          seed: 301,
           samples: [3, 4, 5],
           weeklyData: [{ week: "2026-01-01", throughput: 3 }],
           percentiles: {} as Record<string, number>,
@@ -287,6 +293,7 @@ describe("portfolioPrintReport", () => {
         {
           label: "Historique corr\u00E9l\u00E9",
           hypothesis: "hyp correlated",
+          seed: 302,
           samples: [1, 2, 3],
           weeklyData: [{ week: "2026-01-01", throughput: 1 }],
           percentiles: {} as Record<string, number>,

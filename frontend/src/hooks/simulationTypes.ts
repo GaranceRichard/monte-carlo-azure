@@ -42,6 +42,7 @@ export type StoredSimulationPrefs = {
 export type SimulationHistoryEntry = {
   schemaVersion: 2;
   id: string;
+  seed: number | null;
   createdAt: string;
   selectedOrg: string;
   selectedProject: string;
@@ -100,6 +101,7 @@ export type ChartTab = "cycle_time" | "throughput" | "distribution" | "probabili
 export type PortfolioScenarioResult = {
   label: "Optimiste" | `Arrime (${number}%)` | `Friction (${number}%)` | "Historique corr\u00E9l\u00E9";
   hypothesis: string;
+  seed: number;
   samples: number[];
   weeklyData: WeeklyThroughputRow[];
   percentiles: Record<string, number>;

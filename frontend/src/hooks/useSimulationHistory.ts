@@ -55,6 +55,7 @@ function migrateSimulationHistoryEntry(entry: LegacySimulationHistoryEntry): Sim
   return {
     schemaVersion: CURRENT_SIM_HISTORY_SCHEMA_VERSION,
     id: String(entry.id ?? ""),
+    seed: typeof entry.seed === "number" && Number.isFinite(entry.seed) ? entry.seed : null,
     createdAt: String(entry.createdAt ?? ""),
     selectedOrg: String(entry.selectedOrg ?? ""),
     selectedProject: String(entry.selectedProject ?? ""),
@@ -74,6 +75,7 @@ function migrateSimulationHistoryEntry(entry: LegacySimulationHistoryEntry): Sim
     result: (entry.result ?? {
       result_kind: "weeks",
       samples_count: 0,
+      seed: 0,
       result_percentiles: {},
       result_distribution: [],
     }) as SimulationHistoryEntry["result"],

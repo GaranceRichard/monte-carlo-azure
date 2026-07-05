@@ -16,6 +16,7 @@ function buildLocalEntry(
   return {
     schemaVersion: 2,
     id: "local-1",
+    seed: 123456,
     createdAt: "2026-03-01T10:00:00Z",
     selectedOrg: "org-demo",
     selectedProject: "Projet A",
@@ -34,6 +35,7 @@ function buildLocalEntry(
     result: {
       result_kind: "weeks",
       samples_count: 24,
+      seed: 123456,
       result_percentiles: { P50: 7, P70: 9, P90: 12 },
       risk_score: 0.71,
       result_distribution: [],
@@ -128,6 +130,7 @@ describe("useSimulationHistory", () => {
         {
           schemaVersion: 2,
           id: "local-2",
+          seed: null,
           createdAt: "2026-03-02T10:00:00Z",
           selectedOrg: "org-demo",
           selectedProject: "Projet A",
@@ -150,6 +153,7 @@ describe("useSimulationHistory", () => {
           result: {
             result_kind: "weeks",
             samples_count: 0,
+            seed: 0,
             result_percentiles: {},
             result_distribution: [],
           },
@@ -193,6 +197,7 @@ describe("useSimulationHistory", () => {
         {
           schemaVersion: 2,
           id: "local-3",
+          seed: null,
           createdAt: "2026-03-03T10:00:00Z",
           selectedOrg: "org-demo",
           selectedProject: "Projet A",
@@ -212,6 +217,7 @@ describe("useSimulationHistory", () => {
           result: {
             result_kind: "weeks",
             samples_count: 0,
+            seed: 0,
             result_percentiles: {},
             result_distribution: [],
           },

@@ -94,6 +94,7 @@ function buildSimulation(overrides: Partial<Record<string, unknown>> = {}) {
   return {
     result: {
       result_kind: "weeks",
+      seed: 123,
       throughput_reliability: {
         label: "fiable",
         cv: 0.12,
@@ -228,7 +229,7 @@ describe("SimulationChartTabs", () => {
     simulationContextValue = {
       selectedTeam: "Team Alpha",
       simulation: buildSimulation({
-        result: { result_kind: "weeks" },
+        result: { result_kind: "weeks", seed: 234 },
       }),
     };
 
@@ -243,7 +244,7 @@ describe("SimulationChartTabs", () => {
     simulationContextValue = {
       selectedTeam: "Team Alpha",
       simulation: buildSimulation({
-        result: { result_kind: "weeks" },
+        result: { result_kind: "weeks", seed: 345 },
       }),
     };
 
@@ -365,6 +366,7 @@ describe("SimulationChartTabs", () => {
       simulation: buildSimulation({
         result: {
           result_kind: "weeks",
+          seed: 456,
           throughput_reliability: {
             label: "mystere",
             cv: 0.33,
@@ -405,6 +407,7 @@ describe("SimulationChartTabs", () => {
       simulation: buildSimulation({
         result: {
           result_kind: "items",
+          seed: 567,
           throughput_reliability: {
             label: "incertain",
             cv: 0.42,

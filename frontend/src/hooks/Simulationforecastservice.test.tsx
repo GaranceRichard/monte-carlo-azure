@@ -23,6 +23,7 @@ const WEEKLY_6 = [
 const API_RESPONSE_WEEKS = {
   result_kind: "weeks" as const,
   samples_count: 6,
+  seed: 111,
   result_percentiles: { P50: 8, P70: 10, P90: 13 },
   throughput_reliability: { cv: 0.22, iqr_ratio: 0.3, slope_norm: -0.02, label: "fiable" as const, samples_count: 6 },
   result_distribution: [
@@ -36,6 +37,7 @@ const API_RESPONSE_WEEKS = {
 const API_RESPONSE_ITEMS = {
   result_kind: "items" as const,
   samples_count: 6,
+  seed: 222,
   result_percentiles: { P50: 30, P70: 35, P90: 40 },
   throughput_reliability: { cv: 0.65, iqr_ratio: 0.7, slope_norm: -0.08, label: "incertain" as const, samples_count: 6 },
   result_distribution: [
@@ -269,6 +271,7 @@ describe("appels réseau", () => {
     vi.mocked(postSimulate).mockResolvedValue({
       result_kind: "weeks",
       samples_count: 6,
+      seed: 333,
       result_percentiles: { P50: 8, P70: 10, P90: 13 },
       risk_score: 0.25,
       throughput_reliability: { cv: 0.22, iqr_ratio: 0.3, slope_norm: -0.02, label: "fiable", samples_count: 6 },

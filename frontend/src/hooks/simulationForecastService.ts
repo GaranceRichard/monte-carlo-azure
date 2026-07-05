@@ -8,6 +8,7 @@ import {
 
 export type RunSimulationForecastParams = {
   demoMode?: boolean;
+  seed?: number;
   selectedOrg: string;
   selectedProject: string;
   selectedTeam: string;
@@ -57,6 +58,7 @@ export type FetchTeamThroughputParams = {
 
 export type SimulateFromSamplesParams = {
   demoMode?: boolean;
+  seed?: number;
   throughputSamples: number[];
   includeZeroWeeks?: boolean;
   simulationMode: ForecastMode;

@@ -48,6 +48,7 @@ function getScenarioOrder(label: PortfolioScenarioResult["label"]): number {
 
 type PortfolioSectionInput = {
   selectedTeam: string;
+  seed: number;
   simulationMode: "backlog_to_weeks" | "weeks_to_items";
   includeZeroWeeks: boolean;
   backlogSize: number;

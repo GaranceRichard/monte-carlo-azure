@@ -15,6 +15,7 @@ import {
   computeRiskLegend,
   computeRiskScoreFromPercentiles,
   computeThroughputReliability,
+  generateSimulationSeed,
 } from "../utils/simulation";
 
 export type TeamPortfolioConfig = {
@@ -32,6 +33,7 @@ export type TeamReportError = {
 
 export type PortfolioReportSection = {
   selectedTeam: string;
+  seed: number;
   simulationMode: ForecastMode;
   includeZeroWeeks: boolean;
   backlogSize: number;
@@ -134,6 +136,7 @@ function toScenarioResult(
   return {
     label,
     hypothesis,
+    seed: result.seed,
     samples,
     weeklyData,
     percentiles,
@@ -237,10 +240,14 @@ export function usePortfolioReport({
       }
 
       // Phase 2: run team + portfolio scenario simulations in parallel.
-      const scenarioSamples = buildScenarioSamples(
-        successfulTeams.map((team) => team.data.throughputSamples),
-        alignmentRate,
-      );
+      const seedBySimulation = {
+        teams: successfulTeams.map(() => generateSimulationSeed()),
+        optimistic: generateSimulationSeed(),
+        aligned: generateSimulationSeed(),
+        friction: generateSimulationSeed(),
+        correlated: generateSimulationSeed(),
+      };
+      const scenarioSamples = buildScenarioSamples(successfulTeams.map((team) => team.data.throughputSamples), alignmentRate, seedBySimulation.optimistic);
       const correlatedWeeklyData = buildCorrelatedPortfolioWeeklyThroughputs(
         successfulTeams.map((team) => team.data.weeklyThroughput),
         includeZeroWeeks,
@@ -260,10 +267,11 @@ export function usePortfolioReport({
       };
 
       const simulationSettled = await Promise.allSettled([
-        ...successfulTeams.map(async ({ cfg, data }) => {
+        ...successfulTeams.map(async ({ cfg, data }, teamIndex) => {
           try {
             const result = await simulateForecastFromSamples({
               demoMode,
+              seed: seedBySimulation.teams[teamIndex],
               throughputSamples: data.throughputSamples,
               includeZeroWeeks,
               simulationMode,
@@ -275,6 +283,7 @@ export function usePortfolioReport({
               kind: "team" as const,
               section: {
                 selectedTeam: cfg.teamName,
+                seed: result.seed,
                 simulationMode,
                 includeZeroWeeks,
                 backlogSize: Number(backlogSize),
@@ -306,6 +315,7 @@ export function usePortfolioReport({
           try {
             const result = await simulateForecastFromSamples({
               demoMode,
+              seed: seedBySimulation.optimistic,
               throughputSamples: scenarioSamples.optimistic,
               includeZeroWeeks: true,
               simulationMode,
@@ -334,6 +344,7 @@ export function usePortfolioReport({
           try {
             const result = await simulateForecastFromSamples({
               demoMode,
+              seed: seedBySimulation.aligned,
               throughputSamples: scenarioSamples.aligned,
               includeZeroWeeks: true,
               simulationMode,
@@ -362,6 +373,7 @@ export function usePortfolioReport({
           try {
             const result = await simulateForecastFromSamples({
               demoMode,
+              seed: seedBySimulation.friction,
               throughputSamples: scenarioSamples.friction,
               includeZeroWeeks: true,
               simulationMode,
@@ -390,6 +402,7 @@ export function usePortfolioReport({
           try {
             const result = await simulateForecastFromSamples({
               demoMode,
+              seed: seedBySimulation.correlated,
               throughputSamples: correlatedSamples,
               includeZeroWeeks: true,
               simulationMode,

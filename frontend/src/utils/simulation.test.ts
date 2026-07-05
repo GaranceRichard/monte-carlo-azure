@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   buildCorrelatedPortfolioSamples,
   buildCorrelatedPortfolioWeeklyThroughputs,
@@ -9,6 +9,7 @@ import {
   computeRiskLegend,
   computeRiskScoreFromPercentiles,
   computeThroughputReliability,
+  generateSimulationSeed,
   getProjectionReliabilityNotice,
   simulateMonteCarloLocal,
 } from "./simulation";
@@ -41,59 +42,41 @@ describe("computeRiskScoreFromPercentiles", () => {
 
 describe("buildScenarioSamples", () => {
   it("clamps alignment rate before computing aligned and friction samples", () => {
-    const randomSpy = vi.spyOn(Math, "random");
-    randomSpy.mockReturnValue(0);
-
-    expect(buildScenarioSamples([[5], [7]], -25)).toEqual({
+    expect(buildScenarioSamples([[5], [7]], -25, 123)).toEqual({
       optimistic: [12],
       aligned: [0],
       friction: [0],
     });
-    expect(buildScenarioSamples([[5], [7]], 140)).toEqual({
+    expect(buildScenarioSamples([[5], [7]], 140, 123)).toEqual({
       optimistic: [12],
       aligned: [12],
       friction: [12],
     });
-
-    randomSpy.mockRestore();
   });
 
   it("builds optimistic, aligned and friction samples for 2 teams", () => {
-    const randomSpy = vi.spyOn(Math, "random");
-    randomSpy
-      .mockReturnValueOnce(0.1) // team1 -> 10
-      .mockReturnValueOnce(0.8) // team2 -> 200
-      .mockReturnValueOnce(0.6) // team1 -> 30
-      .mockReturnValueOnce(0.2) // team2 -> 100
-      .mockReturnValueOnce(0.3) // team1 -> 10
-      .mockReturnValueOnce(0.9); // team2 -> 200
-
     const scenarios = buildScenarioSamples(
       [
         [10, 20, 30],
         [100, 200],
       ],
       80,
+      1431655765,
     );
 
-    expect(scenarios.optimistic).toEqual([210, 120, 210]);
-    expect(scenarios.aligned).toEqual([168, 96, 168]);
-    expect(scenarios.friction).toEqual([168, 96, 168]);
+    expect(scenarios.optimistic).toEqual([130, 120, 110]);
+    expect(scenarios.aligned).toEqual([104, 96, 88]);
+    expect(scenarios.friction).toEqual([104, 96, 88]);
     expect(scenarios.optimistic).toHaveLength(3);
     expect(scenarios.aligned).toHaveLength(3);
     expect(scenarios.friction).toHaveLength(3);
-    randomSpy.mockRestore();
   });
 
   it("uses same values for all scenarios with 1 team", () => {
-    const randomSpy = vi.spyOn(Math, "random");
-    randomSpy.mockReturnValue(0.1);
-
-    const scenarios = buildScenarioSamples([[5, 8, 13]], 20);
+    const scenarios = buildScenarioSamples([[5, 8, 13]], 20, 123);
 
     expect(scenarios.optimistic).toEqual(scenarios.aligned);
     expect(scenarios.aligned).toEqual(scenarios.friction);
-    randomSpy.mockRestore();
   });
 
   it("applies no friction penalty with one team, then starts at the second team", () => {
@@ -114,13 +97,10 @@ describe("buildScenarioSamples", () => {
   });
 
   it("keeps the displayed friction percent aligned with the rounded sample factor", () => {
-    const randomSpy = vi.spyOn(Math, "random");
-    randomSpy.mockReturnValue(0.1);
-
-    const oneTeam = buildScenarioSamples([[101]], 80);
-    const twoTeams = buildScenarioSamples([[101], [100]], 80);
-    const threeTeams = buildScenarioSamples([[101], [100], [100]], 80);
-    const fourTeams = buildScenarioSamples([[101], [100], [100], [100]], 80);
+    const oneTeam = buildScenarioSamples([[101]], 80, 123);
+    const twoTeams = buildScenarioSamples([[101], [100]], 80, 123);
+    const threeTeams = buildScenarioSamples([[101], [100], [100]], 80, 123);
+    const fourTeams = buildScenarioSamples([[101], [100], [100], [100]], 80, 123);
 
     expect(oneTeam.friction).toEqual([101]);
     expect(twoTeams.friction).toEqual([160]);
@@ -132,17 +112,63 @@ describe("buildScenarioSamples", () => {
     expect(Math.round((threeTeams.friction[0] / threeTeams.optimistic[0]) * 100)).toBe(computeFrictionRatePercent(3, 80));
     expect(Math.round((fourTeams.friction[0] / fourTeams.optimistic[0]) * 100)).toBe(computeFrictionRatePercent(4, 80));
 
-    randomSpy.mockRestore();
   });
 
   it("throws explicit error when teamSamples is empty", () => {
-    expect(() => buildScenarioSamples([], 100)).toThrow("teamSamples ne peut pas etre vide");
+    expect(() => buildScenarioSamples([], 100, 123)).toThrow("teamSamples ne peut pas etre vide");
   });
 
   it("throws explicit error when a team has no samples", () => {
-    expect(() => buildScenarioSamples([[1, 2], []], 100)).toThrow(
+    expect(() => buildScenarioSamples([[1, 2], []], 100, 123)).toThrow(
       "chaque equipe doit contenir au moins un sample",
     );
+  });
+});
+
+describe("generateSimulationSeed", () => {
+  it("uses crypto.getRandomValues when available", () => {
+    const originalCrypto = globalThis.crypto;
+    Object.defineProperty(globalThis, "crypto", {
+      configurable: true,
+      value: {
+        getRandomValues(target: Uint32Array) {
+          target[0] = 424242;
+          return target;
+        },
+      },
+    });
+
+    expect(generateSimulationSeed()).toBe(424242);
+
+    Object.defineProperty(globalThis, "crypto", {
+      configurable: true,
+      value: originalCrypto,
+    });
+  });
+
+  it("falls back to Date.now when crypto.getRandomValues is unavailable", () => {
+    const originalCrypto = globalThis.crypto;
+    const originalDateNow = Date.now;
+    Object.defineProperty(Date, "now", {
+      configurable: true,
+      value: () => 9876543210,
+    });
+
+    Object.defineProperty(globalThis, "crypto", {
+      configurable: true,
+      value: undefined,
+    });
+
+    expect(generateSimulationSeed()).toBe(1286608618);
+
+    Object.defineProperty(globalThis, "crypto", {
+      configurable: true,
+      value: originalCrypto,
+    });
+    Object.defineProperty(Date, "now", {
+      configurable: true,
+      value: originalDateNow,
+    });
   });
 });
 
@@ -224,19 +250,13 @@ describe("buildCorrelatedPortfolioSamples", () => {
   });
 
   it("is not mathematically forced to match optimistic independent draws", () => {
-    const randomSpy = vi.spyOn(Math, "random");
-    randomSpy
-      .mockReturnValueOnce(0.99)
-      .mockReturnValueOnce(0.01)
-      .mockReturnValueOnce(0.99)
-      .mockReturnValueOnce(0.01);
-
     const scenarios = buildScenarioSamples(
       [
         [1, 100],
         [50, 60],
       ],
       80,
+      2004318071,
     );
     const correlated = buildCorrelatedPortfolioSamples(
       [
@@ -252,11 +272,9 @@ describe("buildCorrelatedPortfolioSamples", () => {
       true,
     );
 
-    expect(scenarios.optimistic).toEqual([150, 150]);
+    expect(scenarios.optimistic).toEqual([61, 150]);
     expect(correlated).toEqual([51, 160]);
     expect(correlated).not.toEqual(scenarios.optimistic);
-
-    randomSpy.mockRestore();
   });
 
   it("throws an explicit error when no complete common week exists", () => {
@@ -530,6 +548,7 @@ describe("getProjectionReliabilityNotice", () => {
 describe("simulateMonteCarloLocal", () => {
   it("keeps compact histograms unchanged when there are few unique outcomes", () => {
     const result = simulateMonteCarloLocal({
+      seed: 123,
       throughputSamples: [2],
       includeZeroWeeks: false,
       mode: "backlog_to_weeks",
@@ -542,6 +561,7 @@ describe("simulateMonteCarloLocal", () => {
 
   it("returns a backend-compatible structure in backlog mode", () => {
     const result = simulateMonteCarloLocal({
+      seed: 123,
       throughputSamples: DEMO_TEAM_SAMPLES.Alpha,
       includeZeroWeeks: true,
       mode: "backlog_to_weeks",
@@ -559,6 +579,7 @@ describe("simulateMonteCarloLocal", () => {
 
   it("returns a backend-compatible structure in target-weeks mode", () => {
     const result = simulateMonteCarloLocal({
+      seed: 456,
       throughputSamples: DEMO_TEAM_SAMPLES.Gamma,
       includeZeroWeeks: true,
       mode: "weeks_to_items",
@@ -576,6 +597,7 @@ describe("simulateMonteCarloLocal", () => {
 
   it("keeps risk_score consistent with the returned business percentiles in both modes", () => {
     const backlogResult = simulateMonteCarloLocal({
+      seed: 123,
       throughputSamples: DEMO_TEAM_SAMPLES.Alpha,
       includeZeroWeeks: true,
       mode: "backlog_to_weeks",
@@ -583,6 +605,7 @@ describe("simulateMonteCarloLocal", () => {
       nSims: 2000,
     });
     const itemsResult = simulateMonteCarloLocal({
+      seed: 456,
       throughputSamples: DEMO_TEAM_SAMPLES.Gamma,
       includeZeroWeeks: true,
       mode: "weeks_to_items",
@@ -601,6 +624,7 @@ describe("simulateMonteCarloLocal", () => {
   it("rejects empty normalized samples for both zero-week modes", () => {
     expect(() =>
       simulateMonteCarloLocal({
+        seed: 123,
         throughputSamples: [Number.NaN, Number.POSITIVE_INFINITY],
         includeZeroWeeks: true,
         mode: "backlog_to_weeks",
@@ -611,6 +635,7 @@ describe("simulateMonteCarloLocal", () => {
 
     expect(() =>
       simulateMonteCarloLocal({
+        seed: 123,
         throughputSamples: [0, -1],
         includeZeroWeeks: false,
         mode: "backlog_to_weeks",
@@ -622,6 +647,7 @@ describe("simulateMonteCarloLocal", () => {
 
   it("aggregates histogram buckets when too many unique outcomes are produced", () => {
     const result = simulateMonteCarloLocal({
+      seed: 123,
       throughputSamples: Array.from({ length: 250 }, (_value, index) => index),
       includeZeroWeeks: true,
       mode: "weeks_to_items",
@@ -636,6 +662,7 @@ describe("simulateMonteCarloLocal", () => {
 
   it("falls back to 521 weeks when zero throughput never burns backlog", () => {
     const result = simulateMonteCarloLocal({
+      seed: 123,
       throughputSamples: [0, 0, 0],
       includeZeroWeeks: true,
       mode: "backlog_to_weeks",
@@ -651,6 +678,7 @@ describe("simulateMonteCarloLocal", () => {
 
   it("normalizes negative and fractional inputs for simulation guards", () => {
     const result = simulateMonteCarloLocal({
+      seed: 123,
       throughputSamples: [1.9, 2.2, 3.8],
       includeZeroWeeks: false,
       mode: "weeks_to_items",
