@@ -14,13 +14,13 @@ from backend.api_models import (
     SimulateResponse,
     ThroughputReliability,
 )
-from backend.mc_core import FinishWeeksSimulation
 from backend.api_routes_simulate import (
     _client_key_from_request,
     _persist_simulation,
     _resolve_simulation_seed,
     limiter,
 )
+from backend.mc_core import FinishWeeksSimulation
 from tests.http_client import ApiTestClient
 
 
@@ -65,7 +65,11 @@ def test_simulate_backlog_to_weeks_success():
     assert body["risk_score"] == expected
     assert isinstance(body["result_distribution"], list)
     assert len(body["result_distribution"]) > 0
-    assert body["completion_summary"]["completed_count"] + body["completion_summary"]["censored_count"] == 2000
+    assert (
+        body["completion_summary"]["completed_count"]
+        + body["completion_summary"]["censored_count"]
+        == 2000
+    )
     assert body["completion_summary"]["horizon_weeks"] == 521
     first_bucket = body["result_distribution"][0]
     assert set(first_bucket.keys()) == {"x", "count"}
