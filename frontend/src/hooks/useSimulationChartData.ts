@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { CycleTimePoint, ForecastResponse, WeeklyThroughputRow } from "../types";
+import type { CycleTimePoint, ForecastPercentiles, ForecastResponse, WeeklyThroughputRow } from "../types";
 import { buildAtLeastPercentiles, buildProbabilityCurve } from "./probability";
 import type { ChartPoint, ProbabilityPoint, ThroughputPoint } from "./simulationTypes";
 import { buildCycleTimeTrendData, summarizeCycleTime } from "../utils/cycleTime";
@@ -22,7 +22,7 @@ function smoothHistogramCounts(points: Array<{ x: number; count: number }>): num
   });
 }
 
-function isLegacyItemsPercentiles(percentiles: Record<string, number>): boolean {
+function isLegacyItemsPercentiles(percentiles: ForecastPercentiles): boolean {
   const p50 = Number(percentiles.P50);
   const p70 = Number(percentiles.P70);
   const p90 = Number(percentiles.P90);
@@ -82,7 +82,7 @@ export function useSimulationChartData({
     return buildProbabilityCurve(points, result.result_kind);
   }, [result]);
 
-  const displayPercentiles = useMemo((): Record<string, number> => {
+  const displayPercentiles = useMemo((): ForecastPercentiles => {
     if (!result) return {};
     if (result.result_kind !== "items") return result.result_percentiles;
     if (!isLegacyItemsPercentiles(result.result_percentiles)) return result.result_percentiles;

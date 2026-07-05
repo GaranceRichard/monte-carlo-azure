@@ -1,8 +1,35 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Dict, Literal, Optional, Tuple
 
 import numpy as np
+
+
+@dataclass(frozen=True)
+class FinishWeeksSimulation:
+    weeks_needed: np.ndarray
+    completed_mask: np.ndarray
+    horizon_weeks: int
+
+    @property
+    def completed_weeks(self) -> np.ndarray:
+        return self.weeks_needed[self.completed_mask]
+
+    @property
+    def completed_count(self) -> int:
+        return int(np.count_nonzero(self.completed_mask))
+
+    @property
+    def censored_count(self) -> int:
+        return int(self.weeks_needed.size - self.completed_count)
+
+    @property
+    def censored_rate(self) -> float:
+        total = int(self.weeks_needed.size)
+        if total <= 0:
+            return 0.0
+        return self.censored_count / total
 
 
 def histogram_buckets(arr: np.ndarray, max_buckets: int = 100) -> list[Dict[str, int]]:
@@ -41,7 +68,7 @@ def mc_finish_weeks(
     n_sims: int = 20000,
     include_zero_weeks: bool = False,
     seed: Optional[int] = None,
-) -> np.ndarray:
+) -> FinishWeeksSimulation:
     """
     Monte Carlo "Quand finira-t-on un backlog de N items ?"
 
@@ -83,7 +110,11 @@ def mc_finish_weeks(
 
     weeks_needed = np.full(n_sims, max_weeks, dtype=int)
     weeks_needed[has_hit] = first_hit_idx[has_hit] + 1  # 1-based
-    return weeks_needed
+    return FinishWeeksSimulation(
+        weeks_needed=weeks_needed,
+        completed_mask=has_hit,
+        horizon_weeks=max_weeks,
+    )
 
 
 def mc_items_done_for_weeks(
@@ -147,30 +178,34 @@ def percentiles(
     - weeks_to_items: quantile de survie discret "lower" pour lire
       "X% des simulations livrent au moins PXX items".
     """
+    values = np.asarray(arr, dtype=int)
+    if values.size == 0:
+        return {}
+
     out: Dict[str, int] = {}
     for p in ps:
         if mode == "weeks_to_items":
             q = max(0.0, min(1.0, (100 - p) / 100))
-            out[f"P{p}"] = _discrete_quantile(arr, q, method="lower")
+            out[f"P{p}"] = _discrete_quantile(values, q, method="lower")
         else:
             q = max(0.0, min(1.0, p / 100))
-            out[f"P{p}"] = _discrete_quantile(arr, q, method="higher")
+            out[f"P{p}"] = _discrete_quantile(values, q, method="higher")
     return out
 
 
 def risk_score(
     mode: Literal["backlog_to_weeks", "weeks_to_items"],
-    p50: int,
-    p90: int,
-) -> float:
+    p50: Optional[int],
+    p90: Optional[int],
+) -> Optional[float]:
     """
     Mesure la dispersion normalisee selon le mode.
 
     - backlog_to_weeks: (P90 - P50) / P50
     - weeks_to_items: (P50 - P90) / P50
     """
-    if p50 <= 0:
-        return 0.0
+    if p50 is None or p90 is None or p50 <= 0:
+        return None
     if mode == "weeks_to_items":
         return max(0.0, float(p50 - p90) / float(p50))
     return max(0.0, float(p90 - p50) / float(p50))

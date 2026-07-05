@@ -126,13 +126,15 @@ export async function simulateForecastFromSamplesCore(
   };
 
   const response = await postSimulate(payload);
+  const resolvedRiskScore = response.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, response.result_percentiles);
   return {
     result_kind: response.result_kind,
     samples_count: response.samples_count,
     seed: response.seed,
     result_percentiles: response.result_percentiles,
-    risk_score: Number(response.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, response.result_percentiles)),
+    risk_score: resolvedRiskScore ?? undefined,
     result_distribution: (response.result_distribution ?? []) as ForecastHistogramBucket[],
+    completion_summary: response.completion_summary,
     throughput_reliability: response.throughput_reliability,
   };
 }

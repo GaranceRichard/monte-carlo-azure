@@ -4,7 +4,7 @@ import {
   readJsonOr,
   toApiErrorMessage,
 } from "./apiHelpers";
-import type { ForecastRequestPayload, ForecastResponse, ThroughputReliability } from "./types";
+import type { CompletionSummary, ForecastPercentiles, ForecastRequestPayload, ForecastResponse, ThroughputReliability } from "./types";
 
 const API_BASE = getApiBase();
 
@@ -21,8 +21,9 @@ export type SimulationStatsHistoryItem = {
   target_weeks?: number | null;
   n_sims: number;
   samples_count: number;
-  percentiles: Record<string, number>;
+  percentiles: ForecastPercentiles;
   distribution: { x: number; count: number }[];
+  completion_summary?: CompletionSummary;
   include_zero_weeks?: boolean;
   throughput_reliability?: ThroughputReliability;
 };

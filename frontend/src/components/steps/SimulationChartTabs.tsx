@@ -199,6 +199,7 @@ export default function SimulationChartTabs() {
         nSims: s.nSims,
         resultKind: s.result.result_kind,
         displayPercentiles: s.displayPercentiles,
+        completionSummary: s.result.completion_summary,
         throughputReliability: reliability,
         cycleTimePoints: s.cycleTimeDaysData,
         cycleTimeTrendPoints: s.cycleTimeTrendData,

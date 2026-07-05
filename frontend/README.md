@@ -74,6 +74,10 @@ Le frontend couvre notamment :
   - formule centralisee dans `src/utils/simulation.ts`
   - `backlog_to_weeks`: `(P90 - P50) / P50`
   - `weeks_to_items`: `(P50 - P90) / P50`
+  - en `backlog_to_weeks`, les censures a l'horizon sont exposees via `completion_summary`
+  - la distribution n'affiche que les simulations terminees
+  - un percentile absent n'est pas remplace par `0` ou `521`
+  - le `Risk Score` n'est pas affiche si `P50` ou `P90` manque
 - historique throughput aligne sur des semaines ISO completes uniquement
   - debut aligne sur le premier lundi complet inclus ou suivant `startDate`
   - fin alignee sur le dernier dimanche complet inclus ou precedent `endDate`
@@ -95,6 +99,7 @@ Le frontend couvre notamment :
   - `includeZeroWeeks` est applique apres aggregation sur le total portefeuille
   - absence de semaine commune complete => erreur explicite
 - export PDF direct des restitutions simulation et portefeuille, sans previsualisation SVG utilisateur
+  - les exports expliquent explicitement la limite d'horizon et les censures quand elles existent
 - persistance locale de certaines preferences et quick filters
 
 ## Notes de structure recentes

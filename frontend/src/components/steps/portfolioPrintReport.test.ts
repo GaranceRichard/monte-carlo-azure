@@ -187,7 +187,7 @@ describe("portfolioPrintReport", () => {
         `Optimiste[\\s\\S]*?<td>${Number(args.scenarios[0].percentiles.P50 ?? 0).toFixed(0)}</td>\\s*<td>${Number(args.scenarios[0].percentiles.P70 ?? 0).toFixed(0)}</td>\\s*<td>${Number(args.scenarios[0].percentiles.P90 ?? 0).toFixed(0)}</td>`,
       ),
     );
-    expect(html).toContain(expectedRisk.toFixed(2).replace(".", ","));
+    expect(html).toContain(expectedRisk?.toFixed(2).replace(".", ",") ?? "");
   });
 
   it("documents the weeks_to_items risk formula in the synthesis", () => {
@@ -210,7 +210,7 @@ describe("portfolioPrintReport", () => {
     const html = buildPortfolioPrintReportHtml(args);
     const expectedRisk = computeRiskScoreFromPercentiles("backlog_to_weeks", args.sections[0].displayPercentiles);
 
-    expect(html).toContain(expectedRisk.toFixed(2).replace(".", ","));
+    expect(html).toContain(expectedRisk?.toFixed(2).replace(".", ",") ?? "");
   });
 
   it("builds a minimal report when sections and scenarios are empty", () => {
@@ -270,7 +270,7 @@ describe("portfolioPrintReport", () => {
     expect(html).toContain("Semaines 0 exclues");
     expect(html).toContain("Non disponible");
     expect(html).toContain("<b>CV:</b> 0,00");
-    expect(html).toContain(">0 semaines (au plus)<");
+    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<section class="kpis">\s*<\/section>/);
   });
 
   it("renders summary-page fallbacks when scenario risk scores and section defaults are missing", () => {
@@ -307,7 +307,27 @@ describe("portfolioPrintReport", () => {
 
     expect(html).toContain("backlog: 0 items");
     expect(html).toContain("<td>0</td>");
-    expect(html).toContain("0,00 (fiable)");
+    expect(html).not.toContain("0,00 (fiable)");
+  });
+
+  it("explains censures on team-like backlog pages", () => {
+    const args = baseArgs();
+    args.sections[0] = {
+      ...args.sections[0],
+      displayPercentiles: { P50: 12 },
+      completionSummary: {
+        completed_count: 4,
+        censored_count: 6,
+        censored_rate: 0.6,
+        horizon_weeks: 521,
+      },
+    };
+
+    const html = buildPortfolioPrintReportHtml(args);
+
+    expect(html).toContain("Limite d'horizon:");
+    expect(html).toContain("6 sur 10 (0,60)");
+    expect(html).toContain("Un percentile absent n'est pas identifiable avant l'horizon.");
   });
 
   it("exports directly to PDF from a detached document", async () => {

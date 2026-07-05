@@ -4,6 +4,14 @@
 
 ### Frontend
 
+- `backlog_to_weeks` ne code plus une non-terminaison par `521` seul: le frontend consomme
+  et produit un `completion_summary` explicite (`completed_count`, `censored_count`,
+  `censored_rate`, `horizon_weeks`) pour distinguer les censures des fins exactes a l'horizon
+- les ecrans simulation et les exports PDF n'affichent plus de percentile fictif ni de
+  `Risk Score` incomplet: percentiles absents si non identifiables, score absent si `P50`
+  ou `P90` manque, avec note utilisateur sur la limite d'horizon
+- compatibilite preservee avec les historiques legacy: le recalcul frontend reste reserve
+  aux anciens historiques quand les nouveaux champs ne sont pas encore presents
 - propagation de la `seed` Monte Carlo dans tous les chemins de simulation frontend:
   contrat `ForecastRequestPayload` / `ForecastResponse`, appel backend, moteur local demo,
   rapport portefeuille, historique local et rejeu
@@ -105,6 +113,14 @@
 
 ### Backend et tests
 
+- `backlog_to_weeks` distingue maintenant les simulations terminees des censures a l'horizon:
+  nouvelle structure `FinishWeeksSimulation`, percentiles calcules uniquement sur les
+  simulations terminees, `completion_summary` persiste dans l'historique Mongo et fin exacte
+  a `521` semaines distincte d'une censure
+- `risk_score` backend devient absent quand `P50` ou `P90` n'est pas identifiable, sans
+  remplacement silencieux par `0` ou `521`
+- ajout de tests backend/frontend pour couvrir les cas limites de censures completes, de fin
+  exacte a l'horizon, d'absence de percentiles et d'absence de `Risk Score`
 - ajout d'un `seed` Monte Carlo optionnel sur `POST /simulate`, valide entre `0` et `4294967295`, renvoye dans la reponse et persiste dans l'historique Mongo pour rejouer un tirage a l'identique
 - ajout de tests API et store pour garantir la reproductibilite avec un `seed` fourni, la generation automatique d'un `seed` valide, et la compatibilite des lignes d'historique legacy depourvues de `seed`
 - refonte de `Scripts/check_identity_boundary.py` autour des regles explicites `IDENTITY-001` a `IDENTITY-008`, avec collecte testable des violations sur les contrats `POST /simulate`, la persistance Mongo, l'historique backend, les proxies locaux et les appels Azure DevOps cote serveur

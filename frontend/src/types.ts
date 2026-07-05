@@ -40,13 +40,23 @@ export type ThroughputReliability = {
   samples_count: number;
 };
 
+export type ForecastPercentiles = Partial<Record<"P50" | "P70" | "P90", number>>;
+
+export type CompletionSummary = {
+  completed_count: number;
+  censored_count: number;
+  censored_rate: number;
+  horizon_weeks: number;
+};
+
 export type ForecastResponse = {
   result_kind: ForecastKind;
   samples_count: number;
   seed: number;
-  result_percentiles: Record<string, number>;
+  result_percentiles: ForecastPercentiles;
   risk_score?: number;
   result_distribution: ForecastHistogramBucket[];
+  completion_summary?: CompletionSummary;
   throughput_reliability?: ThroughputReliability;
 };
 

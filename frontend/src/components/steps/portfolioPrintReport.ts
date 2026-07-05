@@ -1,5 +1,4 @@
-import type { ForecastKind } from "../../types";
-import type { ThroughputReliability } from "../../types";
+import type { CompletionSummary, ForecastKind, ForecastPercentiles, ThroughputReliability } from "../../types";
 import type { PortfolioScenarioResult } from "../../hooks/simulationTypes";
 import { buildProbabilityCurve } from "../../hooks/probability";
 import {
@@ -61,7 +60,8 @@ type PortfolioSectionInput = {
   throughputReliability?: ThroughputReliability | null;
   distribution: Array<{ x: number; count: number }>;
   weeklyThroughput: Array<{ week: string; throughput: number }>;
-  displayPercentiles: Record<string, number>;
+  displayPercentiles: ForecastPercentiles;
+  completionSummary?: CompletionSummary;
 };
 
 type HypothesisBlock =
@@ -105,9 +105,10 @@ function riskColor(label: string): string {
 
 function formatRiskScore(
   mode: "backlog_to_weeks" | "weeks_to_items",
-  percentiles: Record<string, number>,
-): { score: number; label: string; valueLabel: string } {
+  percentiles: ForecastPercentiles,
+): { score: number; label: string; valueLabel: string } | null {
   const score = computeRiskScoreFromPercentiles(mode, percentiles);
+  if (score == null) return null;
   const label = computeRiskLegend(score);
   return {
     score,
@@ -191,9 +192,9 @@ function resolveRiskScore({
   riskScore,
 }: {
   simulationMode: "backlog_to_weeks" | "weeks_to_items";
-  displayPercentiles: Record<string, number>;
+  displayPercentiles: ForecastPercentiles;
   riskScore?: number;
-}): { score: number; label: string; valueLabel: string } {
+}): { score: number; label: string; valueLabel: string } | null {
   if (typeof riskScore === "number" && Number.isFinite(riskScore)) {
     return formatRiskScoreFromValue(riskScore);
   }
@@ -218,6 +219,7 @@ function buildTeamLikePageHtml({
   weeklyThroughput,
   displayPercentiles,
   riskScore,
+  completionSummary,
   throughputReliability,
   note,
   pageBreak,
@@ -237,8 +239,9 @@ function buildTeamLikePageHtml({
   resultKind: ForecastKind;
   distribution: Array<{ x: number; count: number }>;
   weeklyThroughput: Array<{ week: string; throughput: number }>;
-  displayPercentiles: Record<string, number>;
+  displayPercentiles: ForecastPercentiles;
   riskScore?: number;
+  completionSummary?: CompletionSummary;
   throughputReliability?: ThroughputReliability | null;
   note?: string;
   pageBreak: boolean;
@@ -318,14 +321,27 @@ function buildTeamLikePageHtml({
       </header>
 
       <section class="kpis">
-        <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">${Number(effectivePercentiles?.P50 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
-        <div class="kpi"><span class="kpi-label">P70</span><span class="kpi-value">${Number(effectivePercentiles?.P70 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
-        <div class="kpi"><span class="kpi-label">P90</span><span class="kpi-value">${Number(effectivePercentiles?.P90 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
+        ${["P50", "P70", "P90"]
+          .filter((key) => typeof effectivePercentiles?.[key as keyof ForecastPercentiles] === "number")
+          .map(
+            (key) =>
+              `<div class="kpi"><span class="kpi-label">${key}</span><span class="kpi-value">${Number(effectivePercentiles?.[key as keyof ForecastPercentiles] ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>`,
+          )
+          .join("")}
       </section>
       <section class="kpis">
-        <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(risk.valueLabel)} <span style="color:${riskColor(risk.label)}">(${escapeHtml(risk.label)})</span></span></div>
+        ${
+          risk
+            ? `<div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(risk.valueLabel)} <span style="color:${riskColor(risk.label)}">(${escapeHtml(risk.label)})</span></span></div>`
+            : ""
+        }
         <div class="kpi"><span class="kpi-label">Fiabilite</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>
       </section>
+      ${
+        completionSummary && completionSummary.censored_count > 0
+          ? `<section class="section"><div class="meta"><div class="meta-row"><b>Limite d'horizon:</b> ${escapeHtml(String(completionSummary.horizon_weeks))} semaines</div><div class="meta-row"><b>Censures:</b> ${escapeHtml(String(completionSummary.censored_count))} sur ${escapeHtml(String(completionSummary.completed_count + completionSummary.censored_count))} (${escapeHtml(formatMetric(completionSummary.censored_rate))})</div><div class="meta-row"><b>Lecture:</b> la distribution et les percentiles ne couvrent que les simulations terminees. Un percentile absent n'est pas identifiable avant l'horizon.</div></div></section>`
+          : ""
+      }
 
       <section class="section">
         <h2>Courbes de probabilit\u00E9s compar\u00E9es</h2>
@@ -375,9 +391,13 @@ function buildSummaryPage({
   const rows = orderedScenarios
     .map((scenario) => {
       const effectivePercentiles = scenario.percentiles;
-      const risk = formatRiskScoreFromValue(
-        Number(scenario.riskScore ?? computeRiskScoreFromPercentiles(simulationMode, effectivePercentiles)),
-      );
+      const computedRisk = computeRiskScoreFromPercentiles(simulationMode, effectivePercentiles);
+      const risk =
+        typeof scenario.riskScore === "number" && Number.isFinite(scenario.riskScore)
+          ? formatRiskScoreFromValue(scenario.riskScore)
+          : computedRisk == null
+            ? null
+            : formatRiskScoreFromValue(computedRisk);
       const reliability = formatReliabilityScore(scenario.throughputReliability);
       return `
         <tr>
@@ -385,7 +405,7 @@ function buildSummaryPage({
           <td>${Number(effectivePercentiles.P50 ?? 0).toFixed(0)}</td>
           <td>${Number(effectivePercentiles.P70 ?? 0).toFixed(0)}</td>
           <td>${Number(effectivePercentiles.P90 ?? 0).toFixed(0)}</td>
-          <td><span class="risk-chip" style="color:${riskColor(risk.label)}">${escapeHtml(risk.valueLabel)} (${escapeHtml(risk.label)})</span></td>
+          <td>${risk ? `<span class="risk-chip" style="color:${riskColor(risk.label)}">${escapeHtml(risk.valueLabel)} (${escapeHtml(risk.label)})</span>` : ""}</td>
           <td>${escapeHtml(reliability)}</td>
         </tr>
       `;
@@ -572,6 +592,7 @@ export function buildPortfolioPrintReportHtml({
         weeklyThroughput: scenario.weeklyData,
         displayPercentiles: scenario.percentiles,
         riskScore: scenario.riskScore,
+        completionSummary: scenario.completionSummary,
         throughputReliability: scenario.throughputReliability,
         note: "Débit reconstruit par simulation bootstrap - non issu de l'historique réel.",
         pageBreak: idx < orderedScenarios.length - 1 || sections.length > 0,
@@ -598,6 +619,7 @@ export function buildPortfolioPrintReportHtml({
         weeklyThroughput: section.weeklyThroughput,
         displayPercentiles: section.displayPercentiles,
         riskScore: section.riskScore,
+        completionSummary: section.completionSummary,
         throughputReliability: section.throughputReliability,
         pageBreak: idx < sections.length - 1,
       }),

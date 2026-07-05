@@ -160,8 +160,8 @@ describe("simulationPrintReport", () => {
     });
 
     expect(html).toContain("Volume historique encore limite.");
-    expect(html).toContain(">0 semaines (au plus)<");
-    expect(html).toContain("0,00 (fiable)");
+    expect(html).not.toContain('<span class="kpi-label">P50</span>');
+    expect(html).not.toContain('<span class="kpi-label">Risk Score</span>');
   });
 
   it("covers diagnostic summary variants and fragile risk legend", () => {
@@ -234,6 +234,25 @@ describe("simulationPrintReport", () => {
     });
 
     expect(html).toContain("2,00 (eleve)");
+  });
+
+  it("documents horizon and censures when backlog simulations are incomplete", () => {
+    const html = buildSimulationPrintReportHtml({
+      ...buildBaseArgs(),
+      displayPercentiles: { P50: 12 },
+      completionSummary: {
+        completed_count: 4,
+        censored_count: 6,
+        censored_rate: 0.6,
+        horizon_weeks: 521,
+      },
+    });
+
+    expect(html).toContain("Limite d'horizon:");
+    expect(html).toContain("521 semaines");
+    expect(html).toContain("Censures:");
+    expect(html).toContain("6 sur 10 (0,60)");
+    expect(html).toContain("Un percentile absent n'est pas identifiable avant l'horizon.");
   });
 
   it("exports directly to PDF from a detached document", async () => {

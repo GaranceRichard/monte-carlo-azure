@@ -207,6 +207,12 @@ ou
   "result_percentiles": { "P50": 10, "P70": 12, "P90": 15 },
   "risk_score": 0.5,
   "result_distribution": [{ "x": 10, "count": 123 }],
+  "completion_summary": {
+    "completed_count": 18000,
+    "censored_count": 2000,
+    "censored_rate": 0.1,
+    "horizon_weeks": 521
+  },
   "samples_count": 30,
   "seed": 123456
 }
@@ -231,6 +237,7 @@ Les champs autorises en base sont:
 - `samples_count`
 - `percentiles`
 - `distribution`
+- `completion_summary`
 - `throughput_reliability`
 - `include_zero_weeks`
 - `seed`
@@ -262,6 +269,13 @@ Les champs autorises en base sont:
 - `x`: valeur simulee (semaines ou items selon le mode)
 - `count`: frequence observee dans les simulations
 
+En `backlog_to_weeks`, `completion_summary` peut aussi etre present:
+
+- `completed_count`: nombre de simulations terminees avant ou a l'horizon
+- `censored_count`: nombre de simulations non terminees a l'horizon
+- `censored_rate`: ratio `censored_count / total`
+- `horizon_weeks`: horizon maximal de simulation
+
 ### Interpretation metier
 
 - mode `backlog_to_weeks`
@@ -270,6 +284,11 @@ Les champs autorises en base sont:
   - percentiles API: quantile empirique discret conservateur `higher`
   - ordre attendu: `P50 <= P70 <= P90`
   - exemple de lecture: `P90 = 90%` des simulations finissent en `P90` semaines ou moins
+  - une simulation non terminee a l'horizon est comptee comme censure explicite
+  - une fin exacte a l'horizon reste une vraie fin, distincte d'une censure
+  - la distribution et les percentiles ne couvrent que les simulations terminees
+  - un percentile absent signifie qu'il n'est pas identifiable avant l'horizon
+  - `risk_score` est absent si `P50` ou `P90` manque
   - formule `risk_score`: `(P90 - P50) / P50`
 - mode `weeks_to_items`
   - question: "combien d'items livrer en N semaines ?"
@@ -279,6 +298,7 @@ Les champs autorises en base sont:
   - lecture percentiles et courbe UI: `P(X >= items)`
   - compatibilite historique: le frontend ne recalcule depuis l'histogramme que pour
     d'anciennes reponses detectees par l'ordre legacy `P50 <= P70 <= P90`
+  - `risk_score` est absent si `P50` ou `P90` manque
   - formule `risk_score`: `(P50 - P90) / P50`
 
 ## Qualite technique

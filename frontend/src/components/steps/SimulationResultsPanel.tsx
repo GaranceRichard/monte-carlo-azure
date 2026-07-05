@@ -38,6 +38,8 @@ function formatCoefficient(value: number): string {
   return value.toFixed(2).replace(".", ",");
 }
 
+const PERCENTILE_KEYS = ["P50", "P70", "P90"] as const;
+
 export default function SimulationResultsPanel({ hideHistory = false }: SimulationResultsPanelProps) {
   const { simulation: s, selectedTeam } = useSimulationContext();
   const [selectedHistoryId, setSelectedHistoryId] = useState("");
@@ -54,6 +56,8 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
         : "simulations enregistrées";
 
   const effectiveSelectedHistoryId = teamHistory.some((item) => item.id === selectedHistoryId) ? selectedHistoryId : "";
+
+  const visiblePercentiles = PERCENTILE_KEYS.filter((key) => typeof s.displayPercentiles?.[key] === "number");
 
   const kpiToneByLabel: Record<string, string> = {
     P50: "border-[var(--p50)] bg-[var(--p50-soft)]",
@@ -75,7 +79,7 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
     if (typeof s.result.risk_score === "number" && Number.isFinite(s.result.risk_score)) {
       return s.result.risk_score;
     }
-    return computeRiskScoreFromPercentiles(s.simulationMode, s.displayPercentiles ?? {});
+    return null;
   }, [s.result, s.displayPercentiles, s.simulationMode]);
 
   const riskLegend = useMemo(() => {
@@ -138,8 +142,15 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
       {s.result && (
         <div className="space-y-2">
           <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Percentiles</div>
+          {s.result.completion_summary && s.result.completion_summary.censored_count > 0 && (
+            <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-950">
+              Horizon de simulation: {s.result.completion_summary.horizon_weeks} semaines.{" "}
+              {s.result.completion_summary.censored_count}/{s.result.completion_summary.completed_count + s.result.completion_summary.censored_count} simulations
+              {" "}n'ont pas termine ({formatCoefficient(s.result.completion_summary.censored_rate)}). La distribution ne montre que les simulations terminees et un percentile absent signifie qu'il n'est pas identifiable avant l'horizon.
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {["P50", "P70", "P90"].map((k, index) => (
+            {visiblePercentiles.map((k, index) => (
               <div
                 key={k}
                 className={`flex min-h-[3.2rem] flex-col items-center justify-center rounded-xl border p-2 text-center opacity-0 [animation:flowFadeIn_300ms_ease-out_forwards] ${kpiToneByLabel[k]}`}
@@ -155,7 +166,7 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
             {riskScoreValue != null && (
               <div
                 className={`group relative h-[4.4rem] rounded-xl border p-2 opacity-0 [animation:flowFadeIn_300ms_ease-out_forwards] ${combinedIndicatorTone}`}
-                style={{ animationDelay: `${3 * 90}ms` }}
+                style={{ animationDelay: `${visiblePercentiles.length * 90}ms` }}
                 tabIndex={0}
               >
                 <div className="relative h-full w-full text-center">

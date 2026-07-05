@@ -1,4 +1,12 @@
-import type { CycleTimePoint, ForecastMode, ForecastResponse, ThroughputReliability, WeeklyThroughputRow } from "../types";
+import type {
+  CompletionSummary,
+  CycleTimePoint,
+  ForecastMode,
+  ForecastPercentiles,
+  ForecastResponse,
+  ThroughputReliability,
+  WeeklyThroughputRow,
+} from "../types";
 
 export type ChartPoint = { x: number; count: number; gauss: number };
 export type ProbabilityPoint = { x: number; probability: number };
@@ -85,7 +93,7 @@ export type SimulationDateRange = {
 
 export type SimulationResult = {
   result: ForecastResponse | null;
-  displayPercentiles: Record<string, number>;
+  displayPercentiles: ForecastPercentiles;
   throughputData: ThroughputPoint[];
   cycleTimeDaysData: CycleTimePoint[];
   cycleTimeTrendData: CycleTimeTrendPoint[];
@@ -104,10 +112,11 @@ export type PortfolioScenarioResult = {
   seed: number;
   samples: number[];
   weeklyData: WeeklyThroughputRow[];
-  percentiles: Record<string, number>;
+  percentiles: ForecastPercentiles;
   riskScore?: number;
   riskLegend: "fiable" | "incertain" | "fragile" | "non fiable";
   distribution: DistributionBucket[];
+  completionSummary?: CompletionSummary;
   throughputReliability?: ThroughputReliability | null;
 };
 

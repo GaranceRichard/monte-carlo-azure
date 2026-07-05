@@ -67,6 +67,7 @@ Fonctionnalites actuellement presentes dans le produit :
   - semaines vers items
 - visualisation des percentiles et distributions
 - affichage d'un `Risk Score`
+- en `backlog_to_weeks`, les censures a l'horizon sont explicites et lues a part
 - export CSV du throughput hebdomadaire
 - historique local des simulations recentes, contextualise par equipe dans le navigateur
 - cookie client `IDMontecarlo` pour relier un client anonyme a son historique persiste
@@ -117,6 +118,8 @@ Restitution attendue :
 - `P50` pour une lecture mediane
 - `P85` ou `P90` pour une lecture prudente
   - en `backlog_to_weeks`, prudent = plus de semaines
+- si certaines simulations n'atteignent pas le backlog avant l'horizon, elles sont comptees
+  a part comme censures et n'entrent ni dans la distribution ni dans les percentiles
 - `Risk Score` pour objectiver la dispersion
 
 Decision supportee :
@@ -141,7 +144,7 @@ Lecture attendue :
 - `Risk Score` calcule sur les percentiles metier du mode
   - `backlog_to_weeks`: `(P90 - P50) / P50`
   - `weeks_to_items`: `(P50 - P90) / P50`
-  - si `P50 <= 0`, le score vaut `0`
+  - si `P50` ou `P90` manque, le score n'est pas affiche
 
 ### 3. Piloter un portefeuille
 
@@ -178,6 +181,8 @@ Le coeur du produit repose sur :
 - le recalcul des percentiles selon le mode utilise
   - `backlog_to_weeks`: quantile discret conservateur sur `P(X <= semaines)`
   - `weeks_to_items`: quantile de survie sur `P(X >= items)`
+- en `backlog_to_weeks`, une simulation non terminee a l'horizon maximal est une censure
+  explicite, distincte d'une fin exacte a l'horizon
 
 En mode portefeuille, le produit compare plusieurs hypotheses d'agregation plutot que de masquer l'incertitude derriere une seule projection.
 

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { formatDateLocal } from "../date";
-import type { ForecastMode, WeeklyThroughputRow } from "../types";
+import type { CompletionSummary, ForecastMode, ForecastPercentiles, WeeklyThroughputRow } from "../types";
 import { formatAdoHttpErrorMessage, type AdoErrorContext } from "../adoErrors";
 import {
   fetchTeamThroughput,
@@ -46,7 +46,8 @@ export type PortfolioReportSection = {
   throughputReliability?: ReturnType<typeof computeThroughputReliability>;
   distribution: { x: number; count: number }[];
   weeklyThroughput: { week: string; throughput: number }[];
-  displayPercentiles: Record<string, number>;
+  displayPercentiles: ForecastPercentiles;
+  completionSummary?: CompletionSummary;
 };
 
 type UsePortfolioReportParams = {
@@ -129,10 +130,11 @@ function toScenarioResult(
   weeklyData: WeeklyThroughputRow[],
 ): PortfolioScenarioResult {
   const percentiles = result.result_percentiles;
+  const computedRiskScore = computeRiskScoreFromPercentiles(simulationMode, percentiles) ?? undefined;
   const riskScore =
     result.result_kind === "items"
-      ? computeRiskScoreFromPercentiles(simulationMode, percentiles)
-      : Number(result.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, percentiles));
+      ? computedRiskScore
+      : result.risk_score ?? computedRiskScore;
   return {
     label,
     hypothesis,
@@ -141,8 +143,9 @@ function toScenarioResult(
     weeklyData,
     percentiles,
     riskScore,
-    riskLegend: computeRiskLegend(riskScore),
+    riskLegend: computeRiskLegend(riskScore ?? 0),
     distribution: result.result_distribution,
+    completionSummary: result.completion_summary,
     throughputReliability: computeThroughputReliability(samples),
   };
 }
@@ -294,15 +297,13 @@ export function usePortfolioReport({
                 resultKind: result.result_kind,
                 riskScore:
                   result.result_kind === "items"
-                    ? computeRiskScoreFromPercentiles(simulationMode, result.result_percentiles)
-                    : Number(
-                        result.risk_score ??
-                          computeRiskScoreFromPercentiles(simulationMode, result.result_percentiles),
-                      ),
+                    ? computeRiskScoreFromPercentiles(simulationMode, result.result_percentiles) ?? undefined
+                    : result.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, result.result_percentiles) ?? undefined,
                 throughputReliability: computeThroughputReliability(data.throughputSamples),
                 distribution: result.result_distribution,
                 weeklyThroughput: data.weeklyThroughput,
                 displayPercentiles: result.result_percentiles,
+                completionSummary: result.completion_summary,
               } satisfies PortfolioReportSection,
             };
           } catch (error: unknown) {

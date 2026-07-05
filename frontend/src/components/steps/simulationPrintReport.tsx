@@ -15,7 +15,7 @@ import {
   computeThroughputReliability,
   getProjectionReliabilityNotice,
 } from "../../utils/simulation";
-import type { ThroughputReliability } from "../../types";
+import type { CompletionSummary, ForecastPercentiles, ThroughputReliability } from "../../types";
 
 function escapeHtml(value: string): string {
   return value
@@ -30,6 +30,16 @@ export { buildSimulationPdfFileName, downloadSimulationPdf };
 
 function formatMetric(value: number): string {
   return Number(value ?? 0).toFixed(2).replace(".", ",");
+}
+
+function renderPercentileKpis(displayPercentiles: ForecastPercentiles, resultLabel: string): string {
+  return ["P50", "P70", "P90"]
+    .filter((key) => typeof displayPercentiles?.[key as keyof ForecastPercentiles] === "number")
+    .map(
+      (key) =>
+        `<div class="kpi"><span class="kpi-label">${key}</span><span class="kpi-value">${Number(displayPercentiles[key as keyof ForecastPercentiles] ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>`,
+    )
+    .join("");
 }
 
 function buildReliabilitySummary(reliability?: ThroughputReliability): string {
@@ -61,6 +71,7 @@ export function buildSimulationPrintReportHtml({
   nSims,
   resultKind,
   displayPercentiles,
+  completionSummary,
   throughputReliability,
   cycleTimePoints,
   cycleTimeTrendPoints,
@@ -79,7 +90,8 @@ export function buildSimulationPrintReportHtml({
   targetWeeks: number | string;
   nSims: number | string;
   resultKind: "items" | "weeks";
-  displayPercentiles: Record<string, number>;
+  displayPercentiles: ForecastPercentiles;
+  completionSummary?: CompletionSummary;
   throughputReliability?: ThroughputReliability;
   cycleTimePoints: CycleTimeExportPoint[];
   cycleTimeTrendPoints: CycleTimeTrendExportPoint[];
@@ -105,8 +117,16 @@ export function buildSimulationPrintReportHtml({
     computeThroughputReliability(throughputPoints.map((point) => Number(point.throughput ?? 0))) ??
     undefined;
   const riskLegend =
-    effectiveRiskScore <= 0.2 ? "fiable" : effectiveRiskScore <= 0.5 ? "incertain" : effectiveRiskScore <= 0.8 ? "fragile" : "eleve";
-  const riskScoreLabel = formatMetric(effectiveRiskScore);
+    effectiveRiskScore == null
+      ? null
+      : effectiveRiskScore <= 0.2
+        ? "fiable"
+        : effectiveRiskScore <= 0.5
+          ? "incertain"
+          : effectiveRiskScore <= 0.8
+            ? "fragile"
+            : "eleve";
+  const riskScoreLabel = effectiveRiskScore == null ? null : formatMetric(effectiveRiskScore);
   const reliabilityLegend = effectiveReliability?.label ?? "Non disponible";
   const reliabilityScoreLabel = effectiveReliability ? `${formatMetric(effectiveReliability.cv)} (${reliabilityLegend})` : "Non disponible";
   const reliabilitySummary = buildReliabilitySummary(effectiveReliability);
@@ -189,14 +209,21 @@ export function buildSimulationPrintReportHtml({
         </header>
 
         <section class="kpis">
-          <div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">${Number(displayPercentiles?.P50 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
-          <div class="kpi"><span class="kpi-label">P70</span><span class="kpi-value">${Number(displayPercentiles?.P70 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
-          <div class="kpi"><span class="kpi-label">P90</span><span class="kpi-value">${Number(displayPercentiles?.P90 ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>
+          ${renderPercentileKpis(displayPercentiles, resultLabel)}
         </section>
         <section class="kpis">
-          <div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(riskScoreLabel)} (${escapeHtml(riskLegend)})</span></div>
+          ${
+            riskScoreLabel && riskLegend
+              ? `<div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(riskScoreLabel)} (${escapeHtml(riskLegend)})</span></div>`
+              : ""
+          }
           <div class="kpi"><span class="kpi-label">Fiabilite</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>
         </section>
+        ${
+          completionSummary && completionSummary.censored_count > 0
+            ? `<section class="section"><div class="meta"><div class="meta-row"><b>Limite d'horizon:</b> ${escapeHtml(String(completionSummary.horizon_weeks))} semaines</div><div class="meta-row"><b>Censures:</b> ${escapeHtml(String(completionSummary.censored_count))} sur ${escapeHtml(String(completionSummary.completed_count + completionSummary.censored_count))} (${escapeHtml(formatMetric(completionSummary.censored_rate))})</div><div class="meta-row"><b>Lecture:</b> la distribution et les percentiles ne couvrent que les simulations terminees. Un percentile absent n'est pas identifiable avant l'horizon.</div></div></section>`
+            : ""
+        }
         <section class="section">
           <h2>Cycle Time (jours calendaires)</h2>
           <div class="chart-wrap">${cycleTimeSvg}</div>

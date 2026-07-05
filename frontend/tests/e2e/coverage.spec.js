@@ -2891,7 +2891,7 @@ test.describe("e2e istanbul coverage", () => {
     expect(results.invalidIncludeZeroError).toContain(">= 0");
     expect(results.invalidExcludeZeroError).toContain("> 0");
     expect(results.riskLabels).toEqual(["fiable", "incertain", "fragile", "non fiable"]);
-    expect(results.riskScores).toEqual([0, 0.4, 0.4, 0]);
+    expect(results.riskScores).toEqual([null, 0.4, 0.4, 0]);
     expect(results.reliabilities).toContain("non fiable");
     expect(results.reliabilities).toContain("fragile");
     expect(results.reliabilities).toContain("incertain");

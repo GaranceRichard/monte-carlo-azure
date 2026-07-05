@@ -13,12 +13,14 @@ from starlette.concurrency import run_in_threadpool
 from .api_config import get_api_config
 from .api_models import (
     SIMULATION_SEED_MAX,
+    CompletionSummary,
     SimulateRequest,
     SimulateResponse,
     SimulationHistoryItem,
     ThroughputReliability,
 )
 from .mc_core import (
+    FinishWeeksSimulation,
     histogram_buckets,
     mc_finish_weeks,
     mc_items_done_for_weeks,
@@ -117,7 +119,7 @@ def _compute_simulation_result(
     req: SimulateRequest,
     samples: np.ndarray,
     seed: int,
-) -> tuple[np.ndarray, str]:
+) -> tuple[np.ndarray | FinishWeeksSimulation, str]:
     if req.mode == "backlog_to_weeks":
         if not req.backlog_size:
             raise HTTPException(400, "backlog_size requis.")
@@ -175,7 +177,7 @@ def _persist_simulation(
         )
 
 
-@router.post("/simulate", response_model=SimulateResponse)
+@router.post("/simulate", response_model=SimulateResponse, response_model_exclude_none=True)
 @limiter.limit(cfg.rate_limit_simulate)
 async def simulate(
     request: Request,
@@ -221,21 +223,29 @@ async def simulate(
             "Simulation trop longue. Reessayez avec moins de simulations ou plus tard.",
         ) from exc
 
-    simulation_percentiles = percentiles(result, req.mode, ps=(50, 70, 90))
+    completion_summary = None
+    distribution_values = result
+    percentile_values = result
+    if isinstance(result, FinishWeeksSimulation):
+        completion_summary = CompletionSummary(
+            completed_count=result.completed_count,
+            censored_count=result.censored_count,
+            censored_rate=round(result.censored_rate, 4),
+            horizon_weeks=result.horizon_weeks,
+        )
+        distribution_values = result.completed_weeks
+        percentile_values = result.completed_weeks
+
+    simulation_percentiles = percentiles(percentile_values, req.mode, ps=(50, 70, 90))
+    p50 = simulation_percentiles.get("P50")
+    p90 = simulation_percentiles.get("P90")
     reliability = ThroughputReliability(**throughput_reliability(samples))
     response_model = SimulateResponse(
         result_kind=kind,
-        result_percentiles={
-            "P50": simulation_percentiles["P50"],
-            "P70": simulation_percentiles["P70"],
-            "P90": simulation_percentiles["P90"],
-        },
-        risk_score=risk_score(
-            req.mode,
-            simulation_percentiles["P50"],
-            simulation_percentiles["P90"],
-        ),
-        result_distribution=histogram_buckets(result),
+        result_percentiles=simulation_percentiles,
+        risk_score=risk_score(req.mode, p50, p90),
+        result_distribution=histogram_buckets(distribution_values),
+        completion_summary=completion_summary,
         samples_count=int(len(samples)),
         throughput_reliability=reliability,
         seed=seed,

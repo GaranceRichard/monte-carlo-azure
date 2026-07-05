@@ -1,4 +1,11 @@
-import type { ForecastMode, ForecastResponse, ThroughputReliability, WeeklyThroughputRow } from "../types";
+import type {
+  CompletionSummary,
+  ForecastMode,
+  ForecastPercentiles,
+  ForecastResponse,
+  ThroughputReliability,
+  WeeklyThroughputRow,
+} from "../types";
 import { clamp } from "./math";
 
 export type ScenarioSamples = {
@@ -114,7 +121,8 @@ function discretePercentiles(
   values: number[],
   simulationMode: ForecastMode,
   ps: number[],
-): Record<string, number> {
+) : ForecastPercentiles {
+  if (!values.length) return {};
   return Object.fromEntries(
     ps.map((p) => {
       if (simulationMode === "weeks_to_items") {
@@ -148,6 +156,8 @@ export function simulateMonteCarloLocal({
   const safeWeeks = Math.max(1, Math.floor(targetWeeks ?? 0));
   const random = createSeededRandom(seed);
   const results = new Array<number>(safeNSims);
+  const completedFlags = new Array<boolean>(safeNSims).fill(true);
+  let completionSummary: CompletionSummary | undefined;
 
   for (let i = 0; i < safeNSims; i += 1) {
     if (mode === "backlog_to_weeks") {
@@ -159,6 +169,7 @@ export function simulateMonteCarloLocal({
         weeks += 1;
       }
       results[i] = weeks || 521;
+      completedFlags[i] = remaining <= 0;
       continue;
     }
 
@@ -169,16 +180,34 @@ export function simulateMonteCarloLocal({
     results[i] = delivered;
   }
 
-  const resultPercentiles = discretePercentiles(results, mode, [50, 70, 90]);
+  let distributionValues = results;
+  if (mode === "backlog_to_weeks") {
+    const horizonWeeks = 521;
+    distributionValues = results.filter((_value, index) => completedFlags[index]);
+    const completedCount = distributionValues.length;
+    const censoredCount = results.length - completedCount;
+    completionSummary = {
+      completed_count: completedCount,
+      censored_count: censoredCount,
+      censored_rate: Number((censoredCount / results.length).toFixed(4)),
+      horizon_weeks: horizonWeeks,
+    };
+  }
+
+  const resultPercentiles = discretePercentiles(
+    mode === "backlog_to_weeks" ? distributionValues : results,
+    mode,
+    [50, 70, 90],
+  );
+  const resolvedRiskScore = computeRiskScoreFromPercentiles(mode, resultPercentiles);
   return {
     result_kind: mode === "backlog_to_weeks" ? "weeks" : "items",
     samples_count: samples.length,
     seed,
     result_percentiles: resultPercentiles,
-    risk_score: Number(
-      computeRiskScoreFromPercentiles(mode, resultPercentiles).toFixed(4),
-    ),
-    result_distribution: histogramBuckets(results),
+    risk_score: resolvedRiskScore == null ? undefined : Number(resolvedRiskScore.toFixed(4)),
+    result_distribution: histogramBuckets(mode === "backlog_to_weeks" ? distributionValues : results),
+    completion_summary: completionSummary,
     throughput_reliability: computeThroughputReliability(samples) ?? undefined,
   };
 }
@@ -299,11 +328,11 @@ export function computeRiskLegend(score: number): "fiable" | "incertain" | "frag
 
 export function computeRiskScoreFromPercentiles(
   mode: ForecastMode,
-  percentiles: Record<string, number>,
-): number {
+  percentiles: ForecastPercentiles,
+): number | null {
   const p50 = Number(percentiles?.P50 ?? 0);
   const p90 = Number(percentiles?.P90 ?? 0);
-  if (!Number.isFinite(p50) || !Number.isFinite(p90) || p50 <= 0) return 0;
+  if (!Number.isFinite(p50) || !Number.isFinite(p90) || p50 <= 0) return null;
   if (mode === "weeks_to_items") {
     return Math.max(0, (p50 - p90) / p50);
   }

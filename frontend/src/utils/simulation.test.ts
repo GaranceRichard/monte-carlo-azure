@@ -16,10 +16,10 @@ import {
 import { DEMO_TEAM_SAMPLES } from "../demoData";
 
 describe("computeRiskScoreFromPercentiles", () => {
-  it("returns 0 when P50 is missing or non-positive", () => {
-    expect(computeRiskScoreFromPercentiles("backlog_to_weeks", { P90: 14 })).toBe(0);
-    expect(computeRiskScoreFromPercentiles("backlog_to_weeks", { P50: 0, P90: 14 })).toBe(0);
-    expect(computeRiskScoreFromPercentiles("weeks_to_items", { P50: -2, P90: 1 })).toBe(0);
+  it("returns null when P50 is missing or non-positive", () => {
+    expect(computeRiskScoreFromPercentiles("backlog_to_weeks", { P90: 14 })).toBeNull();
+    expect(computeRiskScoreFromPercentiles("backlog_to_weeks", { P50: 0, P90: 14 })).toBeNull();
+    expect(computeRiskScoreFromPercentiles("weeks_to_items", { P50: -2, P90: 1 })).toBeNull();
   });
 
   it("computes normalized spread in backlog_to_weeks mode", () => {
@@ -33,10 +33,10 @@ describe("computeRiskScoreFromPercentiles", () => {
     expect(computeRiskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: 12 })).toBe(0);
   });
 
-  it("returns 0 when percentiles are incoherent or non-finite", () => {
+  it("returns null when percentiles are incoherent or non-finite", () => {
     expect(computeRiskScoreFromPercentiles("backlog_to_weeks", { P50: 10, P90: 8 })).toBe(0);
     expect(computeRiskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: 12 })).toBe(0);
-    expect(computeRiskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: Number.NaN })).toBe(0);
+    expect(computeRiskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: Number.NaN })).toBeNull();
   });
 });
 
@@ -588,9 +588,9 @@ describe("simulateMonteCarloLocal", () => {
     });
 
     expect(result.result_kind).toBe("items");
-    expect(result.result_percentiles.P50).toBeGreaterThan(0);
-    expect(result.result_percentiles.P50).toBeGreaterThanOrEqual(result.result_percentiles.P70);
-    expect(result.result_percentiles.P70).toBeGreaterThanOrEqual(result.result_percentiles.P90);
+    expect(result.result_percentiles.P50 ?? 0).toBeGreaterThan(0);
+    expect(result.result_percentiles.P50 ?? 0).toBeGreaterThanOrEqual(result.result_percentiles.P70 ?? 0);
+    expect(result.result_percentiles.P70 ?? 0).toBeGreaterThanOrEqual(result.result_percentiles.P90 ?? 0);
     expect(result.result_distribution.length).toBeGreaterThan(0);
     expect(result.throughput_reliability?.label).toBe("incertain");
   });
@@ -614,10 +614,10 @@ describe("simulateMonteCarloLocal", () => {
     });
 
     expect(backlogResult.risk_score).toBe(
-      Number(computeRiskScoreFromPercentiles("backlog_to_weeks", backlogResult.result_percentiles).toFixed(4)),
+      Number(computeRiskScoreFromPercentiles("backlog_to_weeks", backlogResult.result_percentiles)?.toFixed(4)),
     );
     expect(itemsResult.risk_score).toBe(
-      Number(computeRiskScoreFromPercentiles("weeks_to_items", itemsResult.result_percentiles).toFixed(4)),
+      Number(computeRiskScoreFromPercentiles("weeks_to_items", itemsResult.result_percentiles)?.toFixed(4)),
     );
   });
 
@@ -660,7 +660,7 @@ describe("simulateMonteCarloLocal", () => {
     expect(result.result_distribution.reduce((sum, bucket) => sum + bucket.count, 0)).toBe(1000);
   });
 
-  it("falls back to 521 weeks when zero throughput never burns backlog", () => {
+  it("reports a fully censored backlog when zero throughput never burns backlog", () => {
     const result = simulateMonteCarloLocal({
       seed: 123,
       throughputSamples: [0, 0, 0],
@@ -671,8 +671,15 @@ describe("simulateMonteCarloLocal", () => {
     });
 
     expect(result.result_kind).toBe("weeks");
-    expect(result.result_percentiles).toEqual({ P50: 521, P70: 521, P90: 521 });
-    expect(result.result_distribution).toEqual([{ x: 521, count: 3 }]);
+    expect(result.result_percentiles).toEqual({});
+    expect(result.result_distribution).toEqual([]);
+    expect(result.completion_summary).toEqual({
+      completed_count: 0,
+      censored_count: 3,
+      censored_rate: 1,
+      horizon_weeks: 521,
+    });
+    expect(result.risk_score).toBeUndefined();
     expect(result.throughput_reliability?.label).toBe("non fiable");
   });
 

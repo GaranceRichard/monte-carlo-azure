@@ -170,6 +170,11 @@ class SimulationStore:
                 "samples_count": response.samples_count,
                 "percentiles": response.result_percentiles,
                 "distribution": [bucket.model_dump() for bucket in response.result_distribution],
+                "completion_summary": (
+                    response.completion_summary.model_dump()
+                    if response.completion_summary is not None
+                    else None
+                ),
                 "throughput_reliability": response.throughput_reliability.model_dump(),
                 "include_zero_weeks": req.include_zero_weeks,
                 "seed": response.seed,

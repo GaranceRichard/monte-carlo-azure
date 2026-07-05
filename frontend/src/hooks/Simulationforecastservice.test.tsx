@@ -163,6 +163,24 @@ describe("demo mode et normalisation", () => {
 
     expect(result.risk_score).toBeCloseTo((13 - 8) / 8);
   });
+
+  it("laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent", async () => {
+    vi.mocked(postSimulate).mockResolvedValue({
+      ...API_RESPONSE_WEEKS,
+      result_percentiles: { P70: 10 },
+      risk_score: undefined,
+    } as never);
+
+    const result = await simulateForecastFromSamples({
+      throughputSamples: [5, 7, 4, 6, 8, 5],
+      simulationMode: "backlog_to_weeks",
+      backlogSize: 80,
+      targetWeeks: 12,
+      nSims: 20000,
+    });
+
+    expect(result.risk_score).toBeUndefined();
+  });
 });
 
 describe("appels réseau", () => {
@@ -434,6 +452,33 @@ describe("historyEntry", () => {
     expect(typeof historyEntry.backlogSize).toBe("number");
   });
 
+    it("retombe sur un id date-seed quand crypto.randomUUID est indisponible", async () => {
+    const originalCrypto = globalThis.crypto;
+    const originalDateNow = Date.now;
+    Object.defineProperty(globalThis, "crypto", {
+      configurable: true,
+      value: undefined,
+    });
+    Object.defineProperty(Date, "now", {
+      configurable: true,
+      value: () => 1234567890,
+    });
+
+    try {
+      const { historyEntry } = await runSimulationForecast(baseParams());
+      expect(historyEntry.id).toMatch(/^1234567890-111-\d+$/);
+    } finally {
+      Object.defineProperty(globalThis, "crypto", {
+        configurable: true,
+        value: originalCrypto,
+      });
+      Object.defineProperty(Date, "now", {
+        configurable: true,
+        value: originalDateNow,
+      });
+    }
+  });
+
   it("copie défensivement les tableaux", async () => {
     const types = ["Bug"];
     const doneStates = ["Done"];
@@ -498,3 +543,4 @@ describe("cohérence du résultat retourné", () => {
     expect(historyEntry.warning).toContain("1/3");
   });
 });
+

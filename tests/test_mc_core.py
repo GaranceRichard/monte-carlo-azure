@@ -15,10 +15,11 @@ def test_mc_finish_weeks_shape_and_bounds():
     samples = np.array([2, 3, 4, 5], dtype=int)
     out = mc_finish_weeks(backlog_size=50, throughput_samples=samples, n_sims=5000, seed=123)
 
-    assert out.shape == (5000,)
-    assert np.issubdtype(out.dtype, np.integer)
-    assert int(out.min()) >= 1
-    assert int(out.max()) <= 521
+    assert out.weeks_needed.shape == (5000,)
+    assert np.issubdtype(out.weeks_needed.dtype, np.integer)
+    assert int(out.weeks_needed.min()) >= 1
+    assert int(out.weeks_needed.max()) <= 521
+    assert out.horizon_weeks == 521
 
 
 def test_mc_finish_weeks_reproducible_for_seed():
@@ -26,26 +27,33 @@ def test_mc_finish_weeks_reproducible_for_seed():
     a = mc_finish_weeks(backlog_size=30, throughput_samples=samples, n_sims=2000, seed=42)
     b = mc_finish_weeks(backlog_size=30, throughput_samples=samples, n_sims=2000, seed=42)
 
-    assert np.array_equal(a, b)
+    assert np.array_equal(a.weeks_needed, b.weeks_needed)
+    assert np.array_equal(a.completed_mask, b.completed_mask)
 
 
 def test_mc_finish_weeks_backlog_size_one():
     samples = np.array([1, 2, 3], dtype=int)
     out = mc_finish_weeks(backlog_size=1, throughput_samples=samples, n_sims=200, seed=1)
-    assert out.shape == (200,)
-    assert np.all(out == 1)
+    assert out.weeks_needed.shape == (200,)
+    assert np.all(out.weeks_needed == 1)
+    assert np.all(out.completed_mask)
 
 
 def test_mc_finish_weeks_single_value_samples():
     samples = np.array([2], dtype=int)
     out = mc_finish_weeks(backlog_size=11, throughput_samples=samples, n_sims=100, seed=1)
-    assert np.all(out == 6)
+    assert np.all(out.weeks_needed == 6)
+    assert np.all(out.completed_mask)
 
 
 def test_mc_finish_weeks_large_backlog_hits_cap():
     samples = np.array([1], dtype=int)
     out = mc_finish_weeks(backlog_size=10_000, throughput_samples=samples, n_sims=50, seed=1)
-    assert np.all(out == 521)
+    assert np.all(out.weeks_needed == 521)
+    assert not np.any(out.completed_mask)
+    assert out.completed_count == 0
+    assert out.censored_count == 50
+    assert out.censored_rate == 1.0
 
 
 def test_mc_finish_weeks_invalid_inputs():
@@ -94,7 +102,8 @@ def test_mc_finish_weeks_accepts_zero_only_samples_when_enabled():
         include_zero_weeks=True,
         seed=1,
     )
-    assert np.all(out == 521)
+    assert np.all(out.weeks_needed == 521)
+    assert not np.any(out.completed_mask)
 
 
 def test_mc_finish_weeks_include_zero_rejects_all_negative_samples():
@@ -164,6 +173,10 @@ def test_percentiles_default_and_custom():
     assert set(p2.keys()) == {"P25", "P75"}
 
 
+def test_percentiles_return_empty_mapping_when_no_completed_simulation_exists():
+    assert percentiles(np.array([], dtype=int), "backlog_to_weeks", ps=(50, 70, 90)) == {}
+
+
 def test_percentiles_backlog_to_weeks_use_conservative_higher_quantiles():
     arr = np.array([3, 4, 6, 8, 10], dtype=int)
 
@@ -188,8 +201,9 @@ def test_risk_score_matches_expected_formulas_and_guardrails():
     assert risk_score("backlog_to_weeks", 10, 8) == 0.0
     assert risk_score("weeks_to_items", 10, 6) == 0.4
     assert risk_score("weeks_to_items", 10, 12) == 0.0
-    assert risk_score("backlog_to_weeks", 0, 5) == 0.0
-    assert risk_score("weeks_to_items", 0, 18) == 0.0
+    assert risk_score("backlog_to_weeks", 0, 5) is None
+    assert risk_score("weeks_to_items", 0, 18) is None
+    assert risk_score("backlog_to_weeks", None, 18) is None
 
 
 def test_throughput_reliability_marks_stable_history_as_fiable():

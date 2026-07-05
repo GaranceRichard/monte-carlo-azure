@@ -9,10 +9,12 @@ from backend.api import app
 from backend.api_config import ApiConfig
 from backend.api_models import (
     SIMULATION_SEED_MAX,
+    CompletionSummary,
     SimulateRequest,
     SimulateResponse,
     ThroughputReliability,
 )
+from backend.mc_core import FinishWeeksSimulation
 from backend.api_routes_simulate import (
     _client_key_from_request,
     _persist_simulation,
@@ -63,6 +65,8 @@ def test_simulate_backlog_to_weeks_success():
     assert body["risk_score"] == expected
     assert isinstance(body["result_distribution"], list)
     assert len(body["result_distribution"]) > 0
+    assert body["completion_summary"]["completed_count"] + body["completion_summary"]["censored_count"] == 2000
+    assert body["completion_summary"]["horizon_weeks"] == 521
     first_bucket = body["result_distribution"][0]
     assert set(first_bucket.keys()) == {"x", "count"}
     assert isinstance(first_bucket["x"], int)
@@ -279,6 +283,83 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
     assert isinstance(items_response.json()["seed"], int)
 
 
+def test_simulate_backlog_to_weeks_omits_unidentifiable_percentiles_and_risk_score(monkeypatch):
+    client = ApiTestClient(app)
+
+    def fake_compute(_req, _samples, _seed):
+        return (
+            FinishWeeksSimulation(
+                weeks_needed=np.array([521, 521, 521], dtype=int),
+                completed_mask=np.array([False, False, False], dtype=bool),
+                horizon_weeks=521,
+            ),
+            "weeks",
+        )
+
+    monkeypatch.setattr("backend.api_routes_simulate._compute_simulation_result", fake_compute)
+
+    response = client.post(
+        "/simulate",
+        json={
+            "throughput_samples": [0, 0, 0, 0, 0, 0],
+            "include_zero_weeks": True,
+            "mode": "backlog_to_weeks",
+            "backlog_size": 10,
+            "n_sims": 2000,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["result_percentiles"] == {}
+    assert "risk_score" not in body
+    assert body["result_distribution"] == []
+    assert body["completion_summary"] == {
+        "completed_count": 0,
+        "censored_count": 3,
+        "censored_rate": 1.0,
+        "horizon_weeks": 521,
+    }
+
+
+def test_simulate_backlog_to_weeks_keeps_exact_finish_at_horizon_distinct_from_censure(monkeypatch):
+    client = ApiTestClient(app)
+
+    def fake_compute(_req, _samples, _seed):
+        return (
+            FinishWeeksSimulation(
+                weeks_needed=np.array([521, 521, 521], dtype=int),
+                completed_mask=np.array([True, False, True], dtype=bool),
+                horizon_weeks=521,
+            ),
+            "weeks",
+        )
+
+    monkeypatch.setattr("backend.api_routes_simulate._compute_simulation_result", fake_compute)
+
+    response = client.post(
+        "/simulate",
+        json={
+            "throughput_samples": [1, 1, 1, 1, 1, 1],
+            "mode": "backlog_to_weeks",
+            "backlog_size": 10,
+            "n_sims": 2000,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["result_distribution"] == [{"x": 521, "count": 2}]
+    assert body["completion_summary"] == {
+        "completed_count": 2,
+        "censored_count": 1,
+        "censored_rate": 0.3333,
+        "horizon_weeks": 521,
+    }
+    assert body["result_percentiles"] == {"P50": 521, "P70": 521, "P90": 521}
+    assert body["risk_score"] == 0.0
+
+
 def test_simulate_returns_same_result_for_same_seed():
     client = ApiTestClient(app)
     payload = {
@@ -369,6 +450,12 @@ def _build_response_model() -> SimulateResponse:
         result_percentiles={"P50": 10, "P70": 12, "P90": 15},
         risk_score=0.5,
         result_distribution=[{"x": 10, "count": 4}],
+        completion_summary=CompletionSummary(
+            completed_count=4,
+            censored_count=0,
+            censored_rate=0.0,
+            horizon_weeks=521,
+        ),
         samples_count=6,
         throughput_reliability=ThroughputReliability(
             cv=0.2,

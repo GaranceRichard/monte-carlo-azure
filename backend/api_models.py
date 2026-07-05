@@ -31,11 +31,19 @@ class ThroughputReliability(BaseModel):
     samples_count: int
 
 
+class CompletionSummary(BaseModel):
+    completed_count: int
+    censored_count: int
+    censored_rate: float
+    horizon_weeks: int
+
+
 class SimulateResponse(BaseModel):
     result_kind: Literal["weeks", "items"]
     result_percentiles: Dict[str, int]
-    risk_score: float
+    risk_score: Optional[float] = None
     result_distribution: List[DistributionBucket]
+    completion_summary: Optional[CompletionSummary] = None
     samples_count: int
     throughput_reliability: ThroughputReliability
     seed: int = Field(ge=SIMULATION_SEED_MIN, le=SIMULATION_SEED_MAX)
@@ -51,6 +59,7 @@ class SimulationHistoryItem(BaseModel):
     samples_count: int
     percentiles: Dict[str, int]
     distribution: List[DistributionBucket]
+    completion_summary: Optional[CompletionSummary] = None
     include_zero_weeks: bool = False
     throughput_reliability: Optional[ThroughputReliability] = None
     seed: Optional[int] = Field(default=None, ge=SIMULATION_SEED_MIN, le=SIMULATION_SEED_MAX)

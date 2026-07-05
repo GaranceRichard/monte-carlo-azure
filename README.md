@@ -42,6 +42,10 @@ Demo GitHub Pages:
 - semantique metier des percentiles alignee sur le mode de simulation:
   - `backlog_to_weeks`: `P90` = 90% des simulations finissent en `P90` semaines ou moins
   - `weeks_to_items`: `P90` = 90% des simulations livrent au moins `P90` items
+- en `backlog_to_weeks`, les simulations non terminees a l'horizon sont des censures explicites:
+  - une fin exacte a `521` semaines reste une vraie fin, distincte d'une censure
+  - la distribution et les percentiles ne couvrent que les simulations terminees
+  - un percentile absent signifie qu'il n'est pas identifiable avant l'horizon
 - badge `Démo` integre a l'en-tete des ecrans demo GitHub Pages (choix d'equipe et simulation)
 - lisibilite renforcee des graphes de simulation, y compris les etiquettes de l'axe X
 - legendes de graphiques harmonisees, affichees seulement quand utiles et sans debordement en bas du panneau
@@ -50,7 +54,7 @@ Demo GitHub Pages:
 - affichage d'un `Risk Score` avec code couleur
   - `backlog_to_weeks`: `(P90 - P50) / P50`
   - `weeks_to_items`: `(P50 - P90) / P50`
-  - toujours borne a `0` si `P50 <= 0` ou si une ancienne reponse est incoherente
+  - absent si `P50` ou `P90` n'est pas identifiable
 - export CSV du throughput hebdomadaire
 - telechargement direct du rapport PDF simulation sans fenetre intermediaire
 - historique local des dernieres simulations, contextualise par equipe dans le navigateur
@@ -103,6 +107,10 @@ renvoyes par l'API et ne recalcule depuis l'histogramme que pour d'anciens histo
 detectes par un ordre legacy `P50 <= P70 <= P90`.
 Le `Risk Score`, lui, est maintenant calcule partout a partir des percentiles metier
 effectivement exposes par l'API et affiches a l'ecran, y compris dans les exports PDF.
+En `backlog_to_weeks`, l'API expose aussi un `completion_summary` avec `completed_count`,
+`censored_count`, `censored_rate` et `horizon_weeks` pour distinguer explicitement les
+simulations terminees des non-terminaisons a l'horizon. Les anciennes entrees d'historique
+restent compatibles: si ce bloc manque, le frontend conserve le comportement legacy.
 Le `Cycle Time`, lui, reste une restitution frontend distincte du moteur Monte Carlo:
 il est calcule et affiche en jours calendaires, tandis que le throughput historique,
 les modes `backlog_to_weeks` / `weeks_to_items` et `target_weeks` restent exprimes en semaines.

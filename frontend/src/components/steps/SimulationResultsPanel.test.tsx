@@ -326,7 +326,7 @@ describe("SimulationResultsPanel history list", () => {
     } as never);
 
     render(<SimulationResultsPanel />);
-    expect(screen.getByText(/^0,00 \/ -$/i)).not.toBeNull();
+    expect(screen.queryByText(/^Risque \/ Fiabilite$/i)).toBeNull();
   });
 
   it("falls back to frontend reliability computation when API reliability is missing", () => {
@@ -467,6 +467,43 @@ describe("SimulationResultsPanel history list", () => {
     } as never);
 
     render(<SimulationResultsPanel />);
+    expect(screen.queryByText(/^Risque \/ Fiabilite$/i)).toBeNull();
+  });
+
+  it("explains censures and hides missing percentiles", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        throughputData: [],
+        result: {
+          result_kind: "weeks",
+          seed: 9,
+          result_percentiles: { P50: 12 },
+          result_distribution: [{ x: 12, count: 4 }],
+          completion_summary: {
+            completed_count: 4,
+            censored_count: 6,
+            censored_rate: 0.6,
+            horizon_weeks: 521,
+          },
+        },
+        displayPercentiles: { P50: 12 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+    expect(screen.getByText(/Horizon de simulation: 521 semaines/i)).not.toBeNull();
+    expect(screen.getByText(/6\/10 simulations n'ont pas termine/i)).not.toBeNull();
+    expect(screen.getByText(/^P50$/i)).not.toBeNull();
+    expect(screen.queryByText(/^P70$/i)).toBeNull();
+    expect(screen.queryByText(/^P90$/i)).toBeNull();
     expect(screen.queryByText(/^Risque \/ Fiabilite$/i)).toBeNull();
   });
 
