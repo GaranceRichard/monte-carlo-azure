@@ -113,6 +113,11 @@
 
 ### Backend et tests
 
+- le moteur Monte Carlo backend n'alloue plus de matrice complete `n_sims x horizon`:
+  les tirages sont maintenant executes par lots de taille centralisee avec un seul generateur
+  pseudo-aleatoire par simulation, ce qui borne la memoire sans casser la reproductibilite
+- ajout de tests backend pour verrouiller la reproductibilite entre tailles de lots et le
+  traitement correct d'un dernier lot incomplet
 - `backlog_to_weeks` distingue maintenant les simulations terminees des censures a l'horizon:
   nouvelle structure `FinishWeeksSimulation`, percentiles calcules uniquement sur les
   simulations terminees, `completion_summary` persiste dans l'historique Mongo et fin exacte

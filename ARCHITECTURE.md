@@ -223,6 +223,8 @@ Comportement du `seed`:
 - `seed` est optionnel et borne a l'intervalle entier `0..4294967295`
 - a payload identique, un meme `seed` reproduit strictement la meme simulation
 - si aucun `seed` n'est fourni, le backend en genere un et le renvoie pour rendre le tirage rejouable
+- cote backend, ce meme tirage est execute par lots avec un unique generateur pseudo-aleatoire;
+  il n'y a ni reensemencement inter-lots, ni allocation complete `n_sims x horizon`
 
 Le backend persiste aussi la simulation dans MongoDB (collection `simulations`) quand le cookie `IDMontecarlo` est present.
 Les champs autorises en base sont:

@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from backend.mc_core import (
+    SIMULATION_BATCH_SIZE,
     histogram_buckets,
     mc_finish_weeks,
     mc_items_done_for_weeks,
@@ -91,6 +92,93 @@ def test_mc_items_done_for_weeks_invalid_inputs():
         mc_items_done_for_weeks(weeks=2, throughput_samples=None)
     with pytest.raises(ValueError):
         mc_items_done_for_weeks(weeks=2, throughput_samples=np.array([0, 0], dtype=int))
+
+
+@pytest.mark.parametrize("batch_size", [1, 4, SIMULATION_BATCH_SIZE])
+def test_mc_finish_weeks_reproducible_across_batch_sizes(batch_size):
+    samples = np.array([1, 2, 3, 4, 5, 6], dtype=int)
+    expected = mc_finish_weeks(backlog_size=40, throughput_samples=samples, n_sims=37, seed=99)
+    actual = mc_finish_weeks(
+        backlog_size=40,
+        throughput_samples=samples,
+        n_sims=37,
+        seed=99,
+        batch_size=batch_size,
+    )
+
+    assert np.array_equal(actual.weeks_needed, expected.weeks_needed)
+    assert np.array_equal(actual.completed_mask, expected.completed_mask)
+
+
+@pytest.mark.parametrize("batch_size", [1, 4, SIMULATION_BATCH_SIZE])
+def test_mc_items_done_for_weeks_reproducible_across_batch_sizes(batch_size):
+    samples = np.array([1, 2, 3, 4, 5, 6], dtype=int)
+    expected = mc_items_done_for_weeks(weeks=9, throughput_samples=samples, n_sims=37, seed=99)
+    actual = mc_items_done_for_weeks(
+        weeks=9,
+        throughput_samples=samples,
+        n_sims=37,
+        seed=99,
+        batch_size=batch_size,
+    )
+
+    assert np.array_equal(actual, expected)
+
+
+def test_mc_finish_weeks_processes_incomplete_last_batch(monkeypatch):
+    batch_sizes: list[tuple[int, int]] = []
+
+    class FakeGenerator:
+        def integers(self, low, high=None, size=None):
+            batch_sizes.append(size)
+            return np.zeros(size, dtype=np.int64)
+
+    monkeypatch.setattr("backend.mc_core.np.random.default_rng", lambda seed: FakeGenerator())
+
+    out = mc_finish_weeks(
+        backlog_size=1,
+        throughput_samples=np.array([1], dtype=int),
+        n_sims=10,
+        seed=123,
+        batch_size=4,
+    )
+
+    assert batch_sizes == [(4, 521), (4, 521), (2, 521)]
+    assert np.all(out.weeks_needed == 1)
+    assert np.all(out.completed_mask)
+
+
+def test_mc_items_done_for_weeks_processes_incomplete_last_batch(monkeypatch):
+    batch_sizes: list[tuple[int, int]] = []
+
+    class FakeGenerator:
+        def integers(self, low, high=None, size=None):
+            batch_sizes.append(size)
+            return np.zeros(size, dtype=np.int64)
+
+    monkeypatch.setattr("backend.mc_core.np.random.default_rng", lambda seed: FakeGenerator())
+
+    out = mc_items_done_for_weeks(
+        weeks=3,
+        throughput_samples=np.array([5], dtype=int),
+        n_sims=10,
+        seed=123,
+        batch_size=4,
+    )
+
+    assert batch_sizes == [(4, 3), (4, 3), (2, 3)]
+    assert np.array_equal(out, np.full(10, 15, dtype=int))
+
+
+@pytest.mark.parametrize("function_name, kwargs", [
+    ("mc_finish_weeks", {"backlog_size": 10, "throughput_samples": np.array([1], dtype=int)}),
+    ("mc_items_done_for_weeks", {"weeks": 3, "throughput_samples": np.array([1], dtype=int)}),
+])
+def test_simulation_batch_size_must_be_positive(function_name, kwargs):
+    function = mc_finish_weeks if function_name == "mc_finish_weeks" else mc_items_done_for_weeks
+
+    with pytest.raises(ValueError, match="batch_size"):
+        function(n_sims=5, batch_size=0, **kwargs)
 
 
 def test_mc_finish_weeks_accepts_zero_only_samples_when_enabled():

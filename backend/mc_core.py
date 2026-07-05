@@ -5,6 +5,8 @@ from typing import Dict, Literal, Optional, Tuple
 
 import numpy as np
 
+SIMULATION_BATCH_SIZE = 2048
+
 
 @dataclass(frozen=True)
 class FinishWeeksSimulation:
@@ -68,6 +70,7 @@ def mc_finish_weeks(
     n_sims: int = 20000,
     include_zero_weeks: bool = False,
     seed: Optional[int] = None,
+    batch_size: int = SIMULATION_BATCH_SIZE,
 ) -> FinishWeeksSimulation:
     """
     Monte Carlo "Quand finira-t-on un backlog de N items ?"
@@ -94,25 +97,31 @@ def mc_finish_weeks(
         if len(samples) == 0:
             raise ValueError("throughput_samples ne contient aucune valeur > 0")
 
+    resolved_batch_size = _resolve_batch_size(batch_size)
     rng = np.random.default_rng(seed)
 
     # Garde-fou historique: la version boucle stoppait au plus tard a 521 semaines.
     max_weeks = 521
-
-    # Vectorisation: tirages hebdomadaires en matrice, puis cumul pour trouver
-    # la premiere semaine ou le backlog est atteint.
-    draws = rng.choice(samples, size=(n_sims, max_weeks), replace=True)
-    cumulative = np.cumsum(draws, axis=1)
-    reached = cumulative >= backlog_size
-
-    first_hit_idx = reached.argmax(axis=1)  # 0-based
-    has_hit = reached.any(axis=1)
-
     weeks_needed = np.full(n_sims, max_weeks, dtype=int)
-    weeks_needed[has_hit] = first_hit_idx[has_hit] + 1  # 1-based
+    completed_mask = np.zeros(n_sims, dtype=bool)
+
+    for start in range(0, n_sims, resolved_batch_size):
+        stop = min(start + resolved_batch_size, n_sims)
+        current_batch_size = stop - start
+        draws = _draw_samples_batch(rng, samples, current_batch_size, max_weeks)
+        cumulative = np.cumsum(draws, axis=1)
+        reached = cumulative >= backlog_size
+
+        first_hit_idx = reached.argmax(axis=1)  # 0-based
+        has_hit = reached.any(axis=1)
+
+        batch_weeks_needed = weeks_needed[start:stop]
+        batch_weeks_needed[has_hit] = first_hit_idx[has_hit] + 1  # 1-based
+        completed_mask[start:stop] = has_hit
+
     return FinishWeeksSimulation(
         weeks_needed=weeks_needed,
-        completed_mask=has_hit,
+        completed_mask=completed_mask,
         horizon_weeks=max_weeks,
     )
 
@@ -123,6 +132,7 @@ def mc_items_done_for_weeks(
     n_sims: int = 20000,
     include_zero_weeks: bool = False,
     seed: Optional[int] = None,
+    batch_size: int = SIMULATION_BATCH_SIZE,
 ) -> np.ndarray:
     """
     Monte Carlo "Combien d'items seront livrés en N semaines ?"
@@ -149,9 +159,33 @@ def mc_items_done_for_weeks(
         if len(samples) == 0:
             raise ValueError("throughput_samples ne contient aucune valeur > 0")
 
+    resolved_batch_size = _resolve_batch_size(batch_size)
     rng = np.random.default_rng(seed)
-    draws = rng.choice(samples, size=(n_sims, weeks), replace=True)
-    return draws.sum(axis=1).astype(int)
+    items_done = np.empty(n_sims, dtype=int)
+
+    for start in range(0, n_sims, resolved_batch_size):
+        stop = min(start + resolved_batch_size, n_sims)
+        current_batch_size = stop - start
+        draws = _draw_samples_batch(rng, samples, current_batch_size, weeks)
+        items_done[start:stop] = draws.sum(axis=1, dtype=int)
+
+    return items_done
+
+
+def _resolve_batch_size(batch_size: int) -> int:
+    if batch_size <= 0:
+        raise ValueError("batch_size doit etre > 0")
+    return int(batch_size)
+
+
+def _draw_samples_batch(
+    rng: np.random.Generator,
+    samples: np.ndarray,
+    batch_size: int,
+    weeks: int,
+) -> np.ndarray:
+    sample_indexes = rng.integers(0, len(samples), size=(batch_size, weeks))
+    return samples[sample_indexes]
 
 
 def _discrete_quantile(

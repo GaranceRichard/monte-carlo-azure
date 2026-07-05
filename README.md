@@ -37,6 +37,8 @@ Demo GitHub Pages:
 - mode `Portefeuille` multi-equipes
 - simulation Monte Carlo cote backend (`POST /simulate`)
 - support optionnel d'un `seed` de simulation pour rejouer exactement un tirage Monte Carlo
+- execution backend par lots pour borner la memoire sans allouer de matrice complete
+  `n_sims x horizon`
 - demo locale et simulations portefeuille reproductibles a `seed` identique
 - visualisation des percentiles et distributions
 - semantique metier des percentiles alignee sur le mode de simulation:
@@ -338,6 +340,8 @@ Comportement du `seed` de simulation:
 - `POST /simulate` accepte un `seed` entier optionnel entre `0` et `4294967295`
 - a payload identique, renvoyer le meme `seed` reproduit strictement le meme resultat de simulation
 - si aucun `seed` n'est fourni, le backend en genere un automatiquement et le renvoie dans la reponse
+- cote backend, le calcul conserve un seul generateur pseudo-aleatoire sur toute l'execution et
+  traite les simulations par lots sans reensemencement inter-lots
 - l'historique Mongo persiste aussi ce `seed` pour faciliter l'analyse a posteriori d'une simulation
 - cote frontend, une execution logique ne consomme qu'une seule `seed`; le rejeu d'une entree
   locale reemploie cette meme `seed` tant que ses parametres restent inchanges
