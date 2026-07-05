@@ -119,7 +119,7 @@ frontend/
       useOnboarding.ts  # PAT en state local
       useSimulation.ts             # orchestrateur simulation
       useSimulationPrefs.ts        # persistance localStorage des preferences
-      useSimulationHistory.ts      # historique local (10 dernieres simulations)
+      useSimulationHistory.ts      # historique local versionne + migration legacy
       useSimulationChartData.ts    # mapping/useMemo des donnees graphiques
       useSimulationAutoRun.ts      # auto-run avec debounce (entree via objet params)
       useSimulationQuickFilters.ts # persistance des quick filters simulation
@@ -129,7 +129,7 @@ frontend/
       simulationForecastService.ts # facade forecast exposee au reste du front
       simulationForecastCore.ts    # logique forecast extraite et testee
     utils/
-      cycleTime.ts        # calcul et tendances du cycle time cote frontend
+      cycleTime.ts        # calcul et tendances du cycle time en jours calendaires
     components/steps/
       SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
       simulationPrintReport.tsx    # rapport imprimable
@@ -246,6 +246,12 @@ Les champs autorises en base sont:
 - `useSimulationHistory.ts` lit et ecrit uniquement `localStorage`
 - l'historique detaille reste contextualise par equipe dans le navigateur
 - le frontend ne recharge plus l'historique Mongo pour le melanger a cet historique local
+- les entrees locales portent un `schemaVersion` explicite
+- la version courante migre les anciennes entrees sans version en interpretant leurs
+  anciennes valeurs `Cycle Time` comme des semaines legacy a convertir en jours calendaires
+- la migration est idempotente: seules les entrees legacy sans version sont multipliees par `7`
+- cette migration ne modifie ni le throughput hebdomadaire, ni les modes Monte Carlo en semaines,
+  ni `target_weeks`
 
 `result_distribution` contient des buckets `{ x, count }`:
 
@@ -305,7 +311,8 @@ Frontend:
 - orchestration App allegée via `src/AppFlowContent.tsx`, `src/appNavigation.ts`, `src/appShellSections.tsx` et `src/appTheme.ts`
 - facade API allegee via `src/apiHelpers.ts` pour conserver des perimetres vitals plus stables
 - logique forecast scindee entre facade `src/hooks/simulationForecastService.ts` et coeur `src/hooks/simulationForecastCore.ts`
-- calcul du cycle time extrait dans `src/utils/cycleTime.ts` avec couverture unitaire ciblee
+- calcul du cycle time extrait dans `src/utils/cycleTime.ts` avec couverture unitaire ciblee,
+  en jours calendaires pour les restitutions frontend
 - quick filters persistants par scope `org::project::team`
 - mode portefeuille avec rapport PDF multi-scenarios
 - generation de rapport parallelisee avec tolerance aux echecs partiels

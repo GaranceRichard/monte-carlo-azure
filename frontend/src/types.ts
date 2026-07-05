@@ -26,7 +26,7 @@ export type WeeklyThroughputRow = {
 
 export type CycleTimePoint = {
   week: string;
-  cycleTime: number;
+  cycleTimeDays: number;
   count: number;
 };
 

@@ -14,6 +14,7 @@ function buildLocalEntry(
   overrides: Partial<SimulationHistoryEntry> = {},
 ): SimulationHistoryEntry {
   return {
+    schemaVersion: 2,
     id: "local-1",
     createdAt: "2026-03-01T10:00:00Z",
     selectedOrg: "org-demo",
@@ -54,10 +55,170 @@ describe("useSimulationHistory", () => {
     const { result } = renderHook(() => useSimulationHistory());
 
     await waitFor(() => {
-      expect(result.current.simulationHistory).toEqual([localEntry]);
+      expect(result.current.simulationHistory).toEqual([
+        expect.objectContaining({
+          ...localEntry,
+          cycleTimeDaysData: [],
+          warning: undefined,
+        }),
+      ]);
     });
 
     expect(storageGetItem).toHaveBeenCalledWith("mc_simulation_history_v2");
+  });
+
+  it("migrates versionless legacy cycle time weeks to schema v2 calendar days", async () => {
+    vi.mocked(storageGetItem).mockReturnValue(
+      JSON.stringify([
+        {
+          ...buildLocalEntry(),
+          schemaVersion: undefined,
+          cycleTimeData: [{ week: "2026-01-05", cycleTime: 2, count: 3 }],
+        },
+      ]),
+    );
+
+    const { result } = renderHook(() => useSimulationHistory());
+
+    await waitFor(() => {
+      expect(result.current.simulationHistory[0]?.schemaVersion).toBe(2);
+      expect(result.current.simulationHistory[0]?.cycleTimeDaysData).toEqual([
+        { week: "2026-01-05", cycleTimeDays: 14, count: 3 },
+      ]);
+    });
+  });
+
+  it("normalizes schema v2 stored entries with mixed weekly throughput and cycle time rows", async () => {
+    vi.mocked(storageGetItem).mockReturnValue(
+      JSON.stringify([
+        {
+          id: "local-2",
+          createdAt: "2026-03-02T10:00:00Z",
+          selectedOrg: "org-demo",
+          selectedProject: "Projet A",
+          selectedTeam: "Equipe Beta",
+          startDate: "2026-01-01",
+          endDate: "2026-02-01",
+          simulationMode: "weeks_to_items",
+          includeZeroWeeks: true,
+          backlogSize: 12,
+          targetWeeks: 6,
+          nSims: "1234.9",
+          types: ["Bug", 42],
+          doneStates: ["Done", null],
+          sampleStats: null,
+          weeklyThroughput: [null, { week: "2026-01-05", throughput: 3 }, "skip-me"],
+          cycleTimeDaysData: [
+            null,
+            { week: "2026-01-05T00:00:00Z", cycleTimeDays: "4.5", count: "2" },
+            { week: "2026-01-12", cycleTime: 3, count: -4 },
+            { week: "", cycleTimeDays: 8, count: 1 },
+          ],
+          result: undefined,
+          warning: 404,
+          schemaVersion: 2,
+        },
+      ]),
+    );
+
+    const { result } = renderHook(() => useSimulationHistory());
+
+    await waitFor(() => {
+      expect(result.current.simulationHistory).toEqual([
+        {
+          schemaVersion: 2,
+          id: "local-2",
+          createdAt: "2026-03-02T10:00:00Z",
+          selectedOrg: "org-demo",
+          selectedProject: "Projet A",
+          selectedTeam: "Equipe Beta",
+          startDate: "2026-01-01",
+          endDate: "2026-02-01",
+          simulationMode: "weeks_to_items",
+          includeZeroWeeks: true,
+          backlogSize: 12,
+          targetWeeks: 6,
+          nSims: 1234,
+          types: ["Bug"],
+          doneStates: ["Done"],
+          sampleStats: null,
+          weeklyThroughput: [{ week: "2026-01-05", throughput: 3 }],
+          cycleTimeDaysData: [
+            { week: "2026-01-05", cycleTimeDays: 4.5, count: 2 },
+            { week: "2026-01-12", cycleTimeDays: 3, count: 0 },
+          ],
+          result: {
+            result_kind: "weeks",
+            samples_count: 0,
+            result_percentiles: {},
+            result_distribution: [],
+          },
+          warning: undefined,
+        },
+      ]);
+    });
+  });
+
+  it("skips non-object rows and preserves string warnings when optional collections are malformed", async () => {
+    vi.mocked(storageGetItem).mockReturnValue(
+      JSON.stringify([
+        null,
+        {
+          id: "local-3",
+          createdAt: "2026-03-03T10:00:00Z",
+          selectedOrg: "org-demo",
+          selectedProject: "Projet A",
+          selectedTeam: "Equipe Gamma",
+          startDate: "2026-01-01",
+          endDate: "2026-02-01",
+          simulationMode: "weeks_to_items",
+          includeZeroWeeks: false,
+          backlogSize: 5,
+          targetWeeks: 2,
+          nSims: 500,
+          types: "Bug",
+          doneStates: "Done",
+          weeklyThroughput: "invalid",
+          cycleTimeDaysData: "invalid",
+          warning: "warning conserve",
+          schemaVersion: 2,
+        },
+      ]),
+    );
+
+    const { result } = renderHook(() => useSimulationHistory());
+
+    await waitFor(() => {
+      expect(result.current.simulationHistory).toEqual([
+        {
+          schemaVersion: 2,
+          id: "local-3",
+          createdAt: "2026-03-03T10:00:00Z",
+          selectedOrg: "org-demo",
+          selectedProject: "Projet A",
+          selectedTeam: "Equipe Gamma",
+          startDate: "2026-01-01",
+          endDate: "2026-02-01",
+          simulationMode: "weeks_to_items",
+          includeZeroWeeks: false,
+          backlogSize: 5,
+          targetWeeks: 2,
+          nSims: 500,
+          types: [],
+          doneStates: [],
+          sampleStats: null,
+          weeklyThroughput: [],
+          cycleTimeDaysData: [],
+          result: {
+            result_kind: "weeks",
+            samples_count: 0,
+            result_percentiles: {},
+            result_distribution: [],
+          },
+          warning: "warning conserve",
+        },
+      ]);
+    });
   });
 
   it("falls back to empty local state when storage contains invalid JSON", async () => {

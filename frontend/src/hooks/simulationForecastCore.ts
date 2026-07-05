@@ -39,7 +39,7 @@ export async function fetchTeamThroughputCore(
     const throughputSamples = getDemoThroughputSamples(selectedTeam).filter((n) => (includeZeroWeeks ? n >= 0 : n > 0));
     return {
       weeklyThroughput: weekly,
-      cycleTimeData: getDemoCycleTime(selectedTeam),
+      cycleTimeDaysData: getDemoCycleTime(selectedTeam),
       throughputSamples,
       sampleStats: {
         totalWeeks: weekly.length,
@@ -77,7 +77,7 @@ export async function fetchTeamThroughputCore(
 
   return {
     weeklyThroughput: weekly,
-    cycleTimeData: throughputResponse.cycleTimeData,
+    cycleTimeDaysData: throughputResponse.cycleTimeDaysData,
     throughputSamples,
     sampleStats,
     warning,
@@ -174,6 +174,7 @@ export async function runSimulationForecastCore(
   });
 
   const historyEntry: SimulationHistoryEntry = {
+    schemaVersion: 2,
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     createdAt: new Date().toISOString(),
     selectedOrg,
@@ -190,14 +191,14 @@ export async function runSimulationForecastCore(
     doneStates: [...doneStates],
     sampleStats: throughputData.sampleStats,
     weeklyThroughput: throughputData.weeklyThroughput,
-    cycleTimeData: throughputData.cycleTimeData,
+    cycleTimeDaysData: throughputData.cycleTimeDaysData,
     result: adjusted,
     warning: throughputData.warning,
   };
 
   return {
     weeklyThroughput: throughputData.weeklyThroughput,
-    cycleTimeData: throughputData.cycleTimeData,
+    cycleTimeDaysData: throughputData.cycleTimeDaysData,
     sampleStats: throughputData.sampleStats,
     result: adjusted,
     historyEntry,

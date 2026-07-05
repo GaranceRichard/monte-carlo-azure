@@ -35,7 +35,7 @@ type TeamFieldValue = { value?: string; includeChildren?: boolean };
 type ProfileMe = { id?: string; publicAlias?: string; displayName?: string };
 type WeeklyThroughputRow = { week: string; throughput: number };
 type WeeklyThroughputResponse = WeeklyThroughputRow[] | { weeklyThroughput: WeeklyThroughputRow[]; warning?: string };
-type TeamDeliveryDataResponse = { weeklyThroughput: WeeklyThroughputRow[]; cycleTimeData: CycleTimePoint[]; warning?: string };
+type TeamDeliveryDataResponse = { weeklyThroughput: WeeklyThroughputRow[]; cycleTimeDaysData: CycleTimePoint[]; warning?: string };
 type ResolvedPatProfile = {
   displayName: string;
   id: string;
@@ -484,7 +484,7 @@ export async function getTeamDeliveryDataDirect(
   if (!completeWeekRange) {
     return {
       weeklyThroughput: [],
-      cycleTimeData: [],
+      cycleTimeDaysData: [],
       warning: "Aucune semaine complete n'est disponible sur la periode selectionnee.",
     };
   }
@@ -675,7 +675,7 @@ export async function getTeamDeliveryDataDirect(
 
   return {
     weeklyThroughput: result,
-    cycleTimeData: calculateCycleTimeData(cycleTimeItems, doneStates),
+    cycleTimeDaysData: calculateCycleTimeData(cycleTimeItems, doneStates),
     warning: warnings.length ? warnings.join(" ") : undefined,
   };
 }

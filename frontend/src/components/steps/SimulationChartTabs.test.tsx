@@ -107,15 +107,15 @@ function buildSimulation(overrides: Partial<Record<string, unknown>> = {}) {
     exportThroughputCsv: vi.fn(),
     resetForTeamSelection: vi.fn(),
     tooltipBaseProps: { cursor: false },
-    cycleTimeData: [
-      { week: "2026-W01", cycleTime: 1.2, count: 2 },
-      { week: "2026-W02", cycleTime: 1.8, count: 1 },
+    cycleTimeDaysData: [
+      { week: "2026-W01", cycleTimeDays: 1.2, count: 2 },
+      { week: "2026-W02", cycleTimeDays: 1.8, count: 1 },
     ],
     cycleTimeTrendData: [
-      { week: "2026-W01", average: 1.2, lowerBound: 1.2, upperBound: 1.2, itemCount: 2 },
-      { week: "2026-W02", average: 1.4, lowerBound: 1.1, upperBound: 1.7, itemCount: 3 },
+      { week: "2026-W01", averageDays: 1.2, lowerBoundDays: 1.2, upperBoundDays: 1.2, itemCount: 2 },
+      { week: "2026-W02", averageDays: 1.4, lowerBoundDays: 1.1, upperBoundDays: 1.7, itemCount: 3 },
     ],
-    cycleTimeSummary: { itemCount: 3, average: 1.4, hasSufficientData: true },
+    cycleTimeSummary: { itemCount: 3, averageDays: 1.4, hasSufficientData: true },
     throughputData: [
       { week: "2026-W01", throughput: 1 },
       { week: "2026-W02", throughput: 3 },
@@ -196,7 +196,7 @@ describe("SimulationChartTabs", () => {
     expect(screen.getByText("Cycle Time")).toBeInTheDocument();
     expect(screen.getByText("Items")).toBeInTheDocument();
     expect(screen.getByText("3")).toBeInTheDocument();
-    expect(screen.getByText("1,40 sem")).toBeInTheDocument();
+    expect(screen.getByText("1,40 j")).toBeInTheDocument();
   });
 
   it("renders the cycle time chart inside the shared chart wrapper", () => {
@@ -280,7 +280,7 @@ describe("SimulationChartTabs", () => {
           targetWeeks: 4,
           nSims: 1000,
           resultKind: "weeks",
-          cycleTimePoints: simulation.cycleTimeData,
+          cycleTimePoints: simulation.cycleTimeDaysData,
           cycleTimeTrendPoints: simulation.cycleTimeTrendData,
           throughputPoints: expect.arrayContaining([
             expect.objectContaining({ week: "2026-W03", throughput: 5, movingAverage: 3 }),
@@ -373,7 +373,7 @@ describe("SimulationChartTabs", () => {
             samples_count: 7,
           },
         },
-        cycleTimeData: [{ week: "2026-W01", cycleTime: 1.2, count: 0 }],
+        cycleTimeDaysData: [{ week: "2026-W01", cycleTimeDays: 1.2, count: 0 }],
       }),
     };
 
@@ -385,7 +385,7 @@ describe("SimulationChartTabs", () => {
       cycleTimeTooltip.content({
         active: true,
         label: "2026-W01",
-        payload: [{ dataKey: "average", value: undefined, payload: {} }],
+        payload: [{ dataKey: "averageDays", value: undefined, payload: {} }],
       }),
     ).toBeTruthy();
     expect(
@@ -426,9 +426,9 @@ describe("SimulationChartTabs", () => {
     simulationContextValue = {
       selectedTeam: "Team Alpha",
       simulation: buildSimulation({
-        cycleTimeData: [{ week: "2026-W01", cycleTime: 1.2, count: 1 }],
-        cycleTimeTrendData: [{ week: "2026-W01", average: 1.2, lowerBound: 1.2, upperBound: 1.2, itemCount: 1 }],
-        cycleTimeSummary: { itemCount: 1, average: 1.2, hasSufficientData: false },
+        cycleTimeDaysData: [{ week: "2026-W01", cycleTimeDays: 1.2, count: 1 }],
+        cycleTimeTrendData: [{ week: "2026-W01", averageDays: 1.2, lowerBoundDays: 1.2, upperBoundDays: 1.2, itemCount: 1 }],
+        cycleTimeSummary: { itemCount: 1, averageDays: 1.2, hasSufficientData: false },
       }),
     };
 

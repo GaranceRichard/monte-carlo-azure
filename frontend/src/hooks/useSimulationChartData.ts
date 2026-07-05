@@ -31,12 +31,12 @@ function isLegacyItemsPercentiles(percentiles: Record<string, number>): boolean 
 
 export function useSimulationChartData({
   weeklyThroughput,
-  cycleTimeData,
+  cycleTimeDaysData,
   includeZeroWeeks,
   result,
 }: {
   weeklyThroughput: WeeklyThroughputRow[];
-  cycleTimeData: CycleTimePoint[];
+  cycleTimeDaysData: CycleTimePoint[];
   includeZeroWeeks: boolean;
   result: ForecastResponse | null;
 }) {
@@ -48,8 +48,8 @@ export function useSimulationChartData({
     }));
   }, [weeklyThroughput, includeZeroWeeks]);
 
-  const cycleTimeTrendData = useMemo(() => buildCycleTimeTrendData(cycleTimeData), [cycleTimeData]);
-  const cycleTimeSummary = useMemo(() => summarizeCycleTime(cycleTimeData), [cycleTimeData]);
+  const cycleTimeTrendData = useMemo(() => buildCycleTimeTrendData(cycleTimeDaysData), [cycleTimeDaysData]);
+  const cycleTimeSummary = useMemo(() => summarizeCycleTime(cycleTimeDaysData), [cycleTimeDaysData]);
 
   const mcHistData = useMemo((): ChartPoint[] => {
     const buckets = result?.result_distribution;
@@ -98,7 +98,7 @@ export function useSimulationChartData({
 
   return {
     throughputData,
-    cycleTimeData,
+    cycleTimeDaysData,
     cycleTimeTrendData,
     cycleTimeSummary,
     mcHistData,

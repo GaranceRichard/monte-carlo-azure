@@ -33,15 +33,17 @@ function buildDemoCycleTimeRows(
 ): CycleTimePoint[] {
   return weeklyRows.flatMap((row, index) => {
     if (row.throughput <= 0) return [];
-    const baseCycleTime = Math.max(0.4, profile.base - row.throughput * profile.throughputWeight);
-    const lowCycleTime = Number(Math.max(0.2, baseCycleTime - profile.spread + ((index % 3) - 1) * 0.12).toFixed(2));
-    const highCycleTime = Number((baseCycleTime + profile.spread + ((index % 2) * 0.14)).toFixed(2));
+    const baseCycleTimeDays = Math.max(3, (profile.base - row.throughput * profile.throughputWeight) * 7);
+    const lowCycleTimeDays = Number(
+      Math.max(1.5, baseCycleTimeDays - profile.spread * 7 + ((index % 3) - 1) * 0.84).toFixed(2),
+    );
+    const highCycleTimeDays = Number((baseCycleTimeDays + profile.spread * 7 + ((index % 2) * 0.98)).toFixed(2));
     const primaryCount = Math.max(1, Math.round(row.throughput * 0.65));
     const secondaryCount = row.throughput - primaryCount;
 
     return [
-      { week: row.week, cycleTime: lowCycleTime, count: primaryCount },
-      ...(secondaryCount > 0 ? [{ week: row.week, cycleTime: highCycleTime, count: secondaryCount }] : []),
+      { week: row.week, cycleTimeDays: lowCycleTimeDays, count: primaryCount },
+      ...(secondaryCount > 0 ? [{ week: row.week, cycleTimeDays: highCycleTimeDays, count: secondaryCount }] : []),
     ];
   });
 }

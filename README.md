@@ -45,6 +45,7 @@ Demo GitHub Pages:
 - lisibilite renforcee des graphes de simulation, y compris les etiquettes de l'axe X
 - legendes de graphiques harmonisees, affichees seulement quand utiles et sans debordement en bas du panneau
 - calcul du `cycleTime` extrait dans un utilitaire dedie avec couverture unitaire ciblee
+- `Cycle Time` affiche partout en jours calendaires (cartes, graphiques, tooltips, demo et PDF)
 - affichage d'un `Risk Score` avec code couleur
   - `backlog_to_weeks`: `(P90 - P50) / P50`
   - `weeks_to_items`: `(P50 - P90) / P50`
@@ -101,6 +102,12 @@ renvoyes par l'API et ne recalcule depuis l'histogramme que pour d'anciens histo
 detectes par un ordre legacy `P50 <= P70 <= P90`.
 Le `Risk Score`, lui, est maintenant calcule partout a partir des percentiles metier
 effectivement exposes par l'API et affiches a l'ecran, y compris dans les exports PDF.
+Le `Cycle Time`, lui, reste une restitution frontend distincte du moteur Monte Carlo:
+il est calcule et affiche en jours calendaires, tandis que le throughput historique,
+les modes `backlog_to_weeks` / `weeks_to_items` et `target_weeks` restent exprimes en semaines.
+L'historique local des simulations embarque aussi un `schemaVersion`; les anciennes entrees
+sans version sont migrees une seule fois au chargement en convertissant leurs anciennes
+valeurs `Cycle Time` stockees en semaines vers des jours calendaires (`* 7`).
 
 ---
 
@@ -117,7 +124,7 @@ Les invariants techniques et les controles CI associes sont documentes dans [`AR
 
 Frontiere d'identite Azure DevOps :
 
-- le navigateur conserve le `PAT`, l'URL serveur, l'organisation, le projet, l'equipe, la periode, les types, les etats `Done`, l'historique hebdomadaire brut, le cycle time brut et l'historique utilisateur contextualise
+- le navigateur conserve le `PAT`, l'URL serveur, l'organisation, le projet, l'equipe, la periode, les types, les etats `Done`, l'historique hebdomadaire brut, le cycle time brut en jours calendaires et l'historique utilisateur contextualise
 - `POST /simulate` transmet uniquement `throughput_samples`, `include_zero_weeks`, `mode`, `backlog_size`, `target_weeks`, `n_sims` et un `seed` optionnel
 - MongoDB ne persiste que `mc_client_id`, `created_at`, `last_seen`, les parametres Monte Carlo et les resultats statistiques anonymes
 - `mc_client_id` est un identifiant anonyme non derive d'Azure DevOps

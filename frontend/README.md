@@ -81,6 +81,9 @@ Le frontend couvre notamment :
   - message explicite si la plage choisie ne contient aucune semaine exploitable
 - historique local des simulations
 - historique local contextualise par equipe, conserve uniquement dans `localStorage`
+- `Cycle Time` calcule et affiche en jours calendaires dans les cartes, graphiques, tooltips et exports PDF
+- historique local versionne: les anciennes entrees sans `schemaVersion` sont migrees une seule fois
+  de semaines vers jours calendaires pour le `Cycle Time`
 - mode portefeuille multi-equipes
   - scenario `Optimiste`: somme des tirages independants par equipe
   - scenario `Arrime`: reduction du scenario optimiste par le facteur d'arrimage
@@ -104,7 +107,9 @@ Le frontend couvre notamment :
 - `src/api.ts` reste un wrapper fin; les normalisations et fallbacks vivent dans `src/apiHelpers.ts`
 - `src/hooks/simulationForecastService.ts` reste la facade forecast publique; les branches metier sont dans `src/hooks/simulationForecastCore.ts`
 - `src/date.ts` centralise les utilitaires de dates locales et l'alignement des semaines completes sans parser `YYYY-MM-DD` en UTC
-- `src/utils/cycleTime.ts` porte le calcul et les tendances du cycle time pour les onglets simulation et l'export
+- `src/utils/cycleTime.ts` porte le calcul et les tendances du cycle time en jours calendaires pour les onglets simulation et l'export
+- `src/hooks/useSimulationHistory.ts` migre les historiques locaux legacy sans version:
+  les anciennes valeurs `Cycle Time` en semaines sont converties en jours calendaires, sans toucher au throughput ni a `targetWeeks`
 
 ## Contraintes d'architecture
 

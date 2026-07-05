@@ -5,14 +5,14 @@ export type ProbabilityPoint = { x: number; probability: number };
 export type ThroughputPoint = { week: string; throughput: number };
 export type CycleTimeTrendPoint = {
   week: string;
-  average: number;
-  lowerBound: number;
-  upperBound: number;
+  averageDays: number;
+  lowerBoundDays: number;
+  upperBoundDays: number;
   itemCount: number;
 };
 export type CycleTimeSummary = {
   itemCount: number;
-  average: number | null;
+  averageDays: number | null;
   hasSufficientData: boolean;
 };
 
@@ -40,6 +40,7 @@ export type StoredSimulationPrefs = {
 };
 
 export type SimulationHistoryEntry = {
+  schemaVersion: 2;
   id: string;
   createdAt: string;
   selectedOrg: string;
@@ -56,7 +57,7 @@ export type SimulationHistoryEntry = {
   doneStates: string[];
   sampleStats: SampleStats | null;
   weeklyThroughput: WeeklyThroughputRow[];
-  cycleTimeData?: CycleTimePoint[];
+  cycleTimeDaysData?: CycleTimePoint[];
   result: ForecastResponse;
   warning?: string;
 };
@@ -85,7 +86,7 @@ export type SimulationResult = {
   result: ForecastResponse | null;
   displayPercentiles: Record<string, number>;
   throughputData: ThroughputPoint[];
-  cycleTimeData: CycleTimePoint[];
+  cycleTimeDaysData: CycleTimePoint[];
   cycleTimeTrendData: CycleTimeTrendPoint[];
   cycleTimeSummary: CycleTimeSummary;
   mcHistData: ChartPoint[];

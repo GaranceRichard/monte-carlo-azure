@@ -67,7 +67,7 @@ function buildThroughputPoints(count: number): ThroughputExportPoint[] {
 function buildCycleTimePoints(count: number): CycleTimeExportPoint[] {
   return Array.from({ length: count }, (_, i) => ({
     week: `2025-01-${String((i % 6) + 1).padStart(2, "0")}`,
-    cycleTime: 1.2 + i * 0.35,
+    cycleTimeDays: 1.2 + i * 0.35,
     count: (i % 3) + 1,
   }));
 }
@@ -75,9 +75,9 @@ function buildCycleTimePoints(count: number): CycleTimeExportPoint[] {
 function buildCycleTimeTrendPoints(count: number): CycleTimeTrendExportPoint[] {
   return Array.from({ length: count }, (_, i) => ({
     week: `2025-01-${String(i + 1).padStart(2, "0")}`,
-    average: 1.5 + i * 0.2,
-    lowerBound: 1.2 + i * 0.2,
-    upperBound: 1.8 + i * 0.2,
+    averageDays: 1.5 + i * 0.2,
+    lowerBoundDays: 1.2 + i * 0.2,
+    upperBoundDays: 1.8 + i * 0.2,
     itemCount: i + 2,
   }));
 }

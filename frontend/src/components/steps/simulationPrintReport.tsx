@@ -198,7 +198,7 @@ export function buildSimulationPrintReportHtml({
           <div class="kpi"><span class="kpi-label">Fiabilite</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>
         </section>
         <section class="section">
-          <h2>Cycle Time</h2>
+          <h2>Cycle Time (jours calendaires)</h2>
           <div class="chart-wrap">${cycleTimeSvg}</div>
         </section>
 

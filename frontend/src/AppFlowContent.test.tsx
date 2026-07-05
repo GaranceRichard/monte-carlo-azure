@@ -96,11 +96,11 @@ function buildProps() {
     activeChartTab: "cycle_time",
     setActiveChartTab: vi.fn(),
     throughputData: [],
-    cycleTimeData: [],
+    cycleTimeDaysData: [],
     cycleTimeTrendData: [],
     cycleTimeSummary: {
       itemCount: 0,
-      average: null,
+      averageDays: null,
       hasSufficientData: false,
     },
     mcHistData: [],

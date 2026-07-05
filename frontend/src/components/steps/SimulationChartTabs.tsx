@@ -74,9 +74,9 @@ export default function SimulationChartTabs() {
   const reliabilityTone = useMemo(() => getReliabilityTone(reliability?.label), [reliability?.label]);
   const cycleTimeChartData = useMemo(() => {
     const observedByWeek = new Map<string, { weightedSum: number; count: number }>();
-    s.cycleTimeData.forEach((point) => {
+    s.cycleTimeDaysData.forEach((point) => {
       const current = observedByWeek.get(point.week) ?? { weightedSum: 0, count: 0 };
-      current.weightedSum += point.cycleTime * point.count;
+      current.weightedSum += point.cycleTimeDays * point.count;
       current.count += point.count;
       observedByWeek.set(point.week, current);
     });
@@ -87,16 +87,16 @@ export default function SimulationChartTabs() {
         observed && observed.count > 0 ? Number((observed.weightedSum / observed.count).toFixed(2)) : null;
       return {
         week: point.week,
-        average: point.average,
-        lowerBound: point.lowerBound,
-        upperBound: point.upperBound,
-        bandBase: point.lowerBound,
-        bandRange: Math.max(0, Number((point.upperBound - point.lowerBound).toFixed(2))),
+        averageDays: point.averageDays,
+        lowerBoundDays: point.lowerBoundDays,
+        upperBoundDays: point.upperBoundDays,
+        bandBaseDays: point.lowerBoundDays,
+        bandRangeDays: Math.max(0, Number((point.upperBoundDays - point.lowerBoundDays).toFixed(2))),
         observedAverage,
         itemCount: point.itemCount,
       };
     });
-  }, [s.cycleTimeData, s.cycleTimeTrendData]);
+  }, [s.cycleTimeDaysData, s.cycleTimeTrendData]);
 
   const renderThroughputTooltip = ({
     active,
@@ -129,7 +129,7 @@ export default function SimulationChartTabs() {
     label?: string | number;
   }) => {
     if (!active || !payload?.length) return null;
-    const averagePoint = payload.find((p) => p.dataKey === "average");
+    const averagePoint = payload.find((p) => p.dataKey === "averageDays");
     const observedPoint = payload.find((p) => p.dataKey === "observedAverage");
     const itemCount = averagePoint?.payload?.itemCount ?? 0;
 
@@ -137,10 +137,10 @@ export default function SimulationChartTabs() {
       <div style={{ background: "var(--panel)", border: "1px solid var(--border)", borderRadius: 10, padding: "8px 10px" }}>
         <div style={{ color: "var(--muted)", fontWeight: 700, marginBottom: 4 }}>{label}</div>
         <div style={{ color: "var(--text)", fontWeight: 700 }}>
-          moyenne glissante: {formatCycleTimeMetric(Number(averagePoint?.value ?? 0))} sem
+          moyenne glissante: {formatCycleTimeMetric(Number(averagePoint?.value ?? 0))} j
         </div>
         <div style={{ color: "var(--text)", fontWeight: 700 }}>
-          cycle time observé: {formatCycleTimeMetric(observedPoint?.value == null ? null : Number(observedPoint.value))} sem
+          cycle time observé: {formatCycleTimeMetric(observedPoint?.value == null ? null : Number(observedPoint.value))} j
         </div>
         <div style={{ color: "var(--muted)", fontWeight: 700, marginTop: 4 }}>{itemCount} items</div>
       </div>
@@ -200,7 +200,7 @@ export default function SimulationChartTabs() {
         resultKind: s.result.result_kind,
         displayPercentiles: s.displayPercentiles,
         throughputReliability: reliability,
-        cycleTimePoints: s.cycleTimeData,
+        cycleTimePoints: s.cycleTimeDaysData,
         cycleTimeTrendPoints: s.cycleTimeTrendData,
         throughputPoints: throughputWithMovingAverage,
         distributionPoints: s.mcHistData,
@@ -260,7 +260,7 @@ export default function SimulationChartTabs() {
               <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3 text-center">
                 <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Cycle Time moyen</div>
                 <div className="mt-1 text-lg font-extrabold text-[var(--text)]">
-                  {formatCycleTimeMetric(s.cycleTimeSummary.average)} sem
+                  {formatCycleTimeMetric(s.cycleTimeSummary.averageDays)} j
                 </div>
               </div>
             </div>
@@ -272,10 +272,10 @@ export default function SimulationChartTabs() {
                     <XAxis dataKey="week" tick={xAxisTick} tickMargin={10} minTickGap={24} />
                     <YAxis domain={[0, getCycleTimeYAxisMax]} tick={yAxisTick} />
                     <Tooltip {...s.tooltipBaseProps} content={renderCycleTimeTooltip} />
-                    <Legend {...sharedLegendProps} content={renderChartLegend(["average", "observedAverage"])} />
+                    <Legend {...sharedLegendProps} content={renderChartLegend(["averageDays", "observedAverage"])} />
                     <Area
                       type="monotone"
-                      dataKey="bandBase"
+                      dataKey="bandBaseDays"
                       stackId="cycle-band"
                       stroke="transparent"
                       fill="transparent"
@@ -284,7 +284,7 @@ export default function SimulationChartTabs() {
                     />
                     <Area
                       type="monotone"
-                      dataKey="bandRange"
+                      dataKey="bandRangeDays"
                       stackId="cycle-band"
                       name="Variabilité"
                       stroke="transparent"
@@ -294,7 +294,7 @@ export default function SimulationChartTabs() {
                     />
                     <Line
                       type="monotone"
-                      dataKey="average"
+                      dataKey="averageDays"
                       dot={false}
                       strokeWidth={2.5}
                       stroke="var(--brand)"

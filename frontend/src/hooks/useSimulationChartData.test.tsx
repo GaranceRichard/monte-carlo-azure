@@ -12,7 +12,7 @@ describe("useSimulationChartData", () => {
     const { result } = renderHook(() =>
       useSimulationChartData({
         weeklyThroughput: [],
-        cycleTimeData: [],
+        cycleTimeDaysData: [],
         includeZeroWeeks: true,
         result: null,
       }),
@@ -30,7 +30,7 @@ describe("useSimulationChartData", () => {
           { week: "2026-01-05T00:00:00Z", throughput: 0 },
           { week: "2026-01-12T00:00:00Z", throughput: 3 },
         ],
-        cycleTimeData: [],
+        cycleTimeDaysData: [],
         includeZeroWeeks: false,
         result: null,
       }),
@@ -45,7 +45,7 @@ describe("useSimulationChartData", () => {
     const { result } = renderHook(() =>
       useSimulationChartData({
         weeklyThroughput: [],
-        cycleTimeData: [],
+        cycleTimeDaysData: [],
         includeZeroWeeks: true,
         result: {
           result_kind: "weeks",
@@ -88,7 +88,7 @@ describe("useSimulationChartData", () => {
     const { result } = renderHook(() =>
       useSimulationChartData({
         weeklyThroughput: [],
-        cycleTimeData: [],
+        cycleTimeDaysData: [],
         includeZeroWeeks: true,
         result: {
           result_kind: "items",
@@ -116,7 +116,7 @@ describe("useSimulationChartData", () => {
     const { result } = renderHook(() =>
       useSimulationChartData({
         weeklyThroughput: [],
-        cycleTimeData: [],
+        cycleTimeDaysData: [],
         includeZeroWeeks: true,
         result: {
           result_kind: "items",
@@ -143,7 +143,7 @@ describe("useSimulationChartData", () => {
     const { result } = renderHook(() =>
       useSimulationChartData({
         weeklyThroughput: [],
-        cycleTimeData: [],
+        cycleTimeDaysData: [],
         includeZeroWeeks: true,
         result: {
           result_kind: "items",

@@ -40,7 +40,7 @@ describe("calculateCycleTimeData", () => {
       ["Done"],
     );
 
-    expect(result).toEqual([{ week: "2026-01-12", cycleTime: 1, count: 2 }]);
+    expect(result).toEqual([{ week: "2026-01-12", cycleTimeDays: 7, count: 2 }]);
   });
 
   it("excludes items that never left new", () => {
@@ -98,9 +98,9 @@ describe("calculateCycleTimeData", () => {
     );
 
     expect(result).toEqual([
-      { week: "2026-01-12", cycleTime: 1.57, count: 1 },
-      { week: "2026-01-12", cycleTime: 1.14, count: 1 },
-    ].sort((left, right) => left.cycleTime - right.cycleTime));
+      { week: "2026-01-12", cycleTimeDays: 11, count: 1 },
+      { week: "2026-01-12", cycleTimeDays: 8, count: 1 },
+    ].sort((left, right) => left.cycleTimeDays - right.cycleTimeDays));
   });
 
   it("sorts points across weeks and skips invalid revision dates", () => {
@@ -124,7 +124,7 @@ describe("calculateCycleTimeData", () => {
       ["Done"],
     );
 
-    expect(result).toEqual([{ week: "2026-01-12", cycleTime: 1.29, count: 1 }]);
+    expect(result).toEqual([{ week: "2026-01-12", cycleTimeDays: 9, count: 1 }]);
   });
 
   it("ignores items whose done transition happens before activation", () => {
@@ -152,68 +152,68 @@ describe("cycle time chart helpers", () => {
 
   it("builds rolling averages and std-dev bands from aggregated data", () => {
     const points = [
-      { week: "2026-01-05", cycleTime: 1, count: 2 },
-      { week: "2026-01-12", cycleTime: 2, count: 1 },
-      { week: "2026-01-19", cycleTime: 3, count: 1 },
+      { week: "2026-01-05", cycleTimeDays: 1, count: 2 },
+      { week: "2026-01-12", cycleTimeDays: 2, count: 1 },
+      { week: "2026-01-19", cycleTimeDays: 3, count: 1 },
     ];
 
     expect(buildCycleTimeTrendData(points, 2)).toEqual([
-      { week: "2026-01-05", average: 1, lowerBound: 1, upperBound: 1, itemCount: 2 },
-      { week: "2026-01-12", average: 1.33, lowerBound: 0.86, upperBound: 1.8, itemCount: 3 },
-      { week: "2026-01-19", average: 2.5, lowerBound: 2, upperBound: 3, itemCount: 2 },
+      { week: "2026-01-05", averageDays: 1, lowerBoundDays: 1, upperBoundDays: 1, itemCount: 2 },
+      { week: "2026-01-12", averageDays: 1.33, lowerBoundDays: 0.86, upperBoundDays: 1.8, itemCount: 3 },
+      { week: "2026-01-19", averageDays: 2.5, lowerBoundDays: 2, upperBoundDays: 3, itemCount: 2 },
     ]);
   });
 
   it("groups several points for the same week into the same rolling window", () => {
     const points = [
-      { week: "2026-01-05", cycleTime: 1, count: 1 },
-      { week: "2026-01-05", cycleTime: 3, count: 1 },
-      { week: "2026-01-12", cycleTime: 5, count: 1 },
+      { week: "2026-01-05", cycleTimeDays: 1, count: 1 },
+      { week: "2026-01-05", cycleTimeDays: 3, count: 1 },
+      { week: "2026-01-12", cycleTimeDays: 5, count: 1 },
     ];
 
     expect(buildCycleTimeTrendData(points, 2)).toEqual([
-      { week: "2026-01-05", average: 2, lowerBound: 1, upperBound: 3, itemCount: 2 },
-      { week: "2026-01-12", average: 3, lowerBound: 1.37, upperBound: 4.63, itemCount: 3 },
+      { week: "2026-01-05", averageDays: 2, lowerBoundDays: 1, upperBoundDays: 3, itemCount: 2 },
+      { week: "2026-01-12", averageDays: 3, lowerBoundDays: 1.37, upperBoundDays: 4.63, itemCount: 3 },
     ]);
   });
 
   it("falls back to zeroed trend values when a week contains no usable item count", () => {
-    expect(buildCycleTimeTrendData([{ week: "2026-01-05", cycleTime: 2, count: 0 }], 1)).toEqual([
-      { week: "2026-01-05", average: 0, lowerBound: 0, upperBound: 0, itemCount: 0 },
+    expect(buildCycleTimeTrendData([{ week: "2026-01-05", cycleTimeDays: 2, count: 0 }], 1)).toEqual([
+      { week: "2026-01-05", averageDays: 0, lowerBoundDays: 0, upperBoundDays: 0, itemCount: 0 },
     ]);
   });
 
   it("summarizes weighted count and average and detects insufficient data", () => {
     expect(
       summarizeCycleTime([
-        { week: "2026-01-05", cycleTime: 1, count: 2 },
-        { week: "2026-01-12", cycleTime: 2, count: 1 },
+        { week: "2026-01-05", cycleTimeDays: 1, count: 2 },
+        { week: "2026-01-12", cycleTimeDays: 2, count: 1 },
       ]),
     ).toEqual({
       itemCount: 3,
-      average: 1.33,
+      averageDays: 1.33,
       hasSufficientData: true,
     });
 
     expect(
-      summarizeCycleTime([{ week: "2026-01-05", cycleTime: 1, count: 1 }]),
+      summarizeCycleTime([{ week: "2026-01-05", cycleTimeDays: 1, count: 1 }]),
     ).toEqual({
       itemCount: 1,
-      average: 1,
+      averageDays: 1,
       hasSufficientData: false,
     });
 
     expect(
-      summarizeCycleTime([{ week: "2026-01-05", cycleTime: 2, count: 0 }]),
+      summarizeCycleTime([{ week: "2026-01-05", cycleTimeDays: 2, count: 0 }]),
     ).toEqual({
       itemCount: 0,
-      average: null,
+      averageDays: null,
       hasSufficientData: false,
     });
 
     expect(summarizeCycleTime([])).toEqual({
       itemCount: 0,
-      average: null,
+      averageDays: null,
       hasSufficientData: false,
     });
   });

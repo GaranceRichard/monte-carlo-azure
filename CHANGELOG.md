@@ -4,6 +4,12 @@
 
 ### Frontend
 
+- `Cycle Time` exprime partout en jours calendaires cote frontend: calcul, types, noms de proprietes,
+  graphiques, tooltips, cartes, demo et exports PDF
+- versionnement de l'historique local de simulation avec `schemaVersion`, migration idempotente
+  des anciennes entrees sans version et conversion unique des anciennes valeurs `Cycle Time`
+  stockees en semaines vers des jours calendaires (`* 7`)
+- renommage des proprietes `Cycle Time` pour expliciter l'unite (`*Days`) et eviter les champs ambigus
 - typage explicite de `AppFlowContent` sur `OnboardingState`, `OnboardingActions` et `SimulationViewModel`, avec test du rendu nominal de l'etape PAT et garde runtime conservee pour une etape inattendue
 - suppression de `client_context` du contrat frontend/backend de simulation: `POST /simulate` transporte maintenant uniquement les donnees Monte Carlo statistiques
 - l'historique detaille contextualise par equipe reste strictement local au navigateur; le frontend ne remappe plus l'historique Mongo dans `useSimulationHistory`

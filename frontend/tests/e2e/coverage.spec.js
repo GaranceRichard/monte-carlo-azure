@@ -1356,8 +1356,8 @@ test.describe("e2e istanbul coverage", () => {
         ),
         zeroLowerBoundTrend: cycleTime.buildCycleTimeTrendData(
           [
-            { week: "2026-01-05", cycleTime: 0.1, count: 1 },
-            { week: "2026-01-12", cycleTime: 5, count: 1 },
+            { week: "2026-01-05", cycleTimeDays: 0.1, count: 1 },
+            { week: "2026-01-12", cycleTimeDays: 5, count: 1 },
           ],
           2,
         ),
@@ -1366,7 +1366,7 @@ test.describe("e2e istanbul coverage", () => {
 
     expect(results.noDoneStates).toEqual([]);
     expect(results.invalidOrdering).toEqual([]);
-    expect(results.zeroLowerBoundTrend[0].lowerBound).toBeGreaterThanOrEqual(0);
+    expect(results.zeroLowerBoundTrend[0].lowerBoundDays).toBeGreaterThanOrEqual(0);
   });
 
   test("coverage: branches usePortfolioReport direct", async ({ page }) => {

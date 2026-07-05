@@ -67,7 +67,7 @@ function baseParams(overrides: Partial<Parameters<typeof runSimulationForecast>[
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({ weeklyThroughput: WEEKLY_6, cycleTimeData: [] });
+  vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({ weeklyThroughput: WEEKLY_6, cycleTimeDaysData: [] });
   vi.mocked(postSimulate).mockResolvedValue(API_RESPONSE_WEEKS);
 });
 
@@ -88,7 +88,7 @@ describe("demo mode et normalisation", () => {
     });
 
     expect(result.weeklyThroughput.length).toBeGreaterThan(0);
-    expect(result.cycleTimeData.length).toBeGreaterThan(0);
+    expect(result.cycleTimeDaysData.length).toBeGreaterThan(0);
     expect(result.sampleStats.totalWeeks).toBe(result.weeklyThroughput.length);
     expect(result.sampleStats.zeroWeeks).toBe(0);
     expect(vi.mocked(getTeamDeliveryDataDirect)).not.toHaveBeenCalled();
@@ -167,7 +167,7 @@ describe("appels réseau", () => {
   it("utilise la forme objet weeklyThroughput + warning quand ADO renvoie un warning", async () => {
     vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({
       weeklyThroughput: WEEKLY_6,
-      cycleTimeData: [],
+      cycleTimeDaysData: [],
       warning: "lots partiellement ignores",
     });
 
@@ -296,7 +296,7 @@ describe("filtrage des throughput samples", () => {
       { week: "2025-02-03", throughput: 6 },
       { week: "2025-02-10", throughput: 8 },
       { week: "2025-02-17", throughput: 5 },
-    ], cycleTimeData: [] });
+    ], cycleTimeDaysData: [] });
 
     const result = await runSimulationForecast(baseParams({ includeZeroWeeks: false }));
 
@@ -318,7 +318,7 @@ describe("filtrage des throughput samples", () => {
       { week: "2025-01-27", throughput: 4 },
       { week: "2025-02-03", throughput: 6 },
       { week: "2025-02-10", throughput: 8 },
-    ], cycleTimeData: [] });
+    ], cycleTimeDaysData: [] });
 
     const result = await runSimulationForecast(baseParams({ includeZeroWeeks: true }));
 
@@ -340,7 +340,7 @@ describe("seuil d'historique insuffisant", () => {
       { week: "2025-01-20", throughput: 7 },
       { week: "2025-01-27", throughput: 4 },
       { week: "2025-02-03", throughput: 6 },
-    ], cycleTimeData: [] });
+    ], cycleTimeDaysData: [] });
 
     await expect(runSimulationForecast(baseParams({ includeZeroWeeks: false }))).rejects.toThrow("Historique insuffisant");
     expect(postSimulate).not.toHaveBeenCalled();
@@ -351,14 +351,14 @@ describe("seuil d'historique insuffisant", () => {
       { week: "2025-01-06", throughput: 3 },
       { week: "2025-01-13", throughput: 5 },
       { week: "2025-01-20", throughput: 4 },
-    ], cycleTimeData: [] });
+    ], cycleTimeDaysData: [] });
 
     await expect(runSimulationForecast(baseParams({ includeZeroWeeks: true }))).rejects.toThrow("Historique insuffisant");
     expect(postSimulate).not.toHaveBeenCalled();
   });
 
   it("renvoie un message lisible", async () => {
-    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({ weeklyThroughput: [{ week: "2025-01-06", throughput: 3 }], cycleTimeData: [] });
+    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({ weeklyThroughput: [{ week: "2025-01-06", throughput: 3 }], cycleTimeDaysData: [] });
 
     await expect(runSimulationForecast(baseParams())).rejects.toThrow("Elargissez la periode");
   });
@@ -379,7 +379,7 @@ describe("sampleStats", () => {
       { week: "2025-02-10", throughput: 6 },
       { week: "2025-02-17", throughput: 8 },
       { week: "2025-02-24", throughput: 5 },
-    ], cycleTimeData: [] });
+    ], cycleTimeDaysData: [] });
 
     const { sampleStats } = await runSimulationForecast(baseParams({ includeZeroWeeks: false }));
 
@@ -441,7 +441,7 @@ describe("historyEntry", () => {
 
     expect(historyEntry.types).toEqual(["Bug"]);
     expect(historyEntry.doneStates).toEqual(["Done"]);
-    expect(historyEntry.cycleTimeData).toEqual([]);
+    expect(historyEntry.cycleTimeDaysData).toEqual([]);
   });
 });
 
@@ -485,7 +485,7 @@ describe("cohérence du résultat retourné", () => {
   it("propage un warning de données partielles", async () => {
     vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({
       weeklyThroughput: WEEKLY_6,
-      cycleTimeData: [],
+      cycleTimeDaysData: [],
       warning: "1/3 lot(s) de work items n'ont pas pu etre charges.",
     });
 

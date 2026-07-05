@@ -6,15 +6,15 @@ export type ThroughputExportPoint = {
 
 export type CycleTimeExportPoint = {
   week: string;
-  cycleTime: number;
+  cycleTimeDays: number;
   count: number;
 };
 
 export type CycleTimeTrendExportPoint = {
   week: string;
-  average: number;
-  lowerBound: number;
-  upperBound: number;
+  averageDays: number;
+  lowerBoundDays: number;
+  upperBoundDays: number;
   itemCount: number;
 };
 
@@ -185,8 +185,8 @@ export function renderCycleTimeChart(points: CycleTimeExportPoint[], trendPoints
   const plotHeight = CHART_HEIGHT - MARGIN.top - MARGIN.bottom;
   const maxY = niceMax(
     Math.max(
-      ...points.map((point) => point.cycleTime),
-      ...trendPoints.map((point) => point.upperBound),
+      ...points.map((point) => point.cycleTimeDays),
+      ...trendPoints.map((point) => point.upperBoundDays),
     ),
   );
   const yScale = (value: number) => MARGIN.top + plotHeight - (Math.max(0, value) / maxY) * plotHeight;
@@ -197,12 +197,12 @@ export function renderCycleTimeChart(points: CycleTimeExportPoint[], trendPoints
   const maxCount = Math.max(...points.map((point) => point.count), 1);
 
   const bandPath = areaPathFromRanges(
-    trendPoints.map((point, index) => ({ x: index, lower: point.lowerBound, upper: point.upperBound })),
+    trendPoints.map((point, index) => ({ x: index, lower: point.lowerBoundDays, upper: point.upperBoundDays })),
     xScale,
     yScale,
   );
   const averagePath = linePath(
-    trendPoints.map((point) => point.average),
+    trendPoints.map((point) => point.averageDays),
     yScale,
     xScale,
   );
@@ -211,7 +211,7 @@ export function renderCycleTimeChart(points: CycleTimeExportPoint[], trendPoints
       const index = weekIndex.get(point.week);
       if (index == null) return "";
       const radius = 4 + (point.count / maxCount) * 7;
-      return `<circle cx="${xScale(index).toFixed(2)}" cy="${yScale(point.cycleTime).toFixed(2)}" r="${radius.toFixed(2)}" fill="#2563eb" fill-opacity="0.65" stroke="#1d4ed8" stroke-width="1.2" />`;
+      return `<circle cx="${xScale(index).toFixed(2)}" cy="${yScale(point.cycleTimeDays).toFixed(2)}" r="${radius.toFixed(2)}" fill="#2563eb" fill-opacity="0.65" stroke="#1d4ed8" stroke-width="1.2" />`;
     })
     .join("");
   const xLabels = weeks

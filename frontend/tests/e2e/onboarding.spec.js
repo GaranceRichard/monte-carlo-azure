@@ -113,3 +113,37 @@ test("onboarding: demo entry hides disconnect and lets user choose a team", asyn
   await page.getByRole("button", { name: /Choisir cette/i }).click();
   await expect(page.getByTestId("selected-team-card")).toBeVisible();
 });
+
+test("onboarding: app shell toggles disconnect and demo badge across standard and demo flows", async ({ page }) => {
+  test.setTimeout(60_000);
+
+  await setupAppRoutes(page, {
+    profileFirstUnauthorized: false,
+    emptyAccountsBefore: 0,
+  });
+
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("button", { name: /Se d.*connecter/i })).toHaveCount(0);
+
+  await page.locator('input[type="password"]').fill("token-value-at-least-20-chars");
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await page.locator("select").first().selectOption("org-demo");
+  await page.getByRole("button", { name: "Choisir cette organisation" }).click();
+  await page.locator("select").first().selectOption("Projet A");
+  await page.getByRole("button", { name: "Choisir ce Projet" }).click();
+  await page.locator("select").first().selectOption("Equipe Alpha");
+  await page.getByRole("button", { name: /Choisir cette .quipe/i }).click();
+
+  await expect(page.getByRole("button", { name: /Se d.*connecter/i })).toBeVisible();
+  await page.getByRole("button", { name: /Se d.*connecter/i }).click();
+  await expect(page.getByText("Connexion Azure DevOps")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Se d.*connecter/i })).toHaveCount(0);
+
+  await page.goto("/?demo=true", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("span").filter({ hasText: /d.+mo/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Se d.*connecter/i })).toHaveCount(0);
+  await page.getByRole("button", { name: /Choisir cette/i }).click();
+  await expect(page.getByTestId("selected-team-card")).toBeVisible();
+  await expect(page.locator("span").filter({ hasText: /d.+mo/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Se d.*connecter/i })).toHaveCount(0);
+});
