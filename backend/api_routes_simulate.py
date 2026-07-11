@@ -194,7 +194,10 @@ async def simulate(
         detail = (
             f"Historique insuffisant (moins de {SIMULATION_THROUGHPUT_SAMPLES_MIN} semaines)."
             if req.include_zero_weeks
-            else f"Historique insuffisant (moins de {SIMULATION_THROUGHPUT_SAMPLES_MIN} semaines non nulles)."
+            else (
+                "Historique insuffisant (moins de "
+                f"{SIMULATION_THROUGHPUT_SAMPLES_MIN} semaines non nulles)."
+            )
         )
         raise HTTPException(422, detail)
 

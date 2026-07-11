@@ -38,7 +38,8 @@ class SimulateRequest(BaseModel):
         ):
             raise ValueError(
                 "throughput_samples doit contenir entre "
-                f"{SIMULATION_THROUGHPUT_SAMPLES_MIN} et {SIMULATION_THROUGHPUT_SAMPLES_MAX} valeurs."
+                f"{SIMULATION_THROUGHPUT_SAMPLES_MIN} et "
+                f"{SIMULATION_THROUGHPUT_SAMPLES_MAX} valeurs."
             )
         return value
 
@@ -71,7 +72,8 @@ class SimulateRequest(BaseModel):
     def validate_n_sims(cls, value: int) -> int:
         if not SIMULATION_N_SIMS_MIN <= value <= SIMULATION_N_SIMS_MAX:
             raise ValueError(
-                f"n_sims doit etre compris entre {SIMULATION_N_SIMS_MIN} et {SIMULATION_N_SIMS_MAX}."
+                f"n_sims doit etre compris entre {SIMULATION_N_SIMS_MIN} et "
+                f"{SIMULATION_N_SIMS_MAX}."
             )
         return value
 

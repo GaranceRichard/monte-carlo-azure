@@ -386,6 +386,7 @@ La task VS Code `Coverage: 8 terminaux` execute aussi:
 - `frontend/coverage/coverage-final.json` comme artefact frontend unique pour le global et les vitals
 
 Ces scripts Python de coverage vitals font partie du lint backend et doivent rester conformes a `ruff check .`, y compris la limite de 100 caracteres par ligne.
+Les messages de validation backend et les imports des tests respectent egalement ce formatage Ruff.
 
 Les details d'API, d'architecture et de CI sont documentes dans [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
