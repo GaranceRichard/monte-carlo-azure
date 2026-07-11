@@ -106,6 +106,12 @@ def main() -> int:
         "CI must declare a real MongoDB service for integration tests",
         errors,
     )
+    pages = _read(".github/workflows/pages.yml")
+    _ok(
+        'const requiredJobs = ["quality-gate"]' in pages,
+        "Pages must wait for the shared quality-gate job",
+        errors,
+    )
 
     # Coverage task integration checks (VS Code): optional local developer file.
     tasks_path = ROOT / ".vscode" / "tasks.json"

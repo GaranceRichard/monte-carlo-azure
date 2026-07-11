@@ -244,6 +244,7 @@ Le detail du flux Cloud / on-prem est documente dans [`frontend/README.md`](fron
 En E2E local, Playwright force aussi `VITE_API_BASE=http://127.0.0.1:8000` pour garder les mocks backend coherents avec les appels `simulate` et `simulations/history`.
 En CI GitHub Actions, le job `quality-gate` installe explicitement `requirements.txt`, les
 dependances frontend et Chromium avant d'executer le meme controle complet que le pre-push.
+Le deploiement GitHub Pages attend ce job unique avant de construire et publier le frontend.
 
 ### Mode manuel en 5 terminaux
 

@@ -29,7 +29,7 @@ jobs:
             const repo = context.repo.repo;
             const sha = context.sha;
             const workflowName = "CI";
-            const requiredJobs = ["backend-tests", "frontend-tests"];
+            const requiredJobs = ["quality-gate"];
             const timeoutMs = 15 * 60 * 1000;
             const pollEveryMs = 15000;
             const startedAt = Date.now();

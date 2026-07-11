@@ -81,12 +81,16 @@ def test_e2e_coverage_thresholds_are_at_least_80() -> None:
 def test_ci_enforces_required_checks() -> None:
     ci = _read(".github/workflows/ci.yml")
     gate = _read("Scripts/quality_gate.py")
+    pages = _read(".github/workflows/pages.yml")
 
     assert "python Scripts/quality_gate.py ci" in ci
     assert "npm run lint" not in ci
     assert "npm run test:e2e" not in ci
     assert "npm run build" not in ci
     assert "--cov-fail-under=80" in gate
+    assert 'const requiredJobs = ["quality-gate"]' in pages
+    assert "backend-tests" not in pages
+    assert "frontend-tests" not in pages
 
 
 def test_coverage_tasks_separate_repo_compliance_and_backend_full() -> None:
