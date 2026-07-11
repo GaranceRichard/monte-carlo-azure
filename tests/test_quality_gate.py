@@ -71,6 +71,33 @@ def test_push_never_runs_docker_but_ci_runs_the_docker_smoke(monkeypatch) -> Non
     assert docker_called
 
 
+def test_docker_smoke_retries_a_transient_connection_reset(monkeypatch) -> None:
+    responses = iter(
+        [
+            ConnectionResetError("backend is still starting"),
+            (200, ""),
+            (200, '{"status":"ok"}'),
+            (200, ""),
+            (200, '{"mode":"backlog_to_weeks"}'),
+            *[(200, "")] * 20,
+            (429, ""),
+        ]
+    )
+
+    monkeypatch.setattr(quality_gate, "_run_command", lambda _: 0)
+    monkeypatch.setattr(quality_gate.time, "sleep", lambda _: None)
+
+    def request(*_args: object, **_kwargs: object) -> tuple[int, str]:
+        response = next(responses)
+        if isinstance(response, OSError):
+            raise response
+        return response
+
+    monkeypatch.setattr(quality_gate, "_request", request)
+
+    assert quality_gate._run_docker_smoke() == 0
+
+
 def test_hooks_and_ci_delegate_to_the_central_command() -> None:
     pre_commit = (ROOT / ".githooks" / "pre-commit").read_text(encoding="utf-8")
     pre_push = (ROOT / ".githooks" / "pre-push").read_text(encoding="utf-8")

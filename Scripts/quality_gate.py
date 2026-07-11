@@ -244,7 +244,7 @@ def _run_docker_smoke() -> int:
         for _ in range(30):
             try:
                 status, _ = _request("http://127.0.0.1:8000/health")
-            except urllib.error.URLError:
+            except (urllib.error.URLError, OSError):
                 status = 0
             if status == 200:
                 break
@@ -294,7 +294,7 @@ def _run_docker_smoke() -> int:
             raise RuntimeError(
                 f"Expected HTTP 429 after the rate limit, received HTTP {last_status}."
             )
-    except (RuntimeError, urllib.error.URLError) as exc:
+    except (RuntimeError, urllib.error.URLError, OSError) as exc:
         print("ERROR: step failed: Docker smoke test", file=sys.stderr)
         print("Failed command: HTTP Docker smoke checks", file=sys.stderr)
         print(f"Detail: {exc}", file=sys.stderr)

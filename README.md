@@ -300,6 +300,7 @@ referentiel et evite les controles code couteux.
 le build et les E2E qui demarrent uniquement le backend et Vite. Il ne lance jamais Docker.
 
 `ci` est reserve a GitHub Actions: il ajoute au mode `push` le build et le smoke test Docker.
+Le healthcheck Docker reessaie les erreurs de connexion transitoires pendant le demarrage.
 Les dependances sont installees explicitement par le workflow CI, jamais par le controle.
 
 Coverage vitals:
