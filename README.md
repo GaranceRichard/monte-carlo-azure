@@ -242,7 +242,8 @@ En on-prem, l'URL attendue est l'URL serveur + collection, par exemple :
 Le detail du flux Cloud / on-prem est documente dans [`frontend/README.md`](frontend/README.md).
 
 En E2E local, Playwright force aussi `VITE_API_BASE=http://127.0.0.1:8000` pour garder les mocks backend coherents avec les appels `simulate` et `simulations/history`.
-En CI GitHub Actions, le job `frontend-tests` installe aussi `requirements.txt` avant `npm run test:e2e`, car Playwright demarre `run_app.py` et a donc besoin de `uvicorn` et des dependances backend.
+En CI GitHub Actions, le job `quality-gate` installe explicitement `requirements.txt`, les
+dependances frontend et Chromium avant d'executer le meme controle complet que le pre-push.
 
 ### Mode manuel en 5 terminaux
 
@@ -285,22 +286,21 @@ while ($true) { try { Invoke-RestMethod http://127.0.0.1:8000/health/mongo -Time
 Depuis la racine:
 
 ```bash
-.venv\Scripts\python.exe -m ruff check .
-.venv\Scripts\python.exe -m ruff format --check .
-APP_MONGO_URL=mongodb://localhost:27017 APP_MONGO_DB=montecarlo_test .venv\Scripts\python.exe -m pytest --cov=backend --cov-report=term-missing -q
+python Scripts/quality_gate.py fast
+python Scripts/quality_gate.py push
+python Scripts/quality_gate.py ci
 ```
 
-Frontend:
+`fast` est le controle pre-commit. Il execute les controles de referentiel, Ruff, les tests
+backend rapides, ESLint sans warning, TypeScript et Vitest. Pour un commit exclusivement
+documentaire (`README.md`, `docs/`, `LICENSE`, `NOTICE`), il conserve les controles de
+referentiel et evite les controles code couteux.
 
-```bash
-npm --prefix frontend run typecheck
-npm --prefix frontend run lint -- --max-warnings 0
-npm --prefix frontend run test:unit
-npm --prefix frontend run test:unit:coverage
-npm --prefix frontend run test:e2e
-npm --prefix frontend run test:e2e:coverage:console
-.venv\Scripts\python.exe -m pytest --cov=backend --cov-fail-under=80 --cov-report=term-missing -q
-```
+`push` est le controle pre-push: il ajoute les couvertures backend (minimum 80 %) et frontend,
+le build et les E2E qui demarrent uniquement le backend et Vite. Il ne lance jamais Docker.
+
+`ci` est reserve a GitHub Actions: il ajoute au mode `push` le build et le smoke test Docker.
+Les dependances sont installees explicitement par le workflow CI, jamais par le controle.
 
 Coverage vitals:
 
@@ -413,7 +413,13 @@ Verification manuelle (si necessaire):
 git config core.hooksPath .githooks
 ```
 
-Le hook `pre-commit` execute:
+Le hook `pre-commit` execute `python Scripts/quality_gate.py fast`; le hook `pre-push` execute
+`python Scripts/quality_gate.py push`. GitHub Actions execute `python Scripts/quality_gate.py ci`.
+La definition des controles reste donc unique; le Docker smoke est reserve a la CI. Les hooks
+arretent le commit ou le push au premier echec et affichent la commande ainsi que la correction
+attendue.
+
+Le mode `fast` execute notamment:
 
 - validation de mise a jour du `README.md` si des fichiers code/config sont commites
 - validation que `README.md` ne contient pas de mojibake (accents casses)

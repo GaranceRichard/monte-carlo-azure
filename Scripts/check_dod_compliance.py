@@ -86,15 +86,21 @@ def main() -> int:
 
     # CI checks expected by DoD
     ci = _read(".github/workflows/ci.yml")
-    _ok("npm run lint -- --max-warnings 0" in ci, "CI must run frontend lint", errors)
-    _ok("npm run test:e2e" in ci, "CI must run E2E tests", errors)
-    _ok("npm run build" in ci, "CI must run frontend build", errors)
     _ok(
-        "python -m pytest" in ci,
-        "CI must run backend tests with pytest",
+        "python Scripts/quality_gate.py ci" in ci,
+        "CI must run the shared CI quality gate",
         errors,
     )
-    _ok("--cov-fail-under=80" in ci, "CI must enforce backend coverage >= 80", errors)
+    _ok(
+        "Scripts/quality_gate.py" in ci,
+        "CI must delegate backend tests to the shared quality gate",
+        errors,
+    )
+    _ok(
+        "--cov-fail-under=80" in _read("Scripts/quality_gate.py"),
+        "Shared quality gate must enforce backend coverage >= 80",
+        errors,
+    )
     _ok(
         ("services:" in ci) and ("mongo:" in ci) and ("image: mongo:7" in ci),
         "CI must declare a real MongoDB service for integration tests",

@@ -8,62 +8,14 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  backend-tests:
+  quality-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 25
     services:
       mongo:
         image: mongo:7
         ports:
           - 27017:27017
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Lint backend (Ruff)
-        run: |
-          python -m ruff check .
-
-      - name: DoD compliance check
-        run: |
-          python Scripts/check_dod_compliance.py
-
-      - name: Enforce Azure DevOps identity boundary
-        run: |
-          python Scripts/check_identity_boundary.py
-
-      - name: Enforce Naming Convention
-        run: |
-          python Scripts/check_naming_convention.py
-
-      - name: Run tests
-        env:
-          # Evite toute dependance a un .env inexistant cote CI
-          ADO_PAT: "FAKE_PAT"
-          ADO_ORG: "FAKE_ORG"
-          ADO_PROJECT: "FAKE_PROJECT"
-          APP_MONGO_URL: mongodb://localhost:27017
-          APP_MONGO_DB: montecarlo_test
-        run: |
-          python -m pytest --cov=backend --cov-fail-under=80 -q
-
-  frontend-tests:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: frontend
 
     steps:
       - name: Checkout
@@ -81,137 +33,25 @@ jobs:
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
-        run: |
-          npm ci
-
-      - name: Install backend dependencies for e2e
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r ../requirements.txt
+          pip install -r requirements.txt
 
-      - name: Lint frontend (ESLint)
-        run: |
-          npm run lint -- --max-warnings 0
-
-      - name: Typecheck frontend (TypeScript)
-        run: |
-          npm run typecheck
-
-      - name: Run unit tests (Vitest)
-        run: |
-          npm run test:unit:coverage
+      - name: Install frontend dependencies
+        run: npm --prefix frontend ci
 
       - name: Install Playwright browsers
-        run: |
-          npx playwright install --with-deps chromium
+        run: npx --prefix frontend playwright install --with-deps chromium
 
-      - name: Run e2e tests (Playwright)
-        run: |
-          npm run test:e2e
+      - name: Prepare Docker environment
+        run: cp .env.example .env
 
-      - name: Build frontend
-        run: |
-          npm run build
-
-  docker-smoke:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs:
-      - backend-tests
-      - frontend-tests
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Prepare env file
-        run: |
-          cp .env.example .env
-
-      - name: Build image
-        run: |
-          docker compose build
-
-      - name: Start services
-        run: |
-          docker compose up -d
-
-      - name: Smoke test API + persistence
-        run: |
-          HEALTH_OK=0
-          for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:8000/health; then
-              HEALTH_OK=1
-              break
-            fi
-            sleep 2
-          done
-          if [ "$HEALTH_OK" -ne 1 ]; then
-            echo "Health endpoint did not become ready in time"
-            docker compose logs backend || true
-            exit 1
-          fi
-
-          curl -fsS http://127.0.0.1:8000/health/mongo > /tmp/mongo-health.json
-          grep -q '"status":"ok"' /tmp/mongo-health.json || {
-            echo "Mongo healthcheck endpoint is not OK"
-            cat /tmp/mongo-health.json
-            docker compose logs backend mongo || true
-            exit 1
-          }
-
-          MC_COOKIE="ci-smoke-idmontecarlo"
-          curl -fsS \
-            -X POST http://127.0.0.1:8000/simulate \
-            -H "Content-Type: application/json" \
-            -H "Cookie: IDMontecarlo=${MC_COOKIE}" \
-            -d '{"throughput_samples":[1,2,3,4,5,6],"mode":"backlog_to_weeks","backlog_size":20,"n_sims":2000}' \
-            > /tmp/simulate-response.json
-
-          curl -fsS \
-            -H "Cookie: IDMontecarlo=${MC_COOKIE}" \
-            http://127.0.0.1:8000/simulations/history \
-            > /tmp/history-response.json
-
-          grep -q '"mode":"backlog_to_weeks"' /tmp/history-response.json || {
-            echo "History endpoint did not return persisted simulation"
-            cat /tmp/history-response.json
-            docker compose logs backend mongo || true
-            exit 1
-          }
-
-          RATE_LIMIT_PAYLOAD='{"throughput_samples":[1,2,3,4,5,6],"mode":"backlog_to_weeks","backlog_size":10,"n_sims":2000}'
-          RATE_LIMIT_IP="ci-rate-limit-shared"
-          LAST_STATUS=""
-          for i in $(seq 1 21); do
-            LAST_STATUS=$(curl -sS -o /tmp/rate-limit-response.json -w "%{http_code}" \
-              -X POST http://127.0.0.1:8000/simulate \
-              -H "Content-Type: application/json" \
-              -H "X-Forwarded-For: ${RATE_LIMIT_IP}" \
-              -d "${RATE_LIMIT_PAYLOAD}")
-            if [ "$i" -le 20 ] && [ "$LAST_STATUS" != "200" ]; then
-              echo "Rate limit rejected too early on request ${i}: ${LAST_STATUS}"
-              cat /tmp/rate-limit-response.json
-              docker compose logs backend redis || true
-              exit 1
-            fi
-          done
-
-          if [ "$LAST_STATUS" != "429" ]; then
-            echo "Expected HTTP 429 after exceeding shared rate limit, got ${LAST_STATUS}"
-            cat /tmp/rate-limit-response.json
-            docker compose logs backend redis || true
-            exit 1
-          fi
-
-      - name: Stop services
-        if: always()
-        run: |
-          docker compose down -v
+      - name: Run shared CI quality gate
+        run: python Scripts/quality_gate.py ci
 
   publish:
-    needs: [docker-smoke]
+    needs: [quality-gate]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:

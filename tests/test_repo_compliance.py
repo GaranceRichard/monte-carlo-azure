@@ -80,19 +80,13 @@ def test_e2e_coverage_thresholds_are_at_least_80() -> None:
 
 def test_ci_enforces_required_checks() -> None:
     ci = _read(".github/workflows/ci.yml")
+    gate = _read("Scripts/quality_gate.py")
 
-    # Frontend checks
-    assert "npm run lint -- --max-warnings 0" in ci
-    assert "npm run test:e2e" in ci
-    assert "npm run build" in ci
-
-    # Backend checks: this project uses pytest/FastAPI, not Django manage.py.
-    assert "python -m pytest" in ci
-
-    # Coverage gate for backend should be explicit in CI.
-    assert (
-        "--cov-fail-under=80" in ci
-    ), "Backend CI should enforce a minimum coverage threshold (>=80%)."
+    assert "python Scripts/quality_gate.py ci" in ci
+    assert "npm run lint" not in ci
+    assert "npm run test:e2e" not in ci
+    assert "npm run build" not in ci
+    assert "--cov-fail-under=80" in gate
 
 
 def test_coverage_tasks_separate_repo_compliance_and_backend_full() -> None:

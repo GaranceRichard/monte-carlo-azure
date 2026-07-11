@@ -10,8 +10,8 @@ elif [ -x "$REPO_ROOT/.venv/bin/python" ]; then
 elif command -v python >/dev/null 2>&1; then
   PYTHON=python
 else
-  echo "ERROR: Python is required. Create .venv or install python before committing." >&2
+  echo "ERROR: Python is required. Create .venv or install python before pushing." >&2
   exit 1
 fi
 
-exec "$PYTHON" "$REPO_ROOT/Scripts/quality_gate.py" fast
+exec "$PYTHON" "$REPO_ROOT/Scripts/quality_gate.py" push

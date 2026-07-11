@@ -164,17 +164,18 @@ def check_naming_convention() -> int:
 
 def main() -> int:
     paths = staged_files()
-    if not paths:
-        return 0
-
     checks = (
-        check_readme_staged(paths),
-        check_readme_encoding(),
-        check_no_secrets(),
-        check_dod_compliance(),
-        check_naming_convention(),
+        lambda: check_readme_staged(paths),
+        check_readme_encoding,
+        check_no_secrets,
+        check_dod_compliance,
+        check_naming_convention,
     )
-    return 1 if any(code != 0 for code in checks) else 0
+    for check in checks:
+        code = check()
+        if code != 0:
+            return code
+    return 0
 
 
 if __name__ == "__main__":

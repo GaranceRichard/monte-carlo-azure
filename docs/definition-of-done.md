@@ -11,6 +11,13 @@ Une tache est "Done" uniquement si tous les criteres ci-dessous sont valides. Ce
 
 Aucune fusion n'est autorisee si un seul de ces checks echoue.
 
+### Orchestration locale et CI
+
+- `python Scripts/quality_gate.py fast` est execute avant chaque commit.
+- `python Scripts/quality_gate.py push` est execute avant chaque push et ne depend jamais de Docker.
+- `python Scripts/quality_gate.py ci` est execute uniquement dans GitHub Actions et ajoute le build
+  ainsi que le smoke test Docker obligatoire.
+
 ## 2. Couverture de code (seuils stricts)
 
 Seuils minimaux par couche:
