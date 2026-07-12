@@ -11,6 +11,11 @@ import {
 
 export type DataQualityLevel = "sufficient" | "watch" | "insufficient";
 export type ForecastUncertaintyLevel = "low" | "moderate" | "high" | "unmeasurable";
+export type ArbitrationRecommendationLevel =
+  | "supportable"
+  | "caution"
+  | "arbitration_required"
+  | "not_recommended";
 export type ForecastPercentileKey = keyof ForecastPercentiles;
 
 export type DiagnosticFactor = {
@@ -28,6 +33,22 @@ export type BusinessDiagnostic<Level extends string> = {
 
 export type DataQualityDiagnostic = BusinessDiagnostic<DataQualityLevel>;
 export type ForecastUncertaintyDiagnostic = BusinessDiagnostic<ForecastUncertaintyLevel>;
+
+export type ArbitrationRecommendationFactor = DiagnosticFactor & {
+  source: "dataQuality" | "forecastUncertainty";
+};
+
+export type ArbitrationRecommendation = {
+  level: ArbitrationRecommendationLevel;
+  justification: string;
+  factors: ArbitrationRecommendationFactor[];
+  advisedAction: string;
+};
+
+export type ArbitrationRecommendationInput = {
+  dataQuality: DataQualityDiagnostic;
+  forecastUncertainty: ForecastUncertaintyDiagnostic;
+};
 
 export type DataQualityInput = {
   throughputSamples: readonly number[];
@@ -235,5 +256,73 @@ export function diagnoseForecastUncertainty({
     level: "low",
     justification: "Les metriques disponibles indiquent une faible dispersion de prevision.",
     factors,
+  };
+}
+
+export function recommendArbitration({
+  dataQuality,
+  forecastUncertainty,
+}: ArbitrationRecommendationInput): ArbitrationRecommendation {
+  const dataFactors = dataQuality.factors.map((factor) => ({
+    ...factor,
+    source: "dataQuality" as const,
+  }));
+  const uncertaintyFactors = forecastUncertainty.factors.map((factor) => ({
+    ...factor,
+    source: "forecastUncertainty" as const,
+  }));
+  const factors = [...dataFactors, ...uncertaintyFactors];
+  const hasFactor = (code: string) => factors.some((factor) => factor.code === code);
+
+  const missingRequiredPercentile = hasFactor("missing_required_percentiles");
+  if (dataQuality.level === "insufficient") {
+    return {
+      level: "not_recommended",
+      justification: "Les donnees disponibles ne peuvent pas soutenir une decision.",
+      factors: dataFactors,
+      advisedAction: "Completer l'historique avant tout arbitrage.",
+    };
+  }
+  if (forecastUncertainty.level === "unmeasurable" || missingRequiredPercentile) {
+    return {
+      level: "not_recommended",
+      justification: "La prevision ne permet pas de mesurer l'incertitude indispensable a la decision.",
+      factors: uncertaintyFactors,
+      advisedAction: "Retablir les percentiles requis avant de decider.",
+    };
+  }
+
+  const hasPartialOrIncompleteAdoData = hasFactor("partial_ado_data")
+    || hasFactor("completeness_issue");
+  const hasCensoredSimulations = factors.some(
+    (factor) => factor.code === "censored_simulations"
+      && typeof factor.value === "number"
+      && factor.value > 0,
+  );
+  const hasDegradedData = dataQuality.level === "watch" || hasPartialOrIncompleteAdoData;
+  const hasDegradedForecast = forecastUncertainty.level === "high" || hasCensoredSimulations;
+
+  if (hasDegradedData && hasDegradedForecast) {
+    return {
+      level: "arbitration_required",
+      justification: "Plusieurs signaux de qualite ou d'incertitude degradent la prevision.",
+      factors,
+      advisedAction: "Faire valider les hypotheses et les limites par un responsable.",
+    };
+  }
+  if (hasDegradedData || hasDegradedForecast) {
+    return {
+      level: "caution",
+      justification: "La decision reste possible, mais un signal degrade doit etre explicite.",
+      factors: hasDegradedData ? dataFactors : uncertaintyFactors,
+      advisedAction: "Decider avec une marge et documenter la limite identifiee.",
+    };
+  }
+
+  return {
+    level: "supportable",
+    justification: "Les donnees et l'incertitude disponible soutiennent raisonnablement la decision.",
+    factors,
+    advisedAction: "Utiliser la prevision en conservant les hypotheses documentees.",
   };
 }

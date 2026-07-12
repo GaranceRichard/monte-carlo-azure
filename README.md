@@ -66,14 +66,16 @@ Demo GitHub Pages:
   - `backlog_to_weeks`: `(P90 - P50) / P50`
   - `weeks_to_items`: `(P50 - P90) / P50`
   - absent si `P50` ou `P90` n'est pas identifiable
-- diagnostics metier distincts et independants:
+- trois dimensions metier distinctes et independantes:
   - `dataQuality` qualifie la profondeur historique, les donnees Azure DevOps partielles
     et les problemes de completude
   - `forecastUncertainty` qualifie la dispersion, la volatilite, les censures et la
     possibilite de calculer les percentiles requis
-  - chaque diagnostic expose un niveau, une justification courte et ses facteurs factuels
+  - la recommandation d'arbitrage traduit ces deux diagnostics en `supportable`, `caution`,
+    `arbitration_required` ou `not_recommended`, avec une justification, des facteurs
+    determinants et une action conseillee
   - le `Risk Score` conserve son calcul actuel et ne constitue pas une mesure de qualite
-    des donnees
+    des donnees ni une recommandation d'arbitrage
 - export CSV du throughput hebdomadaire
 - telechargement direct du rapport PDF simulation sans fenetre intermediaire
 - historique local des dernieres simulations, contextualise par equipe dans le navigateur
