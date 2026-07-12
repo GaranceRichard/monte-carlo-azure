@@ -124,8 +124,11 @@ function renderGridAndYAxis(yTicks: number[], yScale: (value: number) => number)
     .join("");
 }
 
-export function renderThroughputChart(points: ThroughputExportPoint[]): string {
-  if (!points.length) return renderEmptyChart("Throughput hebdomadaire");
+export function renderThroughputChart(
+  points: ThroughputExportPoint[],
+  title = "Throughput hebdomadaire",
+): string {
+  if (!points.length) return renderEmptyChart(title);
   const plotWidth = CHART_WIDTH - MARGIN.left - MARGIN.right;
   const plotHeight = CHART_HEIGHT - MARGIN.top - MARGIN.bottom;
   const maxY = niceMax(Math.max(...points.map((p) => Math.max(p.throughput, p.movingAverage))));
@@ -163,7 +166,7 @@ export function renderThroughputChart(points: ThroughputExportPoint[]): string {
     .join("");
 
   return `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" role="img" aria-label="Throughput hebdomadaire">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" role="img" aria-label="${escapeHtml(title)}">
       <rect x="0" y="0" width="${CHART_WIDTH}" height="${CHART_HEIGHT}" fill="#ffffff" />
       ${renderGridAndYAxis(yTicks, yScale)}
       <line x1="${MARGIN.left}" y1="${MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
@@ -284,7 +287,7 @@ export function renderDistributionChart(points: DistributionExportPoint[]): stri
 }
 
 export function renderProbabilityChart(points: ProbabilityExportPoint[]): string {
-  if (!points.length) return renderEmptyChart("Courbe de probabilite");
+  if (!points.length) return renderEmptyChart("Courbe de probabilit\u00E9");
   const sorted = [...points].sort((a, b) => a.x - b.x);
   const plotWidth = CHART_WIDTH - MARGIN.left - MARGIN.right;
   const plotHeight = CHART_HEIGHT - MARGIN.top - MARGIN.bottom;
@@ -307,7 +310,7 @@ export function renderProbabilityChart(points: ProbabilityExportPoint[]): string
     .join("");
 
   return `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" role="img" aria-label="Courbe de probabilite">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" role="img" aria-label="Courbe de probabilit\u00E9">
       <rect x="0" y="0" width="${CHART_WIDTH}" height="${CHART_HEIGHT}" fill="#ffffff" />
       ${renderGridAndYAxis(yTicks, yScale)}
       <line x1="${MARGIN.left}" y1="${MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
@@ -330,7 +333,7 @@ export function renderOverlayProbabilityChart(series: OverlayProbabilitySeries[]
     }))
     .filter((entry) => entry.points.length > 0);
 
-  if (!sanitized.length) return renderEmptyChart("Comparaison des probabilites");
+  if (!sanitized.length) return renderEmptyChart("Courbes de probabilit\u00E9s compar\u00E9es");
 
   const allX = sanitized.flatMap((entry) => entry.points.map((p) => p.x));
   const minX = Math.min(...allX);
@@ -369,7 +372,7 @@ export function renderOverlayProbabilityChart(series: OverlayProbabilitySeries[]
     .join("");
 
   return `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" role="img" aria-label="Comparaison des probabilites">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" role="img" aria-label="Courbes de probabilit\u00E9s compar\u00E9es">
       <rect x="0" y="0" width="${CHART_WIDTH}" height="${CHART_HEIGHT}" fill="#ffffff" />
       ${renderGridAndYAxis(yTicks, yScale)}
       <line x1="${MARGIN.left}" y1="${MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />

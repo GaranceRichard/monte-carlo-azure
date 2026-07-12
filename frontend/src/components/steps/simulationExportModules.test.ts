@@ -131,13 +131,13 @@ describe("simulationChartsSvg", () => {
 
     expect(distributionSvg).toContain("Distribution Monte Carlo");
     expect(distributionSvg).toContain("<path d=\"M");
-    expect(probabilitySvg).toContain("Courbe de probabilite");
+    expect(probabilitySvg).toContain("Courbe de probabilit\u00E9");
     expect(probabilitySvg).toContain("<path d=\"M");
   });
 
   it("renders probability chart with single point (xStep=0 branch)", () => {
     const svg = renderProbabilityChart([{ x: 4, probability: 120 }]);
-    expect(svg).toContain("Courbe de probabilite");
+    expect(svg).toContain("Courbe de probabilit\u00E9");
     expect(svg).toContain(">4</text>");
   });
 
@@ -146,7 +146,7 @@ describe("simulationChartsSvg", () => {
       { label: "Optimiste", color: "#15803d", points: [{ x: 10, probability: 20 }, { x: 20, probability: 80 }] },
       { label: "Historique corrÃ©lÃ©", color: "#dc2626", points: [{ x: 10, probability: 10 }, { x: 20, probability: 70 }] },
     ]);
-    expect(svg).toContain("Comparaison des probabilites");
+    expect(svg).toContain("Courbes de probabilit\u00E9s compar\u00E9es");
     expect(svg).toContain("Optimiste");
     expect(svg).toContain("Historique corrÃ©lÃ©");
     expect(svg).toContain("#15803d");

@@ -146,12 +146,27 @@ describe("portfolioPrintReport", () => {
     expect(html).toContain("0,22 (fiable)");
     expect(html).toContain("1,60 (non fiable)");
     expect(html).toMatch(/Courbes de probabilit.s compar.es/);
-    expect(html).toContain('aria-label="Comparaison des probabilites"');
+    expect(html).toMatch(/aria-label="Courbes de probabilit.s compar.es"/);
     expect(html).toContain("<strong>Optimiste :</strong>");
     expect(html).toMatch(/<strong>Arrim. :<\/strong>/);
     expect(html).toContain("<strong>Risk Score :</strong>");
     expect(html).toMatch(/<strong>Fiabilit. de l&#39;historique :<\/strong>/);
     expect(html).toMatch(/<p class="hypothesis reading-rule"><strong>R.gle de lecture :<\/strong><br \/>/);
+  });
+
+  it("keeps every portfolio chart title aligned with its rendered data", () => {
+    const html = buildPortfolioPrintReportHtml(baseArgs());
+
+    expect(html).toMatch(/Sc.nario - Optimiste[\s\S]*?<h2>D.bit simul. du sc.nario<\/h2>[\s\S]*?aria-label="D.bit simul. du sc.nario"/);
+    expect(html).toMatch(/Sc.nario - Historique corr.l.[\s\S]*?<h2>Throughput historique corr.l.<\/h2>[\s\S]*?aria-label="Throughput historique corr.l."/);
+    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<h2>Throughput hebdomadaire<\/h2>[\s\S]*?aria-label="Throughput hebdomadaire"/);
+    expect(html.match(/<h2>Courbes de probabilit.s compar.es<\/h2>/g)).toHaveLength(1);
+    expect(html.match(/aria-label="Courbes de probabilit.s compar.es"/g)).toHaveLength(1);
+    expect(html).toMatch(/D.bit synth.tique reconstruit par bootstrap, non issu de l&#39;historique r.el\./);
+    expect(html).toContain('<h2>Distribution Monte Carlo</h2>');
+    expect(html).toContain('aria-label="Distribution Monte Carlo"');
+    expect(html).toMatch(/<h2>Courbe de probabilit.<\/h2>/);
+    expect(html).toMatch(/aria-label="Courbe de probabilit."/);
   });
 
   it("renders a plain scenario subtitle when no lead prefix is detected", () => {

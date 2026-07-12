@@ -4,6 +4,10 @@
 
 ### Frontend
 
+- clarification semantique des graphiques du rapport portefeuille: le throughput equipe,
+  l'historique corr\u00E9l\u00E9 et les scenarios bootstrap sont distingues par des titres HTML et SVG
+  coherents; les scenarios synthetiques restent explicitement presentes comme reconstruits par bootstrap
+  et leurs dates utilisent les utilitaires de calendrier local pour eviter toute derive UTC
 - centralisation du contrat de bornes Monte Carlo dans `src/simulationLimits.ts` et alignement
   des validations UI / simulation locale sur le backend: `n_sims` entre `1_000` et `200_000`,
   `target_weeks` entre `1` et `521`, `throughput_samples` entre `6` et `521` valeurs,

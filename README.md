@@ -70,6 +70,8 @@ Demo GitHub Pages:
 - persistence MongoDB des simulations statistiques anonymes et restitution des 10 dernieres via `/simulations/history`
 - configuration rapide des filtres (types + etats) memorisee localement
 - rapport portefeuille PDF direct avec progression et tolerance aux echecs partiels
+- titres de graphiques portefeuille explicites: historique equipe, historique corr\u00E9l\u00E9,
+  scenario bootstrap synthetique, comparaison des probabilites, distribution Monte Carlo et probabilite
 
 Scenarios portefeuille:
 

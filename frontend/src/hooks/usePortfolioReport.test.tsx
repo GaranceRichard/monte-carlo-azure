@@ -97,6 +97,21 @@ describe("usePortfolioReport", () => {
     }
   });
 
+  it("uses local calendar dates for synthetic scenario weeks", async () => {
+    vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
+    vi.mocked(simulateForecastFromSamples).mockResolvedValue(simulationResult);
+    const { result } = setupReportHook({ startDate: "2026-01-01" });
+
+    await act(async () => {
+      await result.current.handleGenerateReport();
+    });
+
+    const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
+    const syntheticScenarios = exportArgs.scenarios.filter((scenario) => scenario.label !== "Historique corr\u00E9l\u00E9");
+    expect(syntheticScenarios).toHaveLength(3);
+    expect(syntheticScenarios.every((scenario) => scenario.weeklyData[0]?.week === "2026-01-01")).toBe(true);
+  });
+
   it("excludes failed teams from phase 1 and still exports", async () => {
     vi.mocked(fetchTeamThroughput).mockImplementation(async ({ selectedTeam }) => {
       if (selectedTeam === "Team B") throw new Error("collect-failure");

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { formatDateLocal } from "../date";
+import { formatDateLocal, parseLocalIsoDate } from "../date";
 import type { CompletionSummary, ForecastMode, ForecastPercentiles, WeeklyThroughputRow } from "../types";
 import { formatAdoHttpErrorMessage, type AdoErrorContext } from "../adoErrors";
 import {
@@ -111,7 +111,7 @@ export function getPortfolioErrorMessage(error: unknown, context: AdoErrorContex
 }
 
 function buildSyntheticWeeklyData(samples: number[], startDate: string): WeeklyThroughputRow[] {
-  const cursor = new Date(startDate);
+  const cursor = parseLocalIsoDate(startDate);
   return samples.map((value, index) => {
     if (index > 0) cursor.setDate(cursor.getDate() + 7);
     return {

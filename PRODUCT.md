@@ -175,6 +175,14 @@ Lecture produit du scenario `Historique corrélé` :
 
 Le rapport portefeuille gere aussi la progression de generation et la tolerance aux echecs partiels par equipe.
 
+La restitution graphique du rapport distingue explicitement les donnees affichees :
+
+- historique equipe : `Throughput hebdomadaire`
+- scenario bootstrap synthetique : `D\u00E9bit simul\u00E9 du sc\u00E9nario`, avec une note de provenance
+- historique reel aligne entre equipes : `Throughput historique corr\u00E9l\u00E9`
+- comparaison multi-scenarios : `Courbes de probabilit\u00E9s compar\u00E9es`
+- resultats Monte Carlo : `Distribution Monte Carlo` et `Courbe de probabilit\u00E9`
+
 ## Modele de simulation
 
 Le coeur du produit repose sur :

@@ -221,6 +221,7 @@ function buildTeamLikePageHtml({
   riskScore,
   completionSummary,
   throughputReliability,
+  throughputChartTitle,
   note,
   pageBreak,
 }: {
@@ -243,6 +244,7 @@ function buildTeamLikePageHtml({
   riskScore?: number;
   completionSummary?: CompletionSummary;
   throughputReliability?: ThroughputReliability | null;
+  throughputChartTitle: string;
   note?: string;
   pageBreak: boolean;
 }): string {
@@ -275,10 +277,7 @@ function buildTeamLikePageHtml({
   const probabilityPoints = buildProbabilityCurve(sortedDistribution, resultKind, totalSimulationCount);
   const effectivePercentiles = displayPercentiles;
 
-  const throughputSvg = renderThroughputChart(throughputPoints).replaceAll(
-    "Throughput hebdomadaire",
-    "Courbes de probabilités comparées",
-  );
+  const throughputSvg = renderThroughputChart(throughputPoints, throughputChartTitle);
   const distributionSvg = renderDistributionChart(distributionPoints);
   const probabilitySvg = renderProbabilityChart(probabilityPoints);
   const modeSummary =
@@ -347,7 +346,7 @@ function buildTeamLikePageHtml({
       }
 
       <section class="section">
-        <h2>Courbes de probabilit\u00E9s compar\u00E9es</h2>
+        <h2>${escapeHtml(throughputChartTitle)}</h2>
         <div class="chart-wrap">${throughputSvg}</div>
         ${effectiveNote ? `<div class="note">${escapeHtml(effectiveNote)}</div>` : ""}
       </section>
@@ -600,7 +599,12 @@ export function buildPortfolioPrintReportHtml({
         riskScore: scenario.riskScore,
         completionSummary: scenario.completionSummary,
         throughputReliability: scenario.throughputReliability,
-        note: "Débit reconstruit par simulation bootstrap - non issu de l'historique réel.",
+        throughputChartTitle:
+          scenario.label === "Historique corr\u00E9l\u00E9" ? "Throughput historique corr\u00E9l\u00E9" : "D\u00E9bit simul\u00E9 du sc\u00E9nario",
+        note:
+          scenario.label === "Historique corr\u00E9l\u00E9"
+            ? undefined
+            : "D\u00E9bit synth\u00E9tique reconstruit par bootstrap, non issu de l'historique r\u00E9el.",
         pageBreak: idx < orderedScenarios.length - 1 || sections.length > 0,
       }),
     )
@@ -627,6 +631,7 @@ export function buildPortfolioPrintReportHtml({
         riskScore: section.riskScore,
         completionSummary: section.completionSummary,
         throughputReliability: section.throughputReliability,
+        throughputChartTitle: "Throughput hebdomadaire",
         pageBreak: idx < sections.length - 1,
       }),
     )
@@ -718,4 +723,3 @@ export async function exportPortfolioPrintReport(
     throw err;
   }
 }
-
