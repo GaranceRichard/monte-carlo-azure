@@ -17,6 +17,12 @@ Le produit s'adresse en priorite a :
 
 Le produit ne remplace pas le jugement managerial. Il rend l'incertitude visible, mesurable et actionnable.
 
+Trois lectures metier restent distinctes :
+
+- la qualite des donnees qualifie la profondeur historique, la completude et les collectes Azure DevOps partielles ;
+- l'incertitude de prevision qualifie la dispersion, la volatilite, les censures et la possibilite de calculer les percentiles requis ;
+- le `Risk Score` conserve son calcul actuel a partir de `P50` et `P90` : il n'est ni une mesure de qualite des donnees, ni un substitut aux deux diagnostics.
+
 ## Probleme traite
 
 Les decisions de planification reposent encore souvent sur :

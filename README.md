@@ -66,6 +66,14 @@ Demo GitHub Pages:
   - `backlog_to_weeks`: `(P90 - P50) / P50`
   - `weeks_to_items`: `(P50 - P90) / P50`
   - absent si `P50` ou `P90` n'est pas identifiable
+- diagnostics metier distincts et independants:
+  - `dataQuality` qualifie la profondeur historique, les donnees Azure DevOps partielles
+    et les problemes de completude
+  - `forecastUncertainty` qualifie la dispersion, la volatilite, les censures et la
+    possibilite de calculer les percentiles requis
+  - chaque diagnostic expose un niveau, une justification courte et ses facteurs factuels
+  - le `Risk Score` conserve son calcul actuel et ne constitue pas une mesure de qualite
+    des donnees
 - export CSV du throughput hebdomadaire
 - telechargement direct du rapport PDF simulation sans fenetre intermediaire
 - historique local des dernieres simulations, contextualise par equipe dans le navigateur
