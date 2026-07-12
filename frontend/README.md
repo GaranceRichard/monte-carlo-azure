@@ -90,6 +90,9 @@ Le frontend couvre notamment :
 - historique local des simulations
 - historique local contextualise par equipe, conserve uniquement dans `localStorage`
 - `Cycle Time` calcule et affiche en jours calendaires dans les cartes, graphiques, tooltips et exports PDF
+- grammaire visuelle identique dans les graphiques de simulation et les SVG des rapports: observations en barres,
+  points pleins ou traits continus; tendances et lissages pointilles; variabilite en bande; probabilites en trait continu.
+  Les legendes reproduisent le marqueur de la serie affichee.
 - historique local versionne: les anciennes entrees sans `schemaVersion` sont migrees une seule fois
   de semaines vers jours calendaires pour le `Cycle Time`
 - mode portefeuille multi-equipes
@@ -104,6 +107,7 @@ Le frontend couvre notamment :
   - absence de semaine commune complete => erreur explicite
 - export PDF direct des restitutions simulation et portefeuille, sans previsualisation SVG utilisateur
   - les exports expliquent explicitement la limite d'horizon et les censures quand elles existent
+  - les SVG reprennent la meme convention visuelle et les memes legendes que l'interface
 - persistance locale de certaines preferences et quick filters
 
 ## Notes de structure recentes

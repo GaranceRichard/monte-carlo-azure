@@ -112,6 +112,9 @@ describe("simulationChartsSvg", () => {
     expect(svg).toContain("<circle");
     expect(svg).toContain("fill-opacity=\"0.35\"");
     expect(svg).toContain("stroke=\"#f97316\"");
+    expect(svg).toContain("stroke-dasharray=\"8 4\"");
+    expect(svg).toContain("Variabilité");
+    expect(svg).toContain("Moyenne glissante");
   });
 
   it("renders throughput chart with escaped x labels and sparse ticks", () => {
@@ -122,7 +125,8 @@ describe("simulationChartsSvg", () => {
     expect(svg).toContain("Throughput hebdomadaire");
     expect(svg).toContain("&lt;unsafe&gt;&amp;");
     expect(svg).toContain("stroke-dasharray=\"8 4\"");
-    expect(svg).toContain("x1=\"44\" y1=\"16\" x2=\"44\" y2=\"324\"");
+    expect(svg).toContain("Moyenne mobile");
+    expect(svg).toContain("x1=\"44\" y1=\"16\" x2=\"44\" y2=\"296\"");
   });
 
   it("renders distribution/probability charts with sorted x values and sparse labels", () => {
@@ -131,8 +135,13 @@ describe("simulationChartsSvg", () => {
 
     expect(distributionSvg).toContain("Distribution Monte Carlo");
     expect(distributionSvg).toContain("<path d=\"M");
+    expect(distributionSvg).toContain("stroke-dasharray=\"8 4\"");
+    expect(distributionSvg).toContain("Fréquence");
+    expect(distributionSvg).toContain("Courbe lissée");
     expect(probabilitySvg).toContain("Courbe de probabilit\u00E9");
     expect(probabilitySvg).toContain("<path d=\"M");
+    expect(probabilitySvg).toContain("Probabilité");
+    expect(probabilitySvg).toMatch(/<path d="M[^"]*" fill="none" stroke="#2563eb" stroke-width="2\.5" \/>/);
   });
 
   it("renders probability chart with single point (xStep=0 branch)", () => {
@@ -151,6 +160,7 @@ describe("simulationChartsSvg", () => {
     expect(svg).toContain("Historique corrÃ©lÃ©");
     expect(svg).toContain("#15803d");
     expect(svg).toContain("#dc2626");
+    expect(svg).toContain("<line x1=");
   });
 });
 

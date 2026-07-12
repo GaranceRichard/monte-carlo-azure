@@ -1,3 +1,5 @@
+import { SMOOTHED_SERIES_STROKE_DASHARRAY, type ChartLegendVisual } from "./chartVisualSemantics";
+
 export type ThroughputExportPoint = {
   week: string;
   throughput: number;
@@ -37,7 +39,7 @@ export type OverlayProbabilitySeries = {
 
 export const CHART_WIDTH = 960;
 export const CHART_HEIGHT = 360;
-const MARGIN = { top: 16, right: 16, bottom: 36, left: 44 };
+const MARGIN = { top: 16, right: 16, bottom: 64, left: 44 };
 
 function escapeHtml(value: string): string {
   return value
@@ -124,6 +126,28 @@ function renderGridAndYAxis(yTicks: number[], yScale: (value: number) => number)
     .join("");
 }
 
+function renderChartLegend(items: Array<{ label: string; color: string; visual: ChartLegendVisual }>): string {
+  const legendY = CHART_HEIGHT - 14;
+  const legendStep = (CHART_WIDTH - MARGIN.left - MARGIN.right) / Math.max(1, items.length);
+
+  return items
+    .map((item, index) => {
+      const x = MARGIN.left + index * legendStep;
+      const color = escapeHtml(item.color);
+      const marker =
+        item.visual === "bar"
+          ? `<rect x="${x.toFixed(2)}" y="${(legendY - 8).toFixed(2)}" width="16" height="8" rx="2" fill="${color}" />`
+          : item.visual === "band"
+            ? `<rect x="${x.toFixed(2)}" y="${(legendY - 8).toFixed(2)}" width="18" height="8" rx="2" fill="${color}" fill-opacity="0.35" />`
+            : item.visual === "point"
+              ? `<circle cx="${(x + 8).toFixed(2)}" cy="${(legendY - 4).toFixed(2)}" r="4" fill="${color}" />`
+              : `<line x1="${x.toFixed(2)}" y1="${(legendY - 4).toFixed(2)}" x2="${(x + 18).toFixed(2)}" y2="${(legendY - 4).toFixed(2)}" stroke="${color}" stroke-width="2.5"${item.visual === "dashed-line" ? ` stroke-dasharray="${SMOOTHED_SERIES_STROKE_DASHARRAY}"` : ""} />`;
+
+      return `${marker}<text x="${(x + 24).toFixed(2)}" y="${legendY}" fill="#374151" font-size="11">${escapeHtml(item.label)}</text>`;
+    })
+    .join("");
+}
+
 export function renderThroughputChart(
   points: ThroughputExportPoint[],
   title = "Throughput hebdomadaire",
@@ -147,11 +171,6 @@ export function renderThroughputChart(
       return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${Math.max(0, h).toFixed(2)}" fill="#93c5fd" />`;
     })
     .join("");
-  const throughputPath = linePath(
-    points.map((p) => p.throughput),
-    yScale,
-    xScale,
-  );
   const averagePath = linePath(
     points.map((p) => p.movingAverage),
     yScale,
@@ -172,9 +191,12 @@ export function renderThroughputChart(
       <line x1="${MARGIN.left}" y1="${MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       <line x1="${MARGIN.left}" y1="${MARGIN.top + plotHeight}" x2="${CHART_WIDTH - MARGIN.right}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       ${bars}
-      <path d="${throughputPath}" fill="none" stroke="#2563eb" stroke-width="2" />
-      <path d="${averagePath}" fill="none" stroke="#f97316" stroke-width="2.5" stroke-dasharray="8 4" />
+      <path d="${averagePath}" fill="none" stroke="#f97316" stroke-width="2.5" stroke-dasharray="${SMOOTHED_SERIES_STROKE_DASHARRAY}" />
       ${xLabels}
+      ${renderChartLegend([
+        { label: "Throughput", color: "#93c5fd", visual: "bar" },
+        { label: "Moyenne mobile", color: "#f97316", visual: "dashed-line" },
+      ])}
     </svg>
   `;
 }
@@ -232,9 +254,14 @@ export function renderCycleTimeChart(points: CycleTimeExportPoint[], trendPoints
       <line x1="${MARGIN.left}" y1="${MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       <line x1="${MARGIN.left}" y1="${MARGIN.top + plotHeight}" x2="${CHART_WIDTH - MARGIN.right}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       <path d="${bandPath}" fill="#93c5fd" fill-opacity="0.35" stroke="none" />
-      <path d="${averagePath}" fill="none" stroke="#f97316" stroke-width="2.5" />
+      <path d="${averagePath}" fill="none" stroke="#f97316" stroke-width="2.5" stroke-dasharray="${SMOOTHED_SERIES_STROKE_DASHARRAY}" />
       ${circles}
       ${xLabels}
+      ${renderChartLegend([
+        { label: "Variabilité", color: "#93c5fd", visual: "band" },
+        { label: "Moyenne glissante", color: "#f97316", visual: "dashed-line" },
+        { label: "Cycle time observé", color: "#2563eb", visual: "point" },
+      ])}
     </svg>
   `;
 }
@@ -280,8 +307,12 @@ export function renderDistributionChart(points: DistributionExportPoint[]): stri
       <line x1="${MARGIN.left}" y1="${MARGIN.top}" x2="${MARGIN.left}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       <line x1="${MARGIN.left}" y1="${MARGIN.top + plotHeight}" x2="${CHART_WIDTH - MARGIN.right}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       ${bars}
-      <path d="${gaussPath}" fill="none" stroke="#2563eb" stroke-width="2.5" />
+      <path d="${gaussPath}" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-dasharray="${SMOOTHED_SERIES_STROKE_DASHARRAY}" />
       ${xLabels}
+      ${renderChartLegend([
+        { label: "Fréquence", color: "#93c5fd", visual: "bar" },
+        { label: "Courbe lissée", color: "#2563eb", visual: "dashed-line" },
+      ])}
     </svg>
   `;
 }
@@ -317,6 +348,7 @@ export function renderProbabilityChart(points: ProbabilityExportPoint[]): string
       <line x1="${MARGIN.left}" y1="${MARGIN.top + plotHeight}" x2="${CHART_WIDTH - MARGIN.right}" y2="${MARGIN.top + plotHeight}" stroke="#9ca3af" />
       <path d="${probabilityPath}" fill="none" stroke="#2563eb" stroke-width="2.5" />
       ${xLabels}
+      ${renderChartLegend([{ label: "Probabilité", color: "#2563eb", visual: "solid-line" }])}
     </svg>
   `;
 }
@@ -359,17 +391,9 @@ export function renderOverlayProbabilityChart(series: OverlayProbabilitySeries[]
     })
     .join("");
 
-  const legendY = CHART_HEIGHT - 8;
-  const legendStep = (CHART_WIDTH - MARGIN.left - MARGIN.right) / Math.max(1, sanitized.length);
-  const legend = sanitized
-    .map((entry, index) => {
-      const x = MARGIN.left + index * legendStep;
-      return `
-        <circle cx="${x.toFixed(2)}" cy="${legendY}" r="4" fill="${escapeHtml(entry.color)}" />
-        <text x="${(x + 10).toFixed(2)}" y="${legendY + 4}" fill="#374151" font-size="11">${escapeHtml(entry.label)}</text>
-      `;
-    })
-    .join("");
+  const legend = renderChartLegend(
+    sanitized.map((entry) => ({ label: entry.label, color: entry.color, visual: "solid-line" })),
+  );
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_WIDTH} ${CHART_HEIGHT}" role="img" aria-label="Courbes de probabilit\u00E9s compar\u00E9es">

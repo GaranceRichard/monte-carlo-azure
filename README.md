@@ -57,6 +57,9 @@ Demo GitHub Pages:
 - badge `Démo` integre a l'en-tete des ecrans demo GitHub Pages (choix d'equipe et simulation)
 - lisibilite renforcee des graphes de simulation, y compris les etiquettes de l'axe X
 - legendes de graphiques harmonisees, affichees seulement quand utiles et sans debordement en bas du panneau
+- convention visuelle commune a l'interface et aux rapports PDF: observations en barres, points pleins ou trait continu;
+  moyenne mobile, moyenne glissante et lissage en trait pointille; intervalle de variabilite en bande;
+  probabilite et prevision en trait continu. Chaque legende reproduit le style de sa serie.
 - calcul du `cycleTime` extrait dans un utilitaire dedie avec couverture unitaire ciblee
 - `Cycle Time` affiche partout en jours calendaires (cartes, graphiques, tooltips, demo et PDF)
 - affichage d'un `Risk Score` avec code couleur

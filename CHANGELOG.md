@@ -4,6 +4,9 @@
 
 ### Frontend
 
+- harmonisation de la grammaire visuelle des graphiques Recharts et SVG: observations en barres, points pleins ou
+  traits continus; moyenne mobile, moyenne glissante et courbe lissee pointillees; intervalle de variabilite en bande;
+  probabilites continues. Les legendes d'interface et de rapport reproduisent desormais le style de chaque serie.
 - clarification semantique des graphiques du rapport portefeuille: le throughput equipe,
   l'historique corr\u00E9l\u00E9 et les scenarios bootstrap sont distingues par des titres HTML et SVG
   coherents; les scenarios synthetiques restent explicitement presentes comme reconstruits par bootstrap

@@ -7,12 +7,18 @@ const {
   yAxisCalls,
   xAxisCalls,
   tooltipCalls,
+  areaCalls,
+  barCalls,
+  lineCalls,
   exportSimulationPrintReport,
   computeThroughputReliability,
 } = vi.hoisted(() => ({
   yAxisCalls: [] as any[],
   xAxisCalls: [] as any[],
   tooltipCalls: [] as any[],
+  areaCalls: [] as any[],
+  barCalls: [] as any[],
+  lineCalls: [] as any[],
   exportSimulationPrintReport: vi.fn(),
   computeThroughputReliability: vi.fn(),
 }));
@@ -35,7 +41,10 @@ vi.mock("recharts", () => {
     ResponsiveContainer: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     ComposedChart: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     LineChart: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    Area: () => <div />,
+    Area: (props: Record<string, unknown>) => {
+      areaCalls.push(props);
+      return <div />;
+    },
     CartesianGrid: () => <div />,
     XAxis: (props: Record<string, unknown>) => {
       xAxisCalls.push(props);
@@ -56,10 +65,14 @@ vi.mock("recharts", () => {
             {content({
               payload: [
                 { value: "", dataKey: "ignored-empty", color: "#000" },
-                { value: "Moyenne glissante", dataKey: "average", color: "#123" },
+                { value: "Moyenne glissante", dataKey: "averageDays", color: "#123" },
                 { value: "Cycle time observé", dataKey: "observedAverage", color: "#456" },
                 { value: "Throughput", dataKey: "throughput", color: "#789" },
                 { value: "Moyenne mobile", dataKey: "movingAverage", color: "#abc" },
+                { value: "Variabilité", dataKey: "bandRangeDays", color: "#001" },
+                { value: "Fréquence", dataKey: "count", color: "#def" },
+                { value: "Courbe lissée", dataKey: "gauss", color: "#fed" },
+                { value: "Probabilité", dataKey: "probability", color: "#246" },
               ],
             })}
           </>
@@ -67,8 +80,14 @@ vi.mock("recharts", () => {
       }
       return <div>{content}</div>;
     },
-    Bar: () => <div />,
-    Line: () => <div />,
+    Bar: (props: Record<string, unknown>) => {
+      barCalls.push(props);
+      return <div />;
+    },
+    Line: (props: Record<string, unknown>) => {
+      lineCalls.push(props);
+      return <div />;
+    },
   };
 });
 
@@ -149,6 +168,9 @@ describe("SimulationChartTabs", () => {
     yAxisCalls.length = 0;
     xAxisCalls.length = 0;
     tooltipCalls.length = 0;
+    areaCalls.length = 0;
+    barCalls.length = 0;
+    lineCalls.length = 0;
     exportSimulationPrintReport.mockReset();
     computeThroughputReliability.mockReset();
     simulationContextValue = {
@@ -207,7 +229,7 @@ describe("SimulationChartTabs", () => {
     expect(cycleTimeWrap).not.toBeNull();
   });
 
-  it("renders filtered legend items and dashed styles for observed series", () => {
+  it("renders filtered legend items with their actual visual styles", () => {
     const { container } = render(<SimulationChartTabs />);
 
     expect(screen.getAllByText("Moyenne glissante").length).toBeGreaterThan(0);
@@ -215,7 +237,24 @@ describe("SimulationChartTabs", () => {
     expect(screen.getAllByText("Throughput").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Moyenne mobile").length).toBeGreaterThan(0);
     expect(container.textContent).not.toContain("ignored-empty");
-    expect(container.querySelector('[style*="dashed"]')).not.toBeNull();
+    expect(container.querySelector('[data-visual-style="band"]')).not.toBeNull();
+    expect(container.querySelector('[data-visual-style="bar"]')).not.toBeNull();
+    expect(container.querySelector('[data-visual-style="point"]')).not.toBeNull();
+    expect(container.querySelector('[data-visual-style="dashed-line"]')).not.toBeNull();
+    expect(container.querySelector('[data-visual-style="solid-line"]')).not.toBeNull();
+  });
+
+  it("uses bars or points for observations and dashed strokes for smoothing", () => {
+    render(<SimulationChartTabs />);
+
+    expect(areaCalls.find((props) => props.dataKey === "bandRangeDays")?.legendType).toBe("rect");
+    expect(barCalls.map((props) => props.dataKey)).toEqual(expect.arrayContaining(["throughput", "count"]));
+    expect(lineCalls.find((props) => props.dataKey === "averageDays")).toMatchObject({ strokeDasharray: "8 4" });
+    expect(lineCalls.find((props) => props.dataKey === "observedAverage")).toMatchObject({ strokeWidth: 0 });
+    expect(lineCalls.find((props) => props.dataKey === "movingAverage")).toMatchObject({ strokeDasharray: "8 4" });
+    expect(lineCalls.find((props) => props.dataKey === "gauss")).toMatchObject({ strokeDasharray: "8 4" });
+    expect(lineCalls.find((props) => props.dataKey === "probability")?.strokeDasharray).toBeUndefined();
+    expect(lineCalls.some((props) => props.dataKey === "throughput")).toBe(false);
   });
 
   it("computes reliability from throughput data when missing from the result", () => {

@@ -16,6 +16,11 @@ import { useState, type ReactNode } from "react";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "../ui/tabs";
 import { useSimulationContext } from "../../hooks/SimulationContext";
 import { computeThroughputReliability } from "../../utils/simulation";
+import {
+  chartLegendVisualByDataKey,
+  SMOOTHED_SERIES_STROKE_DASHARRAY,
+  type ChartLegendVisual,
+} from "./chartVisualSemantics";
 
 const chartMargin = { top: 8, right: 12, left: 4, bottom: 22 };
 const xAxisTick = { fill: "var(--chart-axis)", fontSize: 12 };
@@ -165,15 +170,33 @@ export default function SimulationChartTabs() {
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-2 text-sm font-medium text-[var(--text)]">
           {items.map((item) => (
             <div key={String(item.dataKey ?? item.value)} className="flex items-center gap-2 whitespace-nowrap">
-              <span
-                aria-hidden="true"
-                className="inline-block w-5 shrink-0 border-t-2"
-                style={{
-                  borderColor: item.color,
-                  borderTopStyle:
-                    item.dataKey === "observedAverage" || item.dataKey === "movingAverage" ? "dashed" : "solid",
-                }}
-              />
+              {(() => {
+                const visual: ChartLegendVisual =
+                  typeof item.dataKey === "string" ? chartLegendVisualByDataKey[item.dataKey] ?? "solid-line" : "solid-line";
+                const markerStyle = { backgroundColor: item.color, borderColor: item.color };
+
+                if (visual === "bar") {
+                  return <span aria-hidden="true" data-visual-style={visual} className="inline-block h-3 w-4 shrink-0 rounded-sm" style={markerStyle} />;
+                }
+                if (visual === "band") {
+                  return <span aria-hidden="true" data-visual-style={visual} className="inline-block h-3 w-5 shrink-0 rounded-sm opacity-20" style={markerStyle} />;
+                }
+                if (visual === "point") {
+                  return <span aria-hidden="true" data-visual-style={visual} className="inline-block h-3 w-3 shrink-0 rounded-full" style={markerStyle} />;
+                }
+
+                return (
+                  <span
+                    aria-hidden="true"
+                    data-visual-style={visual}
+                    className="inline-block w-5 shrink-0 border-t-2"
+                    style={{
+                      borderColor: item.color,
+                      borderTopStyle: visual === "dashed-line" ? "dashed" : "solid",
+                    }}
+                  />
+                );
+              })()}
               <span>{item.value}</span>
             </div>
           ))}
@@ -273,7 +296,7 @@ export default function SimulationChartTabs() {
                     <XAxis dataKey="week" tick={xAxisTick} tickMargin={10} minTickGap={24} />
                     <YAxis domain={[0, getCycleTimeYAxisMax]} tick={yAxisTick} />
                     <Tooltip {...s.tooltipBaseProps} content={renderCycleTimeTooltip} />
-                    <Legend {...sharedLegendProps} content={renderChartLegend(["averageDays", "observedAverage"])} />
+                    <Legend {...sharedLegendProps} content={renderChartLegend(["bandRangeDays", "averageDays", "observedAverage"])} />
                     <Area
                       type="monotone"
                       dataKey="bandBaseDays"
@@ -291,7 +314,7 @@ export default function SimulationChartTabs() {
                       stroke="transparent"
                       fill="var(--p90)"
                       fillOpacity={0.2}
-                      legendType="none"
+                      legendType="rect"
                     />
                     <Line
                       type="monotone"
@@ -299,15 +322,15 @@ export default function SimulationChartTabs() {
                       dot={false}
                       strokeWidth={2.5}
                       stroke="var(--brand)"
+                      strokeDasharray={SMOOTHED_SERIES_STROKE_DASHARRAY}
                       name="Moyenne glissante"
                     />
                     <Line
                       type="monotone"
                       dataKey="observedAverage"
                       dot={{ r: 4, fill: "var(--p70)", stroke: "var(--p70)" }}
-                      strokeWidth={2}
+                      strokeWidth={0}
                       stroke="var(--p70)"
-                      strokeDasharray="8 4"
                       name="Cycle time observé"
                       connectNulls
                     />
@@ -347,16 +370,15 @@ export default function SimulationChartTabs() {
                     tick={yAxisTick}
                   />
                   <Tooltip {...s.tooltipBaseProps} content={renderThroughputTooltip} />
-                  <Legend {...sharedLegendProps} content={renderChartLegend()} />
+                  <Legend {...sharedLegendProps} content={renderChartLegend(["throughput", "movingAverage"])} />
                   <Bar dataKey="throughput" name="Throughput" fill="var(--p90)" radius={[5, 5, 0, 0]} />
-                  <Line type="monotone" dataKey="throughput" dot={false} strokeWidth={2} stroke="var(--brand)" name="Courbe" />
                   <Line
                     type="monotone"
                     dataKey="movingAverage"
                     dot={false}
                     strokeWidth={2.5}
                     stroke="var(--p70)"
-                    strokeDasharray="8 4"
+                    strokeDasharray={SMOOTHED_SERIES_STROKE_DASHARRAY}
                     name="Moyenne mobile"
                   />
                 </ComposedChart>
@@ -383,8 +405,17 @@ export default function SimulationChartTabs() {
                       return [Number(v).toFixed(1), name];
                     }}
                   />
-                  <Bar dataKey="count" fill="var(--p90)" radius={[5, 5, 0, 0]} />
-                  <Line type="monotone" dataKey="gauss" dot={false} strokeWidth={2.5} stroke="var(--brand)" />
+                  <Legend {...sharedLegendProps} content={renderChartLegend(["count", "gauss"])} />
+                  <Bar dataKey="count" name="Fréquence" fill="var(--p90)" radius={[5, 5, 0, 0]} />
+                  <Line
+                    type="monotone"
+                    dataKey="gauss"
+                    dot={false}
+                    strokeWidth={2.5}
+                    stroke="var(--brand)"
+                    strokeDasharray={SMOOTHED_SERIES_STROKE_DASHARRAY}
+                    name="Courbe lissée"
+                  />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
@@ -412,7 +443,8 @@ export default function SimulationChartTabs() {
                       s.result?.result_kind === "items" ? "P(X >= valeur)" : "P(X <= valeur)",
                     ]}
                   />
-                  <Line type="monotone" dataKey="probability" dot={false} strokeWidth={2.5} stroke="var(--brand)" />
+                  <Legend {...sharedLegendProps} content={renderChartLegend(["probability"])} />
+                  <Line type="monotone" dataKey="probability" dot={false} strokeWidth={2.5} stroke="var(--brand)" name="Probabilité" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
