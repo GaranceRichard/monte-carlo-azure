@@ -405,12 +405,21 @@ Sous Windows/VS Code, les taches `pytest --cov` paralleles utilisent des fichier
 Le projet desactive aussi le cacheprovider pytest via `pytest.ini` (`-p no:cacheprovider`) pour supprimer les warnings d'ecriture `.pytest_cache` en environnement restreint.
 Pour la couverture frontend Vitest sous Windows, le projet utilise une execution stable (`pool: "forks"` et `coverage.processingConcurrency: 1` dans `frontend/vitest.config.js`) afin d'eviter les pannes d'agregation V8 de type `ENOENT ... frontend\coverage\.tmp\coverage-*.json`.
 Dans ce repo, une ligne rouge dans le detail d'un rapport de coverage est consideree comme invalide et doit etre couverte avant de considerer la tache acceptable, meme si les seuils globaux restent verts.
+Le coverage Vitest inclut exhaustivement les sources executables de `frontend/src` et applique les
+seuils de 80 % globalement et fichier par fichier. Les seules exclusions sont les feuilles CSS,
+les tests/E2E, les declarations `*.d.ts`, les fichiers generes et les deux modules TypeScript
+strictement declaratifs (`src/types.ts`, `src/hooks/simulationTypes.ts`). Ainsi, tout nouveau
+fichier executable non teste apparait dans le rapport et fait echouer la gate; aucun module de
+production n'est exclu par convenance.
 La task VS Code `Coverage: 8 terminaux` execute aussi:
 
 - `Scripts/check_vitals_compliance.py` pour verifier la traceabilite des points vitaux vers leurs tests cibles
 - `Scripts/report_vitals_coverage.py` pour afficher les taux de couverture par vital a partir des artefacts backend/frontend/e2e
 - `Scripts/check_naming_convention.py` en fin de sequence pour bloquer la reintroduction d'identifiants hors convention
 - `frontend/coverage/coverage-final.json` comme artefact frontend unique pour le global et les vitals
+
+Validation de reference: les couvertures backend, frontend unitaire et E2E, ainsi que les
+controles vitals, sont conformes.
 
 Ces scripts Python de coverage vitals font partie du lint backend et doivent rester conformes a `ruff check .`, y compris la limite de 100 caracteres par ligne.
 Les messages de validation backend et les imports des tests respectent egalement ce formatage Ruff.
