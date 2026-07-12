@@ -82,6 +82,15 @@ Le frontend couvre notamment :
   - la courbe de probabilite utilise le total simule comme denominateur et plafonne
     au taux reel de completion
   - le `Risk Score` n'est pas affiche si `P50` ou `P90` manque
+- langage decisionnel partage dans `src/utils/decisionLanguage.ts`
+  - `buildDecisionLanguage` transforme les diagnostics existants en trois dimensions de restitution :
+    qualite des donnees, incertitude de prevision et recommandation de decision
+  - chaque dimension expose un titre, un statut lisible, la justification et les facteurs
+    deja calcules, ainsi que l'action conseillee par la recommandation existante
+  - le module ne calcule aucun diagnostic et ne modifie ni les percentiles, ni le `Risk Score`,
+    ni les regles de recommandation
+  - il est volontairement independant de React et des exports PDF afin de pouvoir etre integre
+    ulterieurement par l'interface
 - historique throughput aligne sur des semaines ISO completes uniquement
   - debut aligne sur le premier lundi complet inclus ou suivant `startDate`
   - fin alignee sur le dernier dimanche complet inclus ou precedent `endDate`

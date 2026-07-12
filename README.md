@@ -74,6 +74,16 @@ Demo GitHub Pages:
   - la recommandation d'arbitrage traduit ces deux diagnostics en `supportable`, `caution`,
     `arbitration_required` ou `not_recommended`, avec une justification, des facteurs
     determinants et une action conseillee
+  - `frontend/src/utils/decisionLanguage.ts` fournit une formulation partagee, sans modifier
+    les diagnostics : titre, statut lisible, justification existante, facteurs existants et
+    action conseillee. Les statuts sont :
+    - qualite des donnees : `sufficient` → « Données suffisantes », `watch` → « Données à
+      surveiller », `insufficient` → « Données insuffisantes »
+    - incertitude de prevision : `low` → « Incertitude faible », `moderate` → « Incertitude
+      modérée », `high` → « Incertitude élevée », `unmeasurable` → « Incertitude impossible à mesurer »
+    - recommandation de decision : `supportable` → « Décision appuyée par les données »,
+      `caution` → « Décision possible avec prudence », `arbitration_required` → « Arbitrage
+      nécessaire », `not_recommended` → « Décision non recommandée »
   - le `Risk Score` conserve son calcul actuel et ne constitue pas une mesure de qualite
     des donnees ni une recommandation d'arbitrage
 - export CSV du throughput hebdomadaire
