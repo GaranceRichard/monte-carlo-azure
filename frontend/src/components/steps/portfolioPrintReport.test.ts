@@ -14,8 +14,37 @@ vi.mock("./simulationPdfDownload", async () => {
 });
 
 import { buildPortfolioPrintReportHtml, exportPortfolioPrintReport } from "./portfolioPrintReport";
+import { buildDecisionLanguage } from "../../utils/decisionLanguage";
 
 type PortfolioPrintReportArgs = Parameters<typeof buildPortfolioPrintReportHtml>[0];
+
+function scenarioDiagnostic(level: "supportable" | "caution" | "arbitration_required" | "not_recommended") {
+  const dataQualityLevel = level === "not_recommended" ? "insufficient" : level === "arbitration_required" ? "watch" : "sufficient";
+  const uncertaintyLevel = level === "supportable" ? "low" : level === "not_recommended" ? "unmeasurable" : "high";
+  const factors = level === "arbitration_required"
+    ? [
+        { source: "dataQuality" as const, code: "partial_ado_data", description: "Données partielles" },
+        { source: "forecastUncertainty" as const, code: "forecast_percentile_spread", description: "Dispersion élevée" },
+      ]
+    : level === "caution"
+      ? [{ source: "forecastUncertainty" as const, code: "forecast_percentile_spread", description: "Dispersion élevée" }]
+      : [];
+
+  return buildDecisionLanguage({
+    dataQuality: { level: dataQualityLevel, justification: "Qualité issue des données du scénario.", factors: [] },
+    forecastUncertainty: { level: uncertaintyLevel, justification: "Incertitude issue des percentiles du scénario.", factors: [] },
+    decisionRecommendation: {
+      level,
+      justification: `Justification ${level}.`,
+      advisedAction: `Action ${level}.`,
+      factors,
+    },
+  });
+}
+
+function formatScenarioLabelForTest(label: string): string {
+  return label.startsWith("Arrime") ? label.replace("Arrime", "Arrimé") : label;
+}
 
 function baseArgs(): PortfolioPrintReportArgs {
   return {
@@ -39,6 +68,7 @@ function baseArgs(): PortfolioPrintReportArgs {
         riskLegend: "fiable" as const,
         distribution: [{ x: 10, count: 10 }],
         throughputReliability: { cv: 0.22, iqr_ratio: 0.3, slope_norm: -0.02, label: "fiable" as const, samples_count: 8 },
+        decisionDiagnostic: scenarioDiagnostic("caution"),
       },
       {
         label: "Arrime (80%)" as const,
@@ -54,6 +84,7 @@ function baseArgs(): PortfolioPrintReportArgs {
         riskLegend: "incertain" as const,
         distribution: [{ x: 8, count: 10 }],
         throughputReliability: { cv: 0.51, iqr_ratio: 0.55, slope_norm: -0.03, label: "incertain" as const, samples_count: 8 },
+        decisionDiagnostic: scenarioDiagnostic("arbitration_required"),
       },
       {
         label: "Friction (80%)" as const,
@@ -69,6 +100,7 @@ function baseArgs(): PortfolioPrintReportArgs {
         riskLegend: "incertain" as const,
         distribution: [{ x: 7, count: 10 }],
         throughputReliability: { cv: 1.01, iqr_ratio: 0.7, slope_norm: -0.11, label: "fragile" as const, samples_count: 8 },
+        decisionDiagnostic: scenarioDiagnostic("not_recommended"),
       },
       {
         label: "Historique corr\u00E9l\u00E9" as const,
@@ -84,6 +116,7 @@ function baseArgs(): PortfolioPrintReportArgs {
         riskLegend: "incertain" as const,
         distribution: [{ x: 6, count: 10 }],
         throughputReliability: { cv: 1.6, iqr_ratio: 1.2, slope_norm: -0.2, label: "non fiable" as const, samples_count: 5 },
+        decisionDiagnostic: scenarioDiagnostic("supportable"),
       },
     ],
     sections: [
@@ -118,7 +151,7 @@ describe("portfolioPrintReport", () => {
   it("renders synthesis, scenarios and team pages in expected order", () => {
     const html = buildPortfolioPrintReportHtml(baseArgs());
 
-    const idxSynth = html.indexOf("SynthÃƒÂ¨se - Simulation Portefeuille");
+    const idxSynth = html.indexOf("Synth\u00E8se - Simulation Portefeuille");
     const idxOpt = html.search(/Sc.nario - Optimiste/);
     const idxArr = html.search(/Sc.nario - Arrim./);
     const idxFriction = html.search(/Sc.nario - Friction \(80%\)/);
@@ -131,8 +164,8 @@ describe("portfolioPrintReport", () => {
     expect(idxFriction).toBeLessThan(idxCons);
     expect(idxCons).toBeLessThan(idxTeam);
     expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Tickets:<\/b> Bug/);
-    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Etats:<\/b> Done/);
-    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Lecture:<\/b> Throughput en baisse sur les dernieres semaines\./);
+    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>États:<\/b> Done/);
+    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Lecture:<\/b> Throughput en baisse sur les dernières semaines\./);
     expect(html).not.toContain('id="download-pdf"');
   });
 
@@ -152,6 +185,184 @@ describe("portfolioPrintReport", () => {
     expect(html).toContain("<strong>Risk Score :</strong>");
     expect(html).toMatch(/<strong>Fiabilit. de l&#39;historique :<\/strong>/);
     expect(html).toMatch(/<p class="hypothesis reading-rule"><strong>R.gle de lecture :<\/strong><br \/>/);
+  });
+
+  it("keeps every synthesis hypothesis below the chart in a compact two-column section", () => {
+    const html = buildPortfolioPrintReportHtml(baseArgs());
+    const report = new DOMParser().parseFromString(html, "text/html");
+    const summaryPage = report.querySelector<HTMLElement>(".page");
+    const hypothesisSection = summaryPage?.querySelector<HTMLElement>(".section--hypotheses");
+    const columns = Array.from(hypothesisSection?.querySelectorAll<HTMLElement>(".hypothesis-column") ?? []);
+    const hypothesisLabels = Array.from(hypothesisSection?.querySelectorAll<HTMLElement>(".hypothesis strong") ?? []).map(
+      (element) => element.textContent?.trim() ?? "",
+    );
+    const hypothesisCss = html.match(/\.section--hypotheses \{[^}]+\}/)?.[0] ?? "";
+
+    expect(summaryPage?.querySelectorAll(".page")).toHaveLength(0);
+    expect(summaryPage?.querySelector("h2")?.textContent).toBe("Synthèse décisionnelle");
+    expect(summaryPage?.textContent).toContain("Courbes de probabilités comparées");
+    expect(columns).toHaveLength(2);
+    expect(columns.map((column) => column.querySelectorAll(".hypothesis").length)).toEqual([4, 3]);
+    expect(hypothesisLabels).toEqual([
+      "Optimiste :",
+      "Arrimé :",
+      expect.stringMatching(/^Friction/),
+      "Historique corrélé :",
+      "Risk Score :",
+      "Fiabilité de l'historique :",
+      "Règle de lecture :",
+    ]);
+    expect(hypothesisCss).toContain("break-before: auto");
+    expect(hypothesisCss).toContain("page-break-before: auto");
+    expect(hypothesisCss).toContain("break-inside: auto");
+    expect(hypothesisCss).toContain("page-break-inside: auto");
+    expect(hypothesisCss).not.toContain("page-break-after");
+    expect(html).toContain("@media print");
+    expect(html).toContain(".hypothesis-grid { display: block; column-count: 2;");
+    expect(html).toMatch(/\.page-break \{ page-break-after: always; \}/);
+    expect(html).not.toMatch(/[\u00C3\u00C2\uFFFD]/);
+  });
+
+  it("keeps accented portfolio text and lets the synthesis table and decision diagnostic grow naturally", () => {
+    const html = buildPortfolioPrintReportHtml(baseArgs());
+    const summaryTableCss = html.match(/\.summary-table \{[^}]+\}/)?.[0] ?? "";
+    const summaryCellsCss = html.match(/\.summary-table th, \.summary-table td \{[^}]+\}/)?.[0] ?? "";
+    const decisionDiagnosticCss = html.match(/\.decision-diagnostic \{[^}]+\}/)?.[0] ?? "";
+
+    expect(html).toContain("Synth\u00E8se d\u00E9cisionnelle");
+    expect(html).toContain("Hypoth\u00E8ses");
+    expect(html).toContain("Fiabilit\u00E9");
+    expect(html).toContain("Historique corr\u00E9l\u00E9");
+    expect(html).not.toMatch(/[\u00C3\u00C2\uFFFD]/);
+    expect(summaryTableCss).not.toMatch(/(?:^|;)\s*height\s*:/);
+    expect(summaryCellsCss).toContain("vertical-align: top");
+    expect(summaryCellsCss).toContain("overflow-wrap: anywhere");
+    expect(summaryCellsCss).toContain("word-break: break-word");
+    expect(decisionDiagnosticCss).not.toMatch(/(?:^|;)\s*height\s*:/);
+    expect(decisionDiagnosticCss).not.toMatch(/position\s*:/);
+    expect(html.indexOf("Diagnostic d\u00E9cisionnel")).toBeLessThan(html.indexOf("D\u00E9bit simul\u00E9 du sc\u00E9nario"));
+  });
+
+  it("renders a team decision diagnostic only when the available diagnostic is supplied", () => {
+    const args = baseArgs();
+    const diagnostic = buildDecisionLanguage({
+      dataQuality: { level: "sufficient", justification: "Données suffisantes.", factors: [] },
+      forecastUncertainty: { level: "moderate", justification: "Incertitude modérée.", factors: [] },
+      decisionRecommendation: {
+        level: "supportable",
+        justification: "Décision étayée.",
+        advisedAction: "Confirmer la décision.",
+        factors: [],
+      },
+    });
+    args.sections[0] = { ...args.sections[0], decisionDiagnostic: diagnostic };
+
+    const html = buildPortfolioPrintReportHtml(args);
+
+    expect(html).toContain("Diagnostic décisionnel");
+    expect(html).toContain(diagnostic.decisionRecommendation.status);
+    expect(html).toContain(diagnostic.decisionRecommendation.explanation);
+    expect(html).toContain(diagnostic.decisionRecommendation.action);
+    expect(html).not.toMatch(/undefined|null|NaN/);
+  });
+
+  it.each([
+    [0, "Décision possible avec prudence"],
+    [1, "Arbitrage nécessaire"],
+    [2, "Décision non recommandée"],
+  ] as const)("renders the complete decision language on scenario page %s", (scenarioIndex, expectedStatus) => {
+    const args = baseArgs();
+    const scenario = args.scenarios[scenarioIndex];
+    const diagnostic = scenario.decisionDiagnostic!;
+    const report = new DOMParser().parseFromString(buildPortfolioPrintReportHtml(args), "text/html");
+    const page = Array.from(report.querySelectorAll<HTMLElement>(".page")).find(
+      (candidate) => candidate.querySelector("h1")?.textContent?.includes(formatScenarioLabelForTest(scenario.label)),
+    );
+    const text = page?.textContent ?? "";
+
+    expect(text).toContain(expectedStatus);
+    expect(text).toContain(diagnostic.decisionRecommendation.explanation);
+    expect(text).toContain(diagnostic.decisionRecommendation.action);
+    expect(text).toContain(diagnostic.dataQuality.status);
+    expect(text).toContain(diagnostic.forecastUncertainty.status);
+    expect(text).not.toContain("Sensibilité à la période historique");
+  });
+
+  it("adds decision status and action to every scenario in the synthesis", () => {
+    const args = baseArgs();
+    const report = new DOMParser().parseFromString(buildPortfolioPrintReportHtml(args), "text/html");
+    const rows = Array.from(report.querySelectorAll<HTMLTableRowElement>(".summary-table tbody tr"));
+
+    expect(rows).toHaveLength(args.scenarios.length);
+    rows.forEach((row, index) => {
+      const cells = Array.from(row.querySelectorAll("td")).map((cell) => cell.textContent?.trim() ?? "");
+      const decision = args.scenarios[index].decisionDiagnostic!.decisionRecommendation;
+      expect(cells).toHaveLength(8);
+      expect(cells[6]).toBe(decision.status);
+      expect(cells[7]).toBe(decision.action);
+    });
+  });
+
+  it("shows historical sensitivity on a team page only when complete comparable data is supplied", () => {
+    const args = baseArgs();
+    const diagnostic = buildDecisionLanguage({
+      dataQuality: { level: "sufficient", justification: "Données suffisantes.", factors: [] },
+      forecastUncertainty: { level: "low", justification: "Incertitude faible.", factors: [] },
+      decisionRecommendation: {
+        level: "caution",
+        justification: "Sensibilité historique.",
+        advisedAction: "Comparer les périodes.",
+        factors: [{ source: "historicalSensitivity", code: "historical_window_sensitivity", description: "Sensibilité historique" }],
+      },
+      historicalSensitivity: {
+        level: "high",
+        simulationMode: "backlog_to_weeks",
+        comparedSimulations: [],
+        p90Minimum: 10,
+        p90Maximum: 15,
+        absoluteGap: 5,
+        relativeGap: 0.5,
+        recentChangeRate: -0.2,
+        recentWindow: { id: "recent", startDate: "2026-02-01", endDate: "2026-03-01", p90: 12, usableWeeks: 8 },
+        longWindow: { id: "long", startDate: "2025-10-01", endDate: "2026-03-01", p90: 15, usableWeeks: 20 },
+        recentTrend: "improved",
+        justification: "La période récente diffère de la période longue.",
+        advisedAction: "Conserver la période longue comme scénario prudent.",
+        factors: [],
+      },
+    });
+    args.sections[0] = { ...args.sections[0], decisionDiagnostic: diagnostic };
+
+    const html = buildPortfolioPrintReportHtml(args);
+
+    expect(html).toContain(diagnostic.historicalSensitivity!.recentP90);
+    expect(html).toContain(diagnostic.historicalSensitivity!.longP90);
+    expect(html).toContain(diagnostic.historicalSensitivity!.gap);
+  });
+
+  it("hides invalid percentiles and never emits invalid values", () => {
+    const args = baseArgs();
+    args.scenarios[0] = {
+      ...args.scenarios[0],
+      percentiles: { P50: 10, P70: Number.NaN },
+      riskScore: Number.NaN,
+      throughputReliability: null,
+      decisionDiagnostic: buildDecisionLanguage({
+        dataQuality: { level: "watch", justification: "Données à surveiller.", factors: [] },
+        forecastUncertainty: { level: "unmeasurable", justification: "Percentiles manquants.", factors: [] },
+        decisionRecommendation: {
+          level: "not_recommended",
+          justification: "La prévision est incomplète.",
+          advisedAction: "Rétablir les percentiles requis.",
+          factors: [],
+        },
+      }),
+    };
+
+    const html = buildPortfolioPrintReportHtml(args);
+
+    expect(html).toContain("Décision non recommandée");
+    expect(html).not.toMatch(/undefined|null|NaN/);
   });
 
   it("keeps every portfolio chart title aligned with its rendered data", () => {
@@ -264,7 +475,7 @@ describe("portfolioPrintReport", () => {
     const html = buildPortfolioPrintReportHtml(args);
 
     expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Tickets:<\/b> Agr/);
-    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>Etats:<\/b> Agr/);
+    expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<b>États:<\/b> Agr/);
   });
 
   it("renders team-page fallbacks when zero weeks are excluded and metrics are missing", () => {
@@ -281,11 +492,52 @@ describe("portfolioPrintReport", () => {
     };
 
     const html = buildPortfolioPrintReportHtml(args);
+    const report = new DOMParser().parseFromString(html, "text/html");
+    const teamPage = Array.from(report.querySelectorAll<HTMLElement>(".page")).find(
+      (page) => page.querySelector("h1")?.textContent === "Simulation Portefeuille - Team A",
+    );
 
     expect(html).toContain("Semaines 0 exclues");
     expect(html).toContain("Non disponible");
-    expect(html).toContain("<b>CV:</b> 0,00");
+    expect(teamPage?.querySelector(".diagnostic-card")).toBeNull();
     expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<section class="kpis">\s*<\/section>/);
+  });
+
+  it("omits non-finite reliability measurements from a team page", () => {
+    const args = baseArgs();
+    args.scenarios[0] = {
+      ...args.scenarios[0],
+      completionSummary: {
+        completed_count: 9,
+        censored_count: 1,
+        censored_rate: 0.1,
+        horizon_weeks: 52,
+      },
+    };
+    args.sections[0] = {
+      ...args.sections[0],
+      throughputReliability: {
+        cv: Number.NaN,
+        iqr_ratio: Number.NaN,
+        slope_norm: Number.NaN,
+        label: "incertain",
+        samples_count: Number.NaN,
+      },
+    };
+
+    const html = buildPortfolioPrintReportHtml(args);
+    const report = new DOMParser().parseFromString(html, "text/html");
+    const teamPage = Array.from(report.querySelectorAll<HTMLElement>(".page")).find(
+      (page) => page.querySelector("h1")?.textContent === "Simulation Portefeuille - Team A",
+    );
+    const teamText = teamPage?.textContent ?? "";
+
+    expect(teamText).toContain("Non disponible");
+    expect(teamText).not.toContain("CV:");
+    expect(teamText).not.toContain("IQR ratio:");
+    expect(teamText).not.toContain("Pente normalisée:");
+    expect(teamText).not.toContain("Semaines utilisées:");
+    expect(teamText).not.toMatch(/NaN|undefined|null/);
   });
 
   it("renders summary-page fallbacks when scenario risk scores and section defaults are missing", () => {
@@ -321,7 +573,8 @@ describe("portfolioPrintReport", () => {
     });
 
     expect(html).toContain("backlog: 0 items");
-    expect(html).toContain("<td>0</td>");
+    expect(html).toMatch(/<td>\s*<\/td>/);
+    expect(html).not.toContain("<td>0</td>");
     expect(html).not.toContain("0,00 (fiable)");
   });
 

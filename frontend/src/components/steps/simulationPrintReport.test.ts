@@ -17,6 +17,50 @@ import {
   buildSimulationPrintReportHtml,
   exportSimulationPrintReport,
 } from "./simulationPrintReport";
+import { buildDecisionLanguage } from "../../utils/decisionLanguage";
+
+function buildDecisionDiagnostic(
+  level: "supportable" | "caution" | "arbitration_required" | "not_recommended" = "caution",
+  withSensitivity = false,
+  simulationMode: "backlog_to_weeks" | "weeks_to_items" = "backlog_to_weeks",
+) {
+  return buildDecisionLanguage({
+    dataQuality: {
+      level: "watch",
+      justification: "Historique à surveiller.",
+      factors: [{ code: "usable_history_weeks", description: "Semaines historiques exploitables", value: 7 }],
+    },
+    forecastUncertainty: {
+      level: "high",
+      justification: "Dispersion élevée.",
+      factors: [{ code: "forecast_percentile_spread", description: "Dispersion des percentiles", value: 0.7 }],
+    },
+    decisionRecommendation: {
+      level,
+      justification: "Justification validée par l'interface.",
+      advisedAction: "Action validée par l'interface.",
+      factors: [{ source: "dataQuality", code: "usable_history_weeks", description: "Historique limité", value: 7 }],
+    },
+    historicalSensitivity: withSensitivity
+      ? {
+          level: "high",
+          simulationMode,
+          comparedSimulations: [],
+          p90Minimum: 12,
+          p90Maximum: 18,
+          absoluteGap: 6,
+          relativeGap: 0.5,
+          recentChangeRate: simulationMode === "weeks_to_items" ? 0.5 : -0.5,
+          recentWindow: { id: "recent", startDate: "2026-02-01", endDate: "2026-03-01", p90: 18, usableWeeks: 7 },
+          longWindow: { id: "long", startDate: "2025-09-01", endDate: "2026-03-01", p90: 12, usableWeeks: 24 },
+          recentTrend: simulationMode === "weeks_to_items" ? "improved" : "declined",
+          justification: "La période historique modifie fortement la prévision.",
+          advisedAction: "Retenir le scénario prudent.",
+          factors: [],
+        }
+      : undefined,
+  });
+}
 
 function buildBaseArgs() {
   return {
@@ -85,6 +129,57 @@ describe("simulationPrintReport", () => {
     expect(html).toContain("Throughput en baisse sur les dernieres semaines.");
     expect((html.match(/<svg/g) || []).length).toBeGreaterThanOrEqual(4);
     expect(html).not.toContain('id="download-pdf"');
+  });
+
+  it.each([
+    ["caution", "Décision possible avec prudence"],
+    ["arbitration_required", "Arbitrage nécessaire"],
+    ["not_recommended", "Décision non recommandée"],
+  ] as const)("keeps the %s decision wording aligned with the interface", (level, expectedStatus) => {
+    const decisionDiagnostic = buildDecisionDiagnostic(level);
+    const html = buildSimulationPrintReportHtml({ ...buildBaseArgs(), decisionDiagnostic });
+    const reportText = new DOMParser().parseFromString(html, "text/html").body.textContent ?? "";
+
+    expect(html).toContain("Diagnostic décisionnel");
+    expect(html).toContain(expectedStatus);
+    expect(reportText).toContain(decisionDiagnostic.decisionRecommendation.explanation);
+    expect(reportText).toContain(decisionDiagnostic.decisionRecommendation.action);
+    expect(html).toContain("Qualité des données — statut");
+    expect(html).toContain("Incertitude de prévision — statut");
+  });
+
+  it.each(["backlog_to_weeks", "weeks_to_items"] as const)("renders high historical sensitivity for %s", (simulationMode) => {
+    const decisionDiagnostic = buildDecisionDiagnostic("caution", true, simulationMode);
+    const html = buildSimulationPrintReportHtml({ ...buildBaseArgs(), simulationMode, decisionDiagnostic });
+    const sensitivity = decisionDiagnostic.historicalSensitivity!;
+
+    expect(html).toContain(sensitivity.status);
+    expect(html).toContain(sensitivity.recentP90);
+    expect(html).toContain(sensitivity.longP90);
+    expect(html).toContain(sensitivity.gap);
+    expect(html).toContain(sensitivity.action);
+  });
+
+  it("omits unavailable sensitivity and invalid diagnostic content", () => {
+    const missingPercentilesDiagnostic = buildDecisionLanguage({
+      dataQuality: { level: "watch", justification: "Données à surveiller.", factors: [] },
+      forecastUncertainty: {
+        level: "unmeasurable",
+        justification: "Les percentiles requis sont absents.",
+        factors: [{ code: "missing_required_percentiles", description: "Percentiles requis non calculables", value: undefined }],
+      },
+      decisionRecommendation: {
+        level: "arbitration_required",
+        justification: "Arbitrage requis.",
+        advisedAction: "Rétablir les percentiles.",
+        factors: [{ source: "forecastUncertainty", code: "missing_required_percentiles", description: "Percentiles requis non calculables", value: undefined }],
+      },
+    });
+    const html = buildSimulationPrintReportHtml({ ...buildBaseArgs(), decisionDiagnostic: missingPercentilesDiagnostic });
+
+    expect(html).toContain("Incertitude impossible à mesurer");
+    expect(html).not.toContain("Sensibilité à la période historique");
+    expect(html).not.toMatch(/undefined|null|NaN/);
   });
 
   it("renders empty-chart placeholders and escapes unsafe values", () => {
@@ -193,6 +288,23 @@ describe("simulationPrintReport", () => {
       expect(html).toContain(variant.expected);
       expect(html).toContain("0,60 (fragile)");
     }
+  });
+
+  it("renders the short-history warning and the uncertain risk band", () => {
+    const html = buildSimulationPrintReportHtml({
+      ...buildBaseArgs(),
+      displayPercentiles: { P50: 10, P70: 12, P90: 14 },
+      throughputReliability: {
+        cv: 0.2,
+        iqr_ratio: 0.2,
+        slope_norm: 0,
+        label: "incertain",
+        samples_count: 5,
+      },
+    });
+
+    expect(html).toContain("Historique trop court pour projeter avec confiance.");
+    expect(html).toContain("0,40 (incertain)");
   });
 
   it("adds an explicit decision notice when volatility is too high", () => {

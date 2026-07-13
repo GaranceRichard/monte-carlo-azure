@@ -7,6 +7,7 @@ import type {
   ThroughputReliability,
   WeeklyThroughputRow,
 } from "../types";
+import type { DecisionLanguage } from "../utils/decisionLanguage";
 
 export type ChartPoint = { x: number; count: number; gauss: number };
 export type ProbabilityPoint = { x: number; probability: number };
@@ -119,6 +120,7 @@ export type PortfolioScenarioResult = {
   distribution: DistributionBucket[];
   completionSummary?: CompletionSummary;
   throughputReliability?: ThroughputReliability | null;
+  decisionDiagnostic?: DecisionLanguage;
 };
 
 type DistributionBucket = {

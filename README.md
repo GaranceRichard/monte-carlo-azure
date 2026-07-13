@@ -95,6 +95,11 @@ Demo GitHub Pages:
 - rapport portefeuille PDF direct avec progression et tolerance aux echecs partiels
 - titres de graphiques portefeuille explicites: historique equipe, historique corr\u00E9l\u00E9,
   scenario bootstrap synthetique, comparaison des probabilites, distribution Monte Carlo et probabilite
+- parite decisionnelle entre l'interface et les rapports PDF: statut, justification, action conseillee,
+  facteurs, qualite des donnees et incertitude reutilisent les diagnostics existants; les informations
+  absentes ou non comparables ne sont pas affichees
+- la synthese PDF portefeuille conserve sur sa premiere page le tableau decisionnel, la comparaison des
+  probabilites et les hypotheses en deux colonnes; les pages detaillees restent separees par scenario
 
 Scenarios portefeuille:
 

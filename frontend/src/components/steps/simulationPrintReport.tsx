@@ -17,6 +17,8 @@ import {
   getProjectionReliabilityNotice,
 } from "../../utils/simulation";
 import type { CompletionSummary, ForecastPercentiles, ThroughputReliability } from "../../types";
+import type { DecisionLanguage } from "../../utils/decisionLanguage";
+import { renderDecisionDiagnosticHtml } from "../../utils/simulationDecisionDiagnostic";
 
 function escapeHtml(value: string): string {
   return value
@@ -79,6 +81,7 @@ export function buildSimulationPrintReportHtml({
   throughputPoints,
   distributionPoints,
   probabilityPoints,
+  decisionDiagnostic,
 }: {
   selectedTeam: string;
   startDate: string;
@@ -99,6 +102,7 @@ export function buildSimulationPrintReportHtml({
   throughputPoints: ThroughputExportPoint[];
   distributionPoints: DistributionExportPoint[];
   probabilityPoints: ProbabilityExportPoint[];
+  decisionDiagnostic?: DecisionLanguage;
 }): string {
   const cycleTimeSvg = renderCycleTimeChart(cycleTimePoints, cycleTimeTrendPoints);
   const throughputSvg = renderThroughputChart(throughputPoints);
@@ -164,8 +168,11 @@ export function buildSimulationPrintReportHtml({
           .kpi { border: 1px solid #d1d5db; border-radius: 8px; padding: 6px 8px; min-width: 140px; background: #f9fafb; }
           .kpi-label { display: block; font-size: 11px; color: #374151; font-weight: 700; }
           .kpi-value { display: block; margin-top: 2px; font-size: 16px; font-weight: 800; }
-          .section { margin-top: 8px; page-break-inside: avoid; }
-          .section h2 { margin: 0 0 4px 0; font-size: 14px; }
+        .section { margin-top: 8px; page-break-inside: avoid; }
+        .section h2 { margin: 0 0 4px 0; font-size: 14px; }
+        .decision-diagnostic { padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; font-size: 11px; line-height: 1.35; break-inside: avoid; }
+        .decision-dimension + .decision-dimension { margin-top: 6px; padding-top: 6px; border-top: 1px solid #e5e7eb; }
+        .decision-factors { margin: 3px 0; padding-left: 16px; }
           .chart-wrap { width: 100%; overflow: hidden; border: 1px solid #d1d5db; border-radius: 8px; padding: 4px; background: #fff; }
           .chart-wrap svg { width: 100%; height: auto; display: block; }
           .print-action {
@@ -230,6 +237,7 @@ export function buildSimulationPrintReportHtml({
           }
           <div class="kpi"><span class="kpi-label">Fiabilite</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>
         </section>
+        ${renderDecisionDiagnosticHtml(decisionDiagnostic)}
         ${
           completionSummary && completionSummary.censored_count > 0
             ? `<section class="section"><div class="meta"><div class="meta-row"><b>Limite d'horizon:</b> ${escapeHtml(String(completionSummary.horizon_weeks))} semaines</div><div class="meta-row"><b>Censures:</b> ${escapeHtml(String(completionSummary.censored_count))} sur ${escapeHtml(String(completionSummary.completed_count + completionSummary.censored_count))} (${escapeHtml(formatMetric(completionSummary.censored_rate))})</div><div class="meta-row"><b>Lecture:</b> la distribution et les percentiles ne couvrent que les simulations terminees. Un percentile absent n'est pas identifiable avant l'horizon.</div></div></section>`

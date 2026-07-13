@@ -17,6 +17,7 @@ import {
   computeThroughputReliability,
   generateSimulationSeed,
 } from "../utils/simulation";
+import { buildSimulationDecisionLanguage } from "../utils/simulationDecisionDiagnostic";
 
 export type TeamPortfolioConfig = {
   teamName: string;
@@ -48,6 +49,7 @@ export type PortfolioReportSection = {
   weeklyThroughput: { week: string; throughput: number }[];
   displayPercentiles: ForecastPercentiles;
   completionSummary?: CompletionSummary;
+  decisionDiagnostic?: ReturnType<typeof buildSimulationDecisionLanguage>;
 };
 
 type UsePortfolioReportParams = {
@@ -85,13 +87,13 @@ type UsePortfolioReportResult = {
 
 const SCENARIO_HYPOTHESIS_TEXT = {
   optimistic:
-    "Somme des debits de toutes les equipes. Hypothese : livraison independante, aucun cout de synchronisation inter-equipes.",
+    "Somme des débits de toutes les équipes. Hypothèse : livraison indépendante, aucun coût de synchronisation inter-équipes.",
   aligned:
-    "N% de la capacite combinee. Hypothese : couts de synchronisation (ceremonies, dependances, alignement) absorbes sur le debit global.",
+    "N% de la capacité combinée. Hypothèse : coûts de synchronisation (cérémonies, dépendances, alignement) absorbés sur le débit global.",
   friction:
-    "X% de la capacite combinee. Hypothese : chaque equipe supplementaire absorbe un cout d'alignement identique.",
+    "X% de la capacité combinée. Hypothèse : chaque équipe supplémentaire absorbe un coût d'alignement identique.",
   correlated:
-    "Somme des throughputs observes sur les memes semaines pour toutes les equipes. Cette approche conserve les variations et contraintes communes reellement observees dans l'historique.",
+    "Somme des throughputs observés sur les mêmes semaines pour toutes les équipes. Cette approche conserve les variations et contraintes communes réellement observées dans l'historique.",
 } as const;
 
 export function getPortfolioErrorMessage(error: unknown, context: AdoErrorContext): string {
@@ -128,6 +130,14 @@ function toScenarioResult(
   simulationMode: ForecastMode,
   result: Awaited<ReturnType<typeof simulateForecastFromSamples>>,
   weeklyData: WeeklyThroughputRow[],
+  context: {
+    selectedOrg: string;
+    selectedProject: string;
+    startDate: string;
+    endDate: string;
+    backlogSize: number;
+    targetWeeks: number;
+  },
 ): PortfolioScenarioResult {
   const percentiles = result.result_percentiles;
   const computedRiskScore = computeRiskScoreFromPercentiles(simulationMode, percentiles) ?? undefined;
@@ -136,6 +146,7 @@ function toScenarioResult(
     (result.result_kind === "items" && typeof result.risk_score === "number" && Number.isFinite(result.risk_score)
       ? result.risk_score
       : undefined);
+  const throughputReliability = computeThroughputReliability(samples);
   return {
     label,
     hypothesis,
@@ -147,7 +158,27 @@ function toScenarioResult(
     riskLegend: riskScore == null ? undefined : computeRiskLegend(riskScore),
     distribution: result.result_distribution,
     completionSummary: result.completion_summary,
-    throughputReliability: computeThroughputReliability(samples),
+    throughputReliability,
+    decisionDiagnostic: buildSimulationDecisionLanguage({
+      hasResult: true,
+      throughputSamples: samples,
+      includeZeroWeeks: true,
+      percentiles,
+      completionSummary: result.completion_summary,
+      riskScore,
+      throughputReliability,
+      selectedOrg: context.selectedOrg,
+      selectedProject: context.selectedProject,
+      selectedTeam: label,
+      startDate: context.startDate,
+      endDate: context.endDate,
+      simulationMode,
+      backlogSize: context.backlogSize,
+      targetWeeks: context.targetWeeks,
+      types: [],
+      doneStates: [],
+      usableWeeks: samples.length,
+    }),
   };
 }
 
@@ -261,6 +292,14 @@ export function usePortfolioReport({
         includeZeroWeeks,
       );
       const effectiveFrictionRate = computeFrictionRatePercent(successfulTeams.length, alignmentRate);
+      const scenarioDiagnosticContext = {
+        selectedOrg,
+        selectedProject,
+        startDate,
+        endDate,
+        backlogSize: Number(backlogSize),
+        targetWeeks: Number(targetWeeks),
+      };
 
       const totalSimulations = successfulTeams.length + 4;
       setGenerationProgress({ done: 0, total: totalSimulations });
@@ -305,6 +344,27 @@ export function usePortfolioReport({
                 weeklyThroughput: data.weeklyThroughput,
                 displayPercentiles: result.result_percentiles,
                 completionSummary: result.completion_summary,
+                decisionDiagnostic: buildSimulationDecisionLanguage({
+                  hasResult: true,
+                  throughputSamples: data.throughputSamples,
+                  includeZeroWeeks,
+                  percentiles: result.result_percentiles,
+                  completionSummary: result.completion_summary,
+                  riskScore: result.result_kind === "items"
+                    ? computeRiskScoreFromPercentiles(simulationMode, result.result_percentiles)
+                    : result.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, result.result_percentiles),
+                  throughputReliability: computeThroughputReliability(data.throughputSamples),
+                  selectedOrg,
+                  selectedProject,
+                  selectedTeam: cfg.teamName,
+                  startDate,
+                  endDate,
+                  simulationMode,
+                  backlogSize,
+                  targetWeeks,
+                  types: cfg.types,
+                  doneStates: cfg.doneStates,
+                }),
               } satisfies PortfolioReportSection,
             };
           } catch (error: unknown) {
@@ -334,6 +394,7 @@ export function usePortfolioReport({
                 simulationMode,
                 result,
                 buildSyntheticWeeklyData(scenarioSamples.optimistic, startDate),
+                scenarioDiagnosticContext,
               ),
             };
           } catch (error: unknown) {
@@ -363,6 +424,7 @@ export function usePortfolioReport({
                 simulationMode,
                 result,
                 buildSyntheticWeeklyData(scenarioSamples.aligned, startDate),
+                scenarioDiagnosticContext,
               ),
             };
           } catch (error: unknown) {
@@ -392,6 +454,7 @@ export function usePortfolioReport({
                 simulationMode,
                 result,
                 buildSyntheticWeeklyData(scenarioSamples.friction, startDate),
+                scenarioDiagnosticContext,
               ),
             };
           } catch (error: unknown) {
@@ -421,6 +484,7 @@ export function usePortfolioReport({
                 simulationMode,
                 result,
                 correlatedWeeklyData,
+                scenarioDiagnosticContext,
               ),
             };
           } catch (error: unknown) {

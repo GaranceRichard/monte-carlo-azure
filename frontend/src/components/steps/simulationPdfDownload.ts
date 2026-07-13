@@ -3,9 +3,18 @@ import "svg2pdf.js";
 import { CHART_HEIGHT, CHART_WIDTH } from "./simulationChartsSvg";
 
 const SECTION_TITLES = ["Cycle Time", "Throughput hebdomadaire", "Distribution Monte Carlo", "Courbe de probabilitÃ©"];
+const PORTFOLIO_SECTION_TITLES = ["Cycle Time", "Throughput hebdomadaire", "Distribution Monte Carlo", "Courbe de probabilit\u00E9"];
+const PDF_SIMULATION_CHART_COLUMNS = 2;
+const PDF_SIMULATION_CHART_GAP = 4;
+const PDF_SIMULATION_CHART_TITLE_HEIGHT = 4;
+const PDF_SIMULATION_CHART_BOTTOM_GAP = 3;
+const PDF_SIMULATION_DIAGNOSTIC_BOTTOM_GAP = 7;
+const PDF_PORTFOLIO_SUMMARY_CHART_MAX_HEIGHT = 65;
+const PDF_PORTFOLIO_HYPOTHESIS_LINE_HEIGHT = 3.3;
 const SUMMARY_TABLE_COLUMN_RATIOS: Record<number, number[]> = {
   5: [0.28, 0.12, 0.12, 0.12, 0.36],
   6: [0.24, 0.12, 0.12, 0.12, 0.2, 0.2],
+  8: [0.14, 0.06, 0.06, 0.06, 0.11, 0.12, 0.18, 0.27],
 };
 const RISK_CELL_STYLES: Array<{ match: string; fill: [number, number, number]; text: [number, number, number] }> = [
   { match: "non fiable", fill: [31, 41, 55], text: [255, 255, 255] },
@@ -81,7 +90,7 @@ function extractHypothesisParts(hypothesis: HTMLElement): { lead: string; body: 
   }
 
   const prefixedMatch = fullText.match(
-    /^((?:Optimiste|ArrimÃ©|Arrime|Historique corrélé|Friction(?:\s*\([^)]+\))?|Risk Score|FiabilitÃ© de l'historique|RÃ¨gle de lecture)\s*:)\s*(.*)$/u,
+    /^((?:Optimiste|Arrim\u00E9|Arrime|Historique corr\u00E9l\u00E9|Friction(?:\s*\([^)]+\))?|Risk Score|Fiabilit\u00E9 de l'historique|R\u00E8gle de lecture)\s*:)\s*(.*)$/u,
   );
   if (prefixedMatch) {
     return {
@@ -113,6 +122,123 @@ function estimateHypothesisSectionHeight(pdf: jsPDF, hypothesisBlocks: HTMLEleme
   return total;
 }
 
+function estimateHypothesisGridHeight(pdf: jsPDF, hypothesisColumns: HTMLElement[][], contentW: number): number {
+  if (hypothesisColumns.length < 2) return estimateHypothesisSectionHeight(pdf, hypothesisColumns[0] ?? [], contentW);
+
+  const columnGap = 6;
+  const columnWidth = (contentW - columnGap) / hypothesisColumns.length;
+  const tallestColumn = Math.max(
+    ...hypothesisColumns.map((column) =>
+      column.reduce((total, hypothesis) => {
+        const { lead, body } = extractHypothesisParts(hypothesis);
+        const leadLines = lead ? splitPdfText(pdf, lead, columnWidth) : [];
+        const bodyLines = body ? splitPdfText(pdf, body, columnWidth) : [];
+        return total + Math.max(1, leadLines.length + bodyLines.length) * PDF_PORTFOLIO_HYPOTHESIS_LINE_HEIGHT;
+      }, 0),
+    ),
+  );
+  return 10 + 5 + 2 + tallestColumn;
+}
+
+function renderHypothesisGrid(
+  pdf: jsPDF,
+  hypothesisColumns: HTMLElement[][],
+  margin: number,
+  contentW: number,
+  cursorY: number,
+): number {
+  const columnGap = 6;
+  const columnWidth = (contentW - columnGap) / hypothesisColumns.length;
+  let tallestColumnHeight = 0;
+
+  hypothesisColumns.forEach((column, columnIndex) => {
+    let columnY = cursorY;
+    const columnX = margin + columnIndex * (columnWidth + columnGap);
+    column.forEach((hypothesis) => {
+      const { lead, body } = extractHypothesisParts(hypothesis);
+      if (!lead && !body) return;
+
+      const leadLines = lead ? splitPdfText(pdf, lead, columnWidth) : [];
+      const bodyLines = body ? splitPdfText(pdf, body, columnWidth) : [];
+      if (leadLines.length) {
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(30, 58, 138);
+        pdf.text(leadLines, columnX, columnY);
+        columnY += leadLines.length * PDF_PORTFOLIO_HYPOTHESIS_LINE_HEIGHT;
+      }
+      if (bodyLines.length) {
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(bodyLines, columnX, columnY);
+        columnY += bodyLines.length * PDF_PORTFOLIO_HYPOTHESIS_LINE_HEIGHT;
+      }
+    });
+    tallestColumnHeight = Math.max(tallestColumnHeight, columnY - cursorY);
+  });
+
+  return cursorY + tallestColumnHeight;
+}
+
+function getDecisionDiagnostic(scope: ParentNode): { title: string; rows: string[] } | null {
+  const diagnostic = scope.querySelector(".decision-diagnostic");
+  if (!diagnostic) return null;
+
+  const title = diagnostic.querySelector("h2")?.textContent?.trim() ?? "";
+  const rows = Array.from(diagnostic.querySelectorAll(".decision-dimension"))
+    .map((row) => row.textContent?.trim() ?? "")
+    .filter(Boolean);
+  return title && rows.length ? { title, rows } : null;
+}
+
+function renderDecisionDiagnostic(
+  pdf: jsPDF,
+  diagnostic: { title: string; rows: string[] } | null,
+  margin: number,
+  contentW: number,
+  cursorY: number,
+  ensureSpace: (neededHeight: number) => number,
+  titleColor: [number, number, number] = [17, 24, 39],
+  bottomGap = 1,
+  compact = false,
+  lineHeight = 3.6,
+): number {
+  if (!diagnostic) return cursorY;
+
+  pdf.setFontSize(8);
+  const columnCount = compact ? 2 : 1;
+  const columnGap = compact ? 4 : 0;
+  const rowWidth = (contentW - 6 - columnGap * (columnCount - 1)) / columnCount;
+  const rows = diagnostic.rows.map((row) => splitPdfText(pdf, row, rowWidth));
+  const rowHeights = Array.from({ length: Math.ceil(rows.length / columnCount) }, (_, rowIndex) => {
+    const rowStart = rowIndex * columnCount;
+    return Math.max(...rows.slice(rowStart, rowStart + columnCount).map((lines) => Math.max(lines.length, 1))) * lineHeight + 1;
+  });
+  const boxHeight = 8 + rowHeights.reduce((total, height) => total + height, 0);
+  cursorY = ensureSpace(boxHeight + 3);
+  applyThinBlackBorder(pdf);
+  pdf.rect(margin, cursorY, contentW, boxHeight, "S");
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(9);
+  pdf.setTextColor(...titleColor);
+  pdf.text(diagnostic.title, margin + 3, cursorY + 5);
+  const contentY = cursorY + 8;
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(8);
+  diagnostic.rows.forEach((row, index) => {
+    const lines = rows[index] ?? [row];
+    const rowIndex = Math.floor(index / columnCount);
+    const columnIndex = index % columnCount;
+    const rowY = contentY + rowHeights.slice(0, rowIndex).reduce((total, height) => total + height, 0);
+    const rowX = margin + 3 + columnIndex * (rowWidth + columnGap);
+    pdf.setTextColor(17, 24, 39);
+    pdf.text(lines, rowX, rowY);
+  });
+
+  return cursorY + boxHeight + bottomGap;
+}
+
 export async function downloadSimulationPdf(reportWindowDocument: Document, selectedTeam: string): Promise<void> {
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const pageW = pdf.internal.pageSize.getWidth();
@@ -121,10 +247,11 @@ export async function downloadSimulationPdf(reportWindowDocument: Document, sele
   const contentW = pageW - margin * 2;
   let cursorY = margin;
 
-  const ensureSpace = (neededHeight: number): void => {
-    if (cursorY + neededHeight <= pageH - margin) return;
+  const ensureSpace = (neededHeight: number): number => {
+    if (cursorY + neededHeight <= pageH - margin) return cursorY;
     pdf.addPage();
     cursorY = margin;
+    return cursorY;
   };
 
   const title = reportWindowDocument.querySelector("h1")?.textContent ?? "Simulation Monte Carlo";
@@ -219,28 +346,43 @@ export async function downloadSimulationPdf(reportWindowDocument: Document, sele
     });
   }
 
+  cursorY = renderDecisionDiagnostic(
+    pdf,
+    getDecisionDiagnostic(reportWindowDocument),
+    margin,
+    contentW,
+    cursorY,
+    ensureSpace,
+    undefined,
+    PDF_SIMULATION_DIAGNOSTIC_BOTTOM_GAP,
+    true,
+  );
+
   const svgElements = reportWindowDocument.querySelectorAll<SVGSVGElement>(".chart-wrap svg");
+  const chartWidth = (contentW - PDF_SIMULATION_CHART_GAP) / PDF_SIMULATION_CHART_COLUMNS;
+  const chartRowCount = Math.max(1, Math.ceil(svgElements.length / PDF_SIMULATION_CHART_COLUMNS));
+  const availableChartHeight = pageH - margin - cursorY
+    - PDF_SIMULATION_CHART_BOTTOM_GAP * chartRowCount
+    - PDF_SIMULATION_CHART_TITLE_HEIGHT * chartRowCount
+    - PDF_SIMULATION_CHART_GAP * (chartRowCount - 1);
+  const chartHeight = availableChartHeight / chartRowCount;
+  const chartRowHeight = PDF_SIMULATION_CHART_TITLE_HEIGHT + chartHeight + PDF_SIMULATION_CHART_BOTTOM_GAP;
   for (let i = 0; i < svgElements.length; i += 1) {
     const svg = svgElements[i];
-
-    const svgW = svg.viewBox?.baseVal?.width || CHART_WIDTH;
-    const svgH = svg.viewBox?.baseVal?.height || CHART_HEIGHT;
-    const ratio = svgH / svgW;
-    const chartsLeft = svgElements.length - i;
-    const reservedForTitlesAndSpacing = chartsLeft * (4 + 1.5 + 2);
-    const maxChartH = Math.max(24, (pageH - margin - cursorY - reservedForTitlesAndSpacing) / chartsLeft);
-    const renderW = Math.min(contentW, maxChartH / ratio);
-    const renderH = renderW * ratio;
-    const centeredX = margin + (contentW - renderW) / 2;
-
-    ensureSpace(4 + renderH + 2);
+    const chartRow = Math.floor(i / PDF_SIMULATION_CHART_COLUMNS);
+    const chartColumn = i % PDF_SIMULATION_CHART_COLUMNS;
+    const chartX = margin + chartColumn * (chartWidth + PDF_SIMULATION_CHART_GAP);
+    const chartY = cursorY + chartRow * (chartRowHeight + PDF_SIMULATION_CHART_GAP);
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(9);
-    pdf.text(resolveChartTitle(svg, SECTION_TITLES[i] ?? ""), margin, cursorY);
-    cursorY += 4;
+    pdf.text(resolveChartTitle(svg, SECTION_TITLES[i] ?? ""), chartX, chartY);
 
-    await pdf.svg(svg, { x: centeredX, y: cursorY, width: renderW, height: renderH });
-    cursorY += renderH + 2;
+    await pdf.svg(svg, {
+      x: chartX,
+      y: chartY + PDF_SIMULATION_CHART_TITLE_HEIGHT,
+      width: chartWidth,
+      height: chartHeight,
+    });
   }
 
   const filename = buildSimulationPdfFileName(selectedTeam);
@@ -271,10 +413,11 @@ export async function downloadPortfolioPdf(
     let cursorY = margin;
     const section = sections[sectionIndex];
 
-    const ensureSpace = (neededHeight: number): void => {
-      if (cursorY + neededHeight <= pageH - margin) return;
+    const ensureSpace = (neededHeight: number): number => {
+      if (cursorY + neededHeight <= pageH - margin) return cursorY;
       pdf.addPage();
       cursorY = margin;
+      return cursorY;
     };
 
     const title = section.querySelector("h1")?.textContent ?? "Simulation Portefeuille";
@@ -333,7 +476,6 @@ export async function downloadPortfolioPdf(
     }
 
     const summaryTable = section.querySelector<HTMLTableElement>(".summary-table");
-    let summaryTableHeight = 0;
     if (summaryTable) {
       const headerCells = Array.from(summaryTable.querySelectorAll("thead th")).map((cell) => (cell.textContent ?? "").trim());
       const bodyRows = Array.from(summaryTable.querySelectorAll("tbody tr")).map((row) =>
@@ -347,23 +489,23 @@ export async function downloadPortfolioPdf(
         return splitPdfText(pdf, text, Math.max(width - cellPaddingX * 2, 8));
       };
       const headerLines = headerCells.map((cell, index) => getWrappedLines(cell, colWidths[index] ?? contentW));
-      const headerHeight = Math.max(8, Math.max(...headerLines.map((lines) => lines.length), 1) * 3 + 2);
+      const tableLineHeight = 4;
+      const cellPaddingY = 3;
+      const headerHeight = Math.max(8, Math.max(...headerLines.map((lines) => lines.length), 1) * tableLineHeight + cellPaddingY);
       const rowHeights = bodyRows.map((row) => {
         const maxLines = Math.max(
           ...colWidths.map((width, colIndex) => getWrappedLines(row[colIndex] ?? "", width).length),
           1,
         );
-        return Math.max(8, maxLines * 3 + 2);
+        return Math.max(8, maxLines * tableLineHeight + cellPaddingY);
       });
       const tableHeight = headerHeight + rowHeights.reduce((sum, height) => sum + height, 0);
-      summaryTableHeight = tableHeight;
-
       cursorY += 4;
       ensureSpace(4 + tableHeight + 2);
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(12);
       pdf.setTextColor(...BLUE);
-      pdf.text("SynthÃ¨se dÃ©cisionnelle", margin, cursorY);
+      pdf.text("Synth\u00E8se d\u00E9cisionnelle", margin, cursorY);
       cursorY += 4;
 
       let x = margin;
@@ -420,6 +562,10 @@ export async function downloadPortfolioPdf(
     }
 
     const hypothesisBlocks = Array.from(section.querySelectorAll<HTMLElement>(".hypothesis"));
+    const hypothesisColumns = Array.from(section.querySelectorAll<HTMLElement>(".hypothesis-column")).map((column) =>
+      Array.from(column.querySelectorAll<HTMLElement>(".hypothesis")),
+    );
+    const usesHypothesisGrid = Boolean(summaryTable) && hypothesisColumns.length === 2;
     if (hypothesisBlocks.length && !summaryTable) {
       cursorY += 10;
       const hypothesisSectionHeight = estimateHypothesisSectionHeight(pdf, hypothesisBlocks, contentW);
@@ -427,7 +573,7 @@ export async function downloadPortfolioPdf(
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(...BLUE);
-      pdf.text("HypothÃ¨ses", margin, cursorY);
+      pdf.text("Hypoth\u00E8ses", margin, cursorY);
       cursorY += 7;
 
       pdf.setFont("helvetica", "normal");
@@ -480,6 +626,19 @@ export async function downloadPortfolioPdf(
       });
     }
 
+    cursorY = renderDecisionDiagnostic(
+      pdf,
+      getDecisionDiagnostic(section),
+      margin,
+      contentW,
+      cursorY,
+      ensureSpace,
+      BLUE,
+      5,
+      false,
+      4,
+    );
+
     const svgElements = section.querySelectorAll<SVGSVGElement>(".chart-wrap svg");
     for (let i = 0; i < svgElements.length; i += 1) {
       const svg = svgElements[i];
@@ -489,17 +648,19 @@ export async function downloadPortfolioPdf(
       const svgH = svg.viewBox?.baseVal?.height || CHART_HEIGHT;
       const ratio = svgH / svgW;
       const chartsLeft = svgElements.length - i;
-      const reservedForTitlesAndSpacing = chartsLeft * (4 + 1.5 + 2);
+      const reservedForTitlesAndSpacing = chartsLeft * (isSummaryChart ? 13 : 4 + 1.5 + 2);
       const reservedForHypothesisSection =
         summaryTable && hypothesisBlocks.length
-          ? estimateHypothesisSectionHeight(pdf, hypothesisBlocks, contentW)
+          ? usesHypothesisGrid
+            ? estimateHypothesisGridHeight(pdf, hypothesisColumns, contentW)
+            : estimateHypothesisSectionHeight(pdf, hypothesisBlocks, contentW)
           : 0;
       const availableChartH =
         (pageH - margin - cursorY - reservedForTitlesAndSpacing - reservedForHypothesisSection) / chartsLeft;
       const desiredFullWidthH = contentW * ratio;
-      const minChartH = isSummaryChart ? Math.max(summaryTableHeight, 24) : 24;
-      const minimumChartHeight = isSummaryChart ? minChartH : 24;
-      const renderH = Math.max(minimumChartHeight, Math.min(desiredFullWidthH, availableChartH));
+      const renderH = isSummaryChart
+        ? Math.min(desiredFullWidthH, Math.max(0, availableChartH), PDF_PORTFOLIO_SUMMARY_CHART_MAX_HEIGHT)
+        : Math.max(20, Math.min(desiredFullWidthH, availableChartH));
       const renderW = Math.min(contentW, renderH / ratio);
       const centeredX = margin + (contentW - renderW) / 2;
 
@@ -510,7 +671,7 @@ export async function downloadPortfolioPdf(
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(9);
       pdf.setTextColor(...BLUE);
-      pdf.text(resolveChartTitle(svg, SECTION_TITLES[i] ?? ""), margin, cursorY);
+      pdf.text(resolveChartTitle(svg, PORTFOLIO_SECTION_TITLES[i] ?? ""), margin, cursorY);
       cursorY += 4;
 
       await pdf.svg(svg, { x: centeredX, y: cursorY, width: renderW, height: renderH });
@@ -518,40 +679,46 @@ export async function downloadPortfolioPdf(
     }
 
     if (hypothesisBlocks.length && summaryTable) {
-      cursorY += 6;
-      const hypothesisSectionHeight = estimateHypothesisSectionHeight(pdf, hypothesisBlocks, contentW);
+      cursorY += 2;
+      const hypothesisSectionHeight = usesHypothesisGrid
+        ? estimateHypothesisGridHeight(pdf, hypothesisColumns, contentW)
+        : estimateHypothesisSectionHeight(pdf, hypothesisBlocks, contentW);
       ensureSpace(hypothesisSectionHeight);
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(...BLUE);
-      pdf.text("HypothÃ¨ses", margin, cursorY);
-      cursorY += 7;
+      pdf.text("Hypoth\u00E8ses", margin, cursorY);
+      cursorY += 5;
 
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(8);
-      hypothesisBlocks.forEach((hypothesis) => {
-        const { lead, body } = extractHypothesisParts(hypothesis);
-        if (!lead && !body) return;
+      if (usesHypothesisGrid) {
+        cursorY = renderHypothesisGrid(pdf, hypothesisColumns, margin, contentW, cursorY);
+      } else {
+        hypothesisBlocks.forEach((hypothesis) => {
+          const { lead, body } = extractHypothesisParts(hypothesis);
+          if (!lead && !body) return;
 
-        const leadLines = lead ? splitPdfText(pdf, lead, contentW) : [];
-        const bodyLines = body ? splitPdfText(pdf, body, contentW) : [];
-        const blockHeight = Math.max(1, leadLines.length + bodyLines.length) * 3.8;
-        ensureSpace(blockHeight);
+          const leadLines = lead ? splitPdfText(pdf, lead, contentW) : [];
+          const bodyLines = body ? splitPdfText(pdf, body, contentW) : [];
+          const blockHeight = Math.max(1, leadLines.length + bodyLines.length) * 3.8;
+          ensureSpace(blockHeight);
 
-        if (leadLines.length) {
-          pdf.setFont("helvetica", "bold");
-          pdf.setTextColor(...BLUE);
-          pdf.text(leadLines, margin, cursorY);
-          cursorY += leadLines.length * 3.8;
-        }
+          if (leadLines.length) {
+            pdf.setFont("helvetica", "bold");
+            pdf.setTextColor(...BLUE);
+            pdf.text(leadLines, margin, cursorY);
+            cursorY += leadLines.length * 3.8;
+          }
 
-        if (bodyLines.length) {
-          pdf.setFont("helvetica", "normal");
-          pdf.setTextColor(...BLACK);
-          pdf.text(bodyLines, margin, cursorY);
-          cursorY += bodyLines.length * 3.8;
-        }
-      });
+          if (bodyLines.length) {
+            pdf.setFont("helvetica", "normal");
+            pdf.setTextColor(...BLACK);
+            pdf.text(bodyLines, margin, cursorY);
+            cursorY += bodyLines.length * 3.8;
+          }
+        });
+      }
       cursorY += 2;
     }
 
@@ -559,7 +726,7 @@ export async function downloadPortfolioPdf(
       pdf.setFont("helvetica", "italic");
       pdf.setFontSize(8);
       pdf.setTextColor(107, 114, 128);
-      pdf.text("DonnÃ©es de dÃ©monstration â€” Monte Carlo Azure", margin, pageH - 5);
+      pdf.text("Donn\u00E9es de d\u00E9monstration \u2014 Monte Carlo Azure", margin, pageH - 5);
     }
   }
 

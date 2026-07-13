@@ -4,6 +4,12 @@
 
 ### Frontend
 
+- alignement des diagnostics decisionnels entre l'interface et les rapports PDF simulation / portefeuille:
+  statuts, justifications, actions conseillees, facteurs, qualite des donnees et incertitude reutilisent
+  le langage decisionnel existant, sans modifier les calculs ni les recommandations
+- mise en page de la synthese PDF portefeuille stabilisee sur une seule page: tableau decisionnel,
+  comparaison des probabilites lisible et hypotheses en deux colonnes; les pages scenario conservent
+  leurs sauts de page dedies
 - harmonisation de la grammaire visuelle des graphiques Recharts et SVG: observations en barres, points pleins ou
   traits continus; moyenne mobile, moyenne glissante et courbe lissee pointillees; intervalle de variabilite en bande;
   probabilites continues. Les legendes d'interface et de rapport reproduisent desormais le style de chaque serie.

@@ -89,8 +89,8 @@ Le frontend couvre notamment :
     deja calcules, ainsi que l'action conseillee par la recommandation existante
   - le module ne calcule aucun diagnostic et ne modifie ni les percentiles, ni le `Risk Score`,
     ni les regles de recommandation
-  - il est volontairement independant de React et des exports PDF afin de pouvoir etre integre
-    ulterieurement par l'interface
+  - il est volontairement independant de React; l'interface et les exports PDF reutilisent ses
+    formulations sans recalculer les diagnostics
 - historique throughput aligne sur des semaines ISO completes uniquement
   - debut aligne sur le premier lundi complet inclus ou suivant `startDate`
   - fin alignee sur le dernier dimanche complet inclus ou precedent `endDate`
@@ -117,6 +117,8 @@ Le frontend couvre notamment :
 - export PDF direct des restitutions simulation et portefeuille, sans previsualisation SVG utilisateur
   - les exports expliquent explicitement la limite d'horizon et les censures quand elles existent
   - les SVG reprennent la meme convention visuelle et les memes legendes que l'interface
+  - le rapport portefeuille reprend les diagnostics decisionnels disponibles; sa synthese garde sur une
+    page le tableau decisionnel, le graphique comparatif et les hypotheses compactees en deux colonnes
 - persistance locale de certaines preferences et quick filters
 
 ## Notes de structure recentes

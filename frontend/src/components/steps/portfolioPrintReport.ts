@@ -16,6 +16,8 @@ import {
   type ThroughputExportPoint,
 } from "./simulationChartsSvg";
 import { downloadPortfolioPdf } from "./simulationPdfDownload";
+import type { DecisionLanguage } from "../../utils/decisionLanguage";
+import { renderDecisionDiagnosticHtml } from "../../utils/simulationDecisionDiagnostic";
 
 function escapeHtml(value: string): string {
   return value
@@ -62,6 +64,7 @@ type PortfolioSectionInput = {
   weeklyThroughput: Array<{ week: string; throughput: number }>;
   displayPercentiles: ForecastPercentiles;
   completionSummary?: CompletionSummary;
+  decisionDiagnostic?: DecisionLanguage;
 };
 
 type HypothesisBlock =
@@ -128,12 +131,22 @@ function formatRiskScoreFromValue(score: number): { score: number; label: string
 }
 
 function formatMetric(value: number): string {
-  return Number(value ?? 0).toFixed(2).replace(".", ",");
+  return Number.isFinite(value) ? value.toFixed(2).replace(".", ",") : "";
+}
+
+function formatPercentile(value: number | undefined): string {
+  return typeof value === "number" && Number.isFinite(value) ? value.toFixed(0) : "";
+}
+
+function renderTechnicalMetricRow(label: string, value: number | undefined): string {
+  const formatted = typeof value === "number" ? formatMetric(value) : "";
+  return formatted ? `<div class="meta-row"><b>${escapeHtml(label)}:</b> ${escapeHtml(formatted)}</div>` : "";
 }
 
 function formatReliabilityScore(reliability?: ThroughputReliability | null): string {
   if (!reliability) return "Non disponible";
-  return `${formatMetric(reliability.cv)} (${reliability.label})`;
+  const score = formatMetric(reliability.cv);
+  return score ? `${score} (${reliability.label})` : "Non disponible";
 }
 
 function buildReliabilitySummary(reliability?: ThroughputReliability | null): string {
@@ -146,27 +159,27 @@ function buildReliabilitySummary(reliability?: ThroughputReliability | null): st
     },
     {
       matches: reliability.slope_norm <= -0.15,
-      text: "Throughput en forte baisse sur les dernieres semaines.",
+      text: "Throughput en forte baisse sur les dernières semaines.",
     },
     {
       matches: reliability.slope_norm <= -0.05,
-      text: "Throughput en baisse sur les dernieres semaines.",
+      text: "Throughput en baisse sur les dernières semaines.",
     },
     {
       matches: reliability.slope_norm >= 0.1,
-      text: "Throughput en forte hausse sur les dernieres semaines.",
+      text: "Throughput en forte hausse sur les dernières semaines.",
     },
     {
       matches: reliability.slope_norm >= 0.05,
-      text: "Throughput en hausse sur les dernieres semaines.",
+      text: "Throughput en hausse sur les dernières semaines.",
     },
     {
       matches: reliability.cv >= 1 || reliability.iqr_ratio >= 1,
-      text: "Dispersion elevee du throughput historique.",
+      text: "Dispersion élevée du throughput historique.",
     },
     {
       matches: reliability.samples_count < 8,
-      text: "Volume historique encore limite.",
+      text: "Volume historique encore limité.",
     },
   ].find((entry) => entry.matches);
 
@@ -224,6 +237,7 @@ function buildTeamLikePageHtml({
   throughputChartTitle,
   note,
   pageBreak,
+  decisionDiagnostic,
 }: {
   title: string;
   subtitle?: string;
@@ -247,6 +261,7 @@ function buildTeamLikePageHtml({
   throughputChartTitle: string;
   note?: string;
   pageBreak: boolean;
+  decisionDiagnostic?: DecisionLanguage;
 }): string {
   const throughputRows = includeZeroWeeks ? weeklyThroughput : weeklyThroughput.filter((row) => row.throughput > 0);
   const effectiveNote =
@@ -307,27 +322,30 @@ function buildTeamLikePageHtml({
           <div class="meta-row"><b>Période:</b> ${escapeHtml(startDate)} au ${escapeHtml(endDate)}</div>
           <div class="meta-row"><b>Mode:</b> ${escapeHtml(modeSummary)}</div>
           <div class="meta-row"><b>Tickets:</b> ${escapeHtml(typeSummary)}</div>
-          <div class="meta-row"><b>Etats:</b> ${escapeHtml(stateSummary)}</div>
+          <div class="meta-row"><b>États:</b> ${escapeHtml(stateSummary)}</div>
           <div class="meta-row"><b>Échantillon:</b> ${escapeHtml(modeZeroLabel)}</div>
           <div class="meta-row"><b>Simulations:</b> ${escapeHtml(String(nSims))}</div>
           </div>
-          <aside class="diagnostic-card">
+          ${throughputReliability ? `<aside class="diagnostic-card">
             <h2 class="diagnostic-title">Diagnostic</h2>
             <div class="meta-row"><b>Lecture:</b> ${escapeHtml(reliabilitySummary)}</div>
-            <div class="meta-row"><b>CV:</b> ${escapeHtml(formatMetric(throughputReliability?.cv ?? 0))}</div>
-            <div class="meta-row"><b>IQR ratio:</b> ${escapeHtml(formatMetric(throughputReliability?.iqr_ratio ?? 0))}</div>
-            <div class="meta-row"><b>Pente normalisee:</b> ${escapeHtml(formatMetric(throughputReliability?.slope_norm ?? 0))}</div>
-            <div class="meta-row"><b>Semaines utilisees:</b> ${escapeHtml(String(throughputReliability?.samples_count ?? 0))}</div>
-          </aside>
+            ${renderTechnicalMetricRow("CV", throughputReliability.cv)}
+            ${renderTechnicalMetricRow("IQR ratio", throughputReliability.iqr_ratio)}
+            ${renderTechnicalMetricRow("Pente normalisée", throughputReliability.slope_norm)}
+            ${Number.isFinite(throughputReliability.samples_count) ? `<div class="meta-row"><b>Semaines utilisées:</b> ${escapeHtml(String(throughputReliability.samples_count))}</div>` : ""}
+          </aside>` : ""}
         </div>
       </header>
 
       <section class="kpis">
         ${["P50", "P70", "P90"]
-          .filter((key) => typeof effectivePercentiles?.[key as keyof ForecastPercentiles] === "number")
+          .filter((key) => {
+            const value = effectivePercentiles?.[key as keyof ForecastPercentiles];
+            return typeof value === "number" && Number.isFinite(value);
+          })
           .map(
             (key) =>
-              `<div class="kpi"><span class="kpi-label">${key}</span><span class="kpi-value">${Number(effectivePercentiles?.[key as keyof ForecastPercentiles] ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>`,
+              `<div class="kpi"><span class="kpi-label">${key}</span><span class="kpi-value">${formatPercentile(effectivePercentiles?.[key as keyof ForecastPercentiles])} ${escapeHtml(resultLabel)}</span></div>`,
           )
           .join("")}
       </section>
@@ -337,11 +355,12 @@ function buildTeamLikePageHtml({
             ? `<div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(risk.valueLabel)} <span style="color:${riskColor(risk.label)}">(${escapeHtml(risk.label)})</span></span></div>`
             : ""
         }
-        <div class="kpi"><span class="kpi-label">Fiabilite</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>
+        <div class="kpi"><span class="kpi-label">Fiabilité</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>
       </section>
+      ${renderDecisionDiagnosticHtml(decisionDiagnostic)}
       ${
         completionSummary && completionSummary.censored_count > 0
-          ? `<section class="section"><div class="meta"><div class="meta-row"><b>Limite d'horizon:</b> ${escapeHtml(String(completionSummary.horizon_weeks))} semaines</div><div class="meta-row"><b>Censures:</b> ${escapeHtml(String(completionSummary.censored_count))} sur ${escapeHtml(String(completionSummary.completed_count + completionSummary.censored_count))} (${escapeHtml(formatMetric(completionSummary.censored_rate))})</div><div class="meta-row"><b>Lecture:</b> la distribution et les percentiles ne couvrent que les simulations terminees. Un percentile absent n'est pas identifiable avant l'horizon.</div></div></section>`
+          ? `<section class="section"><div class="meta"><div class="meta-row"><b>Limite d'horizon:</b> ${escapeHtml(String(completionSummary.horizon_weeks))} semaines</div><div class="meta-row"><b>Censures:</b> ${escapeHtml(String(completionSummary.censored_count))} sur ${escapeHtml(String(completionSummary.completed_count + completionSummary.censored_count))} (${escapeHtml(formatMetric(completionSummary.censored_rate))})</div><div class="meta-row"><b>Lecture:</b> la distribution et les percentiles ne couvrent que les simulations terminées. Un percentile absent n'est pas identifiable avant l'horizon.</div></div></section>`
           : ""
       }
 
@@ -401,14 +420,19 @@ function buildSummaryPage({
             ? null
             : formatRiskScoreFromValue(computedRisk);
       const reliability = formatReliabilityScore(scenario.throughputReliability);
+      const decision = scenario.decisionDiagnostic?.decisionRecommendation;
+      const decisionStatus = decision?.status?.trim() ?? "";
+      const decisionAction = decision?.action?.trim() ?? "";
       return `
         <tr>
           <td>${escapeHtml(formatScenarioDisplayLabel(scenario.label))}</td>
-          <td>${Number(effectivePercentiles.P50 ?? 0).toFixed(0)}</td>
-          <td>${Number(effectivePercentiles.P70 ?? 0).toFixed(0)}</td>
-          <td>${Number(effectivePercentiles.P90 ?? 0).toFixed(0)}</td>
+          <td>${formatPercentile(effectivePercentiles.P50)}</td>
+          <td>${formatPercentile(effectivePercentiles.P70)}</td>
+          <td>${formatPercentile(effectivePercentiles.P90)}</td>
           <td>${risk ? `<span class="risk-chip" style="color:${riskColor(risk.label)}">${escapeHtml(risk.valueLabel)} (${escapeHtml(risk.label)})</span>` : ""}</td>
           <td>${escapeHtml(reliability)}</td>
+          <td>${escapeHtml(decisionStatus)}</td>
+          <td class="summary-action">${escapeHtml(decisionAction)}</td>
         </tr>
       `;
     })
@@ -491,6 +515,7 @@ function buildSummaryPage({
         "Commencer par la fiabilit\u00E9 de l'historique, puis le Risk Score, puis les percentiles. Un P85 sur un historique fiable et un Risk Score faible constitue un engagement d\u00E9fendable. Le m\u00EAme P85 sur un historique fragile reste un chiffre calculable - mais son usage en comit\u00E9 n\u00E9cessite de mentionner explicitement les limites de l'historique source.",
     },
   ];
+  const summaryHypothesisColumns = [hypothesisBlocks.slice(0, 4), hypothesisBlocks.slice(4)];
 
   return `
     <section class="page page-break">
@@ -519,9 +544,11 @@ function buildSummaryPage({
             <col class="summary-col summary-col--percentile" />
             <col class="summary-col summary-col--risk" />
             <col class="summary-col summary-col--reliability" />
+            <col class="summary-col summary-col--decision" />
+            <col class="summary-col summary-col--action" />
           </colgroup>
           <thead>
-            <tr><th>Sc\u00E9nario</th><th>P50</th><th>P70</th><th>P90</th><th>Risk Score</th><th>Fiabilit\u00E9</th></tr>
+            <tr><th>Sc\u00E9nario</th><th>P50</th><th>P70</th><th>P90</th><th>Risk Score</th><th>Fiabilit\u00E9</th><th>Statut</th><th>Action</th></tr>
           </thead>
           <tbody>
             ${rows}
@@ -529,14 +556,18 @@ function buildSummaryPage({
         </table>
       </section>
 
-      <section class="section">
+      <section class="section section--summary-chart">
         <h2>Courbes de probabilit\u00E9s compar\u00E9es</h2>
         <div class="chart-wrap">${overlaySvg}</div>
       </section>
 
       <section class="section section--hypotheses">
         <h2>Hypoth\u00E8ses</h2>
-        ${hypothesisBlocks.map((block) => renderHypothesisBlock(block)).join("")}
+        <div class="hypothesis-grid">
+          ${summaryHypothesisColumns
+            .map((column) => `<div class="hypothesis-column">${column.map((block) => renderHypothesisBlock(block)).join("")}</div>`)
+            .join("")}
+        </div>
       </section>
     </section>
   `;
@@ -599,6 +630,7 @@ export function buildPortfolioPrintReportHtml({
         riskScore: scenario.riskScore,
         completionSummary: scenario.completionSummary,
         throughputReliability: scenario.throughputReliability,
+        decisionDiagnostic: scenario.decisionDiagnostic,
         throughputChartTitle:
           scenario.label === "Historique corr\u00E9l\u00E9" ? "Throughput historique corr\u00E9l\u00E9" : "D\u00E9bit simul\u00E9 du sc\u00E9nario",
         note:
@@ -630,6 +662,7 @@ export function buildPortfolioPrintReportHtml({
         displayPercentiles: section.displayPercentiles,
         riskScore: section.riskScore,
         completionSummary: section.completionSummary,
+        decisionDiagnostic: section.decisionDiagnostic,
         throughputReliability: section.throughputReliability,
         throughputChartTitle: "Throughput hebdomadaire",
         pageBreak: idx < sections.length - 1,
@@ -659,22 +692,33 @@ export function buildPortfolioPrintReportHtml({
         .kpi-label { display: block; font-size: 11px; color: #374151; font-weight: 700; }
         .kpi-value { display: block; margin-top: 2px; font-size: 16px; font-weight: 800; }
         .section { margin-top: 8px; page-break-inside: avoid; }
-        .section--hypotheses { margin-top: 24px; }
+        .decision-diagnostic { padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; font-size: 11px; line-height: 1.35; break-inside: avoid; }
+        .decision-dimension + .decision-dimension { margin-top: 6px; padding-top: 6px; border-top: 1px solid #e5e7eb; }
+        .decision-factors { margin: 3px 0; padding-left: 16px; }
+        .section--summary-chart { page-break-after: auto; break-after: auto; }
+        .section--hypotheses { margin-top: 8px; break-before: auto; page-break-before: auto; break-inside: auto; page-break-inside: auto; }
         .section h2 { margin: 0 0 4px 0; font-size: 14px; }
         .note { margin-top: 4px; font-size: 11px; color: #4b5563; }
         .chart-wrap { width: 100%; overflow: hidden; border: 1px solid #d1d5db; border-radius: 8px; padding: 4px; background: #fff; }
         .chart-wrap svg { width: 100%; height: auto; display: block; }
         .summary-table { width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; }
-        .summary-table--compact .summary-col--scenario { width: 24%; }
-        .summary-table--compact .summary-col--percentile { width: 10%; }
-        .summary-table--compact .summary-col--risk { width: 20%; }
-        .summary-table--compact .summary-col--reliability { width: 26%; }
+        .summary-table--compact .summary-col--scenario { width: 14%; }
+        .summary-table--compact .summary-col--percentile { width: 6%; }
+        .summary-table--compact .summary-col--risk { width: 11%; }
+        .summary-table--compact .summary-col--reliability { width: 12%; }
+        .summary-table--compact .summary-col--decision { width: 18%; }
+        .summary-table--compact .summary-col--action { width: 27%; }
         .summary-table th, .summary-table td { border: 1px solid #d1d5db; padding: 4px; text-align: left; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; }
         .summary-table th { background: #f3f4f6; }
         .risk-chip { font-weight: 700; }
+        .summary-action { font-size: 9px; line-height: 1.25; }
+        .hypothesis-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 14px; }
+        .hypothesis-column { min-width: 0; }
         .hypothesis { margin: 4px 0; font-size: 12px; }
+        .section--hypotheses .hypothesis { margin: 0 0 3px; font-size: 10px; line-height: 1.25; }
         .hypothesis strong { font-weight: 700; }
         .reading-rule { margin-top: 10px; font-size: 13px; line-height: 1.4; }
+        .section--hypotheses .reading-rule { margin-top: 4px; font-size: 10px; line-height: 1.28; }
         .print-action {
           position: fixed;
           top: 16px;
@@ -693,6 +737,9 @@ export function buildPortfolioPrintReportHtml({
         @media print {
           body { padding: 7mm; }
           .print-action { display: none; }
+          .hypothesis-grid { display: block; column-count: 2; column-gap: 14px; }
+          .hypothesis-column { break-inside: auto; page-break-inside: auto; }
+          .section--hypotheses .hypothesis { break-inside: avoid; page-break-inside: avoid; }
         }
         @media (max-width: 720px) {
           .summary-grid { grid-template-columns: 1fr; }

@@ -15,7 +15,8 @@ import {
 import { useState, type ReactNode } from "react";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "../ui/tabs";
 import { useSimulationContext } from "../../hooks/SimulationContext";
-import { computeThroughputReliability } from "../../utils/simulation";
+import { computeRiskScoreFromPercentiles, computeThroughputReliability } from "../../utils/simulation";
+import { buildSimulationDecisionLanguage } from "../../utils/simulationDecisionDiagnostic";
 import {
   chartLegendVisualByDataKey,
   SMOOTHED_SERIES_STROKE_DASHARRAY,
@@ -77,6 +78,28 @@ export default function SimulationChartTabs() {
   }, [s.result?.throughput_reliability, s.throughputData]);
 
   const reliabilityTone = useMemo(() => getReliabilityTone(reliability?.label), [reliability?.label]);
+  const decisionDiagnostic = useMemo(() => buildSimulationDecisionLanguage({
+    hasResult: Boolean(s.result),
+    throughputSamples: (s.throughputData ?? []).map((point) => point.throughput),
+    includeZeroWeeks: s.includeZeroWeeks,
+    adoDataWarning: s.warning,
+    percentiles: s.displayPercentiles,
+    completionSummary: s.result?.completion_summary,
+    riskScore: computeRiskScoreFromPercentiles(s.simulationMode, s.displayPercentiles),
+    throughputReliability: reliability,
+    selectedOrg: s.selectedOrg,
+    selectedProject: s.selectedProject,
+    selectedTeam,
+    startDate: s.startDate,
+    endDate: s.endDate,
+    simulationMode: s.simulationMode,
+    backlogSize: s.backlogSize,
+    targetWeeks: s.targetWeeks,
+    types: s.types,
+    doneStates: s.doneStates,
+    usableWeeks: s.sampleStats?.usedWeeks,
+    history: s.simulationHistory,
+  }), [reliability, s, selectedTeam]);
   const cycleTimeChartData = useMemo(() => {
     const observedByWeek = new Map<string, { weightedSum: number; count: number }>();
     s.cycleTimeDaysData.forEach((point) => {
@@ -229,6 +252,7 @@ export default function SimulationChartTabs() {
         throughputPoints: throughputWithMovingAverage,
         distributionPoints: s.mcHistData,
         probabilityPoints: s.probabilityCurveData,
+        decisionDiagnostic,
       });
     } finally {
       setLoadingReport(false);

@@ -29,6 +29,7 @@ const pdfMocks = vi.hoisted(() => ({
     svg: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   }>,
+  splitTextToSizeImplementation: undefined as undefined | ((text: string, width: number) => string[]),
 }));
 
 vi.mock("jspdf", () => ({
@@ -43,7 +44,7 @@ vi.mock("jspdf", () => ({
       setFillColor: vi.fn().mockReturnThis(),
       roundedRect: vi.fn().mockReturnThis(),
       rect: vi.fn().mockReturnThis(),
-      splitTextToSize: vi.fn((text: string) => [text]),
+      splitTextToSize: vi.fn((text: string, width: number) => pdfMocks.splitTextToSizeImplementation?.(text, width) ?? [text]),
       text: vi.fn().mockReturnThis(),
       addPage: vi.fn().mockReturnThis(),
       svg: vi.fn(async () => undefined),
@@ -167,6 +168,7 @@ describe("simulationChartsSvg", () => {
 describe("simulationPdfDownload", () => {
   afterEach(() => {
     pdfMocks.instances.length = 0;
+    pdfMocks.splitTextToSizeImplementation = undefined;
   });
 
   it("builds fallback filename when team sanitizes to empty", () => {
@@ -299,6 +301,83 @@ describe("simulationPdfDownload", () => {
     expect(pdf.text).toHaveBeenCalledWith("P50: 82 items", expect.any(Number), expect.any(Number), { align: "center" });
     expect(pdf.text).toHaveBeenCalledWith("Risk Score: 0,21 (incertain)", expect.any(Number), expect.any(Number), { align: "center" });
     expect(pdf.text).toHaveBeenCalledWith("Fiabilite: 0,62 (incertain)", expect.any(Number), expect.any(Number), { align: "center" });
+  });
+
+  it("renders the decision diagnostic section in simulation and portfolio PDFs", async () => {
+    const simulationDoc = document.implementation.createHTMLDocument("report");
+    simulationDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo</h1>
+      <section class="decision-diagnostic">
+        <h2>Diagnostic décisionnel</h2>
+        <div class="decision-dimension">Statut de décision : Arbitrage nécessaire. Action conseillée : Rétablir les percentiles.</div>
+      </section>
+    `;
+    await downloadSimulationPdf(simulationDoc, "Equipe A");
+    const simulationPdf = pdfMocks.instances.at(-1)!;
+
+    expect(simulationPdf.text).toHaveBeenCalledWith("Diagnostic décisionnel", expect.any(Number), expect.any(Number));
+    expect(simulationPdf.text.mock.calls.some((call) => Array.isArray(call[0]) && call[0][0]?.includes("Arbitrage nécessaire"))).toBe(true);
+
+    const portfolioDoc = document.implementation.createHTMLDocument("report");
+    portfolioDoc.body.innerHTML = `
+      <section class="page">
+        <h1>Simulation Portefeuille</h1>
+        <section class="decision-diagnostic">
+          <h2>Diagnostic décisionnel</h2>
+          <div class="decision-dimension">Statut de décision : Décision non recommandée. Action conseillée : Compléter les données.</div>
+        </section>
+      </section>
+    `;
+    await downloadPortfolioPdf(portfolioDoc, "Projet A");
+    const portfolioPdf = pdfMocks.instances.at(-1)!;
+
+    expect(portfolioPdf.text).toHaveBeenCalledWith("Diagnostic décisionnel", expect.any(Number), expect.any(Number));
+    expect(portfolioPdf.text.mock.calls.some((call) => Array.isArray(call[0]) && call[0][0]?.includes("Décision non recommandée"))).toBe(true);
+  });
+
+  it("keeps a gap after the compact decision diagnostic and fits the simulation charts on one page", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <h1>Simulation Monte Carlo</h1>
+      <div class="summary-grid">
+        <div class="meta">
+          <div class="meta-row">Période : 2026-01-01 au 2026-03-01</div>
+          <div class="meta-row">Mode : Backlog vers semaines</div>
+          <div class="meta-row">Tickets : Bug</div>
+          <div class="meta-row">États : Done</div>
+          <div class="meta-row">Échantillon : Semaines 0 incluses</div>
+          <div class="meta-row">Simulations : 20 000</div>
+        </div>
+        <aside class="diagnostic-card"><div class="meta-row">Lecture : Historique stable.</div></aside>
+      </div>
+      <div class="kpis"><div class="kpi"><span class="kpi-label">P50</span><span class="kpi-value">8 semaines</span></div><div class="kpi"><span class="kpi-label">P70</span><span class="kpi-value">10 semaines</span></div><div class="kpi"><span class="kpi-label">P90</span><span class="kpi-value">13 semaines</span></div></div>
+      <div class="kpis"><div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">0,25</span></div><div class="kpi"><span class="kpi-label">Fiabilité</span><span class="kpi-value">0,62</span></div></div>
+      <section class="decision-diagnostic">
+        <h2>Diagnostic décisionnel</h2>
+        <div class="decision-dimension">Statut de décision : Arbitrage nécessaire.</div>
+        <div class="decision-dimension">Justification métier : Les percentiles requis sont absents.</div>
+        <div class="decision-dimension">Action conseillée : Rétablir les percentiles.</div>
+      </section>
+      <section><h2>Cycle Time (jours calendaires)</h2><div class="chart-wrap"><svg viewBox="0 0 960 360"></svg></div></section>
+      <section><h2>Throughput hebdomadaire</h2><div class="chart-wrap"><svg viewBox="0 0 960 360"></svg></div></section>
+      <section><h2>Distribution Monte Carlo</h2><div class="chart-wrap"><svg viewBox="0 0 960 360"></svg></div></section>
+      <section><h2>Courbe de probabilité</h2><div class="chart-wrap"><svg viewBox="0 0 960 360"></svg></div></section>
+    `;
+
+    await downloadSimulationPdf(reportDoc, "Equipe A");
+    const pdf = pdfMocks.instances.at(-1)!;
+    const diagnosticBox = pdf.rect.mock.calls.find((call) => call[4] === "S")!;
+    const cycleTitle = pdf.text.mock.calls.find((call) => call[0] === "Cycle Time (jours calendaires)")!;
+
+    expect(cycleTitle[2] - (diagnosticBox[1] + diagnosticBox[3])).toBeGreaterThanOrEqual(7);
+    expect(pdf.svg).toHaveBeenCalledTimes(4);
+    const chartLayouts = pdf.svg.mock.calls.map((call) => call[1] as { width: number; height: number; y: number });
+    expect(chartLayouts.every((layout) => layout.width === 95 && layout.height > 36)).toBe(true);
+    expect(new Set(chartLayouts.map((layout) => layout.height)).size).toBe(1);
+    const lastChart = chartLayouts.at(-1)!;
+    expect(lastChart.y + lastChart.height).toBeGreaterThan(275);
+    expect(lastChart.y + lastChart.height).toBeLessThanOrEqual(289);
+    expect(pdf.addPage).not.toHaveBeenCalled();
   });
 
   it("renders a boxed scoped metadata block without diagnostic card", async () => {
@@ -555,6 +634,150 @@ describe("simulationPdfDownload", () => {
     expect((firstChartCall?.[1] as { width: number }).width).toBeGreaterThan(150);
     expect((firstChartCall?.[1] as { height: number }).height).toBeGreaterThan(40);
     expect(pdf.save).toHaveBeenCalledWith(expect.stringMatching(/^simulation-Portefeuille-Projet-A-\d{2}_\d{2}_\d{4}\.pdf$/));
+  });
+
+  it("renders portfolio decision status and action in an eight-column synthesis", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page">
+        <h1>Synthèse - Simulation Portefeuille</h1>
+        <table class="summary-table">
+          <thead><tr><th>Scénario</th><th>P50</th><th>P70</th><th>P90</th><th>Risk Score</th><th>Fiabilité</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody><tr><td>Arrimé</td><td>20</td><td>18</td><td>15</td><td>0,25</td><td>fiable</td><td>Arbitrage nécessaire</td><td>Valider les hypothèses.</td></tr></tbody>
+        </table>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.splitTextToSize).toHaveBeenCalledWith("Arbitrage nécessaire", expect.any(Number));
+    expect(pdf.splitTextToSize).toHaveBeenCalledWith("Valider les hypothèses.", expect.any(Number));
+    expect(pdf.text.mock.calls.some((call) => Array.isArray(call[0]) && call[0][0] === "Arbitrage nécessaire")).toBe(true);
+    expect(pdf.text.mock.calls.some((call) => Array.isArray(call[0]) && call[0][0] === "Valider les hypothèses.")).toBe(true);
+  });
+
+  it("keeps the correlated-history row within its dynamic table height and renders accented portfolio labels", async () => {
+    pdfMocks.splitTextToSizeImplementation = (text) =>
+      text.includes("Historique corrélé") || text.includes("Arbitrage nécessaire") || text.includes("Préparer")
+        ? ["ligne 1", "ligne 2", "ligne 3", "ligne 4"]
+        : [text];
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page">
+        <h1>Synthèse - Simulation Portefeuille</h1>
+        <table class="summary-table">
+          <thead><tr><th>Scénario</th><th>P50</th><th>P70</th><th>P90</th><th>Risk Score</th><th>Fiabilité</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody><tr><td>Historique corrélé</td><td>20</td><td>18</td><td>15</td><td>0,25</td><td>fiable</td><td>Arbitrage nécessaire</td><td>Préparer un arbitrage avec les parties prenantes.</td></tr></tbody>
+        </table>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+    const bodyCellRects = pdf.rect.mock.calls.slice(8, 16);
+
+    expect(pdf.text).toHaveBeenCalledWith("Synthèse décisionnelle", expect.any(Number), expect.any(Number));
+    expect(pdf.text.mock.calls.flatMap((call) => (Array.isArray(call[0]) ? call[0] : [call[0]])).join(" ")).not.toMatch(/[ÃÂ�]/);
+    expect(bodyCellRects).toHaveLength(8);
+    expect(bodyCellRects.every((call) => call[3] === 19)).toBe(true);
+    expect(pdf.addPage).not.toHaveBeenCalled();
+  });
+
+  it("keeps the detailed decision diagnostic in normal flow before the scenario throughput chart", async () => {
+    pdfMocks.splitTextToSizeImplementation = (text) =>
+      text.includes("Justification") || text.includes("Action") ? ["ligne 1", "ligne 2", "ligne 3"] : [text];
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page">
+        <h1>Scénario - Arrimé</h1>
+        <section class="section decision-diagnostic">
+          <h2>Diagnostic décisionnel</h2>
+          <div class="decision-dimension">Décision — statut : Arbitrage nécessaire. Justification : informations à confirmer. Action conseillée : préparer un arbitrage.</div>
+          <div class="decision-dimension">Qualité des données — statut : À surveiller. Justification : couverture partielle. Action conseillée : compléter les données.</div>
+        </section>
+        <section class="section"><h2>Débit simulé du scénario</h2><div class="chart-wrap"><svg viewBox="0 0 960 360"></svg></div></section>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+    const diagnosticTitleIndex = pdf.text.mock.calls.findIndex((call) => call[0] === "Diagnostic décisionnel");
+    const diagnosticTitleCall = pdf.text.mock.calls[diagnosticTitleIndex];
+    const chartTitleIndex = pdf.text.mock.calls.findIndex((call) => call[0] === "Débit simulé du scénario");
+    const chartTitleCall = pdf.text.mock.calls[chartTitleIndex];
+    const diagnosticFrame = pdf.rect.mock.calls.find((call) => {
+      const [x, y, width, height, style] = call as [number, number, number, number, string];
+      const titleX = diagnosticTitleCall?.[1] as number | undefined;
+      const titleY = diagnosticTitleCall?.[2] as number | undefined;
+      return style === "S" && titleX != null && titleY != null && titleX >= x && titleX <= x + width && titleY >= y && titleY <= y + height;
+    });
+    const diagnosticContentIndexes = pdf.text.mock.calls
+      .map((call, index) => ({ call, index }))
+      .filter(({ call, index }) => {
+        const [, y] = call.slice(1, 3) as [number, number];
+        return index > diagnosticTitleIndex && Array.isArray(call[0]) && diagnosticFrame != null && y >= diagnosticFrame[1] && y <= diagnosticFrame[1] + diagnosticFrame[3];
+      })
+      .map(({ index }) => index);
+
+    expect(diagnosticTitleIndex).toBeGreaterThanOrEqual(0);
+    expect(diagnosticFrame).toBeDefined();
+    expect(diagnosticContentIndexes.length).toBeGreaterThan(0);
+    expect(chartTitleIndex).toBeGreaterThan(diagnosticContentIndexes.at(-1)!);
+    expect(chartTitleCall?.[2]).toBeGreaterThanOrEqual(diagnosticFrame![1] + diagnosticFrame![3] + 5);
+    expect(pdf.svg).toHaveBeenCalledTimes(1);
+    expect(pdf.addPage).not.toHaveBeenCalled();
+  });
+
+  it("keeps the portfolio synthesis hypotheses on its first PDF page after the comparison chart", async () => {
+    pdfMocks.splitTextToSizeImplementation = (text, width) => {
+      const maxChars = Math.max(24, Math.floor(width / 0.55));
+      return Array.from({ length: Math.max(1, Math.ceil(text.length / maxChars)) }, (_, index) =>
+        text.slice(index * maxChars, (index + 1) * maxChars),
+      );
+    };
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page">
+        <h1>Synthèse - Simulation Portefeuille</h1>
+        <table class="summary-table">
+          <thead><tr><th>Scénario</th><th>P50</th><th>P70</th><th>P90</th><th>Risk Score</th><th>Fiabilité</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>Optimiste</td><td>20</td><td>18</td><td>15</td><td>0,12</td><td>fiable</td><td>Décision possible</td><td>Confirmer les dépendances.</td></tr>
+            <tr><td>Arrimé</td><td>18</td><td>16</td><td>14</td><td>0,25</td><td>fiable</td><td>Arbitrage nécessaire</td><td>Valider les hypothèses.</td></tr>
+            <tr><td>Friction</td><td>15</td><td>13</td><td>11</td><td>0,45</td><td>incertain</td><td>Décision possible avec prudence</td><td>Suivre la capacité.</td></tr>
+            <tr><td>Historique corrélé</td><td>13</td><td>11</td><td>9</td><td>0,60</td><td>fragile</td><td>Décision non recommandée</td><td>Réexaminer les données.</td></tr>
+          </tbody>
+        </table>
+        <section class="section section--summary-chart"><h2>Courbes de probabilités comparées</h2><div class="chart-wrap"><svg viewBox="0 0 960 360"></svg></div></section>
+        <section class="section section--hypotheses">
+          <h2>Hypothèses</h2>
+          <div class="hypothesis-grid">
+            <div class="hypothesis-column">
+              <p class="hypothesis"><strong>Optimiste :</strong> Hypothèse optimiste pour le portefeuille.</p><p class="hypothesis"><strong>Arrimé :</strong> Hypothèse d'arrimage des équipes.</p><p class="hypothesis"><strong>Friction :</strong> Hypothèse de friction entre équipes.</p><p class="hypothesis"><strong>Historique corrélé :</strong> Hypothèse fondée sur les semaines comparables.</p>
+            </div>
+            <div class="hypothesis-column">
+              <p class="hypothesis"><strong>Risk Score :</strong> Indicateur de dispersion de la prévision.</p><p class="hypothesis"><strong>Fiabilité de l'historique :</strong> Indicateur de qualité des données utilisées.</p><p class="hypothesis reading-rule"><strong>Règle de lecture :</strong> Lire la fiabilité avant les percentiles et les recommandations.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+      <section class="page page-break"><h1>Scénario - Optimiste</h1></section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+    const chartCall = pdf.svg.mock.calls[0]?.[1] as { y: number; width: number; height: number };
+    const hypothesesTitle = pdf.text.mock.calls.find((call) => call[0] === "Hypothèses");
+    const readingRule = pdf.text.mock.calls.find((call) => Array.isArray(call[0]) && call[0][0] === "Règle de lecture :");
+
+    expect(chartCall).toBeDefined();
+    expect(chartCall.width).toBeGreaterThanOrEqual(170);
+    expect(chartCall.height).toBeGreaterThanOrEqual(55);
+    expect(chartCall.height).toBeLessThanOrEqual(65);
+    expect(hypothesesTitle?.[2]).toBeGreaterThan(chartCall.y + chartCall.height);
+    expect(readingRule?.[2]).toBeLessThanOrEqual(289);
+    expect(pdf.addPage).toHaveBeenCalledTimes(1);
   });
 
   it("downloads portfolio pdf without table, hypotheses or kpis", async () => {
@@ -895,6 +1118,31 @@ describe("simulationPdfDownload", () => {
     const pdf = pdfMocks.instances.at(-1)!;
 
     expect(pdf.text).toHaveBeenCalledWith([""], expect.any(Number), expect.any(Number));
+  });
+
+  it("renders partial and empty assumptions in the two-column summary grid", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("report");
+    reportDoc.body.innerHTML = `
+      <section class="page">
+        <h1>Synthèse - Simulation Portefeuille</h1>
+        <table class="summary-table"><thead><tr><th>Scénario</th></tr></thead><tbody></tbody></table>
+        <div class="hypothesis-columns">
+          <div class="hypothesis-column">
+            <p class="hypothesis"></p>
+            <p class="hypothesis">Explication sans libellé.</p>
+          </div>
+          <div class="hypothesis-column">
+            <p class="hypothesis"><strong>Risk Score :</strong></p>
+          </div>
+        </div>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    expect(pdf.text).toHaveBeenCalledWith(["Explication sans libellé."], expect.any(Number), expect.any(Number));
+    expect(pdf.text).toHaveBeenCalledWith(["Risk Score :"], expect.any(Number), expect.any(Number));
   });
 
   it("covers summary table fallbacks for missing headers, rows and widths", async () => {

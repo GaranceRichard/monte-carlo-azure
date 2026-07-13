@@ -32,9 +32,14 @@ vi.mock("./simulationPrintReport", () => ({
   exportSimulationPrintReport,
 }));
 
-vi.mock("../../utils/simulation", () => ({
-  computeThroughputReliability,
-}));
+vi.mock(import("../../utils/simulation"), async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../utils/simulation")>();
+
+  return {
+    ...actual,
+    computeThroughputReliability,
+  };
+});
 
 vi.mock("recharts", () => {
   return {

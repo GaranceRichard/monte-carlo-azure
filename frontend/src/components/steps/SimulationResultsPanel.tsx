@@ -8,13 +8,8 @@ import {
   getProjectionReliabilityNotice,
 } from "../../utils/simulation";
 import {
-  countUsableThroughputSamples,
-  diagnoseDataQuality,
-  diagnoseForecastUncertainty,
-  diagnoseHistoricalWindowSensitivity,
-  recommendArbitration,
-} from "../../utils/forecastDiagnostics";
-import { buildDecisionLanguage } from "../../utils/decisionLanguage";
+  buildSimulationDecisionLanguage,
+} from "../../utils/simulationDecisionDiagnostic";
 import DecisionDiagnostic from "./DecisionDiagnostic";
 
 function formatHistoryEntryLabel(entry: {
@@ -112,73 +107,27 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
 
   const decisionDiagnostic = useMemo(() => {
     const throughputSamples = (s.throughputData ?? []).map((point) => point.throughput);
-    const hasDisplayPercentile = PERCENTILE_KEYS.some(
-      (key) => typeof s.displayPercentiles?.[key] === "number" && Number.isFinite(s.displayPercentiles[key]),
-    );
-    if (!s.result || throughputSamples.length === 0 || !hasDisplayPercentile) return null;
-
-    const dataQuality = diagnoseDataQuality({
+    return buildSimulationDecisionLanguage({
+      hasResult: Boolean(s.result),
       throughputSamples,
       includeZeroWeeks: s.includeZeroWeeks,
-      adoDataWarning: s.warning || null,
-    });
-    const forecastUncertainty = diagnoseForecastUncertainty({
+      adoDataWarning: s.warning,
       percentiles: s.displayPercentiles,
-      completionSummary: s.result.completion_summary,
+      completionSummary: s.result?.completion_summary,
       riskScore: riskScoreValue,
       throughputReliability: reliability,
-      throughputSamples,
-    });
-    const historicalSensitivity = diagnoseHistoricalWindowSensitivity({
-      current: {
-        id: "current-simulation",
-        selectedOrg: s.selectedOrg,
-        selectedProject: s.selectedProject,
-        selectedTeam,
-        startDate: s.startDate,
-        endDate: s.endDate,
-        simulationMode: s.simulationMode,
-        includeZeroWeeks: s.includeZeroWeeks,
-        backlogSize: Number(s.backlogSize),
-        targetWeeks: Number(s.targetWeeks),
-        types: s.types,
-        doneStates: s.doneStates,
-        p90: s.displayPercentiles.P90,
-        usableWeeks: s.sampleStats?.usedWeeks
-          ?? countUsableThroughputSamples(throughputSamples, s.includeZeroWeeks),
-      },
-      history: s.simulationHistory.map((entry) => ({
-        id: entry.id,
-        selectedOrg: entry.selectedOrg,
-        selectedProject: entry.selectedProject,
-        selectedTeam: entry.selectedTeam,
-        startDate: entry.startDate,
-        endDate: entry.endDate,
-        simulationMode: entry.simulationMode,
-        includeZeroWeeks: entry.includeZeroWeeks,
-        backlogSize: entry.backlogSize,
-        targetWeeks: entry.targetWeeks,
-        types: entry.types,
-        doneStates: entry.doneStates,
-        p90: entry.result.result_percentiles?.P90,
-        usableWeeks: entry.sampleStats?.usedWeeks
-          ?? countUsableThroughputSamples(
-            entry.weeklyThroughput.map((point) => point.throughput),
-            entry.includeZeroWeeks,
-          ),
-      })),
-    });
-    const decisionRecommendation = recommendArbitration({
-      dataQuality,
-      forecastUncertainty,
-      historicalSensitivity,
-    });
-
-    return buildDecisionLanguage({
-      dataQuality,
-      forecastUncertainty,
-      decisionRecommendation,
-      historicalSensitivity,
+      selectedOrg: s.selectedOrg,
+      selectedProject: s.selectedProject,
+      selectedTeam,
+      startDate: s.startDate,
+      endDate: s.endDate,
+      simulationMode: s.simulationMode,
+      backlogSize: s.backlogSize,
+      targetWeeks: s.targetWeeks,
+      types: s.types,
+      doneStates: s.doneStates,
+      usableWeeks: s.sampleStats?.usedWeeks,
+      history: s.simulationHistory,
     });
   }, [
     reliability,

@@ -89,6 +89,12 @@ describe("usePortfolioReport", () => {
     expect(vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0].scenarios.map((scenario) => scenario.label)).toContain(
       "Historique corr\u00E9l\u00E9",
     );
+    const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
+    expect(exportArgs.scenarios.every((scenario) => scenario.decisionDiagnostic)).toBe(true);
+    expect(exportArgs.scenarios.every((scenario) => scenario.decisionDiagnostic?.historicalSensitivity === undefined)).toBe(true);
+    expect(exportArgs.scenarios[0].decisionDiagnostic?.decisionRecommendation.status).toMatch(
+      /Décision appuyée par les données|Décision possible avec prudence|Arbitrage nécessaire|Décision non recommandée/,
+    );
     for (const call of vi.mocked(simulateForecastFromSamples).mock.calls) {
       expect(call[0]).not.toHaveProperty("selectedTeam");
       expect(call[0]).not.toHaveProperty("selectedOrg");
