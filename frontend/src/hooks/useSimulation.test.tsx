@@ -2,13 +2,15 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { runSimulationForecast } from "./simulationForecastService";
 import { useSimulation } from "./useSimulation";
+import type { SimulationViewModel } from "./useSimulation";
+import type { SimulationHistoryEntry } from "./simulationTypes";
 
 const pushSimulationHistory = vi.fn();
 const clearSimulationHistory = vi.fn();
 const resetTeamOptions = vi.fn();
-const resetAutoRunState = vi.fn();
 const exportThroughputCsv = vi.fn();
 const capturedOnTeamOptionsReset = vi.hoisted(() => ({ current: undefined as undefined | (() => void) }));
+const simulationHistoryState = vi.hoisted(() => ({ entries: [] as Array<Record<string, unknown>> }));
 const teamOptions = vi.hoisted(() => ({
   loadingTeamOptions: false,
   workItemTypeOptions: ["Bug"],
@@ -20,14 +22,21 @@ const teamOptions = vi.hoisted(() => ({
 
 vi.mock("./simulationForecastService", () => ({ runSimulationForecast: vi.fn() }));
 vi.mock("../utils/export", () => ({ exportThroughputCsv: (...args: unknown[]) => exportThroughputCsv(...args) }));
-vi.mock("./useSimulationHistory", () => ({ useSimulationHistory: () => ({ simulationHistory: [], pushSimulationHistory, clearSimulationHistory }) }));
+vi.mock("./useSimulationHistory", () => ({ useSimulationHistory: () => ({ simulationHistory: simulationHistoryState.entries, pushSimulationHistory, clearSimulationHistory }) }));
 vi.mock("./useTeamOptions", () => ({ useTeamOptions: (params: { onTeamOptionsReset: () => void }) => {
   capturedOnTeamOptionsReset.current = params.onTeamOptionsReset;
   return { ...teamOptions, resetTeamOptions };
 } }));
 vi.mock("./useSimulationQuickFilters", () => ({ useSimulationQuickFilters: () => undefined }));
-vi.mock("./useSimulationAutoRun", () => ({ useSimulationAutoRun: () => ({ resetAutoRunState }) }));
-vi.mock("./useSimulationChartData", () => ({ useSimulationChartData: () => ({ throughputData: [], cycleTimeDaysData: [], cycleTimeTrendData: [], cycleTimeSummary: { itemCount: 0, averageDays: null, hasSufficientData: false }, mcHistData: [], probabilityCurveData: [], displayPercentiles: {} }) }));
+vi.mock("./useSimulationChartData", () => ({ useSimulationChartData: ({ weeklyThroughput, result }: { weeklyThroughput: Array<{ week: string; throughput: number }>; result: typeof forecast.result | null }) => ({
+  throughputData: weeklyThroughput,
+  cycleTimeDaysData: [],
+  cycleTimeTrendData: [],
+  cycleTimeSummary: { itemCount: 0, averageDays: null, hasSufficientData: false },
+  mcHistData: result ? [{ x: 1, count: 1, gauss: 1 }] : [],
+  probabilityCurveData: result ? [{ x: 1, probability: 100 }] : [],
+  displayPercentiles: result?.result_percentiles ?? {},
+}) }));
 
 function setup(overrides: Partial<Parameters<typeof useSimulation>[0]> = {}) {
   return renderHook(() => useSimulation({ step: "simulation", selectedOrg: "Org", selectedProject: "Projet", selectedTeam: "Equipe", pat: "pat", serverUrl: "", ...overrides }));
@@ -42,11 +51,51 @@ const forecast = {
   historyEntry: { id: "history" },
 };
 
+function reusableHistoryEntry(
+  simulation: SimulationViewModel,
+  overrides: Partial<SimulationHistoryEntry> = {},
+): SimulationHistoryEntry {
+  return {
+    schemaVersion: 2,
+    id: "reusable",
+    seed: 77,
+    createdAt: "2026-04-01T10:00:00.000Z",
+    selectedOrg: simulation.selectedOrg,
+    selectedProject: simulation.selectedProject,
+    selectedTeam: "Equipe",
+    startDate: simulation.startDate,
+    endDate: simulation.endDate,
+    simulationMode: simulation.simulationMode,
+    includeZeroWeeks: simulation.includeZeroWeeks,
+    backlogSize: Number(simulation.backlogSize),
+    targetWeeks: Number(simulation.targetWeeks),
+    nSims: Number(simulation.nSims),
+    types: [...simulation.types],
+    doneStates: [...simulation.doneStates],
+    sampleStats: { totalWeeks: 12, zeroWeeks: 0, usedWeeks: 12 },
+    weeklyThroughput: [{ week: "2026-01-05", throughput: 8 }],
+    cycleTimeDaysData: [],
+    result: {
+      result_kind: simulation.simulationMode === "weeks_to_items" ? "items" : "weeks",
+      samples_count: Number(simulation.nSims),
+      seed: 77,
+      result_percentiles: { P50: 10, P70: 12, P90: 15 },
+      risk_score: 0.5,
+      result_distribution: [{ x: 10, count: 5 }],
+      completion_summary: simulation.simulationMode === "backlog_to_weeks"
+        ? { completed_count: Number(simulation.nSims), censored_count: 0, censored_rate: 0, horizon_weeks: 521 }
+        : undefined,
+    },
+    ...overrides,
+  };
+}
+
 describe("useSimulation", () => {
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();
     vi.useRealTimers();
+    simulationHistoryState.entries.length = 0;
     teamOptions.workItemTypeOptions = ["Bug"];
     teamOptions.statesByType = { Bug: ["Done", "Closed"] };
   });
@@ -63,6 +112,7 @@ describe("useSimulation", () => {
     expect(noTeam.result.current.err).toContain("équipe");
     noTeam.unmount();
     const noPat = setup({ pat: "" });
+    act(() => { noPat.result.current.setTypes(["Bug"]); noPat.result.current.setDoneStates(["Done"]); });
     await act(() => noPat.result.current.runForecast());
     expect(noPat.result.current.err).toContain("PAT");
     noPat.unmount();
@@ -147,7 +197,85 @@ describe("useSimulation", () => {
     expect(vi.mocked(runSimulationForecast).mock.calls[0]?.[0]).toMatchObject({ demoMode: true });
   });
 
-  it("restores a saved run, replays its seed while unchanged, and clears it after a parameter change", async () => {
+  it.each([
+    ["historical period", (simulation: SimulationViewModel) => simulation.setStartDate("2025-01-01")],
+    ["simulation mode", (simulation: SimulationViewModel) => simulation.setSimulationMode("weeks_to_items")],
+    ["active objective", (simulation: SimulationViewModel) => simulation.setBacklogSize(121)],
+    ["ticket filters", (simulation: SimulationViewModel) => simulation.setDoneStates(["Closed"])],
+  ])("invalidates result and chart data without recalculating after changing %s", async (_label, change) => {
+    vi.mocked(runSimulationForecast).mockResolvedValue(forecast as never);
+    const { result } = setup();
+    act(() => { result.current.setTypes(["Bug"]); result.current.setDoneStates(["Done"]); });
+    await act(() => result.current.runForecast());
+    expect(result.current.result).toEqual(forecast.result);
+    expect(result.current.mcHistData).not.toHaveLength(0);
+
+    act(() => change(result.current));
+
+    await waitFor(() => expect(result.current.result).toBeNull());
+    expect(result.current.mcHistData).toEqual([]);
+    expect(result.current.probabilityCurveData).toEqual([]);
+    expect(result.current.displayPercentiles).toEqual({});
+    expect(result.current.hasLaunchedOnce).toBe(false);
+    expect(runSimulationForecast).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the displayed execution for visual changes, inactive objectives and reordered filters", async () => {
+    vi.mocked(runSimulationForecast).mockResolvedValue(forecast as never);
+    const { result } = setup();
+    act(() => {
+      result.current.setTypes(["Bug"]);
+      result.current.setDoneStates(["Done", "Closed"]);
+    });
+    await act(() => result.current.runForecast());
+
+    act(() => {
+      result.current.setTargetWeeks(99);
+      result.current.setDoneStates(["Closed", "Done"]);
+      result.current.setActiveChartTab("throughput");
+    });
+
+    await act(async () => Promise.resolve());
+    expect(result.current.result).toEqual(forecast.result);
+    expect(result.current.hasLaunchedOnce).toBe(true);
+    expect(runSimulationForecast).toHaveBeenCalledTimes(1);
+  });
+
+  it("reloads an identical complete local simulation without a network call or history duplication", async () => {
+    const { result } = setup({ pat: "" });
+    act(() => { result.current.setTypes(["Bug"]); result.current.setDoneStates(["Done"]); });
+    const entry = reusableHistoryEntry(result.current);
+    simulationHistoryState.entries.push(entry as unknown as Record<string, unknown>);
+
+    await act(() => result.current.runForecast());
+
+    expect(runSimulationForecast).not.toHaveBeenCalled();
+    expect(pushSimulationHistory).not.toHaveBeenCalled();
+    expect(result.current.notice).toBe("Simulation existante rechargée");
+    expect(result.current.result).toEqual(entry.result);
+    expect(result.current.displayPercentiles).toEqual(entry.result.result_percentiles);
+    expect(result.current.throughputData).toEqual(entry.weeklyThroughput);
+  });
+
+  it("ignores different or incomplete local entries and runs a new simulation", async () => {
+    vi.mocked(runSimulationForecast).mockResolvedValue(forecast as never);
+    const { result } = setup();
+    act(() => { result.current.setTypes(["Bug"]); result.current.setDoneStates(["Done"]); });
+    const different = reusableHistoryEntry(result.current, { id: "different", backlogSize: 999 });
+    const incomplete = reusableHistoryEntry(result.current, { id: "incomplete", cycleTimeDaysData: undefined });
+    simulationHistoryState.entries.push(
+      different as unknown as Record<string, unknown>,
+      incomplete as unknown as Record<string, unknown>,
+    );
+
+    await act(() => result.current.runForecast());
+
+    expect(runSimulationForecast).toHaveBeenCalledOnce();
+    expect(pushSimulationHistory).toHaveBeenCalledOnce();
+    expect(result.current.notice).toBe("");
+  });
+
+  it("restores a saved run, replays its seed while unchanged, and clears it after a meaningful parameter change", async () => {
     vi.mocked(runSimulationForecast).mockResolvedValue(forecast as never);
     const { result } = setup();
     const entry = {
@@ -178,10 +306,10 @@ describe("useSimulation", () => {
     await act(() => result.current.runForecast());
     expect(vi.mocked(runSimulationForecast).mock.calls[0]?.[0]).toMatchObject({ seed: 77 });
 
-    act(() => result.current.setTargetWeeks(13));
+    act(() => result.current.setBacklogSize(121));
+    await waitFor(() => expect(result.current.result).toBeNull());
     await act(() => result.current.runForecast());
     expect(vi.mocked(runSimulationForecast).mock.calls[1]?.[0]).toMatchObject({ seed: undefined });
-    expect(resetAutoRunState).toHaveBeenCalled();
   });
 
   it("handles a legacy history entry and exposes CSV export and result reset actions", () => {
@@ -213,6 +341,6 @@ describe("useSimulation", () => {
     act(() => result.current.resetForTeamSelection());
     expect(result.current).toMatchObject({ result: null, hasLaunchedOnce: false, warning: "" });
     act(() => result.current.resetSimulationResults());
-    expect(resetAutoRunState).toHaveBeenCalledTimes(3);
+    expect(result.current.result).toBeNull();
   });
 });

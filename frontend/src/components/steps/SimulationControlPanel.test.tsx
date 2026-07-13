@@ -207,7 +207,7 @@ describe("SimulationControlPanel launch button visibility", () => {
     expect(screen.queryByText(/Horizon de 12 semaines/i)).toBeNull();
   });
 
-  it("resets simulation when opening ticket filters after a launched simulation", () => {
+  it("does not invalidate simulation when only opening ticket filters", () => {
     const resetSimulationResults = vi.fn();
     vi.mocked(useSimulationContext).mockReturnValue({
       selectedTeam: "Equipe A",
@@ -235,7 +235,7 @@ describe("SimulationControlPanel launch button visibility", () => {
     if (!filtersSection) return;
 
     fireEvent.click(within(filtersSection).getByRole("button", { name: /d.velopper/i }));
-    expect(resetSimulationResults).toHaveBeenCalledTimes(1);
+    expect(resetSimulationResults).not.toHaveBeenCalled();
   });
 
   it("clears validation message when filters become valid after an error", () => {

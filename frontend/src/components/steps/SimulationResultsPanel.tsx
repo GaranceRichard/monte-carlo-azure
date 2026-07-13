@@ -7,6 +7,15 @@ import {
   computeThroughputReliability,
   getProjectionReliabilityNotice,
 } from "../../utils/simulation";
+import {
+  countUsableThroughputSamples,
+  diagnoseDataQuality,
+  diagnoseForecastUncertainty,
+  diagnoseHistoricalWindowSensitivity,
+  recommendArbitration,
+} from "../../utils/forecastDiagnostics";
+import { buildDecisionLanguage } from "../../utils/decisionLanguage";
+import DecisionDiagnostic from "./DecisionDiagnostic";
 
 function formatHistoryEntryLabel(entry: {
   createdAt: string;
@@ -101,6 +110,98 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
     return "border-[var(--border)] bg-[var(--surface-2)] text-[var(--text)]";
   }, [riskLegend, reliability?.label]);
 
+  const decisionDiagnostic = useMemo(() => {
+    const throughputSamples = (s.throughputData ?? []).map((point) => point.throughput);
+    const hasDisplayPercentile = PERCENTILE_KEYS.some(
+      (key) => typeof s.displayPercentiles?.[key] === "number" && Number.isFinite(s.displayPercentiles[key]),
+    );
+    if (!s.result || throughputSamples.length === 0 || !hasDisplayPercentile) return null;
+
+    const dataQuality = diagnoseDataQuality({
+      throughputSamples,
+      includeZeroWeeks: s.includeZeroWeeks,
+      adoDataWarning: s.warning || null,
+    });
+    const forecastUncertainty = diagnoseForecastUncertainty({
+      percentiles: s.displayPercentiles,
+      completionSummary: s.result.completion_summary,
+      riskScore: riskScoreValue,
+      throughputReliability: reliability,
+      throughputSamples,
+    });
+    const historicalSensitivity = diagnoseHistoricalWindowSensitivity({
+      current: {
+        id: "current-simulation",
+        selectedOrg: s.selectedOrg,
+        selectedProject: s.selectedProject,
+        selectedTeam,
+        startDate: s.startDate,
+        endDate: s.endDate,
+        simulationMode: s.simulationMode,
+        includeZeroWeeks: s.includeZeroWeeks,
+        backlogSize: Number(s.backlogSize),
+        targetWeeks: Number(s.targetWeeks),
+        types: s.types,
+        doneStates: s.doneStates,
+        p90: s.displayPercentiles.P90,
+        usableWeeks: s.sampleStats?.usedWeeks
+          ?? countUsableThroughputSamples(throughputSamples, s.includeZeroWeeks),
+      },
+      history: s.simulationHistory.map((entry) => ({
+        id: entry.id,
+        selectedOrg: entry.selectedOrg,
+        selectedProject: entry.selectedProject,
+        selectedTeam: entry.selectedTeam,
+        startDate: entry.startDate,
+        endDate: entry.endDate,
+        simulationMode: entry.simulationMode,
+        includeZeroWeeks: entry.includeZeroWeeks,
+        backlogSize: entry.backlogSize,
+        targetWeeks: entry.targetWeeks,
+        types: entry.types,
+        doneStates: entry.doneStates,
+        p90: entry.result.result_percentiles?.P90,
+        usableWeeks: entry.sampleStats?.usedWeeks
+          ?? countUsableThroughputSamples(
+            entry.weeklyThroughput.map((point) => point.throughput),
+            entry.includeZeroWeeks,
+          ),
+      })),
+    });
+    const decisionRecommendation = recommendArbitration({
+      dataQuality,
+      forecastUncertainty,
+      historicalSensitivity,
+    });
+
+    return buildDecisionLanguage({
+      dataQuality,
+      forecastUncertainty,
+      decisionRecommendation,
+      historicalSensitivity,
+    });
+  }, [
+    reliability,
+    riskScoreValue,
+    s.displayPercentiles,
+    s.doneStates,
+    s.endDate,
+    s.includeZeroWeeks,
+    s.backlogSize,
+    s.result,
+    s.sampleStats,
+    s.selectedOrg,
+    s.selectedProject,
+    s.simulationHistory,
+    s.simulationMode,
+    s.startDate,
+    s.targetWeeks,
+    s.throughputData,
+    s.types,
+    s.warning,
+    selectedTeam,
+  ]);
+
   return (
     <div className="min-h-0 space-y-4">
       {s.loading && (
@@ -113,6 +214,16 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
           <div aria-hidden="true">
             <ProgressBar value={65} />
           </div>
+        </div>
+      )}
+
+      {s.notice && (
+        <div
+          className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3 text-xs font-semibold text-[var(--text)]"
+          role="status"
+          aria-live="polite"
+        >
+          {s.notice}
         </div>
       )}
 
@@ -138,6 +249,7 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
 
       {s.result && (
         <div className="space-y-2">
+          {decisionDiagnostic && <DecisionDiagnostic diagnostic={decisionDiagnostic} />}
           <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Percentiles</div>
           {s.result.completion_summary && s.result.completion_summary.censored_count > 0 && (
             <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-950">

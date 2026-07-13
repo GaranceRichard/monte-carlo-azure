@@ -42,9 +42,6 @@ export default function SimulationControlPanel({ onExpansionChange }: Simulation
   function toggleSection(section: "period" | "mode" | "filters"): void {
     setOpenSection((current) => {
       const next = current === section ? null : section;
-      if (next === "filters" && s.hasLaunchedOnce) {
-        s.resetSimulationResults();
-      }
       return next;
     });
   }

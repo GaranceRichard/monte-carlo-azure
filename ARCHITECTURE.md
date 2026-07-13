@@ -118,13 +118,13 @@ frontend/
     appNavigation.ts    # navigation/backspace et helpers de retour
     appShellSections.tsx # sections shell, mode public et stepper
     appTheme.ts         # resolution/persistance du theme
+    runtime.ts          # détection des modes standard, démo et connexion publique
     hooks/
       useOnboarding.ts  # PAT en state local
-      useSimulation.ts             # orchestrateur simulation
+      useSimulation.ts             # orchestrateur, invalidation et rechargement par signature
       useSimulationPrefs.ts        # persistance localStorage des preferences
       useSimulationHistory.ts      # historique local versionne + migration legacy
       useSimulationChartData.ts    # mapping/useMemo des donnees graphiques
-      useSimulationAutoRun.ts      # auto-run avec debounce (entree via objet params)
       useSimulationQuickFilters.ts # persistance des quick filters simulation
       useTeamOptions.ts            # chargement options equipe (types + etats)
       usePortfolio.ts              # logique mode portefeuille
@@ -133,6 +133,7 @@ frontend/
       simulationForecastCore.ts    # logique forecast extraite et testee
     utils/
       cycleTime.ts        # calcul et tendances du cycle time en jours calendaires
+      simulationSignature.ts # signature canonique et selection du cache local reutilisable
     components/steps/
       SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
       simulationPrintReport.tsx    # rapport imprimable

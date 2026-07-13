@@ -87,6 +87,7 @@ export function AppFlowContent({
           selectedTeam={onboardingState.selectedTeam}
           setSelectedTeam={onboardingActions.setSelectedTeam}
           loading={onboardingState.loading}
+          demoMode={runtime.isDemoMode}
           onContinue={onGoToSimulation}
           onPortfolio={onGoToPortfolio}
         />

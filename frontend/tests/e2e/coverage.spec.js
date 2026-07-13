@@ -264,12 +264,19 @@ test.describe("e2e istanbul coverage", () => {
 
     await openIfCollapsed(modeSection);
     await page.getByLabel(/Inclure les semaines.*0/i).uncheck();
+    await expect(page.getByRole("tab", { name: "Distribution" })).not.toBeVisible();
+    await closeIfExpanded(modeSection);
+    await page.getByRole("button", { name: "Lancer la simulation" }).click();
+    await expect(page.getByText("38 items")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("tab", { name: "Distribution" })).toBeVisible();
     await page.getByRole("tab", { name: "Distribution" }).click();
     await page.getByRole("tab", { name: /Probabilit/i }).click();
     await page.getByRole("tab", { name: "Throughput" }).click();
     await page.getByRole("button", { name: "CSV" }).click();
     await page.getByRole("button", { name: "Rapport" }).click();
     await expect(page.getByRole("button", { name: "Rapport" })).toBeVisible();
+    await page.getByRole("button", { name: /R.+initialiser/i }).click();
+    await expect(page.getByText(/Lancez une simulation pour afficher les graphiques/i)).toBeVisible();
 
     await openIfCollapsed(modeSection);
     await modeSelect.focus();
@@ -277,7 +284,6 @@ test.describe("e2e istanbul coverage", () => {
     await modeSelect.selectOption("backlog_to_weeks");
     await modeNumberInputs.first().fill("120");
     await modeNumberInputs.nth(1).fill("5000");
-    await page.getByRole("button", { name: /R.+initialiser/i }).click();
     await expect(page.getByText(/Lancez une simulation pour afficher les graphiques/i)).toBeVisible();
     await page.getByRole("button", { name: "Lancer la simulation" }).click();
     await expect(page.getByText("10 sem")).toBeVisible({ timeout: 10_000 });
@@ -296,11 +302,11 @@ test.describe("e2e istanbul coverage", () => {
       return labels.some((label) => label.includes("12 semaines"));
     }).toBe(true);
     const localHistoryValue = await historySelect.locator("option").evaluateAll((options) => {
-      const match = options.find((option) => {
+      const matches = options.filter((option) => {
         const label = option.textContent || "";
         return label.includes("12 semaines");
       });
-      return match?.getAttribute("value") || "";
+      return matches.at(-1)?.getAttribute("value") || "";
     });
     expect(localHistoryValue).toBeTruthy();
     await historySelect.selectOption(localHistoryValue);
@@ -2673,7 +2679,8 @@ test.describe("e2e istanbul coverage", () => {
     await page.goto("/?demo=true");
 
     await expect(page.getByRole("heading", { name: /Choix de l'équipe/i })).toBeVisible();
-    await expect(page.getByText(/Cette démo vous laisse choisir votre point d'entrée/i)).toBeVisible();
+    await expect(page.getByText(/Cette démo vous laisse choisir votre point d’entrée/i)).toBeVisible();
+    await expect(page.getByText(/Choisissez votre point d’entrée/i)).toHaveCount(0);
     await expect(page.getByRole("link", { name: /Connecter un vrai compte/i })).toHaveCount(0);
     await expect(page.locator("select").first()).toBeVisible();
     await page.getByRole("button", { name: /Choisir cette équipe/i }).click();

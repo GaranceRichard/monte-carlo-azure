@@ -102,6 +102,7 @@ export type SimulationResult = {
   probabilityCurveData: ProbabilityPoint[];
   sampleStats: SampleStats | null;
   warning: string;
+  notice: string;
 };
 
 export type ChartTab = "cycle_time" | "throughput" | "distribution" | "probability";

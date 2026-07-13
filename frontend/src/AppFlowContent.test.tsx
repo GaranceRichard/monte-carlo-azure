@@ -14,7 +14,7 @@ vi.mock("./components/steps/ProjectStep", () => ({
   default: () => <div>ProjectStep</div>,
 }));
 vi.mock("./components/steps/TeamStep", () => ({
-  default: () => <div>TeamStep</div>,
+  default: ({ demoMode }: { demoMode?: boolean }) => <div>{demoMode ? "TeamStep demo" : "TeamStep normal"}</div>,
 }));
 vi.mock("./components/steps/SimulationStep", () => ({
   default: () => <div>SimulationStep</div>,
@@ -62,6 +62,8 @@ function buildProps() {
   };
 
   const simulation: SimulationViewModel = {
+    selectedOrg: "",
+    selectedProject: "",
     loading: false,
     hasLaunchedOnce: false,
     loadingTeamOptions: false,
@@ -77,6 +79,7 @@ function buildProps() {
     setIncludeZeroWeeks: vi.fn(),
     sampleStats: null,
     warning: "",
+    notice: "",
     backlogSize: 0,
     setBacklogSize: vi.fn(),
     targetWeeks: 0,
@@ -151,5 +154,21 @@ describe("AppFlowContent", () => {
     );
 
     expect(container.firstChild).toBeNull();
+  });
+
+  it.each([
+    [false, "TeamStep normal"],
+    [true, "TeamStep demo"],
+  ])("passes demo mode %s to the team step", (isDemoMode, expectedText) => {
+    const props = buildProps();
+    const { container } = render(
+      <AppFlowContent
+        {...props}
+        runtime={{ isDemoMode }}
+        onboardingState={{ ...props.onboardingState, step: "teams" }}
+      />,
+    );
+
+    expect(container).toHaveTextContent(expectedText);
   });
 });

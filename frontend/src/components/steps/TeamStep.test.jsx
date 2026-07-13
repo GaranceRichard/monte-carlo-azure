@@ -61,7 +61,7 @@ describe("TeamStep", () => {
     expect(screen.getByRole("button", { name: /Choisir cette/i })).toBeDisabled();
   });
 
-  it("renders team screen labels with proper accents", () => {
+  it("shows neutral wording in normal local mode with the existing entry descriptions", () => {
     render(
       <TeamStep
         err=""
@@ -78,7 +78,47 @@ describe("TeamStep", () => {
     expect(screen.getByText("Projet s\u00E9lectionn\u00E9:")).toBeInTheDocument();
     expect(screen.getByText("\u00C9quipes disponibles")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Choisir cette \u00E9quipe" })).toBeInTheDocument();
-    expect(screen.getByText(/Cette démo vous laisse choisir votre point d'entrée/i)).toBeInTheDocument();
+    expect(screen.getByText(/Choisissez votre point d’entrée\. Sélectionnez une équipe puis ouvrez soit la simulation détaillée, soit la vue portefeuille\./i)).toBeInTheDocument();
+    expect(screen.queryByText(/démo/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText((_, node) => node?.textContent?.includes("Simulation : throughput hebdomadaire") ?? false).length).toBeGreaterThan(0);
+    expect(screen.getAllByText((_, node) => node?.textContent?.includes("Portefeuille : comparaison multi-équipes") ?? false).length).toBeGreaterThan(0);
+  });
+
+  it("shows neutral wording when connected to Azure DevOps", () => {
+    render(
+      <TeamStep
+        err=""
+        selectedProject="Projet Azure DevOps"
+        teams={[{ id: "t1", name: "Equipe Alpha" }]}
+        selectedTeam="Equipe Alpha"
+        setSelectedTeam={vi.fn()}
+        loading={false}
+        demoMode={false}
+        onContinue={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText(/Choisissez votre point d’entrée\. Sélectionnez une équipe/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Cette démo/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/throughput hebdomadaire, percentiles, distributions, probabilités, export CSV et rapport/i)).toBeInTheDocument();
+    expect(screen.getByText(/comparaison multi-équipes, scénarios consolidés et rapport PDF de synthèse/i)).toBeInTheDocument();
+  });
+
+  it("shows demo-specific wording only in demo mode", () => {
+    render(
+      <TeamStep
+        err=""
+        selectedProject="Projet Démo"
+        teams={[{ id: "t1", name: "Equipe Alpha" }]}
+        selectedTeam="Equipe Alpha"
+        setSelectedTeam={vi.fn()}
+        loading={false}
+        demoMode
+        onContinue={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText(/Cette démo vous laisse choisir votre point d’entrée\. Sélectionnez une équipe puis ouvrez soit la simulation détaillée, soit la vue portefeuille\./i)).toBeInTheDocument();
     expect(screen.getAllByText((_, node) => node?.textContent?.includes("Simulation : throughput hebdomadaire") ?? false).length).toBeGreaterThan(0);
     expect(screen.getAllByText((_, node) => node?.textContent?.includes("Portefeuille : comparaison multi-équipes") ?? false).length).toBeGreaterThan(0);
   });

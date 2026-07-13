@@ -61,6 +61,9 @@ test("simulation: erreur puis succes sur les 2 modes", async ({ page }) => {
   await openIfCollapsed(modeSection);
   await page.locator("select").first().selectOption("backlog_to_weeks");
   await page.locator('input[type="number"]').first().fill("120");
+  await expect(page.getByText("10 sem")).not.toBeVisible();
   await closeIfExpanded(modeSection);
+  await page.getByRole("button", { name: "Lancer la simulation" }).click();
+  await expect(page.getByText("P50")).toBeVisible({ timeout: 10_000 });
   await expect(page.getByText("10 sem")).toBeVisible({ timeout: 10_000 });
 });

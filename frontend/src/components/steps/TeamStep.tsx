@@ -10,6 +10,7 @@ type TeamStepProps = {
   selectedTeam: string;
   setSelectedTeam: (value: string) => void;
   loading: boolean;
+  demoMode?: boolean;
   onContinue: () => void | Promise<void>;
   onPortfolio?: () => void | Promise<void>;
 };
@@ -21,6 +22,7 @@ export default function TeamStep({
   selectedTeam,
   setSelectedTeam,
   loading,
+  demoMode = false,
   onContinue,
   onPortfolio,
 }: TeamStepProps) {
@@ -42,8 +44,10 @@ export default function TeamStep({
       </p>
       <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-sm text-[var(--text)]">
         <p className="m-0">
-          Cette démo vous laisse choisir votre point d&apos;entrée. Sélectionnez une équipe puis ouvrez soit la
-          simulation détaillée, soit la vue portefeuille.
+          {demoMode
+            ? "Cette démo vous laisse choisir votre point d’entrée."
+            : "Choisissez votre point d’entrée."}{" "}
+          Sélectionnez une équipe puis ouvrez soit la simulation détaillée, soit la vue portefeuille.
         </p>
         <p className="mt-3 mb-0">
           <b>Simulation</b> : throughput hebdomadaire, percentiles, distributions, probabilités, export CSV et
@@ -101,4 +105,3 @@ export default function TeamStep({
     </>
   );
 }
-

@@ -140,6 +140,15 @@ renvoyes par l'API et ne recalcule depuis l'histogramme que pour d'anciens histo
 detectes par un ordre legacy `P50 <= P70 <= P90`.
 Le `Risk Score`, lui, est maintenant calcule partout a partir des percentiles metier
 effectivement exposes par l'API et affiches a l'ecran, y compris dans les exports PDF.
+L'interface de resultats affiche aussi un diagnostic decisionnel distinct du Risk Score :
+une synthese de recommandation et un acces a son detail dans une modale.
+La modale organise cette lecture en deux colonnes decisionnelle et complementaire sur ecran large,
+tout en conservant l'ordre de decision sur mobile.
+Lorsque l'historique local contient des simulations comparables, cette modale mesure aussi
+la sensibilite a la fenetre choisie et aide a arbitrer entre reference recente et scenario prudent.
+Toute modification d'un parametre metier invalide immediatement le resultat affiche, sans
+recalcul automatique. Un nouveau lancement recharge d'abord la simulation locale identique
+la plus recente lorsqu'elle contient toutes les donnees du schema courant.
 En `backlog_to_weeks`, l'API expose aussi un `completion_summary` avec `completed_count`,
 `censored_count`, `censored_rate` et `horizon_weeks` pour distinguer explicitement les
 simulations terminees des non-terminaisons a l'horizon. Les anciennes entrees d'historique
@@ -249,7 +258,8 @@ sur le contrat statistique courant (`throughput_samples`, `mode`, `backlog_size`
 `n_sims`, `include_zero_weeks`) afin de detecter toute derive de contrat sans reintroduire
 d'ancien champ refuse par l'API.
 
-Sur GitHub Pages, la demo publique precharge les donnees puis laisse l'utilisateur choisir son point d'entree:
+Sur GitHub Pages, la démo publique précharge les données puis laisse l’utilisateur choisir son point d’entrée.
+Le mode démo est activé par `?demo=true` ou par le build GitHub Pages ; le wording et le badge `Démo` ne sont pas affichés en fonctionnement local ou Azure DevOps normal.
 
 - `Simulation` pour ouvrir une equipe et ses graphiques/detail
 - `Portefeuille` pour comparer plusieurs equipes et generer un rapport consolide

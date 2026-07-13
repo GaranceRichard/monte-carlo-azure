@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import SimulationResultsPanel from "./SimulationResultsPanel";
 import { useSimulationContext } from "../../hooks/SimulationContext";
@@ -468,6 +468,278 @@ describe("SimulationResultsPanel history list", () => {
 
     render(<SimulationResultsPanel />);
     expect(screen.queryByText(/^Risque \/ Fiabilite$/i)).toBeNull();
+    expect(screen.queryByRole("heading", { name: /Diagnostic décisionnel/i })).toBeNull();
+  });
+
+  it("shows a compact decision summary and keeps the long diagnostic out of the page", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        warning: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        throughputData: [10, 11, 9, 10, 10, 11, 9, 10].map((throughput, index) => ({ week: `2026-01-${index + 1}`, throughput })),
+        result: {
+          result_kind: "weeks",
+          seed: 10,
+          risk_score: 0.1,
+          throughput_reliability: { cv: 0.1, iqr_ratio: 0.1, slope_norm: 0.01, label: "fiable", samples_count: 8 },
+        },
+        displayPercentiles: { P50: 10, P70: 10.5, P90: 11 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+
+    expect(screen.getByText(/Décision appuyée par les données/i)).not.toBeNull();
+    expect(screen.getByRole("button", { name: /Voir le diagnostic décisionnel/i })).not.toBeNull();
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.queryByRole("heading", { name: /Décision recommandée/i })).toBeNull();
+    expect(screen.queryByText(/Semaines historiques exploitables : 8/i)).toBeNull();
+  });
+
+  it("closes the diagnostic modal as soon as the displayed result is invalidated", () => {
+    const contextValue: { selectedTeam: string; simulation: Record<string, unknown> } = {
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        notice: "",
+        warning: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        throughputData: [10, 11, 9, 10, 10, 11, 9, 10].map((throughput, index) => ({
+          week: `2026-01-${index + 1}`,
+          throughput,
+        })),
+        result: { result_kind: "weeks", seed: 16 },
+        displayPercentiles: { P50: 10, P70: 11, P90: 12 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    };
+    vi.mocked(useSimulationContext).mockImplementation(() => contextValue as never);
+    const { rerender } = render(<SimulationResultsPanel />);
+    fireEvent.click(screen.getByRole("button", { name: /Voir le diagnostic décisionnel/i }));
+    expect(screen.getByRole("dialog")).not.toBeNull();
+
+    contextValue.simulation = {
+      ...contextValue.simulation,
+      result: null,
+      throughputData: [],
+      displayPercentiles: {},
+    };
+    rerender(<SimulationResultsPanel />);
+
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.queryByRole("heading", { name: /Diagnostic décisionnel/i })).toBeNull();
+  });
+
+  it("announces a locally reloaded simulation without presenting a calculation", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        notice: "Simulation existante rechargée",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        result: null,
+        displayPercentiles: {},
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+    expect(screen.getByRole("status")).toHaveTextContent("Simulation existante rechargée");
+    expect(screen.queryByText(/Calcul/i)).toBeNull();
+  });
+
+  it("shows a caution diagnostic with the relevant factors and action", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        warning: "Collecte Azure DevOps partielle.",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        throughputData: [1, 2, 3, 4, 5, 6].map((throughput, index) => ({ week: `2026-02-${index + 1}`, throughput })),
+        result: {
+          result_kind: "weeks",
+          seed: 11,
+          risk_score: 0.1,
+          throughput_reliability: { cv: 0.1, iqr_ratio: 0.1, slope_norm: 0.01, label: "fiable", samples_count: 6 },
+        },
+        displayPercentiles: { P50: 10, P70: 12, P90: 14 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+
+    expect(screen.getByText(/Décision possible avec prudence/i)).not.toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /Voir le diagnostic décisionnel/i }));
+    const whySection = screen.getByRole("heading", { name: "Pourquoi ?" }).closest("section");
+    expect(whySection).not.toBeNull();
+    expect(within(whySection as HTMLElement).getByText(/Collecte Azure DevOps partielle : Collecte Azure DevOps partielle/i)).not.toBeNull();
+    expect(within(whySection as HTMLElement).getByText(/Semaines historiques exploitables : 6/i)).not.toBeNull();
+    expect(screen.getByText(/Compléter les données Azure DevOps et observer quelques semaines supplémentaires avant un engagement difficilement réversible\./i)).not.toBeNull();
+  });
+
+  it("shows blocking diagnostics when data and required percentiles are missing", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        warning: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        throughputData: [1, 2, 3, 4, 5].map((throughput, index) => ({ week: `2026-03-${index + 1}`, throughput })),
+        result: { result_kind: "weeks", seed: 12 },
+        displayPercentiles: { P50: 10 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+
+    expect(screen.getByText(/Décision non recommandée/i)).not.toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /Voir le diagnostic décisionnel/i }));
+    expect(screen.getByText(/Données insuffisantes/i)).not.toBeNull();
+    expect(screen.getByText(/Incertitude impossible à mesurer/i)).not.toBeNull();
+    expect(screen.getByText(/Percentiles requis non calculables : P70, P90/i)).not.toBeNull();
+    expect(screen.getByText(/Compléter l'historique avant tout arbitrage\./i)).not.toBeNull();
+  });
+
+  it("shows arbitration when data quality and forecast uncertainty are both degraded", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        warning: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        throughputData: [1, 2, 3, 4, 5, 6].map((throughput, index) => ({ week: `2026-04-${index + 1}`, throughput })),
+        result: {
+          result_kind: "weeks",
+          seed: 13,
+          risk_score: 0.8,
+          throughput_reliability: { cv: 1, iqr_ratio: 1, slope_norm: 0.1, label: "fragile", samples_count: 6 },
+        },
+        displayPercentiles: { P50: 10, P70: 14, P90: 20 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+
+    expect(screen.getByText(/Arbitrage nécessaire/i)).not.toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /Voir le diagnostic décisionnel/i }));
+    expect(screen.getByText(/Vérifier la stabilité de la capacité récente sur quelques semaines supplémentaires\./i)).not.toBeNull();
+  });
+
+  it("compares local historical windows and exposes high sensitivity in the summary and dialog", () => {
+    const longWindow = {
+      ...baseEntry("long-window", "Alpha-Team"),
+      startDate: "2025-12-01",
+      endDate: "2026-04-30",
+      targetWeeks: 3,
+      types: ["Bug", "Story"],
+      doneStates: ["Closed", "Done"],
+      sampleStats: null,
+      weeklyThroughput: Array.from({ length: 17 }, (_, index) => ({
+        week: `2026-01-${String(index + 1).padStart(2, "0")}`,
+        throughput: 8,
+      })),
+      result: {
+        ...baseEntry("source", "Alpha-Team").result,
+        result_percentiles: { P50: 10, P70: 11, P90: 12 },
+      },
+    };
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        selectedOrg: "org-a",
+        selectedProject: "Projet A",
+        startDate: "2026-03-01",
+        endDate: "2026-04-30",
+        simulationMode: "weeks_to_items",
+        includeZeroWeeks: true,
+        backlogSize: 12,
+        targetWeeks: 3,
+        types: ["Story", "Bug"],
+        doneStates: ["Done", "Closed"],
+        loading: false,
+        loadingStageMessage: "",
+        warning: "",
+        sampleStats: { totalWeeks: 9, zeroWeeks: 0, usedWeeks: 9 },
+        throughputData: [8, 9, 10, 8, 9, 10, 8, 9, 10].map((throughput, index) => ({
+          week: `2026-03-${index + 1}`,
+          throughput,
+        })),
+        result: {
+          result_kind: "items",
+          seed: 15,
+          throughput_reliability: { cv: 0.1, iqr_ratio: 0.1, slope_norm: 0.01, label: "fiable", samples_count: 9 },
+        },
+        displayPercentiles: { P50: 12, P70: 15, P90: 18 },
+        simulationHistory: [longWindow],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+
+    expect(screen.getByText(/Arbitrage nécessaire/i)).not.toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /Voir le diagnostic décisionnel/i }));
+    const sensitivityHeading = screen.getByRole("heading", { name: /Sensibilité à la période historique/i });
+    const sensitivitySection = sensitivityHeading.closest("section");
+    expect(sensitivitySection).not.toBeNull();
+    expect(screen.getByText("P90 période récente : 18 items — 9 semaines")).not.toBeNull();
+    expect(screen.getByText("P90 période longue : 12 items — 17 semaines")).not.toBeNull();
+    expect(screen.getByText("Écart : +50 %")).not.toBeNull();
+    expect(within(sensitivitySection as HTMLElement).getByText(/scénario prudent/i)).not.toBeNull();
+  });
+
+  it("keeps incomplete legacy histories unchanged by hiding the diagnostic", () => {
+    vi.mocked(useSimulationContext).mockReturnValue({
+      selectedTeam: "Alpha-Team",
+      simulation: {
+        loading: false,
+        loadingStageMessage: "",
+        warning: "",
+        includeZeroWeeks: true,
+        sampleStats: null,
+        throughputData: [],
+        result: { result_kind: "weeks", seed: 14 },
+        displayPercentiles: { P50: 10 },
+        simulationHistory: [],
+        applyHistoryEntry: vi.fn(),
+        clearSimulationHistory: vi.fn(),
+      },
+    } as never);
+
+    render(<SimulationResultsPanel />);
+    expect(screen.getByText(/10 sem/i)).not.toBeNull();
+    expect(screen.queryByRole("heading", { name: /Diagnostic décisionnel/i })).toBeNull();
   });
 
   it("explains censures and hides missing percentiles", () => {

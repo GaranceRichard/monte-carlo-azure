@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type {
   AppStep,
@@ -16,7 +16,6 @@ import type {
   TooltipBaseProps,
 } from "./simulationTypes";
 import { exportThroughputCsv as exportCsv } from "../utils/export";
-import { useSimulationAutoRun } from "./useSimulationAutoRun";
 import { useSimulationChartData } from "./useSimulationChartData";
 import { runSimulationForecast } from "./simulationForecastService";
 import { useSimulationHistory } from "./useSimulationHistory";
@@ -24,6 +23,11 @@ import { useSimulationPrefs } from "./useSimulationPrefs";
 import { useSimulationQuickFilters } from "./useSimulationQuickFilters";
 import { useTeamOptions } from "./useTeamOptions";
 import { DEMO_CONFIG } from "../demoData";
+import {
+  buildSimulationExecutionSnapshot,
+  findLatestReusableSimulation,
+} from "../utils/simulationSignature";
+import type { SimulationExecutionSnapshot } from "../utils/simulationSignature";
 
 const TOOLTIP_BASE_PROPS: TooltipBaseProps = {
   cursor: false,
@@ -40,6 +44,8 @@ const TOOLTIP_BASE_PROPS: TooltipBaseProps = {
 export type SimulationViewModel = SimulationForecastControls &
   SimulationDateRange &
   SimulationResult & {
+  selectedOrg: string;
+  selectedProject: string;
   loading: boolean;
   hasLaunchedOnce: boolean;
   loadingTeamOptions: boolean;
@@ -68,32 +74,8 @@ export type SimulationViewModel = SimulationForecastControls &
 
 type SimulationReplayContext = {
   seed: number;
-  fingerprint: string;
+  signature: string;
 };
-
-function buildSimulationFingerprint(params: {
-  selectedOrg: string;
-  selectedProject: string;
-  selectedTeam: string;
-  startDate: string;
-  endDate: string;
-  simulationMode: "backlog_to_weeks" | "weeks_to_items";
-  includeZeroWeeks: boolean;
-  backlogSize: number | string;
-  targetWeeks: number | string;
-  nSims: number | string;
-  types: string[];
-  doneStates: string[];
-}): string {
-  return JSON.stringify({
-    ...params,
-    backlogSize: Number(params.backlogSize),
-    targetWeeks: Number(params.targetWeeks),
-    nSims: Number(params.nSims),
-    types: [...params.types],
-    doneStates: [...params.doneStates],
-  });
-}
 
 export function useSimulation({
   demoMode = false,
@@ -139,6 +121,7 @@ export function useSimulation({
   const [err, setErr] = useState("");
   const [sampleStats, setSampleStats] = useState<SampleStats | null>(null);
   const [warning, setWarning] = useState("");
+  const [notice, setNotice] = useState("");
   const [doneStates, setDoneStates] = useState<string[]>([]);
   const [types, setTypes] = useState<string[]>([]);
   const [result, setResult] = useState<ForecastResponse | null>(null);
@@ -147,12 +130,54 @@ export function useSimulation({
   const [activeChartTab, setActiveChartTab] = useState<ChartTab>("cycle_time");
   const [hasLaunchedOnce, setHasLaunchedOnce] = useState(false);
   const [replayContext, setReplayContext] = useState<SimulationReplayContext | null>(null);
+  const [executedSimulation, setExecutedSimulation] = useState<SimulationExecutionSnapshot | null>(null);
+  const demoAutoRunTeamRef = useRef("");
+
+  const currentSimulation = useMemo(() => buildSimulationExecutionSnapshot({
+    selectedOrg,
+    selectedProject,
+    selectedTeam,
+    startDate,
+    endDate,
+    simulationMode,
+    includeZeroWeeks,
+    backlogSize,
+    targetWeeks,
+    nSims,
+    types,
+    doneStates,
+  }), [
+    backlogSize,
+    doneStates,
+    endDate,
+    includeZeroWeeks,
+    nSims,
+    selectedOrg,
+    selectedProject,
+    selectedTeam,
+    simulationMode,
+    startDate,
+    targetWeeks,
+    types,
+  ]);
+  const hasCurrentResult = Boolean(
+    result && executedSimulation?.signature === currentSimulation.signature,
+  );
+  const displayedResult = hasCurrentResult ? result : null;
+  const displayedWeeklyThroughput = hasCurrentResult ? weeklyThroughput : [];
+  const displayedCycleTimeDaysData = hasCurrentResult ? cycleTimeDaysData : [];
+  const displayedSampleStats = hasCurrentResult ? sampleStats : null;
+  const displayedWarning = hasCurrentResult ? warning : "";
+  const displayedNotice = result && !hasCurrentResult ? "" : notice;
+  const displayedHasLaunchedOnce = result
+    ? hasCurrentResult && hasLaunchedOnce
+    : hasLaunchedOnce;
 
   const { throughputData, cycleTimeDaysData: cycleTimeChartData, cycleTimeTrendData, cycleTimeSummary, mcHistData, probabilityCurveData, displayPercentiles } = useSimulationChartData({
-    weeklyThroughput,
-    cycleTimeDaysData,
+    weeklyThroughput: displayedWeeklyThroughput,
+    cycleTimeDaysData: displayedCycleTimeDaysData,
     includeZeroWeeks,
-    result,
+    result: displayedResult,
   });
 
   const onTeamOptionsReset = useCallback((): void => {
@@ -217,12 +242,53 @@ export function useSimulation({
     setCycleTimeDaysData([]);
     setSampleStats(null);
     setWarning("");
+    setNotice("");
+    setExecutedSimulation(null);
     setActiveChartTab("cycle_time");
   }, []);
+
+  const restoreComputedSimulation = useCallback((
+    entry: SimulationHistoryEntry,
+    snapshot: SimulationExecutionSnapshot,
+  ): void => {
+    setErr("");
+    setWarning(entry.warning ?? "");
+    setSampleStats(entry.sampleStats);
+    setWeeklyThroughput(entry.weeklyThroughput);
+    setCycleTimeDaysData(entry.cycleTimeDaysData ?? []);
+    setResult(entry.result);
+    setExecutedSimulation(snapshot);
+    setActiveChartTab("cycle_time");
+    setHasLaunchedOnce(true);
+    setReplayContext(entry.seed == null ? null : {
+      seed: entry.seed,
+      signature: snapshot.signature,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!result || !executedSimulation) return;
+    if (executedSimulation.signature === currentSimulation.signature) return;
+    clearComputedSimulationState();
+    setHasLaunchedOnce(false);
+    setReplayContext(null);
+  }, [
+    clearComputedSimulationState,
+    currentSimulation.signature,
+    executedSimulation,
+    result,
+  ]);
+
+  useEffect(() => {
+    if (!notice) return;
+    const timer = window.setTimeout(() => setNotice(""), 3000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
 
   const onInvalidFilters = useCallback(() => {
     setErr("Ticket et État obligatoires.");
     clearComputedSimulationState();
+    setHasLaunchedOnce(false);
   }, [clearComputedSimulationState]);
 
   const runForecast = useCallback(async (): Promise<void> => {
@@ -231,12 +297,22 @@ export function useSimulation({
       setErr("Sélectionnez une équipe.");
       return;
     }
-    if (!pat) {
-      setErr("PAT manquant. Reconnectez-vous.");
-      return;
-    }
     if (!types.length || !doneStates.length) {
       onInvalidFilters();
+      return;
+    }
+
+    const reusableSimulation = findLatestReusableSimulation(
+      simulationHistory,
+      currentSimulation.signature,
+    );
+    if (reusableSimulation) {
+      restoreComputedSimulation(reusableSimulation, currentSimulation);
+      setNotice("Simulation existante rechargée");
+      return;
+    }
+    if (!pat) {
+      setErr("PAT manquant. Reconnectez-vous.");
       return;
     }
 
@@ -251,23 +327,9 @@ export function useSimulation({
     }, 1200);
 
     try {
-      const currentFingerprint = buildSimulationFingerprint({
-        selectedOrg,
-        selectedProject,
-        selectedTeam,
-        startDate,
-        endDate,
-        simulationMode,
-        includeZeroWeeks,
-        backlogSize,
-        targetWeeks,
-        nSims,
-        types,
-        doneStates,
-      });
       const forecast = await runSimulationForecast({
         demoMode,
-        seed: replayContext?.fingerprint === currentFingerprint ? replayContext.seed : undefined,
+        seed: replayContext?.signature === currentSimulation.signature ? replayContext.seed : undefined,
         selectedOrg,
         selectedProject,
         selectedTeam,
@@ -287,11 +349,13 @@ export function useSimulation({
       setWeeklyThroughput(forecast.weeklyThroughput);
       setCycleTimeDaysData(forecast.cycleTimeDaysData);
       setResult(forecast.result);
+      setExecutedSimulation(currentSimulation);
       setWarning(forecast.warning ?? "");
       pushSimulationHistory(forecast.historyEntry);
     } catch (e: unknown) {
       setWarning("");
       setErr(e instanceof Error ? e.message : String(e));
+      setHasLaunchedOnce(false);
     } finally {
       window.clearTimeout(phaseTimer);
       setLoading(false);
@@ -300,6 +364,7 @@ export function useSimulation({
   }, [
     backlogSize,
     clearComputedSimulationState,
+    currentSimulation,
     doneStates,
     demoMode,
     endDate,
@@ -310,6 +375,7 @@ export function useSimulation({
     pat,
     serverUrl,
     pushSimulationHistory,
+    restoreComputedSimulation,
     selectedOrg,
     selectedProject,
     selectedTeam,
@@ -318,40 +384,22 @@ export function useSimulation({
     targetWeeks,
     types,
     replayContext,
+    simulationHistory,
   ]);
 
   useEffect(() => {
-    if (!demoMode || step !== "simulation" || hasLaunchedOnce || loading) return;
+    if (!demoMode || step !== "simulation" || loading) return;
     if (!selectedTeam || !types.length || !doneStates.length) return;
+    if (demoAutoRunTeamRef.current === selectedTeam) return;
+    demoAutoRunTeamRef.current = selectedTeam;
     void runForecast();
-  }, [demoMode, doneStates, hasLaunchedOnce, loading, runForecast, selectedTeam, step, types]);
-
-  const { resetAutoRunState } = useSimulationAutoRun({
-    params: {
-      step,
-      selectedTeam,
-      startDate,
-      endDate,
-      simulationMode,
-      includeZeroWeeks,
-      backlogSize,
-      targetWeeks,
-      nSims,
-      types,
-      doneStates,
-    },
-    hasLaunchedOnce,
-    loading,
-    onInvalidFilters,
-    onRun: runForecast,
-  });
+  }, [demoMode, doneStates, loading, runForecast, selectedTeam, step, types]);
 
   function resetForTeamSelection(): void {
     setErr("");
     setWarning("");
     clearComputedSimulationState();
     setHasLaunchedOnce(false);
-    resetAutoRunState();
     setReplayContext(null);
   }
 
@@ -363,13 +411,12 @@ export function useSimulation({
     clearComputedSimulationState();
     resetTeamOptions();
     setHasLaunchedOnce(false);
-    resetAutoRunState();
     setReplayContext(null);
   }
 
   function applyHistoryEntry(entry: SimulationHistoryEntry): void {
-    setErr("");
-    setWarning(entry.warning ?? "");
+    const entrySnapshot = buildSimulationExecutionSnapshot(entry);
+    setNotice("");
     setStartDate(entry.startDate);
     setEndDate(entry.endDate);
     setSimulationMode(entry.simulationMode);
@@ -379,34 +426,7 @@ export function useSimulation({
     setNSims(entry.nSims);
     setTypes(entry.types);
     setDoneStates(entry.doneStates);
-    setSampleStats(entry.sampleStats);
-    setWeeklyThroughput(entry.weeklyThroughput);
-    setCycleTimeDaysData(entry.cycleTimeDaysData ?? []);
-    setResult(entry.result);
-    setActiveChartTab("cycle_time");
-    setHasLaunchedOnce(true);
-    resetAutoRunState();
-    if (entry.seed != null) {
-      setReplayContext({
-        seed: entry.seed,
-        fingerprint: buildSimulationFingerprint({
-          selectedOrg: entry.selectedOrg,
-          selectedProject: entry.selectedProject,
-          selectedTeam: entry.selectedTeam,
-          startDate: entry.startDate,
-          endDate: entry.endDate,
-          simulationMode: entry.simulationMode,
-          includeZeroWeeks: entry.includeZeroWeeks,
-          backlogSize: entry.backlogSize,
-          targetWeeks: entry.targetWeeks,
-          nSims: entry.nSims,
-          types: entry.types,
-          doneStates: entry.doneStates,
-        }),
-      });
-    } else {
-      setReplayContext(null);
-    }
+    restoreComputedSimulation(entry, entrySnapshot);
   }
 
   function resetSimulationResults(): void {
@@ -414,13 +434,14 @@ export function useSimulation({
     setWarning("");
     clearComputedSimulationState();
     setHasLaunchedOnce(false);
-    resetAutoRunState();
     setReplayContext(null);
   }
 
   return {
+    selectedOrg,
+    selectedProject,
     loading,
-    hasLaunchedOnce,
+    hasLaunchedOnce: displayedHasLaunchedOnce,
     loadingTeamOptions,
     loadingStageMessage,
     err,
@@ -432,8 +453,9 @@ export function useSimulation({
     setSimulationMode,
     includeZeroWeeks,
     setIncludeZeroWeeks,
-    sampleStats,
-    warning,
+    sampleStats: displayedSampleStats,
+    warning: displayedWarning,
+    notice: displayedNotice,
     backlogSize,
     setBacklogSize,
     targetWeeks,
@@ -448,7 +470,7 @@ export function useSimulation({
     setDoneStates,
     hasQuickFilterConfig,
     applyQuickFilterConfig,
-    result,
+    result: displayedResult,
     displayPercentiles,
     activeChartTab,
     setActiveChartTab,
