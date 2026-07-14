@@ -133,6 +133,7 @@ frontend/
       simulationForecastCore.ts    # logique forecast extraite et testee
     utils/
       cycleTime.ts        # calcul et tendances du cycle time en jours calendaires
+      portfolioComparisonDiagnostic.ts # diagnostic metier comparatif des scenarios portefeuille
       simulationSignature.ts # signature canonique et selection du cache local reutilisable
     components/steps/
       SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
@@ -351,6 +352,8 @@ Frontend:
   en jours calendaires pour les restitutions frontend
 - quick filters persistants par scope `org::project::team`
 - mode portefeuille avec rapport PDF multi-scenarios
+- diagnostic comparatif portefeuille pur: qualite historique, stabilite simulee et credibilite des hypotheses
+  restent separes; il est expose par le modele de generation sans modifier le rendu UI ou PDF
 - generation de rapport parallelisee avec tolerance aux echecs partiels
 - mocks E2E Playwright elargis pour couvrir aussi `/simulations/history` et les revisions de work items
 

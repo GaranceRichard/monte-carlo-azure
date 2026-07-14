@@ -95,12 +95,56 @@ describe("usePortfolioReport", () => {
     expect(exportArgs.scenarios[0].decisionDiagnostic?.decisionRecommendation.status).toMatch(
       /Décision appuyée par les données|Décision possible avec prudence|Arbitrage nécessaire|Décision non recommandée/,
     );
+    expect(result.current.portfolioComparisonDiagnostic).toMatchObject({
+      preferredScenario: null,
+      comparisonConfidence: { level: "insufficient" },
+    });
+    expect(result.current.portfolioComparisonDiagnostic?.hypothesisCredibility.map((item) => item.evidenceType)).toEqual([
+      "unsupported",
+      "user_input",
+      "calculated",
+      "observed",
+    ]);
+    expect(exportArgs).not.toHaveProperty("portfolioComparisonDiagnostic");
     for (const call of vi.mocked(simulateForecastFromSamples).mock.calls) {
       expect(call[0]).not.toHaveProperty("selectedTeam");
       expect(call[0]).not.toHaveProperty("selectedOrg");
       expect(call[0]).not.toHaveProperty("types");
       expect(call[0]).not.toHaveProperty("doneStates");
     }
+  });
+
+  it("keeps existing Monte Carlo scenario results invariant while adding the comparison diagnostic", async () => {
+    vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
+    const monteCarloResult = {
+      ...simulationResult,
+      seed: 24680,
+      risk_score: 0.42,
+      result_percentiles: { P50: 11, P70: 13, P90: 17 },
+      result_distribution: [
+        { x: 11, count: 40 },
+        { x: 17, count: 60 },
+      ],
+    };
+    vi.mocked(simulateForecastFromSamples).mockResolvedValue(monteCarloResult);
+    const { result } = setupReportHook();
+
+    await act(async () => {
+      await result.current.handleGenerateReport();
+    });
+
+    const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
+    expect(exportArgs.scenarios).toHaveLength(4);
+    for (const scenario of exportArgs.scenarios) {
+      expect(scenario.seed).toBe(monteCarloResult.seed);
+      expect(scenario.percentiles).toEqual(monteCarloResult.result_percentiles);
+      expect(scenario.distribution).toEqual(monteCarloResult.result_distribution);
+      expect(scenario.riskScore).toBe(computeRiskScoreFromPercentiles(
+        "backlog_to_weeks",
+        monteCarloResult.result_percentiles,
+      ));
+    }
+    expect(result.current.portfolioComparisonDiagnostic).not.toBeNull();
   });
 
   it("uses local calendar dates for synthetic scenario weeks", async () => {

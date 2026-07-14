@@ -4,6 +4,9 @@
 
 ### Frontend
 
+- ajout du diagnostic comparatif portefeuille dans le modele de generation: qualite des historiques observes,
+  stabilite des resultats simules et credibilite des hypotheses sont separees; aucune hypothese n'est preferee
+  avec les seules donnees disponibles, et le rendu UI/PDF reste inchange
 - alignement des diagnostics decisionnels entre l'interface et les rapports PDF simulation / portefeuille:
   statuts, justifications, actions conseillees, facteurs, qualite des donnees et incertitude reutilisent
   le langage decisionnel existant, sans modifier les calculs ni les recommandations

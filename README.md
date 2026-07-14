@@ -126,6 +126,20 @@ Regle scenario portefeuille `Historique corrélé`:
 - `includeZeroWeeks=false` conserve uniquement les totaux `> 0`
 - si aucune semaine commune complete n'est disponible, le frontend renvoie une erreur explicite
 
+Diagnostic comparatif portefeuille:
+
+- le modele distingue la qualite des historiques observes, la stabilite du resultat simule et la
+  credibilite de chaque hypothese d'agregation
+- `Optimiste` est une reconstruction bootstrap independante, `Arrime` repose sur un taux saisi,
+  `Friction` est derive de ce taux et `Historique corrélé` repose sur des semaines communes observees
+- une distribution stable ne valide pas une hypothese; un taux saisi ou derive ne constitue pas une preuve
+- l'historique corrélé ne demontre ni la substituabilite des equipes, ni leurs relations operationnelles,
+  ni la validite future du scenario
+- avec les seules donnees historiques, resultats simules et taux manuel, le diagnostic ne recommande aucun
+  scenario unique et conclut que les preuves sont insuffisantes
+- ce diagnostic est expose dans le modele portefeuille pour les prochaines restitutions UI et PDF, sans etre
+  encore affiche
+
 Regle calendrier throughput:
 
 - l'historique hebdomadaire utilise uniquement des semaines ISO completes

@@ -60,7 +60,9 @@ Passer de "chaque equipe a sa simulation" a "la direction a une lecture agregee 
 **Visualisation des dependances inter-equipes**
 
 Modeliser l'impact d'un retard d'une equipe sur les autres.
-Le mode portefeuille actuel suppose l'independance des equipes ; cette evolution leve cette hypothese.
+Le mode portefeuille distingue deja les hypotheses independante, alignee, derivee par friction et fondee sur
+l'historique commun, sans en demontrer les dependances operationnelles. Cette evolution ajouterait des
+dependances explicites et observables.
 
 *Valeur : anticiper les effets de cascade avant qu'ils se produisent, pas apres.*
 

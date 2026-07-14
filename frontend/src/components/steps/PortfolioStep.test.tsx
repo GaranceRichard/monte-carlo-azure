@@ -12,6 +12,7 @@ function basePortfolioMock() {
     demoMode: false,
     err: "",
     reportErrors: [],
+    portfolioComparisonDiagnostic: null,
     clearReportErrors: vi.fn(),
     startDate: "2026-01-01",
     setStartDate: vi.fn(),

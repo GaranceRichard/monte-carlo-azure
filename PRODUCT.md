@@ -179,7 +179,20 @@ Lecture produit du scenario `Historique corrélé` :
 - il ne s'agit pas d'un tirage independant par equipe
 - le portefeuille additionne les throughputs observes sur les memes semaines pour toutes les equipes
 - seules les semaines communes completes sont conservees
-- ce scenario preserve les effets reels partages: vacances, incidents, ralentissements, dependances temporelles
+- ce scenario conserve les variations simultanees observees, sans demontrer leurs causes, les dependances
+  operationnelles, la substituabilite des equipes ou leur validite future
+
+Le diagnostic comparatif portefeuille separe explicitement :
+
+- la qualite des historiques observes par equipe et les faits a verifier au niveau portefeuille;
+- la stabilite ou l'incertitude de chaque resultat simule;
+- la credibilite de l'hypothese sous-jacente et son type de preuve: observation, calcul, saisie utilisateur ou
+  absence de preuve comparative.
+
+Une distribution stable ne valide pas une hypothese. Avec les seules donnees historiques, les resultats simules
+et un taux d'alignement manuel, le produit ne privilegie aucun scenario unique: la conclusion « preuves
+insuffisantes pour privilegier une hypothese » est un resultat metier valide. Ce diagnostic est disponible dans
+le modele portefeuille; son affichage UI et PDF reste a concevoir.
 
 Le rapport portefeuille gere aussi la progression de generation et la tolerance aux echecs partiels par equipe.
 

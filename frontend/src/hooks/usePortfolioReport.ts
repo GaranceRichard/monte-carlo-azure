@@ -18,6 +18,11 @@ import {
   generateSimulationSeed,
 } from "../utils/simulation";
 import { buildSimulationDecisionLanguage } from "../utils/simulationDecisionDiagnostic";
+import {
+  buildPortfolioComparisonDiagnostic,
+  type PortfolioComparisonDiagnostic,
+  type ScenarioSimulationObservation,
+} from "../utils/portfolioComparisonDiagnostic";
 
 export type TeamPortfolioConfig = {
   teamName: string;
@@ -79,6 +84,7 @@ type UsePortfolioReportResult = {
   reportErr: string;
   reportProgressLabel: string;
   reportErrors: TeamReportError[];
+  portfolioComparisonDiagnostic: PortfolioComparisonDiagnostic | null;
   generationProgress: GenerationProgress;
   handleGenerateReport: () => Promise<void>;
   clearReportErrors: () => void;
@@ -201,6 +207,7 @@ export function usePortfolioReport({
   const [loadingReport, setLoadingReport] = useState<boolean>(false);
   const [reportErr, setReportErr] = useState<string>("");
   const [reportErrors, setReportErrors] = useState<TeamReportError[]>([]);
+  const [portfolioComparisonDiagnostic, setPortfolioComparisonDiagnostic] = useState<PortfolioComparisonDiagnostic | null>(null);
   const [generationProgress, setGenerationProgress] = useState<GenerationProgress>({ done: 0, total: 0 });
 
   const reportProgressLabel = useMemo(() => {
@@ -209,10 +216,14 @@ export function usePortfolioReport({
   }, [generationProgress]);
 
   async function handleGenerateReport(): Promise<void> {
-    if (!teamConfigs.length) return;
+    if (!teamConfigs.length) {
+      setPortfolioComparisonDiagnostic(null);
+      return;
+    }
 
     setReportErr("");
     setReportErrors([]);
+    setPortfolioComparisonDiagnostic(null);
     setLoadingReport(true);
     setGenerationProgress({ done: 0, total: 0 });
 
@@ -387,6 +398,7 @@ export function usePortfolioReport({
             });
             return {
               kind: "scenario" as const,
+              hypothesis: "independent" as const,
               scenario: toScenarioResult(
                 "Optimiste",
                 SCENARIO_HYPOTHESIS_TEXT.optimistic,
@@ -417,6 +429,7 @@ export function usePortfolioReport({
             });
             return {
               kind: "scenario" as const,
+              hypothesis: "aligned" as const,
               scenario: toScenarioResult(
                 `Arrime (${Number(alignmentRate)}%)`,
                 SCENARIO_HYPOTHESIS_TEXT.aligned.replace("N%", `${String(alignmentRate)}%`),
@@ -447,6 +460,7 @@ export function usePortfolioReport({
             });
             return {
               kind: "scenario" as const,
+              hypothesis: "friction" as const,
               scenario: toScenarioResult(
                 `Friction (${effectiveFrictionRate}%)`,
                 SCENARIO_HYPOTHESIS_TEXT.friction.replace("X%", `${String(effectiveFrictionRate)}%`),
@@ -477,6 +491,7 @@ export function usePortfolioReport({
             });
             return {
               kind: "scenario" as const,
+              hypothesis: "correlated" as const,
               scenario: toScenarioResult(
                 "Historique corr\u00E9l\u00E9",
                 SCENARIO_HYPOTHESIS_TEXT.correlated,
@@ -497,11 +512,19 @@ export function usePortfolioReport({
 
       const sections: PortfolioReportSection[] = [];
       const scenarios: PortfolioScenarioResult[] = [];
+      const scenarioObservations: ScenarioSimulationObservation[] = [];
 
       for (const result of simulationSettled) {
         if (result.status === "fulfilled") {
           if (result.value.kind === "team") sections.push(result.value.section);
-          if (result.value.kind === "scenario") scenarios.push(result.value.scenario);
+          if (result.value.kind === "scenario") {
+            scenarios.push(result.value.scenario);
+            scenarioObservations.push({
+              hypothesis: result.value.hypothesis,
+              riskScore: result.value.scenario.riskScore,
+              riskLegend: result.value.scenario.riskLegend,
+            });
+          }
           continue;
         }
 
@@ -525,6 +548,17 @@ export function usePortfolioReport({
         setReportErr("Aucune simulation n'a pu etre finalisee.");
         return;
       }
+
+      setPortfolioComparisonDiagnostic(buildPortfolioComparisonDiagnostic({
+        alignmentRate,
+        frictionRate: effectiveFrictionRate,
+        commonHistoricalWeeks: correlatedWeeklyData.length,
+        teamObservations: successfulTeams.map(({ cfg, data }) => ({
+          teamName: cfg.teamName,
+          reliability: computeThroughputReliability(data.throughputSamples),
+        })),
+        scenarioObservations,
+      }));
 
       const { exportPortfolioPrintReport } = await import("../components/steps/portfolioPrintReport");
       await exportPortfolioPrintReport({
@@ -564,6 +598,7 @@ export function usePortfolioReport({
     reportErr,
     reportProgressLabel,
     reportErrors,
+    portfolioComparisonDiagnostic,
     generationProgress,
     handleGenerateReport,
     clearReportErrors,
