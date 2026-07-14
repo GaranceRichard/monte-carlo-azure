@@ -134,6 +134,7 @@ frontend/
     utils/
       cycleTime.ts        # calcul et tendances du cycle time en jours calendaires
       portfolioComparisonDiagnostic.ts # diagnostic metier comparatif des scenarios portefeuille
+      portfolioComparisonPresentation.ts # libelles et formulations partages UI/PDF
       simulationSignature.ts # signature canonique et selection du cache local reutilisable
     components/steps/
       SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
@@ -353,7 +354,10 @@ Frontend:
 - quick filters persistants par scope `org::project::team`
 - mode portefeuille avec rapport PDF multi-scenarios
 - diagnostic comparatif portefeuille pur: qualite historique, stabilite simulee et credibilite des hypotheses
-  restent separes; il est expose par le modele de generation sans modifier le rendu UI ou PDF
+  restent separes; le rapport PDF le restitue sur une page dediee, sans afficher le diagnostic detaille dans l'UI
+- reference de pilotage facultative conservee comme choix de presentation et de gouvernance, hors du diagnostic
+  metier et sans effet sur `preferredScenario` ou les calculs
+- mise en page de la comparaison PDF pilotee par un curseur vertical explicite et des sauts de page calcules
 - generation de rapport parallelisee avec tolerance aux echecs partiels
 - mocks E2E Playwright elargis pour couvrir aussi `/simulations/history` et les revisions de work items
 

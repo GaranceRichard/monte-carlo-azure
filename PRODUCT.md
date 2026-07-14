@@ -124,7 +124,7 @@ Exemple :
 Restitution attendue :
 
 - `P50` pour une lecture mediane
-- `P85` ou `P90` pour une lecture prudente
+- `P90` pour une lecture prudente
   - en `backlog_to_weeks`, prudent = plus de semaines
 - si certaines simulations n'atteignent pas le backlog avant l'horizon, elles sont comptees
   a part comme censures et n'entrent ni dans la distribution ni dans les percentiles
@@ -169,7 +169,7 @@ Le mode portefeuille permet de :
 
 Les scenarios actuellement proposes sont :
 
-- `Optimiste`
+- `Independant`
 - `Arrime`
 - `Friction`
 - `Historique corrélé`
@@ -191,8 +191,14 @@ Le diagnostic comparatif portefeuille separe explicitement :
 
 Une distribution stable ne valide pas une hypothese. Avec les seules donnees historiques, les resultats simules
 et un taux d'alignement manuel, le produit ne privilegie aucun scenario unique: la conclusion « preuves
-insuffisantes pour privilegier une hypothese » est un resultat metier valide. Ce diagnostic est disponible dans
-le modele portefeuille; son affichage UI et PDF reste a concevoir.
+insuffisantes pour privilegier une hypothese » est un resultat metier valide. Le diagnostic detaille n'est pas
+affiche dans l'interface de generation; il est restitue dans une page dediee du rapport portefeuille PDF, apres
+la synthese et avant le detail des scenarios.
+
+L'utilisateur peut choisir, sans selection par defaut, un scenario de reference de pilotage. Ce choix facultatif
+est une convention de gouvernance distincte de la recommandation issue des preuves: il ne modifie ni
+`preferredScenario`, ni la credibilite des hypotheses, ni les calculs. Lorsque les preuves sont insuffisantes,
+la preconisation porte sur la demarche de documentation, de calibration et de backtest, pas sur un scenario.
 
 Le rapport portefeuille gere aussi la progression de generation et la tolerance aux echecs partiels par equipe.
 

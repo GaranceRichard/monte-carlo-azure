@@ -15,6 +15,8 @@ vi.mock("./simulationPdfDownload", async () => {
 
 import { buildPortfolioPrintReportHtml, exportPortfolioPrintReport } from "./portfolioPrintReport";
 import { buildDecisionLanguage } from "../../utils/decisionLanguage";
+import type { PortfolioComparisonDiagnostic } from "../../utils/portfolioComparisonDiagnostic";
+import { presentPortfolioComparisonDiagnostic } from "../../utils/portfolioComparisonPresentation";
 
 type PortfolioPrintReportArgs = Parameters<typeof buildPortfolioPrintReportHtml>[0];
 
@@ -43,7 +45,32 @@ function scenarioDiagnostic(level: "supportable" | "caution" | "arbitration_requ
 }
 
 function formatScenarioLabelForTest(label: string): string {
+  if (label === "Optimiste") return "Indépendant";
   return label.startsWith("Arrime") ? label.replace("Arrime", "Arrimé") : label;
+}
+
+function htmlTextForScenario(report: Document, label: string): string {
+  return Array.from(report.querySelectorAll<HTMLElement>(".page")).find(
+    (page) => page.querySelector("h1")?.textContent === `Scénario - ${label}`,
+  )?.textContent ?? "";
+}
+
+function comparisonDiagnosticFixture(overrides: Partial<PortfolioComparisonDiagnostic> = {}): PortfolioComparisonDiagnostic {
+  return {
+    historicalData: { quality: "fragile", observedFacts: [], teamFindings: [] },
+    simulationStability: [],
+    hypothesisCredibility: [
+      { hypothesis: "independent", evidenceType: "unsupported", evidence: "Tirages synthétiques : l’indépendance est modélisée, pas observée.", limitations: ["Une simulation stable ne valide pas cette hypothèse."] },
+      { hypothesis: "aligned", evidenceType: "user_input", evidence: "Le coefficient d’alignement est saisi par l’utilisateur.", limitations: ["Le paramètre n’est pas un fait démontré."] },
+      { hypothesis: "friction", evidenceType: "calculated", evidence: "Le coefficient de friction est calculé à partir du paramètre saisi.", limitations: ["Le calcul n’est pas une observation historique."] },
+      { hypothesis: "correlated", evidenceType: "observed", evidence: "Des semaines historiques communes ont été observées.", limitations: ["Ce caractère observé ne suffit pas à recommander automatiquement ce scénario."] },
+    ],
+    significantRisks: [{ kind: "team_history", teamNames: ["Atlas"], statement: "L’équipe Atlas présente un historique fragile : fait à vérifier au niveau portefeuille." }],
+    comparisonConfidence: { level: "insufficient", statement: "Les éléments disponibles ne suffisent pas à départager la crédibilité future des hypothèses." },
+    preferredScenario: null,
+    conclusion: "Preuves insuffisantes pour privilégier une hypothèse.",
+    ...overrides,
+  };
 }
 
 function baseArgs(): PortfolioPrintReportArgs {
@@ -138,6 +165,7 @@ function baseArgs(): PortfolioPrintReportArgs {
         displayPercentiles: { P50: 10, P70: 12, P90: 15 },
       },
     ],
+    portfolioComparisonDiagnostic: comparisonDiagnosticFixture(),
   };
 }
 
@@ -152,13 +180,15 @@ describe("portfolioPrintReport", () => {
     const html = buildPortfolioPrintReportHtml(baseArgs());
 
     const idxSynth = html.indexOf("Synth\u00E8se - Simulation Portefeuille");
-    const idxOpt = html.search(/Sc.nario - Optimiste/);
+    const idxOpt = html.search(/Sc.nario - Ind.pendant/);
     const idxArr = html.search(/Sc.nario - Arrim./);
     const idxFriction = html.search(/Sc.nario - Friction \(80%\)/);
     const idxCons = html.search(/Sc.nario - Historique corr.l./);
     const idxTeam = html.indexOf("Simulation Portefeuille - Team A");
 
     expect(idxSynth).toBeLessThan(idxOpt);
+    expect(html.indexOf("Comparaison des hypothèses")).toBeGreaterThan(idxSynth);
+    expect(html.indexOf("Comparaison des hypothèses")).toBeLessThan(idxOpt);
     expect(idxOpt).toBeLessThan(idxArr);
     expect(idxArr).toBeLessThan(idxFriction);
     expect(idxFriction).toBeLessThan(idxCons);
@@ -172,19 +202,135 @@ describe("portfolioPrintReport", () => {
   it("includes synthesis content, overlay SVG and reading rule", () => {
     const html = buildPortfolioPrintReportHtml(baseArgs());
 
-    expect(html).toContain("<td>Optimiste</td>");
+    expect(html).toContain("<td>Indépendant</td>");
     expect(html).toMatch(/<td>Arrim. \(80%\)<\/td>/);
     expect(html).toContain("<td>Friction (80%)</td>");
     expect(html).toMatch(/<td>Historique corr.l.<\/td>/);
-    expect(html).toContain("0,22 (fiable)");
-    expect(html).toContain("1,60 (non fiable)");
     expect(html).toMatch(/Courbes de probabilit.s compar.es/);
     expect(html).toMatch(/aria-label="Courbes de probabilit.s compar.es"/);
-    expect(html).toContain("<strong>Optimiste :</strong>");
+    expect(html).toContain("<strong>Indépendant :</strong>");
     expect(html).toMatch(/<strong>Arrim. :<\/strong>/);
     expect(html).toContain("<strong>Risk Score :</strong>");
     expect(html).toMatch(/<strong>Fiabilit. de l&#39;historique :<\/strong>/);
     expect(html).toMatch(/<p class="hypothesis reading-rule"><strong>R.gle de lecture :<\/strong><br \/>/);
+  });
+
+  it("uses the unified Independent label and the exposed P90 percentile everywhere", () => {
+    const report = new DOMParser().parseFromString(buildPortfolioPrintReportHtml(baseArgs()), "text/html");
+    const text = report.body.textContent ?? "";
+
+    expect(text).toContain("Indépendant");
+    expect(text).not.toContain("Optimiste");
+    expect(text).toContain("P90");
+    expect(text).not.toContain("P85");
+  });
+
+  it("renders the complete comparative diagnosis in the PDF and no preferred scenario", () => {
+    const args = baseArgs();
+    const diagnostic = args.portfolioComparisonDiagnostic!;
+    const presentation = presentPortfolioComparisonDiagnostic(diagnostic);
+    const report = new DOMParser().parseFromString(buildPortfolioPrintReportHtml(args), "text/html");
+    const comparison = Array.from(report.querySelectorAll<HTMLElement>(".comparison-page")).at(0);
+    const text = comparison?.textContent ?? "";
+
+    expect(text).toContain(presentation.conclusion);
+    expect(text).toContain(presentation.comparisonConfidence);
+    expect(text).toContain("Aucune recommandation de scénario issue des preuves disponibles.");
+    expect(text).toContain("Ne pas privilégier automatiquement un scénario.");
+    expect(text).toContain("Référence de pilotageNon définie");
+    expect(text).not.toMatch(/scénario recommandé par les preuves/i);
+    presentation.scenarioCredibilities.forEach((hypothesis) => {
+      expect(text).toContain(hypothesis.label);
+      expect(text).toContain(hypothesis.evidenceTypeLabel);
+      expect(text).toContain(hypothesis.evidence);
+    });
+    expect(text).toContain("Tirages synthétiques");
+    expect(text).toContain("pas observée");
+    expect(text).toContain("ne suffit pas à recommander automatiquement");
+    expect(text).toContain("L’équipe Atlas présente un historique fragile");
+    expect(text).toContain("La régularité des résultats simulés ne valide pas une hypothèse de portefeuille.");
+    expect(text).not.toMatch(/se compensent|sont substituables|provoque|cause/i);
+    expect(htmlTextForScenario(report, "Historique corrélé")).toContain("ne valide ni la crédibilité future du scénario");
+  });
+
+  it("renders a domain-provided preference as the evidence recommendation", () => {
+    const args = baseArgs();
+    args.portfolioComparisonDiagnostic = comparisonDiagnosticFixture({ preferredScenario: "correlated" });
+
+    const comparisonText = new DOMParser()
+      .parseFromString(buildPortfolioPrintReportHtml(args), "text/html")
+      .querySelector<HTMLElement>(".comparison-page")?.textContent ?? "";
+
+    expect(comparisonText).toContain("Scénario recommandé par les preuves : Historique corrélé.");
+    expect(comparisonText).not.toContain("Ne pas privilégier automatiquement un scénario.");
+  });
+
+  it.each([
+    ["independent", "Indépendant"],
+    ["aligned", "Arrimé"],
+    ["friction", "Friction"],
+    ["correlated", "Historique corrélé"],
+  ] as const)("keeps the user pilot reference %s separate from evidence", (pilotReference, expectedLabel) => {
+    const args = baseArgs();
+    args.pilotReference = pilotReference;
+    const comparisonText = new DOMParser()
+      .parseFromString(buildPortfolioPrintReportHtml(args), "text/html")
+      .querySelector<HTMLElement>(".comparison-page")?.textContent ?? "";
+
+    expect(args.portfolioComparisonDiagnostic?.preferredScenario).toBeNull();
+    expect(comparisonText).toContain(`Référence de pilotage${expectedLabel}`);
+    expect(comparisonText).toContain("Choix de gouvernance utilisé comme convention de pilotage");
+    expect(comparisonText).toContain("Aucune recommandation de scénario issue des preuves disponibles.");
+    if (pilotReference === "correlated") {
+      expect(comparisonText).not.toMatch(/Historique corrélé[^.]{0,80}(?:recommandé|validé|fiable)/i);
+    }
+  });
+
+  it("keeps scenario pages free of simulated-source diagnostics while preserving real-team diagnostics", () => {
+    const report = new DOMParser().parseFromString(buildPortfolioPrintReportHtml(baseArgs()), "text/html");
+
+    ["Indépendant", "Arrimé (80%)", "Friction (80%)"].forEach((label) => {
+      const text = htmlTextForScenario(report, label);
+      expect(text).not.toMatch(/Décision appuyée par les données|Données suffisantes|Historique globalement stable|Semaines utilisées|semaines historiques exploitables/i);
+      expect(text).not.toContain("Diagnostic décisionnel");
+      expect(text).not.toContain("Fiabilité");
+    });
+    const teamPage = Array.from(report.querySelectorAll<HTMLElement>(".page")).find(
+      (page) => page.querySelector("h1")?.textContent === "Simulation Portefeuille - Team A",
+    );
+    expect(teamPage?.textContent).toContain("Diagnostic");
+    expect(teamPage?.textContent).toContain("Fiabilité");
+  });
+
+  it("keeps the comparison title with its first block and never creates an empty report page", () => {
+    const report = new DOMParser().parseFromString(buildPortfolioPrintReportHtml(baseArgs()), "text/html");
+    const comparison = report.querySelector<HTMLElement>(".comparison-page");
+
+    expect(comparison?.querySelector(".comparison-intro h1")?.textContent).toBe("Comparaison des hypothèses");
+    expect(comparison?.querySelector(".comparison-intro .comparison-overview")?.textContent).toContain("Conclusion comparative");
+    expect(Array.from(report.querySelectorAll<HTMLElement>(".page")).every((page) => (page.textContent ?? "").trim().length > 0)).toBe(true);
+    expect(buildPortfolioPrintReportHtml(baseArgs())).toContain(".comparison-intro { break-inside: avoid; page-break-inside: avoid; }");
+  });
+
+  it("renders long comparison text and the explicit no-risk state without invalid content", () => {
+    const longText = "Limite détaillée ".repeat(80);
+    const args = baseArgs();
+    args.portfolioComparisonDiagnostic = comparisonDiagnosticFixture({
+      significantRisks: [],
+      hypothesisCredibility: comparisonDiagnosticFixture().hypothesisCredibility.map((hypothesis) => ({
+        ...hypothesis,
+        evidence: longText,
+        limitations: [longText],
+      })),
+    });
+
+    const html = buildPortfolioPrintReportHtml(args);
+
+    expect(html).toContain("Aucun risque significatif d’équipe n’est remonté par le diagnostic.");
+    expect(html).toContain(longText);
+    expect(html).toContain("overflow-wrap: anywhere");
+    expect(html).toContain("break-inside: avoid");
+    expect(html).not.toMatch(/undefined|null|NaN/);
   });
 
   it("keeps every synthesis hypothesis below the chart in a compact two-column section", () => {
@@ -204,7 +350,7 @@ describe("portfolioPrintReport", () => {
     expect(columns).toHaveLength(2);
     expect(columns.map((column) => column.querySelectorAll(".hypothesis").length)).toEqual([4, 3]);
     expect(hypothesisLabels).toEqual([
-      "Optimiste :",
+      "Indépendant :",
       "Arrimé :",
       expect.stringMatching(/^Friction/),
       "Historique corrélé :",
@@ -240,7 +386,6 @@ describe("portfolioPrintReport", () => {
     expect(summaryCellsCss).toContain("word-break: break-word");
     expect(decisionDiagnosticCss).not.toMatch(/(?:^|;)\s*height\s*:/);
     expect(decisionDiagnosticCss).not.toMatch(/position\s*:/);
-    expect(html.indexOf("Diagnostic d\u00E9cisionnel")).toBeLessThan(html.indexOf("D\u00E9bit simul\u00E9 du sc\u00E9nario"));
   });
 
   it("renders a team decision diagnostic only when the available diagnostic is supplied", () => {
@@ -266,29 +411,39 @@ describe("portfolioPrintReport", () => {
     expect(html).not.toMatch(/undefined|null|NaN/);
   });
 
-  it.each([
-    [0, "Décision possible avec prudence"],
-    [1, "Arbitrage nécessaire"],
-    [2, "Décision non recommandée"],
-  ] as const)("renders the complete decision language on scenario page %s", (scenarioIndex, expectedStatus) => {
+  it("separates team diagnostic justification, usable weeks and action in the printable markup", () => {
     const args = baseArgs();
-    const scenario = args.scenarios[scenarioIndex];
-    const diagnostic = scenario.decisionDiagnostic!;
-    const report = new DOMParser().parseFromString(buildPortfolioPrintReportHtml(args), "text/html");
-    const page = Array.from(report.querySelectorAll<HTMLElement>(".page")).find(
-      (candidate) => candidate.querySelector("h1")?.textContent?.includes(formatScenarioLabelForTest(scenario.label)),
-    );
-    const text = page?.textContent ?? "";
+    args.sections[0] = {
+      ...args.sections[0],
+      decisionDiagnostic: buildDecisionLanguage({
+        dataQuality: {
+          level: "watch",
+          justification: "Données à consolider.",
+          factors: [{ code: "limited_recent_history", description: "Période récente", value: "19 semaines exploitables" }],
+        },
+        forecastUncertainty: { level: "moderate", justification: "Incertitude modérée.", factors: [] },
+        decisionRecommendation: {
+          level: "caution",
+          justification: "Décision à documenter.",
+          advisedAction: "Calibrer les paramètres.",
+          factors: [],
+        },
+      }),
+    };
 
-    expect(text).toContain(expectedStatus);
-    expect(text).toContain(diagnostic.decisionRecommendation.explanation);
-    expect(text).toContain(diagnostic.decisionRecommendation.action);
-    expect(text).toContain(diagnostic.dataQuality.status);
-    expect(text).toContain(diagnostic.forecastUncertainty.status);
-    expect(text).not.toContain("Sensibilité à la période historique");
+    const report = new DOMParser().parseFromString(buildPortfolioPrintReportHtml(args), "text/html");
+    const diagnostic = Array.from(report.querySelectorAll<HTMLElement>(".page")).find(
+      (page) => page.querySelector("h1")?.textContent === "Simulation Portefeuille - Team A",
+    )?.querySelector<HTMLElement>(".decision-diagnostic");
+    const markup = diagnostic?.innerHTML ?? "";
+
+    expect(markup).toContain("Justification métier :");
+    expect(markup).toContain("19 semaines exploitables");
+    expect(markup).toContain("<br><b>Action conseillée :</b>");
+    expect(markup).not.toMatch(/donnéesJustification|19Action conseillée|modérée\.Action/i);
   });
 
-  it("adds decision status and action to every scenario in the synthesis", () => {
+  it("keeps only numerical and risk indicators in the scenario synthesis", () => {
     const args = baseArgs();
     const report = new DOMParser().parseFromString(buildPortfolioPrintReportHtml(args), "text/html");
     const rows = Array.from(report.querySelectorAll<HTMLTableRowElement>(".summary-table tbody tr"));
@@ -296,11 +451,10 @@ describe("portfolioPrintReport", () => {
     expect(rows).toHaveLength(args.scenarios.length);
     rows.forEach((row, index) => {
       const cells = Array.from(row.querySelectorAll("td")).map((cell) => cell.textContent?.trim() ?? "");
-      const decision = args.scenarios[index].decisionDiagnostic!.decisionRecommendation;
-      expect(cells).toHaveLength(8);
-      expect(cells[6]).toBe(decision.status);
-      expect(cells[7]).toBe(decision.action);
+      expect(cells).toHaveLength(5);
+      expect(cells[0]).toBe(formatScenarioLabelForTest(args.scenarios[index].label));
     });
+    expect(report.querySelector("thead")?.textContent).not.toMatch(/Statut|Action|Fiabilité/);
   });
 
   it("shows historical sensitivity on a team page only when complete comparable data is supplied", () => {
@@ -361,14 +515,14 @@ describe("portfolioPrintReport", () => {
 
     const html = buildPortfolioPrintReportHtml(args);
 
-    expect(html).toContain("Décision non recommandée");
+    expect(html).not.toContain("Décision non recommandée");
     expect(html).not.toMatch(/undefined|null|NaN/);
   });
 
   it("keeps every portfolio chart title aligned with its rendered data", () => {
     const html = buildPortfolioPrintReportHtml(baseArgs());
 
-    expect(html).toMatch(/Sc.nario - Optimiste[\s\S]*?<h2>D.bit simul. du sc.nario<\/h2>[\s\S]*?aria-label="D.bit simul. du sc.nario"/);
+    expect(html).toMatch(/Sc.nario - Ind.pendant[\s\S]*?<h2>D.bit simul. du sc.nario<\/h2>[\s\S]*?aria-label="D.bit simul. du sc.nario"/);
     expect(html).toMatch(/Sc.nario - Historique corr.l.[\s\S]*?<h2>Throughput historique corr.l.<\/h2>[\s\S]*?aria-label="Throughput historique corr.l."/);
     expect(html).toMatch(/Simulation Portefeuille - Team A[\s\S]*?<h2>Throughput hebdomadaire<\/h2>[\s\S]*?aria-label="Throughput hebdomadaire"/);
     expect(html.match(/<h2>Courbes de probabilit.s compar.es<\/h2>/g)).toHaveLength(1);
@@ -380,7 +534,7 @@ describe("portfolioPrintReport", () => {
     expect(html).toMatch(/aria-label="Courbe de probabilit."/);
   });
 
-  it("renders a plain scenario subtitle when no lead prefix is detected", () => {
+  it("does not render scenario hypothesis subtitles outside the comparative section", () => {
     const args = baseArgs();
     args.scenarios[0] = {
       ...args.scenarios[0],
@@ -389,7 +543,7 @@ describe("portfolioPrintReport", () => {
 
     const html = buildPortfolioPrintReportHtml(args);
 
-    expect(html).toContain("<div class=\"subtitle\"><i>Observed common slowdowns remained visible in the shared history.</i></div>");
+    expect(html).not.toContain("Observed common slowdowns remained visible in the shared history.");
   });
 
   it("uses business percentiles in weeks_to_items mode for scenario risk score", () => {
@@ -410,7 +564,7 @@ describe("portfolioPrintReport", () => {
 
     expect(html).toMatch(
       new RegExp(
-        `Optimiste[\\s\\S]*?<td>${Number(args.scenarios[0].percentiles.P50 ?? 0).toFixed(0)}</td>\\s*<td>${Number(args.scenarios[0].percentiles.P70 ?? 0).toFixed(0)}</td>\\s*<td>${Number(args.scenarios[0].percentiles.P90 ?? 0).toFixed(0)}</td>`,
+        `Indépendant[\\s\\S]*?<td>${Number(args.scenarios[0].percentiles.P50 ?? 0).toFixed(0)}</td>\\s*<td>${Number(args.scenarios[0].percentiles.P70 ?? 0).toFixed(0)}</td>\\s*<td>${Number(args.scenarios[0].percentiles.P90 ?? 0).toFixed(0)}</td>`,
       ),
     );
     expect(html).toContain(expectedRisk?.toFixed(2).replace(".", ",") ?? "");

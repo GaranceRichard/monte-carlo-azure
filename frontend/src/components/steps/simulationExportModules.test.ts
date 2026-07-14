@@ -56,6 +56,9 @@ vi.mock("jspdf", () => ({
 }));
 
 import { buildSimulationPdfFileName, downloadPortfolioPdf, downloadSimulationPdf } from "./simulationPdfDownload";
+import { buildPortfolioPrintReportHtml } from "./portfolioPrintReport";
+import { presentPortfolioComparisonDiagnostic } from "../../utils/portfolioComparisonPresentation";
+import type { PortfolioComparisonDiagnostic } from "../../utils/portfolioComparisonDiagnostic";
 
 function buildThroughputPoints(count: number): ThroughputExportPoint[] {
   return Array.from({ length: count }, (_, i) => ({
@@ -778,6 +781,299 @@ describe("simulationPdfDownload", () => {
     expect(hypothesesTitle?.[2]).toBeGreaterThan(chartCall.y + chartCall.height);
     expect(readingRule?.[2]).toBeLessThanOrEqual(289);
     expect(pdf.addPage).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders every comparison block on the PDF page after its title", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page comparison-page">
+        <div class="comparison-intro"><h1>Comparaison des hypothèses</h1><section class="comparison-overview"><h2>Conclusion comparative</h2><p>Preuves insuffisantes pour privilégier une hypothèse.</p><div class="comparison-confidence"><strong>Niveau de confiance comparatif</strong><br />Confiance insuffisante.</div><div class="comparison-label-value"><strong>Recommandation issue des preuves</strong><br />Aucune recommandation de scénario issue des preuves disponibles.</div><div class="comparison-label-value"><strong>Préconisation</strong><br />Ne pas privilégier automatiquement un scénario.</div><div class="comparison-label-value"><strong>Référence de pilotage</strong><br />Non définie</div></section></div>
+        <section><h2>Lecture comparative</h2><div class="comparison-hypotheses">
+          <article class="comparison-hypothesis"><h3>Indépendant</h3><p class="comparison-evidence-type">Hypothèse non étayée par les données</p><p>Explication indépendante.</p><h4>Limites</h4><ul><li>Limite indépendante.</li></ul></article>
+          <article class="comparison-hypothesis"><h3>Arrimé</h3><p class="comparison-evidence-type">Paramètre saisi par l’utilisateur</p><p>Explication arrimée.</p><h4>Limites</h4><ul><li>Limite arrimée.</li></ul></article>
+          <article class="comparison-hypothesis"><h3>Friction</h3><p class="comparison-evidence-type">Calculée à partir d’un paramètre</p><p>Explication friction.</p><h4>Limites</h4><ul><li>Limite friction.</li></ul></article>
+          <article class="comparison-hypothesis"><h3>Historique corrélé</h3><p class="comparison-evidence-type">Fondée sur des observations historiques</p><p>Explication corrélée.</p><h4>Limites</h4><ul><li>Limite corrélée.</li></ul></article>
+        </div></section>
+        <section><h2>Faits à vérifier</h2><ul class="comparison-risks"><li>Risque équipe Atlas à vérifier.</li></ul></section>
+        <section class="comparison-readings"><h2>Trois lectures distinctes</h2><div><strong>Qualité des données historiques</strong><br />Historique fragile : informations limitées.</div><div><strong>Stabilité des résultats simulés</strong><br />La régularité simulée ne valide pas une hypothèse.</div><div><strong>Crédibilité des hypothèses portefeuille</strong><br />Elle dépend du type de preuve.</div></section>
+      </section>
+      <section class="page"><h1>Scénario - Optimiste</h1></section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+    const nextPageOrder = pdf.addPage.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY;
+    const firstPageText = pdf.text.mock.calls
+      .filter((_call, index) => (pdf.text.mock.invocationCallOrder[index] ?? 0) < nextPageOrder)
+      .flatMap((call) => Array.isArray(call[0]) ? call[0] : [call[0]])
+      .join(" ");
+
+    expect(firstPageText).toContain("Comparaison des hypothèses");
+    expect(firstPageText).toContain("Preuves insuffisantes pour privilégier une hypothèse.");
+    expect(firstPageText).toContain("Aucune recommandation de scénario issue des preuves disponibles.");
+    expect(firstPageText).toContain("Ne pas privilégier automatiquement un scénario.");
+    expect(firstPageText).toContain("Référence de pilotage");
+    expect(firstPageText).toContain("Non définie");
+    expect(firstPageText).toContain("Fondée sur des observations historiques");
+    expect(firstPageText).toContain("Calculée à partir d’un paramètre");
+    expect(firstPageText).toContain("Paramètre saisi par l’utilisateur");
+    expect(firstPageText).toContain("Hypothèse non étayée par les données");
+    expect(firstPageText).toContain("Limite corrélée.");
+    expect(firstPageText).toContain("Risque équipe Atlas à vérifier.");
+    expect(firstPageText).toContain("Qualité des données historiques");
+    expect(firstPageText).toContain("Stabilité des résultats simulés");
+    expect(firstPageText).toContain("Crédibilité des hypothèses portefeuille");
+    expect(firstPageText).not.toMatch(/^Comparaison des hypothèses$/);
+    const comparisonRects = pdf.rect.mock.calls
+      .map((call) => ({ y: Number(call[1]), height: Number(call[3]) }))
+      .filter((rect) => Number.isFinite(rect.y) && Number.isFinite(rect.height));
+    expect(comparisonRects).toHaveLength(4);
+    comparisonRects.slice(1).forEach((rect, index) => {
+      const previous = comparisonRects[index]!;
+      expect(rect.y).toBeGreaterThanOrEqual(previous.y + previous.height);
+    });
+    const findTextY = (text: string): number => {
+      const call = pdf.text.mock.calls.find(([content]) => (Array.isArray(content) ? content.join(" ") : String(content)).includes(text));
+      expect(call).toBeDefined();
+      return Number(call?.[2]);
+    };
+    const correlatedBlock = comparisonRects.at(-1)!;
+    const factsY = findTextY("Faits à vérifier");
+    expect(factsY).toBeGreaterThan(correlatedBlock.y + correlatedBlock.height);
+    expect(factsY - (correlatedBlock.y + correlatedBlock.height)).toBeGreaterThan(0);
+    [
+      ["Niveau de confiance comparatif", "Confiance insuffisante."],
+      ["Recommandation issue des preuves", "Aucune recommandation de scénario issue des preuves disponibles."],
+      ["Préconisation", "Ne pas privilégier automatiquement un scénario."],
+      ["Référence de pilotage", "Non définie"],
+      ["Qualité des données historiques", "Historique fragile : informations limitées."],
+      ["Stabilité des résultats simulés", "La régularité simulée ne valide pas une hypothèse."],
+      ["Crédibilité des hypothèses portefeuille", "Elle dépend du type de preuve."],
+    ].forEach(([label, description]) => {
+      expect(findTextY(description)).toBeGreaterThan(findTextY(label));
+    });
+    expect(firstPageText).not.toContain("Niveau de confiance comparatifConfiance insuffisante.");
+    expect(firstPageText).not.toContain("Qualité des données historiquesHistorique fragile");
+    expect(pdf.text.mock.calls
+      .filter((_call, index) => (pdf.text.mock.invocationCallOrder[index] ?? 0) < nextPageOrder)
+      .every((call) => Number(call[2]) >= 8 && Number(call[2]) <= 289)).toBe(true);
+  });
+
+  it("preserves explicit separators between team diagnostic fields in the PDF", async () => {
+    pdfMocks.splitTextToSizeImplementation = (text) => text.split("\n");
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page">
+        <h1>Simulation Portefeuille - Team A</h1>
+        <section class="section decision-diagnostic">
+          <h2>Diagnostic décisionnel</h2>
+          <div class="decision-dimension"><b>Qualité des données — statut :</b> À surveiller<br /><b>Justification :</b> Données à consolider.<ul><li>Période récente : 19 semaines exploitables</li></ul><br /><b>Action conseillée :</b> Calibrer les paramètres.</div>
+        </section>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+    const diagnosticLines = pdf.text.mock.calls
+      .filter((call) => Array.isArray(call[0]))
+      .flatMap((call) => call[0] as string[]);
+
+    expect(diagnosticLines).toEqual(expect.arrayContaining([
+      "Qualité des données — statut : À surveiller",
+      "Justification : Données à consolider.",
+      "• Période récente : 19 semaines exploitables",
+      "Action conseillée : Calibrer les paramètres.",
+    ]));
+    expect(diagnosticLines.join(" ")).not.toMatch(/donnéesJustification|19Action conseillée|modérée\.Action/i);
+  });
+
+  it("uses the same evidence and pilot-reference formulations in printable HTML and jsPDF", async () => {
+    const diagnostic: PortfolioComparisonDiagnostic = {
+      historicalData: { quality: "fragile", observedFacts: [], teamFindings: [] },
+      simulationStability: [],
+      hypothesisCredibility: [
+        { hypothesis: "independent", evidenceType: "unsupported", evidence: "Indépendance non observée.", limitations: ["Limite indépendante."] },
+        { hypothesis: "aligned", evidenceType: "user_input", evidence: "Paramètre utilisateur.", limitations: ["Limite arrimée."] },
+        { hypothesis: "friction", evidenceType: "calculated", evidence: "Paramètre calculé.", limitations: ["Limite friction."] },
+        { hypothesis: "correlated", evidenceType: "observed", evidence: "Semaines communes observées.", limitations: ["Limite historique."] },
+      ],
+      significantRisks: [],
+      comparisonConfidence: { level: "insufficient", statement: "Confiance insuffisante." },
+      preferredScenario: null,
+      conclusion: "Preuves insuffisantes.",
+    };
+    const presentation = presentPortfolioComparisonDiagnostic(diagnostic, "correlated");
+    const html = buildPortfolioPrintReportHtml({
+      selectedProject: "Projet A",
+      startDate: "2026-01-01",
+      endDate: "2026-03-01",
+      alignmentRate: 80,
+      includedTeams: [],
+      sections: [],
+      scenarios: [],
+      portfolioComparisonDiagnostic: diagnostic,
+      pilotReference: "correlated",
+    });
+    const reportDoc = new DOMParser().parseFromString(html, "text/html");
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+    const printableText = reportDoc.querySelector<HTMLElement>(".comparison-page")?.textContent ?? "";
+    const pdfText = pdf.text.mock.calls.flatMap((call) => Array.isArray(call[0]) ? call[0] : [call[0]]).join(" ");
+
+    [
+      presentation.evidenceRecommendation,
+      presentation.preconization,
+      presentation.pilotReferenceLabel,
+      presentation.pilotReferenceGovernanceNote,
+    ].filter((formulation): formulation is string => formulation !== null).forEach((formulation) => {
+      expect(printableText).toContain(formulation);
+      expect(pdfText).toContain(formulation);
+    });
+    expect(diagnostic.preferredScenario).toBeNull();
+    expect(pdfText).not.toContain("Scénario recommandé par les preuves : Historique corrélé.");
+  });
+
+  it("renders the documented no-risk fallback and demo footer on a comparison page without hypotheses", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page comparison-page">
+        <h1>Comparaison des hypothèses</h1>
+        <section class="section"><h2>Faits à vérifier</h2><p>Aucun risque significatif d’équipe n’est remonté par le diagnostic.</p></section>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A", true);
+    const pdf = pdfMocks.instances.at(-1)!;
+    const footer = pdf.text.mock.calls.find((call) => call[0] === "Données de démonstration — Monte Carlo Azure");
+
+    const text = pdf.text.mock.calls.flatMap((call) => Array.isArray(call[0]) ? call[0] : [call[0]]).join(" ");
+    expect(text).toContain("Faits à vérifier");
+    expect(text).toContain("Aucun risque significatif d’équipe n’est remonté par le diagnostic.");
+    expect(footer).toMatchObject(["Données de démonstration — Monte Carlo Azure", 8, 292]);
+    expect(pdf.setFont).toHaveBeenCalledWith("helvetica", "italic");
+    expect(pdf.addPage).not.toHaveBeenCalled();
+  });
+
+  it("uses the comparison fallbacks for an ungrouped scenario and ignores an empty risk", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page comparison-page">
+        <h1>Comparaison des hypothèses</h1>
+        <article class="comparison-hypothesis"><h3>Indépendant</h3><p class="comparison-evidence-type">Hypothèse non étayée par les données</p><p>Explication.</p><h4>Limites</h4><ul><li>Limite.</li></ul></article>
+        <section class="section"><h2>Faits à vérifier</h2><ul class="comparison-risks"><li> </li><li>Risque d’équipe à vérifier.</li></ul></section>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+    const text = pdf.text.mock.calls.flatMap((call) => Array.isArray(call[0]) ? call[0] : [call[0]]).join(" ");
+
+    expect(text).toContain("Lecture comparative");
+    expect(text).toContain("Risque d’équipe à vérifier.");
+    expect(text).not.toContain("•  ");
+    expect(pdf.rect).toHaveBeenCalledTimes(1);
+    expect(pdf.addPage).not.toHaveBeenCalled();
+  });
+
+  it("keeps the facts heading when neither a risk nor a documented no-risk fallback is available", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page comparison-page">
+        <h1>Comparaison des hypothèses</h1>
+        <section class="section"><h2>Faits à vérifier</h2></section>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+
+    const text = pdf.text.mock.calls.flatMap((call) => Array.isArray(call[0]) ? call[0] : [call[0]]).join(" ");
+    expect(text).toContain("Faits à vérifier");
+    expect(text).not.toContain("Aucun risque significatif d’équipe");
+    expect(pdf.addPage).not.toHaveBeenCalled();
+  });
+
+  it("keeps exporting an incomplete comparison report through its documented label fallbacks", async () => {
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page comparison-page">
+        <section class="comparison-overview"><p>Conclusion sans titre explicite.</p><div class="comparison-confidence">Confiance sans libellé.</div></section>
+        <article class="comparison-hypothesis"></article>
+        <section class="comparison-readings"><div>Lecture sans libellé.</div></section>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+    const text = pdf.text.mock.calls.flatMap((call) => Array.isArray(call[0]) ? call[0] : [call[0]]).join(" ");
+
+    expect(text).toContain("Comparaison des hypothèses");
+    expect(text).toContain("Conclusion comparative");
+    expect(text).toContain("Lecture comparative");
+    expect(text).toContain("Trois lectures distinctes");
+    expect(text).toContain("Confiance sans libellé.");
+    expect(text).toContain("Lecture sans libellé.");
+    expect(pdf.addPage).not.toHaveBeenCalled();
+  });
+
+  it("wraps a scenario limitation across lines without duplicating its bullet", async () => {
+    pdfMocks.splitTextToSizeImplementation = (text) => text === "Limite longue." ? ["Limite", "longue."] : [text];
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page comparison-page">
+        <h1>Comparaison des hypothèses</h1>
+        <section><h2>Lecture comparative</h2><div class="comparison-hypotheses"><article class="comparison-hypothesis"><h3>Indépendant</h3><p class="comparison-evidence-type">Hypothèse non étayée par les données</p><p>Explication.</p><h4>Limites</h4><ul><li>Limite longue.</li></ul></article></div></section>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+    const bullet = pdf.text.mock.calls.find((call) => Array.isArray(call[0]) && call[0][0] === "• Limite");
+    const continuation = pdf.text.mock.calls.find((call) => Array.isArray(call[0]) && call[0][1] === "longue.");
+
+    expect(bullet).toBeDefined();
+    expect(continuation).toBeDefined();
+    expect(continuation?.[2]).toBe(bullet?.[2]);
+    expect(pdf.addPage).not.toHaveBeenCalled();
+  });
+
+  it("moves long comparison content to controlled continuation pages without overlapping vertical positions", async () => {
+    pdfMocks.splitTextToSizeImplementation = (text) => {
+      const width = 60;
+      return Array.from({ length: Math.max(1, Math.ceil(text.length / width)) }, (_, index) => text.slice(index * width, (index + 1) * width));
+    };
+    const longText = "Texte comparatif long à rendre sans chevauchement. ".repeat(55);
+    const reportDoc = document.implementation.createHTMLDocument("portfolio");
+    reportDoc.body.innerHTML = `
+      <section class="page comparison-page">
+        <div class="comparison-intro"><h1>Comparaison des hypothèses</h1><section class="comparison-overview"><h2>Conclusion comparative</h2><p>${longText}</p><div class="comparison-confidence">Niveau de confiance comparatif ${longText}</div><p>Aucune hypothèse ne peut être privilégiée avec les éléments disponibles.</p></section></div>
+        <section><h2>Lecture comparative</h2><div class="comparison-hypotheses"><article class="comparison-hypothesis"><h3>Indépendant</h3><p class="comparison-evidence-type">Hypothèse non étayée par les données</p><p>${longText}</p><h4>Limites</h4><ul><li>${longText}</li></ul></article></div></section>
+        <section><h2>Faits à vérifier</h2><ul class="comparison-risks"><li>${longText}</li></ul></section>
+        <section class="comparison-readings"><h2>Trois lectures distinctes</h2><div>${longText}</div><div>${longText}</div><div>${longText}</div></section>
+      </section>
+    `;
+
+    await downloadPortfolioPdf(reportDoc, "Projet A");
+    const pdf = pdfMocks.instances.at(-1)!;
+    const yPositions = pdf.text.mock.calls
+      .map((call) => Number(call[2]))
+      .filter((value) => Number.isFinite(value));
+    const pageGroups = yPositions.reduce<number[][]>((groups, y) => {
+      const current = groups.at(-1) ?? [];
+      if (current.length && y < current.at(-1)!) groups.push([y]);
+      else current.push(y);
+      if (!groups.length) groups.push(current);
+      return groups;
+    }, []);
+
+    expect(pdf.addPage).toHaveBeenCalled();
+    expect(pageGroups.every((positions) => positions.length > 1)).toBe(true);
+    pageGroups.forEach((positions) => {
+      positions.slice(1).forEach((position, index) => expect(position).toBeGreaterThan(positions[index]!));
+    });
+    expect(pdf.text.mock.calls.flatMap((call) => Array.isArray(call[0]) ? call[0] : [call[0]]).join(" "))
+      .toContain("Comparaison des hypothèses — suite");
   });
 
   it("downloads portfolio pdf without table, hypotheses or kpis", async () => {

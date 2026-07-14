@@ -3576,7 +3576,7 @@ test.describe("e2e istanbul coverage", () => {
 
     expect(results.emptyExportDone).toBe(true);
     expect(results.renderedHtml).toContain("Synthèse - Simulation Portefeuille");
-    expect(results.renderedHtml).toContain("Scénario - Optimiste");
+    expect(results.renderedHtml).toContain("Scénario - Indépendant");
     expect(results.renderedHtml).toContain("Simulation Portefeuille - Equipe Alpha");
   });
 });

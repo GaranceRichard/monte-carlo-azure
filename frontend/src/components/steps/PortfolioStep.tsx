@@ -9,7 +9,10 @@ import {
 } from "../../simulationLimits";
 import type { NamedEntity } from "../../types";
 import { usePortfolio } from "../../hooks/usePortfolio";
-import PortfolioComparisonDiagnostic from "./PortfolioComparisonDiagnostic";
+import {
+  portfolioPilotReferenceOptions,
+  type PortfolioPilotReference,
+} from "../../utils/portfolioComparisonPresentation";
 
 type PortfolioStepProps = {
   demoMode?: boolean;
@@ -154,6 +157,22 @@ export default function PortfolioStep({
             />
           </label>
         </div>
+        <div className="mt-3 max-w-sm">
+          <label className="sim-label">
+            Scénario de référence de pilotage — facultatif
+            <select
+              className="sim-input"
+              value={portfolio.pilotReference ?? ""}
+              onChange={(event) => portfolio.setPilotReference((event.target.value || null) as PortfolioPilotReference)}
+            >
+              {portfolioPilotReferenceOptions.map((option) => (
+                <option key={option.value ?? "none"} value={option.value ?? ""}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
       </section>
 
       <section className="sim-control-section">
@@ -204,10 +223,6 @@ export default function PortfolioStep({
           {portfolio.reportProgressLabel} ({portfolio.generationProgress.done}/{portfolio.generationProgress.total})
         </div>
       )}
-      {portfolio.portfolioComparisonDiagnostic && (
-        <PortfolioComparisonDiagnostic diagnostic={portfolio.portfolioComparisonDiagnostic} />
-      )}
-
       {portfolio.showAddModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4">
           <div className="w-full max-w-4xl rounded-xl border border-[var(--border)] bg-[var(--panel)] p-4 shadow-2xl">

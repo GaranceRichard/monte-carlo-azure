@@ -90,7 +90,7 @@ test("portfolio print: synthesis hypotheses remain in the first printable page",
   expect(layout.nextPageStyle.pageBreakAfter).toBe("always");
 });
 
-test("portfolio PDF: the synthesis does not add an extra page before scenario details", async ({ page }) => {
+test("portfolio PDF: the comparison occupies one page before scenario details", async ({ page }) => {
   await page.goto("/");
 
   const downloadPromise = page.waitForEvent("download");
@@ -134,6 +134,20 @@ test("portfolio PDF: the synthesis does not add an extra page before scenario de
       targetWeeks: 12,
       scenarios,
       sections: [],
+      portfolioComparisonDiagnostic: {
+        historicalData: { quality: "fragile", observedFacts: [], teamFindings: [] },
+        simulationStability: [],
+        hypothesisCredibility: [
+          { hypothesis: "independent", evidenceType: "unsupported", evidence: "Tirages synthétiques, pas observations historiques.", limitations: ["Hypothèse non étayée."] },
+          { hypothesis: "aligned", evidenceType: "user_input", evidence: "Paramètre saisi.", limitations: ["Pas un fait démontré."] },
+          { hypothesis: "friction", evidenceType: "calculated", evidence: "Paramètre calculé.", limitations: ["Pas une observation historique."] },
+          { hypothesis: "correlated", evidenceType: "observed", evidence: "Semaines communes observées.", limitations: ["Pas de recommandation automatique."] },
+        ],
+        significantRisks: [],
+        comparisonConfidence: { level: "insufficient", statement: "Confiance insuffisante." },
+        preferredScenario: null,
+        conclusion: "Preuves insuffisantes pour privilégier une hypothèse.",
+      },
     });
     const reportDocument = document.implementation.createHTMLDocument("portfolio");
     reportDocument.documentElement.innerHTML = html;
@@ -144,5 +158,5 @@ test("portfolio PDF: the synthesis does not add an extra page before scenario de
   const pdfText = pdf.toString("latin1");
   const pageCount = (pdfText.match(/\/Type\s*\/Page\b/g) ?? []).length;
 
-  expect(pageCount).toBe(5);
+  expect(pageCount).toBe(6);
 });

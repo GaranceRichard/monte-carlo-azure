@@ -31,6 +31,8 @@ function basePortfolioMock() {
     setIncludeZeroWeeks: vi.fn(),
     alignmentRate: 100,
     setAlignmentRate: vi.fn(),
+    pilotReference: null,
+    setPilotReference: vi.fn(),
     teamConfigs: [],
     availableTeamNames: [],
     openAddModal: vi.fn(),
@@ -103,6 +105,36 @@ describe("PortfolioStep", () => {
 
     fireEvent.change(screen.getByLabelText("Taux d'arrimage"), { target: { value: "75" } });
     expect(setAlignmentRate).toHaveBeenCalledWith(75);
+  });
+
+  it("offers no default pilot reference and forwards every explicit user choice", () => {
+    const setPilotReference = vi.fn();
+    vi.mocked(usePortfolio).mockReturnValue({
+      ...basePortfolioMock(),
+      setPilotReference,
+    });
+
+    render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[]} pat="pat" serverUrl="" />);
+
+    const select = screen.getByLabelText("Scénario de référence de pilotage — facultatif") as HTMLSelectElement;
+    expect(select.value).toBe("");
+    expect(Array.from(select.options).map((option) => option.textContent)).toEqual([
+      "Aucun",
+      "Indépendant",
+      "Arrimé",
+      "Friction",
+      "Historique corrélé",
+    ]);
+    ["independent", "aligned", "friction", "correlated", ""].forEach((value) => {
+      fireEvent.change(select, { target: { value } });
+    });
+    expect(setPilotReference.mock.calls.map(([value]) => value)).toEqual([
+      "independent",
+      "aligned",
+      "friction",
+      "correlated",
+      null,
+    ]);
   });
 
   it("passes the raw simulations input value without forcing 20000", () => {
@@ -307,7 +339,7 @@ describe("PortfolioStep", () => {
     expect(screen.getByRole("option", { name: /Toutes les équipes/i })).toBeTruthy();
   });
 
-  it("places the comparison diagnostic after portfolio report feedback", () => {
+  it("keeps the comparative diagnostic in the report model without rendering it in the UI", () => {
     const portfolioComparisonDiagnostic: PortfolioComparisonDiagnostic = {
       historicalData: { quality: "insufficient", observedFacts: [], teamFindings: [] },
       simulationStability: [],
@@ -317,17 +349,12 @@ describe("PortfolioStep", () => {
       preferredScenario: null,
       conclusion: "Preuves insuffisantes pour privilégier une hypothèse.",
     };
-    vi.mocked(usePortfolio).mockReturnValue({
-      ...basePortfolioMock(),
-      portfolioComparisonDiagnostic,
-      reportProgressLabel: "Rapport terminé",
-      generationProgress: { done: 6, total: 6 },
-    });
+    vi.mocked(usePortfolio).mockReturnValue({ ...basePortfolioMock(), portfolioComparisonDiagnostic });
 
     render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[]} pat="pat" serverUrl="" />);
 
-    const progress = screen.getByText("Rapport terminé (6/6)");
-    const comparison = screen.getByRole("heading", { name: "Comparaison des hypothèses" });
-    expect(progress.compareDocumentPosition(comparison) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "Comparaison des hypothèses" })).toBeNull();
+    expect(screen.queryByText("Confiance comparative insuffisante.")).toBeNull();
   });
+
 });

@@ -19,6 +19,7 @@ import {
   SIMULATION_N_SIMS_MIN,
   isBoundedIntegerValue,
 } from "../simulationLimits";
+import type { PortfolioPilotReference } from "../utils/portfolioComparisonPresentation";
 
 export type { TeamPortfolioConfig } from "./usePortfolioReport";
 
@@ -65,6 +66,7 @@ export function usePortfolio({ demoMode = false, selectedOrg, selectedProject, t
   const [targetWeeks, setTargetWeeks] = useState<number>(12);
   const [nSims, setNSims] = useState<number | string>(20000);
   const [alignmentRate, setAlignmentRate] = useState<number>(Number(portfolioPrefs.alignmentRate ?? 100));
+  const [pilotReference, setPilotReference] = useState<PortfolioPilotReference>(null);
 
   const [modalErr, setModalErr] = useState<string>("");
   const [teamConfigs, setTeamConfigs] = useState<TeamPortfolioConfig[]>(demoMode ? DEMO_PORTFOLIO_TEAM_CONFIGS : []);
@@ -124,6 +126,7 @@ export function usePortfolio({ demoMode = false, selectedOrg, selectedProject, t
     targetWeeks,
     nSims: normalizedNSims,
     alignmentRate,
+    pilotReference,
     teamConfigs,
   });
 
@@ -319,6 +322,8 @@ export function usePortfolio({ demoMode = false, selectedOrg, selectedProject, t
     setNSims,
     alignmentRate,
     setAlignmentRate,
+    pilotReference,
+    setPilotReference,
     loadingReport,
     reportProgressLabel,
     generationProgress,

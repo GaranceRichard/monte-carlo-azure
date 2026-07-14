@@ -2,218 +2,223 @@
 
 [![CI](https://github.com/GaranceRichard/monte-carlo-azure/actions/workflows/ci.yml/badge.svg)](https://github.com/GaranceRichard/monte-carlo-azure/actions/workflows/ci.yml)
 
-Outil de prevision base sur une simulation Monte Carlo. L'application aide a transformer un historique Azure DevOps en projection probabiliste, sans exposer le PAT Azure DevOps au backend.
+Outil de prévision basé sur une simulation Monte Carlo. L'application aide à transformer un historique Azure DevOps en projection probabiliste, sans exposer le PAT Azure DevOps au backend.
 
-Demo GitHub Pages:
+Démo GitHub Pages:
 
 - Démo publique: [https://garancerichard.github.io/monte-carlo-azure/](https://garancerichard.github.io/monte-carlo-azure/)
 
 ## En bref
 
 - cible: directeur de projet, PMO, responsables delivery et portefeuille
-- usage: securiser une date, arbitrer un perimetre, dimensionner une capacite, expliciter un niveau de risque
-- principe cle: le frontend appelle Azure DevOps directement; le backend ne recoit que des donnees anonymisees de throughput
+- usage: sécuriser une date, arbitrer un périmètre, dimensionner une capacité, expliciter un niveau de risque
+- principe clé: le frontend appelle Azure DevOps directement; le backend ne reçoit que des données anonymisées de throughput
 
 ## Parcours de lecture
 
 - vision produit et valeur: [`PRODUCT.md`](PRODUCT.md)
-- architecture, securite, API, CI: [`ARCHITECTURE.md`](ARCHITECTURE.md)
-  - inclut la convention de nommage: identifiants de code en anglais, textes utilisateur en francais
-- historique des evolutions: [`CHANGELOG.md`](CHANGELOG.md)
+- architecture, sécurité, API, CI: [`ARCHITECTURE.md`](ARCHITECTURE.md)
+  - inclut la convention de nommage: identifiants de code en anglais, textes utilisateur en français
+- historique des évolutions: [`CHANGELOG.md`](CHANGELOG.md)
 - guide frontend: [`frontend/README.md`](frontend/README.md)
-- definition of done: [`docs/definition-of-done.md`](docs/definition-of-done.md)
+- définition of done: [`docs/definition-of-done.md`](docs/definition-of-done.md)
 - chemins critiques: [`docs/critical-paths.md`](docs/critical-paths.md)
-- traceabilite vitals -> tests: [`docs/vitals-traceability.md`](docs/vitals-traceability.md)
+- traçabilité vitals -> tests: [`docs/vitals-traceability.md`](docs/vitals-traceability.md)
 - mapping coverage vitals: [`docs/vitals-coverage-map.json`](docs/vitals-coverage-map.json)
-- deploiement production: [`docs/deployment.md`](docs/deployment.md)
+- déploiement production: [`docs/deployment.md`](docs/deployment.md)
 
 ---
 
-## Fonctionnalites
+## Fonctionnalités
 
-- connexion Azure DevOps avec PAT cote navigateur
+- connexion Azure DevOps avec PAT côté navigateur
 - support Azure DevOps Cloud et Azure DevOps Server / TFS on-premise
-- selection organisation -> projet -> equipe
-- mode `Portefeuille` multi-equipes
-- simulation Monte Carlo cote backend (`POST /simulate`)
+- sélection organisation -> projet -> équipe
+- mode `Portefeuille` multi-équipes
+- simulation Monte Carlo côté backend (`POST /simulate`)
 - support optionnel d'un `seed` de simulation pour rejouer exactement un tirage Monte Carlo
-- execution backend par lots pour borner la memoire sans allouer de matrice complete
+- exécution backend par lots pour borner la mémoire sans allouer de matrice complète
   `n_sims x horizon`
-- contrat de simulation borne avant calcul: `n_sims` entre `1_000` et `200_000`,
+- contrat de simulation borné avant calcul: `n_sims` entre `1_000` et `200_000`,
   `target_weeks` entre `1` et `521`, `throughput_samples` entre `6` et `521` valeurs,
   `backlog_size` entre `1` et `1_000_000`
-- demo locale et simulations portefeuille reproductibles a `seed` identique
+- démo locale et simulations portefeuille reproductibles à `seed` identique
 - visualisation des percentiles et distributions
-- semantique metier des percentiles alignee sur le mode de simulation:
+- sémantique métier des percentiles alignée sur le mode de simulation:
   - `backlog_to_weeks`: `P90` = 90% des simulations finissent en `P90` semaines ou moins
-    seulement si assez de simulations sont terminees pour atteindre ce rang dans `n_sims`
+    seulement si assez de simulations sont terminées pour atteindre ce rang dans `n_sims`
   - `weeks_to_items`: `P90` = 90% des simulations livrent au moins `P90` items
-- en `backlog_to_weeks`, les simulations non terminees a l'horizon sont des censures explicites:
-  - une fin exacte a `521` semaines reste une vraie fin, distincte d'une censure
-  - la distribution et les percentiles ne couvrent que les simulations terminees
+- en `backlog_to_weeks`, les simulations non terminées à l'horizon sont des censures explicites:
+  - une fin exacte à `521` semaines reste une vraie fin, distincte d'une censure
+  - la distribution et les percentiles ne couvrent que les simulations terminées
   - un percentile absent signifie qu'il n'est pas identifiable avant l'horizon
-  - la courbe de probabilite utilise `n_sims` comme denominateur et reste plafonnee
-    au taux reel de completion, sans retour artificiel a `100%`
-- badge `Démo` integre a l'en-tete des ecrans demo GitHub Pages (choix d'equipe et simulation)
-- lisibilite renforcee des graphes de simulation, y compris les etiquettes de l'axe X
-- legendes de graphiques harmonisees, affichees seulement quand utiles et sans debordement en bas du panneau
-- convention visuelle commune a l'interface et aux rapports PDF: observations en barres, points pleins ou trait continu;
-  moyenne mobile, moyenne glissante et lissage en trait pointille; intervalle de variabilite en bande;
-  probabilite et prevision en trait continu. Chaque legende reproduit le style de sa serie.
-- calcul du `cycleTime` extrait dans un utilitaire dedie avec couverture unitaire ciblee
-- `Cycle Time` affiche partout en jours calendaires (cartes, graphiques, tooltips, demo et PDF)
+  - la courbe de probabilité utilise `n_sims` comme dénominateur et reste plafonnée
+    au taux réel de complétion, sans retour artificiel à `100%`
+- badge `Démo` intégré à l'en-tête des écrans démo GitHub Pages (choix d'équipe et simulation)
+- lisibilité renforcée des graphes de simulation, y compris les étiquettes de l'axe X
+- légendes de graphiques harmonisées, affichées seulement quand utiles et sans débordement en bas du panneau
+- convention visuelle commune à l'interface et aux rapports PDF: observations en barres, points pleins ou trait continu;
+  moyenne mobile, moyenne glissante et lissage en trait pointillé; intervalle de variabilité en bande;
+  probabilité et prévision en trait continu. Chaque légende reproduit le style de sa série.
+- calcul du `cycleTime` extrait dans un utilitaire dédié avec couverture unitaire ciblée
+- `Cycle Time` affiché partout en jours calendaires (cartes, graphiques, tooltips, démo et PDF)
 - affichage d'un `Risk Score` avec code couleur
   - `backlog_to_weeks`: `(P90 - P50) / P50`
   - `weeks_to_items`: `(P50 - P90) / P50`
   - absent si `P50` ou `P90` n'est pas identifiable
-- trois dimensions metier distinctes et independantes:
-  - `dataQuality` qualifie la profondeur historique, les donnees Azure DevOps partielles
-    et les problemes de completude
-  - `forecastUncertainty` qualifie la dispersion, la volatilite, les censures et la
-    possibilite de calculer les percentiles requis
+- trois dimensions métier distinctes et indépendantes:
+  - `dataQuality` qualifie la profondeur historique, les données Azure DevOps partielles
+    et les problèmes de complétude
+  - `forecastUncertainty` qualifie la dispersion, la volatilité, les censures et la
+    possibilité de calculer les percentiles requis
   - la recommandation d'arbitrage traduit ces deux diagnostics en `supportable`, `caution`,
     `arbitration_required` ou `not_recommended`, avec une justification, des facteurs
-    determinants et une action conseillee
-  - `frontend/src/utils/decisionLanguage.ts` fournit une formulation partagee, sans modifier
+    déterminants et une action conseillée
+  - `frontend/src/utils/decisionLanguage.ts` fournit une formulation partagée, sans modifier
     les diagnostics : titre, statut lisible, justification existante, facteurs existants et
-    action conseillee. Les statuts sont :
-    - qualite des donnees : `sufficient` → « Données suffisantes », `watch` → « Données à
+    action conseillée. Les statuts sont :
+    - qualité des données : `sufficient` → « Données suffisantes », `watch` → « Données à
       surveiller », `insufficient` → « Données insuffisantes »
-    - incertitude de prevision : `low` → « Incertitude faible », `moderate` → « Incertitude
+    - incertitude de prévision : `low` → « Incertitude faible », `moderate` → « Incertitude
       modérée », `high` → « Incertitude élevée », `unmeasurable` → « Incertitude impossible à mesurer »
-    - recommandation de decision : `supportable` → « Décision appuyée par les données »,
+    - recommandation de décision : `supportable` → « Décision appuyée par les données »,
       `caution` → « Décision possible avec prudence », `arbitration_required` → « Arbitrage
       nécessaire », `not_recommended` → « Décision non recommandée »
-  - le `Risk Score` conserve son calcul actuel et ne constitue pas une mesure de qualite
-    des donnees ni une recommandation d'arbitrage
+- le `Risk Score` conserve son calcul actuel et ne constitue pas une mesure de qualité
+    des données ni une recommandation d'arbitrage
 - export CSV du throughput hebdomadaire
-- telechargement direct du rapport PDF simulation sans fenetre intermediaire
-- historique local des dernieres simulations, contextualise par equipe dans le navigateur
-- cookie client `IDMontecarlo` pour relier un client anonyme a ses simulations persistees
-- persistence MongoDB des simulations statistiques anonymes et restitution des 10 dernieres via `/simulations/history`
-- configuration rapide des filtres (types + etats) memorisee localement
-- rapport portefeuille PDF direct avec progression et tolerance aux echecs partiels
-- titres de graphiques portefeuille explicites: historique equipe, historique corr\u00E9l\u00E9,
-  scenario bootstrap synthetique, comparaison des probabilites, distribution Monte Carlo et probabilite
-- parite decisionnelle entre l'interface et les rapports PDF: statut, justification, action conseillee,
-  facteurs, qualite des donnees et incertitude reutilisent les diagnostics existants; les informations
-  absentes ou non comparables ne sont pas affichees
-- la synthese PDF portefeuille conserve sur sa premiere page le tableau decisionnel, la comparaison des
-  probabilites et les hypotheses en deux colonnes; les pages detaillees restent separees par scenario
+- téléchargement direct du rapport PDF simulation sans fenêtre intermédiaire
+- historique local des dernières simulations, contextualisé par équipe dans le navigateur
+- cookie client `IDMontecarlo` pour relier un client anonyme à ses simulations persistées
+- persistance MongoDB des simulations statistiques anonymes et restitution des 10 dernières via `/simulations/history`
+- configuration rapide des filtres (types + états) mémorisée localement
+- rapport portefeuille PDF direct avec progression et tolérance aux échecs partiels
+- page PDF « Comparaison des hypothèses » placée après la synthèse et avant le détail des scénarios
+- titres de graphiques portefeuille explicites: historique équipe, historique corrélé,
+  scénario bootstrap synthétique, comparaison des probabilités, distribution Monte Carlo et probabilité
+- parité décisionnelle entre l'interface et les rapports PDF: statut, justification, action conseillée,
+  facteurs, qualité des données et incertitude réutilisent les diagnostics existants; les informations
+  absentes ou non comparables ne sont pas affichées
+- la synthèse PDF portefeuille conserve sur sa première page les résultats chiffrés et la comparaison des
+  probabilités; la conclusion décisionnelle comparative reste réservée à sa page dédiée
 
-Scenarios portefeuille:
+Scénarios portefeuille:
 
-- `Optimiste`: somme des throughputs tires independamment pour chaque equipe
-- `Arrime`: `Optimiste` reduit au facteur d'arrimage configure
-- `Friction`: application d'un cout d'alignement identique par equipe supplementaire
-- `Historique corrélé`: somme des throughputs observes sur les memes semaines pour toutes les equipes
-  afin de conserver les variations communes reellement observees
+- `Independant`: somme des throughputs tirés indépendamment pour chaque équipe
+- `Arrime`: `Independant` réduit au facteur d'arrimage configuré
+- `Friction`: application d'un coût d'alignement identique par équipe supplémentaire
+- `Historique corrélé`: somme des throughputs observés sur les mêmes semaines pour toutes les équipes
+  afin de conserver les variations communes réellement observées
 
-Regle scenario portefeuille `Friction`:
+Règle scénario portefeuille `Friction`:
 
-- le facteur applique est `alignmentRate^(teamCount - 1)`
-- l'exposant est borne a `0`
-- `1` equipe => aucune penalite (`100%` de capacite conservee)
-- la penalite commence a partir de la `2e` equipe
-- le pourcentage affiche dans le rapport correspond exactement au facteur utilise pour la simulation
+- le facteur appliqué est `alignmentRate^(teamCount - 1)`
+- l'exposant est borné à `0`
+- `1` équipe => aucune pénalité (`100%` de capacité conservée)
+- la pénalité commence à partir de la `2e` équipe
+- le pourcentage affiché dans le rapport correspond exactement au facteur utilisé pour la simulation
 
-Regle scenario portefeuille `Historique corrélé`:
+Règle scénario portefeuille `Historique corrélé`:
 
-- l'echantillon est construit a partir des `weeklyThroughput` reels de chaque equipe
-- seules les semaines calendaires communes a toutes les equipes sont conservees
-- le throughput portefeuille d'une semaine est la somme des throughputs observes cette meme semaine
+- l'échantillon est construit à partir des `weeklyThroughput` réels de chaque équipe
+- seules les semaines calendaires communes à toutes les équipes sont conservées
+- le throughput portefeuille d'une semaine est la somme des throughputs observés cette même semaine
 - `includeZeroWeeks=true` conserve les totaux `>= 0`
 - `includeZeroWeeks=false` conserve uniquement les totaux `> 0`
-- si aucune semaine commune complete n'est disponible, le frontend renvoie une erreur explicite
+- si aucune semaine commune complète n'est disponible, le frontend renvoie une erreur explicite
 
 Diagnostic comparatif portefeuille:
 
-- le modele distingue la qualite des historiques observes, la stabilite du resultat simule et la
-  credibilite de chaque hypothese d'agregation
-- `Optimiste` est une reconstruction bootstrap independante, `Arrime` repose sur un taux saisi,
-  `Friction` est derive de ce taux et `Historique corrélé` repose sur des semaines communes observees
-- une distribution stable ne valide pas une hypothese; un taux saisi ou derive ne constitue pas une preuve
-- l'historique corrélé ne demontre ni la substituabilite des equipes, ni leurs relations operationnelles,
-  ni la validite future du scenario
-- avec les seules donnees historiques, resultats simules et taux manuel, le diagnostic ne recommande aucun
-  scenario unique et conclut que les preuves sont insuffisantes
-- l'interface portefeuille expose cette comparaison de credibilite des hypotheses; son integration au PDF
-  reste a venir
+- le modèle distingue la qualité des historiques observés, la stabilité du résultat simulé et la
+  crédibilité de chaque hypothèse d'agrégation
+- `Independant` est une reconstruction bootstrap indépendante, `Arrime` repose sur un taux saisi,
+  `Friction` est dérivé de ce taux et `Historique corrélé` repose sur des semaines communes observées
+- une distribution stable ne valide pas une hypothèse; un taux saisi ou dérivé ne constitue pas une preuve
+- l'historique corrélé ne démontre ni la substituabilité des équipes, ni leurs relations opérationnelles,
+  ni la validité future du scénario
+- avec les seules données historiques, résultats simulés et taux manuel, le diagnostic ne recommande aucun
+  scénario unique et conclut que les preuves sont insuffisantes
+- la comparaison de crédibilité des hypothèses est disponible dans le rapport portefeuille PDF uniquement ;
+  le diagnostic détaillé n'est pas réintroduit dans l'interface de génération et le rapport réutilise le même
+  diagnostic sans modifier les résultats chiffrés des simulations
+- une recommandation de scénario provient exclusivement des preuves du diagnostic ; une référence de
+  pilotage facultative, non sélectionnée par défaut, peut être choisie par l'utilisateur comme convention de
+  gouvernance, sans modifier `preferredScenario`, les calculs ou la crédibilité attribuée aux hypothèses
 
-Regle calendrier throughput:
+Règle calendrier throughput:
 
-- l'historique hebdomadaire utilise uniquement des semaines ISO completes
+- l'historique hebdomadaire utilise uniquement des semaines ISO complètes
 - une semaine est retenue seulement si elle commence un lundi, se termine un dimanche,
-  est entierement comprise dans la periode selectionnee et est deja totalement ecoulee
-- la semaine courante n'entre jamais dans la simulation tant que son dimanche n'est pas passe
-- si la periode ne contient aucune semaine complete, le frontend renvoie un message explicite
+  est entièrement comprise dans la période sélectionnée et est déjà totalement écoulée
+- la semaine courante n'entre jamais dans la simulation tant que son dimanche n'est pas passé
+- si la période ne contient aucune semaine complète, le frontend renvoie un message explicite
 
-Le contrat de simulation ne transporte plus de parametre de capacite reduite:
-les projections reposent uniquement sur l'historique de throughput observe.
+Le contrat de simulation ne transporte plus de paramètre de capacité réduite:
+les projections reposent uniquement sur l'historique de throughput observé.
 La route `POST /simulate` isole aussi la persistance Mongo du calcul principal:
-la reponse utilisateur est retournee des que la simulation est prete, puis l'ecriture
-de l'historique part en arriere-plan. Si Mongo est indisponible, l'incident reste limite
-a l'historique et ne bloque plus le resultat de simulation.
+la réponse utilisateur est retournée dès que la simulation est prête, puis l'écriture
+de l'historique part en arrière-plan. Si Mongo est indisponible, l'incident reste limité
+à l'historique et ne bloque plus le résultat de simulation.
 Pour `weeks_to_items`, le frontend consomme directement les `result_percentiles`
-renvoyes par l'API et ne recalcule depuis l'histogramme que pour d'anciens historiques
-detectes par un ordre legacy `P50 <= P70 <= P90`.
-Le `Risk Score`, lui, est maintenant calcule partout a partir des percentiles metier
-effectivement exposes par l'API et affiches a l'ecran, y compris dans les exports PDF.
-L'interface de resultats affiche aussi un diagnostic decisionnel distinct du Risk Score :
-une synthese de recommandation et un acces a son detail dans une modale.
-La modale organise cette lecture en deux colonnes decisionnelle et complementaire sur ecran large,
-tout en conservant l'ordre de decision sur mobile.
+renvoyés par l'API et ne recalcule depuis l'histogramme que pour d'anciens historiques
+détectés par un ordre legacy `P50 <= P70 <= P90`.
+Le `Risk Score`, lui, est maintenant calculé partout à partir des percentiles métier
+effectivement exposés par l'API et affichés à l'écran, y compris dans les exports PDF.
+L'interface de résultats affiche aussi un diagnostic décisionnel distinct du Risk Score :
+une synthèse de recommandation et un accès à son détail dans une modale.
+La modale organise cette lecture en deux colonnes décisionnelle et complémentaire sur écran large,
+tout en conservant l'ordre de décision sur mobile.
 Lorsque l'historique local contient des simulations comparables, cette modale mesure aussi
-la sensibilite a la fenetre choisie et aide a arbitrer entre reference recente et scenario prudent.
-Toute modification d'un parametre metier invalide immediatement le resultat affiche, sans
+la sensibilité à la fenêtre choisie et aide à arbitrer entre référence récente et scénario prudent.
+Toute modification d'un paramètre métier invalide immédiatement le résultat affiché, sans
 recalcul automatique. Un nouveau lancement recharge d'abord la simulation locale identique
-la plus recente lorsqu'elle contient toutes les donnees du schema courant.
+la plus récente lorsqu'elle contient toutes les données du schéma courant.
 En `backlog_to_weeks`, l'API expose aussi un `completion_summary` avec `completed_count`,
 `censored_count`, `censored_rate` et `horizon_weeks` pour distinguer explicitement les
-simulations terminees des non-terminaisons a l'horizon. Les anciennes entrees d'historique
+simulations terminées des non-terminaisons à l'horizon. Les anciennes entrées d'historique
 restent compatibles: si ce bloc manque, le frontend conserve le comportement legacy.
 Le `Cycle Time`, lui, reste une restitution frontend distincte du moteur Monte Carlo:
-il est calcule et affiche en jours calendaires, tandis que le throughput historique,
-les modes `backlog_to_weeks` / `weeks_to_items` et `target_weeks` restent exprimes en semaines.
-L'historique local des simulations embarque aussi un `schemaVersion`; les anciennes entrees
-sans version sont migrees une seule fois au chargement en convertissant leurs anciennes
-valeurs `Cycle Time` stockees en semaines vers des jours calendaires (`* 7`).
-Les nouvelles entrees locales embarquent aussi leur `seed`: une nouvelle simulation frontend
-genere une seule `seed` par execution logique, la transmet au backend si besoin, l'utilise
-dans le moteur demo / portefeuille, puis la conserve lors d'un rejeu local. Les historiques
-plus anciens sans `seed` restent lisibles et rejouables, mais sans promesse de reproductibilite
-bit a bit.
+il est calculé et affiché en jours calendaires, tandis que le throughput historique,
+les modes `backlog_to_weeks` / `weeks_to_items` et `target_weeks` restent exprimés en semaines.
+L'historique local des simulations embarque aussi un `schemaVersion`; les anciennes entrées
+sans version sont migrées une seule fois au chargement en convertissant leurs anciennes
+valeurs `Cycle Time` stockées en semaines vers des jours calendaires (`* 7`).
+Les nouvelles entrées locales embarquent aussi leur `seed`: une nouvelle simulation frontend
+génère une seule `seed` par exécution logique, la transmet au backend si besoin, l'utilise
+dans le moteur démo / portefeuille, puis la conserve lors d'un rejeu local. Les historiques
+plus anciens sans `seed` restent lisibles et rejouables, mais sans promesse de reproductibilité
+bit à bit.
 
 ---
 
-## Securite
+## Sécurité
 
 Le PAT Azure DevOps:
 
-- est utilise uniquement dans le navigateur de l'utilisateur
+- est utilisé uniquement dans le navigateur de l'utilisateur
 - ne transite jamais par le backend
-- n'est pas sauvegarde par le serveur
+- n'est pas sauvegardé par le serveur
 - en mode Cloud, les appels partent directement vers `https://dev.azure.com` et `https://app.vssps.visualstudio.com`
 
-Les invariants techniques et les controles CI associes sont documentes dans [`ARCHITECTURE.md`](ARCHITECTURE.md).
+Les invariants techniques et les contrôles CI associés sont documentés dans [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
-Frontiere d'identite Azure DevOps :
+Frontière d'identité Azure DevOps :
 
-- le navigateur conserve le `PAT`, l'URL serveur, l'organisation, le projet, l'equipe, la periode, les types, les etats `Done`, l'historique hebdomadaire brut, le cycle time brut en jours calendaires et l'historique utilisateur contextualise
+- le navigateur conserve le `PAT`, l'URL serveur, l'organisation, le projet, l'équipe, la période, les types, les états `Done`, l'historique hebdomadaire brut, le cycle time brut en jours calendaires et l'historique utilisateur contextualisé
 - `POST /simulate` transmet uniquement `throughput_samples`, `include_zero_weeks`, `mode`, `backlog_size`, `target_weeks`, `n_sims` et un `seed` optionnel
-- MongoDB ne persiste que `mc_client_id`, `created_at`, `last_seen`, les parametres Monte Carlo et les resultats statistiques anonymes
-- `mc_client_id` est un identifiant anonyme non derive d'Azure DevOps
-- `Scripts/check_identity_boundary.py` bloque en CI toute reintroduction d'un champ Azure DevOps dans le payload de simulation, les modeles backend, la persistence Mongo, l'historique serveur, les proxies locaux ou les appels Azure DevOps cote backend
-- `tests/test_identity_boundary.py` construit ses depots temporaires dans le workspace du repo pour rester stable sous Windows, meme si `AppData\Local\Temp\pytest-of-*` est verrouille
+- MongoDB ne persiste que `mc_client_id`, `created_at`, `last_seen`, les paramètres Monte Carlo et les résultats statistiques anonymes
+- `mc_client_id` est un identifiant anonyme non dérivé d'Azure DevOps
+- `Scripts/check_identity_boundary.py` bloque en CI toute réintroduction d'un champ Azure DevOps dans le payload de simulation, les modèles backend, la persistance Mongo, l'historique serveur, les proxies locaux ou les appels Azure DevOps côté backend
+- `tests/test_identity_boundary.py` construit ses dépôts temporaires dans le workspace du repo pour rester stable sous Windows, même si `AppData\Local\Temp\pytest-of-*` est verrouillé
 
 ---
 
-## Prerequis
+## Prérequis
 
 - Python 3.10+
 - Node.js 20+
-- acces Azure DevOps + PAT
-- Docker (optionnel, recommande pour un deploiement rapide)
+- accès Azure DevOps + PAT
+- Docker (optionnel, recommandé pour un déploiement rapide)
 
 ## Quick Start (Docker)
 
@@ -227,7 +232,7 @@ Application disponible sur:
 
 - `http://127.0.0.1:8000`
 
-## Lancer en developpement
+## Lancer en développement
 
 Option rapide (Windows PowerShell, 4 terminaux: mongo + backend + frontend + health):
 
@@ -235,8 +240,8 @@ Option rapide (Windows PowerShell, 4 terminaux: mongo + backend + frontend + hea
 .\start-dev.ps1 -ThreeTerminals
 ```
 
-Le terminal health verifie `http://127.0.0.1:8000/health` et `http://127.0.0.1:8000/health/mongo` en boucle (intervalle par defaut: 5s).
-Dans VS Code, `Ctrl+Shift+B` lance aussi la tache par defaut `Dev: 5 terminaux`.
+Le terminal health vérifie `http://127.0.0.1:8000/health` et `http://127.0.0.1:8000/health/mongo` en boucle (intervalle par défaut: 5s).
+Dans VS Code, `Ctrl+Shift+B` lance aussi la tâche par défaut `Dev: 5 terminaux`.
 
 ### Backend
 
@@ -250,9 +255,9 @@ python run_app.py
 API: `http://127.0.0.1:8000`
 
 Note rate limiting:
-`APP_REDIS_URL` est inutile en developpement local avec un seul processus `python run_app.py`.
+`APP_REDIS_URL` est inutile en développement local avec un seul processus `python run_app.py`.
 Laissez cette variable absente pour conserver le backend `memory://`.
-Elle devient requise en production quand l'API tourne avec plusieurs workers, sinon la limite est comptee separement par processus.
+Elle devient requise en production quand l'API tourne avec plusieurs workers, sinon la limite est comptée séparément par processus.
 
 ### Frontend
 
@@ -264,26 +269,26 @@ npm run dev
 
 UI: `http://localhost:5173`
 
-Pour emuler le build GitHub Pages localement:
+Pour émuler le build GitHub Pages localement:
 
 ```powershell
 $env:VITE_GITHUB_PAGES="true"
 npm run build
 ```
 
-Le workflow GitHub Pages retente une fois `actions/deploy-pages` si GitHub retourne un echec transitoire apres creation de l'artefact de deploiement.
-Le smoke test Docker de la CI utilise aussi un payload `POST /simulate` strictement aligne
+Le workflow GitHub Pages retente une fois `actions/deploy-pages` si GitHub retourne un échec transitoire après création de l'artefact de déploiement.
+Le smoke test Docker de la CI utilise aussi un payload `POST /simulate` strictement aligné
 sur le contrat statistique courant (`throughput_samples`, `mode`, `backlog_size`, `target_weeks`,
-`n_sims`, `include_zero_weeks`) afin de detecter toute derive de contrat sans reintroduire
-d'ancien champ refuse par l'API.
+`n_sims`, `include_zero_weeks`) afin de détecter toute dérive de contrat sans réintroduire
+d'ancien champ refusé par l'API.
 
 Sur GitHub Pages, la démo publique précharge les données puis laisse l’utilisateur choisir son point d’entrée.
 Le mode démo est activé par `?demo=true` ou par le build GitHub Pages ; le wording et le badge `Démo` ne sont pas affichés en fonctionnement local ou Azure DevOps normal.
 
-- `Simulation` pour ouvrir une equipe et ses graphiques/detail
-- `Portefeuille` pour comparer plusieurs equipes et generer un rapport consolide
+- `Simulation` pour ouvrir une équipe et ses graphiques/détail
+- `Portefeuille` pour comparer plusieurs équipes et générer un rapport consolidé
 
-Le frontend detecte automatiquement le mode Azure DevOps a partir de l'URL saisie :
+Le frontend détecte automatiquement le mode Azure DevOps à partir de l'URL saisie :
 
 - URL vide ou hote `dev.azure.com` / `*.visualstudio.com` => Cloud
 - tout autre hote => on-prem
@@ -293,12 +298,12 @@ En on-prem, l'URL attendue est l'URL serveur + collection, par exemple :
 - `https://ado.monentreprise.local/tfs/DefaultCollection`
 - `https://devops700.itp.extra/700`
 
-Le detail du flux Cloud / on-prem est documente dans [`frontend/README.md`](frontend/README.md).
+Le détail du flux Cloud / on-prem est documenté dans [`frontend/README.md`](frontend/README.md).
 
-En E2E local, Playwright force aussi `VITE_API_BASE=http://127.0.0.1:8000` pour garder les mocks backend coherents avec les appels `simulate` et `simulations/history`.
+En E2E local, Playwright force aussi `VITE_API_BASE=http://127.0.0.1:8000` pour garder les mocks backend cohérents avec les appels `simulate` et `simulations/history`.
 En CI GitHub Actions, le job `quality-gate` installe explicitement `requirements.txt`, les
-dependances frontend et Chromium avant d'executer le meme controle complet que le pre-push.
-Le deploiement GitHub Pages attend ce job unique avant de construire et publier le frontend.
+dépendances frontend et Chromium avant d'exécuter le même contrôle complet que le pre-push.
+Le déploiement GitHub Pages attend ce job unique avant de construire et publier le frontend.
 
 ### Mode manuel en 5 terminaux
 
@@ -322,13 +327,13 @@ Terminal 3 (frontend):
 npm --prefix frontend run dev
 ```
 
-Terminal 4 (check recurrent health):
+Terminal 4 (contrôle récurrent health):
 
 ```powershell
 while ($true) { try { Invoke-RestMethod http://127.0.0.1:8000/health -TimeoutSec 2 | ConvertTo-Json -Compress } catch { Write-Host $_.Exception.Message }; Start-Sleep -Seconds 5 }
 ```
 
-Terminal 5 (check recurrent health Mongo):
+Terminal 5 (contrôle récurrent health Mongo):
 
 ```powershell
 while ($true) { try { Invoke-RestMethod http://127.0.0.1:8000/health/mongo -TimeoutSec 2 | ConvertTo-Json -Compress } catch { Write-Host $_.Exception.Message }; Start-Sleep -Seconds 5 }
@@ -336,7 +341,7 @@ while ($true) { try { Invoke-RestMethod http://127.0.0.1:8000/health/mongo -Time
 
 ---
 
-## Tests et coverage
+## Tests et couverture
 
 Depuis la racine:
 
@@ -346,17 +351,17 @@ python Scripts/quality_gate.py push
 python Scripts/quality_gate.py ci
 ```
 
-`fast` est le controle pre-commit. Il execute les controles de referentiel, Ruff, les tests
+`fast` est le contrôle pre-commit. Il exécute les contrôles de référentiel, Ruff, les tests
 backend rapides, ESLint sans warning, TypeScript et Vitest. Pour un commit exclusivement
-documentaire (`README.md`, `docs/`, `LICENSE`, `NOTICE`), il conserve les controles de
-referentiel et evite les controles code couteux.
+documentaire (`README.md`, `docs/`, `LICENSE`, `NOTICE`), il conserve les contrôles de
+référentiel et évite les contrôles code coûteux.
 
-`push` est le controle pre-push: il ajoute les couvertures backend (minimum 80 %) et frontend,
-le build et les E2E qui demarrent uniquement le backend et Vite. Il ne lance jamais Docker.
+`push` est le contrôle pre-push: il ajoute les couvertures backend (minimum 80 %) et frontend,
+le build et les E2E qui démarrent uniquement le backend et Vite. Il ne lance jamais Docker.
 
-`ci` est reserve a GitHub Actions: il ajoute au mode `push` le build et le smoke test Docker.
-Le healthcheck Docker reessaie les erreurs de connexion transitoires pendant le demarrage.
-Les dependances sont installees explicitement par le workflow CI, jamais par le controle.
+`ci` est réservé à GitHub Actions: il ajoute au mode `push` le build et le smoke test Docker.
+Le healthcheck Docker réessaie les erreurs de connexion transitoires pendant le démarrage.
+Les dépendances sont installées explicitement par le workflow CI, jamais par le contrôle.
 
 Coverage vitals:
 
@@ -366,147 +371,147 @@ python Scripts/report_vitals_coverage.py
 powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\run-vitals-compliance.ps1 -WorkspaceRoot .
 ```
 
-Reference actuelle apres recalcul local:
+Référence actuelle après recalcul local:
 
-- `SLA Identite`: frontend_unit / branches = `100%`, e2e / branches = `100%`
+- `SLA Identité`: frontend_unit / branches = `100%`, e2e / branches = `100%`
 - `Flux onboarding critique`: frontend_unit / branches = `95.80%`, e2e / branches = `100%`
 - `Export rapport simulation (SVG/PDF)`: frontend_unit / branches = `95.94%`
 
 ### Variables d'environnement Mongo / purge
 
 - `APP_MONGO_URL` (ex: `mongodb://mongo:27017`)
-- `APP_MONGO_DB` (defaut: `montecarlo`)
-- `APP_MONGO_COLLECTION_SIMULATIONS` (defaut: `simulations`)
-- `APP_MONGO_MIN_POOL_SIZE` (defaut: `5`)
-- `APP_MONGO_MAX_POOL_SIZE` (defaut: `20`)
-- `APP_MONGO_SERVER_SELECTION_TIMEOUT_MS` (defaut: `2000`)
-- `APP_MONGO_CONNECT_TIMEOUT_MS` (defaut: `2000`)
-- `APP_MONGO_SOCKET_TIMEOUT_MS` (defaut: `5000`)
-- `APP_MONGO_MAX_IDLE_TIME_MS` (defaut: `60000`)
-- `APP_SIMULATION_HISTORY_LIMIT` (defaut: `10`)
-- `APP_PURGE_RETENTION_DAYS` (defaut script purge: `30`)
+- `APP_MONGO_DB` (défaut: `montecarlo`)
+- `APP_MONGO_COLLECTION_SIMULATIONS` (défaut: `simulations`)
+- `APP_MONGO_MIN_POOL_SIZE` (défaut: `5`)
+- `APP_MONGO_MAX_POOL_SIZE` (défaut: `20`)
+- `APP_MONGO_SERVER_SELECTION_TIMEOUT_MS` (défaut: `2000`)
+- `APP_MONGO_CONNECT_TIMEOUT_MS` (défaut: `2000`)
+- `APP_MONGO_SOCKET_TIMEOUT_MS` (défaut: `5000`)
+- `APP_MONGO_MAX_IDLE_TIME_MS` (défaut: `60000`)
+- `APP_SIMULATION_HISTORY_LIMIT` (défaut: `10`)
+- `APP_PURGE_RETENTION_DAYS` (défaut script purge: `30`)
 
 Variable d'environnement rate limiting:
 
-- `APP_RATE_LIMIT_SIMULATE` (defaut: `20/minute`)
-- `APP_REDIS_URL` uniquement en production multi-workers; ne pas la definir en developpement local
+- `APP_RATE_LIMIT_SIMULATE` (défaut: `20/minute`)
+- `APP_REDIS_URL` uniquement en production multi-workers; ne pas la définir en développement local
 
 Variable d'environnement simulation:
 
-- `APP_FORECAST_TIMEOUT_SECONDS` (defaut: `30`)
-  - applique un timeout de reponse sur `POST /simulate`
-  - le calcul NumPy continue jusqu'a sa fin dans son thread si le delai est depasse, mais l'API rend immediatement un `503`
+- `APP_FORECAST_TIMEOUT_SECONDS` (défaut: `30`)
+  - applique un timeout de réponse sur `POST /simulate`
+  - le calcul NumPy continue jusqu'à sa fin dans son thread si le délai est dépassé, mais l'API rend immédiatement un `503`
 
 Comportement du `seed` de simulation:
 
 - `POST /simulate` accepte un `seed` entier optionnel entre `0` et `4294967295`
-- a payload identique, renvoyer le meme `seed` reproduit strictement le meme resultat de simulation
-- si aucun `seed` n'est fourni, le backend en genere un automatiquement et le renvoie dans la reponse
-- cote backend, le calcul conserve un seul generateur pseudo-aleatoire sur toute l'execution et
-  traite les simulations par lots sans reensemencement inter-lots
+- à payload identique, renvoyer le même `seed` reproduit strictement le même résultat de simulation
+- si aucun `seed` n'est fourni, le backend en génère un automatiquement et le renvoie dans la réponse
+- côté backend, le calcul conserve un seul générateur pseudo-aléatoire sur toute l'exécution et
+  traite les simulations par lots sans réensemencement inter-lots
 - l'historique Mongo persiste aussi ce `seed` pour faciliter l'analyse a posteriori d'une simulation
-- cote frontend, une execution logique ne consomme qu'une seule `seed`; le rejeu d'une entree
-  locale reemploie cette meme `seed` tant que ses parametres restent inchanges
+- côté frontend, une exécution logique ne consomme qu'une seule `seed`; le rejeu d'une entrée
+  locale réemploie cette même `seed` tant que ses paramètres restent inchangés
 
-Purge planifiee:
+Purge planifiée:
 
 ```bash
 python Scripts/purge_inactive_clients.py
 ```
 
-Nettoyage des anciens champs d'identite Azure DevOps dans Mongo:
+Nettoyage des anciens champs d'identité Azure DevOps dans Mongo:
 
 ```bash
 .venv\Scripts\python.exe Scripts/scrub_simulation_identity.py
 .venv\Scripts\python.exe Scripts/scrub_simulation_identity.py --apply
 ```
 
-Le script est en `dry-run` par defaut et supprime uniquement les anciens champs sensibles via `$unset` en mode `--apply`.
+Le script est en `dry-run` par défaut et supprime uniquement les anciens champs sensibles via `$unset` en mode `--apply`.
 
-Suite E2E decoupee:
+Suite E2E découpée:
 
 - `frontend/tests/e2e/onboarding.spec.js`
 - `frontend/tests/e2e/selection.spec.js`
 - `frontend/tests/e2e/simulation.spec.js`
 - `frontend/tests/e2e/coverage.spec.js`
 
-Sous Windows/VS Code, les taches `pytest --cov` paralleles utilisent des fichiers coverage distincts via `COVERAGE_FILE` pour eviter les conflits de verrouillage.
-Le projet desactive aussi le cacheprovider pytest via `pytest.ini` (`-p no:cacheprovider`) pour supprimer les warnings d'ecriture `.pytest_cache` en environnement restreint.
-Pour la couverture frontend Vitest sous Windows, le projet utilise une execution stable (`pool: "forks"` et `coverage.processingConcurrency: 1` dans `frontend/vitest.config.js`) afin d'eviter les pannes d'agregation V8 de type `ENOENT ... frontend\coverage\.tmp\coverage-*.json`.
-Dans ce repo, une ligne rouge dans le detail d'un rapport de coverage est consideree comme invalide et doit etre couverte avant de considerer la tache acceptable, meme si les seuils globaux restent verts.
-Le coverage Vitest inclut exhaustivement les sources executables de `frontend/src` et applique les
+Sous Windows/VS Code, les tâches `pytest --cov` parallèles utilisent des fichiers coverage distincts via `COVERAGE_FILE` pour éviter les conflits de verrouillage.
+Le projet désactive aussi le cacheprovider pytest via `pytest.ini` (`-p no:cacheprovider`) pour supprimer les warnings d'écriture `.pytest_cache` en environnement restreint.
+Pour la couverture frontend Vitest sous Windows, le projet utilise une exécution stable (`pool: "forks"` et `coverage.processingConcurrency: 1` dans `frontend/vitest.config.js`) afin d'éviter les pannes d'agrégation V8 de type `ENOENT ... frontend\coverage\.tmp\coverage-*.json`.
+Dans ce repo, une ligne rouge dans le détail d'un rapport de coverage est considérée comme invalide et doit être couverte avant de considérer la tâche acceptable, même si les seuils globaux restent verts.
+Le coverage Vitest inclut exhaustivement les sources exécutables de `frontend/src` et applique les
 seuils de 80 % globalement et fichier par fichier. Les seules exclusions sont les feuilles CSS,
-les tests/E2E, les declarations `*.d.ts`, les fichiers generes et les deux modules TypeScript
-strictement declaratifs (`src/types.ts`, `src/hooks/simulationTypes.ts`). Ainsi, tout nouveau
-fichier executable non teste apparait dans le rapport et fait echouer la gate; aucun module de
+les tests/E2E, les déclarations `*.d.ts`, les fichiers générés et les deux modules TypeScript
+strictement déclaratifs (`src/types.ts`, `src/hooks/simulationTypes.ts`). Ainsi, tout nouveau
+fichier exécutable non testé apparaît dans le rapport et fait échouer la gate; aucun module de
 production n'est exclu par convenance.
-La task VS Code `Coverage: 8 terminaux` execute aussi:
+La task VS Code `Coverage: 8 terminaux` exécute aussi:
 
-- `Scripts/check_vitals_compliance.py` pour verifier la traceabilite des points vitaux vers leurs tests cibles
-- `Scripts/report_vitals_coverage.py` pour afficher les taux de couverture par vital a partir des artefacts backend/frontend/e2e
-- `Scripts/check_naming_convention.py` en fin de sequence pour bloquer la reintroduction d'identifiants hors convention
+- `Scripts/check_vitals_compliance.py` pour vérifier la traçabilité des points vitaux vers leurs tests ciblés
+- `Scripts/report_vitals_coverage.py` pour afficher les taux de couverture par vital à partir des artefacts backend/frontend/e2e
+- `Scripts/check_naming_convention.py` en fin de séquence pour bloquer la réintroduction d'identifiants hors convention
 - `frontend/coverage/coverage-final.json` comme artefact frontend unique pour le global et les vitals
 
-Validation de reference: les couvertures backend, frontend unitaire et E2E, ainsi que les
-controles vitals, sont conformes.
+Validation de référence: les couvertures backend, frontend unitaire et E2E, ainsi que les
+contrôles vitals, sont conformes.
 
-Ces scripts Python de coverage vitals font partie du lint backend et doivent rester conformes a `ruff check .`, y compris la limite de 100 caracteres par ligne.
-Les messages de validation backend et les imports des tests respectent egalement ce formatage Ruff.
+Ces scripts Python de coverage vitals font partie du lint backend et doivent rester conformes à `ruff check .`, y compris la limite de 100 caractères par ligne.
+Les messages de validation backend et les imports des tests respectent également ce formatage Ruff.
 
-Les details d'API, d'architecture et de CI sont documentes dans [`ARCHITECTURE.md`](ARCHITECTURE.md).
+Les détails d'API, d'architecture et de CI sont documentés dans [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ---
 
 ## Bonnes pratiques
 
-- ne pas commiter de secrets (PAT, tokens, cles privees)
-- verifier avant commit:
+- ne pas commiter de secrets (PAT, tokens, clés privées)
+- vérifier avant commit:
 
 ```bash
 python Scripts/check_no_secrets.py
 ```
 
-### Pre-commit local (active automatiquement)
+### Pre-commit local (activé automatiquement)
 
-Le hook versionne est active automatiquement apres installation frontend via:
+Le hook versionné est activé automatiquement après installation frontend via:
 
 - `npm --prefix frontend install` (script `prepare` -> `git -C .. config --local core.hooksPath .githooks`)
 
-Verification manuelle (si necessaire):
+Vérification manuelle (si nécessaire):
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-Le hook `pre-commit` execute `python Scripts/quality_gate.py fast`; le hook `pre-push` execute
-`python Scripts/quality_gate.py push`. GitHub Actions execute `python Scripts/quality_gate.py ci`.
-La definition des controles reste donc unique; le Docker smoke est reserve a la CI. Les hooks
-arretent le commit ou le push au premier echec et affichent la commande ainsi que la correction
+Le hook `pre-commit` exécute `python Scripts/quality_gate.py fast`; le hook `pre-push` exécute
+`python Scripts/quality_gate.py push`. GitHub Actions exécute `python Scripts/quality_gate.py ci`.
+La définition des contrôles reste donc unique; le Docker smoke est réservé à la CI. Les hooks
+arrêtent le commit ou le push au premier échec et affichent la commande ainsi que la correction
 attendue.
 
-Le mode `fast` execute notamment:
+Le mode `fast` exécute notamment:
 
-- validation de mise a jour du `README.md` si des fichiers code/config sont commites
-- validation que `README.md` ne contient pas de mojibake (accents casses)
+- validation de mise à jour du `README.md` si des fichiers code/config sont committés
+- validation que `README.md` ne contient ni mojibake (accents cassés), ni désaccentuation massive du texte français
 - `python Scripts/check_no_secrets.py`
   - bloque aussi les valeurs Azure DevOps non factices (`ADO_ORG`, `ADO_PROJECT`, etc.) dans la CI et les tests
-  - refuse aussi les changements non documentes sur ce controle via le garde README du pre-commit
+  - refuse aussi les changements non documentés sur ce contrôle via le garde README du pre-commit
 - `python Scripts/check_dod_compliance.py`
-  - ce controle verifie la conformite DoD au niveau referentiel (docs, CI, seuils, tasks)
-  - les verifications de tasks VS Code sont appliquees seulement si `.vscode/tasks.json` est present
+  - ce contrôle vérifie la conformité DoD au niveau référentiel (docs, CI, seuils, tasks)
+  - les vérifications de tasks VS Code sont appliquées seulement si `.vscode/tasks.json` est présent
 - `python Scripts/check_naming_convention.py`
-  - bloque les identifiants de code contenant les termes francais explicitement bannis par la convention repo
+  - bloque les identifiants de code contenant les termes français explicitement bannis par la convention repo
 
 ## Licence
 
-Monte Carlo Azure est distribue sous licence
+Monte Carlo Azure est distribué sous licence
 [Apache License 2.0](LICENSE).
 
-Le projet a ete initialement concu et developpe par **Garance Richard**.
+Le projet a été initialement conçu et développé par **Garance Richard**.
 
-Les organisations qui creent, modifient ou exploitent un fork sont seules
-responsables de sa gouvernance, de sa maintenance, de sa securite, de son
+Les organisations qui créent, modifient ou exploitent un fork sont seules
+responsables de sa gouvernance, de sa maintenance, de sa sécurité, de son
 support et des modifications qu'elles y apportent.
 
-Les informations d'attribution sont precisees dans le fichier
+Les informations d'attribution sont précisées dans le fichier
 [`NOTICE`](NOTICE).

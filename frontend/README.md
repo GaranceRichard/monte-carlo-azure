@@ -105,8 +105,8 @@ Le frontend couvre notamment :
 - historique local versionne: les anciennes entrees sans `schemaVersion` sont migrees une seule fois
   de semaines vers jours calendaires pour le `Cycle Time`
 - mode portefeuille multi-equipes
-  - scenario `Optimiste`: somme des tirages independants par equipe
-  - scenario `Arrime`: reduction du scenario optimiste par le facteur d'arrimage
+  - scenario `Independant`: somme des tirages independants par equipe
+  - scenario `Arrime`: reduction du scenario independant par le facteur d'arrimage
   - scenario `Friction`: facteur `alignmentRate^(teamCount - 1)`
   - `1` equipe conserve `100%` de capacite; la penalite commence a la `2e` equipe
   - le pourcentage affiche dans le rapport reprend exactement le facteur applique
@@ -117,8 +117,13 @@ Le frontend couvre notamment :
 - export PDF direct des restitutions simulation et portefeuille, sans previsualisation SVG utilisateur
   - les exports expliquent explicitement la limite d'horizon et les censures quand elles existent
   - les SVG reprennent la meme convention visuelle et les memes legendes que l'interface
-  - le rapport portefeuille reprend les diagnostics decisionnels disponibles; sa synthese garde sur une
-    page le tableau decisionnel, le graphique comparatif et les hypotheses compactees en deux colonnes
+  - le rapport portefeuille conserve une synthese chiffree, puis consacre une page a la comparaison des
+    hypotheses avant les pages detaillees des scenarios et des equipes
+  - cette comparaison consomme le diagnostic metier existant et distingue qualite historique, stabilite
+    simulee et credibilite des hypotheses; elle n'est pas affichee en detail dans l'interface de generation
+  - une reference de pilotage facultative peut etre transmise au rapport comme convention de gouvernance,
+    sans selection par defaut et sans modifier la recommandation issue des preuves ou les calculs
+  - la pagination de la comparaison utilise un curseur vertical explicite pour les contenus multilignes
 - persistance locale de certaines preferences et quick filters
 
 ## Notes de structure recentes

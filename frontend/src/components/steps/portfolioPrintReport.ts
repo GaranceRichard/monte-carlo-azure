@@ -18,6 +18,12 @@ import {
 import { downloadPortfolioPdf } from "./simulationPdfDownload";
 import type { DecisionLanguage } from "../../utils/decisionLanguage";
 import { renderDecisionDiagnosticHtml } from "../../utils/simulationDecisionDiagnostic";
+import type { PortfolioComparisonDiagnostic } from "../../utils/portfolioComparisonDiagnostic";
+import {
+  formatPortfolioScenarioLabel,
+  presentPortfolioComparisonDiagnostic,
+  type PortfolioPilotReference,
+} from "../../utils/portfolioComparisonPresentation";
 
 function escapeHtml(value: string): string {
   return value
@@ -29,7 +35,7 @@ function escapeHtml(value: string): string {
 }
 
 function formatScenarioDisplayLabel(label: string): string {
-  return label.startsWith("Arrime") ? label.replace("Arrime", "Arrim\u00E9") : label;
+  return formatPortfolioScenarioLabel(label);
 }
 
 function buildDetachedReportDocument(html: string): Document {
@@ -238,6 +244,7 @@ function buildTeamLikePageHtml({
   note,
   pageBreak,
   decisionDiagnostic,
+  showSourceDiagnostic,
 }: {
   title: string;
   subtitle?: string;
@@ -262,11 +269,12 @@ function buildTeamLikePageHtml({
   note?: string;
   pageBreak: boolean;
   decisionDiagnostic?: DecisionLanguage;
+  showSourceDiagnostic: boolean;
 }): string {
   const throughputRows = includeZeroWeeks ? weeklyThroughput : weeklyThroughput.filter((row) => row.throughput > 0);
   const effectiveNote =
     title.includes("Historique corr\u00E9l\u00E9")
-      ? "D\u00E9bit portefeuille issu des semaines historiques communes observ\u00E9es."
+      ? "La distribution repose sur des semaines communes observées ; ce caractère observé ne valide ni la crédibilité future du scénario, ni la substituabilité ou les dépendances entre équipes."
       : note;
   const throughputPoints: ThroughputExportPoint[] = throughputRows.map((point, index, arr) => {
     const windowSize = 4;
@@ -308,8 +316,8 @@ function buildTeamLikePageHtml({
     displayPercentiles: effectivePercentiles,
     riskScore,
   });
-  const reliabilitySummary = buildReliabilitySummary(throughputReliability);
-  const reliabilityScoreLabel = formatReliabilityScore(throughputReliability);
+  const reliabilitySummary = showSourceDiagnostic ? buildReliabilitySummary(throughputReliability) : "";
+  const reliabilityScoreLabel = showSourceDiagnostic ? formatReliabilityScore(throughputReliability) : "";
 
   return `
     <section class="page ${pageBreak ? "page-break" : ""}">
@@ -326,7 +334,7 @@ function buildTeamLikePageHtml({
           <div class="meta-row"><b>Échantillon:</b> ${escapeHtml(modeZeroLabel)}</div>
           <div class="meta-row"><b>Simulations:</b> ${escapeHtml(String(nSims))}</div>
           </div>
-          ${throughputReliability ? `<aside class="diagnostic-card">
+          ${showSourceDiagnostic && throughputReliability ? `<aside class="diagnostic-card">
             <h2 class="diagnostic-title">Diagnostic</h2>
             <div class="meta-row"><b>Lecture:</b> ${escapeHtml(reliabilitySummary)}</div>
             ${renderTechnicalMetricRow("CV", throughputReliability.cv)}
@@ -355,9 +363,9 @@ function buildTeamLikePageHtml({
             ? `<div class="kpi"><span class="kpi-label">Risk Score</span><span class="kpi-value">${escapeHtml(risk.valueLabel)} <span style="color:${riskColor(risk.label)}">(${escapeHtml(risk.label)})</span></span></div>`
             : ""
         }
-        <div class="kpi"><span class="kpi-label">Fiabilité</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>
+        ${showSourceDiagnostic ? `<div class="kpi"><span class="kpi-label">Fiabilité</span><span class="kpi-value">${escapeHtml(reliabilityScoreLabel)}</span></div>` : ""}
       </section>
-      ${renderDecisionDiagnosticHtml(decisionDiagnostic)}
+      ${showSourceDiagnostic ? renderDecisionDiagnosticHtml(decisionDiagnostic) : ""}
       ${
         completionSummary && completionSummary.censored_count > 0
           ? `<section class="section"><div class="meta"><div class="meta-row"><b>Limite d'horizon:</b> ${escapeHtml(String(completionSummary.horizon_weeks))} semaines</div><div class="meta-row"><b>Censures:</b> ${escapeHtml(String(completionSummary.censored_count))} sur ${escapeHtml(String(completionSummary.completed_count + completionSummary.censored_count))} (${escapeHtml(formatMetric(completionSummary.censored_rate))})</div><div class="meta-row"><b>Lecture:</b> la distribution et les percentiles ne couvrent que les simulations terminées. Un percentile absent n'est pas identifiable avant l'horizon.</div></div></section>`
@@ -419,10 +427,6 @@ function buildSummaryPage({
           : computedRisk == null
             ? null
             : formatRiskScoreFromValue(computedRisk);
-      const reliability = formatReliabilityScore(scenario.throughputReliability);
-      const decision = scenario.decisionDiagnostic?.decisionRecommendation;
-      const decisionStatus = decision?.status?.trim() ?? "";
-      const decisionAction = decision?.action?.trim() ?? "";
       return `
         <tr>
           <td>${escapeHtml(formatScenarioDisplayLabel(scenario.label))}</td>
@@ -430,9 +434,6 @@ function buildSummaryPage({
           <td>${formatPercentile(effectivePercentiles.P70)}</td>
           <td>${formatPercentile(effectivePercentiles.P90)}</td>
           <td>${risk ? `<span class="risk-chip" style="color:${riskColor(risk.label)}">${escapeHtml(risk.valueLabel)} (${escapeHtml(risk.label)})</span>` : ""}</td>
-          <td>${escapeHtml(reliability)}</td>
-          <td>${escapeHtml(decisionStatus)}</td>
-          <td class="summary-action">${escapeHtml(decisionAction)}</td>
         </tr>
       `;
     })
@@ -466,31 +467,31 @@ function buildSummaryPage({
   const hypothesisBlocks: HypothesisBlock[] = [
     {
       kind: "paragraph",
-      lead: "Optimiste :",
+      lead: "Indépendant :",
       emphasizedLead: true,
       body:
-        " Somme des d\u00E9bits de toutes les \u00E9quipes. Hypoth\u00E8se : livraison ind\u00E9pendante, aucun co\u00FBt de synchronisation inter-\u00E9quipes. En pr\u00E9sence de d\u00E9pendances fortes entre \u00E9quipes, pr\u00E9f\u00E9rer les sc\u00E9narios Arrim\u00E9 ou Friction.",
+        " addition de tirages synthétiques reconstruits par bootstrap. L’indépendance est modélisée, sans être étayée par une observation historique.",
     },
     {
       kind: "paragraph",
       lead: "Arrim\u00E9 :",
       emphasizedLead: true,
       body:
-        ` ${String(alignmentRate)}% de la capacit\u00E9 combin\u00E9e. Hypoth\u00E8se : co\u00FBts de synchronisation (c\u00E9r\u00E9monies, d\u00E9pendances, alignement) absorb\u00E9s sur le d\u00E9bit global.`,
+        ` ${String(alignmentRate)}% de la capacité combinée, à partir d’un paramètre saisi par l’utilisateur ; ce taux est une exploration, pas un fait historique démontré.`,
     },
     {
       kind: "paragraph",
       lead: `${formatScenarioDisplayLabel(effectiveFrictionLabel)} :`,
       emphasizedLead: true,
       body:
-        ` ${effectiveFrictionLabel.replace("Friction ", "")} de la capacit\u00E9 combin\u00E9e. Hypoth\u00E8se : chaque \u00E9quipe suppl\u00E9mentaire absorbe un co\u00FBt d'alignement identique.`,
+        ` ${effectiveFrictionLabel.replace("Friction ", "")} de la capacité combinée, calculée à partir du paramètre saisi ; ce calcul ne constitue pas une observation historique.`,
     },
     {
       kind: "paragraph",
       lead: "Historique corr\u00E9l\u00E9 :",
       emphasizedLead: true,
       body:
-        " Somme des throughputs observ\u00E9s sur les m\u00EAmes semaines pour toutes les \u00E9quipes. Cette approche conserve les variations et contraintes communes r\u00E9ellement observ\u00E9es dans l'historique.",
+        " agrégation des semaines historiques communes observées. Ce caractère observé ne valide pas automatiquement ce scénario ni sa crédibilité future.",
     },
     {
       kind: "paragraph",
@@ -512,7 +513,7 @@ function buildSummaryPage({
       kind: "reading-rule",
       lead: "R\u00E8gle de lecture :",
       body:
-        "Commencer par la fiabilit\u00E9 de l'historique, puis le Risk Score, puis les percentiles. Un P85 sur un historique fiable et un Risk Score faible constitue un engagement d\u00E9fendable. Le m\u00EAme P85 sur un historique fragile reste un chiffre calculable - mais son usage en comit\u00E9 n\u00E9cessite de mentionner explicitement les limites de l'historique source.",
+        "Commencer par la fiabilit\u00E9 de l'historique, puis le Risk Score, puis les percentiles. Un P90 sur un historique fiable et un Risk Score faible constitue un engagement d\u00E9fendable. Le m\u00EAme P90 sur un historique fragile reste un chiffre calculable - mais son usage en comit\u00E9 n\u00E9cessite de mentionner explicitement les limites de l'historique source.",
     },
   ];
   const summaryHypothesisColumns = [hypothesisBlocks.slice(0, 4), hypothesisBlocks.slice(4)];
@@ -543,12 +544,9 @@ function buildSummaryPage({
             <col class="summary-col summary-col--percentile" />
             <col class="summary-col summary-col--percentile" />
             <col class="summary-col summary-col--risk" />
-            <col class="summary-col summary-col--reliability" />
-            <col class="summary-col summary-col--decision" />
-            <col class="summary-col summary-col--action" />
           </colgroup>
           <thead>
-            <tr><th>Sc\u00E9nario</th><th>P50</th><th>P70</th><th>P90</th><th>Risk Score</th><th>Fiabilit\u00E9</th><th>Statut</th><th>Action</th></tr>
+            <tr><th>Sc\u00E9nario</th><th>P50</th><th>P70</th><th>P90</th><th>Risk Score</th></tr>
           </thead>
           <tbody>
             ${rows}
@@ -573,6 +571,58 @@ function buildSummaryPage({
   `;
 }
 
+function buildComparisonPage(
+  diagnostic: PortfolioComparisonDiagnostic,
+  pilotReference: PortfolioPilotReference,
+): string {
+  const presentation = presentPortfolioComparisonDiagnostic(diagnostic, pilotReference);
+  const scenarioCredibilities = presentation.scenarioCredibilities
+    .map((hypothesis) => `
+      <article class="comparison-hypothesis">
+        <h3>${escapeHtml(hypothesis.label)}</h3>
+        <p class="comparison-evidence-type">${escapeHtml(hypothesis.evidenceTypeLabel)}</p>
+        <p>${escapeHtml(hypothesis.evidence)}</p>
+        <h4>Limites à garder en tête</h4>
+        <ul>${hypothesis.limitations.map((limitation) => `<li>${escapeHtml(limitation)}</li>`).join("")}</ul>
+      </article>
+    `)
+    .join("");
+  const risks = presentation.significantRiskStatements.length
+    ? `<ul class="comparison-risks">${presentation.significantRiskStatements.map((statement) => `<li>${escapeHtml(statement)}</li>`).join("")}</ul>`
+    : "<p>Aucun risque significatif d’équipe n’est remonté par le diagnostic.</p>";
+
+  return `
+    <section class="page page-break comparison-page">
+      <div class="comparison-intro">
+        <header class="header"><h1 class="title">Comparaison des hypothèses</h1></header>
+        <section class="section comparison-overview">
+          <h2>Conclusion comparative</h2>
+          <p>${escapeHtml(presentation.conclusion)}</p>
+          <div class="comparison-confidence"><strong>Niveau de confiance comparatif</strong><br />${escapeHtml(presentation.comparisonConfidence)}</div>
+          <div class="comparison-label-value"><strong>Recommandation issue des preuves</strong><br />${escapeHtml(presentation.evidenceRecommendation)}</div>
+          ${presentation.preconization ? `<div class="comparison-label-value"><strong>Préconisation</strong><br />${escapeHtml(presentation.preconization)}</div>` : ""}
+          <div class="comparison-label-value comparison-pilot-reference"><strong>Référence de pilotage</strong><br />${escapeHtml(presentation.pilotReferenceLabel)}</div>
+          ${presentation.pilotReferenceGovernanceNote ? `<p class="comparison-governance-note">${escapeHtml(presentation.pilotReferenceGovernanceNote)}</p>` : ""}
+        </section>
+      </div>
+      <section class="section">
+        <h2>Lecture comparative</h2>
+        <div class="comparison-hypotheses">${scenarioCredibilities}</div>
+      </section>
+      <section class="section">
+        <h2>Faits à vérifier</h2>
+        ${risks}
+      </section>
+      <section class="section comparison-readings">
+        <h2>Trois lectures distinctes</h2>
+        <div><strong>Qualité des données historiques</strong><br />${escapeHtml(presentation.historicalDataQuality)} : ce que les semaines observées permettent d’étayer.</div>
+        <div><strong>Stabilité des résultats simulés</strong><br />La régularité des résultats simulés ne valide pas une hypothèse de portefeuille.</div>
+        <div><strong>Crédibilité des hypothèses portefeuille</strong><br />Elle dépend du type de preuve et des limites affichées pour chaque hypothèse.</div>
+      </section>
+    </section>
+  `;
+}
+
 type PortfolioPrintReportArgs = {
   isDemo?: boolean;
   selectedProject: string;
@@ -582,6 +632,8 @@ type PortfolioPrintReportArgs = {
   includedTeams: string[];
   sections: PortfolioSectionInput[];
   scenarios: PortfolioScenarioResult[];
+  portfolioComparisonDiagnostic?: PortfolioComparisonDiagnostic | null;
+  pilotReference?: PortfolioPilotReference;
 };
 
 export function buildPortfolioPrintReportHtml({
@@ -592,6 +644,8 @@ export function buildPortfolioPrintReportHtml({
   includedTeams,
   sections,
   scenarios,
+  portfolioComparisonDiagnostic,
+  pilotReference = null,
 }: PortfolioPrintReportArgs): string {
   const simulationMode = sections[0]?.simulationMode ?? "backlog_to_weeks";
   const orderedScenarios = [...scenarios].sort((a, b) => getScenarioOrder(a.label) - getScenarioOrder(b.label));
@@ -607,12 +661,15 @@ export function buildPortfolioPrintReportHtml({
     targetWeeks: sections[0]?.targetWeeks ?? 0,
     scenarios: orderedScenarios,
   });
+  const comparisonPage = portfolioComparisonDiagnostic
+    ? buildComparisonPage(portfolioComparisonDiagnostic, pilotReference)
+    : "";
 
   const scenarioPages = orderedScenarios
     .map((scenario, idx) =>
       buildTeamLikePageHtml({
         title: `Scénario - ${formatScenarioDisplayLabel(scenario.label)}`,
-        subtitle: scenario.hypothesis,
+        subtitle: undefined,
         selectedProject,
         startDate,
         endDate,
@@ -638,6 +695,7 @@ export function buildPortfolioPrintReportHtml({
             ? undefined
             : "D\u00E9bit synth\u00E9tique reconstruit par bootstrap, non issu de l'historique r\u00E9el.",
         pageBreak: idx < orderedScenarios.length - 1 || sections.length > 0,
+        showSourceDiagnostic: false,
       }),
     )
     .join("");
@@ -666,6 +724,7 @@ export function buildPortfolioPrintReportHtml({
         throughputReliability: section.throughputReliability,
         throughputChartTitle: "Throughput hebdomadaire",
         pageBreak: idx < sections.length - 1,
+        showSourceDiagnostic: true,
       }),
     )
     .join("");
@@ -697,21 +756,36 @@ export function buildPortfolioPrintReportHtml({
         .decision-factors { margin: 3px 0; padding-left: 16px; }
         .section--summary-chart { page-break-after: auto; break-after: auto; }
         .section--hypotheses { margin-top: 8px; break-before: auto; page-break-before: auto; break-inside: auto; page-break-inside: auto; }
+        .comparison-page .section { page-break-inside: auto; break-inside: auto; }
+        .comparison-intro { break-inside: avoid; page-break-inside: avoid; }
+        .comparison-overview, .comparison-confidence, .comparison-hypothesis, .comparison-readings > div, .comparison-risks > li { overflow-wrap: anywhere; word-break: break-word; }
+        .comparison-confidence, .comparison-hypothesis, .comparison-readings > div, .comparison-risks > li { border: 1px solid #d1d5db; border-radius: 8px; background: #f9fafb; padding: 7px 8px; }
+        .comparison-label-value { margin-top: 5px; }
+        .comparison-pilot-reference { border-left: 3px solid #6b7280; padding-left: 7px; }
+        .comparison-governance-note { color: #4b5563; font-style: italic; }
+        .comparison-hypotheses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .comparison-hypothesis { break-inside: avoid; page-break-inside: avoid; }
+        .comparison-hypothesis h3, .comparison-hypothesis h4 { margin: 0 0 4px 0; }
+        .comparison-hypothesis h3 { font-size: 12px; }
+        .comparison-hypothesis h4, .comparison-evidence-type { font-size: 11px; }
+        .comparison-evidence-type { margin: 0 0 5px 0; font-weight: 700; color: #374151; }
+        .comparison-hypothesis p, .comparison-hypothesis ul, .comparison-risks { margin: 4px 0; }
+        .comparison-hypothesis ul, .comparison-risks { padding-left: 18px; }
+        .comparison-risks { display: grid; gap: 6px; list-style-position: inside; padding-left: 0; }
+        .comparison-readings { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+        .comparison-page h2, .comparison-hypothesis h3, .comparison-hypothesis h4 { break-after: avoid; page-break-after: avoid; }
+        .comparison-readings h2 { grid-column: 1 / -1; }
         .section h2 { margin: 0 0 4px 0; font-size: 14px; }
         .note { margin-top: 4px; font-size: 11px; color: #4b5563; }
         .chart-wrap { width: 100%; overflow: hidden; border: 1px solid #d1d5db; border-radius: 8px; padding: 4px; background: #fff; }
         .chart-wrap svg { width: 100%; height: auto; display: block; }
         .summary-table { width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; }
-        .summary-table--compact .summary-col--scenario { width: 14%; }
-        .summary-table--compact .summary-col--percentile { width: 6%; }
-        .summary-table--compact .summary-col--risk { width: 11%; }
-        .summary-table--compact .summary-col--reliability { width: 12%; }
-        .summary-table--compact .summary-col--decision { width: 18%; }
-        .summary-table--compact .summary-col--action { width: 27%; }
+        .summary-table--compact .summary-col--scenario { width: 32%; }
+        .summary-table--compact .summary-col--percentile { width: 14%; }
+        .summary-table--compact .summary-col--risk { width: 26%; }
         .summary-table th, .summary-table td { border: 1px solid #d1d5db; padding: 4px; text-align: left; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; }
         .summary-table th { background: #f3f4f6; }
         .risk-chip { font-weight: 700; }
-        .summary-action { font-size: 9px; line-height: 1.25; }
         .hypothesis-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 14px; }
         .hypothesis-column { min-width: 0; }
         .hypothesis { margin: 4px 0; font-size: 12px; }
@@ -740,14 +814,18 @@ export function buildPortfolioPrintReportHtml({
           .hypothesis-grid { display: block; column-count: 2; column-gap: 14px; }
           .hypothesis-column { break-inside: auto; page-break-inside: auto; }
           .section--hypotheses .hypothesis { break-inside: avoid; page-break-inside: avoid; }
+          .comparison-hypotheses { display: block; column-count: 2; column-gap: 14px; }
+          .comparison-hypothesis { margin-bottom: 8px; }
         }
         @media (max-width: 720px) {
           .summary-grid { grid-template-columns: 1fr; }
+          .comparison-hypotheses, .comparison-readings { grid-template-columns: 1fr; column-count: 1; }
         }
       </style>
     </head>
     <body>
       ${summaryPage}
+      ${comparisonPage}
       ${scenarioPages}
       ${teamPages}
     </body>

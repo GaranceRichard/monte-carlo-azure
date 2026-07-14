@@ -170,7 +170,7 @@ function renderDimension(dimension: DecisionLanguageDimension): string {
   const action = safeText(dimension.action);
   if (!title || !status || !explanation || !action) return "";
 
-  return `<div class="decision-dimension"><b>${escapeHtml(title)} — statut :</b> ${escapeHtml(status)}<br /><b>Justification :</b> ${escapeHtml(explanation)}${renderFactors(dimension.factors)}<b>Action conseillée :</b> ${escapeHtml(action)}</div>`;
+  return `<div class="decision-dimension"><b>${escapeHtml(title)} — statut :</b> ${escapeHtml(status)}<br /><b>Justification :</b> ${escapeHtml(explanation)}${renderFactors(dimension.factors)}<br /><b>Action conseillée :</b> ${escapeHtml(action)}</div>`;
 }
 
 export function renderDecisionDiagnosticHtml(diagnostic?: DecisionLanguage): string {
@@ -189,5 +189,5 @@ export function renderDecisionDiagnosticHtml(diagnostic?: DecisionLanguage): str
     ? `<div class="decision-dimension"><b>${escapeHtml(sensitivity.title)} — statut :</b> ${escapeHtml(sensitivity.status)}<br />${escapeHtml(sensitivity.recentP90)}<br />${escapeHtml(sensitivity.longP90)}<br /><b>${escapeHtml(sensitivity.gap)}</b>${safeText(sensitivity.evolution) ? `<br />${escapeHtml(sensitivity.evolution)}` : ""}<br /><b>Scénario recommandé :</b> ${escapeHtml(sensitivity.action)}</div>`
     : "";
 
-  return `<section class="section decision-diagnostic"><h2>Diagnostic décisionnel</h2><div class="decision-dimension"><b>Statut de décision :</b> ${escapeHtml(status)}<br /><b>Justification métier :</b> ${escapeHtml(explanation)}${renderFactors(recommendation.factors)}<b>Action conseillée :</b> ${escapeHtml(action)}</div>${renderDimension(diagnostic.dataQuality)}${renderDimension(diagnostic.forecastUncertainty)}${sensitivityHtml}</section>`;
+  return `<section class="section decision-diagnostic"><h2>Diagnostic décisionnel</h2><div class="decision-dimension"><b>Statut de décision :</b> ${escapeHtml(status)}<br /><b>Justification métier :</b> ${escapeHtml(explanation)}${renderFactors(recommendation.factors)}<br /><b>Action conseillée :</b> ${escapeHtml(action)}</div>${renderDimension(diagnostic.dataQuality)}${renderDimension(diagnostic.forecastUncertainty)}${sensitivityHtml}</section>`;
 }

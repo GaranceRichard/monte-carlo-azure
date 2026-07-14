@@ -45,6 +45,7 @@ function setupReportHook(overrides: Partial<Parameters<typeof usePortfolioReport
       targetWeeks: 12,
       nSims: 20000,
       alignmentRate: 80,
+      pilotReference: null,
       teamConfigs: [
         {
           teamName: "Team A",
@@ -90,11 +91,8 @@ describe("usePortfolioReport", () => {
       "Historique corr\u00E9l\u00E9",
     );
     const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
-    expect(exportArgs.scenarios.every((scenario) => scenario.decisionDiagnostic)).toBe(true);
-    expect(exportArgs.scenarios.every((scenario) => scenario.decisionDiagnostic?.historicalSensitivity === undefined)).toBe(true);
-    expect(exportArgs.scenarios[0].decisionDiagnostic?.decisionRecommendation.status).toMatch(
-      /Décision appuyée par les données|Décision possible avec prudence|Arbitrage nécessaire|Décision non recommandée/,
-    );
+    expect(exportArgs.scenarios.every((scenario) => scenario.decisionDiagnostic === undefined)).toBe(true);
+    expect(exportArgs.scenarios.every((scenario) => scenario.throughputReliability === undefined)).toBe(true);
     expect(result.current.portfolioComparisonDiagnostic).toMatchObject({
       preferredScenario: null,
       comparisonConfidence: { level: "insufficient" },
@@ -105,7 +103,8 @@ describe("usePortfolioReport", () => {
       "calculated",
       "observed",
     ]);
-    expect(exportArgs).not.toHaveProperty("portfolioComparisonDiagnostic");
+    expect(exportArgs.portfolioComparisonDiagnostic).toBe(result.current.portfolioComparisonDiagnostic);
+    expect(exportArgs.pilotReference).toBeNull();
     for (const call of vi.mocked(simulateForecastFromSamples).mock.calls) {
       expect(call[0]).not.toHaveProperty("selectedTeam");
       expect(call[0]).not.toHaveProperty("selectedOrg");
@@ -113,6 +112,24 @@ describe("usePortfolioReport", () => {
       expect(call[0]).not.toHaveProperty("doneStates");
     }
   });
+
+  it.each(["independent", "aligned", "friction", "correlated"] as const)(
+    "forwards the explicit %s pilot reference without changing the domain recommendation",
+    async (pilotReference) => {
+      vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
+      vi.mocked(simulateForecastFromSamples).mockResolvedValue(simulationResult);
+      const { result } = setupReportHook({ pilotReference });
+
+      await act(async () => {
+        await result.current.handleGenerateReport();
+      });
+
+      const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
+      expect(exportArgs.pilotReference).toBe(pilotReference);
+      expect(exportArgs.portfolioComparisonDiagnostic?.preferredScenario).toBeNull();
+      expect(result.current.portfolioComparisonDiagnostic?.preferredScenario).toBeNull();
+    },
+  );
 
   it("keeps existing Monte Carlo scenario results invariant while adding the comparison diagnostic", async () => {
     vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);

@@ -4,9 +4,15 @@
 
 ### Frontend
 
-- ajout du diagnostic comparatif portefeuille dans le modele de generation: qualite des historiques observes,
-  stabilite des resultats simules et credibilite des hypotheses sont separees; aucune hypothese n'est preferee
-  avec les seules donnees disponibles, et le rendu UI/PDF reste inchange
+- ajout d'une page PDF « Comparaison des hypotheses » apres la synthese portefeuille: qualite des historiques
+  observes, stabilite des resultats simules et credibilite des hypotheses restent separees, sans reconstruire
+  de recommandation depuis les resultats statistiques
+- retrait du diagnostic comparatif detaille de l'interface de generation; seul un controle compact permet de
+  choisir facultativement une reference de pilotage, sans selection par defaut et hors du diagnostic metier
+- distinction explicite dans le rapport entre recommandation issue des preuves, preconisation de demarche et
+  reference de pilotage choisie comme convention de gouvernance
+- libelle utilisateur `Independant` harmonise dans la synthese, les legendes et les pages du rapport; lecture
+  prudente alignee sur le percentile P90 effectivement expose et diagnostics d'equipe rendus sans concatenation
 - alignement des diagnostics decisionnels entre l'interface et les rapports PDF simulation / portefeuille:
   statuts, justifications, actions conseillees, facteurs, qualite des donnees et incertitude reutilisent
   le langage decisionnel existant, sans modifier les calculs ni les recommandations

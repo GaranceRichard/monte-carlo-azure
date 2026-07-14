@@ -11,8 +11,9 @@ Cette roadmap exprime les priorites en termes de valeur delivree, pas de feature
 
 - simulation Monte Carlo a partir du throughput reel Azure DevOps
 - deux modes de question : "en combien de temps ?" et "combien d'items en N semaines ?"
-- mode portefeuille multi-equipes avec 4 scenarios d'agregation : `Optimiste`, `Arrime`, `Friction`, `Historique corrélé`
-- rapport PDF exportable, oriente restitution en COPIL
+- mode portefeuille multi-equipes avec 4 scenarios d'agregation : `Independant`, `Arrime`, `Friction`, `Historique corrélé`
+- rapport PDF exportable, oriente restitution en COPIL, avec comparaison de credibilite des hypotheses
+- reference de pilotage facultative, explicite et distincte d'une recommandation fondee sur les preuves
 - `Risk Score` avec code couleur pour qualifier la dispersion de la projection
 - aucune donnee d'identification Azure DevOps ne transite par le serveur
 

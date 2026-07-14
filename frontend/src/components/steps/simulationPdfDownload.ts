@@ -185,7 +185,16 @@ function getDecisionDiagnostic(scope: ParentNode): { title: string; rows: string
 
   const title = diagnostic.querySelector("h2")?.textContent?.trim() ?? "";
   const rows = Array.from(diagnostic.querySelectorAll(".decision-dimension"))
-    .map((row) => row.textContent?.trim() ?? "")
+    .map((row) => {
+      const clone = row.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll("br").forEach((separator) => separator.replaceWith("\n"));
+      clone.querySelectorAll("li").forEach((item) => item.replaceWith(`\n• ${item.textContent.trim()}\n`));
+      return clone.textContent
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .join("\n");
+    })
     .filter(Boolean);
   return title && rows.length ? { title, rows } : null;
 }
@@ -237,6 +246,205 @@ function renderDecisionDiagnostic(
   });
 
   return cursorY + boxHeight + bottomGap;
+}
+
+type ComparisonPdfLayout = {
+  pdf: jsPDF;
+  margin: number;
+  contentW: number;
+  pageH: number;
+  cursorY: number;
+  continuationTitle: string;
+};
+
+const COMPARISON_LINE_HEIGHT = 4;
+const COMPARISON_BLOCK_GAP = 2;
+const COMPARISON_SECTION_GAP = 3;
+const COMPARISON_BOTTOM_MARGIN = 8;
+
+function ensureSpace(layout: ComparisonPdfLayout, requiredHeight: number, continuationHeading = ""): number {
+  if (layout.cursorY + requiredHeight <= layout.pageH - COMPARISON_BOTTOM_MARGIN) return layout.cursorY;
+
+  layout.pdf.addPage();
+  layout.cursorY = layout.margin;
+  if (!continuationHeading) return layout.cursorY;
+
+  const lines = splitPdfText(layout.pdf, continuationHeading, layout.contentW);
+  layout.pdf.setFont("helvetica", "bold");
+  layout.pdf.setFontSize(10);
+  layout.pdf.setTextColor(30, 58, 138);
+  layout.pdf.text(lines, layout.margin, layout.cursorY);
+  layout.cursorY += lines.length * COMPARISON_LINE_HEIGHT + COMPARISON_BLOCK_GAP;
+  return layout.cursorY;
+}
+
+function drawHeading(layout: ComparisonPdfLayout, text: string, level: 1 | 2, keepWithHeight = COMPARISON_LINE_HEIGHT): number {
+  const lines = splitPdfText(layout.pdf, text, layout.contentW);
+  const lineHeight = level === 1 ? 5 : COMPARISON_LINE_HEIGHT;
+  ensureSpace(layout, lines.length * lineHeight + keepWithHeight, level === 1 ? "" : layout.continuationTitle);
+  layout.pdf.setFont("helvetica", "bold");
+  layout.pdf.setFontSize(level === 1 ? 14 : 10);
+  layout.pdf.setTextColor(level === 1 ? 0 : 30, level === 1 ? 0 : 58, level === 1 ? 0 : 138);
+  layout.pdf.text(lines, layout.margin, layout.cursorY);
+  layout.cursorY += lines.length * lineHeight + COMPARISON_BLOCK_GAP;
+  return layout.cursorY;
+}
+
+function drawParagraph(
+  layout: ComparisonPdfLayout,
+  text: string,
+  options: { bold?: boolean; indent?: number; gapAfter?: number; continuationHeading?: string } = {},
+): number {
+  const indent = options.indent ?? 0;
+  const width = layout.contentW - indent;
+  const lines = splitPdfText(layout.pdf, text, width);
+  layout.pdf.setFont("helvetica", options.bold ? "bold" : "normal");
+  layout.pdf.setFontSize(8);
+  layout.pdf.setTextColor(0, 0, 0);
+  lines.forEach((line) => {
+    ensureSpace(layout, COMPARISON_LINE_HEIGHT, options.continuationHeading ?? layout.continuationTitle);
+    layout.pdf.text(line, layout.margin + indent, layout.cursorY);
+    layout.cursorY += COMPARISON_LINE_HEIGHT;
+  });
+  layout.cursorY += options.gapAfter ?? COMPARISON_BLOCK_GAP;
+  return layout.cursorY;
+}
+
+function drawLabelValue(layout: ComparisonPdfLayout, label: string, value: string): number {
+  const valueLines = splitPdfText(layout.pdf, value, layout.contentW);
+  ensureSpace(layout, COMPARISON_LINE_HEIGHT + Math.min(valueLines.length, 1) * COMPARISON_LINE_HEIGHT, layout.continuationTitle);
+  drawParagraph(layout, label, { bold: true, gapAfter: 0 });
+  return drawParagraph(layout, value, { gapAfter: COMPARISON_BLOCK_GAP });
+}
+
+function getLabelValue(element: HTMLElement): { label: string; value: string } {
+  const label = element.querySelector("strong")?.textContent?.trim() ?? "";
+  const text = element.textContent?.trim() ?? "";
+  return {
+    label,
+    value: label && text.startsWith(label) ? text.slice(label.length).trim() : text,
+  };
+}
+
+function drawElementLabelValue(layout: ComparisonPdfLayout, element: HTMLElement): number {
+  const { label, value } = getLabelValue(element);
+  return label ? drawLabelValue(layout, label, value) : drawParagraph(layout, value);
+}
+
+function drawBulletList(layout: ComparisonPdfLayout, items: string[]): number {
+  items.forEach((item) => {
+    const lines = splitPdfText(layout.pdf, item, layout.contentW - 6);
+    ensureSpace(layout, Math.min(lines.length, 1) * COMPARISON_LINE_HEIGHT, layout.continuationTitle);
+    lines.forEach((line, index) => {
+      ensureSpace(layout, COMPARISON_LINE_HEIGHT, layout.continuationTitle);
+      layout.pdf.text(index === 0 ? `• ${line}` : line, layout.margin + (index === 0 ? 0 : 4), layout.cursorY);
+      layout.cursorY += COMPARISON_LINE_HEIGHT;
+    });
+    layout.cursorY += 1;
+  });
+  layout.cursorY += COMPARISON_BLOCK_GAP;
+  return layout.cursorY;
+}
+
+function drawScenarioEvidenceBlock(layout: ComparisonPdfLayout, scenario: HTMLElement): number {
+  const title = scenario.querySelector("h3")?.textContent?.trim() ?? "";
+  const evidenceType = scenario.querySelector(".comparison-evidence-type")?.textContent?.trim() ?? "";
+  const evidence = Array.from(scenario.querySelectorAll("p")).find((paragraph) => !paragraph.classList.contains("comparison-evidence-type"))?.textContent?.trim() ?? "";
+  const limitsTitle = scenario.querySelector("h4")?.textContent?.trim() ?? "";
+  const limits = Array.from(scenario.querySelectorAll("li")).map((item) => item.textContent.trim()).filter(Boolean);
+  const paragraphWidth = layout.contentW - 3;
+  const bulletWidth = layout.contentW - 6;
+  const titleLines = splitPdfText(layout.pdf, title, paragraphWidth);
+  const evidenceTypeLines = splitPdfText(layout.pdf, evidenceType, paragraphWidth);
+  const evidenceLines = splitPdfText(layout.pdf, evidence, paragraphWidth);
+  const limitsTitleLines = splitPdfText(layout.pdf, limitsTitle, paragraphWidth);
+  const limitLines = limits.map((limit) => splitPdfText(layout.pdf, limit, bulletWidth));
+  const renderedBlockHeight = 4
+    + (titleLines.length + evidenceTypeLines.length + evidenceLines.length + limitsTitleLines.length) * COMPARISON_LINE_HEIGHT
+    + 1
+    + limitLines.reduce((height, lines) => height + lines.length * COMPARISON_LINE_HEIGHT + 1, 0)
+    + COMPARISON_BLOCK_GAP
+    + 2;
+
+  if (renderedBlockHeight > layout.pageH - layout.margin - COMPARISON_BOTTOM_MARGIN) {
+    drawHeading(layout, title, 2);
+    drawLabelValue(layout, "Type de preuve", evidenceType);
+    drawParagraph(layout, evidence);
+    drawHeading(layout, limitsTitle, 2);
+    return drawBulletList(layout, limits);
+  }
+
+  ensureSpace(layout, renderedBlockHeight, layout.continuationTitle);
+  const blockTop = layout.cursorY;
+  const blockBottom = blockTop + renderedBlockHeight;
+  applyThinBlackBorder(layout.pdf);
+  layout.pdf.rect(layout.margin, blockTop, layout.contentW, renderedBlockHeight, "S");
+  layout.cursorY += 4;
+  const drawBlockLines = (lines: string[], bold = false, indent = 3, gapAfter = 0): void => {
+    layout.pdf.setFont("helvetica", bold ? "bold" : "normal");
+    layout.pdf.setFontSize(8);
+    layout.pdf.setTextColor(0, 0, 0);
+    layout.pdf.text(lines, layout.margin + indent, layout.cursorY);
+    layout.cursorY += lines.length * COMPARISON_LINE_HEIGHT + gapAfter;
+  };
+  drawBlockLines(titleLines, true);
+  drawBlockLines(evidenceTypeLines, true);
+  drawBlockLines(evidenceLines, false, 3, 1);
+  drawBlockLines(limitsTitleLines, true);
+  limitLines.forEach((lines) => {
+    layout.pdf.text(lines.map((line, index) => index === 0 ? `• ${line}` : line), layout.margin + 3, layout.cursorY);
+    layout.cursorY += lines.length * COMPARISON_LINE_HEIGHT + 1;
+  });
+  layout.cursorY += COMPARISON_BLOCK_GAP;
+  layout.cursorY = blockBottom + COMPARISON_SECTION_GAP;
+  return layout.cursorY;
+}
+
+function addComparisonPage(pdf: jsPDF, section: HTMLElement, margin: number, contentW: number, pageH: number): number {
+  const layout: ComparisonPdfLayout = {
+    pdf,
+    margin,
+    contentW,
+    pageH,
+    cursorY: margin,
+    continuationTitle: "Comparaison des hypothèses — suite",
+  };
+  const title = section.querySelector("h1")?.textContent?.trim() ?? "Comparaison des hypothèses";
+  drawHeading(layout, title, 1, COMPARISON_LINE_HEIGHT * 2);
+
+  const overview = section.querySelector<HTMLElement>(".comparison-overview");
+  if (overview) {
+    drawHeading(layout, overview.querySelector("h2")?.textContent?.trim() ?? "Conclusion comparative", 2);
+    Array.from(overview.querySelectorAll<HTMLElement>("p, .comparison-confidence, .comparison-label-value")).forEach((element) => {
+      if (element.classList.contains("comparison-confidence") || element.classList.contains("comparison-label-value")) drawElementLabelValue(layout, element);
+      else drawParagraph(layout, element.textContent.trim());
+    });
+  }
+
+  const scenarioBlocks = Array.from(section.querySelectorAll<HTMLElement>(".comparison-hypothesis"));
+  if (scenarioBlocks.length) {
+    drawHeading(layout, section.querySelector(".comparison-hypotheses")?.previousElementSibling?.textContent?.trim() ?? "Lecture comparative", 2);
+    scenarioBlocks.forEach((scenario) => drawScenarioEvidenceBlock(layout, scenario));
+  }
+
+  const factsHeading = Array.from(section.querySelectorAll<HTMLElement>(".section > h2"))
+    .find((heading) => heading.textContent?.trim() === "Faits à vérifier")?.textContent?.trim() ?? "Faits à vérifier";
+  const risks = Array.from(section.querySelectorAll<HTMLElement>(".comparison-risks > li")).map((item) => item.textContent.trim()).filter(Boolean);
+  const noRisk = Array.from(section.querySelectorAll<HTMLElement>(".section > p"))
+    .find((paragraph) => paragraph.textContent?.includes("Aucun risque significatif"))?.textContent?.trim();
+  drawHeading(layout, factsHeading, 2);
+  if (risks.length) drawBulletList(layout, risks);
+  else if (noRisk) drawParagraph(layout, noRisk);
+
+  const readings = section.querySelector<HTMLElement>(".comparison-readings");
+  if (readings) {
+    drawHeading(layout, readings.querySelector("h2")?.textContent?.trim() ?? "Trois lectures distinctes", 2);
+    Array.from(readings.children)
+      .filter((element): element is HTMLElement => element instanceof HTMLElement && element.tagName === "DIV")
+      .forEach((element) => drawElementLabelValue(layout, element));
+  }
+
+  return layout.cursorY;
 }
 
 export async function downloadSimulationPdf(reportWindowDocument: Document, selectedTeam: string): Promise<void> {
@@ -419,6 +627,18 @@ export async function downloadPortfolioPdf(
       cursorY = margin;
       return cursorY;
     };
+
+    const isComparisonPage = "classList" in section && section.classList.contains("comparison-page");
+    if (isComparisonPage) {
+      addComparisonPage(pdf, section, margin, contentW, pageH);
+      if (isDemo) {
+        pdf.setFont("helvetica", "italic");
+        pdf.setFontSize(8);
+        pdf.setTextColor(107, 114, 128);
+        pdf.text("Données de démonstration — Monte Carlo Azure", margin, pageH - 5);
+      }
+      continue;
+    }
 
     const title = section.querySelector("h1")?.textContent ?? "Simulation Portefeuille";
     pdf.setFont("helvetica", "bold");

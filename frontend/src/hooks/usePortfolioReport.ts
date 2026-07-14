@@ -23,6 +23,7 @@ import {
   type PortfolioComparisonDiagnostic,
   type ScenarioSimulationObservation,
 } from "../utils/portfolioComparisonDiagnostic";
+import type { PortfolioPilotReference } from "../utils/portfolioComparisonPresentation";
 
 export type TeamPortfolioConfig = {
   teamName: string;
@@ -71,6 +72,7 @@ type UsePortfolioReportParams = {
   targetWeeks: number;
   nSims: number;
   alignmentRate: number;
+  pilotReference: PortfolioPilotReference;
   teamConfigs: TeamPortfolioConfig[];
 };
 
@@ -136,14 +138,6 @@ function toScenarioResult(
   simulationMode: ForecastMode,
   result: Awaited<ReturnType<typeof simulateForecastFromSamples>>,
   weeklyData: WeeklyThroughputRow[],
-  context: {
-    selectedOrg: string;
-    selectedProject: string;
-    startDate: string;
-    endDate: string;
-    backlogSize: number;
-    targetWeeks: number;
-  },
 ): PortfolioScenarioResult {
   const percentiles = result.result_percentiles;
   const computedRiskScore = computeRiskScoreFromPercentiles(simulationMode, percentiles) ?? undefined;
@@ -152,7 +146,6 @@ function toScenarioResult(
     (result.result_kind === "items" && typeof result.risk_score === "number" && Number.isFinite(result.risk_score)
       ? result.risk_score
       : undefined);
-  const throughputReliability = computeThroughputReliability(samples);
   return {
     label,
     hypothesis,
@@ -164,27 +157,6 @@ function toScenarioResult(
     riskLegend: riskScore == null ? undefined : computeRiskLegend(riskScore),
     distribution: result.result_distribution,
     completionSummary: result.completion_summary,
-    throughputReliability,
-    decisionDiagnostic: buildSimulationDecisionLanguage({
-      hasResult: true,
-      throughputSamples: samples,
-      includeZeroWeeks: true,
-      percentiles,
-      completionSummary: result.completion_summary,
-      riskScore,
-      throughputReliability,
-      selectedOrg: context.selectedOrg,
-      selectedProject: context.selectedProject,
-      selectedTeam: label,
-      startDate: context.startDate,
-      endDate: context.endDate,
-      simulationMode,
-      backlogSize: context.backlogSize,
-      targetWeeks: context.targetWeeks,
-      types: [],
-      doneStates: [],
-      usableWeeks: samples.length,
-    }),
   };
 }
 
@@ -202,6 +174,7 @@ export function usePortfolioReport({
   targetWeeks,
   nSims,
   alignmentRate,
+  pilotReference,
   teamConfigs,
 }: UsePortfolioReportParams): UsePortfolioReportResult {
   const [loadingReport, setLoadingReport] = useState<boolean>(false);
@@ -303,15 +276,6 @@ export function usePortfolioReport({
         includeZeroWeeks,
       );
       const effectiveFrictionRate = computeFrictionRatePercent(successfulTeams.length, alignmentRate);
-      const scenarioDiagnosticContext = {
-        selectedOrg,
-        selectedProject,
-        startDate,
-        endDate,
-        backlogSize: Number(backlogSize),
-        targetWeeks: Number(targetWeeks),
-      };
-
       const totalSimulations = successfulTeams.length + 4;
       setGenerationProgress({ done: 0, total: totalSimulations });
       let completedSimulations = 0;
@@ -406,11 +370,10 @@ export function usePortfolioReport({
                 simulationMode,
                 result,
                 buildSyntheticWeeklyData(scenarioSamples.optimistic, startDate),
-                scenarioDiagnosticContext,
               ),
             };
           } catch (error: unknown) {
-            throw { kind: "scenario", teamName: "Optimiste", error };
+            throw { kind: "scenario", teamName: "Indépendant", error };
           } finally {
             markSimulationDone();
           }
@@ -437,7 +400,6 @@ export function usePortfolioReport({
                 simulationMode,
                 result,
                 buildSyntheticWeeklyData(scenarioSamples.aligned, startDate),
-                scenarioDiagnosticContext,
               ),
             };
           } catch (error: unknown) {
@@ -468,7 +430,6 @@ export function usePortfolioReport({
                 simulationMode,
                 result,
                 buildSyntheticWeeklyData(scenarioSamples.friction, startDate),
-                scenarioDiagnosticContext,
               ),
             };
           } catch (error: unknown) {
@@ -499,7 +460,6 @@ export function usePortfolioReport({
                 simulationMode,
                 result,
                 correlatedWeeklyData,
-                scenarioDiagnosticContext,
               ),
             };
           } catch (error: unknown) {
@@ -549,7 +509,7 @@ export function usePortfolioReport({
         return;
       }
 
-      setPortfolioComparisonDiagnostic(buildPortfolioComparisonDiagnostic({
+      const comparisonDiagnostic = buildPortfolioComparisonDiagnostic({
         alignmentRate,
         frictionRate: effectiveFrictionRate,
         commonHistoricalWeeks: correlatedWeeklyData.length,
@@ -558,7 +518,8 @@ export function usePortfolioReport({
           reliability: computeThroughputReliability(data.throughputSamples),
         })),
         scenarioObservations,
-      }));
+      });
+      setPortfolioComparisonDiagnostic(comparisonDiagnostic);
 
       const { exportPortfolioPrintReport } = await import("../components/steps/portfolioPrintReport");
       await exportPortfolioPrintReport({
@@ -570,6 +531,8 @@ export function usePortfolioReport({
         includedTeams: sections.map((section) => section.selectedTeam),
         sections,
         scenarios,
+        portfolioComparisonDiagnostic: comparisonDiagnostic,
+        pilotReference,
       });
     } catch (error: unknown) {
       setReportErr(

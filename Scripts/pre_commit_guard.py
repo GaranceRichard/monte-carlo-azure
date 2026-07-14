@@ -6,13 +6,15 @@ Pre-commit guard for repository hygiene.
 Checks:
 1) README update is staged when code/config changes are staged.
 2) README text does not contain common mojibake artifacts.
-3) Secret scan via Scripts/check_no_secrets.py.
-4) DoD compliance guard via Scripts/check_dod_compliance.py.
-5) Naming convention guard via Scripts/check_naming_convention.py.
+3) README French prose is not massively de-accented.
+4) Secret scan via Scripts/check_no_secrets.py.
+5) DoD compliance guard via Scripts/check_dod_compliance.py.
+6) Naming convention guard via Scripts/check_naming_convention.py.
 """
 
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -55,6 +57,41 @@ MOJIBAKE_TOKENS = (
     "Â ",
     "�",
 )
+
+# Common French terms used in the README. This detects an accidental wholesale conversion
+# of French prose to ASCII without treating it as mojibake or inspecting code fragments.
+FRENCH_ACCENT_PAIRS = (
+    ("prévision", "prevision"),
+    ("sécuriser", "securiser"),
+    ("périmètre", "perimetre"),
+    ("capacité", "capacite"),
+    ("fonctionnalités", "fonctionnalites"),
+    ("sécurité", "securite"),
+    ("qualité", "qualite"),
+    ("fiabilité", "fiabilite"),
+    ("scénario", "scenario"),
+    ("déploiement", "deploiement"),
+    ("prérequis", "prerequis"),
+    ("contrôle", "controle"),
+    ("définition", "definition"),
+    ("données", "donnees"),
+    ("équipe", "equipe"),
+    ("résultat", "resultat"),
+)
+MAX_UNACCENTED_FRENCH_TERMS = 4
+
+
+def prose_without_code(text: str) -> str:
+    """Drop fenced and inline code before checking French documentation prose."""
+    prose: list[str] = []
+    in_fence = False
+    for line in text.splitlines():
+        if line.strip().startswith("```"):
+            in_fence = not in_fence
+            continue
+        if not in_fence:
+            prose.append(line)
+    return re.sub(r"`[^`]*`", "", "\n".join(prose))
 
 
 def run(cmd: list[str]) -> subprocess.CompletedProcess[str]:
@@ -120,6 +157,33 @@ def check_readme_encoding() -> int:
     return 0
 
 
+def check_readme_french_accents() -> int:
+    if not README_PATH.exists():
+        print("ERROR: README.md is missing.", file=sys.stderr)
+        return 1
+
+    prose = prose_without_code(README_PATH.read_text(encoding="utf-8", errors="replace")).casefold()
+    unaccented = [
+        plain
+        for _accented, plain in FRENCH_ACCENT_PAIRS
+        if re.search(rf"\b{re.escape(plain)}\b", prose)
+    ]
+    if len(unaccented) > MAX_UNACCENTED_FRENCH_TERMS:
+        print(
+            "ERROR: README.md appears to contain massively de-accented French prose.",
+            file=sys.stderr,
+        )
+        print(
+            "Detected unaccented terms:", ", ".join(sorted(unaccented)), file=sys.stderr
+        )
+        print(
+            "Action: restore French accents in prose; keep technical identifiers unchanged.",
+            file=sys.stderr,
+        )
+        return 1
+    return 0
+
+
 def check_no_secrets() -> int:
     if not SECRET_CHECK_PATH.exists():
         print("ERROR: Scripts/check_no_secrets.py is missing.", file=sys.stderr)
@@ -167,6 +231,7 @@ def main() -> int:
     checks = (
         lambda: check_readme_staged(paths),
         check_readme_encoding,
+        check_readme_french_accents,
         check_no_secrets,
         check_dod_compliance,
         check_naming_convention,
