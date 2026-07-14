@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import PortfolioStep from "./PortfolioStep";
 import { usePortfolio } from "../../hooks/usePortfolio";
+import type { PortfolioComparisonDiagnostic } from "../../utils/portfolioComparisonDiagnostic";
 
 vi.mock("../../hooks/usePortfolio", () => ({
   usePortfolio: vi.fn(),
@@ -304,5 +305,29 @@ describe("PortfolioStep", () => {
     expect(screen.getByRole("button", { name: /Génération du rapport/i })).toBeTruthy();
     expect(screen.getByText("Filtres indisponibles")).toBeTruthy();
     expect(screen.getByRole("option", { name: /Toutes les équipes/i })).toBeTruthy();
+  });
+
+  it("places the comparison diagnostic after portfolio report feedback", () => {
+    const portfolioComparisonDiagnostic: PortfolioComparisonDiagnostic = {
+      historicalData: { quality: "insufficient", observedFacts: [], teamFindings: [] },
+      simulationStability: [],
+      hypothesisCredibility: [],
+      significantRisks: [],
+      comparisonConfidence: { level: "insufficient", statement: "Confiance comparative insuffisante." },
+      preferredScenario: null,
+      conclusion: "Preuves insuffisantes pour privilégier une hypothèse.",
+    };
+    vi.mocked(usePortfolio).mockReturnValue({
+      ...basePortfolioMock(),
+      portfolioComparisonDiagnostic,
+      reportProgressLabel: "Rapport terminé",
+      generationProgress: { done: 6, total: 6 },
+    });
+
+    render(<PortfolioStep selectedOrg="Org A" selectedProject="Project A" teams={[]} pat="pat" serverUrl="" />);
+
+    const progress = screen.getByText("Rapport terminé (6/6)");
+    const comparison = screen.getByRole("heading", { name: "Comparaison des hypothèses" });
+    expect(progress.compareDocumentPosition(comparison) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });

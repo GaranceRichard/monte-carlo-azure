@@ -9,6 +9,7 @@ import {
 } from "../../simulationLimits";
 import type { NamedEntity } from "../../types";
 import { usePortfolio } from "../../hooks/usePortfolio";
+import PortfolioComparisonDiagnostic from "./PortfolioComparisonDiagnostic";
 
 type PortfolioStepProps = {
   demoMode?: boolean;
@@ -202,6 +203,9 @@ export default function PortfolioStep({
         <div className="sim-advanced-summary">
           {portfolio.reportProgressLabel} ({portfolio.generationProgress.done}/{portfolio.generationProgress.total})
         </div>
+      )}
+      {portfolio.portfolioComparisonDiagnostic && (
+        <PortfolioComparisonDiagnostic diagnostic={portfolio.portfolioComparisonDiagnostic} />
       )}
 
       {portfolio.showAddModal && (

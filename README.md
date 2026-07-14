@@ -137,8 +137,8 @@ Diagnostic comparatif portefeuille:
   ni la validite future du scenario
 - avec les seules donnees historiques, resultats simules et taux manuel, le diagnostic ne recommande aucun
   scenario unique et conclut que les preuves sont insuffisantes
-- ce diagnostic est expose dans le modele portefeuille pour les prochaines restitutions UI et PDF, sans etre
-  encore affiche
+- l'interface portefeuille expose cette comparaison de credibilite des hypotheses; son integration au PDF
+  reste a venir
 
 Regle calendrier throughput:
 
