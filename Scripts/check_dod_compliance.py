@@ -24,6 +24,88 @@ def _ok(condition: bool, message: str, errors: list[str]) -> None:
         errors.append(message)
 
 
+def _workflow_job_block(workflow: str, job_name: str) -> str | None:
+    match = re.search(
+        rf"(?ms)^  {re.escape(job_name)}:\s*\n(?P<body>.*?)(?=^  [\w-]+:\s*\n|\Z)",
+        workflow,
+    )
+    return match.group("body") if match else None
+
+
+def pages_workflow_run_errors(pages: str, ci_workflow_name: str = "CI") -> list[str]:
+    errors: list[str] = []
+    escaped_name = re.escape(ci_workflow_name)
+    _ok(
+        bool(re.search(r"(?m)^  workflow_run:\s*$", pages))
+        and bool(
+            re.search(
+                rf"(?m)^    workflows:\s*\[\s*[\"']{escaped_name}[\"']\s*\]\s*$",
+                pages,
+            )
+        )
+        and bool(re.search(r"(?m)^    types:\s*\[\s*completed\s*\]\s*$", pages))
+        and bool(re.search(r"(?m)^    branches:\s*\[\s*main\s*\]\s*$", pages)),
+        "Pages must run after the completed CI workflow on main",
+        errors,
+    )
+    _ok(
+        not re.search(r"(?m)^  workflow_dispatch:\s*$", pages),
+        "Pages workflow_dispatch must not bypass CI validation",
+        errors,
+    )
+
+    gate_job = _workflow_job_block(pages, "quality-gate")
+    deploy_job = _workflow_job_block(pages, "build-and-deploy")
+    required_gate_conditions = (
+        "github.event_name == 'workflow_run'",
+        f"github.event.workflow_run.name == '{ci_workflow_name}'",
+        "github.event.workflow_run.event == 'push'",
+        "github.event.workflow_run.head_branch == 'main'",
+        "github.event.workflow_run.conclusion == 'success'",
+    )
+    _ok(
+        gate_job is not None
+        and all(condition in gate_job for condition in required_gate_conditions),
+        "Pages quality-gate must require a successful CI push on main",
+        errors,
+    )
+    _ok(
+        deploy_job is not None
+        and bool(re.search(r"(?m)^    needs:\s*quality-gate\s*$", deploy_job)),
+        "Pages must wait for the shared quality-gate job",
+        errors,
+    )
+    if deploy_job is not None:
+        _ok(
+            "ref: ${{ github.event.workflow_run.head_sha }}" in deploy_job,
+            "Pages must checkout the exact SHA validated by CI",
+            errors,
+        )
+        job_header = deploy_job.split("\n    steps:", maxsplit=1)[0]
+        _ok(
+            not re.search(
+                r"(?mi)^    if:.*(?:always|failure|cancelled)\s*\(",
+                job_header,
+            ),
+            "Pages deployment must not bypass a failed or cancelled quality-gate",
+            errors,
+        )
+
+    polling_markers = (
+        "actions/github-script",
+        "actions/runs",
+        "github.paginate",
+        "listWorkflowRunsForRepo",
+        "wait-for-ci.cjs",
+    )
+    _ok(
+        not any(marker in pages for marker in polling_markers),
+        "Pages must not poll the GitHub Actions API",
+        errors,
+    )
+    return errors
+
+
 def collect_dod_errors(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
 
@@ -127,11 +209,7 @@ def collect_dod_errors(root: Path = ROOT) -> list[str]:
         errors,
     )
     pages = _read(".github/workflows/pages.yml", root)
-    _ok(
-        'const requiredJobs = ["quality-gate"]' in pages,
-        "Pages must wait for the shared quality-gate job",
-        errors,
-    )
+    errors.extend(pages_workflow_run_errors(pages, "CI"))
 
     # Coverage task integration checks (VS Code): optional local developer file.
     tasks_path = root / ".vscode" / "tasks.json"

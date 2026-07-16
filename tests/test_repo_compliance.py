@@ -2,22 +2,17 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "Scripts"))
+
+import check_dod_compliance  # noqa: E402
 
 
 def _read(relpath: str) -> str:
     return (ROOT / relpath).read_text(encoding="utf-8")
-
-
-def _workflow_job_block(workflow: str, job_name: str) -> str:
-    match = re.search(
-        rf"(?ms)^  {re.escape(job_name)}:\s*\n(?P<body>.*?)(?=^  [\w-]+:\s*\n|\Z)",
-        workflow,
-    )
-    assert match, f"Missing workflow job: {job_name}"
-    return match.group("body")
 
 
 def test_dod_docs_exist_and_are_linked_from_readme() -> None:
@@ -101,27 +96,86 @@ def test_ci_enforces_required_checks() -> None:
     assert "npm run test:e2e" not in ci
     assert "npm run build" not in ci
     assert "--cov-fail-under=80" in gate
-    assert 'const requiredJobs = ["quality-gate"]' in pages
-    gate_job = _workflow_job_block(pages, "quality-gate")
-    deploy_job = _workflow_job_block(pages, "build-and-deploy")
+    assert check_dod_compliance.pages_workflow_run_errors(pages) == []
+    gate_job = check_dod_compliance._workflow_job_block(pages, "quality-gate")
+    deploy_job = check_dod_compliance._workflow_job_block(pages, "build-and-deploy")
+    assert gate_job is not None
+    assert deploy_job is not None
     assert re.search(r"(?m)^    needs:\s*quality-gate\s*$", deploy_job)
-    checkout_position = gate_job.find("uses: actions/checkout@")
-    script_position = gate_job.find("wait-for-ci.cjs")
-    assert 0 <= checkout_position < script_position
-    assert "  wait-for-ci:" not in pages
+    assert 'workflows: ["CI"]' in pages
+    assert "types: [completed]" in pages
+    assert "branches: [main]" in pages
+    assert "workflow_dispatch:" not in pages
     assert "backend-tests" not in pages
     assert "frontend-tests" not in pages
 
 
-def test_pages_deployment_cannot_bypass_failed_or_cancelled_quality_gate() -> None:
+def test_pages_allows_only_successful_ci_pushes_on_main() -> None:
     pages = _read(".github/workflows/pages.yml")
-    deploy_job = _workflow_job_block(pages, "build-and-deploy")
+    gate_job = check_dod_compliance._workflow_job_block(pages, "quality-gate")
+    deploy_job = check_dod_compliance._workflow_job_block(pages, "build-and-deploy")
+    assert gate_job is not None
+    assert deploy_job is not None
     job_header = deploy_job.split("\n    steps:", maxsplit=1)[0]
+    conclusion = re.search(
+        r"github\.event\.workflow_run\.conclusion == '([^']+)'",
+        gate_job,
+    )
 
+    assert conclusion
+    assert conclusion.group(1) == "success"
+    assert "github.event.workflow_run.event == 'push'" in gate_job
+    assert "github.event.workflow_run.head_branch == 'main'" in gate_job
     assert re.search(r"(?m)^    needs:\s*quality-gate\s*$", job_header)
     assert not re.search(
         r"(?mi)^    if:.*(?:always|failure|cancelled)\s*\(",
         job_header,
+    )
+    for blocked in (
+        "failure",
+        "cancelled",
+        "timed_out",
+        "action_required",
+        "neutral",
+        "skipped",
+        None,
+    ):
+        assert blocked != conclusion.group(1)
+
+
+def test_pages_checks_out_only_the_sha_validated_by_ci_and_has_no_polling() -> None:
+    pages = _read(".github/workflows/pages.yml")
+    deploy_job = check_dod_compliance._workflow_job_block(pages, "build-and-deploy")
+    assert deploy_job is not None
+
+    assert "ref: ${{ github.event.workflow_run.head_sha }}" in deploy_job
+    assert "ref: main" not in deploy_job
+    for marker in (
+        "actions/github-script",
+        "actions/runs",
+        "github.paginate",
+        "listWorkflowRunsForRepo",
+        "wait-for-ci.cjs",
+    ):
+        assert marker not in pages
+    assert not (ROOT / ".github" / "scripts" / "wait-for-ci.cjs").exists()
+    assert not (ROOT / ".github" / "scripts" / "wait-for-ci.test.cjs").exists()
+
+
+def test_pages_dod_rejects_a_poll_or_a_checkout_other_than_validated_sha() -> None:
+    pages = _read(".github/workflows/pages.yml")
+
+    wrong_sha = pages.replace(
+        "ref: ${{ github.event.workflow_run.head_sha }}",
+        "ref: main",
+    )
+    assert "Pages must checkout the exact SHA validated by CI" in (
+        check_dod_compliance.pages_workflow_run_errors(wrong_sha)
+    )
+
+    polling = pages + "\n# actions/github-script polling\n"
+    assert "Pages must not poll the GitHub Actions API" in (
+        check_dod_compliance.pages_workflow_run_errors(polling)
     )
 
 
