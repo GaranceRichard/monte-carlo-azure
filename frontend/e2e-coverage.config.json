@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "artifactMaxAgeSeconds": 3600,
+  "scope": {
+    "id": "frontend-src-e2e-v1",
+    "urlPathPrefix": "/src/",
+    "excludedPathSuffixes": [
+      "/src/components/steps/simulationPrintReport.tsx",
+      "/src/utils/export.ts",
+      "/export.ts",
+      "/src/main.tsx",
+      "/main.tsx",
+      "/src/e2e/runtime.ts",
+      "/runtime.ts"
+    ]
+  },
+  "thresholds": {
+    "statements": 80,
+    "branches": 80,
+    "functions": 80,
+    "lines": 80
+  }
+}

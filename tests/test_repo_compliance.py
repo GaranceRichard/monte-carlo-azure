@@ -64,18 +64,22 @@ def test_frontend_unit_coverage_thresholds_are_at_least_80() -> None:
 
 
 def test_e2e_coverage_thresholds_are_at_least_80() -> None:
-    content = _read("frontend/tests/e2e/coverage.spec.js")
-    checks = {
-        "statements": r"summary\.statements\.pct\)\.toBeGreaterThanOrEqual\((\d+)\)",
-        "branches": r"summary\.branches\.pct\)\.toBeGreaterThanOrEqual\((\d+)\)",
-        "functions": r"summary\.functions\.pct\)\.toBeGreaterThanOrEqual\((\d+)\)",
-        "lines": r"summary\.lines\.pct\)\.toBeGreaterThanOrEqual\((\d+)\)",
+    config = json.loads(_read("frontend/e2e-coverage.config.json"))
+    assert set(config["thresholds"]) == {
+        "statements",
+        "branches",
+        "functions",
+        "lines",
     }
-    for metric, pattern in checks.items():
-        match = re.search(pattern, content)
-        assert match, f"Missing e2e threshold assertion for {metric}"
-        value = int(match.group(1))
+    for metric, value in config["thresholds"].items():
         assert value >= 80, f"E2E threshold too low for {metric}: {value}"
+
+    scripts = json.loads(_read("frontend/package.json"))["scripts"]
+    assert scripts["test:e2e"] == "node scripts/run-e2e-coverage.mjs"
+    assert (
+        scripts["test:e2e:coverage:console"]
+        == "node scripts/run-e2e-coverage.mjs --reporter=line"
+    )
 
 
 def test_ci_enforces_required_checks() -> None:

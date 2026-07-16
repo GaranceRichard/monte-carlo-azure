@@ -1,83 +1,124 @@
 # Roadmap
 
-Monte Carlo Azure est un outil d'aide a la decision pour la planification sous incertitude.
-Cette roadmap exprime les priorites en termes de valeur delivree, pas de features techniques.
+Monte Carlo Azure est un outil d’aide à la décision pour la planification sous incertitude.
+Cette roadmap exprime les priorités en termes de valeur livrée et de confiance décisionnelle ;
+elle ne constitue pas un backlog technique.
 
 ---
 
-## Maintenant - Outil operationnel pour une equipe ou un portefeuille
+## Déjà livré — Rendre les projections et leurs limites lisibles
 
-**Ce qui est disponible**
-
-- simulation Monte Carlo a partir du throughput reel Azure DevOps
-- deux modes de question : "en combien de temps ?" et "combien d'items en N semaines ?"
-- mode portefeuille multi-equipes avec 4 scenarios d'agregation : `Independant`, `Arrime`, `Friction`, `Historique corrélé`
-- rapport PDF exportable, oriente restitution en COPIL, avec comparaison de credibilite des hypotheses
-- reference de pilotage facultative, explicite et distincte d'une recommandation fondee sur les preuves
-- `Risk Score` avec code couleur pour qualifier la dispersion de la projection
-- aucune donnee d'identification Azure DevOps ne transite par le serveur
-
-**Ce que ca permet**
-
-Arriver en comite avec une projection chiffree et un niveau de confiance explicite, plutot qu'une estimation subjective.
-Arbitrer scope et delai sur une base commune, pas sur des intuitions divergentes.
-
----
-
-## Ensuite - Renforcer la lecture decisionnelle dans le temps
-
-**Comparaison de periodes**
-
-Permettre de comparer le throughput avant et apres un evenement organisationnel, comme une reorganisation, un changement de perimetre ou un onboarding.
-Aujourd'hui l'outil donne une photo ; cette evolution donne un film.
-
-*Valeur : identifier si une decision passee a ameliore ou degrade la capacite de delivery, avec des donnees.*
-
-**Indicateur de stabilite du throughput**
-
-Signaler explicitement quand l'historique est trop volatile pour produire une projection fiable.
-Aujourd'hui le `Risk Score` mesure la dispersion du resultat ; cet indicateur mesurerait la qualite de la donnee source.
-
-*Valeur : eviter les fausses certitudes. Un directeur de projet doit savoir quand ne pas s'appuyer sur une simulation.*
-
-**Export structure pour reporting existant**
-
-Produire un export compatible avec les formats de reporting programme, par exemple Excel ou PowerPoint.
-Aujourd'hui le PDF est oriente COPIL ; cet export ciblerait l'integration dans un tableau de bord existant.
-
-*Valeur : reduire le temps de preparation des instances de gouvernance.*
+- Simulation Monte Carlo à partir du throughput réel Azure DevOps, en mode équipe et portefeuille,
+  pour répondre aux questions « en combien de temps ? » et « combien d’items en N semaines ? ».
+- Restitutions interface et PDF des percentiles, distributions, censures à l’horizon et `Risk Score`,
+  avec export CSV du throughput et rapports directement téléchargeables.
+- Quatre hypothèses d’agrégation portefeuille comparables : `Independant`, `Arrime`, `Friction` et
+  `Historique corrélé`.
+- Comparaison de crédibilité des hypothèses portefeuille : la qualité des données historiques, la
+  stabilité des résultats simulés et la crédibilité de l’hypothèse sont trois diagnostics distincts.
+- Types de preuve explicites : `observed`, `calculated`, `user_input` et `unsupported`.
+- Absence de recommandation automatique lorsqu’aucune preuve ne permet de privilégier une hypothèse :
+  cette conclusion est un résultat métier, pas une erreur à masquer.
+- Distinction entre une recommandation fondée sur les données et une référence de pilotage choisie par
+  l’utilisateur ; cette dernière est facultative et ne modifie ni les calculs ni la crédibilité attribuée
+  aux scénarios.
+- Connexion Azure DevOps Cloud et Server/TFS depuis le navigateur, sans faire transiter le PAT ou le
+  contexte Azure DevOps par le backend.
+- Contrôles qualité adaptatifs livrés avec trois niveaux explicables (`targeted`, `impacted`, `massive`) :
+  le pré-commit valide l’index Git, le pré-push valide les commits poussés dans des worktrees détachés et
+  la CI conserve le plan complet avec smoke test Docker.
+- Chaîne de couverture fiabilisée : suppression des doubles exécutions, seuils E2E réellement bloquants,
+  artefacts identifiés et réutilisés par les Vitals, et temporaires Pytest isolés dans le workspace.
+- Documentation normative réalignée sur les gates, la couverture, la traçabilité et les critères de
+  validation complète, de conformité DoD et de publiabilité.
 
 ---
 
-## Plus tard - Vision direction de programme
+## Maintenant — Fiabiliser les données qui fondent l’arbitrage
 
-**Dashboard multi-projets**
+**Une baseline de performance reproductible**
 
-Consolider plusieurs projets en une vue unique avec niveaux de risque compares.
-Passer de "chaque equipe a sa simulation" a "la direction a une lecture agregee du portefeuille programme".
+Établir une baseline de performance reproductible afin de mesurer les régressions de façon comparable et
+de prioriser les optimisations sur des faits, maintenant que la chaîne de validation adaptative est en
+place.
 
-*Valeur : permettre a une direction de programme d'arbitrer les priorites et les ressources sur une base probabiliste commune.*
+*Valeur : préserver la confiance dans les projections, les exports et les parcours critiques tout en
+disposant d’un repère objectif de vitesse et de capacité.*
 
-**Visualisation des dependances inter-equipes**
+**Une collecte Azure DevOps qui ne mélange pas les signaux**
 
-Modeliser l'impact d'un retard d'une equipe sur les autres.
-Le mode portefeuille distingue deja les hypotheses independante, alignee, derivee par friction et fondee sur
-l'historique commun, sans en demontrer les dependances operationnelles. Cette evolution ajouterait des
-dependances explicites et observables.
+Fiabiliser la collecte Azure DevOps en découplant clairement le throughput et le cycle time : chacun doit
+conserver sa définition, ses sources et ses limites de qualité. Intégrer les limites de sprint disponibles
+dans Azure DevOps Cloud et Server, sans dégrader la compatibilité entre les deux environnements.
 
-*Valeur : anticiper les effets de cascade avant qu'ils se produisent, pas apres.*
+*Valeur : éviter qu’un indicateur de flux ou de délai ne soit interprété à partir de données incomplètes,
+ou d’une règle de sprint implicite.*
 
-**Indicateur de maturite de delivery par equipe**
+**Des limites de sprint visibles au moment de décider**
 
-Produire un score de maturite base sur la stabilite du throughput dans le temps, la predictibilite des engagements et la qualite des donnees ADO.
-Utilisable pour un diagnostic portefeuille ou un accompagnement transformation.
+Restituer les limites de sprint Azure DevOps dans l’interface et dans les PDF, avec une formulation qui
+permet de comprendre leur effet sur la lecture de la projection et du portefeuille.
 
-*Valeur : donner aux responsables transformation un instrument de mesure objectif de la progression des equipes.*
+*Valeur : rendre les hypothèses de capacité vérifiables en comité, au même titre que les percentiles et
+les diagnostics déjà affichés.*
+
+---
+
+## Ensuite — Renforcer la robustesse des prévisions et préparer la croissance
+
+**Des projections vérifiables dans le temps**
+
+Renforcer la robustesse statistique avec des contrats cohérents entre Python et TypeScript, du backtesting
+des hypothèses et des diagnostics de concentration de fin de sprint. Compléter cette lecture par la
+comparaison de périodes, afin d’identifier l’effet d’un changement d’organisation, de périmètre ou
+d’onboarding sur le delivery.
+
+*Valeur : distinguer une projection calculable d’une projection dont les hypothèses restent crédibles face
+aux résultats observés.*
+
+**Un socle qui évolue sans fragiliser le produit**
+
+Restructurer progressivement l’architecture afin d’isoler les responsabilités métier et de conserver les
+invariants de sécurité. Optimiser les performances à partir de la baseline et préparer le passage à
+l’échelle des simulations, de la collecte et de la génération de rapports.
+
+*Valeur : maintenir une expérience fluide et des résultats cohérents lorsque les volumes, les équipes et
+les usages augmentent.*
+
+**Des restitutions adaptées aux instances existantes**
+
+Ajouter des exports structurés pour les outils de reporting programme lorsque les décisions doivent être
+réutilisées au-delà du PDF de comité.
+
+*Valeur : réduire la préparation manuelle des instances de gouvernance sans dupliquer les chiffres ou les
+hypothèses.*
+
+---
+
+## Plus tard — Faire du portefeuille un outil d’arbitrage de programme
+
+**Un portefeuille qui explicite les relations entre équipes**
+
+Enrichir le pilotage portefeuille avec les dépendances, contraintes, règles de substituabilité et diagnostics
+multi-équipes. Les scénarios actuels rendent les hypothèses comparables ; cette étape rendra visibles les
+relations opérationnelles qui peuvent les justifier, les limiter ou les invalider.
+
+*Valeur : anticiper les effets de cascade et rendre les arbitrages de ressources plus explicites avant que
+les retards ne se matérialisent.*
+
+**Une vue direction de programme**
+
+Consolider plusieurs projets dans une vue de portefeuille avec des niveaux de risque, des contraintes et des
+signaux de maturité comparables. Cette vue s’appuiera sur les diagnostics d’historique, de prévision et de
+crédibilité, sans les réduire à un score unique.
+
+*Valeur : permettre aux directions programme et transformation d’arbitrer priorités et capacité sur une
+base probabiliste commune, tout en conservant les limites des données visibles.*
 
 ---
 
 ## Ce qui ne fait pas partie de la roadmap
 
-- gestion de backlog : l'outil lit Azure DevOps, il ne le remplace pas
-- estimation par story points : le modele repose intentionnellement sur le throughput reel
-- garantie de resultat : l'outil structure l'incertitude, il ne l'elimine pas
+- gestion de backlog : l’outil lit Azure DevOps, il ne le remplace pas ;
+- estimation par story points : le modèle repose intentionnellement sur le throughput réel ;
+- garantie de résultat : l’outil structure l’incertitude, il ne l’élimine pas.

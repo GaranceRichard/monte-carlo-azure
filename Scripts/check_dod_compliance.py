@@ -10,11 +10,13 @@ import re
 import sys
 from pathlib import Path
 
+from check_e2e_coverage import load_validated_config
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def _read(relpath: str) -> str:
-    return (ROOT / relpath).read_text(encoding="utf-8")
+def _read(relpath: str, root: Path = ROOT) -> str:
+    return (root / relpath).read_text(encoding="utf-8")
 
 
 def _ok(condition: bool, message: str, errors: list[str]) -> None:
@@ -22,19 +24,19 @@ def _ok(condition: bool, message: str, errors: list[str]) -> None:
         errors.append(message)
 
 
-def main() -> int:
+def collect_dod_errors(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
 
     # Docs presence and linkage
-    dod = ROOT / "docs/definition-of-done.md"
-    critical = ROOT / "docs/critical-paths.md"
-    traceability = ROOT / "docs/vitals-traceability.md"
-    vitals_map = ROOT / "docs/vitals-coverage-map.json"
+    dod = root / "docs/definition-of-done.md"
+    critical = root / "docs/critical-paths.md"
+    traceability = root / "docs/vitals-traceability.md"
+    vitals_map = root / "docs/vitals-coverage-map.json"
     _ok(dod.exists(), "Missing docs/definition-of-done.md", errors)
     _ok(critical.exists(), "Missing docs/critical-paths.md", errors)
     _ok(traceability.exists(), "Missing docs/vitals-traceability.md", errors)
     _ok(vitals_map.exists(), "Missing docs/vitals-coverage-map.json", errors)
-    readme = _read("README.md")
+    readme = _read("README.md", root)
     _ok(
         "docs/definition-of-done.md" in readme,
         "README must link docs/definition-of-done.md",
@@ -51,41 +53,59 @@ def main() -> int:
         errors,
     )
     _ok(
-        "Integration: couverture globale >= 80%." in _read("docs/definition-of-done.md"),
+        "Integration: couverture globale >= 80%."
+        in _read("docs/definition-of-done.md", root),
         "DoD must define integration coverage >= 80%",
         errors,
     )
 
     # Frontend script guards
-    package_json = json.loads(_read("frontend/package.json"))
+    package_json = json.loads(_read("frontend/package.json", root))
     scripts = package_json.get("scripts", {})
     for required in ["lint", "build", "test:e2e", "test:unit:coverage"]:
         _ok(required in scripts, f"Missing frontend script: {required}", errors)
 
     # Vitest unit coverage thresholds
-    vitest = _read("frontend/vitest.config.js")
+    vitest = _read("frontend/vitest.config.js", root)
     for metric in ["statements", "branches", "functions", "lines"]:
         m = re.search(rf"{metric}\s*:\s*(\d+)", vitest)
         _ok(bool(m), f"Missing Vitest threshold for {metric}", errors)
         if m:
             _ok(int(m.group(1)) >= 80, f"Vitest {metric} threshold must be >= 80", errors)
 
-    # E2E coverage thresholds
-    e2e_cov = _read("frontend/tests/e2e/coverage.spec.js")
-    checks = {
-        "statements": r"summary\.statements\.pct\)\.toBeGreaterThanOrEqual\((\d+)\)",
-        "branches": r"summary\.branches\.pct\)\.toBeGreaterThanOrEqual\((\d+)\)",
-        "functions": r"summary\.functions\.pct\)\.toBeGreaterThanOrEqual\((\d+)\)",
-        "lines": r"summary\.lines\.pct\)\.toBeGreaterThanOrEqual\((\d+)\)",
-    }
-    for metric, pattern in checks.items():
-        m = re.search(pattern, e2e_cov)
-        _ok(bool(m), f"Missing E2E threshold assertion for {metric}", errors)
-        if m:
-            _ok(int(m.group(1)) >= 80, f"E2E {metric} threshold must be >= 80", errors)
+    # E2E coverage thresholds and executable orchestration
+    try:
+        e2e_config = load_validated_config(
+            root / "frontend" / "e2e-coverage.config.json"
+        )
+    except ValueError as exc:
+        errors.extend(str(exc).splitlines())
+        e2e_config = None
+    if e2e_config is not None:
+        for metric in ["statements", "branches", "functions", "lines"]:
+            _ok(
+                float(e2e_config["thresholds"][metric]) >= 80,
+                f"E2E {metric} threshold must be >= 80",
+                errors,
+            )
+    runner = root / "frontend" / "scripts" / "run-e2e-coverage.mjs"
+    validator = root / "Scripts" / "check_e2e_coverage.py"
+    _ok(runner.exists(), "Missing executable E2E coverage runner", errors)
+    _ok(validator.exists(), "Missing E2E coverage artifact validator", errors)
+    _ok(
+        scripts.get("test:e2e") == "node scripts/run-e2e-coverage.mjs",
+        "Frontend test:e2e must use the blocking E2E coverage runner",
+        errors,
+    )
+    _ok(
+        scripts.get("test:e2e:coverage:console")
+        == "node scripts/run-e2e-coverage.mjs --reporter=line",
+        "Frontend E2E coverage console script must use the blocking runner",
+        errors,
+    )
 
     # CI checks expected by DoD
-    ci = _read(".github/workflows/ci.yml")
+    ci = _read(".github/workflows/ci.yml", root)
     _ok(
         "python Scripts/quality_gate.py ci" in ci,
         "CI must run the shared CI quality gate",
@@ -97,7 +117,7 @@ def main() -> int:
         errors,
     )
     _ok(
-        "--cov-fail-under=80" in _read("Scripts/quality_gate.py"),
+        "--cov-fail-under=80" in _read("Scripts/quality_gate.py", root),
         "Shared quality gate must enforce backend coverage >= 80",
         errors,
     )
@@ -106,7 +126,7 @@ def main() -> int:
         "CI must declare a real MongoDB service for integration tests",
         errors,
     )
-    pages = _read(".github/workflows/pages.yml")
+    pages = _read(".github/workflows/pages.yml", root)
     _ok(
         'const requiredJobs = ["quality-gate"]' in pages,
         "Pages must wait for the shared quality-gate job",
@@ -114,7 +134,7 @@ def main() -> int:
     )
 
     # Coverage task integration checks (VS Code): optional local developer file.
-    tasks_path = ROOT / ".vscode" / "tasks.json"
+    tasks_path = root / ".vscode" / "tasks.json"
     if tasks_path.exists():
         tasks = tasks_path.read_text(encoding="utf-8")
         _ok(
@@ -158,6 +178,11 @@ def main() -> int:
             errors,
         )
 
+    return errors
+
+
+def main() -> int:
+    errors = collect_dod_errors(ROOT)
     if errors:
         print("ERROR: DoD compliance check failed.", file=sys.stderr)
         for err in errors:

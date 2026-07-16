@@ -1,25 +1,13 @@
 import istanbulCoverage from "istanbul-lib-coverage";
 import v8toIstanbul from "v8-to-istanbul";
+import {
+  isExcludedCoveragePath,
+  loadE2ECoverageConfig,
+  normalizeCoverageMetric,
+} from "../../../scripts/e2e-coverage-config.mjs";
 
 let inlineScriptCounter = 0;
-const E2E_COVERAGE_EXCLUDES = [
-  "/src/components/steps/simulationPrintReport.tsx",
-  "/src/utils/export.ts",
-  "/export.ts",
-  "/src/main.tsx",
-  "/main.tsx",
-  "/src/e2e/runtime.ts",
-  "/runtime.ts",
-];
-
-function normalizeFilePath(filePath) {
-  return String(filePath || "").replace(/\\/g, "/");
-}
-
-function shouldExcludeCoverageFile(filePath) {
-  const normalized = normalizeFilePath(filePath);
-  return E2E_COVERAGE_EXCLUDES.some((pattern) => normalized.endsWith(pattern) || normalized.includes(pattern));
-}
+const coverageScope = loadE2ECoverageConfig().scope;
 
 export async function summarizeCoverageIstanbul(entries) {
   const { createCoverageMap } = istanbulCoverage;
@@ -29,7 +17,7 @@ export async function summarizeCoverageIstanbul(entries) {
 
   for (const entry of entries) {
     const url = typeof entry?.url === "string" ? entry.url : "";
-    if (E2E_COVERAGE_EXCLUDES.some((pattern) => url.includes(pattern))) {
+    if (isExcludedCoveragePath(url, coverageScope)) {
       continue;
     }
 
@@ -68,7 +56,7 @@ export async function summarizeCoverageIstanbul(entries) {
       converter.applyCoverage(v8Functions);
       const convertedMap = createCoverageMap(converter.toIstanbul());
       for (const filePath of convertedMap.files()) {
-        if (shouldExcludeCoverageFile(filePath)) {
+        if (isExcludedCoveragePath(filePath, coverageScope)) {
           continue;
         }
         map.addFileCoverage(convertedMap.fileCoverageFor(filePath));
@@ -84,10 +72,10 @@ export async function summarizeCoverageIstanbul(entries) {
       const fileSummary = map.fileCoverageFor(filePath).toSummary().toJSON();
       return {
         file: filePath,
-        statements: fileSummary.statements,
-        branches: fileSummary.branches,
-        functions: fileSummary.functions,
-        lines: fileSummary.lines,
+        statements: normalizeCoverageMetric(fileSummary.statements),
+        branches: normalizeCoverageMetric(fileSummary.branches),
+        functions: normalizeCoverageMetric(fileSummary.functions),
+        lines: normalizeCoverageMetric(fileSummary.lines),
       };
     })
     .sort((a, b) => {
@@ -97,10 +85,10 @@ export async function summarizeCoverageIstanbul(entries) {
     });
   return {
     files: map.files().length,
-    statements: summary.statements,
-    branches: summary.branches,
-    functions: summary.functions,
-    lines: summary.lines,
+    statements: normalizeCoverageMetric(summary.statements),
+    branches: normalizeCoverageMetric(summary.branches),
+    functions: normalizeCoverageMetric(summary.functions),
+    lines: normalizeCoverageMetric(summary.lines),
     byFile,
   };
 }

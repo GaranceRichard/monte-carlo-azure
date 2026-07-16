@@ -1,13 +1,18 @@
 import fs from "node:fs";
 import path from "node:path";
-import { cwd } from "node:process";
+import { cwd, env } from "node:process";
 import { test, expect } from "@playwright/test";
+import {
+  isIncludedCoverageUrl,
+  loadE2ECoverageConfig,
+} from "../../scripts/e2e-coverage-config.mjs";
 import { summarizeCoverageIstanbul } from "./helpers/coverage";
 import { setupAppRoutes } from "./helpers/mocks";
 
 test.describe("e2e istanbul coverage", () => {
   test.describe.configure({ mode: "serial" });
 
+  const coverageConfig = loadE2ECoverageConfig();
   const allCoverageEntries = [];
 
   const openIfCollapsed = async (section) => {
@@ -40,16 +45,39 @@ test.describe("e2e istanbul coverage", () => {
   test.afterEach(async ({ page }) => {
     const coverageEntries = await page.coverage.stopJSCoverage();
     const appEntries = coverageEntries.filter(
-      (e) => typeof e?.url === "string" && /^http:\/\/127\.0\.0\.1:\d+\/src\//.test(e.url),
+      (entry) => isIncludedCoverageUrl(entry?.url, coverageConfig.scope),
     );
     allCoverageEntries.push(...appEntries);
   });
 
   test.afterAll(async () => {
     const summary = await summarizeCoverageIstanbul(allCoverageEntries);
+    const requiredContext = {
+      runId: env.E2E_COVERAGE_RUN_ID,
+      startedAt: env.E2E_COVERAGE_STARTED_AT,
+      scopeId: env.E2E_COVERAGE_SCOPE_ID,
+      scopeFingerprint: env.E2E_COVERAGE_SCOPE_FINGERPRINT,
+    };
+    for (const [key, value] of Object.entries(requiredContext)) {
+      if (!value) {
+        throw new Error(`Missing E2E coverage execution context: ${key}`);
+      }
+    }
+    const artifact = {
+      schemaVersion: 1,
+      producer: "playwright-v8-istanbul",
+      context: {
+        ...requiredContext,
+        completedAt: new Date().toISOString(),
+      },
+      ...summary,
+    };
     const reportDir = path.resolve(cwd(), "coverage");
     fs.mkdirSync(reportDir, { recursive: true });
-    fs.writeFileSync(path.join(reportDir, "e2e-coverage-summary.json"), JSON.stringify(summary, null, 2));
+    fs.writeFileSync(
+      path.join(reportDir, "e2e-coverage-summary.json"),
+      JSON.stringify(artifact, null, 2),
+    );
     const metricLabels = {
       statements: "statements",
       branches: "branches",
@@ -84,12 +112,6 @@ test.describe("e2e istanbul coverage", () => {
 
     expect(summary.files).toBeGreaterThan(0);
     expect(summary.statements.total).toBeGreaterThan(0);
-    /*
-      expect(summary.statements.pct).toBeGreaterThanOrEqual(80);
-      expect(summary.branches.pct).toBeGreaterThanOrEqual(80);
-      expect(summary.functions.pct).toBeGreaterThanOrEqual(80);
-      expect(summary.lines.pct).toBeGreaterThanOrEqual(80);
-    */
   });
 
   test("coverage: public pages direct", async ({ page }) => {

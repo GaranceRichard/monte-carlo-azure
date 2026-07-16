@@ -1,38 +1,42 @@
 ﻿# Architecture
 
-## Vue d'ensemble
+## Vue d’ensemble
 
-Monte Carlo Azure suit une architecture a frontiere d'identite stricte:
+Monte Carlo Azure suit une architecture à frontière d’identité stricte :
 
-- le frontend appelle Azure DevOps directement depuis le navigateur
-- le backend FastAPI ne recoit que des donnees anonymisees de throughput pour calculer les simulations
-- le PAT Azure DevOps n'est jamais transmis au backend
+- le frontend appelle Azure DevOps directement depuis le navigateur ;
+- le backend FastAPI ne reçoit que des données anonymisées de throughput pour calculer les simulations ;
+- le PAT Azure DevOps n’est jamais transmis au backend.
 
-## Invariants de securite
+## Invariants de sécurité
 
-Le SLA identite est non negociable:
+Le SLA identité est non négociable :
 
-- les donnees Azure DevOps peuvent exister dans le navigateur pour les appels directs a Azure DevOps
-- elles sont interdites dans le payload `POST /simulate`, les modeles backend, les routes backend, la persistance Mongo, les reponses `GET /simulations/history` et tout proxy ou relais serveur
-- le cookie `IDMontecarlo` et le champ `mc_client_id` restent autorises car ils sont generes independamment d'Azure DevOps et ne contiennent ni organisation, ni projet, ni equipe
-- la politique ne bloque pas "tous les UUID": elle bloque les donnees d'identite Azure DevOps et les secrets associes quand ils franchissent la frontiere serveur
-- le cookie `IDMontecarlo` ne doit jamais etre envoye vers `https://dev.azure.com` ni `https://app.vssps.visualstudio.com`
-- les appels Azure DevOps partent directement du navigateur vers:
+- les données Azure DevOps peuvent exister dans le navigateur pour les appels directs à Azure DevOps ;
+- elles sont interdites dans le payload `POST /simulate`, les modèles backend, les routes backend, la
+  persistance Mongo, les réponses `GET /simulations/history` et tout proxy ou relais serveur ;
+- le cookie `IDMontecarlo` et le champ `mc_client_id` restent autorisés car ils sont générés indépendamment
+  d’Azure DevOps et ne contiennent ni organisation, ni projet, ni équipe ;
+- la politique ne bloque pas « tous les UUID » : elle bloque les données d’identité Azure DevOps et les
+  secrets associés quand ils franchissent la frontière serveur ;
+- le cookie `IDMontecarlo` ne doit jamais être envoyé vers `https://dev.azure.com` ni
+  `https://app.vssps.visualstudio.com` ;
+- les appels Azure DevOps partent directement du navigateur vers :
   - `https://dev.azure.com`
   - `https://app.vssps.visualstudio.com`
   - ou une URL Azure DevOps Server saisie localement dans le navigateur
 
-Le backend ne recoit que:
+Le backend ne reçoit que :
 
 - `throughput_samples`
 - `include_zero_weeks`
-- les parametres de simulation (`mode`, `backlog_size` / `target_weeks`, `n_sims`, `seed` optionnel)
-- bornes de contrat avant calcul: `throughput_samples` entre `6` et `521` valeurs,
+- les paramètres de simulation (`mode`, `backlog_size` / `target_weeks`, `n_sims`, `seed` optionnel) ;
+- bornes de contrat avant calcul : `throughput_samples` entre `6` et `521` valeurs,
   `n_sims` entre `1_000` et `200_000`, `target_weeks` entre `1` et `521`,
   `backlog_size` entre `1` et `1_000_000`
-- un cookie anonyme `IDMontecarlo` pour relier un historique statistique non contextualise
+- un cookie anonyme `IDMontecarlo` pour relier un historique statistique non contextualisé.
 
-Champs explicitement interdits a la frontiere backend/payload:
+Champs explicitement interdits à la frontière backend/payload :
 
 - `client_context`
 - `selected_org`
@@ -48,7 +52,7 @@ Champs explicitement interdits a la frontiere backend/payload:
 - `azure_devops_url`
 - `ado_server_url`
 
-Regles bloquees par CI:
+Règles bloquées par la CI :
 
 - `IDENTITY-001`: aucun proxy local `/ado` ou `/vssps`
 - `IDENTITY-002`: aucun endpoint local ou backend recevant un PAT Azure DevOps
@@ -59,7 +63,7 @@ Regles bloquees par CI:
 - `IDENTITY-007`: `SimulationHistoryItem` et `GET /simulations/history` n'exposent aucun contexte Azure DevOps
 - `IDENTITY-008`: aucun code backend ne contacte `dev.azure.com`, `visualstudio.com` ou un serveur ADO fourni par le client
 
-Chemins surveilles par `Scripts/check_identity_boundary.py`:
+Chemins surveillés par `Scripts/check_identity_boundary.py` :
 
 - `frontend/src/types.ts`
 - `frontend/src/api.ts`
@@ -69,42 +73,44 @@ Chemins surveilles par `Scripts/check_identity_boundary.py`:
 - `backend/api_models.py`
 - `backend/api_routes_simulate.py`
 - `backend/simulation_store.py`
-- tout fichier `backend/` pour detecter un appel reseau Azure DevOps cote serveur
+- tout fichier `backend/` pour détecter un appel réseau Azure DevOps côté serveur
 - `frontend/vite.config.js`
-- toute configuration proxy/Nginx ajoutee au depot
+- toute configuration proxy/Nginx ajoutée au dépôt
 
-Exceptions explicitement autorisees:
+Exceptions explicitement autorisées :
 
 - `selectedOrg` dans `useOnboarding.ts`
 - `selectedProject` dans `ProjectStep.tsx`
 - `selectedTeam` dans `TeamStep.tsx` et dans l'historique local navigateur
 - `pat` dans `frontend/src/adoClient.ts` et dans le parcours local navigateur
 - `serverUrl` dans le navigateur pour Azure DevOps Server
-- les tests qui verifient l'interdiction de ces champs
+- les tests qui vérifient l’interdiction de ces champs
 - la documentation qui explique cette politique
 
-Controles associes:
+Contrôles associés :
 
-- CI execute `python Scripts/check_identity_boundary.py` avant les tests backend
-- CI execute `python Scripts/check_naming_convention.py`
-- toute proxyfication serveur (`/ado`, `/vssps`), reintroduction d'un champ ADO dans `POST /simulate`, persistance Mongo contextuelle ou exposition via `/simulations/history` fait echouer la CI
-- l'echec reste bloquant: aucun warning, aucun `continue-on-error`, aucun masquage du code de sortie
+- le gate central exécute `Scripts/check_identity_boundary.py` et
+  `Scripts/check_naming_convention.py` avant les suites applicatives ;
+- toute proxyfication serveur (`/ado`, `/vssps`), réintroduction d’un champ ADO dans `POST /simulate`,
+  persistance Mongo contextuelle ou exposition via `/simulations/history` fait échouer le gate ;
+- l’échec reste bloquant : aucun avertissement, aucun `continue-on-error`, aucun masquage du code de sortie.
 
-Invariants de preparation du throughput cote frontend:
+Invariants de préparation du throughput côté frontend :
 
-- l'historique Azure DevOps est regroupe par semaines ISO du lundi au dimanche
-- seules les semaines completes, entierement incluses dans la plage demandee, sont conservees
-- la semaine courante est exclue tant qu'elle n'est pas entierement ecoulee
-- les chaines `YYYY-MM-DD` sont traitees comme dates locales (`src/date.ts`) pour eviter toute derive UTC d'un jour
+- l’historique Azure DevOps est regroupé par semaines ISO du lundi au dimanche ;
+- seules les semaines complètes, entièrement incluses dans la plage demandée, sont conservées ;
+- la semaine courante est exclue tant qu’elle n’est pas entièrement écoulée ;
+- les chaînes `YYYY-MM-DD` sont traitées comme dates locales (`src/date.ts`) pour éviter toute dérive UTC
+  d’un jour.
 
-Garde-fous serveur:
+Garde-fous serveur :
 
 - rate limiting sur `POST /simulate` via `slowapi`
-- stockage `memory://` en developpement local mono-processus
+- stockage `memory://` en développement local mono-processus
 - stockage Redis en production multi-workers pour partager le compteur entre processus
 - mode permissif si Redis devient indisponible, avec log applicatif au niveau `warning`
-- niveau de logs applicatifs reduit (`warning`)
-- logs d'acces HTTP desactives
+- niveau de logs applicatifs réduit (`warning`)
+- logs d’accès HTTP désactivés
 
 ## Structure du code
 
@@ -114,72 +120,76 @@ frontend/
     adoClient.ts        # appels directs Azure DevOps
     api.ts              # appel backend /simulate uniquement
     apiHelpers.ts       # normalisation/fallbacks API hors wrapper vital
-    AppFlowContent.tsx  # rendu des etapes onboarding/simulation
+    AppFlowContent.tsx  # rendu des étapes onboarding/simulation
     appNavigation.ts    # navigation/backspace et helpers de retour
     appShellSections.tsx # sections shell, mode public et stepper
-    appTheme.ts         # resolution/persistance du theme
+    appTheme.ts         # résolution/persistance du thème
     runtime.ts          # détection des modes standard, démo et connexion publique
     hooks/
       useOnboarding.ts  # PAT en state local
       useSimulation.ts             # orchestrateur, invalidation et rechargement par signature
-      useSimulationPrefs.ts        # persistance localStorage des preferences
-      useSimulationHistory.ts      # historique local versionne + migration legacy
-      useSimulationChartData.ts    # mapping/useMemo des donnees graphiques
+      useSimulationPrefs.ts        # persistance localStorage des préférences
+      useSimulationHistory.ts      # historique local versionné + migration legacy
+      useSimulationChartData.ts    # mapping/useMemo des données graphiques
       useSimulationQuickFilters.ts # persistance des quick filters simulation
-      useTeamOptions.ts            # chargement options equipe (types + etats)
+      useTeamOptions.ts            # chargement options équipe (types + états)
       usePortfolio.ts              # logique mode portefeuille
-      usePortfolioReport.ts        # generation rapport portefeuille
-      simulationForecastService.ts # facade forecast exposee au reste du front
-      simulationForecastCore.ts    # logique forecast extraite et testee
+      usePortfolioReport.ts        # génération rapport portefeuille
+      simulationForecastService.ts # façade forecast exposée au reste du front
+      simulationForecastCore.ts    # logique forecast extraite et testée
     utils/
       cycleTime.ts        # calcul et tendances du cycle time en jours calendaires
-      portfolioComparisonDiagnostic.ts # diagnostic metier comparatif des scenarios portefeuille
-      portfolioComparisonPresentation.ts # libelles et formulations partages UI/PDF
-      simulationSignature.ts # signature canonique et selection du cache local reutilisable
+      portfolioComparisonDiagnostic.ts # diagnostic métier comparatif des scénarios portefeuille
+      portfolioComparisonPresentation.ts # libellés et formulations partagés UI/PDF
+      simulationSignature.ts # signature canonique et sélection du cache local réutilisable
     components/steps/
       SimulationChartTabs.tsx      # tabs + rendu des charts Recharts
       simulationPrintReport.tsx    # rapport imprimable
-      simulationChartsSvg.ts       # rendu SVG des graphiques exportes
-      simulationPdfDownload.ts     # telechargement PDF
+      simulationChartsSvg.ts       # rendu SVG des graphiques exportés
+      simulationPdfDownload.ts     # téléchargement PDF
 
 backend/
   api.py                 # FastAPI + CORS + /simulate + /health
   api_routes_simulate.py # endpoint /simulate
   api_models.py          # SimulateRequest / SimulateResponse
-  mc_core.py             # coeur Monte Carlo
+  mc_core.py             # cœur Monte Carlo
 ```
 
 ## Convention de nommage
 
-Regle repo:
+Règle du dépôt :
 
-- tous les identifiants de code sont en anglais: variables, fonctions, types, props, cles d'objet et constantes
-- toutes les chaines affichees a l'utilisateur restent en francais: libelles UI, messages, textes de rapport, erreurs metier
+- tous les identifiants de code sont en anglais : variables, fonctions, types, props, clés d’objet et
+  constantes ;
+- toutes les chaînes affichées à l’utilisateur restent en français : libellés UI, messages, textes de
+  rapport et erreurs métier.
 
-Objectif:
+Objectif :
 
-- eviter les identifiants mixtes francais/anglais dans une meme zone du code
-- garder une separation nette entre langage d'implementation et langage produit
+- éviter les identifiants mixtes français/anglais dans une même zone du code ;
+- garder une séparation nette entre langage d’implémentation et langage produit.
 
-Controle:
+Contrôle :
 
-- CI et pre-commit executent `python Scripts/check_naming_convention.py`
-- le controle bloque les termes francais deja identifies comme dette dans les identifiants de code
+- le plan central de `Scripts/quality_gate.py` exécute `Scripts/check_naming_convention.py` une seule fois ;
+- le pré-commit l’exécute sur l’instantané de l’index Git, le pré-push sur le commit dans son worktree
+  détaché, et la CI sur son checkout ;
+- le contrôle bloque les termes français déjà identifiés comme dette dans les identifiants de code.
 
 ## API
 
-Routes exposees:
+Routes exposées :
 
 - `GET /health`
 - `POST /simulate`
 - `GET /simulations/history`
-- CORS autorise: `GET`, `POST`, `OPTIONS`
+- CORS autorisé : `GET`, `POST`, `OPTIONS`
 
-Swagger:
+Swagger :
 
 - `/docs`
 
-### Requete `POST /simulate`
+### Requête `POST /simulate`
 
 ```json
 {
@@ -191,7 +201,8 @@ Swagger:
 }
 ```
 
-Le contrat interdit tout champ de contexte Azure DevOps (`PAT`, `server_url`, organisation, projet, equipe, plage de dates, types, etats `Done`).
+Le contrat interdit tout champ de contexte Azure DevOps (`PAT`, `server_url`, organisation, projet, équipe,
+plage de dates, types, états `Done`).
 
 ou
 
@@ -205,7 +216,7 @@ ou
 }
 ```
 
-### Reponse `POST /simulate`
+### Réponse `POST /simulate`
 
 ```json
 {
@@ -224,16 +235,16 @@ ou
 }
 ```
 
-Comportement du `seed`:
+Comportement du `seed` :
 
-- `seed` est optionnel et borne a l'intervalle entier `0..4294967295`
-- a payload identique, un meme `seed` reproduit strictement la meme simulation
-- si aucun `seed` n'est fourni, le backend en genere un et le renvoie pour rendre le tirage rejouable
-- cote backend, ce meme tirage est execute par lots avec un unique generateur pseudo-aleatoire;
-  il n'y a ni reensemencement inter-lots, ni allocation complete `n_sims x horizon`
+- `seed` est optionnel et borné à l’intervalle entier `0..4294967295` ;
+- à payload identique, un même `seed` reproduit strictement la même simulation ;
+- si aucun `seed` n’est fourni, le backend en génère un et le renvoie pour rendre le tirage rejouable ;
+- côté backend, ce même tirage est exécuté par lots avec un unique générateur pseudo-aléatoire ;
+  il n’y a ni réensemencement inter-lots, ni allocation complète `n_sims x horizon`.
 
-Le backend persiste aussi la simulation dans MongoDB (collection `simulations`) quand le cookie `IDMontecarlo` est present.
-Les champs autorises en base sont:
+Le backend persiste aussi la simulation dans MongoDB (collection `simulations`) quand le cookie
+`IDMontecarlo` est présent. Les champs autorisés en base sont :
 
 - `mc_client_id`
 - `created_at`
@@ -252,116 +263,122 @@ Les champs autorises en base sont:
 
 ### Historique client `GET /simulations/history`
 
-- le cookie `IDMontecarlo` est lu cote backend
-- reponse: jusqu'a 10 simulations recentes du client, limitees aux donnees statistiques anonymes
-- aucun champ Azure DevOps historique n'est reexpose, y compris pour d'anciens documents Mongo
+- le cookie `IDMontecarlo` est lu côté backend ;
+- réponse : jusqu’à 10 simulations récentes du client, limitées aux données statistiques anonymes ;
+- aucun champ Azure DevOps historique n’est réexposé, y compris pour d’anciens documents Mongo.
 
 ### Historique frontend local
 
-- `useSimulationHistory.ts` lit et ecrit uniquement `localStorage`
-- l'historique detaille reste contextualise par equipe dans le navigateur
-- le frontend ne recharge plus l'historique Mongo pour le melanger a cet historique local
-- les entrees locales portent un `schemaVersion` explicite
-- les nouvelles entrees locales portent aussi la `seed` effectivement utilisee par l'execution
+- `useSimulationHistory.ts` lit et écrit uniquement `localStorage` ;
+- l’historique détaillé reste contextualisé par équipe dans le navigateur ;
+- le frontend ne recharge plus l’historique Mongo pour le mélanger à cet historique local ;
+- les entrées locales portent un `schemaVersion` explicite ;
+- les nouvelles entrées locales portent aussi la `seed` effectivement utilisée par l’exécution
   Monte Carlo frontend ou backend
-- un rejeu local reapplique cette meme `seed` tant que les parametres de simulation ne changent pas
-- la version courante migre les anciennes entrees sans version en interpretant leurs
-  anciennes valeurs `Cycle Time` comme des semaines legacy a convertir en jours calendaires
-- les historiques legacy sans `seed` restent compatibles; ils sont restaures avec `seed = null`
-- la migration est idempotente: seules les entrees legacy sans version sont multipliees par `7`
+- un rejeu local réapplique cette même `seed` tant que les paramètres de simulation ne changent pas ;
+- la version courante migre les anciennes entrées sans version en interprétant leurs
+  anciennes valeurs `Cycle Time` comme des semaines legacy à convertir en jours calendaires ;
+- les historiques legacy sans `seed` restent compatibles ; ils sont restaurés avec `seed = null` ;
+- la migration est idempotente : seules les entrées legacy sans version sont multipliées par `7` ;
 - cette migration ne modifie ni le throughput hebdomadaire, ni les modes Monte Carlo en semaines,
   ni `target_weeks`
 
-`result_distribution` contient des buckets `{ x, count }`:
+`result_distribution` contient des buckets `{ x, count }` :
 
-- `x`: valeur simulee (semaines ou items selon le mode)
-- `count`: frequence observee dans les simulations
+- `x` : valeur simulée (semaines ou items selon le mode)
+- `count` : fréquence observée dans les simulations
 
-En `backlog_to_weeks`, `completion_summary` peut aussi etre present:
+En `backlog_to_weeks`, `completion_summary` peut aussi être présent :
 
-- `completed_count`: nombre de simulations terminees avant ou a l'horizon
-- `censored_count`: nombre de simulations non terminees a l'horizon
-- `censored_rate`: ratio `censored_count / total`
-- `horizon_weeks`: horizon maximal de simulation
+- `completed_count` : nombre de simulations terminées avant ou à l’horizon
+- `censored_count` : nombre de simulations non terminées à l’horizon
+- `censored_rate` : ratio `censored_count / total`
+- `horizon_weeks` : horizon maximal de simulation
 
-### Interpretation metier
+### Interprétation métier
 
 - mode `backlog_to_weeks`
-  - question: "en combien de semaines terminer le backlog ?"
-  - lecture: `P(X <= semaines)`
-  - percentiles API: quantile empirique discret conservateur `higher`
-  - ordre attendu: `P50 <= P70 <= P90`
-  - exemple de lecture: `P90 = 90%` des simulations finissent en `P90` semaines ou moins
-  - le rang d'un percentile est calcule sur la population totale `n_sims`, pas seulement
-    sur les simulations terminees
-  - une simulation non terminee a l'horizon est comptee comme censure explicite
-  - une fin exacte a l'horizon reste une vraie fin, distincte d'une censure
-  - la distribution et les percentiles ne couvrent que les simulations terminees
-  - un percentile absent signifie qu'il n'est pas identifiable avant l'horizon
-  - la courbe de probabilite UI utilise `n_sims` comme denominateur et reste bornee
-    par le taux reel de completion
+  - question : « en combien de semaines terminer le backlog ? »
+  - lecture : `P(X <= semaines)`
+  - percentiles API : quantile empirique discret conservateur `higher`
+  - ordre attendu : `P50 <= P70 <= P90`
+  - exemple de lecture : `P90 = 90%` des simulations finissent en `P90` semaines ou moins
+  - le rang d’un percentile est calculé sur la population totale `n_sims`, pas seulement
+    sur les simulations terminées
+  - une simulation non terminée à l’horizon est comptée comme censure explicite
+  - une fin exacte à l’horizon reste une vraie fin, distincte d’une censure
+  - la distribution et les percentiles ne couvrent que les simulations terminées
+  - un percentile absent signifie qu’il n’est pas identifiable avant l’horizon
+  - la courbe de probabilité UI utilise `n_sims` comme dénominateur et reste bornée
+    par le taux réel de complétion
   - `risk_score` est absent si `P50` ou `P90` manque
-  - formule `risk_score`: `(P90 - P50) / P50`
+  - formule `risk_score` : `(P90 - P50) / P50`
 - mode `weeks_to_items`
-  - question: "combien d'items livrer en N semaines ?"
-  - percentiles API: quantile de survie discret `lower`
-  - niveaux utilises: `P90 -> q10`, `P70 -> q30`, `P50 -> q50`
-  - ordre attendu: `P50 >= P70 >= P90`
-  - lecture percentiles et courbe UI: `P(X >= items)`
-  - compatibilite historique: le frontend ne recalcule depuis l'histogramme que pour
-    d'anciennes reponses detectees par l'ordre legacy `P50 <= P70 <= P90`
+  - question : « combien d’items livrer en N semaines ? »
+  - percentiles API : quantile de survie discret `lower`
+  - niveaux utilisés : `P90 -> q10`, `P70 -> q30`, `P50 -> q50`
+  - ordre attendu : `P50 >= P70 >= P90`
+  - lecture percentiles et courbe UI : `P(X >= items)`
+  - compatibilité historique : le frontend ne recalcule depuis l’histogramme que pour
+    d’anciennes réponses détectées par l’ordre legacy `P50 <= P70 <= P90`
   - `risk_score` est absent si `P50` ou `P90` manque
-  - formule `risk_score`: `(P50 - P90) / P50`
+  - formule `risk_score` : `(P50 - P90) / P50`
 
-## Qualite technique
+## Qualité technique
 
-CI GitHub Actions:
+La sélection des contrôles est centralisée dans `Scripts/quality_gate.py` :
 
-- job `backend-tests`
-  - MongoDB reel (`mongo:7`)
-  - `python -m ruff check .`
-  - `python Scripts/check_dod_compliance.py`
-  - `python Scripts/check_identity_boundary.py`
-  - `python -m pytest --cov=backend --cov-fail-under=80 -q`
-- job `frontend-tests`
-  - `actions/setup-python@v6` (`python-version: "3.12"`)
-  - `npm ci`
-  - `pip install -r ../requirements.txt` pour demarrer `run_app.py` pendant les E2E Playwright
-  - `npm run lint -- --max-warnings 0`
-  - `npm run test:unit:coverage`
-  - `npm run test:e2e`
-  - `npm run build`
-- job `docker-smoke`
-  - build image
-  - smoke tests `/health` et `/health/mongo`
-  - payload `/simulate` strictement aligne sur le contrat statistique courant, sans champ legacy refuse
-  - verification de persistance via `/simulate` puis `/simulations/history`
-  - verification du `429` au-dela du seuil de `POST /simulate`
+- `targeted` exécute les contrôles généraux et les tests directs identifiables ;
+- `impacted` ajoute les contrôles du domaine et les dépendances proches ;
+- `massive` exécute le plan complet ; tout chemin inconnu ou ambigu utilise ce niveau.
 
-## Notes d'implementation recentes
+Les sources de changement sont distinctes : index Git pour le pré-commit, commits introduits pour le
+pré-push, checkout de travail pour la CI. Le pré-push valide chaque SHA terminal distinct dans un worktree
+détaché temporaire et n’utilise pas le workspace courant.
 
-Frontend:
+CI GitHub Actions :
 
-- ecran simulation charge en lazy (`React.lazy`)
-- erreurs Azure DevOps unifiees via `src/adoErrors.ts`
-- orchestration App allegée via `src/AppFlowContent.tsx`, `src/appNavigation.ts`, `src/appShellSections.tsx` et `src/appTheme.ts`
-- facade API allegee via `src/apiHelpers.ts` pour conserver des perimetres vitals plus stables
-- logique forecast scindee entre facade `src/hooks/simulationForecastService.ts` et coeur `src/hooks/simulationForecastCore.ts`
-- moteur Monte Carlo frontend et scenarios portefeuille desormais pilotes par une `seed`
-  explicite unique par execution logique, sans `Math.random()` dans les calculs de simulation
-- calcul du cycle time extrait dans `src/utils/cycleTime.ts` avec couverture unitaire ciblee,
+- job unique `quality-gate` avec service MongoDB réel (`mongo:7`) ;
+- installation explicite de Python, Node.js, des dépendances et de Chromium ;
+- exécution de `python Scripts/quality_gate.py ci` ;
+- plan massif ordonné : contrôles de dépôt et de sécurité, Ruff, ESLint, TypeScript, couvertures backend et
+  frontend, build, E2E, puis smoke test Docker ;
+- les suites avec couverture remplacent leurs suites simples équivalentes afin d’éviter une double
+  exécution de Pytest ou Vitest ;
+- smoke tests `/health`, `/health/mongo`, `/simulate`, `/simulations/history` et limitation `429`.
+
+Les seuils E2E de 80 % sur `statements`, `branches`, `functions` et `lines` sont appliqués à partir de
+`frontend/coverage/e2e-coverage-summary.json`. Le validateur vérifie également l’identité du run, les
+timestamps, le périmètre, son fingerprint, la fraîcheur et la cohérence des métriques. Les artefacts
+backend, frontend et E2E alimentent une agrégation Vitals unique, ensuite réutilisée par la conformité.
+
+## Notes d’implémentation récentes
+
+Frontend :
+
+- écran simulation chargé en lazy (`React.lazy`)
+- erreurs Azure DevOps unifiées via `src/adoErrors.ts`
+- orchestration App allégée via `src/AppFlowContent.tsx`, `src/appNavigation.ts`,
+  `src/appShellSections.tsx` et `src/appTheme.ts`
+- façade API allégée via `src/apiHelpers.ts` pour conserver des périmètres Vitals plus stables
+- logique forecast scindée entre façade `src/hooks/simulationForecastService.ts` et cœur
+  `src/hooks/simulationForecastCore.ts`
+- moteur Monte Carlo frontend et scénarios portefeuille désormais pilotés par une `seed`
+  explicite unique par exécution logique, sans `Math.random()` dans les calculs de simulation
+- calcul du cycle time extrait dans `src/utils/cycleTime.ts` avec couverture unitaire ciblée,
   en jours calendaires pour les restitutions frontend
 - quick filters persistants par scope `org::project::team`
-- mode portefeuille avec rapport PDF multi-scenarios
-- diagnostic comparatif portefeuille pur: qualite historique, stabilite simulee et credibilite des hypotheses
-  restent separes; le rapport PDF le restitue sur une page dediee, sans afficher le diagnostic detaille dans l'UI
-- reference de pilotage facultative conservee comme choix de presentation et de gouvernance, hors du diagnostic
-  metier et sans effet sur `preferredScenario` ou les calculs
-- mise en page de la comparaison PDF pilotee par un curseur vertical explicite et des sauts de page calcules
-- generation de rapport parallelisee avec tolerance aux echecs partiels
-- mocks E2E Playwright elargis pour couvrir aussi `/simulations/history` et les revisions de work items
+- mode portefeuille avec rapport PDF multi-scénarios
+- diagnostic comparatif portefeuille pur : qualité historique, stabilité simulée et crédibilité des hypothèses
+  restent séparées ; le rapport PDF le restitue sur une page dédiée, sans afficher le diagnostic détaillé
+  dans l’UI
+- référence de pilotage facultative conservée comme choix de présentation et de gouvernance, hors du
+  diagnostic métier et sans effet sur `preferredScenario` ou les calculs
+- mise en page de la comparaison PDF pilotée par un curseur vertical explicite et des sauts de page calculés
+- génération de rapport parallélisée avec tolérance aux échecs partiels
+- mocks E2E Playwright élargis pour couvrir aussi `/simulations/history` et les révisions de work items
 
-Backend/tests:
+Backend/tests :
 
-- backend FastAPI aligne Ruff/isort
-- tests et conformite repo durcis autour de `pytest`
+- backend FastAPI aligné Ruff/isort
+- tests et conformité du dépôt durcis autour de `pytest`

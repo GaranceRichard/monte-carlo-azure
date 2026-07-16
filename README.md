@@ -21,7 +21,7 @@ Démo GitHub Pages:
   - inclut la convention de nommage: identifiants de code en anglais, textes utilisateur en français
 - historique des évolutions: [`CHANGELOG.md`](CHANGELOG.md)
 - guide frontend: [`frontend/README.md`](frontend/README.md)
-- définition of done: [`docs/definition-of-done.md`](docs/definition-of-done.md)
+- Definition of Done : [`docs/definition-of-done.md`](docs/definition-of-done.md)
 - chemins critiques: [`docs/critical-paths.md`](docs/critical-paths.md)
 - traçabilité vitals -> tests: [`docs/vitals-traceability.md`](docs/vitals-traceability.md)
 - mapping coverage vitals: [`docs/vitals-coverage-map.json`](docs/vitals-coverage-map.json)
@@ -209,7 +209,8 @@ Frontière d'identité Azure DevOps :
 - MongoDB ne persiste que `mc_client_id`, `created_at`, `last_seen`, les paramètres Monte Carlo et les résultats statistiques anonymes
 - `mc_client_id` est un identifiant anonyme non dérivé d'Azure DevOps
 - `Scripts/check_identity_boundary.py` bloque en CI toute réintroduction d'un champ Azure DevOps dans le payload de simulation, les modèles backend, la persistance Mongo, l'historique serveur, les proxies locaux ou les appels Azure DevOps côté backend
-- `tests/test_identity_boundary.py` construit ses dépôts temporaires dans le workspace du repo pour rester stable sous Windows, même si `AppData\Local\Temp\pytest-of-*` est verrouillé
+- les exécutions Pytest lancées par la couverture VS Code utilisent un temporaire isolé dans le workspace ;
+  elles ne dépendent pas du répertoire temporaire global de l’utilisateur
 
 ---
 
@@ -302,7 +303,8 @@ Le détail du flux Cloud / on-prem est documenté dans [`frontend/README.md`](fr
 
 En E2E local, Playwright force aussi `VITE_API_BASE=http://127.0.0.1:8000` pour garder les mocks backend cohérents avec les appels `simulate` et `simulations/history`.
 En CI GitHub Actions, le job `quality-gate` installe explicitement `requirements.txt`, les
-dépendances frontend et Chromium avant d'exécuter le même contrôle complet que le pre-push.
+dépendances frontend et Chromium avant d’exécuter le plan massif commun au pré-push, puis le smoke test
+Docker réservé à la CI.
 Le déploiement GitHub Pages attend ce job unique avant de construire et publier le frontend.
 
 ### Mode manuel en 5 terminaux
@@ -351,31 +353,35 @@ python Scripts/quality_gate.py push
 python Scripts/quality_gate.py ci
 ```
 
-`fast` est le contrôle pre-commit. Il exécute les contrôles de référentiel, Ruff, les tests
-backend rapides, ESLint sans warning, TypeScript et Vitest. Pour un commit exclusivement
-documentaire (`README.md`, `docs/`, `LICENSE`, `NOTICE`), il conserve les contrôles de
-référentiel et évite les contrôles code coûteux.
+Le plan est construit à partir des chemins réellement modifiés, puis classé selon trois niveaux :
 
-`push` est le contrôle pre-push: il ajoute les couvertures backend (minimum 80 %) et frontend,
-le build et les E2E qui démarrent uniquement le backend et Vite. Il ne lance jamais Docker.
+- `targeted` : tests directement rattachables à un changement local ;
+- `impacted` : contrôles du domaine concerné et tests des dépendances proches ;
+- `massive` : plan complet pour les changements transverses, structurels ou incertains.
 
-`ci` est réservé à GitHub Actions: il ajoute au mode `push` le build et le smoke test Docker.
-Le healthcheck Docker réessaie les erreurs de connexion transitoires pendant le démarrage.
-Les dépendances sont installées explicitement par le workflow CI, jamais par le contrôle.
+Un chemin inconnu, une dépendance impossible à résoudre ou une ambiguïté provoque toujours un repli
+conservateur vers `massive`. Un changement backend seul ne lance pas les suites frontend, et
+réciproquement. Un changement mixte agrège les commandes sans doublon.
 
-Coverage vitals:
+Les trois modes ne lisent pas le même état du dépôt :
 
-```powershell
-npm --prefix frontend run test:unit:coverage
-python Scripts/report_vitals_coverage.py
-powershell -NoProfile -ExecutionPolicy Bypass -File .\.vscode\scripts\run-vitals-compliance.ps1 -WorkspaceRoot .
-```
+- `fast`, appelé par le pré-commit, prend la liste des fichiers dans `git diff --cached` et exécute tous
+  ses contrôles dans un instantané du contenu indexé. Une modification non indexée ne peut donc ni faire
+  réussir ni faire échouer le hook ;
+- `push`, appelé par le pré-push, interprète les références fournies par Git, calcule les commits et les
+  fichiers introduits, puis valide une seule fois le SHA terminal de chaque référence dans un worktree
+  détaché temporaire. Les suppressions de références n’exécutent pas de suite et le workspace courant,
+  même sale, est ignoré ;
+- `ci`, réservé à GitHub Actions, exécute le plan complet sur le checkout CI et ajoute le smoke test
+  Docker. Les dépendances sont installées par le workflow, jamais par le gate.
 
-Référence actuelle après recalcul local:
+Dans un plan complet `push` ou `ci`, les suites avec couverture remplacent les mêmes suites simples :
+Pytest n’est pas exécuté une première fois sans couverture, et Vitest n’est pas exécuté une première fois
+via `test:unit`. L’ordre applicatif reste lint, typecheck, tests, build, puis E2E.
 
-- `SLA Identité`: frontend_unit / branches = `100%`, e2e / branches = `100%`
-- `Flux onboarding critique`: frontend_unit / branches = `95.80%`, e2e / branches = `100%`
-- `Export rapport simulation (SVG/PDF)`: frontend_unit / branches = `95.94%`
+La définition normative des niveaux de validation, des seuils et de la publiabilité se trouve dans
+[`docs/definition-of-done.md`](docs/definition-of-done.md). La consommation détaillée des artefacts Vitals
+est décrite dans [`docs/vitals-traceability.md`](docs/vitals-traceability.md).
 
 ### Variables d'environnement Mongo / purge
 
@@ -435,7 +441,10 @@ Suite E2E découpée:
 - `frontend/tests/e2e/simulation.spec.js`
 - `frontend/tests/e2e/coverage.spec.js`
 
-Sous Windows/VS Code, les tâches `pytest --cov` parallèles utilisent des fichiers coverage distincts via `COVERAGE_FILE` pour éviter les conflits de verrouillage.
+Sous Windows/VS Code, la couverture backend utilise un `--basetemp` unique sous
+`.tmp/pytest/coverage-staged-<PID>-<GUID>`. Seul le répertoire créé par l’exécution courante est supprimé,
+y compris après un échec ou une interruption ; le répertoire temporaire global de l’utilisateur n’est
+jamais supprimé.
 Le projet désactive aussi le cacheprovider pytest via `pytest.ini` (`-p no:cacheprovider`) pour supprimer les warnings d'écriture `.pytest_cache` en environnement restreint.
 Pour la couverture frontend Vitest sous Windows, le projet utilise une exécution stable (`pool: "forks"` et `coverage.processingConcurrency: 1` dans `frontend/vitest.config.js`) afin d'éviter les pannes d'agrégation V8 de type `ENOENT ... frontend\coverage\.tmp\coverage-*.json`.
 Dans ce repo, une ligne rouge dans le détail d'un rapport de coverage est considérée comme invalide et doit être couverte avant de considérer la tâche acceptable, même si les seuils globaux restent verts.
@@ -445,15 +454,21 @@ les tests/E2E, les déclarations `*.d.ts`, les fichiers générés et les deux m
 strictement déclaratifs (`src/types.ts`, `src/hooks/simulationTypes.ts`). Ainsi, tout nouveau
 fichier exécutable non testé apparaît dans le rapport et fait échouer la gate; aucun module de
 production n'est exclu par convenance.
-La task VS Code `Coverage: 8 terminaux` exécute aussi:
+La task VS Code `Coverage: 8 terminaux` conserve l’orchestration manuelle complète. Elle appelle les
+scripts PowerShell versionnés `run-coverage-staged.ps1`, `run-e2e-coverage.ps1`,
+`run-vitals-staged.ps1`, `run-vitals-coverage.ps1` et `run-vitals-compliance.ps1`, puis termine par la
+convention de nommage. Elle produit ou réutilise notamment :
 
-- `Scripts/check_vitals_compliance.py` pour vérifier la traçabilité des points vitaux vers leurs tests ciblés
-- `Scripts/report_vitals_coverage.py` pour afficher les taux de couverture par vital à partir des artefacts backend/frontend/e2e
-- `Scripts/check_naming_convention.py` en fin de séquence pour bloquer la réintroduction d'identifiants hors convention
-- `frontend/coverage/coverage-final.json` comme artefact frontend unique pour le global et les vitals
+- `.coverage` et `.coverage.backend.json` pour le backend ;
+- `frontend/coverage/coverage-final.json` et `frontend/coverage/index.html` pour Vitest ;
+- `frontend/coverage/e2e-coverage-summary.json` pour les E2E ;
+- `frontend/coverage/vitals-coverage-report.json` pour l’agrégation Vitals réutilisée par la conformité.
 
-Validation de référence: les couvertures backend, frontend unitaire et E2E, ainsi que les
-contrôles vitals, sont conformes.
+Les E2E appliquent réellement un seuil de 80 % sur `statements`, `branches`, `functions` et `lines`.
+L’artefact doit être un JSON complet et cohérent, porter l’identité du run courant, ses timestamps,
+l’identifiant et le fingerprint du périmètre, et rester dans la fenêtre de fraîcheur configurée. Une
+métrique par fichier sans élément mesurable est représentée de façon canonique par
+`total = covered = skipped = 0` et `pct = 100`; les métriques globales restent mesurables et bloquantes.
 
 Ces scripts Python de coverage vitals font partie du lint backend et doivent rester conformes à `ruff check .`, y compris la limite de 100 caractères par ligne.
 Les messages de validation backend et les imports des tests respectent également ce formatage Ruff.
@@ -483,11 +498,11 @@ Vérification manuelle (si nécessaire):
 git config core.hooksPath .githooks
 ```
 
-Le hook `pre-commit` exécute `python Scripts/quality_gate.py fast`; le hook `pre-push` exécute
-`python Scripts/quality_gate.py push`. GitHub Actions exécute `python Scripts/quality_gate.py ci`.
-La définition des contrôles reste donc unique; le Docker smoke est réservé à la CI. Les hooks
-arrêtent le commit ou le push au premier échec et affichent la commande ainsi que la correction
-attendue.
+Le hook `pre-commit` exécute `python Scripts/quality_gate.py fast` sur l’index Git. Le hook `pre-push`
+transmet ses références à `python Scripts/quality_gate.py push`, qui valide les commits poussés dans des
+worktrees détachés. GitHub Actions exécute `python Scripts/quality_gate.py ci` sur son checkout. La
+définition des contrôles reste donc unique ; le smoke test Docker est réservé à la CI. Les hooks restent
+fail-fast et affichent la commande ainsi que la correction attendue.
 
 Le mode `fast` exécute notamment:
 
@@ -501,6 +516,11 @@ Le mode `fast` exécute notamment:
   - les vérifications de tasks VS Code sont appliquées seulement si `.vscode/tasks.json` est présent
 - `python Scripts/check_naming_convention.py`
   - bloque les identifiants de code contenant les termes français explicitement bannis par la convention repo
+
+Une validation ciblée verte confirme uniquement le plan sélectionné. La validation complète correspond à
+la task `Coverage: 8 terminaux`. La conformité DoD ajoute les exigences normatives et documentaires. Enfin,
+un changement n’est publiable qu’après validation complète, vérification du worktree et de la branche, et
+présence confirmée du remote GitHub.
 
 ## Licence
 

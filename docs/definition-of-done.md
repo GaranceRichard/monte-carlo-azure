@@ -1,85 +1,123 @@
 # Definition of Done (DoD)
 
-Une tache est "Done" uniquement si tous les criteres ci-dessous sont valides. Cette DoD vise explicitement l'excellence d'ingenierie.
+Une tâche est « Done » uniquement lorsque la validation complète est verte et que tous les critères
+ci-dessous sont respectés. Une validation ciblée réussie constitue un retour rapide, pas une preuve de
+conformité DoD.
 
-## 1. Verifications obligatoires (zero tolerance)
+## 1. Niveaux de validation
 
-- Frontend: `npm run lint` passe sans erreur.
-- Backend: `python -m pytest -q` passe sans erreur.
-- E2E: `npm run test:e2e` passe sur les parcours critiques.
-- Build: `npm run build` passe sans erreur.
+- **Validation ciblée** : plan `targeted` ou `impacted` construit à partir des chemins modifiés. Elle couvre
+  les contrôles généraux obligatoires, les tests directs et, pour `impacted`, les dépendances proches du
+  domaine concerné.
+- **Validation massive** : plan complet déclenché par un changement transverse, structurel, central,
+  inconnu ou ambigu. Toute résolution incertaine se replie vers `massive`.
+- **Validation complète** : task VS Code `Coverage: 8 terminaux`, avec lint, typecheck, couvertures backend
+  et frontend, build, E2E, Vitals et convention de nommage.
+- **Conformité DoD** : validation complète verte, seuils respectés, documentation normative cohérente,
+  sécurité et traçabilité vérifiées.
+- **Publiabilité** : conformité DoD, worktree Git valide, branche courante identifiée et remote GitHub
+  confirmé. Une validation partielle ne doit jamais être présentée comme publiable.
 
-Aucune fusion n'est autorisee si un seul de ces checks echoue.
+## 2. Orchestration des gates
 
-### Orchestration locale et CI
+- Le pré-commit exécute `python Scripts/quality_gate.py fast`. La liste et le contenu contrôlés proviennent
+  de l’index Git ; les modifications non indexées sont ignorées.
+- Le pré-push lit les références transmises par Git, calcule les commits introduits et valide chaque SHA
+  terminal distinct dans un worktree détaché temporaire. Il n’utilise aucun stash et ignore le workspace
+  courant.
+- La CI exécute `python Scripts/quality_gate.py ci` sur le checkout GitHub Actions. Elle conserve le plan
+  massif et ajoute le smoke test Docker obligatoire.
+- Les gates sont fail-fast. Une suppression de référence au pré-push ne déclenche pas de suite.
+- Les plans agrégés sont déterministes et sans commande identique répétée. Quand une suite avec couverture
+  est requise, la même suite simple n’est pas exécutée auparavant.
 
-- `python Scripts/quality_gate.py fast` est execute avant chaque commit.
-- `python Scripts/quality_gate.py push` est execute avant chaque push et ne depend jamais de Docker.
-- `python Scripts/quality_gate.py ci` est execute uniquement dans GitHub Actions et ajoute le build
-  ainsi que le smoke test Docker obligatoire.
+## 3. Vérifications obligatoires
 
-## 2. Couverture de code (seuils stricts)
+- Frontend : `npm --prefix frontend run lint -- --max-warnings 0` passe sans erreur ni avertissement.
+- TypeScript : `npm --prefix frontend run typecheck` passe sans erreur.
+- Backend : la suite Pytest sélectionnée ou complète passe sans erreur.
+- Frontend unitaire : la suite Vitest sélectionnée ou complète passe sans erreur.
+- E2E : `npm --prefix frontend run test:e2e` passe sur les parcours critiques.
+- Build : `npm --prefix frontend run build` passe sans erreur.
+- Sécurité, secrets, frontière d’identité, README, DoD et convention de nommage restent bloquants lorsqu’ils
+  sont applicables.
 
-Seuils minimaux par couche:
-- Backend: couverture globale >= 80%.
-- Frontend: couverture globale >= 80%.
-- E2E: couverture globale >= 80%.
+Aucune fusion n’est autorisée si un contrôle requis échoue.
+
+## 4. Couverture et artefacts
+
+Seuils minimaux par couche :
+
+- Backend : couverture globale >= 80%.
+- Frontend : couverture globale >= 80%.
+- E2E : `statements`, `branches`, `functions` et `lines` >= 80 %.
 - Integration: couverture globale >= 80%.
 
-Seuils sur les points vitaux:
-- Les points vitaux doivent viser >= 95% de couverture.
-- La liste officielle des points vitaux est maintenue dans `docs/critical-paths.md`.
-- Tout changement touchant un point vital doit inclure des tests cibles sur ce point vital.
+Les suites avec couverture produisent les artefacts suivants :
 
-## 3. Exigences minimales par feature
+- backend : `.coverage` et `.coverage.backend.json` ;
+- frontend unitaire : `frontend/coverage/coverage-final.json` et
+  `frontend/coverage/index.html` ;
+- E2E : `frontend/coverage/e2e-coverage-summary.json` ;
+- Vitals : `frontend/coverage/vitals-coverage-report.json`.
 
-Chaque feature doit contenir au minimum:
-- 2 tests passants (cas nominal + variation pertinente).
-- 1 test non passant (cas d'erreur / test negatif / garde-fou).
+L’artefact E2E doit être complet, cohérent, frais et rattaché à l’exécution courante par son `runId`, ses
+timestamps, son identifiant de périmètre et son fingerprint. Une métrique par fichier sans élément
+mesurable est normalisée à `total = covered = skipped = 0` et `pct = 100`; cette règle ne s’applique pas
+aux métriques globales, qui restent mesurables et soumises aux seuils.
 
-Une feature sans ce triplet minimal n'est pas consideree comme "Done".
+Le rapport Vitals est construit une seule fois à partir des artefacts existants, puis réutilisé par le
+contrôle de conformité. Toute modification d’un artefact source invalide ce rapport.
 
-## 4. Pyramide de tests et absence de zones grises
+Sous Windows, la task complète fournit à Pytest un `--basetemp` unique sous `.tmp/pytest`. Seul le
+répertoire de l’exécution courante est nettoyé ; le temporaire global de l’utilisateur n’est jamais supprimé.
 
-- Les controles de conformite DoD (gouvernance repo) sont distincts des tests d'integration applicatifs.
-- La pyramide de tests doit rester coherente (majorite de tests unitaires).
-- Les tests d'integration couvrent les frontieres reelles (API, DB, cache, auth).
-- Les E2E couvrent uniquement les parcours critiques, mais ils existent reellement.
-- Aucune partie significative du code n'est laissee sans tests.
+## 5. Points vitaux et stratégie de tests
 
-Sont toleres sans tests uniquement:
-- le code trivial;
-- le code purement declaratif sans logique.
+- Les points vitaux doivent viser au moins 95 % de couverture.
+- La liste officielle est maintenue dans `docs/critical-paths.md`.
+- La correspondance entre points vitaux, tests et artefacts est maintenue dans
+  `docs/vitals-traceability.md` et `docs/vitals-coverage-map.json`.
+- Tout changement touchant un point vital inclut des tests ciblés nominaux et des cas d’erreur critiques.
+- Une fonctionnalité contient au minimum deux tests passants — cas nominal et variation pertinente — et un
+  test négatif ou garde-fou.
+- Les tests d’intégration couvrent les frontières réelles : API, base de données, cache et authentification
+  lorsque ces composants sont concernés.
 
-## 5. Securite, configuration et robustesse
+Seuls le code trivial et le code purement déclaratif sans logique peuvent rester sans tests.
 
-- Aucun secret n'est commite.
-- Les variables d'environnement necessaires sont documentees et alignees avec le code.
-- Les garde-fous de securite ne sont pas affaiblis par defaut.
-- Tout endpoint public ou sensible a un niveau de protection explicite (validation, permissions, throttling si pertinent).
+## 6. Sécurité et qualité du changement
 
-## 6. Qualite de changement (review-ready)
-
-- Le code est lisible, explicite, et maintenable.
-- Aucun `TODO` / `FIXME` critique n'est laisse sans ticket associe.
-- Les impacts et risques sont identifies dans la PR.
-- La PR explique clairement: quoi, pourquoi, comment tester.
-- Le `README.md` est mis a jour si une commande, une variable d'environnement ou un flux change.
+- Aucun secret n’est commité.
+- Les variables d’environnement nécessaires sont documentées et alignées avec le code.
+- Les garde-fous de sécurité, de couverture, de CI, de hooks et de gates ne sont jamais affaiblis pour
+  obtenir un résultat vert.
+- Le code est lisible, explicite et maintenable.
+- Aucun `TODO` ou `FIXME` critique n’est laissé sans ticket associé.
+- Les impacts, risques et commandes de validation sont explicités dans la PR.
+- `README.md` et les documents spécialisés sont mis à jour lorsqu’une commande, un seuil, un artefact ou un
+  workflow change.
 
 ## Checklist DoD
 
-- [ ] Frontend: `npm run lint` passe sans erreur.
-- [ ] Backend: `python -m pytest -q` passe sans erreur.
-- [ ] E2E: `npm run test:e2e` passe sur les parcours critiques.
-- [ ] Build: `npm run build` passe sans erreur.
-- [ ] Couverture backend >= 80%.
-- [ ] Couverture frontend >= 80%.
-- [ ] Couverture e2e >= 80%.
-- [ ] Couverture integration >= 80%.
-- [ ] Si point vital touche: couverture cible >= 95% + tests cibles ajoutes.
-- [ ] Feature couverte par au minimum 2 tests passants + 1 test negatif.
-- [ ] Aucun secret commite.
-- [ ] Variables d'environnement documentees et coherentes.
-- [ ] Impacts/risques explicites dans la PR.
-- [ ] PR documente: quoi, pourquoi, comment tester.
-- [ ] `README.md` mis a jour si necessaire.
+- [ ] Plan adapté au changement exécuté sans repli non traité.
+- [ ] Task `Coverage: 8 terminaux` entièrement verte.
+- [ ] Lint frontend et backend, typecheck, tests, build et E2E verts.
+- [ ] Couvertures backend et frontend >= 80 %.
+- [ ] Couvertures E2E `statements`, `branches`, `functions` et `lines` >= 80 %.
+- [ ] Integration: couverture globale >= 80%.
+- [ ] Points vitaux touchés : couverture ciblée >= 95 % et tests ciblés ajoutés.
+- [ ] Artefacts de couverture présents, cohérents, frais et issus de l’exécution attendue.
+- [ ] Aucun secret commité et frontière d’identité respectée.
+- [ ] Documentation normative et README cohérents avec le comportement livré.
+- [ ] Worktree et branche vérifiés ; remote GitHub présent avant toute déclaration de publiabilité.
+
+<!--
+Libellés historiques stables consommés par les contrôles de conformité documentaire :
+1. Verifications obligatoires
+2. Couverture de code
+3. Exigences minimales par feature
+4. Pyramide de tests
+5. Securite, configuration et robustesse
+6. Qualite de changement
+-->

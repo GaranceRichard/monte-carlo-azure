@@ -13,6 +13,7 @@ __pycache__/
 *.so
 *.egg-info/
 .pytest_cache/
+.tmp/
 .coverage
 .coverage.*
 htmlcov/
@@ -30,7 +31,15 @@ ENV/
 # ---- OS / IDE ----
 .DS_Store
 Thumbs.db
-.vscode/
+.vscode/*
+!.vscode/tasks.json
+!.vscode/scripts/
+.vscode/scripts/*
+!.vscode/scripts/run-coverage-staged.ps1
+!.vscode/scripts/run-e2e-coverage.ps1
+!.vscode/scripts/run-vitals-staged.ps1
+!.vscode/scripts/run-vitals-coverage.ps1
+!.vscode/scripts/run-vitals-compliance.ps1
 .idea/
 *.swp
 *.suo

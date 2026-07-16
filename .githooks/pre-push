@@ -14,4 +14,6 @@ else
   exit 1
 fi
 
-exec "$PYTHON" "$REPO_ROOT/Scripts/quality_gate.py" push
+exec "$PYTHON" "$REPO_ROOT/Scripts/quality_gate.py" push \
+  --remote-name "${1:-}" \
+  --remote-url "${2:-}"

@@ -13,9 +13,9 @@
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:unit:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
+    "test:e2e": "node scripts/run-e2e-coverage.mjs",
     "test:e2e:coverage": "npm run test:e2e:coverage:console",
-    "test:e2e:coverage:console": "playwright test --reporter=line"
+    "test:e2e:coverage:console": "node scripts/run-e2e-coverage.mjs --reporter=line"
   },
   "dependencies": {
     "@radix-ui/react-progress": "^1.1.7",

@@ -1,12 +1,524 @@
 from __future__ import annotations
 
+import json
+import shutil
+import stat
+import subprocess
 import sys
+from contextlib import contextmanager
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "Scripts"))
 
+import check_dod_compliance  # noqa: E402
+import check_naming_convention  # noqa: E402
+import pre_commit_guard  # noqa: E402
 import quality_gate  # noqa: E402
+
+
+def _run_git(repository: Path, *args: str, input_text: str | None = None) -> str:
+    result = subprocess.run(
+        ["git", *args],
+        cwd=repository,
+        check=True,
+        capture_output=True,
+        text=True,
+        input=input_text,
+        encoding="utf-8",
+    )
+    return result.stdout.strip()
+
+
+def _oid(character: str) -> str:
+    return character * 40
+
+
+def _pre_push_line(
+    local_ref: str,
+    local_sha: str,
+    remote_ref: str,
+    remote_sha: str,
+) -> str:
+    return f"{local_ref} {local_sha} {remote_ref} {remote_sha}\n"
+
+
+def _mock_push_git(
+    monkeypatch,
+    *,
+    commits_by_range: dict[str, tuple[str, ...]],
+    paths_by_commit: dict[str, tuple[str, ...]],
+) -> None:
+    monkeypatch.setattr(
+        quality_gate,
+        "resolve_commit_sha",
+        lambda sha, _root=quality_gate.ROOT: sha,
+    )
+
+    def fake_git_output(args: list[str], **_kwargs: object) -> str:
+        if args[0] == "rev-list":
+            range_key = next(
+                (
+                    argument
+                    for argument in args
+                    if ".." in argument or _is_oid_argument(argument)
+                ),
+                "",
+            )
+            return "".join(f"{sha}\n" for sha in commits_by_range.get(range_key, ()))
+        if args[0] == "diff-tree":
+            commit_sha = args[-1]
+            return "".join(f"{path}\n" for path in paths_by_commit.get(commit_sha, ()))
+        return ""
+
+    monkeypatch.setattr(quality_gate, "_git_output", fake_git_output)
+
+
+def _is_oid_argument(value: str) -> bool:
+    return len(value) in {40, 64} and all(
+        character in "0123456789abcdef" for character in value
+    )
+
+
+def _put_index_blob(repository: Path, path: str, content: str) -> None:
+    blob = _run_git(repository, "hash-object", "-w", "--stdin", input_text=content)
+    _run_git(repository, "update-index", "--add", "--cacheinfo", f"100644,{blob},{path}")
+
+
+def _copy_dod_fixture(destination: Path) -> None:
+    paths = [
+        "README.md",
+        "docs/definition-of-done.md",
+        "docs/critical-paths.md",
+        "docs/vitals-traceability.md",
+        "docs/vitals-coverage-map.json",
+        "frontend/package.json",
+        "frontend/vitest.config.js",
+        "frontend/e2e-coverage.config.json",
+        "frontend/scripts/run-e2e-coverage.mjs",
+        "frontend/tests/e2e/coverage.spec.js",
+        "Scripts/check_e2e_coverage.py",
+        ".github/workflows/ci.yml",
+        ".github/workflows/pages.yml",
+        "Scripts/quality_gate.py",
+        ".vscode/tasks.json",
+    ]
+    for relpath in paths:
+        source = ROOT / relpath
+        target = destination / relpath
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+
+
+@pytest.fixture
+def indexed_repository(tmp_path: Path) -> Path:
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    _run_git(repository, "init")
+    return repository
+
+
+def test_change_context_characterizes_mode_inputs(monkeypatch) -> None:
+    staged_calls = 0
+
+    def fake_staged_files() -> list[str]:
+        nonlocal staged_calls
+        staged_calls += 1
+        return ["README.md", "docs/definition-of-done.md"]
+
+    monkeypatch.setattr(quality_gate, "staged_files", fake_staged_files)
+
+    fast = quality_gate.resolve_change_context("fast")
+    push = quality_gate.resolve_change_context("push")
+    ci = quality_gate.resolve_change_context("ci", ["backend/api.py"])
+
+    assert staged_calls == 1
+    assert fast.mode == "fast"
+    assert fast.changed_paths == ("README.md", "docs/definition-of-done.md")
+    assert fast.changed_paths_source == quality_gate.InputSource.GIT_INDEX
+    assert fast.documentation_only
+    assert fast.classification is not None
+    assert fast.classification.level == quality_gate.ChangeLevel.MASSIVE
+    assert fast.classification.trigger_paths == ("docs/definition-of-done.md",)
+
+    assert push.mode == "push"
+    assert push.changed_paths == ()
+    assert push.changed_paths_source == quality_gate.InputSource.HEAD
+    assert not push.documentation_only
+    assert push.classification is not None
+    assert push.classification.level == quality_gate.ChangeLevel.MASSIVE
+
+    assert ci.mode == "ci"
+    assert ci.changed_paths == ("backend/api.py",)
+    assert ci.changed_paths_source is None
+    assert not ci.documentation_only
+    assert ci.classification is not None
+    assert ci.classification.level == quality_gate.ChangeLevel.IMPACTED
+
+
+def test_change_context_rejects_unknown_modes() -> None:
+    try:
+        quality_gate.build_change_context("unknown", [])
+    except ValueError as exc:
+        assert str(exc) == "Unsupported mode: unknown"
+    else:
+        raise AssertionError("An unsupported mode must be rejected.")
+
+
+@pytest.mark.parametrize(
+    ("paths", "expected_level", "expected_triggers"),
+    [
+        (
+            ["docs/user-guide.md", "README.md"],
+            quality_gate.ChangeLevel.TARGETED,
+            ("docs/user-guide.md", "README.md"),
+        ),
+        (
+            ["tests/test_api_health.py"],
+            quality_gate.ChangeLevel.TARGETED,
+            ("tests/test_api_health.py",),
+        ),
+        (
+            ["backend/api_config.py"],
+            quality_gate.ChangeLevel.TARGETED,
+            ("backend/api_config.py",),
+        ),
+        (
+            ["frontend/src/components/AppHeader.tsx"],
+            quality_gate.ChangeLevel.TARGETED,
+            ("frontend/src/components/AppHeader.tsx",),
+        ),
+        (
+            ["frontend/src/utils/math.ts"],
+            quality_gate.ChangeLevel.IMPACTED,
+            ("frontend/src/utils/math.ts",),
+        ),
+        (
+            ["backend/mc_core.py"],
+            quality_gate.ChangeLevel.MASSIVE,
+            ("backend/mc_core.py",),
+        ),
+        (
+            ["backend/api_models.py", "frontend/src/types.ts"],
+            quality_gate.ChangeLevel.MASSIVE,
+            ("backend/api_models.py", "frontend/src/types.ts"),
+        ),
+        (
+            ["requirements.txt", "frontend/package-lock.json"],
+            quality_gate.ChangeLevel.MASSIVE,
+            ("requirements.txt", "frontend/package-lock.json"),
+        ),
+        (
+            [
+                ".githooks/pre-push",
+                "Scripts/quality_gate.py",
+                ".github/workflows/ci.yml",
+                "frontend/vitest.config.js",
+                "frontend/tests/e2e/coverage.spec.js",
+            ],
+            quality_gate.ChangeLevel.MASSIVE,
+            (
+                ".githooks/pre-push",
+                "Scripts/quality_gate.py",
+                ".github/workflows/ci.yml",
+                "frontend/vitest.config.js",
+                "frontend/tests/e2e/coverage.spec.js",
+            ),
+        ),
+        (
+            ["experimental/new_system.xyz"],
+            quality_gate.ChangeLevel.MASSIVE,
+            ("experimental/new_system.xyz",),
+        ),
+    ],
+)
+def test_change_classification_rules(
+    paths: list[str],
+    expected_level: quality_gate.ChangeLevel,
+    expected_triggers: tuple[str, ...],
+) -> None:
+    classification = quality_gate.classify_changes(paths)
+
+    assert classification.level == expected_level
+    assert classification.trigger_paths == expected_triggers
+    assert classification.justification
+    assert [decision.path for decision in classification.path_decisions] == paths
+    assert all(decision.justification for decision in classification.path_decisions)
+
+
+def test_change_classification_uses_the_highest_level_across_mixed_paths() -> None:
+    classification = quality_gate.classify_changes(
+        [
+            "backend/api_config.py",
+            "frontend/src/utils/math.ts",
+            ".github/workflows/ci.yml",
+        ]
+    )
+
+    assert classification.level == quality_gate.ChangeLevel.MASSIVE
+    assert classification.trigger_paths == (".github/workflows/ci.yml",)
+    assert [decision.level for decision in classification.path_decisions] == [
+        quality_gate.ChangeLevel.TARGETED,
+        quality_gate.ChangeLevel.IMPACTED,
+        quality_gate.ChangeLevel.MASSIVE,
+    ]
+
+
+def test_empty_or_ambiguous_change_set_is_massive_by_default() -> None:
+    empty = quality_gate.classify_changes([])
+    ambiguous = quality_gate.classify_changes(["../outside.py"])
+
+    assert empty.level == quality_gate.ChangeLevel.MASSIVE
+    assert empty.trigger_paths == ()
+    assert ambiguous.level == quality_gate.ChangeLevel.MASSIVE
+    assert ambiguous.trigger_paths == ("../outside.py",)
+
+
+def test_documentation_only_selects_only_general_mandatory_controls() -> None:
+    context = quality_gate.build_change_context("push", ["docs/user-guide.md"])
+    plan = quality_gate.build_execution_plan(context)
+
+    assert plan.resolution is not None
+    assert plan.resolution.level == quality_gate.ChangeLevel.TARGETED
+    assert [command.step for command in plan.commands] == [
+        "Repository hygiene (README, encoding, secrets and DoD)",
+        "Identity boundary",
+        "Naming convention",
+    ]
+
+
+def test_isolated_backend_test_selects_only_that_test_and_no_frontend() -> None:
+    context = quality_gate.build_change_context("fast", ["tests/test_api_health.py"])
+    plan = quality_gate.build_execution_plan(context)
+
+    assert plan.resolution is not None
+    assert plan.resolution.backend_tests == ("tests/test_api_health.py",)
+    assert plan.resolution.frontend_tests == ()
+    assert plan.commands[-1].argv == (
+        sys.executable,
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_api_health.py",
+    )
+    assert all(command.argv[0] != quality_gate.NPM_COMMAND for command in plan.commands)
+
+
+def test_local_backend_module_selects_its_direct_test() -> None:
+    context = quality_gate.build_change_context("push", ["backend/api_config.py"])
+    plan = quality_gate.build_execution_plan(context)
+
+    assert plan.resolution is not None
+    assert plan.resolution.level == quality_gate.ChangeLevel.TARGETED
+    assert plan.resolution.backend_tests == ("tests/test_api_config.py",)
+    assert [command.step for command in plan.commands][-1] == "Selected backend tests"
+    assert "Backend lint (Ruff)" not in [command.step for command in plan.commands]
+
+
+def test_local_frontend_component_selects_its_colocated_test() -> None:
+    context = quality_gate.build_change_context(
+        "push", ["frontend/src/components/AppHeader.tsx"]
+    )
+    plan = quality_gate.build_execution_plan(context)
+
+    assert plan.resolution is not None
+    assert plan.resolution.frontend_tests == (
+        "frontend/src/components/AppHeader.test.jsx",
+    )
+    assert plan.commands[-1].argv == (
+        quality_gate.NPM_COMMAND,
+        "--prefix",
+        "frontend",
+        "run",
+        "test:unit",
+        "--",
+        "src/components/AppHeader.test.jsx",
+    )
+    assert all(
+        command.argv[:3] != (sys.executable, "-m", "pytest")
+        for command in plan.commands
+    )
+
+
+def test_shared_frontend_utility_adds_domain_controls_and_nearby_tests() -> None:
+    context = quality_gate.build_change_context(
+        "push", ["frontend/src/utils/math.ts"]
+    )
+    resolution = quality_gate.resolve_tests(context)
+    plan = quality_gate.build_execution_plan(context)
+
+    assert resolution.level == quality_gate.ChangeLevel.IMPACTED
+    assert resolution.impacted_domains == (quality_gate.ChangeDomain.FRONTEND,)
+    assert resolution.frontend_tests == (
+        "frontend/src/utils/math.test.ts",
+        "frontend/src/utils/simulation.test.ts",
+        "frontend/src/utils/forecastDiagnostics.test.ts",
+    )
+    assert [command.step for command in plan.commands] == [
+        "Repository hygiene (README, encoding, secrets and DoD)",
+        "Identity boundary",
+        "Naming convention",
+        "Frontend lint (ESLint, zero warning)",
+        "Frontend typecheck (TypeScript)",
+        "Selected frontend unit tests (Vitest)",
+    ]
+
+
+def test_combined_backend_and_frontend_change_aggregates_without_cross_domain_suites() -> None:
+    context = quality_gate.build_change_context(
+        "push",
+        [
+            "backend/api_config.py",
+            "frontend/src/components/AppHeader.tsx",
+        ],
+    )
+    plan = quality_gate.build_execution_plan(context)
+
+    assert plan.resolution is not None
+    assert plan.resolution.domains == (
+        quality_gate.ChangeDomain.BACKEND,
+        quality_gate.ChangeDomain.FRONTEND,
+    )
+    assert [command.step for command in plan.commands] == [
+        "Repository hygiene (README, encoding, secrets and DoD)",
+        "Identity boundary",
+        "Naming convention",
+        "Selected backend tests",
+        "Selected frontend unit tests (Vitest)",
+    ]
+
+
+def test_massive_and_unknown_changes_use_the_complete_push_plan() -> None:
+    massive = quality_gate.build_execution_plan(
+        quality_gate.build_change_context("push", ["Scripts/quality_gate.py"])
+    )
+    unknown = quality_gate.build_execution_plan(
+        quality_gate.build_change_context("push", ["experimental/new_system.xyz"])
+    )
+
+    assert massive.resolution is not None
+    assert massive.resolution.level == quality_gate.ChangeLevel.MASSIVE
+    assert unknown.resolution is not None
+    assert unknown.resolution.level == quality_gate.ChangeLevel.MASSIVE
+    assert [command.argv for command in massive.commands] == [
+        command.argv for command in unknown.commands
+    ]
+    assert "Backend coverage (minimum 80%)" in [
+        command.step for command in massive.commands
+    ]
+    assert "End-to-end tests (Playwright)" in [
+        command.step for command in massive.commands
+    ]
+
+
+def test_unresolvable_targeted_dependency_falls_back_to_massive() -> None:
+    context = quality_gate.build_change_context(
+        "push", ["frontend/src/components/PublicConnectNotice.tsx"]
+    )
+    plan = quality_gate.build_execution_plan(context)
+
+    assert context.classification is not None
+    assert context.classification.level == quality_gate.ChangeLevel.TARGETED
+    assert plan.resolution is not None
+    assert plan.resolution.level == quality_gate.ChangeLevel.MASSIVE
+    assert plan.resolution.unresolved_paths == (
+        "frontend/src/components/PublicConnectNotice.tsx",
+    )
+    assert "Frontend unit coverage" in [command.step for command in plan.commands]
+
+
+def test_aggregated_plan_contains_no_duplicate_commands() -> None:
+    context = quality_gate.build_change_context(
+        "push",
+        [
+            "backend/api_config.py",
+            "tests/test_api_config.py",
+            "frontend/src/components/AppHeader.tsx",
+            "frontend/src/components/AppHeader.test.jsx",
+        ],
+    )
+    plan = quality_gate.build_execution_plan(context)
+    argv = [command.argv for command in plan.commands]
+
+    assert len(argv) == len(set(argv))
+    assert plan.resolution is not None
+    assert plan.resolution.backend_tests == ("tests/test_api_config.py",)
+    assert plan.resolution.frontend_tests == (
+        "frontend/src/components/AppHeader.test.jsx",
+    )
+
+
+def test_impacted_backend_plan_is_ordered_and_contains_no_duplicate_commands() -> None:
+    plan = quality_gate.build_execution_plan(
+        quality_gate.build_change_context("push", ["backend/api.py"])
+    )
+    argv = [command.argv for command in plan.commands]
+
+    assert [command.step for command in plan.commands] == [
+        "Repository hygiene (README, encoding, secrets and DoD)",
+        "Identity boundary",
+        "Naming convention",
+        "Backend lint (Ruff)",
+        "Selected backend tests",
+    ]
+    assert len(argv) == len(set(argv))
+
+
+def test_impacted_frontend_plan_is_ordered_and_contains_no_duplicate_commands() -> None:
+    plan = quality_gate.build_execution_plan(
+        quality_gate.build_change_context("push", ["frontend/src/utils/math.ts"])
+    )
+    argv = [command.argv for command in plan.commands]
+
+    assert [command.step for command in plan.commands] == [
+        "Repository hygiene (README, encoding, secrets and DoD)",
+        "Identity boundary",
+        "Naming convention",
+        "Frontend lint (ESLint, zero warning)",
+        "Frontend typecheck (TypeScript)",
+        "Selected frontend unit tests (Vitest)",
+    ]
+    assert len(argv) == len(set(argv))
+
+
+def test_mixed_impacted_plan_keeps_lint_typecheck_tests_order_without_repetition() -> None:
+    plan = quality_gate.build_execution_plan(
+        quality_gate.build_change_context(
+            "push",
+            ["backend/api.py", "frontend/src/utils/math.ts"],
+        )
+    )
+    argv = [command.argv for command in plan.commands]
+
+    assert [command.step for command in plan.commands] == [
+        "Repository hygiene (README, encoding, secrets and DoD)",
+        "Identity boundary",
+        "Naming convention",
+        "Backend lint (Ruff)",
+        "Frontend lint (ESLint, zero warning)",
+        "Frontend typecheck (TypeScript)",
+        "Selected backend tests",
+        "Selected frontend unit tests (Vitest)",
+    ]
+    assert len(argv) == len(set(argv))
+
+
+def test_plan_selection_output_explains_level_triggers_and_commands(capsys) -> None:
+    context = quality_gate.build_change_context(
+        "push", ["frontend/src/utils/math.ts"]
+    )
+    plan = quality_gate.build_execution_plan(context)
+
+    quality_gate._print_plan_selection(plan)
+
+    output = capsys.readouterr().out
+    assert "Change validation level: impacted" in output
+    assert "Trigger paths: frontend/src/utils/math.ts" in output
+    assert "Selected commands:" in output
+    assert "Frontend lint (ESLint, zero warning)" in output
+    assert "Selected frontend unit tests (Vitest)" in output
 
 
 def test_fast_push_and_ci_modes_have_the_expected_scope() -> None:
@@ -14,13 +526,773 @@ def test_fast_push_and_ci_modes_have_the_expected_scope() -> None:
     push_steps = [command.step for command in quality_gate.execution_plan("push", False)]
     ci_steps = [command.step for command in quality_gate.execution_plan("ci", False)]
 
-    assert fast_steps == push_steps[: len(fast_steps)]
     assert push_steps == ci_steps
+    assert "Backend tests" in fast_steps
+    assert "Frontend unit tests (Vitest)" in fast_steps
     assert "Backend coverage (minimum 80%)" not in fast_steps
+    assert "Frontend unit coverage" not in fast_steps
+    assert "Backend tests" not in push_steps
+    assert "Frontend unit tests (Vitest)" not in push_steps
     assert "Backend coverage (minimum 80%)" in push_steps
+    assert "Frontend unit coverage" in push_steps
     assert "End-to-end tests (Playwright)" in push_steps
     push_commands = quality_gate.execution_plan("push", False)
     assert all("docker" not in " ".join(command.argv).lower() for command in push_commands)
+
+
+def test_fast_plan_reads_index_push_reads_commits_and_ci_reads_workspace() -> None:
+    fast = quality_gate.build_execution_plan(
+        quality_gate.build_change_context("fast", ["backend/api.py"])
+    )
+    push = quality_gate.build_execution_plan(
+        quality_gate.build_change_context("push", ["backend/api.py"])
+    )
+    ci = quality_gate.build_execution_plan(
+        quality_gate.build_change_context("ci", ["backend/api.py"])
+    )
+
+    assert all(
+        command.input_sources == (quality_gate.InputSource.GIT_INDEX,)
+        for command in fast.commands
+    )
+    assert all(
+        command.input_sources == (quality_gate.InputSource.HEAD,)
+        for command in push.commands
+    )
+    assert all(
+        command.input_sources == (quality_gate.InputSource.WORKSPACE,)
+        for command in ci.commands
+    )
+
+
+def test_pre_push_update_of_one_commit(monkeypatch) -> None:
+    remote_sha = _oid("a")
+    local_sha = _oid("b")
+    updates = quality_gate.parse_pre_push_updates(
+        _pre_push_line(
+            "refs/heads/main",
+            local_sha,
+            "refs/heads/main",
+            remote_sha,
+        )
+    )
+    _mock_push_git(
+        monkeypatch,
+        commits_by_range={f"{remote_sha}..{local_sha}": (local_sha,)},
+        paths_by_commit={local_sha: ("backend/api.py",)},
+    )
+
+    plan = quality_gate.build_push_validation_plan(updates, "origin")
+
+    assert [target.terminal_sha for target in plan.targets] == [local_sha]
+    assert plan.targets[0].changed_paths == ("backend/api.py",)
+    assert plan.ranges[0].revision_args == (
+        "--reverse",
+        "--topo-order",
+        f"{remote_sha}..{local_sha}",
+    )
+    assert plan.ranges[0].terminal_sha == local_sha
+
+
+def test_pre_push_multiple_commits_keep_range_but_validate_only_terminal_sha(
+    monkeypatch,
+) -> None:
+    remote_sha = _oid("a")
+    first_sha = _oid("b")
+    local_sha = _oid("c")
+    updates = quality_gate.parse_pre_push_updates(
+        _pre_push_line(
+            "refs/heads/main",
+            local_sha,
+            "refs/heads/main",
+            remote_sha,
+        )
+    )
+    _mock_push_git(
+        monkeypatch,
+        commits_by_range={
+            f"{remote_sha}..{local_sha}": (first_sha, local_sha),
+        },
+        paths_by_commit={
+            first_sha: ("backend/api.py", "README.md"),
+            local_sha: ("frontend/src/App.tsx", "backend/api.py"),
+        },
+    )
+
+    plan = quality_gate.build_push_validation_plan(updates, "origin")
+
+    assert [target.terminal_sha for target in plan.targets] == [local_sha]
+    assert plan.ranges[0].commit_shas == (first_sha, local_sha)
+    assert plan.ranges[0].changed_paths == (
+        "backend/api.py",
+        "README.md",
+        "frontend/src/App.tsx",
+    )
+    assert plan.targets[0].changed_paths == plan.ranges[0].changed_paths
+    context = quality_gate.build_push_change_context(plan.targets[0])
+    assert context.changed_paths == plan.ranges[0].changed_paths
+    assert context.terminal_sha == local_sha
+    assert context.introduced_commit_shas == (first_sha, local_sha)
+    assert context.revision_ranges == (plan.ranges[0].revision_args,)
+
+
+def test_pre_push_remote_branch_creation_uses_remote_reachability(monkeypatch) -> None:
+    local_sha = _oid("c")
+    updates = quality_gate.parse_pre_push_updates(
+        _pre_push_line(
+            "refs/heads/topic",
+            local_sha,
+            "refs/heads/topic",
+            "0" * 40,
+        )
+    )
+    _mock_push_git(
+        monkeypatch,
+        commits_by_range={local_sha: ()},
+        paths_by_commit={local_sha: ("backend/new_module.py",)},
+    )
+
+    plan = quality_gate.build_push_validation_plan(updates, "origin")
+
+    assert plan.updates[0].is_creation
+    assert plan.ranges[0].revision_args == (
+        "--reverse",
+        "--topo-order",
+        local_sha,
+        "--not",
+        "--remotes=origin",
+    )
+    assert [target.terminal_sha for target in plan.targets] == [local_sha]
+    assert plan.ranges[0].commit_shas == (local_sha,)
+    assert plan.ranges[0].changed_paths == ("backend/new_module.py",)
+
+
+def test_pre_push_remote_branch_deletion_runs_no_commit_validation(monkeypatch) -> None:
+    updates = quality_gate.parse_pre_push_updates(
+        _pre_push_line(
+            "(delete)",
+            "0" * 40,
+            "refs/heads/obsolete",
+            _oid("d"),
+        )
+    )
+    monkeypatch.setattr(
+        quality_gate,
+        "_git_output",
+        lambda *_args, **_kwargs: pytest.fail("A deletion must not resolve a range."),
+    )
+
+    plan = quality_gate.build_push_validation_plan(updates, "origin")
+
+    assert plan.updates[0].is_deletion
+    assert plan.ranges[0].revision_args == ()
+    assert plan.targets == ()
+
+    monkeypatch.setattr(
+        quality_gate,
+        "build_push_validation_plan",
+        lambda *_args, **_kwargs: plan,
+    )
+    monkeypatch.setattr(
+        quality_gate,
+        "detached_commit_worktree",
+        lambda *_args, **_kwargs: pytest.fail(
+            "A reference deletion must not create a worktree."
+        ),
+    )
+    assert quality_gate.run_pre_push_gate(
+        _pre_push_line(
+            "(delete)",
+            "0" * 40,
+            "refs/heads/obsolete",
+            _oid("d"),
+        ),
+        remote_name="origin",
+    ) == 0
+
+
+def test_pre_push_two_references_with_same_terminal_sha_validate_it_once(
+    monkeypatch,
+) -> None:
+    shared_terminal = _oid("d")
+    updates = quality_gate.parse_pre_push_updates(
+        _pre_push_line(
+            "refs/heads/main",
+            shared_terminal,
+            "refs/heads/main",
+            _oid("a"),
+        )
+        + _pre_push_line(
+            "refs/heads/release",
+            shared_terminal,
+            "refs/heads/release",
+            _oid("b"),
+        )
+    )
+    _mock_push_git(
+        monkeypatch,
+        commits_by_range={
+            f"{_oid('a')}..{shared_terminal}": (_oid("c"), shared_terminal),
+            f"{_oid('b')}..{shared_terminal}": (shared_terminal,),
+        },
+        paths_by_commit={
+            _oid("c"): ("backend/api.py",),
+            shared_terminal: ("frontend/src/App.tsx",),
+        },
+    )
+
+    plan = quality_gate.build_push_validation_plan(updates, "origin")
+
+    assert len(plan.ranges) == 2
+    assert len(plan.targets) == 1
+    assert plan.targets[0].terminal_sha == shared_terminal
+    assert plan.targets[0].ranges == plan.ranges
+    assert plan.targets[0].changed_paths == (
+        "backend/api.py",
+        "frontend/src/App.tsx",
+    )
+    context = quality_gate.build_push_change_context(plan.targets[0])
+    assert context.introduced_commit_shas == (_oid("c"), shared_terminal)
+    assert context.revision_ranges == tuple(
+        commit_range.revision_args for commit_range in plan.ranges
+    )
+
+
+def test_pre_push_two_references_with_distinct_terminal_shas_validate_both(
+    monkeypatch,
+) -> None:
+    shared_sha = _oid("c")
+    main_sha = _oid("d")
+    topic_sha = _oid("e")
+    updates = quality_gate.parse_pre_push_updates(
+        _pre_push_line(
+            "refs/heads/main",
+            main_sha,
+            "refs/heads/main",
+            _oid("a"),
+        )
+        + _pre_push_line(
+            "refs/heads/topic",
+            topic_sha,
+            "refs/heads/topic",
+            _oid("b"),
+        )
+    )
+    _mock_push_git(
+        monkeypatch,
+        commits_by_range={
+            f"{_oid('a')}..{main_sha}": (shared_sha, main_sha),
+            f"{_oid('b')}..{topic_sha}": (shared_sha, topic_sha),
+        },
+        paths_by_commit={
+            shared_sha: ("README.md",),
+            main_sha: ("backend/api.py",),
+            topic_sha: ("frontend/src/App.tsx",),
+        },
+    )
+
+    plan = quality_gate.build_push_validation_plan(updates, "origin")
+
+    assert len(plan.ranges) == 2
+    assert [target.terminal_sha for target in plan.targets] == [main_sha, topic_sha]
+    assert plan.targets[0].changed_paths == ("README.md", "backend/api.py")
+    assert plan.targets[1].changed_paths == ("README.md", "frontend/src/App.tsx")
+
+
+def test_pre_push_invalid_stdin_and_unresolvable_sha_are_rejected(
+    monkeypatch, capsys
+) -> None:
+    with pytest.raises(ValueError, match="no reference updates"):
+        quality_gate.parse_pre_push_updates("")
+    with pytest.raises(ValueError, match="expected 4 fields"):
+        quality_gate.parse_pre_push_updates("refs/heads/main too-few-fields\n")
+    with pytest.raises(ValueError, match="not a full OID"):
+        quality_gate.parse_pre_push_updates(
+            _pre_push_line(
+                "refs/heads/main",
+                "not-a-sha",
+                "refs/heads/main",
+                _oid("a"),
+            )
+        )
+
+    monkeypatch.setattr(
+        quality_gate,
+        "resolve_commit_sha",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            ValueError("Unable to resolve pushed SHA as a commit")
+        ),
+    )
+    code = quality_gate.run_pre_push_gate(
+        _pre_push_line(
+            "refs/heads/main",
+            _oid("b"),
+            "refs/heads/main",
+            _oid("a"),
+        ),
+        remote_name="origin",
+    )
+
+    assert code == 2
+    assert "Unable to resolve pushed SHA" in capsys.readouterr().err
+
+
+def test_pre_push_executes_once_per_terminal_sha_with_aggregated_context(
+    tmp_path: Path, monkeypatch
+) -> None:
+    terminal_sha = _oid("c")
+    worktree = tmp_path / "terminal-worktree"
+    worktree.mkdir()
+    executed_roots: list[Path] = []
+    contexts: list[quality_gate.ChangeContext] = []
+    cleaned: list[str] = []
+
+    monkeypatch.setattr(
+        quality_gate,
+        "build_push_validation_plan",
+        lambda *_args, **_kwargs: quality_gate.PushValidationPlan(
+            updates=(),
+            ranges=(),
+            targets=(
+                quality_gate.PushValidationTarget(
+                    terminal_sha=terminal_sha,
+                    ranges=(),
+                    changed_paths=("backend/api.py", "frontend/src/App.tsx"),
+                ),
+            ),
+        ),
+    )
+
+    @contextmanager
+    def fake_worktree(commit_sha: str, _repository_root: Path):
+        try:
+            yield worktree
+        finally:
+            cleaned.append(commit_sha)
+
+    def fake_execute(
+        plan: quality_gate.GateExecutionPlan,
+        *,
+        validation_root: Path,
+        **_kwargs: object,
+    ) -> int:
+        executed_roots.append(validation_root)
+        contexts.append(plan.context)
+        return 0
+
+    monkeypatch.setattr(quality_gate, "detached_commit_worktree", fake_worktree)
+    monkeypatch.setattr(quality_gate, "_execute_gate_plan", fake_execute)
+
+    assert quality_gate.run_pre_push_gate(
+        _pre_push_line(
+            "refs/heads/main",
+            terminal_sha,
+            "refs/heads/main",
+            _oid("a"),
+        ),
+        remote_name="origin",
+    ) == 0
+    assert executed_roots == [worktree]
+    assert quality_gate.ROOT not in executed_roots
+    assert cleaned == [terminal_sha]
+    assert len(contexts) == 1
+    context = contexts[0]
+    assert context.mode == "push"
+    assert context.changed_paths == ("backend/api.py", "frontend/src/App.tsx")
+    assert context.changed_paths_source == quality_gate.InputSource.HEAD
+    assert not context.documentation_only
+    assert context.terminal_sha == terminal_sha
+    assert context.introduced_commit_shas == ()
+    assert context.revision_ranges == ()
+    assert context.classification is not None
+    assert context.classification.level == quality_gate.ChangeLevel.MASSIVE
+    assert context.classification.trigger_paths == ("frontend/src/App.tsx",)
+
+
+def test_detached_worktree_cleanup_runs_after_success_and_failure(
+    tmp_path: Path, monkeypatch
+) -> None:
+    calls: list[tuple[str, ...]] = []
+
+    def fake_worktree_command(
+        args: list[str],
+        *,
+        repository_root: Path,
+    ) -> subprocess.CompletedProcess[str]:
+        calls.append(tuple(args))
+        if args[0] == "add":
+            Path(args[-2]).mkdir(parents=True)
+        return subprocess.CompletedProcess(args, 0, "", "")
+
+    monkeypatch.setattr(quality_gate, "_run_worktree_command", fake_worktree_command)
+
+    with quality_gate.detached_commit_worktree(_oid("a"), tmp_path):
+        pass
+    assert [call[0] for call in calls] == ["add", "remove", "prune"]
+
+    calls.clear()
+    with pytest.raises(RuntimeError, match="validation failed"):
+        with quality_gate.detached_commit_worktree(_oid("b"), tmp_path):
+            raise RuntimeError("validation failed")
+    assert [call[0] for call in calls] == ["add", "remove", "prune"]
+
+    calls.clear()
+    with pytest.raises(KeyboardInterrupt):
+        with quality_gate.detached_commit_worktree(_oid("c"), tmp_path):
+            raise KeyboardInterrupt
+    assert [call[0] for call in calls] == ["add", "remove", "prune"]
+
+
+def test_pre_push_stops_after_failure_but_cleans_the_failed_worktree(
+    tmp_path: Path, monkeypatch
+) -> None:
+    first_sha = _oid("b")
+    second_sha = _oid("c")
+    cleaned: list[str] = []
+    executed: list[str] = []
+
+    monkeypatch.setattr(
+        quality_gate,
+        "build_push_validation_plan",
+        lambda *_args, **_kwargs: quality_gate.PushValidationPlan(
+            updates=(),
+            ranges=(),
+            targets=(
+                quality_gate.PushValidationTarget(
+                    terminal_sha=first_sha,
+                    ranges=(),
+                    changed_paths=("backend/api.py",),
+                ),
+                quality_gate.PushValidationTarget(
+                    terminal_sha=second_sha,
+                    ranges=(),
+                    changed_paths=("frontend/src/App.tsx",),
+                ),
+            ),
+        ),
+    )
+
+    @contextmanager
+    def fake_worktree(commit_sha: str, _repository_root: Path):
+        try:
+            yield tmp_path / commit_sha
+        finally:
+            cleaned.append(commit_sha)
+
+    def fail_first(
+        _plan: quality_gate.GateExecutionPlan,
+        *,
+        validation_root: Path,
+        **_kwargs: object,
+    ) -> int:
+        executed.append(validation_root.name)
+        return 17
+
+    monkeypatch.setattr(quality_gate, "detached_commit_worktree", fake_worktree)
+    monkeypatch.setattr(quality_gate, "_execute_gate_plan", fail_first)
+
+    assert quality_gate.run_pre_push_gate(
+        _pre_push_line(
+            "refs/heads/main",
+            second_sha,
+            "refs/heads/main",
+            _oid("a"),
+        ),
+        remote_name="origin",
+    ) == 17
+    assert executed == [first_sha]
+    assert cleaned == [first_sha]
+
+
+def test_staged_snapshot_ignores_workspace_edits_and_reflects_deletes_and_renames(
+    indexed_repository: Path,
+) -> None:
+    valid_readme = "# Pr\u00e9vision\n\nLa qualit\u00e9 reste document\u00e9e.\n"
+    _put_index_blob(indexed_repository, "README.md", valid_readme)
+    _put_index_blob(
+        indexed_repository,
+        "backend/old_module.py",
+        "def calculate_forecast():\n    return 1\n",
+    )
+    _run_git(indexed_repository, "update-index", "--force-remove", "backend/old_module.py")
+    _put_index_blob(
+        indexed_repository,
+        "backend/renamed_module.py",
+        "def calculate_forecast():\n    return 1\n",
+    )
+    _put_index_blob(
+        indexed_repository,
+        "backend/deleted_module.py",
+        "def calculate_deleted_forecast():\n    return 1\n",
+    )
+    _run_git(indexed_repository, "update-index", "--force-remove", "backend/deleted_module.py")
+
+    (indexed_repository / "backend").mkdir()
+    (indexed_repository / "README.md").write_text(
+        "# Pr\u00c3\u00a9vision\n\nSecuriser le perimetre, la capacite, la securite, "
+        "la qualite et le deploiement.\n",
+        encoding="utf-8",
+    )
+    (indexed_repository / "backend" / "renamed_module.py").write_text(
+        "def calcul_arrime():\n    return 1\n",
+        encoding="utf-8",
+    )
+    (indexed_repository / "backend" / "deleted_module.py").write_text(
+        "def calcul_arrime_supprime():\n    return 1\n",
+        encoding="utf-8",
+    )
+    (indexed_repository / "backend" / "old_module.py").write_text(
+        "def calcul_arrime_ancien():\n    return 1\n",
+        encoding="utf-8",
+    )
+
+    with quality_gate.staged_index_snapshot(indexed_repository) as snapshot:
+        assert (snapshot / "README.md").read_text(encoding="utf-8") == valid_readme
+        assert pre_commit_guard.check_readme_encoding(snapshot / "README.md") == 0
+        assert pre_commit_guard.check_readme_french_accents(snapshot / "README.md") == 0
+        assert check_naming_convention.collect_naming_violations(snapshot) == []
+        assert not (snapshot / "backend" / "deleted_module.py").exists()
+        assert not (snapshot / "backend" / "old_module.py").exists()
+        assert (snapshot / "backend" / "renamed_module.py").exists()
+
+    assert pre_commit_guard.check_readme_encoding(indexed_repository / "README.md") == 1
+    assert pre_commit_guard.check_readme_french_accents(
+        indexed_repository / "README.md"
+    ) == 1
+    assert check_naming_convention.collect_naming_violations(indexed_repository)
+
+
+def test_invalid_staged_readme_and_code_are_blocked_even_if_workspace_is_valid(
+    indexed_repository: Path,
+) -> None:
+    _put_index_blob(
+        indexed_repository,
+        "README.md",
+        "# Pr\u00c3\u00a9vision\n\nSecuriser le perimetre, la capacite, la securite, "
+        "la qualite et le deploiement.\n",
+    )
+    _put_index_blob(
+        indexed_repository,
+        "backend/forecast.py",
+        "def calcul_arrime():\n    return 1\n",
+    )
+
+    (indexed_repository / "backend").mkdir()
+    (indexed_repository / "README.md").write_text(
+        "# Pr\u00e9vision\n\nLa qualit\u00e9 reste document\u00e9e.\n",
+        encoding="utf-8",
+    )
+    (indexed_repository / "backend" / "forecast.py").write_text(
+        "def calculate_forecast():\n    return 1\n",
+        encoding="utf-8",
+    )
+
+    with quality_gate.staged_index_snapshot(indexed_repository) as snapshot:
+        assert pre_commit_guard.check_readme_encoding(snapshot / "README.md") == 1
+        assert pre_commit_guard.check_readme_french_accents(snapshot / "README.md") == 1
+        violations = check_naming_convention.collect_naming_violations(snapshot)
+
+    assert [violation.identifier for violation in violations] == ["calcul_arrime"]
+    assert pre_commit_guard.check_readme_french_accents(
+        indexed_repository / "README.md"
+    ) == 0
+    assert check_naming_convention.collect_naming_violations(indexed_repository) == []
+
+
+def test_dod_control_uses_the_supplied_staged_root_and_ignores_workspace_changes(
+    tmp_path: Path,
+) -> None:
+    staged_root = tmp_path / "staged"
+    workspace_root = tmp_path / "workspace"
+    _copy_dod_fixture(staged_root)
+    shutil.copytree(staged_root, workspace_root)
+
+    assert check_dod_compliance.collect_dod_errors(staged_root) == []
+
+    workspace_readme = workspace_root / "README.md"
+    workspace_readme.write_text(
+        workspace_readme.read_text(encoding="utf-8").replace(
+            "docs/definition-of-done.md",
+            "docs/missing-definition-of-done.md",
+        ),
+        encoding="utf-8",
+    )
+
+    assert any(
+        "README must link docs/definition-of-done.md" in error
+        for error in check_dod_compliance.collect_dod_errors(workspace_root)
+    )
+    assert check_dod_compliance.collect_dod_errors(staged_root) == []
+
+    staged_readme = staged_root / "README.md"
+    staged_readme.write_text(
+        staged_readme.read_text(encoding="utf-8").replace(
+            "docs/definition-of-done.md",
+            "docs/missing-definition-of-done.md",
+        ),
+        encoding="utf-8",
+    )
+    assert any(
+        "README must link docs/definition-of-done.md" in error
+        for error in check_dod_compliance.collect_dod_errors(staged_root)
+    )
+
+
+def test_fast_executes_composite_dod_identity_and_naming_from_snapshot(
+    tmp_path: Path, monkeypatch
+) -> None:
+    snapshot = tmp_path / "snapshot"
+    snapshot.mkdir()
+    calls: list[tuple[str, Path, Path, bool, dict[str, str] | None]] = []
+
+    @contextmanager
+    def fake_snapshot():
+        yield snapshot
+
+    def fake_run(
+        command: quality_gate.GateCommand,
+        *,
+        validation_root: Path,
+        runtime_temp_root: Path,
+        isolated_validation: bool,
+        extra_env: dict[str, str] | None,
+    ) -> int:
+        calls.append(
+            (
+                command.step,
+                validation_root,
+                runtime_temp_root,
+                isolated_validation,
+                extra_env,
+            )
+        )
+        return 0
+
+    monkeypatch.setattr(quality_gate, "staged_index_snapshot", fake_snapshot)
+    monkeypatch.setattr(quality_gate, "_run_command", fake_run)
+
+    assert quality_gate.run_gate("fast", paths=["README.md"]) == 0
+    assert [step for step, _root, _temp, _isolated, _env in calls] == [
+        "Repository hygiene (README, encoding, secrets and DoD)",
+        "Identity boundary",
+        "Naming convention",
+    ]
+    assert all(root == snapshot for _step, root, _temp, _isolated, _env in calls)
+    assert all(
+        temp == snapshot.parent / ".tmp" / "pytest"
+        for _step, _root, temp, _isolated, _env in calls
+    )
+    assert all(isolated for _step, _root, _temp, isolated, _env in calls)
+    assert all(
+        env is not None and env["GIT_WORK_TREE"] == str(ROOT.resolve())
+        for _step, _root, _temp, _isolated, env in calls
+    )
+
+
+def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
+    plan = quality_gate.build_execution_plan(
+        quality_gate.build_change_context("push", ["Scripts/quality_gate.py"])
+    )
+
+    assert [command.argv for command in plan.commands] == [
+        (sys.executable, "Scripts/pre_commit_guard.py"),
+        (sys.executable, "Scripts/check_identity_boundary.py"),
+        (sys.executable, "Scripts/check_naming_convention.py"),
+        (sys.executable, "-m", "ruff", "check", "."),
+        (
+            quality_gate.NPM_COMMAND,
+            "--prefix",
+            "frontend",
+            "run",
+            "lint",
+            "--",
+            "--max-warnings",
+            "0",
+        ),
+        (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run", "typecheck"),
+        (
+            sys.executable,
+            "-m",
+            "pytest",
+            "--cov=backend",
+            "--cov-branch",
+            "--cov-report=json:.coverage.backend.json",
+            "--cov-fail-under=80",
+            "--cov-report=term-missing",
+            "-q",
+        ),
+        (
+            quality_gate.NPM_COMMAND,
+            "--prefix",
+            "frontend",
+            "run",
+            "test:unit:coverage",
+        ),
+        (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run", "build"),
+        (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run", "test:e2e"),
+    ]
+    assert plan.commands[0].input_sources == (quality_gate.InputSource.HEAD,)
+    assert all(
+        command.input_sources == (quality_gate.InputSource.HEAD,)
+        for command in plan.commands
+    )
+    assert {
+        command.step: command.coverage_artifacts
+        for command in plan.commands
+        if command.coverage_artifacts
+    } == {
+        "Backend coverage (minimum 80%)": (".coverage", ".coverage.backend.json"),
+        "Frontend unit coverage": (
+            "frontend/coverage/coverage-final.json",
+            "frontend/coverage/index.html",
+        ),
+        "End-to-end tests (Playwright)": (
+            "frontend/coverage/e2e-coverage-summary.json",
+        ),
+    }
+    assert plan.coverage_artifacts == (
+        ".coverage",
+        ".coverage.backend.json",
+        "frontend/coverage/coverage-final.json",
+        "frontend/coverage/index.html",
+        "frontend/coverage/e2e-coverage-summary.json",
+    )
+    assert not plan.docker_smoke
+
+
+def test_push_and_ci_use_coverage_suites_without_simple_test_duplicates() -> None:
+    for mode in ("push", "ci"):
+        commands = quality_gate.execution_plan(mode, False)
+        pytest_commands = [
+            command
+            for command in commands
+            if command.argv[:3] == (sys.executable, "-m", "pytest")
+        ]
+        frontend_unit_commands = [
+            command
+            for command in commands
+            if command.argv[:4]
+            == (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run")
+            and command.argv[4] in {"test:unit", "test:unit:coverage"}
+        ]
+
+        assert len(pytest_commands) == 1
+        assert "--cov=backend" in pytest_commands[0].argv
+        assert [command.argv[4] for command in frontend_unit_commands] == [
+            "test:unit:coverage",
+        ]
+
+
+def test_naming_convention_runs_once_in_the_main_plan() -> None:
+    plan = quality_gate.build_execution_plan(
+        quality_gate.build_change_context("push", ["Scripts/quality_gate.py"])
+    )
+
+    assert sum(command.step == "Naming convention" for command in plan.commands) == 1
+    assert all(
+        check.name != "Naming convention"
+        for check in pre_commit_guard.guard_plan(["Scripts/quality_gate.py"])
+    )
 
 
 def test_documentation_only_fast_path_skips_expensive_checks() -> None:
@@ -36,14 +1308,353 @@ def test_documentation_only_fast_path_skips_expensive_checks() -> None:
     assert not quality_gate.is_documentation_only(["README.md", "backend/api.py"])
 
 
+def test_pytest_command_uses_unique_workspace_basetemps_without_global_temp_access(
+    tmp_path: Path, monkeypatch
+) -> None:
+    basetemps: list[Path] = []
+
+    def forbidden_global_temp() -> str:
+        pytest.fail("The gate must not consult the global user temporary directory.")
+
+    def run(argv: tuple[str, ...], **_kwargs: object) -> subprocess.CompletedProcess[str]:
+        basetemp = Path(argv[argv.index("--basetemp") + 1])
+        assert basetemp.is_dir()
+        basetemps.append(basetemp)
+        return subprocess.CompletedProcess(argv, 0)
+
+    monkeypatch.setattr(quality_gate.tempfile, "gettempdir", forbidden_global_temp)
+    monkeypatch.setattr(quality_gate.subprocess, "run", run)
+    command = quality_gate.GateCommand(
+        "Selected backend tests",
+        (sys.executable, "-m", "pytest", "-q", "tests/test_api_health.py"),
+        "Correct the test.",
+        backend_test=True,
+    )
+
+    assert quality_gate._run_command(command, validation_root=tmp_path) == 0
+    assert quality_gate._run_command(command, validation_root=tmp_path) == 0
+
+    assert len(set(basetemps)) == 2
+    assert all(path.parent == tmp_path / ".tmp" / "pytest" for path in basetemps)
+    assert all(path.name.startswith("selected-backend-tests-") for path in basetemps)
+    assert all(not path.exists() for path in basetemps)
+
+
+@pytest.mark.parametrize("return_code", [0, 23])
+def test_pytest_basetemp_is_cleaned_after_success_and_failure(
+    tmp_path: Path, monkeypatch, return_code: int
+) -> None:
+    basetemp: Path | None = None
+
+    def run(argv: tuple[str, ...], **_kwargs: object) -> subprocess.CompletedProcess[str]:
+        nonlocal basetemp
+        basetemp = Path(argv[argv.index("--basetemp") + 1])
+        assert basetemp.exists()
+        return subprocess.CompletedProcess(argv, return_code)
+
+    monkeypatch.setattr(quality_gate.subprocess, "run", run)
+    command = quality_gate.GateCommand(
+        "Backend tests",
+        (sys.executable, "-m", "pytest", "-q"),
+        "Correct the test.",
+        backend_test=True,
+    )
+
+    assert quality_gate._run_command(command, validation_root=tmp_path) == return_code
+    assert basetemp is not None
+    assert not basetemp.exists()
+
+
+def test_pytest_basetemp_is_cleaned_after_interruption(tmp_path: Path, monkeypatch) -> None:
+    basetemp: Path | None = None
+
+    def interrupt(argv: tuple[str, ...], **_kwargs: object) -> None:
+        nonlocal basetemp
+        basetemp = Path(argv[argv.index("--basetemp") + 1])
+        assert basetemp.exists()
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(quality_gate.subprocess, "run", interrupt)
+    command = quality_gate.GateCommand(
+        "Backend coverage (minimum 80%)",
+        (sys.executable, "-m", "pytest", "--cov=backend", "-q"),
+        "Correct the test.",
+        backend_test=True,
+    )
+
+    with pytest.raises(KeyboardInterrupt):
+        quality_gate._run_command(command, validation_root=tmp_path)
+    assert basetemp is not None
+    assert not basetemp.exists()
+
+
+def test_pytest_basetemp_cleanup_removes_only_the_expected_directory(
+    tmp_path: Path,
+) -> None:
+    runtime_temp_root = tmp_path / ".tmp" / "pytest"
+    basetemp = runtime_temp_root / "backend-tests-123-normal"
+    sibling = runtime_temp_root / "backend-tests-456-sibling"
+    basetemp.mkdir(parents=True)
+    sibling.mkdir()
+    (basetemp / "result.txt").write_text("ok", encoding="utf-8")
+
+    quality_gate._remove_pytest_basetemp(
+        basetemp,
+        runtime_temp_root,
+        expected_prefix="backend-tests-123-",
+    )
+
+    assert not basetemp.exists()
+    assert sibling.exists()
+
+
+@pytest.mark.skipif(quality_gate.os.name != "nt", reason="Windows read-only semantics")
+def test_pytest_basetemp_cleanup_removes_a_readonly_file(tmp_path: Path) -> None:
+    runtime_temp_root = tmp_path / ".tmp" / "pytest"
+    basetemp = runtime_temp_root / "backend-tests-123-readonly"
+    basetemp.mkdir(parents=True)
+    readonly_file = basetemp / "readonly.txt"
+    readonly_file.write_text("locked", encoding="utf-8")
+    readonly_file.chmod(stat.S_IREAD)
+
+    quality_gate._remove_pytest_basetemp(
+        basetemp,
+        runtime_temp_root,
+        expected_prefix="backend-tests-123-",
+    )
+
+    assert not basetemp.exists()
+
+
+@pytest.mark.skipif(quality_gate.os.name != "nt", reason="Windows read-only semantics")
+def test_pytest_basetemp_cleanup_handles_readonly_git_objects(tmp_path: Path) -> None:
+    runtime_temp_root = tmp_path / ".tmp" / "pytest"
+    basetemp = runtime_temp_root / "backend-tests-123-git"
+    git_object = basetemp / "repository" / ".git" / "objects" / "ab" / "object"
+    git_object.parent.mkdir(parents=True)
+    git_object.write_bytes(b"temporary git object")
+    git_object.chmod(stat.S_IREAD)
+
+    quality_gate._remove_pytest_basetemp(
+        basetemp,
+        runtime_temp_root,
+        expected_prefix="backend-tests-123-",
+    )
+
+    assert not basetemp.exists()
+
+
+@pytest.mark.skipif(quality_gate.os.name != "nt", reason="Windows retry semantics")
+def test_pytest_basetemp_cleanup_retries_the_failing_path(
+    tmp_path: Path, monkeypatch
+) -> None:
+    runtime_temp_root = tmp_path / ".tmp" / "pytest"
+    basetemp = runtime_temp_root / "backend-tests-123-retry"
+    blocked_file = basetemp / "blocked.txt"
+    blocked_file.parent.mkdir(parents=True)
+    blocked_file.write_text("locked", encoding="utf-8")
+    attempts: list[Path] = []
+
+    def rmtree(path: Path, *, onexc) -> None:
+        def retry(failing_path: str) -> None:
+            attempts.append(Path(failing_path))
+            Path(failing_path).unlink()
+
+        onexc(retry, str(blocked_file), PermissionError("read-only"))
+        Path(path).rmdir()
+
+    monkeypatch.setattr(quality_gate.shutil, "rmtree", rmtree)
+
+    quality_gate._remove_pytest_basetemp(
+        basetemp,
+        runtime_temp_root,
+        expected_prefix="backend-tests-123-",
+    )
+
+    assert attempts == [blocked_file]
+    assert not basetemp.exists()
+
+
+@pytest.mark.skipif(quality_gate.os.name != "nt", reason="Windows retry semantics")
+def test_pytest_basetemp_cleanup_propagates_a_persistent_permission_error(
+    tmp_path: Path, monkeypatch
+) -> None:
+    runtime_temp_root = tmp_path / ".tmp" / "pytest"
+    basetemp = runtime_temp_root / "backend-tests-123-persistent"
+    blocked_file = basetemp / "blocked.txt"
+    blocked_file.parent.mkdir(parents=True)
+    blocked_file.write_text("locked", encoding="utf-8")
+
+    def rmtree(_path: Path, *, onexc) -> None:
+        def retry(_failing_path: str) -> None:
+            raise PermissionError("still locked")
+
+        onexc(retry, str(blocked_file), PermissionError("read-only"))
+
+    monkeypatch.setattr(quality_gate.shutil, "rmtree", rmtree)
+
+    with pytest.raises(PermissionError, match="still locked"):
+        quality_gate._remove_pytest_basetemp(
+            basetemp,
+            runtime_temp_root,
+            expected_prefix="backend-tests-123-",
+        )
+
+
+def test_pytest_basetemp_cleanup_rejects_a_path_outside_runtime_root(
+    tmp_path: Path,
+) -> None:
+    runtime_temp_root = tmp_path / ".tmp" / "pytest"
+    outside = tmp_path / "outside" / "backend-tests-123-unsafe"
+    outside.mkdir(parents=True)
+
+    with pytest.raises(ValueError, match="unexpected Pytest basetemp"):
+        quality_gate._remove_pytest_basetemp(
+            outside,
+            runtime_temp_root,
+            expected_prefix="backend-tests-123-",
+        )
+
+    assert outside.exists()
+
+
+@pytest.mark.parametrize("mode", ["fast", "push", "ci"])
+def test_all_gate_modes_apply_the_same_pytest_basetemp_strategy(
+    tmp_path: Path, mode: str
+) -> None:
+    command = next(
+        command
+        for command in quality_gate.execution_plan(mode, False)
+        if quality_gate._is_direct_pytest_command(command)
+    )
+    isolated_validation = mode in {"fast", "push"}
+    validation_root = (
+        tmp_path / mode / "repository" if isolated_validation else tmp_path / mode
+    )
+    validation_root.mkdir(parents=True)
+    runtime_temp_root = quality_gate._runtime_temp_root(
+        validation_root,
+        isolated_validation=isolated_validation,
+    )
+
+    with quality_gate._command_argv(
+        command,
+        validation_root,
+        runtime_temp_root,
+        isolated_validation=isolated_validation,
+    ) as argv:
+        basetemp = Path(argv[argv.index("--basetemp") + 1])
+        assert basetemp.parent == runtime_temp_root
+        assert basetemp.name.startswith(quality_gate._pytest_basetemp_prefix(command))
+        assert basetemp.exists()
+        if isolated_validation:
+            assert not quality_gate._is_descendant(basetemp, validation_root)
+        else:
+            assert basetemp.parent == validation_root / ".tmp" / "pytest"
+
+    assert not basetemp.exists()
+
+
+def test_isolated_validation_rejects_a_runtime_temp_descendant(tmp_path: Path) -> None:
+    validation_root = tmp_path / "snapshot" / "repository"
+    validation_root.mkdir(parents=True)
+    command = quality_gate.GateCommand(
+        "Backend tests",
+        (sys.executable, "-m", "pytest", "-q"),
+        "Correct the test.",
+        backend_test=True,
+    )
+
+    with pytest.raises(ValueError, match="outside the isolated validation root"):
+        with quality_gate._command_argv(
+            command,
+            validation_root,
+            validation_root / ".tmp" / "pytest",
+            isolated_validation=True,
+        ):
+            pytest.fail("An unsafe basetemp must be rejected before command execution.")
+
+
+def test_external_snapshot_basetemp_supports_a_nested_git_repository(
+    tmp_path: Path, monkeypatch
+) -> None:
+    validation_root = tmp_path / "snapshot" / "repository"
+    validation_root.mkdir(parents=True)
+    runtime_temp_root = quality_gate._runtime_temp_root(
+        validation_root,
+        isolated_validation=True,
+    )
+    observed_basetemp: Path | None = None
+    run_process = subprocess.run
+    monkeypatch.setenv("GIT_DIR", str(validation_root / ".git-from-index"))
+    monkeypatch.setenv("GIT_WORK_TREE", str(validation_root))
+
+    def run(argv: tuple[str, ...], **_kwargs: object) -> subprocess.CompletedProcess[str]:
+        nonlocal observed_basetemp
+        observed_basetemp = Path(argv[argv.index("--basetemp") + 1])
+        nested_repository = observed_basetemp / "nested-repository"
+        command_env = _kwargs["env"]
+        assert isinstance(command_env, dict)
+        assert "GIT_DIR" not in command_env
+        assert "GIT_WORK_TREE" not in command_env
+        result = run_process(
+            ["git", "init", str(nested_repository)],
+            check=False,
+            capture_output=True,
+            text=True,
+            env=command_env,
+        )
+        assert result.returncode == 0
+        assert (nested_repository / ".git").is_dir()
+        return subprocess.CompletedProcess(argv, 0)
+
+    monkeypatch.setattr(quality_gate.subprocess, "run", run)
+    command = quality_gate.GateCommand(
+        "Backend tests",
+        (sys.executable, "-m", "pytest", "-q"),
+        "Correct the test.",
+        backend_test=True,
+    )
+
+    assert (
+        quality_gate._run_command(
+            command,
+            validation_root=validation_root,
+            runtime_temp_root=runtime_temp_root,
+            isolated_validation=True,
+        )
+        == 0
+    )
+    assert observed_basetemp is not None
+    assert not quality_gate._is_descendant(observed_basetemp, validation_root)
+    assert not observed_basetemp.exists()
+
+
 def test_first_failed_command_exit_code_is_propagated(monkeypatch) -> None:
     failure = quality_gate.GateCommand("failing check", ("missing-command",), "Fix it.")
     skipped = quality_gate.GateCommand("must not run", ("also-missing",), "Fix it.")
     calls: list[str] = []
 
-    monkeypatch.setattr(quality_gate, "execution_plan", lambda *_: [failure, skipped])
+    monkeypatch.setattr(
+        quality_gate,
+        "build_execution_plan",
+        lambda context: quality_gate.GateExecutionPlan(
+            context=context,
+            commands=(failure, skipped),
+            docker_smoke=False,
+        ),
+    )
 
-    def fake_run(command: quality_gate.GateCommand) -> int:
+    @contextmanager
+    def fake_snapshot():
+        yield ROOT
+
+    monkeypatch.setattr(quality_gate, "staged_index_snapshot", fake_snapshot)
+
+    def fake_run(
+        command: quality_gate.GateCommand,
+        **_kwargs: object,
+    ) -> int:
         calls.append(command.step)
         return 23
 
@@ -54,7 +1665,7 @@ def test_first_failed_command_exit_code_is_propagated(monkeypatch) -> None:
 
 
 def test_push_never_runs_docker_but_ci_runs_the_docker_smoke(monkeypatch) -> None:
-    monkeypatch.setattr(quality_gate, "_run_command", lambda _: 0)
+    monkeypatch.setattr(quality_gate, "_run_command", lambda _command, **_kwargs: 0)
     monkeypatch.setattr(quality_gate, "_ensure_frontend_dependencies", lambda: 0)
     docker_called = False
 
@@ -71,6 +1682,20 @@ def test_push_never_runs_docker_but_ci_runs_the_docker_smoke(monkeypatch) -> Non
     assert docker_called
 
 
+def test_real_docker_smoke_is_blocked_without_env(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    monkeypatch.setattr(quality_gate, "ROOT", tmp_path)
+    monkeypatch.setattr(
+        quality_gate,
+        "_run_command",
+        lambda *_args, **_kwargs: pytest.fail("Docker must not start without .env."),
+    )
+
+    assert quality_gate._run_docker_smoke() == 1
+    assert ".env is required for Docker smoke testing" in capsys.readouterr().err
+
+
 def test_docker_smoke_retries_a_transient_connection_reset(monkeypatch) -> None:
     responses = iter(
         [
@@ -84,7 +1709,6 @@ def test_docker_smoke_retries_a_transient_connection_reset(monkeypatch) -> None:
         ]
     )
 
-    monkeypatch.setattr(quality_gate, "_run_command", lambda _: 0)
     monkeypatch.setattr(quality_gate.time, "sleep", lambda _: None)
 
     def request(*_args: object, **_kwargs: object) -> tuple[int, str]:
@@ -95,7 +1719,7 @@ def test_docker_smoke_retries_a_transient_connection_reset(monkeypatch) -> None:
 
     monkeypatch.setattr(quality_gate, "_request", request)
 
-    assert quality_gate._run_docker_smoke() == 0
+    assert quality_gate._run_docker_http_smoke() is None
 
 
 def test_hooks_and_ci_delegate_to_the_central_command() -> None:
@@ -105,6 +1729,8 @@ def test_hooks_and_ci_delegate_to_the_central_command() -> None:
 
     assert "Scripts/quality_gate.py\" fast" in pre_commit
     assert "Scripts/quality_gate.py\" push" in pre_push
+    assert '--remote-name "${1:-}"' in pre_push
+    assert '--remote-url "${2:-}"' in pre_push
     assert "python Scripts/quality_gate.py ci" in ci
     assert "npm run lint" not in ci
     assert "npm run test:e2e" not in ci
@@ -113,5 +1739,112 @@ def test_hooks_and_ci_delegate_to_the_central_command() -> None:
 def test_ci_mode_statically_keeps_the_docker_smoke() -> None:
     gate = (ROOT / "Scripts" / "quality_gate.py").read_text(encoding="utf-8")
 
-    assert 'if mode == "ci":\n        return _run_docker_smoke()' in gate
+    assert 'docker_smoke=context.mode == "ci"' in gate
+    assert "if plan.docker_smoke:" in gate
     assert '("docker", "compose", "build")' in gate
+
+
+def test_vscode_coverage_task_characterizes_current_orchestration() -> None:
+    tasks = json.loads((ROOT / ".vscode" / "tasks.json").read_text(encoding="utf-8"))
+    by_label = {task["label"]: task for task in tasks["tasks"]}
+
+    assert by_label["Coverage: 8 terminaux"]["dependsOn"] == [
+        "Coverage (Staged)",
+        "Coverage Naming Convention",
+    ]
+    assert by_label["Coverage: 8 terminaux"]["dependsOrder"] == "sequence"
+
+    staged_script = (ROOT / ".vscode" / "scripts" / "run-coverage-staged.ps1").read_text(
+        encoding="utf-8"
+    )
+    ordered_commands = [
+        "npm --prefix frontend run lint",
+        "npm --prefix frontend run typecheck",
+        "npm --prefix frontend run build",
+        "-m pytest --cov=backend --cov-branch "
+        "--cov-report=json:.coverage.backend.json --cov-fail-under=80 "
+        "--cov-report=term-missing -q",
+        "npm --prefix frontend run test:unit:coverage",
+        'run-e2e-coverage.ps1" -workspaceRoot $WorkspaceRoot -Workers 2',
+        'run-vitals-staged.ps1" -WorkspaceRoot $WorkspaceRoot',
+    ]
+    positions = [staged_script.index(command) for command in ordered_commands]
+    assert positions == sorted(positions)
+    assert '".tmp\\pytest"' in staged_script
+    assert '"coverage-staged-{0}-{1}"' in staged_script
+    assert "[System.Guid]::NewGuid()" in staged_script
+    assert '--basetemp "$pytestBaseTemp"' in staged_script
+    assert "finally {" in staged_script
+    assert "if ($locationPushed)" in staged_script
+    assert "Remove-Item -LiteralPath $pytestBaseTempFullPath -Recurse -Force" in staged_script
+    assert "pytest-of-" not in staged_script
+
+
+def test_workspace_pytest_temporaries_are_git_ignored() -> None:
+    gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
+
+    assert ".tmp/" in gitignore.splitlines()
+
+
+def test_complete_coverage_task_scripts_are_selectively_publishable() -> None:
+    gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+    required_scripts = {
+        ".vscode/scripts/run-coverage-staged.ps1",
+        ".vscode/scripts/run-e2e-coverage.ps1",
+        ".vscode/scripts/run-vitals-staged.ps1",
+        ".vscode/scripts/run-vitals-coverage.ps1",
+        ".vscode/scripts/run-vitals-compliance.ps1",
+    }
+
+    assert ".vscode/*" in gitignore
+    assert "!.vscode/scripts/" in gitignore
+    assert ".vscode/scripts/*" in gitignore
+    assert {
+        line.removeprefix("!")
+        for line in gitignore
+        if line.startswith("!.vscode/scripts/") and line.endswith(".ps1")
+    } == required_scripts
+    assert all((ROOT / path).is_file() for path in required_scripts)
+    assert not any(
+        line in {
+            "!.vscode/settings.json",
+            "!.vscode/launch.json",
+            "!.vscode/scripts/health-watch.ps1",
+            "!.vscode/scripts/start-mongo-dev.ps1",
+            "!.vscode/scripts/run-front-coverage-staged.ps1",
+        }
+        for line in gitignore
+    )
+
+
+def test_vscode_coverage_artifacts_and_e2e_threshold_state_are_locked() -> None:
+    vitals_rates = (
+        ROOT / ".vscode" / "scripts" / "run-vitals-coverage.ps1"
+    ).read_text(encoding="utf-8")
+    vitals_compliance = (
+        ROOT / ".vscode" / "scripts" / "run-vitals-compliance.ps1"
+    ).read_text(encoding="utf-8")
+    e2e_config = json.loads(
+        (ROOT / "frontend" / "e2e-coverage.config.json").read_text(encoding="utf-8")
+    )
+    package_scripts = json.loads(
+        (ROOT / "frontend" / "package.json").read_text(encoding="utf-8")
+    )["scripts"]
+    vitals_staged = (
+        ROOT / ".vscode" / "scripts" / "run-vitals-staged.ps1"
+    ).read_text(encoding="utf-8")
+
+    for script in (vitals_rates, vitals_compliance):
+        assert 'frontend\\coverage\\coverage-final.json' in script
+        assert '".coverage.backend.json"' in script
+        assert 'frontend\\coverage\\e2e-coverage-summary.json' in script
+        assert "vitals-coverage-report.json" in script
+    assert set(e2e_config["thresholds"]) == {
+        "statements",
+        "branches",
+        "functions",
+        "lines",
+    }
+    assert all(value >= 80 for value in e2e_config["thresholds"].values())
+    assert package_scripts["test:e2e"] == "node scripts/run-e2e-coverage.mjs"
+    assert "-ReuseExistingReport" in vitals_staged

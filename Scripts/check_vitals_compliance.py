@@ -5,11 +5,12 @@ Fail fast if the repository no longer maintains an explicit traceability map for
 
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 from pathlib import Path
 
-from report_vitals_coverage import build_vitals_report
+from report_vitals_coverage import build_vitals_report, load_vitals_report_bundle
 
 ROOT = Path(__file__).resolve().parents[1]
 CRITICAL_PATHS = ROOT / "docs" / "critical-paths.md"
@@ -57,18 +58,24 @@ def _extract_traceability_sections(content: str) -> dict[str, list[str]]:
 
 def _metric_pct(metric: dict[str, int]) -> float | None:
     total = int(metric.get("total", 0))
-    if total <= 0:
-        return None
     covered = int(metric.get("covered", 0))
+    if total == 0 and covered == 0:
+        return 100.0
+    if total <= 0 or covered < 0 or covered > total:
+        return None
     return (covered / total) * 100
 
 
-def _append_vitals_rate_errors(errors: list[str]) -> None:
-    try:
-        report = build_vitals_report()
-    except Exception as exc:  # pragma: no cover - defensive CLI behavior
-        errors.append(f"Unable to build vitals coverage report: {exc}")
-        return
+def _append_vitals_rate_errors(
+    errors: list[str],
+    report: list[dict] | None = None,
+) -> None:
+    if report is None:
+        try:
+            report = build_vitals_report()
+        except Exception as exc:  # pragma: no cover - defensive CLI behavior
+            errors.append(f"Unable to build vitals coverage report: {exc}")
+            return
 
     for vital in report:
         title = vital["title"]
@@ -101,7 +108,10 @@ def _append_vitals_rate_errors(errors: list[str]) -> None:
                     )
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--report-json", type=Path)
+    args = parser.parse_args(argv)
     errors: list[str] = []
 
     if not CRITICAL_PATHS.exists():
@@ -141,7 +151,14 @@ def main() -> int:
         if '"Coverage Vitals Rates"' not in tasks_content:
             errors.append("Coverage aggregate task must include Vitals Rates")
 
-    _append_vitals_rate_errors(errors)
+    report = None
+    if args.report_json is not None:
+        try:
+            report = load_vitals_report_bundle(args.report_json, ROOT)["report"]
+        except ValueError as exc:
+            errors.append(str(exc))
+    if args.report_json is None or report is not None:
+        _append_vitals_rate_errors(errors, report)
 
     if errors:
         print("ERROR: Vitals compliance check failed.", file=sys.stderr)

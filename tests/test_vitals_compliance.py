@@ -9,6 +9,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "Scripts"))
 import check_vitals_compliance as vitals_compliance  # noqa: E402
+import report_vitals_coverage  # noqa: E402
 
 
 def _read(relpath: str) -> str:
@@ -77,8 +78,28 @@ def test_vitals_compliance_script_exists() -> None:
     assert script.exists(), "Missing Scripts/check_vitals_compliance.py"
 
 
-def test_metric_pct_handles_missing_totals() -> None:
-    assert vitals_compliance._metric_pct({"covered": 0, "total": 0}) is None
+def test_metric_pct_normalizes_empty_measurable_sets() -> None:
+    assert vitals_compliance._metric_pct({"covered": 0, "total": 0}) == 100.0
+    assert report_vitals_coverage._pct(0, 0) == "100.00%"
+
+
+def test_vitals_preserve_empty_istanbul_function_and_branch_metrics() -> None:
+    empty = {"total": 0, "covered": 0, "skipped": 0, "pct": 100}
+    metrics = report_vitals_coverage._summary_istanbul_metrics(
+        {
+            "summary": {
+                "statements": {"total": 1, "covered": 1, "skipped": 0, "pct": 100},
+                "branches": empty,
+                "functions": empty,
+                "lines": {"total": 1, "covered": 1, "skipped": 0, "pct": 100},
+            }
+        }
+    )
+
+    assert metrics["branches"] == {"covered": 0, "total": 0}
+    assert metrics["functions"] == {"covered": 0, "total": 0}
+    assert vitals_compliance._metric_pct(metrics["branches"]) == 100.0
+    assert vitals_compliance._metric_pct(metrics["functions"]) == 100.0
 
 
 def test_append_vitals_rate_errors_flags_metrics_below_threshold(monkeypatch) -> None:
@@ -136,3 +157,64 @@ def test_append_vitals_rate_errors_flags_missing_matches(monkeypatch) -> None:
     vitals_compliance._append_vitals_rate_errors(errors)
 
     assert "Vital coverage source has no matching files: Cookie IDMontecarlo / e2e" in errors
+
+
+def test_vitals_aggregation_is_built_once_then_reused(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    source_paths = [
+        tmp_path / "docs" / "vitals-coverage-map.json",
+        tmp_path / "frontend" / "coverage" / "coverage-final.json",
+        tmp_path / ".coverage.backend.json",
+        tmp_path / "frontend" / "coverage" / "e2e-coverage-summary.json",
+        tmp_path / "frontend" / "e2e-coverage.config.json",
+    ]
+    for source_path in source_paths:
+        source_path.parent.mkdir(parents=True, exist_ok=True)
+        source_path.write_text("{}\n", encoding="utf-8")
+
+    calls = 0
+
+    def fake_load(_root: Path) -> dict:
+        nonlocal calls
+        calls += 1
+        perfect = {
+            metric: {"covered": 100, "total": 100}
+            for metric in ("statements", "branches", "functions", "lines")
+        }
+        return {
+            "mapping": {
+                "vitals": [
+                    {
+                        "title": "Vital",
+                        "sources": {"frontend_unit": ["frontend/src/App.tsx"]},
+                    }
+                ]
+            },
+            "frontend_unit_files": {
+                "frontend/src/App.tsx": {"summary": perfect}
+            },
+            "backend_files": {},
+            "e2e_files": {},
+        }
+
+    monkeypatch.setattr(
+        report_vitals_coverage,
+        "load_coverage_artifacts",
+        fake_load,
+    )
+    report_path = tmp_path / "frontend" / "coverage" / "vitals-report.json"
+
+    report_vitals_coverage.write_vitals_report_bundle(report_path, tmp_path)
+    bundle = report_vitals_coverage.load_vitals_report_bundle(report_path, tmp_path)
+    monkeypatch.setattr(
+        vitals_compliance,
+        "build_vitals_report",
+        lambda: pytest.fail("Vitals aggregation must not be rebuilt"),
+    )
+    errors: list[str] = []
+    vitals_compliance._append_vitals_rate_errors(errors, bundle["report"])
+
+    assert calls == 1
+    assert errors == []

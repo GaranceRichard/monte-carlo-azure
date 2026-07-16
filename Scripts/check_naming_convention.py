@@ -20,12 +20,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET_DIRS = (
-    ROOT / "backend",
-    ROOT / "frontend" / "src",
-    ROOT / "frontend" / "tests",
-    ROOT / "Scripts",
-)
 TARGET_SUFFIXES = {".py", ".ts", ".tsx", ".js", ".jsx"}
 BLOCKED_FRAGMENTS = (
     "arrimage",
@@ -54,9 +48,18 @@ class Violation:
     fragment: str
 
 
-def _iter_source_files() -> list[Path]:
+def _target_dirs(root: Path) -> tuple[Path, ...]:
+    return (
+        root / "backend",
+        root / "frontend" / "src",
+        root / "frontend" / "tests",
+        root / "Scripts",
+    )
+
+
+def _iter_source_files(root: Path = ROOT) -> list[Path]:
     files: list[Path] = []
-    for base in TARGET_DIRS:
+    for base in _target_dirs(root):
         if not base.exists():
             continue
         for path in base.rglob("*"):
@@ -142,10 +145,15 @@ def _scan_file(path: Path) -> list[Violation]:
     return _extract_js_identifiers(path)
 
 
-def main() -> int:
+def collect_naming_violations(root: Path = ROOT) -> list[Violation]:
     violations: list[Violation] = []
-    for path in _iter_source_files():
+    for path in _iter_source_files(root):
         violations.extend(_scan_file(path))
+    return violations
+
+
+def main() -> int:
+    violations = collect_naming_violations(ROOT)
 
     if not violations:
         print("No violations : Naming compliance is ok")
