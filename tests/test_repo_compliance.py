@@ -11,6 +11,15 @@ def _read(relpath: str) -> str:
     return (ROOT / relpath).read_text(encoding="utf-8")
 
 
+def _workflow_job_block(workflow: str, job_name: str) -> str:
+    match = re.search(
+        rf"(?ms)^  {re.escape(job_name)}:\s*\n(?P<body>.*?)(?=^  [\w-]+:\s*\n|\Z)",
+        workflow,
+    )
+    assert match, f"Missing workflow job: {job_name}"
+    return match.group("body")
+
+
 def test_dod_docs_exist_and_are_linked_from_readme() -> None:
     dod = ROOT / "docs/definition-of-done.md"
     critical = ROOT / "docs/critical-paths.md"
@@ -93,8 +102,27 @@ def test_ci_enforces_required_checks() -> None:
     assert "npm run build" not in ci
     assert "--cov-fail-under=80" in gate
     assert 'const requiredJobs = ["quality-gate"]' in pages
+    gate_job = _workflow_job_block(pages, "quality-gate")
+    deploy_job = _workflow_job_block(pages, "build-and-deploy")
+    assert re.search(r"(?m)^    needs:\s*quality-gate\s*$", deploy_job)
+    checkout_position = gate_job.find("uses: actions/checkout@")
+    script_position = gate_job.find("wait-for-ci.cjs")
+    assert 0 <= checkout_position < script_position
+    assert "  wait-for-ci:" not in pages
     assert "backend-tests" not in pages
     assert "frontend-tests" not in pages
+
+
+def test_pages_deployment_cannot_bypass_failed_or_cancelled_quality_gate() -> None:
+    pages = _read(".github/workflows/pages.yml")
+    deploy_job = _workflow_job_block(pages, "build-and-deploy")
+    job_header = deploy_job.split("\n    steps:", maxsplit=1)[0]
+
+    assert re.search(r"(?m)^    needs:\s*quality-gate\s*$", job_header)
+    assert not re.search(
+        r"(?mi)^    if:.*(?:always|failure|cancelled)\s*\(",
+        job_header,
+    )
 
 
 def test_coverage_tasks_separate_repo_compliance_and_backend_full() -> None:
