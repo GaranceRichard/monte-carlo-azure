@@ -1,12 +1,23 @@
+import path from "node:path";
 import process from "node:process";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "@playwright/test";
+import {
+  formatBackendLaunchError,
+  missingBackendDependency,
+  resolveBackendWebServer,
+} from "./scripts/e2e-backend-web-server.mjs";
 
+const frontendRoot = path.dirname(fileURLToPath(import.meta.url));
 const webPort = Number(process.env.PLAYWRIGHT_WEB_PORT || "4173");
 const reuseExistingServer = process.env.PLAYWRIGHT_REUSE_SERVER !== "0";
 const configuredWorkers = process.env.PLAYWRIGHT_WORKERS ? Number(process.env.PLAYWRIGHT_WORKERS) : undefined;
-const pythonCommand = process.platform === "win32"
-  ? "..\\.venv\\Scripts\\python.exe"
-  : "python";
+const backendWebServer = resolveBackendWebServer();
+const missingBackend = missingBackendDependency(backendWebServer);
+
+if (missingBackend) {
+  throw new Error(formatBackendLaunchError(backendWebServer, missingBackend));
+}
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -21,13 +32,15 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: `${pythonCommand} ../run_app.py --host 127.0.0.1 --port 8000 --no-browser`,
+      command: backendWebServer.command,
+      cwd: backendWebServer.cwd,
       url: "http://127.0.0.1:8000/health",
       reuseExistingServer,
       timeout: 60_000,
     },
     {
       command: `npm run dev -- --host 127.0.0.1 --port ${webPort}`,
+      cwd: frontendRoot,
       port: webPort,
       reuseExistingServer,
       timeout: 60_000,

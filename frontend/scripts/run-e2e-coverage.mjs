@@ -9,6 +9,11 @@ import {
   coverageScopeFingerprint,
   loadE2ECoverageConfig,
 } from "./e2e-coverage-config.mjs";
+import {
+  formatBackendLaunchError,
+  missingBackendDependency,
+  resolveBackendWebServer,
+} from "./e2e-backend-web-server.mjs";
 
 const frontendRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = path.resolve(frontendRoot, "..");
@@ -18,6 +23,13 @@ const startedAt = new Date().toISOString();
 
 fs.rmSync(E2E_COVERAGE_ARTIFACT_PATH, { force: true });
 
+const backendWebServer = resolveBackendWebServer();
+const missingBackend = missingBackendDependency(backendWebServer);
+if (missingBackend) {
+  console.error(formatBackendLaunchError(backendWebServer, missingBackend));
+  process.exit(2);
+}
+
 const playwrightCli = path.join(
   frontendRoot,
   "node_modules",
@@ -25,6 +37,15 @@ const playwrightCli = path.join(
   "test",
   "cli.js",
 );
+if (!fs.existsSync(playwrightCli)) {
+  console.error([
+    "Unable to start Playwright.",
+    `Command: ${process.execPath} ${playwrightCli} test`,
+    `CWD: ${frontendRoot}`,
+    `Missing dependency: Playwright CLI: ${playwrightCli}`,
+  ].join("\n"));
+  process.exit(2);
+}
 const playwright = spawnSync(
   process.execPath,
   [playwrightCli, "test", ...process.argv.slice(2)],
@@ -52,9 +73,8 @@ if (playwright.status !== 0) {
 const localPython = process.platform === "win32"
   ? path.join(repositoryRoot, ".venv", "Scripts", "python.exe")
   : path.join(repositoryRoot, ".venv", "bin", "python");
-const pythonCommand = fs.existsSync(localPython)
-  ? localPython
-  : (process.env.PYTHON || "python");
+const pythonCommand = process.env.MONTECARLO_E2E_PYTHON
+  || (fs.existsSync(localPython) ? localPython : (process.env.PYTHON || "python"));
 const validation = spawnSync(
   pythonCommand,
   [

@@ -1264,8 +1264,9 @@ def _checkout_index(snapshot_root: Path, repository_root: Path = ROOT) -> None:
 
 
 def _link_directory(source: Path, destination: Path) -> None:
-    if destination.exists():
-        return
+    is_junction = getattr(os.path, "isjunction", lambda _path: False)
+    if destination.exists() or destination.is_symlink() or is_junction(destination):
+        raise FileExistsError(f"Frontend dependency destination already exists: {destination}")
     destination.parent.mkdir(parents=True, exist_ok=True)
     try:
         destination.symlink_to(source, target_is_directory=True)
@@ -1287,19 +1288,47 @@ def _link_directory(source: Path, destination: Path) -> None:
         raise OSError(result.stderr or result.stdout or "Unable to link frontend dependencies.")
 
 
-def _prepare_snapshot_dependencies(snapshot_root: Path) -> None:
+def _frontend_dependency_paths(validation_root: Path) -> tuple[Path, Path]:
     source = ROOT / "frontend" / "node_modules"
-    if source.is_dir():
-        _link_directory(source, snapshot_root / "frontend" / "node_modules")
+    destination = validation_root / "frontend" / "node_modules"
+    return source, destination
 
 
-def _remove_snapshot_dependency_link(snapshot_root: Path) -> None:
-    destination = snapshot_root / "frontend" / "node_modules"
+def _remove_frontend_dependency_link(destination: Path, expected_source: Path) -> None:
     is_junction = getattr(os.path, "isjunction", lambda _path: False)
+    if not (destination.is_symlink() or is_junction(destination)):
+        raise OSError(f"Refusing to remove a non-link dependency path: {destination}")
+    if destination.resolve() != expected_source.resolve():
+        raise OSError(
+            "Refusing to remove a frontend dependency link with an unexpected target: "
+            f"{destination}"
+        )
     if destination.is_symlink():
         destination.unlink()
-    elif is_junction(destination):
+    else:
         os.rmdir(destination)
+
+
+@contextmanager
+def exposed_frontend_dependencies(validation_root: Path) -> Iterator[Path]:
+    """Expose only installed frontend dependencies to one isolated repository."""
+    source, destination = _frontend_dependency_paths(validation_root)
+    if not source.is_dir():
+        raise FileNotFoundError(f"Host frontend dependencies are missing: {source}")
+
+    created = False
+    try:
+        _link_directory(source, destination)
+        created = True
+        if destination.resolve() != source.resolve():
+            raise OSError(
+                "Frontend dependency exposure points to an unexpected target: "
+                f"{destination}"
+            )
+        yield destination
+    finally:
+        if created:
+            _remove_frontend_dependency_link(destination, source)
 
 
 @contextmanager
@@ -1309,10 +1338,7 @@ def staged_index_snapshot(repository_root: Path = ROOT) -> Iterator[Path]:
         snapshot_root = Path(temp_dir) / "repository"
         snapshot_root.mkdir()
         _checkout_index(snapshot_root, repository_root)
-        try:
-            yield snapshot_root
-        finally:
-            _remove_snapshot_dependency_link(snapshot_root)
+        yield snapshot_root
 
 
 def _run_worktree_command(
@@ -1335,7 +1361,6 @@ def _cleanup_detached_worktree(
     worktree_root: Path,
     repository_root: Path = ROOT,
 ) -> None:
-    _remove_snapshot_dependency_link(worktree_root)
     remove_result = _run_worktree_command(
         ["remove", "--force", str(worktree_root)],
         repository_root=repository_root,
@@ -1398,7 +1423,8 @@ def _index_git_environment(repository_root: Path = ROOT) -> dict[str, str]:
 def _ensure_frontend_dependencies() -> int:
     if _frontend_dependencies_available():
         return 0
-    print("ERROR: frontend dependencies are missing (frontend/node_modules).", file=sys.stderr)
+    dependency_root = ROOT / "frontend" / "node_modules"
+    print(f"ERROR: frontend dependencies are missing: {dependency_root}", file=sys.stderr)
     print(
         "Expected correction: run `npm --prefix frontend ci` explicitly, then retry.",
         file=sys.stderr,
@@ -1552,34 +1578,39 @@ def _execute_gate_plan(
     runtime_temp_root: Path,
     isolated_validation: bool,
     command_env: dict[str, str] | None = None,
-    link_frontend_dependencies: bool = False,
 ) -> int:
-    frontend_checked = False
-    for command in plan.commands:
-        if command.argv[0] == NPM_COMMAND and not frontend_checked:
-            frontend_checked = True
-            code = _ensure_frontend_dependencies()
-            if code:
-                return code
-            if link_frontend_dependencies:
-                try:
-                    _prepare_snapshot_dependencies(validation_root)
-                except OSError as exc:
-                    print(
-                        "ERROR: unable to expose frontend dependencies to isolated checkout: "
-                        f"{exc}",
-                        file=sys.stderr,
-                    )
-                    return 1
-        code = _run_command(
-            command,
-            validation_root=validation_root,
-            runtime_temp_root=runtime_temp_root,
-            isolated_validation=isolated_validation,
-            extra_env=command_env,
-        )
+    execution_env = dict(command_env or {})
+    if isolated_validation:
+        execution_env["MONTECARLO_E2E_PYTHON"] = sys.executable
+    has_frontend_commands = any(command.argv[0] == NPM_COMMAND for command in plan.commands)
+    if has_frontend_commands:
+        code = _ensure_frontend_dependencies()
         if code:
             return code
+    dependency_manager = (
+        exposed_frontend_dependencies(validation_root)
+        if has_frontend_commands and isolated_validation
+        else nullcontext()
+    )
+    try:
+        with dependency_manager:
+            for command in plan.commands:
+                code = _run_command(
+                    command,
+                    validation_root=validation_root,
+                    runtime_temp_root=runtime_temp_root,
+                    isolated_validation=isolated_validation,
+                    extra_env=execution_env or None,
+                )
+                if code:
+                    return code
+    except OSError as exc:
+        print(
+            "ERROR: unable to expose frontend dependencies to isolated checkout: "
+            f"{exc}",
+            file=sys.stderr,
+        )
+        return 1
     return 0
 
 
@@ -1626,7 +1657,6 @@ def run_gate(mode: str, paths: list[str] | None = None) -> int:
             runtime_temp_root=runtime_temp_root,
             isolated_validation=isolated_validation,
             command_env=command_env,
-            link_frontend_dependencies=mode == "fast",
         )
         if code:
             return code
@@ -1682,7 +1712,6 @@ def run_pre_push_gate(
                         isolated_validation=True,
                     ),
                     isolated_validation=True,
-                    link_frontend_dependencies=True,
                 )
         except (KeyboardInterrupt, RuntimeError) as exc:
             print(f"ERROR: pre-push validation interrupted: {exc}", file=sys.stderr)

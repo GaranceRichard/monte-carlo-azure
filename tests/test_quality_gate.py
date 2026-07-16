@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import stat
 import subprocess
@@ -1187,6 +1188,168 @@ def test_fast_executes_composite_dod_identity_and_naming_from_snapshot(
         env is not None and env["GIT_WORK_TREE"] == str(ROOT.resolve())
         for _step, _root, _temp, _isolated, env in calls
     )
+    assert all(
+        env is not None and env["MONTECARLO_E2E_PYTHON"] == sys.executable
+        for _step, _root, _temp, _isolated, env in calls
+    )
+
+
+@pytest.mark.parametrize("failing_step", [None, "Frontend build"])
+def test_isolated_frontend_plan_shares_one_dependency_exposure_and_cleans_it(
+    tmp_path: Path, monkeypatch, failing_step: str | None
+) -> None:
+    host_root = tmp_path / "host"
+    host_dependencies = host_root / "frontend" / "node_modules"
+    host_dependencies.mkdir(parents=True)
+    (host_dependencies / "dependency.txt").write_text("host dependency", encoding="utf-8")
+    executable_suffix = ".cmd" if os.name == "nt" else ""
+    dependency_executables = {
+        "lint": host_dependencies / ".bin" / f"eslint{executable_suffix}",
+        "typecheck": host_dependencies / ".bin" / f"tsc{executable_suffix}",
+        "test:unit": host_dependencies / ".bin" / f"vitest{executable_suffix}",
+        "build": host_dependencies / ".bin" / f"vite{executable_suffix}",
+        "test:e2e": host_dependencies / "@playwright" / "test" / "cli.js",
+    }
+    for executable in dependency_executables.values():
+        executable.parent.mkdir(parents=True, exist_ok=True)
+        executable.write_text("host dependency executable\n", encoding="utf-8")
+    (host_root / "frontend" / "src").mkdir()
+    (host_root / "frontend" / "src" / "host-only.ts").write_text(
+        "throw new Error('must not be read');\n",
+        encoding="utf-8",
+    )
+    validation_root = tmp_path / "worktree" / "repository"
+    validated_frontend = validation_root / "frontend"
+    (validated_frontend / "src").mkdir(parents=True)
+    (validated_frontend / "package.json").write_text("{}\n", encoding="utf-8")
+    (validated_frontend / "playwright.config.js").write_text(
+        "// detached config\n",
+        encoding="utf-8",
+    )
+    (validated_frontend / "src" / "validated.ts").write_text(
+        "export const validated = true;\n",
+        encoding="utf-8",
+    )
+    runtime_temp_root = validation_root.parent / ".tmp" / "pytest"
+    commands = tuple(
+        quality_gate.GateCommand(
+            step,
+            (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run", script),
+            "Correct the frontend command.",
+        )
+        for step, script in (
+            ("Frontend lint", "lint"),
+            ("Frontend typecheck", "typecheck"),
+            ("Frontend unit tests", "test:unit"),
+            ("Frontend build", "build"),
+            ("End-to-end tests", "test:e2e"),
+        )
+    )
+    plan = quality_gate.GateExecutionPlan(
+        context=quality_gate.build_change_context("push", ["frontend/src/App.tsx"]),
+        commands=commands,
+        docker_smoke=False,
+    )
+    link_calls = 0
+    command_calls: list[str] = []
+    link_directory = quality_gate._link_directory
+    monkeypatch.setattr(quality_gate, "ROOT", host_root)
+
+    def counted_link(source: Path, destination: Path) -> None:
+        nonlocal link_calls
+        link_calls += 1
+        link_directory(source, destination)
+
+    def run_command(
+        command: quality_gate.GateCommand,
+        *,
+        validation_root: Path,
+        extra_env: dict[str, str] | None,
+        **_kwargs: object,
+    ) -> int:
+        dependency_link = validation_root / "frontend" / "node_modules"
+        assert dependency_link.resolve() == host_dependencies.resolve()
+        assert (validation_root / "frontend" / "package.json").exists()
+        assert (validation_root / "frontend" / "playwright.config.js").exists()
+        assert (validation_root / "frontend" / "src" / "validated.ts").exists()
+        assert not (validation_root / "frontend" / "src" / "host-only.ts").exists()
+        script = command.argv[4]
+        exposed_executable = dependency_executables[script].relative_to(host_dependencies)
+        assert (dependency_link / exposed_executable).is_file()
+        if script == "test:e2e":
+            assert (dependency_link / ".bin" / f"vite{executable_suffix}").is_file()
+        assert str(host_root) not in " ".join(command.argv)
+        assert extra_env == {"MONTECARLO_E2E_PYTHON": sys.executable}
+        command_calls.append(command.step)
+        return 17 if command.step == failing_step else 0
+
+    monkeypatch.setattr(quality_gate, "_link_directory", counted_link)
+    monkeypatch.setattr(quality_gate, "_run_command", run_command)
+
+    result = quality_gate._execute_gate_plan(
+        plan,
+        validation_root=validation_root,
+        runtime_temp_root=runtime_temp_root,
+        isolated_validation=True,
+    )
+
+    assert result == (17 if failing_step else 0)
+    assert link_calls == 1
+    expected_calls = [command.step for command in commands]
+    if failing_step:
+        expected_calls = expected_calls[: expected_calls.index(failing_step) + 1]
+    assert command_calls == expected_calls
+    assert not (validated_frontend / "node_modules").exists()
+    assert host_dependencies.exists()
+
+
+def test_isolated_frontend_plan_reports_missing_host_dependencies(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    host_root = tmp_path / "host"
+    validation_root = tmp_path / "snapshot" / "repository"
+    (validation_root / "frontend").mkdir(parents=True)
+    command = quality_gate.GateCommand(
+        "Frontend lint",
+        (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run", "lint"),
+        "Correct the frontend command.",
+    )
+    plan = quality_gate.GateExecutionPlan(
+        context=quality_gate.build_change_context("fast", ["frontend/src/App.tsx"]),
+        commands=(command,),
+        docker_smoke=False,
+    )
+    monkeypatch.setattr(quality_gate, "ROOT", host_root)
+    monkeypatch.setattr(
+        quality_gate,
+        "_run_command",
+        lambda *_args, **_kwargs: pytest.fail("Frontend command must not run."),
+    )
+
+    assert quality_gate._execute_gate_plan(
+        plan,
+        validation_root=validation_root,
+        runtime_temp_root=validation_root.parent / ".tmp" / "pytest",
+        isolated_validation=True,
+    ) == 1
+    assert str(host_root / "frontend" / "node_modules") in capsys.readouterr().err
+
+
+def test_frontend_dependency_exposure_cleans_after_interruption(
+    tmp_path: Path, monkeypatch
+) -> None:
+    host_root = tmp_path / "host"
+    (host_root / "frontend" / "node_modules").mkdir(parents=True)
+    validation_root = tmp_path / "snapshot" / "repository"
+    (validation_root / "frontend").mkdir(parents=True)
+    monkeypatch.setattr(quality_gate, "ROOT", host_root)
+
+    with pytest.raises(KeyboardInterrupt):
+        with quality_gate.exposed_frontend_dependencies(validation_root):
+            assert (validation_root / "frontend" / "node_modules").exists()
+            raise KeyboardInterrupt
+
+    assert not (validation_root / "frontend" / "node_modules").exists()
 
 
 def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
