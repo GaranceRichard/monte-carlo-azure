@@ -193,6 +193,8 @@ MASSIVE_EXACT_PATHS = {
     "frontend/package-lock.json",
     "frontend/vitest.config.js",
     "frontend/playwright.config.js",
+    "config/maintainability.json", "config/maintainability-baseline.json",
+    "config/maintainability-exceptions.json", ".coveragerc",
     "backend/mc_core.py",
     "backend/api_models.py",
     "backend/api_routes_simulate.py",
@@ -215,16 +217,23 @@ MASSIVE_PREFIXES = (
 MASSIVE_SCRIPT_NAMES = {
     "check_dod_compliance.py",
     "check_identity_boundary.py",
+    "check_maintainability.py",
+    "check_python_coverage.py",
     "check_naming_convention.py",
     "check_no_secrets.py",
     "check_vitals_compliance.py",
     "pre_commit_guard.py",
     "quality_gate.py",
+    "maintainability_common.py", "maintainability_config.py",
+    "maintainability_dependencies.py", "maintainability_metrics.py",
+    "maintainability_ratchet.py",
     "report_vitals_coverage.py",
     "setup_git_hooks.py",
 }
 MASSIVE_TEST_PATHS = {
     "tests/test_identity_boundary.py",
+    "tests/test_maintainability.py",
+    "tests/test_python_coverage.py",
     "tests/test_pre_commit_guard.py",
     "tests/test_quality_gate.py",
     "tests/test_repo_compliance.py",
@@ -970,6 +979,25 @@ def resolve_change_context(mode: str, paths: list[str] | None = None) -> ChangeC
     return build_change_context(mode, resolved_paths)
 
 
+def _python_coverage_commands(command_input: tuple[InputSource, ...]) -> tuple[GateCommand, ...]:
+    return (
+        GateCommand(
+            "Versioned Python coverage",
+            (sys.executable, "-m", "pytest", "--cov", "--cov-config=.coveragerc",
+             "--cov-report=json:.coverage.python.json", "--cov-report=term-missing", "-q"),
+            "Add tests until every declared Python source has no uncovered line.",
+            backend_test=True, input_sources=command_input,
+            coverage_artifacts=(".coverage", ".coverage.python.json"),
+        ),
+        GateCommand(
+            "Python coverage scope and per-file compliance",
+            (sys.executable, "Scripts/check_python_coverage.py"),
+            "Restore the declared Python scope, branch coverage, and per-file compliance.",
+            input_sources=command_input,
+        ),
+    )
+
+
 def build_execution_plan(context: ChangeContext) -> GateExecutionPlan:
     """Build the immutable ordered command plan for a resolved context."""
     if context.mode not in {"fast", "push", "ci"}:
@@ -997,6 +1025,12 @@ def build_execution_plan(context: ChangeContext) -> GateExecutionPlan:
             "Naming convention",
             (sys.executable, "Scripts/check_naming_convention.py"),
             "Rename the reported code identifier in English.",
+            input_sources=command_input,
+        ),
+        GateCommand(
+            "Maintainability ratchet",
+            (sys.executable, "Scripts/check_maintainability.py"),
+            "Remove the new maintainability drift or explicitly review the versioned baseline.",
             input_sources=command_input,
         ),
     ]
@@ -1121,24 +1155,7 @@ def build_execution_plan(context: ChangeContext) -> GateExecutionPlan:
     if context.mode in {"push", "ci"}:
         commands.extend(
             [
-                GateCommand(
-                    "Backend coverage (minimum 80%)",
-                    (
-                        sys.executable,
-                        "-m",
-                        "pytest",
-                        "--cov=backend",
-                        "--cov-branch",
-                        "--cov-report=json:.coverage.backend.json",
-                        "--cov-fail-under=80",
-                        "--cov-report=term-missing",
-                        "-q",
-                    ),
-                    "Add tests until backend coverage is at least 80% with no uncovered red lines.",
-                    backend_test=True,
-                    input_sources=command_input,
-                    coverage_artifacts=(".coverage", ".coverage.backend.json"),
-                ),
+                *_python_coverage_commands(command_input),
                 GateCommand(
                     "Frontend unit coverage",
                     (NPM_COMMAND, "--prefix", "frontend", "run", "test:unit:coverage"),

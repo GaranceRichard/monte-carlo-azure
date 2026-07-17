@@ -11,7 +11,7 @@ conformité DoD.
   domaine concerné.
 - **Validation massive** : plan complet déclenché par un changement transverse, structurel, central,
   inconnu ou ambigu. Toute résolution incertaine se replie vers `massive`.
-- **Validation complète** : task VS Code `Coverage: 8 terminaux`, avec lint, typecheck, couvertures backend
+- **Validation complète** : task VS Code `Coverage: 8 terminaux`, avec lint, typecheck, couvertures Python
   et frontend, build, E2E, Vitals et convention de nommage.
 - **Conformité DoD** : validation complète verte, seuils respectés, documentation normative cohérente,
   sécurité et traçabilité vérifiées.
@@ -35,12 +35,14 @@ conformité DoD.
 
 - Frontend : `npm --prefix frontend run lint -- --max-warnings 0` passe sans erreur ni avertissement.
 - TypeScript : `npm --prefix frontend run typecheck` passe sans erreur.
-- Backend : la suite Pytest sélectionnée ou complète passe sans erreur.
+- Python : la suite Pytest sélectionnée ou complète passe sans erreur pour le backend et l’outillage.
 - Frontend unitaire : la suite Vitest sélectionnée ou complète passe sans erreur.
 - E2E : `npm --prefix frontend run test:e2e` passe sur les parcours critiques.
 - Build : `npm --prefix frontend run build` passe sans erreur.
 - Sécurité, secrets, frontière d’identité, README, DoD et convention de nommage restent bloquants lorsqu’ils
   sont applicables.
+- Le ratchet de maintenabilité reste bloquant : une dette enregistrée peut rester stable ou diminuer, mais
+  une dette nouvelle ou aggravée échoue.
 
 Aucune fusion n’est autorisée si un contrôle requis échoue.
 
@@ -48,14 +50,17 @@ Aucune fusion n’est autorisée si un contrôle requis échoue.
 
 Seuils minimaux par couche :
 
-- Backend : couverture globale >= 80%.
+- Python exécutable versionné : couverture globale >= 80 %, couverture par fichier >= 80 %, couverture
+  de branche active et aucune ligne exécutable non couverte. Le périmètre déclaratif unique couvre
+  `backend/`, `Scripts/` et `run_app.py` ; `tests/` est exclu car il constitue le code de test. Le contrôle
+  de conformité échoue si un fichier Python exécutable versionné est absent de ce périmètre ou du rapport.
 - Frontend : couverture globale >= 80%.
 - E2E : `statements`, `branches`, `functions` et `lines` >= 80 %.
 - Integration: couverture globale >= 80%.
 
 Les suites avec couverture produisent les artefacts suivants :
 
-- backend : `.coverage` et `.coverage.backend.json` ;
+- Python : `.coverage` et `.coverage.python.json` ;
 - frontend unitaire : `frontend/coverage/coverage-final.json` et
   `frontend/coverage/index.html` ;
 - E2E : `frontend/coverage/e2e-coverage-summary.json` ;
@@ -103,12 +108,13 @@ Seuls le code trivial et le code purement déclaratif sans logique peuvent reste
 - [ ] Plan adapté au changement exécuté sans repli non traité.
 - [ ] Task `Coverage: 8 terminaux` entièrement verte.
 - [ ] Lint frontend et backend, typecheck, tests, build et E2E verts.
-- [ ] Couvertures backend et frontend >= 80 %.
+- [ ] Couvertures Python et frontend >= 80 % ; chaque source Python mesurée est sans ligne rouge.
 - [ ] Couvertures E2E `statements`, `branches`, `functions` et `lines` >= 80 %.
 - [ ] Integration: couverture globale >= 80%.
 - [ ] Points vitaux touchés : couverture ciblée >= 95 % et tests ciblés ajoutés.
 - [ ] Artefacts de couverture présents, cohérents, frais et issus de l’exécution attendue.
 - [ ] Aucun secret commité et frontière d’identité respectée.
+- [ ] Ratchet de maintenabilité vert, sans régénération automatique de la baseline.
 - [ ] Documentation normative et README cohérents avec le comportement livré.
 - [ ] Worktree et branche vérifiés ; remote GitHub présent avant toute déclaration de publiabilité.
 

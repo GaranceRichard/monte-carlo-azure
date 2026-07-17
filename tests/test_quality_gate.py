@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import json
 import os
 import shutil
@@ -95,12 +96,24 @@ def _copy_dod_fixture(destination: Path) -> None:
         "docs/critical-paths.md",
         "docs/vitals-traceability.md",
         "docs/vitals-coverage-map.json",
+        "docs/maintainability.md",
+        "config/maintainability.json",
+        "config/maintainability-baseline.json",
+        "config/maintainability-exceptions.json",
         "frontend/package.json",
         "frontend/vitest.config.js",
         "frontend/e2e-coverage.config.json",
         "frontend/scripts/run-e2e-coverage.mjs",
         "frontend/tests/e2e/coverage.spec.js",
         "Scripts/check_e2e_coverage.py",
+        "Scripts/check_maintainability.py",
+        "Scripts/check_python_coverage.py",
+        "Scripts/maintainability_common.py",
+        "Scripts/maintainability_config.py",
+        "Scripts/maintainability_dependencies.py",
+        "Scripts/maintainability_metrics.py",
+        "Scripts/maintainability_ratchet.py",
+        ".coveragerc",
         ".github/workflows/ci.yml",
         ".github/workflows/pages.yml",
         "Scripts/quality_gate.py",
@@ -287,6 +300,7 @@ def test_documentation_only_selects_only_general_mandatory_controls() -> None:
         "Repository hygiene (README, encoding, secrets and DoD)",
         "Identity boundary",
         "Naming convention",
+        "Maintainability ratchet",
     ]
 
 
@@ -361,6 +375,7 @@ def test_shared_frontend_utility_adds_domain_controls_and_nearby_tests() -> None
         "Repository hygiene (README, encoding, secrets and DoD)",
         "Identity boundary",
         "Naming convention",
+        "Maintainability ratchet",
         "Frontend lint (ESLint, zero warning)",
         "Frontend typecheck (TypeScript)",
         "Selected frontend unit tests (Vitest)",
@@ -386,6 +401,7 @@ def test_combined_backend_and_frontend_change_aggregates_without_cross_domain_su
         "Repository hygiene (README, encoding, secrets and DoD)",
         "Identity boundary",
         "Naming convention",
+        "Maintainability ratchet",
         "Selected backend tests",
         "Selected frontend unit tests (Vitest)",
     ]
@@ -406,7 +422,7 @@ def test_massive_and_unknown_changes_use_the_complete_push_plan() -> None:
     assert [command.argv for command in massive.commands] == [
         command.argv for command in unknown.commands
     ]
-    assert "Backend coverage (minimum 80%)" in [
+    assert "Versioned Python coverage" in [
         command.step for command in massive.commands
     ]
     assert "End-to-end tests (Playwright)" in [
@@ -461,6 +477,7 @@ def test_impacted_backend_plan_is_ordered_and_contains_no_duplicate_commands() -
         "Repository hygiene (README, encoding, secrets and DoD)",
         "Identity boundary",
         "Naming convention",
+        "Maintainability ratchet",
         "Backend lint (Ruff)",
         "Selected backend tests",
     ]
@@ -477,6 +494,7 @@ def test_impacted_frontend_plan_is_ordered_and_contains_no_duplicate_commands() 
         "Repository hygiene (README, encoding, secrets and DoD)",
         "Identity boundary",
         "Naming convention",
+        "Maintainability ratchet",
         "Frontend lint (ESLint, zero warning)",
         "Frontend typecheck (TypeScript)",
         "Selected frontend unit tests (Vitest)",
@@ -497,6 +515,7 @@ def test_mixed_impacted_plan_keeps_lint_typecheck_tests_order_without_repetition
         "Repository hygiene (README, encoding, secrets and DoD)",
         "Identity boundary",
         "Naming convention",
+        "Maintainability ratchet",
         "Backend lint (Ruff)",
         "Frontend lint (ESLint, zero warning)",
         "Frontend typecheck (TypeScript)",
@@ -530,11 +549,12 @@ def test_fast_push_and_ci_modes_have_the_expected_scope() -> None:
     assert push_steps == ci_steps
     assert "Backend tests" in fast_steps
     assert "Frontend unit tests (Vitest)" in fast_steps
-    assert "Backend coverage (minimum 80%)" not in fast_steps
+    assert "Versioned Python coverage" not in fast_steps
     assert "Frontend unit coverage" not in fast_steps
     assert "Backend tests" not in push_steps
     assert "Frontend unit tests (Vitest)" not in push_steps
-    assert "Backend coverage (minimum 80%)" in push_steps
+    assert "Versioned Python coverage" in push_steps
+    assert "Python coverage scope and per-file compliance" in push_steps
     assert "Frontend unit coverage" in push_steps
     assert "End-to-end tests (Playwright)" in push_steps
     push_commands = quality_gate.execution_plan("push", False)
@@ -1177,6 +1197,7 @@ def test_fast_executes_composite_dod_identity_and_naming_from_snapshot(
         "Repository hygiene (README, encoding, secrets and DoD)",
         "Identity boundary",
         "Naming convention",
+        "Maintainability ratchet",
     ]
     assert all(root == snapshot for _step, root, _temp, _isolated, _env in calls)
     assert all(
@@ -1361,6 +1382,7 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
         (sys.executable, "Scripts/pre_commit_guard.py"),
         (sys.executable, "Scripts/check_identity_boundary.py"),
         (sys.executable, "Scripts/check_naming_convention.py"),
+        (sys.executable, "Scripts/check_maintainability.py"),
         (sys.executable, "-m", "ruff", "check", "."),
         (
             quality_gate.NPM_COMMAND,
@@ -1377,13 +1399,13 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
             sys.executable,
             "-m",
             "pytest",
-            "--cov=backend",
-            "--cov-branch",
-            "--cov-report=json:.coverage.backend.json",
-            "--cov-fail-under=80",
+            "--cov",
+            "--cov-config=.coveragerc",
+            "--cov-report=json:.coverage.python.json",
             "--cov-report=term-missing",
             "-q",
         ),
+        (sys.executable, "Scripts/check_python_coverage.py"),
         (
             quality_gate.NPM_COMMAND,
             "--prefix",
@@ -1404,7 +1426,7 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
         for command in plan.commands
         if command.coverage_artifacts
     } == {
-        "Backend coverage (minimum 80%)": (".coverage", ".coverage.backend.json"),
+        "Versioned Python coverage": (".coverage", ".coverage.python.json"),
         "Frontend unit coverage": (
             "frontend/coverage/coverage-final.json",
             "frontend/coverage/index.html",
@@ -1415,7 +1437,7 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
     }
     assert plan.coverage_artifacts == (
         ".coverage",
-        ".coverage.backend.json",
+        ".coverage.python.json",
         "frontend/coverage/coverage-final.json",
         "frontend/coverage/index.html",
         "frontend/coverage/e2e-coverage-summary.json",
@@ -1440,7 +1462,8 @@ def test_push_and_ci_use_coverage_suites_without_simple_test_duplicates() -> Non
         ]
 
         assert len(pytest_commands) == 1
-        assert "--cov=backend" in pytest_commands[0].argv
+        assert "--cov" in pytest_commands[0].argv
+        assert "--cov-config=.coveragerc" in pytest_commands[0].argv
         assert [command.argv[4] for command in frontend_unit_commands] == [
             "test:unit:coverage",
         ]
@@ -1458,6 +1481,14 @@ def test_naming_convention_runs_once_in_the_main_plan() -> None:
     )
 
 
+def test_maintainability_ratchet_runs_once_in_the_main_plan() -> None:
+    plan = quality_gate.build_execution_plan(
+        quality_gate.build_change_context("push", ["Scripts/quality_gate.py"])
+    )
+
+    assert sum(command.step == "Maintainability ratchet" for command in plan.commands) == 1
+
+
 def test_documentation_only_fast_path_skips_expensive_checks() -> None:
     paths = ["README.md", "docs/definition-of-done.md"]
 
@@ -1467,6 +1498,7 @@ def test_documentation_only_fast_path_skips_expensive_checks() -> None:
         "Repository hygiene (README, encoding, secrets and DoD)",
         "Identity boundary",
         "Naming convention",
+        "Maintainability ratchet",
     ]
     assert not quality_gate.is_documentation_only(["README.md", "backend/api.py"])
 
@@ -1539,8 +1571,8 @@ def test_pytest_basetemp_is_cleaned_after_interruption(tmp_path: Path, monkeypat
 
     monkeypatch.setattr(quality_gate.subprocess, "run", interrupt)
     command = quality_gate.GateCommand(
-        "Backend coverage (minimum 80%)",
-        (sys.executable, "-m", "pytest", "--cov=backend", "-q"),
+        "Versioned Python coverage",
+        (sys.executable, "-m", "pytest", "--cov", "-q"),
         "Correct the test.",
         backend_test=True,
     )
@@ -1924,9 +1956,10 @@ def test_vscode_coverage_task_characterizes_current_orchestration() -> None:
         "npm --prefix frontend run lint",
         "npm --prefix frontend run typecheck",
         "npm --prefix frontend run build",
-        "-m pytest --cov=backend --cov-branch "
-        "--cov-report=json:.coverage.backend.json --cov-fail-under=80 "
+        "-m pytest --cov --cov-config=.coveragerc "
+        "--cov-report=json:.coverage.python.json "
         "--cov-report=term-missing -q",
+        "Scripts/check_python_coverage.py",
         "npm --prefix frontend run test:unit:coverage",
         'run-e2e-coverage.ps1" -workspaceRoot $WorkspaceRoot -Workers 2',
         'run-vitals-staged.ps1" -WorkspaceRoot $WorkspaceRoot',
@@ -1999,7 +2032,7 @@ def test_vscode_coverage_artifacts_and_e2e_threshold_state_are_locked() -> None:
 
     for script in (vitals_rates, vitals_compliance):
         assert 'frontend\\coverage\\coverage-final.json' in script
-        assert '".coverage.backend.json"' in script
+        assert '".coverage.python.json"' in script
         assert 'frontend\\coverage\\e2e-coverage-summary.json' in script
         assert "vitals-coverage-report.json" in script
     assert set(e2e_config["thresholds"]) == {
@@ -2011,3 +2044,491 @@ def test_vscode_coverage_artifacts_and_e2e_threshold_state_are_locked() -> None:
     assert all(value >= 80 for value in e2e_config["thresholds"].values())
     assert package_scripts["test:e2e"] == "node scripts/run-e2e-coverage.mjs"
     assert "-ReuseExistingReport" in vitals_staged
+
+
+def test_dod_reports_invalid_python_and_e2e_policies(tmp_path: Path) -> None:
+    _copy_dod_fixture(tmp_path)
+    (tmp_path / ".coveragerc").write_text("[run]\nbranch = invalid\n", encoding="utf-8")
+    (tmp_path / "frontend/e2e-coverage.config.json").write_text(
+        '{"schemaVersion": 2}', encoding="utf-8"
+    )
+    errors = check_dod_compliance.collect_dod_errors(tmp_path)
+    assert any("Invalid Python coverage configuration" in error for error in errors)
+    assert any("E2E coverage" in error for error in errors)
+
+
+def test_dod_main_reports_failure_and_success(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(check_dod_compliance, "collect_dod_errors", lambda _root: ["boom"])
+    assert check_dod_compliance.main() == 1
+    assert "boom" in capsys.readouterr().err
+    monkeypatch.setattr(check_dod_compliance, "collect_dod_errors", lambda _root: [])
+    assert check_dod_compliance.main() == 0
+
+
+def test_git_helpers_and_staged_listing_cover_failures(tmp_path: Path, monkeypatch, capsys) -> None:
+    class Result:
+        def __init__(self, code=0, stdout="", stderr=""):
+            self.returncode = code
+            self.stdout = stdout
+            self.stderr = stderr
+
+    monkeypatch.setattr(
+        quality_gate.subprocess,
+        "run",
+        lambda *_a, **_k: Result(stdout="ABCDEF" * 7),
+    )
+    assert quality_gate._git_output(["status"], repository_root=tmp_path)
+    monkeypatch.setattr(
+        quality_gate.subprocess,
+        "run",
+        lambda *_a, **_k: Result(1, stderr="git failed"),
+    )
+    with pytest.raises(RuntimeError, match="git failed"):
+        quality_gate._git_output(["status"], repository_root=tmp_path)
+    with pytest.raises(ValueError, match="Unable to resolve pushed SHA"):
+        quality_gate.resolve_commit_sha("a" * 40, tmp_path)
+
+    monkeypatch.setattr(
+        quality_gate.subprocess,
+        "run",
+        lambda *_a, **_k: Result(0, stdout="not-an-oid"),
+    )
+    with pytest.raises(ValueError, match="invalid commit SHA"):
+        quality_gate.resolve_commit_sha("a" * 40, tmp_path)
+
+    monkeypatch.setattr(
+        quality_gate.subprocess,
+        "run",
+        lambda *_a, **_k: Result(1, stderr="index failed"),
+    )
+    with pytest.raises(RuntimeError, match="checkout-index"):
+        quality_gate._checkout_index(tmp_path, tmp_path)
+    with pytest.raises(RuntimeError, match="git diff"):
+        quality_gate.staged_files()
+    assert "index failed" in capsys.readouterr().err
+
+
+def test_push_plan_rejects_missing_remote_git_errors_and_invalid_revisions(
+    tmp_path: Path, monkeypatch
+) -> None:
+    update = quality_gate.PrePushRefUpdate(
+        "refs/heads/main", "a" * 40, "refs/heads/main", "b" * 40
+    )
+    with pytest.raises(ValueError, match="remote name"):
+        quality_gate.build_push_validation_plan((update,), "", tmp_path)
+
+    monkeypatch.setattr(quality_gate, "resolve_commit_sha", lambda sha, _root: sha)
+    monkeypatch.setattr(
+        quality_gate,
+        "_git_output",
+        lambda *_a, **_k: (_ for _ in ()).throw(RuntimeError("boom")),
+    )
+    with pytest.raises(ValueError, match="commit range"):
+        quality_gate.build_push_validation_plan((update,), "origin", tmp_path)
+
+    calls = iter(["invalid\n"])
+    monkeypatch.setattr(quality_gate, "_git_output", lambda *_a, **_k: next(calls))
+    with pytest.raises(ValueError, match="invalid commit SHA"):
+        quality_gate.build_push_validation_plan((update,), "origin", tmp_path)
+
+    monkeypatch.setattr(
+        quality_gate,
+        "_git_output",
+        lambda *_a, **_k: (_ for _ in ()).throw(RuntimeError("diff")),
+    )
+    with pytest.raises(ValueError, match="changed files"):
+        quality_gate._changed_paths_for_commits(("a" * 40,), tmp_path)
+
+
+def test_remaining_classification_and_command_paths(tmp_path: Path) -> None:
+    assert quality_gate.parse_pre_push_updates("\nrefs/a " + "a" * 40 + " refs/b " + "b" * 40)
+    decision = quality_gate._classify_changed_path("backend/__init__.py")
+    assert decision.level == quality_gate.ChangeLevel.IMPACTED
+    unknown = quality_gate._classify_changed_path("backend/unknown.py")
+    assert quality_gate._resolve_path_tests(unknown) is None
+    assert quality_gate._resolve_path_tests(
+        quality_gate.PathClassification("unknown.txt", quality_gate.ChangeLevel.MASSIVE, "unknown")
+    ) is None
+    command = quality_gate.GateCommand("Echo", ("echo", "ok"), "Fix")
+    with quality_gate._command_argv(
+        command, tmp_path, tmp_path / ".tmp/pytest", isolated_validation=False
+    ) as argv:
+        assert argv == command.argv
+    with pytest.raises(ValueError, match="Unsupported mode"):
+        quality_gate.resolve_change_context("unknown", [])
+
+
+def test_run_command_start_failure_and_environment_cleanup(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    command = quality_gate.GateCommand("Tool", ("missing",), "Install it", backend_test=True)
+    monkeypatch.setenv("GIT_DIR", "bad")
+    monkeypatch.setenv("GIT_WORK_TREE", "bad")
+    monkeypatch.setattr(
+        quality_gate.subprocess,
+        "run",
+        lambda *_a, **_k: (_ for _ in ()).throw(OSError("missing")),
+    )
+    assert quality_gate._run_command(
+        command,
+        validation_root=tmp_path,
+        extra_env={"EXTRA": "1"},
+    ) == 127
+    assert "could not start" in capsys.readouterr().err
+
+
+def test_frontend_link_guards_and_platform_paths(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    destination = tmp_path / "destination"
+    destination.mkdir()
+    with pytest.raises(FileExistsError):
+        quality_gate._link_directory(source, destination)
+
+    destination.rmdir()
+    monkeypatch.setattr(quality_gate.os, "name", "posix")
+
+    class FakeLink:
+        def __init__(self, target: Path) -> None:
+            self.target = target
+            self.linked = False
+            self.parent = destination.parent
+
+        def exists(self):
+            return False
+
+        def __fspath__(self):
+            return str(destination)
+
+        def symlink_to(self, target, target_is_directory=False):
+            assert target_is_directory
+            self.target = target
+            self.linked = True
+
+        def is_symlink(self):
+            return self.linked
+
+        def resolve(self):
+            return self.target.resolve()
+
+        def unlink(self):
+            self.linked = False
+
+    fake = FakeLink(source)
+    quality_gate._link_directory(source, fake)
+    assert fake.linked
+    quality_gate._remove_frontend_dependency_link(fake, source)
+    assert not fake.linked
+
+    bad = tmp_path / "bad"
+    bad.mkdir()
+    with pytest.raises(OSError, match="non-link"):
+        quality_gate._remove_frontend_dependency_link(bad, source)
+    bad.rmdir()
+    other = tmp_path / "other"
+    other.mkdir()
+    fake = FakeLink(other)
+    fake.linked = True
+    with pytest.raises(OSError, match="unexpected target"):
+        quality_gate._remove_frontend_dependency_link(fake, source)
+
+    missing_root = tmp_path / "validation"
+    monkeypatch.setattr(
+        quality_gate,
+        "_frontend_dependency_paths",
+        lambda _root: (tmp_path / "missing", missing_root / "node_modules"),
+    )
+    with pytest.raises(FileNotFoundError, match="dependencies are missing"):
+        with quality_gate.exposed_frontend_dependencies(missing_root):
+            pass
+
+
+def test_windows_link_failure_and_worktree_cleanup_errors(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    destination = tmp_path / "destination"
+    monkeypatch.setattr(quality_gate.os, "name", "nt")
+    monkeypatch.setattr(
+        quality_gate.subprocess,
+        "run",
+        lambda *_a, **_k: subprocess.CompletedProcess([], 1, stdout="", stderr="junction"),
+    )
+    with pytest.raises(OSError, match="junction"):
+        quality_gate._link_directory(source, destination)
+
+    monkeypatch.setattr(
+        quality_gate,
+        "_run_worktree_command",
+        lambda *_a, **_k: subprocess.CompletedProcess([], 1, stdout="", stderr="cleanup"),
+    )
+    with pytest.raises(RuntimeError, match="clean detached"):
+        quality_gate._cleanup_detached_worktree(tmp_path, tmp_path)
+
+    calls = iter(
+        [
+            subprocess.CompletedProcess([], 1, stdout="", stderr="add failed"),
+            subprocess.CompletedProcess([], 1, stdout="", stderr="cleanup failed"),
+        ]
+    )
+    monkeypatch.setattr(quality_gate, "_run_worktree_command", lambda *_a, **_k: next(calls))
+    monkeypatch.setattr(
+        quality_gate,
+        "_cleanup_detached_worktree",
+        lambda *_a, **_k: (_ for _ in ()).throw(RuntimeError("cleanup failed")),
+    )
+    with pytest.raises(RuntimeError, match="Unable to create"):
+        with quality_gate.detached_commit_worktree("a" * 40, tmp_path):
+            pass
+    assert "cleanup failed" in capsys.readouterr().err
+
+
+def test_request_success_http_error_and_docker_log_command(monkeypatch) -> None:
+    class Response:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            return b"ok"
+
+    monkeypatch.setattr(quality_gate.urllib.request, "urlopen", lambda *_a, **_k: Response())
+    assert quality_gate._request("http://example.test") == (200, "ok")
+    error = quality_gate.urllib.error.HTTPError(
+        "http://example.test", 429, "limited", {}, io.BytesIO(b"limited")
+    )
+    monkeypatch.setattr(
+        quality_gate.urllib.request,
+        "urlopen",
+        lambda *_a, **_k: (_ for _ in ()).throw(error),
+    )
+    assert quality_gate._request("http://example.test", b"{}", {"X": "1"}) == (429, "limited")
+    calls = []
+    monkeypatch.setattr(quality_gate.subprocess, "run", lambda *a, **k: calls.append((a, k)))
+    quality_gate._docker_logs()
+    assert calls
+
+
+@pytest.mark.parametrize(
+    ("responses", "message"),
+    [
+        ([(500, "")] * 30, "did not become ready"),
+        ([(200, ""), (500, "bad")], "Mongo health"),
+        ([(200, ""), (200, '{"status":"ok"}'), (500, "")], "POST /simulate"),
+        (
+            [(200, ""), (200, '{"status":"ok"}'), (200, ""), (200, "[]")],
+            "history",
+        ),
+    ],
+)
+def test_docker_http_smoke_reports_protocol_failures(monkeypatch, responses, message) -> None:
+    iterator = iter(responses)
+    monkeypatch.setattr(quality_gate, "_request", lambda *_a, **_k: next(iterator))
+    monkeypatch.setattr(quality_gate.time, "sleep", lambda _seconds: None)
+    with pytest.raises(RuntimeError, match=message):
+        quality_gate._run_docker_http_smoke()
+
+
+def test_docker_rate_limit_failures_and_smoke_orchestration(tmp_path: Path, monkeypatch) -> None:
+    prefix = [(200, ""), (200, '{"status":"ok"}'), (200, ""), (200, '{"mode":"backlog_to_weeks"}')]
+    for tail, message in [
+        ([(429, "")], "too early"),
+        ([(200, "")] * 21, "Expected HTTP 429"),
+    ]:
+        iterator = iter([*prefix, *tail])
+        monkeypatch.setattr(quality_gate, "_request", lambda *_a, **_k: next(iterator))
+        with pytest.raises(RuntimeError, match=message):
+            quality_gate._run_docker_http_smoke()
+
+    (tmp_path / ".env").write_text("ok", encoding="utf-8")
+    assert quality_gate._validate_docker_smoke_configuration(tmp_path)
+    monkeypatch.setattr(quality_gate, "_validate_docker_smoke_configuration", lambda: True)
+    commands = []
+    monkeypatch.setattr(
+        quality_gate,
+        "_run_command",
+        lambda command, **_kwargs: commands.append(command.step) or 0,
+    )
+    monkeypatch.setattr(
+        quality_gate,
+        "_run_docker_http_smoke",
+        lambda: (_ for _ in ()).throw(RuntimeError("smoke")),
+    )
+    monkeypatch.setattr(quality_gate, "_docker_logs", lambda: commands.append("logs"))
+    assert quality_gate._run_docker_smoke() == 1
+    assert commands == ["Docker build", "Docker start", "logs", "Docker cleanup"]
+
+    commands.clear()
+    monkeypatch.setattr(quality_gate, "_run_command", lambda command, **_k: 7)
+    assert quality_gate._run_docker_smoke() == 7
+
+
+def test_execute_plan_dependency_error_pre_push_interrupt_and_main_dispatch(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    context = quality_gate.build_change_context("push", ["frontend/src/App.tsx"])
+    command = quality_gate.GateCommand(
+        "Frontend", (quality_gate.NPM_COMMAND, "--version"), "Fix"
+    )
+    plan = quality_gate.GateExecutionPlan(context, (command,), False)
+    monkeypatch.setattr(quality_gate, "_ensure_frontend_dependencies", lambda: 0)
+
+    @contextmanager
+    def broken_dependencies(_root):
+        raise OSError("link")
+        yield
+
+    monkeypatch.setattr(quality_gate, "exposed_frontend_dependencies", broken_dependencies)
+    assert quality_gate._execute_gate_plan(
+        plan,
+        validation_root=tmp_path,
+        runtime_temp_root=tmp_path / ".tmp",
+        isolated_validation=True,
+    ) == 1
+    assert "unable to expose" in capsys.readouterr().err
+
+    assert quality_gate.run_pre_push_gate("bad", remote_name="origin") == 2
+    target = quality_gate.PushValidationTarget("a" * 40, (), ())
+    validation = quality_gate.PushValidationPlan((), (), (target,))
+    monkeypatch.setattr(quality_gate, "parse_pre_push_updates", lambda _text: ())
+    monkeypatch.setattr(quality_gate, "build_push_validation_plan", lambda *_a, **_k: validation)
+    monkeypatch.setattr(
+        quality_gate,
+        "detached_commit_worktree",
+        lambda *_a, **_k: (_ for _ in ()).throw(KeyboardInterrupt()),
+    )
+    assert quality_gate.run_pre_push_gate("", remote_name="origin") == 1
+
+    monkeypatch.setattr(quality_gate, "run_pre_push_gate", lambda *a, **k: 4)
+    monkeypatch.setattr(quality_gate.sys, "stdin", io.StringIO("updates"))
+    assert quality_gate.main(["push", "--remote-name", "origin"]) == 4
+    monkeypatch.setattr(quality_gate, "run_gate", lambda mode: 5)
+    assert quality_gate.main(["ci"]) == 5
+
+
+def test_remaining_quality_gate_success_and_cleanup_paths(tmp_path: Path, monkeypatch) -> None:
+    oid = "a" * 40
+    monkeypatch.setattr(quality_gate, "_git_output", lambda *_a, **_k: oid.upper())
+    assert quality_gate.resolve_commit_sha(oid, tmp_path) == oid
+
+    class Result:
+        returncode = 0
+        stdout = "backend/api.py\n\n"
+        stderr = ""
+
+    monkeypatch.setattr(quality_gate.subprocess, "run", lambda *_a, **_k: Result())
+    assert quality_gate.staged_files() == ["backend/api.py"]
+    assert quality_gate._run_worktree_command(["prune"], repository_root=tmp_path).returncode == 0
+
+    with pytest.raises(RuntimeError, match="plain"):
+        quality_gate._retry_windows_readonly_removal(
+            lambda _path: None, str(tmp_path), RuntimeError("plain")
+        )
+    runtime = tmp_path / "runtime"
+    runtime.mkdir()
+    absent = runtime / "step-absent"
+    quality_gate._remove_pytest_basetemp(absent, runtime, expected_prefix="step-")
+    persistent = runtime / "step-persistent"
+    persistent.mkdir()
+    monkeypatch.setattr(quality_gate.shutil, "rmtree", lambda *_a, **_k: None)
+    with pytest.raises(OSError, match="still exists"):
+        quality_gate._remove_pytest_basetemp(persistent, runtime, expected_prefix="step-")
+
+    bad_context = quality_gate.ChangeContext(
+        mode="bad", changed_paths=(), changed_paths_source=None, documentation_only=False
+    )
+    with pytest.raises(ValueError, match="Unsupported mode"):
+        quality_gate.build_execution_plan(bad_context)
+
+
+def test_link_rethrow_unexpected_exposure_and_cleanup_propagation(
+    tmp_path: Path, monkeypatch
+) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+
+    class BrokenDestination:
+        parent = tmp_path
+
+        def __fspath__(self):
+            return str(tmp_path / "broken")
+
+        def exists(self):
+            return False
+
+        def is_symlink(self):
+            return False
+
+        def symlink_to(self, *_a, **_k):
+            raise OSError("symlink failed")
+
+    monkeypatch.setattr(quality_gate.os, "name", "posix")
+    with pytest.raises(OSError, match="symlink failed"):
+        quality_gate._link_directory(source, BrokenDestination())
+
+    destination = tmp_path / "destination"
+    destination.mkdir()
+    monkeypatch.setattr(
+        quality_gate,
+        "_frontend_dependency_paths",
+        lambda _root: (source, destination),
+    )
+    monkeypatch.setattr(quality_gate, "_link_directory", lambda *_a: None)
+    other = tmp_path / "other"
+    monkeypatch.setattr(
+        destination.__class__,
+        "resolve",
+        lambda self: other if self == destination else self,
+    )
+    monkeypatch.setattr(quality_gate, "_remove_frontend_dependency_link", lambda *_a: None)
+    with pytest.raises(OSError, match="unexpected target"):
+        with quality_gate.exposed_frontend_dependencies(tmp_path):
+            pass
+
+    monkeypatch.setattr(quality_gate.os, "name", "nt")
+    calls = iter(
+        [subprocess.CompletedProcess([], 0, stdout="", stderr="")]
+    )
+    monkeypatch.setattr(quality_gate, "_run_worktree_command", lambda *_a, **_k: next(calls))
+    monkeypatch.setattr(
+        quality_gate,
+        "_cleanup_detached_worktree",
+        lambda *_a, **_k: (_ for _ in ()).throw(RuntimeError("cleanup only")),
+    )
+    with pytest.raises(RuntimeError, match="cleanup only"):
+        with quality_gate.detached_commit_worktree("a" * 40, tmp_path):
+            pass
+
+
+def test_docker_smoke_success_and_pre_push_reference_output(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(quality_gate, "_validate_docker_smoke_configuration", lambda: True)
+    commands: list[str] = []
+    monkeypatch.setattr(
+        quality_gate,
+        "_run_command",
+        lambda command, **_k: commands.append(command.step) or 0,
+    )
+    monkeypatch.setattr(quality_gate, "_run_docker_http_smoke", lambda: None)
+    assert quality_gate._run_docker_smoke() == 0
+    assert commands[-1] == "Docker cleanup"
+
+    update = quality_gate.PrePushRefUpdate(
+        "refs/heads/main", "a" * 40, "refs/heads/main", "b" * 40
+    )
+    commit_range = quality_gate.PushCommitRange(
+        update, "a" * 40, ("--reverse", "b..a"), ("a" * 40,), ("README.md",)
+    )
+    validation = quality_gate.PushValidationPlan((update,), (commit_range,), ())
+    monkeypatch.setattr(quality_gate, "parse_pre_push_updates", lambda _text: (update,))
+    monkeypatch.setattr(quality_gate, "build_push_validation_plan", lambda *_a, **_k: validation)
+    assert (
+        quality_gate.run_pre_push_gate(
+            "update", remote_name="origin", repository_root=tmp_path
+        )
+        == 0
+    )

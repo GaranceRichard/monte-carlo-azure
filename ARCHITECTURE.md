@@ -332,6 +332,13 @@ La sélection des contrôles est centralisée dans `Scripts/quality_gate.py` :
 - `impacted` ajoute les contrôles du domaine et les dépendances proches ;
 - `massive` exécute le plan complet ; tout chemin inconnu ou ambigu utilise ce niveau.
 
+Le même plan exécute le ratchet de maintenabilité. Il compare les métriques de taille et de complexité,
+les cycles, les directions de dépendance documentées et le mojibake à une baseline versionnée. La dette
+existante peut rester stable ou diminuer ; toute dette nouvelle ou aggravée bloque la gate. Les seules
+directions imposées sont la séparation entre `frontend/src` et `backend` dans les deux sens. Les directions
+internes entre métier, application, infrastructure et présentation ne sont pas assez définies pour devenir
+des règles automatiques.
+
 Les sources de changement sont distinctes : index Git pour le pré-commit, commits introduits pour le
 pré-push, checkout de travail pour la CI. Le pré-push valide chaque SHA terminal distinct dans un worktree
 détaché temporaire et n’utilise pas le workspace courant.
@@ -341,16 +348,21 @@ CI GitHub Actions :
 - job unique `quality-gate` avec service MongoDB réel (`mongo:7`) ;
 - installation explicite de Python, Node.js, des dépendances et de Chromium ;
 - exécution de `python Scripts/quality_gate.py ci` ;
-- plan massif ordonné : contrôles de dépôt et de sécurité, Ruff, ESLint, TypeScript, couvertures backend et
-  frontend, build, E2E, puis smoke test Docker ;
+- plan massif ordonné : contrôles de dépôt, de sécurité et de maintenabilité, Ruff, ESLint, TypeScript,
+  couvertures Python et frontend, build, E2E, puis smoke test Docker ;
 - les suites avec couverture remplacent leurs suites simples équivalentes afin d’éviter une double
   exécution de Pytest ou Vitest ;
 - smoke tests `/health`, `/health/mongo`, `/simulate`, `/simulations/history` et limitation `429`.
 
+La couverture Python est pilotée par `.coveragerc` pour `backend/`, `Scripts/` et `run_app.py`, avec
+branches actives. Le validateur exige au moins 80 % globalement et par fichier, aucune ligne exécutable
+non couverte et aucun fichier Python exécutable versionné absent du rapport.
+
 Les seuils E2E de 80 % sur `statements`, `branches`, `functions` et `lines` sont appliqués à partir de
 `frontend/coverage/e2e-coverage-summary.json`. Le validateur vérifie également l’identité du run, les
 timestamps, le périmètre, son fingerprint, la fraîcheur et la cohérence des métriques. Les artefacts
-backend, frontend et E2E alimentent une agrégation Vitals unique, ensuite réutilisée par la conformité.
+Python — pour sa portion backend —, frontend et E2E alimentent une agrégation Vitals unique, ensuite
+réutilisée par la conformité.
 
 ## Notes d’implémentation récentes
 

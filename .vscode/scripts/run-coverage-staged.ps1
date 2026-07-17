@@ -42,8 +42,12 @@ try {
   npm --prefix frontend run build
   if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-  Write-Host "[coverage] backend"
-  & "$WorkspaceRoot\.venv\Scripts\python.exe" -m pytest --cov=backend --cov-branch --cov-report=json:.coverage.backend.json --cov-fail-under=80 --cov-report=term-missing -q --basetemp "$pytestBaseTemp"
+  Write-Host "[coverage] versioned Python"
+  & "$WorkspaceRoot\.venv\Scripts\python.exe" -m pytest --cov --cov-config=.coveragerc --cov-report=json:.coverage.python.json --cov-report=term-missing -q --basetemp "$pytestBaseTemp"
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+  Write-Host "[coverage] Python scope and per-file compliance"
+  & "$WorkspaceRoot\.venv\Scripts\python.exe" Scripts/check_python_coverage.py
   if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
   Write-Host "[coverage] frontend unit coverage"

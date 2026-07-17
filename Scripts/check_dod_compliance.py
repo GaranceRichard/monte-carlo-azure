@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 
 from check_e2e_coverage import load_validated_config
+from check_python_coverage import load_policy
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -106,9 +107,60 @@ def pages_workflow_run_errors(pages: str, ci_workflow_name: str = "CI") -> list[
     return errors
 
 
+def _append_maintainability_errors(root: Path, errors: list[str]) -> None:
+    required = (
+        "Scripts/check_maintainability.py",
+        "Scripts/check_python_coverage.py",
+        "Scripts/maintainability_common.py",
+        "Scripts/maintainability_config.py",
+        "Scripts/maintainability_dependencies.py",
+        "Scripts/maintainability_metrics.py",
+        "Scripts/maintainability_ratchet.py",
+        "config/maintainability.json",
+        "config/maintainability-baseline.json",
+        "config/maintainability-exceptions.json",
+        "docs/maintainability.md",
+        ".coveragerc",
+    )
+    for relpath in required:
+        _ok((root / relpath).exists(), f"Missing maintainability control file: {relpath}", errors)
+    _ok(
+        "docs/maintainability.md" in _read("README.md", root),
+        "README must link docs/maintainability.md",
+        errors,
+    )
+    gate_path = root / "Scripts" / "quality_gate.py"
+    if gate_path.exists():
+        _ok(
+            "Scripts/check_maintainability.py" in gate_path.read_text(encoding="utf-8"),
+            "Shared quality gate must run the maintainability ratchet",
+            errors,
+        )
+
+
+def _append_python_coverage_errors(root: Path, errors: list[str]) -> None:
+    try:
+        policy = load_policy(root / ".coveragerc")
+    except ValueError as exc:
+        errors.append(str(exc))
+        return
+    checks = (
+        (policy["sources"] == ["backend", "Scripts", "run_app"],
+         "Python coverage must include backend, Scripts and run_app"),
+        (policy["branch"], "Python branch coverage must remain enabled"),
+        (float(policy["globalThreshold"]) >= 80,
+         "Global Python coverage threshold must be >= 80"),
+        (float(policy["perFileThreshold"]) >= 80,
+         "Per-file Python coverage threshold must be >= 80"),
+        (policy["requireNoMissingLines"],
+         "Python coverage must reject every uncovered line"),
+    )
+    for condition, message in checks:
+        _ok(condition, message, errors)
+
+
 def collect_dod_errors(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
-
     # Docs presence and linkage
     dod = root / "docs/definition-of-done.md"
     critical = root / "docs/critical-paths.md"
@@ -140,13 +192,13 @@ def collect_dod_errors(root: Path = ROOT) -> list[str]:
         "DoD must define integration coverage >= 80%",
         errors,
     )
-
+    _append_maintainability_errors(root, errors)
+    _append_python_coverage_errors(root, errors)
     # Frontend script guards
     package_json = json.loads(_read("frontend/package.json", root))
     scripts = package_json.get("scripts", {})
     for required in ["lint", "build", "test:e2e", "test:unit:coverage"]:
         _ok(required in scripts, f"Missing frontend script: {required}", errors)
-
     # Vitest unit coverage thresholds
     vitest = _read("frontend/vitest.config.js", root)
     for metric in ["statements", "branches", "functions", "lines"]:
@@ -198,9 +250,11 @@ def collect_dod_errors(root: Path = ROOT) -> list[str]:
         "CI must delegate backend tests to the shared quality gate",
         errors,
     )
+    gate = _read("Scripts/quality_gate.py", root)
+    _ok("--cov-config=.coveragerc" in gate, "Shared quality gate must use .coveragerc", errors)
     _ok(
-        "--cov-fail-under=80" in _read("Scripts/quality_gate.py", root),
-        "Shared quality gate must enforce backend coverage >= 80",
+        "Scripts/check_python_coverage.py" in gate,
+        "Shared quality gate must validate the Python coverage report",
         errors,
     )
     _ok(
@@ -231,8 +285,8 @@ def collect_dod_errors(root: Path = ROOT) -> list[str]:
             errors,
         )
         _ok(
-            '"label": "Coverage Back (Full)"' in tasks,
-            "Missing backend full coverage task",
+            '"label": "Coverage Python (Full)"' in tasks,
+            "Missing complete Python coverage task",
             errors,
         )
         _ok(
@@ -246,13 +300,13 @@ def collect_dod_errors(root: Path = ROOT) -> list[str]:
             errors,
         )
         _ok(
-            "--cov=backend" in tasks,
-            "Coverage workflow must measure backend coverage",
+            "--cov-config=.coveragerc" in tasks,
+            "Coverage workflow must use the declared Python scope",
             errors,
         )
         _ok(
-            "--cov-fail-under=80" in tasks,
-            "Coverage task must enforce backend coverage >= 80",
+            ".coverage.python.json" in tasks,
+            "Coverage task must produce the Python coverage artifact",
             errors,
         )
 

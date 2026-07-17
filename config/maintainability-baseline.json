@@ -1,0 +1,487 @@
+{
+  "schemaVersion": 1,
+  "limits": {
+    "file.lines": 500,
+    "file.complexity": 80,
+    "function.lines": 80,
+    "function.complexity": 15
+  },
+  "metrics": [
+    {
+      "path": "Scripts/check_dod_compliance.py",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 152,
+      "symbol": "collect_dod_errors"
+    },
+    {
+      "path": "Scripts/check_e2e_coverage.py",
+      "metric": "file.complexity",
+      "limit": 80,
+      "value": 101
+    },
+    {
+      "path": "Scripts/check_e2e_coverage.py",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 27,
+      "symbol": "normalize_coverage_metric"
+    },
+    {
+      "path": "Scripts/check_e2e_coverage.py",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 36,
+      "symbol": "validate_artifact_payload"
+    },
+    {
+      "path": "Scripts/check_e2e_coverage.py",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 22,
+      "symbol": "validate_config"
+    },
+    {
+      "path": "Scripts/check_e2e_coverage.py",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 90,
+      "symbol": "validate_artifact_payload"
+    },
+    {
+      "path": "Scripts/check_vitals_compliance.py",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 22,
+      "symbol": "main"
+    },
+    {
+      "path": "Scripts/quality_gate.py",
+      "metric": "file.complexity",
+      "limit": 80,
+      "value": 238
+    },
+    {
+      "path": "Scripts/quality_gate.py",
+      "metric": "file.lines",
+      "limit": 500,
+      "value": 1573
+    },
+    {
+      "path": "Scripts/quality_gate.py",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 32,
+      "symbol": "_classify_changed_path"
+    },
+    {
+      "path": "Scripts/quality_gate.py",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 18,
+      "symbol": "build_push_validation_plan"
+    },
+    {
+      "path": "Scripts/quality_gate.py",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 118,
+      "symbol": "_classify_changed_path"
+    },
+    {
+      "path": "Scripts/quality_gate.py",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 208,
+      "symbol": "build_execution_plan"
+    },
+    {
+      "path": "Scripts/quality_gate.py",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 88,
+      "symbol": "build_push_validation_plan"
+    },
+    {
+      "path": "Scripts/report_vitals_coverage.py",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 19,
+      "symbol": "_raw_istanbul_metrics"
+    },
+    {
+      "path": "backend/api_routes_simulate.py",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 100,
+      "symbol": "simulate"
+    },
+    {
+      "path": "backend/mc_core.py",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 21,
+      "symbol": "throughput_reliability"
+    },
+    {
+      "path": "frontend/src/App.tsx",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 93,
+      "symbol": "App"
+    },
+    {
+      "path": "frontend/src/AppFlowContent.test.tsx",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 110,
+      "symbol": "buildProps"
+    },
+    {
+      "path": "frontend/src/adoClient.ts",
+      "metric": "file.complexity",
+      "limit": 80,
+      "value": 96
+    },
+    {
+      "path": "frontend/src/adoClient.ts",
+      "metric": "file.lines",
+      "limit": 500,
+      "value": 622
+    },
+    {
+      "path": "frontend/src/adoClient.ts",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 28,
+      "symbol": "getTeamDeliveryDataDirect"
+    },
+    {
+      "path": "frontend/src/adoClient.ts",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 86,
+      "symbol": "checkPatDirect"
+    },
+    {
+      "path": "frontend/src/adoClient.ts",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 200,
+      "symbol": "getTeamDeliveryDataDirect"
+    },
+    {
+      "path": "frontend/src/components/steps/SimulationChartTabs.tsx",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 39,
+      "symbol": "SimulationChartTabs"
+    },
+    {
+      "path": "frontend/src/components/steps/SimulationChartTabs.tsx",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 427,
+      "symbol": "SimulationChartTabs"
+    },
+    {
+      "path": "frontend/src/components/steps/SimulationModeAndParametersControls.tsx",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 83,
+      "symbol": "SimulationModeAndParametersControls"
+    },
+    {
+      "path": "frontend/src/components/steps/SimulationResultsPanel.test.tsx",
+      "metric": "file.lines",
+      "limit": 500,
+      "value": 736
+    },
+    {
+      "path": "frontend/src/components/steps/portfolioPrintReport.test.ts",
+      "metric": "file.lines",
+      "limit": 500,
+      "value": 699
+    },
+    {
+      "path": "frontend/src/components/steps/portfolioPrintReport.test.ts",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 95,
+      "symbol": "baseArgs"
+    },
+    {
+      "path": "frontend/src/components/steps/portfolioPrintReport.ts",
+      "metric": "file.lines",
+      "limit": 500,
+      "value": 804
+    },
+    {
+      "path": "frontend/src/components/steps/simulationExportModules.test.ts",
+      "metric": "file.lines",
+      "limit": 500,
+      "value": 1376
+    },
+    {
+      "path": "frontend/src/components/steps/simulationPdfDownload.ts",
+      "metric": "file.complexity",
+      "limit": 80,
+      "value": 186
+    },
+    {
+      "path": "frontend/src/components/steps/simulationPdfDownload.ts",
+      "metric": "file.lines",
+      "limit": 500,
+      "value": 944
+    },
+    {
+      "path": "frontend/src/components/steps/simulationPdfDownload.ts",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 75,
+      "symbol": "downloadPortfolioPdf"
+    },
+    {
+      "path": "frontend/src/components/steps/simulationPdfDownload.ts",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 23,
+      "symbol": "downloadSimulationPdf"
+    },
+    {
+      "path": "frontend/src/components/steps/simulationPdfDownload.ts",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 352,
+      "symbol": "downloadPortfolioPdf"
+    },
+    {
+      "path": "frontend/src/components/steps/simulationPdfDownload.ts",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 149,
+      "symbol": "downloadSimulationPdf"
+    },
+    {
+      "path": "frontend/src/hooks/useOnboarding.test.tsx",
+      "metric": "file.lines",
+      "limit": 500,
+      "value": 663
+    },
+    {
+      "path": "frontend/src/hooks/useOnboarding.ts",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 22,
+      "symbol": "submitPat"
+    },
+    {
+      "path": "frontend/src/hooks/useOnboarding.ts",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 87,
+      "symbol": "submitPat"
+    },
+    {
+      "path": "frontend/src/hooks/usePortfolioReport.test.tsx",
+      "metric": "file.lines",
+      "limit": 500,
+      "value": 502
+    },
+    {
+      "path": "frontend/src/hooks/usePortfolioReport.ts",
+      "metric": "file.lines",
+      "limit": 500,
+      "value": 536
+    },
+    {
+      "path": "frontend/src/hooks/usePortfolioReport.ts",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 27,
+      "symbol": "handleGenerateReport"
+    },
+    {
+      "path": "frontend/src/hooks/usePortfolioReport.ts",
+      "metric": "function.lines",
+      "limit": 80,
+      "value": 359,
+      "symbol": "handleGenerateReport"
+    },
+    {
+      "path": "frontend/src/hooks/useSimulationHistory.ts",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 21,
+      "symbol": "migrateSimulationHistoryEntry"
+    },
+    {
+      "path": "frontend/src/utils/cycleTime.ts",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 26,
+      "symbol": "calculateCycleTimeData"
+    },
+    {
+      "path": "frontend/src/utils/decisionLanguage.ts",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 17,
+      "symbol": "buildRecommendationAction"
+    },
+    {
+      "path": "frontend/src/utils/forecastDiagnostics.ts",
+      "metric": "file.complexity",
+      "limit": 80,
+      "value": 104
+    },
+    {
+      "path": "frontend/src/utils/forecastDiagnostics.ts",
+      "metric": "file.lines",
+      "limit": 500,
+      "value": 573
+    },
+    {
+      "path": "frontend/src/utils/simulation.test.ts",
+      "metric": "file.lines",
+      "limit": 500,
+      "value": 702
+    },
+    {
+      "path": "frontend/src/utils/simulation.ts",
+      "metric": "file.complexity",
+      "limit": 80,
+      "value": 94
+    },
+    {
+      "path": "frontend/src/utils/simulation.ts",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 20,
+      "symbol": "computeThroughputReliability"
+    },
+    {
+      "path": "frontend/src/utils/simulationSignature.ts",
+      "metric": "function.complexity",
+      "limit": 15,
+      "value": 45,
+      "symbol": "isReusableSimulationHistoryEntry"
+    }
+  ],
+  "cycles": [
+    {
+      "nodes": [
+        "frontend/src/api.ts",
+        "frontend/src/apiHelpers.ts"
+      ],
+      "edges": [
+        [
+          "frontend/src/api.ts",
+          "frontend/src/apiHelpers.ts"
+        ],
+        [
+          "frontend/src/apiHelpers.ts",
+          "frontend/src/api.ts"
+        ]
+      ]
+    },
+    {
+      "nodes": [
+        "frontend/src/demoData.ts",
+        "frontend/src/hooks/simulationForecastCore.ts",
+        "frontend/src/hooks/simulationForecastService.ts",
+        "frontend/src/hooks/usePortfolioReport.ts"
+      ],
+      "edges": [
+        [
+          "frontend/src/demoData.ts",
+          "frontend/src/hooks/usePortfolioReport.ts"
+        ],
+        [
+          "frontend/src/hooks/simulationForecastCore.ts",
+          "frontend/src/demoData.ts"
+        ],
+        [
+          "frontend/src/hooks/simulationForecastCore.ts",
+          "frontend/src/hooks/simulationForecastService.ts"
+        ],
+        [
+          "frontend/src/hooks/simulationForecastService.ts",
+          "frontend/src/hooks/simulationForecastCore.ts"
+        ],
+        [
+          "frontend/src/hooks/usePortfolioReport.ts",
+          "frontend/src/hooks/simulationForecastService.ts"
+        ]
+      ]
+    }
+  ],
+  "dependencyViolations": [],
+  "mojibake": [
+    {
+      "path": "Scripts/check_no_secrets.py",
+      "pattern": "utf8-as-latin1-punctuation",
+      "count": 1
+    },
+    {
+      "path": "Scripts/pre_commit_guard.py",
+      "pattern": "replacement-character",
+      "count": 1
+    },
+    {
+      "path": "Scripts/pre_commit_guard.py",
+      "pattern": "utf8-as-latin1-a-circumflex",
+      "count": 1
+    },
+    {
+      "path": "Scripts/pre_commit_guard.py",
+      "pattern": "utf8-as-latin1-a-tilde",
+      "count": 8
+    },
+    {
+      "path": "Scripts/pre_commit_guard.py",
+      "pattern": "utf8-as-latin1-punctuation",
+      "count": 6
+    },
+    {
+      "path": "frontend/src/appShellSections.tsx",
+      "pattern": "utf8-as-latin1-a-tilde",
+      "count": 4
+    },
+    {
+      "path": "frontend/src/components/steps/OnboardingMojibake.test.jsx",
+      "pattern": "utf8-as-latin1-a-tilde",
+      "count": 1
+    },
+    {
+      "path": "frontend/src/components/steps/simulationExportModules.test.ts",
+      "pattern": "replacement-character",
+      "count": 1
+    },
+    {
+      "path": "frontend/src/components/steps/simulationExportModules.test.ts",
+      "pattern": "utf8-as-latin1-a-circumflex",
+      "count": 12
+    },
+    {
+      "path": "frontend/src/components/steps/simulationExportModules.test.ts",
+      "pattern": "utf8-as-latin1-a-tilde",
+      "count": 12
+    },
+    {
+      "path": "frontend/src/components/steps/simulationPdfDownload.ts",
+      "pattern": "utf8-as-latin1-a-tilde",
+      "count": 1
+    },
+    {
+      "path": "frontend/tests/e2e/coverage.spec.js",
+      "pattern": "utf8-as-latin1-a-circumflex",
+      "count": 1
+    },
+    {
+      "path": "tests/test_pre_commit_guard.py",
+      "pattern": "utf8-as-latin1-a-tilde",
+      "count": 1
+    }
+  ]
+}

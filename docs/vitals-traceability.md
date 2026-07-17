@@ -8,7 +8,8 @@ de couverture. La sélection machine des fichiers sources reste définie dans
 
 - Chaque point vital possède au moins un test ciblé référencé ici, et chaque chemin référencé existe dans le
   dépôt.
-- `.coverage.backend.json` fournit les métriques backend.
+- `.coverage.python.json` fournit le périmètre Python complet ; la carte Vitals y consomme les métriques
+  des sources backend concernées.
 - `frontend/coverage/coverage-final.json` fournit les métriques frontend unitaires.
 - `frontend/coverage/e2e-coverage-summary.json` fournit les métriques E2E par fichier.
 - `frontend/coverage/vitals-coverage-report.json` agrège ces sources une seule fois ; le contrôle de
@@ -82,6 +83,7 @@ Tests ciblés :
 
 - `frontend/src/components/steps/simulationPrintReport.test.ts`
 - `frontend/src/components/steps/simulationExportModules.test.ts`
+- `frontend/src/components/steps/simulationPdfDownload.fallback.test.ts`
 - `frontend/src/components/steps/portfolioPrintReport.test.ts`
 - `frontend/src/components/steps/SimulationChartTabs.test.tsx`
 - `frontend/tests/e2e/coverage.spec.js`

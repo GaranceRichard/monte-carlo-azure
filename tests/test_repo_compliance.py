@@ -55,6 +55,25 @@ def test_frontend_required_scripts_exist() -> None:
         assert script in scripts, f"Missing frontend script: {script}"
 
 
+def test_maintainability_control_is_versioned_documented_and_delegated() -> None:
+    required = [
+        "Scripts/check_maintainability.py",
+        "Scripts/maintainability_common.py",
+        "Scripts/maintainability_config.py",
+        "Scripts/maintainability_dependencies.py",
+        "Scripts/maintainability_metrics.py",
+        "Scripts/maintainability_ratchet.py",
+        "config/maintainability.json",
+        "config/maintainability-baseline.json",
+        "config/maintainability-exceptions.json",
+        "docs/maintainability.md",
+    ]
+
+    assert all((ROOT / path).is_file() for path in required)
+    assert "docs/maintainability.md" in _read("README.md")
+    assert "Scripts/check_maintainability.py" in _read("Scripts/quality_gate.py")
+
+
 def test_frontend_unit_coverage_thresholds_are_at_least_80() -> None:
     content = _read("frontend/vitest.config.js")
     thresholds = {}
@@ -95,7 +114,8 @@ def test_ci_enforces_required_checks() -> None:
     assert "npm run lint" not in ci
     assert "npm run test:e2e" not in ci
     assert "npm run build" not in ci
-    assert "--cov-fail-under=80" in gate
+    assert "--cov-config=.coveragerc" in gate
+    assert "Scripts/check_python_coverage.py" in gate
     assert check_dod_compliance.pages_workflow_run_errors(pages) == []
     gate_job = check_dod_compliance._workflow_job_block(pages, "quality-gate")
     deploy_job = check_dod_compliance._workflow_job_block(pages, "build-and-deploy")
@@ -179,19 +199,19 @@ def test_pages_dod_rejects_a_poll_or_a_checkout_other_than_validated_sha() -> No
     )
 
 
-def test_coverage_tasks_separate_repo_compliance_and_backend_full() -> None:
+def test_coverage_tasks_separate_repo_compliance_and_python_full() -> None:
     tasks_path = ROOT / ".vscode" / "tasks.json"
     if not tasks_path.exists():
         # Optional local developer tooling file; may be absent in CI checkouts.
         return
     tasks_content = tasks_path.read_text(encoding="utf-8")
     assert '"label": "Coverage: 8 terminaux"' in tasks_content
-    assert '"label": "Coverage Back (Full)"' in tasks_content
+    assert '"label": "Coverage Python (Full)"' in tasks_content
     assert '"label": "Coverage Vitals Compliance"' in tasks_content
     assert '"label": "Coverage Vitals Rates"' in tasks_content
     assert '"label": "Coverage Integration (Backend API)"' not in tasks_content
     assert '"label": "Coverage Repo Compliance"' not in tasks_content
     assert "tests/test_repo_compliance.py" not in tasks_content
     assert "--cov=tests.test_repo_compliance" not in tasks_content
-    assert "--cov=backend" in tasks_content
-    assert "--cov-fail-under=80" in tasks_content
+    assert "--cov-config=.coveragerc" in tasks_content
+    assert ".coverage.python.json" in tasks_content

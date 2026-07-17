@@ -166,7 +166,7 @@ def test_vitals_aggregation_is_built_once_then_reused(
     source_paths = [
         tmp_path / "docs" / "vitals-coverage-map.json",
         tmp_path / "frontend" / "coverage" / "coverage-final.json",
-        tmp_path / ".coverage.backend.json",
+        tmp_path / ".coverage.python.json",
         tmp_path / "frontend" / "coverage" / "e2e-coverage-summary.json",
         tmp_path / "frontend" / "e2e-coverage.config.json",
     ]
@@ -218,3 +218,297 @@ def test_vitals_aggregation_is_built_once_then_reused(
 
     assert calls == 1
     assert errors == []
+
+
+def test_extractors_and_invalid_metric_paths() -> None:
+    critical = "intro\n## Liste officielle des points vitaux\n- Vital: detail\n## End\n- ignored"
+    assert vitals_compliance._extract_critical_vitals(critical) == ["Vital: detail"]
+    traceability = "ignored\n### Vital\ntext\n- `tests/test_vital.py`\n"
+    assert vitals_compliance._extract_traceability_sections(traceability) == {
+        "Vital": ["tests/test_vital.py"]
+    }
+    assert vitals_compliance._metric_pct({"covered": -1, "total": 2}) is None
+    assert vitals_compliance._metric_pct({"covered": 3, "total": 2}) is None
+    assert vitals_compliance._metric_pct({"covered": 1, "total": 2}) == 50.0
+    assert report_vitals_coverage._pct(1, 0) == "n/a"
+    assert report_vitals_coverage._pct(1, 2) == "50.00%"
+
+
+def test_vitals_rate_errors_cover_empty_invalid_and_build_failure(monkeypatch) -> None:
+    errors: list[str] = []
+    vitals_compliance._append_vitals_rate_errors(
+        errors,
+        [
+            {"title": "Empty", "sources": {}},
+            {
+                "title": "Invalid",
+                "sources": {
+                    "backend": {
+                        "matched": ["backend/a.py"],
+                        "metrics": {"lines": {"covered": 3, "total": 2}},
+                    }
+                },
+            },
+        ],
+    )
+    assert "Vital has no coverage sources: Empty" in errors
+    assert any("has no data" in error for error in errors)
+
+    monkeypatch.setattr(
+        vitals_compliance,
+        "build_vitals_report",
+        lambda: (_ for _ in ()).throw(RuntimeError("boom")),
+    )
+    errors = []
+    vitals_compliance._append_vitals_rate_errors(errors)
+    assert errors == ["Unable to build vitals coverage report: boom"]
+
+
+def _perfect_report() -> list[dict]:
+    return [
+        {
+            "title": "Vital",
+            "sources": {
+                "backend": {
+                    "matched": ["backend/a.py"],
+                    "metrics": {
+                        "statements": {"covered": 1, "total": 1},
+                        "branches": {"covered": 0, "total": 0},
+                        "lines": {"covered": 1, "total": 1},
+                    },
+                }
+            },
+        }
+    ]
+
+
+def test_vitals_compliance_main_success_and_structural_failures(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    critical = tmp_path / "critical.md"
+    traceability = tmp_path / "trace.md"
+    tasks = tmp_path / "tasks.json"
+    monkeypatch.setattr(vitals_compliance, "CRITICAL_PATHS", critical)
+    monkeypatch.setattr(vitals_compliance, "TRACEABILITY", traceability)
+    monkeypatch.setattr(vitals_compliance, "TASKS", tasks)
+    monkeypatch.setattr(vitals_compliance, "ROOT", tmp_path)
+
+    assert vitals_compliance.main([]) == 1
+    assert "Missing docs/critical-paths.md" in capsys.readouterr().err
+
+    critical.write_text(
+        "## Liste officielle des points vitaux\n"
+        "- Vital: detail\n- Missing: detail\n- Ghost: detail\n",
+        encoding="utf-8",
+    )
+    traceability.write_text(
+        "### Vital\n- `tests/missing.py`\n### Missing\n",
+        encoding="utf-8",
+    )
+    tasks.write_text("{}", encoding="utf-8")
+    monkeypatch.setattr(vitals_compliance, "build_vitals_report", _perfect_report)
+    assert vitals_compliance.main([]) == 1
+    error = capsys.readouterr().err
+    assert "Missing referenced test file" in error
+    assert "Vital has no referenced tests" in error
+    assert "Missing traceability section for vital: Ghost" in error
+    assert "Missing VS Code task" in error
+
+    test_file = tmp_path / "tests" / "ok.py"
+    test_file.parent.mkdir()
+    test_file.write_text("", encoding="utf-8")
+    traceability.write_text("### Vital\n- `tests/ok.py`\n", encoding="utf-8")
+    critical.write_text(
+        "## Liste officielle des points vitaux\n- Vital: detail\n", encoding="utf-8"
+    )
+    tasks.write_text(
+        '"label": "Coverage Vitals Compliance"\n'
+        '"label": "Coverage Vitals Rates"\n'
+        '"label": "Coverage: 8 terminaux"\n',
+        encoding="utf-8",
+    )
+    assert vitals_compliance.main([]) == 0
+
+
+def test_vitals_compliance_main_loads_report_and_rejects_invalid_bundle(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    monkeypatch.setattr(vitals_compliance, "CRITICAL_PATHS", ROOT / "docs/critical-paths.md")
+    monkeypatch.setattr(vitals_compliance, "TRACEABILITY", ROOT / "docs/vitals-traceability.md")
+    monkeypatch.setattr(vitals_compliance, "TASKS", ROOT / ".vscode/tasks.json")
+    monkeypatch.setattr(vitals_compliance, "ROOT", ROOT)
+    report = tmp_path / "bad.json"
+    report.write_text("{}", encoding="utf-8")
+    assert vitals_compliance.main(["--report-json", str(report)]) == 1
+    assert "Invalid Vitals coverage report schema" in capsys.readouterr().err
+
+
+def test_raw_payload_and_istanbul_aggregation_resolution() -> None:
+    payload = {
+        "statementMap": {
+            "0": {"start": {"line": 1}},
+            "1": {"start": {}},
+            "2": {"start": {"line": 1}},
+        },
+        "s": {"0": 0, "1": 1, "2": 1},
+        "fnMap": {"0": {}, "1": {}},
+        "f": {"0": 1, "1": 0},
+        "b": {"0": [1, 0]},
+    }
+    metrics = report_vitals_coverage._raw_istanbul_metrics(payload)
+    assert metrics["statements"] == {"covered": 2, "total": 3}
+    assert metrics["functions"] == {"covered": 1, "total": 2}
+    assert metrics["branches"] == {"covered": 1, "total": 2}
+    assert metrics["lines"] == {"covered": 1, "total": 1}
+    assert report_vitals_coverage._payload_metrics({})["lines"] == {
+        "covered": 0,
+        "total": 0,
+    }
+
+    aggregated = report_vitals_coverage._aggregate_istanbul(
+        {
+            "C:/repo/src/exact.ts": {"summary": {"lines": {"covered": 1, "total": 1}}},
+            "C:/other/unique.ts": payload,
+        },
+        ["C:/repo/src/exact.ts", "other/unique.ts", "missing.ts"],
+    )
+    assert len(aggregated["matched"]) == 2
+    basename = report_vitals_coverage._aggregate_istanbul(
+        {"C:/unique/name.ts": payload}, ["different/name.ts"]
+    )
+    assert basename["matched"] == ["C:/unique/name.ts"]
+
+
+def test_backend_aggregation_and_report_building_cover_each_source() -> None:
+    backend = report_vitals_coverage._aggregate_backend(
+        {
+            "C:/repo/backend/a.py": {
+                "summary": {
+                    "num_statements": 3,
+                    "num_branches": 2,
+                    "covered_branches": 1,
+                },
+                "missing_lines": [2],
+            }
+        },
+        ["C:/repo/backend/a.py", "missing.py"],
+    )
+    assert backend["metrics"]["lines"] == {"covered": 2, "total": 3}
+    basename_backend = report_vitals_coverage._aggregate_backend(
+        {"C:/repo/backend/a.py": {"summary": {"num_statements": 1}}}, ["a.py"]
+    )
+    assert basename_backend["matched"] == ["C:/repo/backend/a.py"]
+    artifacts = {
+        "mapping": {
+            "vitals": [
+                {
+                    "title": "All",
+                    "sources": {
+                        "frontend_unit": ["a.ts"],
+                        "backend": ["a.py"],
+                        "e2e": ["a.ts"],
+                    },
+                }
+            ]
+        },
+        "frontend_unit_files": {},
+        "backend_files": {},
+        "e2e_files": {},
+    }
+    report = report_vitals_coverage.build_vitals_report(artifacts)
+    assert set(report[0]["sources"]) == {"frontend_unit", "backend", "e2e"}
+
+
+def test_load_artifacts_bundle_validation_render_and_main(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    paths = report_vitals_coverage._paths(tmp_path)
+    for path in paths.values():
+        path.parent.mkdir(parents=True, exist_ok=True)
+    paths["mapping"].write_text('{"vitals": []}', encoding="utf-8")
+    paths["frontend_unit"].write_text("{}", encoding="utf-8")
+    paths["backend"].write_text('{"files": {}}', encoding="utf-8")
+    paths["e2e"].write_text("{}", encoding="utf-8")
+    paths["e2e_config"].write_text("{}", encoding="utf-8")
+    monkeypatch.setattr(
+        report_vitals_coverage,
+        "load_validated_artifact",
+        lambda *_a: {"byFile": []},
+    )
+    artifacts = report_vitals_coverage.load_coverage_artifacts(tmp_path)
+    assert artifacts["mapping"] == {"vitals": []}
+
+    bundle_path = tmp_path / "bundle.json"
+    bundle = report_vitals_coverage.write_vitals_report_bundle(bundle_path, tmp_path)
+    assert report_vitals_coverage.load_vitals_report_bundle(bundle_path, tmp_path) == bundle
+    report_vitals_coverage.render_vitals_report(_perfect_report())
+    assert "statements=100.00%" in capsys.readouterr().out
+
+    for bad_payload, message in [
+        ("not json", "Invalid Vitals coverage report artifact"),
+        ("{}", "schema"),
+        ('{"schemaVersion": 1, "report": {}}', "payload"),
+        ('{"schemaVersion": 1, "report": [], "sourceArtifacts": []}', "identities"),
+    ]:
+        bundle_path.write_text(bad_payload, encoding="utf-8")
+        with pytest.raises(ValueError, match=message):
+            report_vitals_coverage.load_vitals_report_bundle(bundle_path, tmp_path)
+
+    monkeypatch.setattr(report_vitals_coverage, "build_vitals_report", lambda: _perfect_report())
+    assert report_vitals_coverage.main([]) == 0
+    monkeypatch.setattr(
+        report_vitals_coverage,
+        "build_vitals_report",
+        lambda: (_ for _ in ()).throw(ValueError("boom")),
+    )
+    assert report_vitals_coverage.main([]) == 1
+    assert "Unable to build" in capsys.readouterr().out
+
+
+def test_bundle_identity_validation_and_output_main(tmp_path: Path, monkeypatch, capsys) -> None:
+    source = tmp_path / "source.json"
+    source.write_text("{}", encoding="utf-8")
+    bundle_path = tmp_path / "bundle.json"
+    base = {"schemaVersion": 1, "report": [], "sourceArtifacts": []}
+
+    for identity, message in [
+        ("invalid", "Invalid Vitals source artifact identity"),
+        ({"path": "missing.json"}, "Missing Vitals source artifact"),
+    ]:
+        payload = {**base, "sourceArtifacts": [identity]}
+        bundle_path.write_text(__import__("json").dumps(payload), encoding="utf-8")
+        with pytest.raises(ValueError, match=message):
+            report_vitals_coverage.load_vitals_report_bundle(bundle_path, tmp_path)
+
+    identity = report_vitals_coverage._artifact_identity(source, tmp_path)
+    payload = {**base, "sourceArtifacts": [identity]}
+    bundle_path.write_text(__import__("json").dumps(payload), encoding="utf-8")
+    source.write_text("changed", encoding="utf-8")
+    with pytest.raises(ValueError, match="Stale Vitals coverage report"):
+        report_vitals_coverage.load_vitals_report_bundle(bundle_path, tmp_path)
+
+    report = [
+        {
+            "title": "Functions",
+            "sources": {
+                "frontend": {
+                    "metrics": {
+                        "statements": {"covered": 1, "total": 1},
+                        "branches": {"covered": 1, "total": 1},
+                        "functions": {"covered": 1, "total": 1},
+                        "lines": {"covered": 1, "total": 1},
+                    }
+                }
+            },
+        }
+    ]
+    report_vitals_coverage.render_vitals_report(report)
+    assert "functions=100.00%" in capsys.readouterr().out
+
+    output = tmp_path / "output.json"
+    monkeypatch.setattr(
+        report_vitals_coverage,
+        "write_vitals_report_bundle",
+        lambda path: {"report": report},
+    )
+    assert report_vitals_coverage.main(["--output", str(output)]) == 0

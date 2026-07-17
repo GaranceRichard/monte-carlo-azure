@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "sourcePatterns": [
+    "backend/*.py",
+    "backend/**/*.py",
+    "frontend/src/*.js",
+    "frontend/src/*.jsx",
+    "frontend/src/*.ts",
+    "frontend/src/*.tsx",
+    "frontend/src/**/*.js",
+    "frontend/src/**/*.jsx",
+    "frontend/src/**/*.ts",
+    "frontend/src/**/*.tsx",
+    "Scripts/*.py",
+    "Scripts/**/*.py"
+  ],
+  "limits": {
+    "file.lines": 500,
+    "file.complexity": 80,
+    "function.lines": 80,
+    "function.complexity": 15
+  },
+  "dependencyRules": [
+    {
+      "id": "frontend-must-not-depend-on-backend",
+      "evidence": "ARCHITECTURE.md: le frontend appelle les services depuis le navigateur et le backend ne reçoit que les données de simulation anonymisées.",
+      "sourcePatterns": ["frontend/src/**"],
+      "forbiddenPatterns": ["backend/**"]
+    },
+    {
+      "id": "backend-must-not-depend-on-frontend",
+      "evidence": "ARCHITECTURE.md: le backend FastAPI constitue la frontière serveur séparée du code navigateur.",
+      "sourcePatterns": ["backend/**"],
+      "forbiddenPatterns": ["frontend/src/**"]
+    }
+  ]
+}

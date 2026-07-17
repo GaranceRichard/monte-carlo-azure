@@ -1,0 +1,20 @@
+[run]
+branch = True
+source =
+    backend
+    Scripts
+    run_app
+
+[report]
+fail_under = 80
+show_missing = True
+skip_covered = False
+
+[json]
+output = .coverage.python.json
+
+[montecarlo]
+excluded_tracked_prefixes =
+    tests/
+per_file_fail_under = 80
+require_no_missing_lines = True

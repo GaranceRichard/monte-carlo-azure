@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+import Scripts.check_identity_boundary as identity
 from Scripts.check_identity_boundary import collect_identity_boundary_violations
 
 
@@ -367,3 +368,135 @@ def test_selected_org_in_architecture_documentation_is_allowed(repo_root: Path) 
     violations = collect_identity_boundary_violations(repo)
 
     assert violations == []
+
+
+def test_block_extractors_cover_missing_multiline_and_unbalanced_shapes(tmp_path: Path) -> None:
+    python_file = tmp_path / "sample.py"
+    _write(
+        python_file,
+        """
+def multiline(
+    value,
+):
+    selected_org = value
+
+def next_block():
+    return None
+""",
+    )
+    block = identity._extract_python_block(python_file, "def", "multiline")
+    assert any("selected_org" in line for _, line in block)
+    assert identity._extract_python_block(python_file, "class", "Missing") == []
+
+    ts_file = tmp_path / "sample.ts"
+    ts_file.write_text("const marker = value;", encoding="utf-8")
+    assert identity._extract_ts_brace_block(ts_file, "missing") == []
+    assert identity._extract_ts_brace_block(ts_file, "marker") == []
+    ts_file.write_text("const marker = { selected_org: 1;", encoding="utf-8")
+    assert identity._extract_ts_brace_block(ts_file, "marker") == []
+
+
+def test_token_collection_comments_deduplication_and_helpers(tmp_path: Path) -> None:
+    path = tmp_path / "sample.ts"
+    violations = identity._collect_tokens_in_block(
+        path,
+        "IDENTITY-005",
+        [(1, "// selected_org"), (2, "selected_org selected_org")],
+        ("selected_org",),
+    )
+    assert len(violations) == 1
+    collected: list[identity.Violation] = []
+    seen: set[tuple] = set()
+    identity._append_if_missing(collected, seen, violations[0])
+    identity._append_if_missing(collected, seen, violations[0])
+    assert len(collected) == 1
+    assert identity._is_comment_only(tmp_path / "file.txt", "text") is False
+    duplicates = identity._collect_tokens_in_block(
+        path, "IDENTITY-005", [(3, "selected_org")], ("selected_org", "selected_org")
+    )
+    assert len(duplicates) == 1
+
+
+def test_missing_official_urls_and_payload_fields_are_reported(repo_root: Path) -> None:
+    repo = _build_repo(
+        repo_root,
+        {
+            "frontend/src/adoClient.ts": "export const value = 1;",
+            "frontend/src/hooks/extra.ts": """
+                import { postSimulate } from "../api";
+                export async function send() {
+                  return postSimulate({ selected_team: "x" });
+                }
+            """,
+        },
+    )
+    violations = collect_identity_boundary_violations(repo)
+    pairs = {(item.rule, item.token) for item in violations}
+    assert ("IDENTITY-003", "dev.azure.com") in pairs
+    assert ("IDENTITY-003", "app.vssps.visualstudio.com") in pairs
+    assert ("IDENTITY-005", "selected_team") in pairs
+
+
+def test_pat_route_and_backend_server_url_are_reported(repo_root: Path) -> None:
+    repo = _build_repo(
+        repo_root,
+        {
+            "backend/api_routes_simulate.py": """
+                from fastapi import APIRouter
+                router = APIRouter()
+                @router.get("/pat-token")
+                def token_route():
+                    server_url = "internal"
+                    return server_url
+            """,
+        },
+    )
+    pairs = {(item.rule, item.token) for item in collect_identity_boundary_violations(repo)}
+    assert ("IDENTITY-002", "pat") in pairs
+    assert ("IDENTITY-008", "server_url") in pairs
+
+
+def test_missing_optional_roots_return_no_violations(tmp_path: Path) -> None:
+    assert identity._payload_candidate_files(tmp_path)
+    assert identity._collect_identity_001(tmp_path) == []
+    assert identity._collect_identity_002(tmp_path) == []
+    assert len(identity._collect_identity_003(tmp_path)) == 0
+    assert identity._collect_identity_005(tmp_path) == []
+    assert identity._collect_identity_006(tmp_path) == []
+    assert identity._collect_identity_008(tmp_path) == []
+
+
+def test_missing_candidates_and_comment_only_backend_tokens_are_ignored(tmp_path: Path) -> None:
+    (tmp_path / "frontend/src").mkdir(parents=True)
+    (tmp_path / "frontend/src/adoClient.ts").write_text(
+        'const A = "https://dev.azure.com";\n'
+        'const B = "https://app.vssps.visualstudio.com";\n',
+        encoding="utf-8",
+    )
+    assert identity._collect_identity_002(tmp_path) == []
+    (tmp_path / "frontend/vite.config.js").write_text(
+        'const route = "/__dev/resolve-pat";\n', encoding="utf-8"
+    )
+    assert identity._collect_identity_002(tmp_path)
+    backend = tmp_path / "backend"
+    backend.mkdir()
+    (backend / "module.py").write_text("# server_url only\n", encoding="utf-8")
+    assert identity._collect_identity_008(tmp_path) == []
+
+
+def test_format_and_main_success_and_failure(tmp_path: Path, monkeypatch, capsys) -> None:
+    path = tmp_path / "backend" / "api.py"
+    violation = identity.Violation(path, "IDENTITY-008", "fetch(", 4)
+    assert "backend/api.py:4" in identity._format_violation(tmp_path, violation)
+
+    monkeypatch.setattr(identity, "ROOT", tmp_path)
+    monkeypatch.setattr(identity, "collect_identity_boundary_violations", lambda _root: [])
+    assert identity.main() == 0
+    assert "passed" in capsys.readouterr().out
+    monkeypatch.setattr(
+        identity,
+        "collect_identity_boundary_violations",
+        lambda _root: [violation],
+    )
+    assert identity.main() == 1
+    assert "SLA breach" in capsys.readouterr().err

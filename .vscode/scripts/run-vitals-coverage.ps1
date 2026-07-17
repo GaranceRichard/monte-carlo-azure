@@ -3,7 +3,7 @@ param(
 )
 
 $frontendUnit = Join-Path $WorkspaceRoot "frontend\coverage\coverage-final.json"
-$backendJson = Join-Path $WorkspaceRoot ".coverage.backend.json"
+$backendJson = Join-Path $WorkspaceRoot ".coverage.python.json"
 $e2eJson = Join-Path $WorkspaceRoot "frontend\coverage\e2e-coverage-summary.json"
 $vitalsJson = Join-Path $WorkspaceRoot "frontend\coverage\vitals-coverage-report.json"
 

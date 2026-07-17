@@ -3,6 +3,8 @@ import pytest
 
 from backend.mc_core import (
     SIMULATION_BATCH_SIZE,
+    FinishWeeksSimulation,
+    _discrete_quantile,
     histogram_buckets,
     mc_finish_weeks,
     mc_items_done_for_weeks,
@@ -11,6 +13,23 @@ from backend.mc_core import (
     throughput_reliability,
 )
 from backend.simulation_limits import SIMULATION_HORIZON_WEEKS_MAX, SIMULATION_N_SIMS_MAX
+
+
+def test_empty_finish_result_and_discrete_quantile_guardrails():
+    result = FinishWeeksSimulation(
+        weeks_needed=np.array([], dtype=int),
+        completed_mask=np.array([], dtype=bool),
+        horizon_weeks=10,
+    )
+    assert result.censored_rate == 0.0
+    with pytest.raises(ValueError, match="arr est vide"):
+        _discrete_quantile(np.array([], dtype=int), 0.5, method="higher")
+    with pytest.raises(ValueError, match="throughput_samples est vide"):
+        throughput_reliability(np.array([], dtype=int))
+
+
+def test_throughput_reliability_marks_moderate_trend_as_incertain():
+    assert throughput_reliability(np.arange(7, 15))["label"] == "incertain"
 
 
 def test_mc_finish_weeks_shape_and_bounds():

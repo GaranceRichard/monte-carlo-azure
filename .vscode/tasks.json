@@ -218,16 +218,15 @@
       }
     },
     {
-      "label": "Coverage Back (Full)",
+      "label": "Coverage Python (Full)",
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
         "-m",
         "pytest",
-        "--cov=backend",
-        "--cov-branch",
-        "--cov-report=json:.coverage.backend.json",
-        "--cov-fail-under=80",
+        "--cov",
+        "--cov-config=.coveragerc",
+        "--cov-report=json:.coverage.python.json",
         "--cov-report=term-missing",
         "-q"
       ],

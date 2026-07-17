@@ -303,3 +303,133 @@ def test_current_complete_e2e_artifact_is_accepted_after_normalization() -> None
         metric == {"total": 0, "covered": 0, "skipped": 0, "pct": 100}
         for metric in empty_metrics
     )
+
+
+def test_json_loader_rejects_non_object_and_config_validation_covers_each_field(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "array.json"
+    path.write_text("[]", encoding="utf-8")
+    payload, errors = check_e2e_coverage._load_json(path, "fixture")
+    assert payload is None
+    assert "top-level value must be an object" in errors[0]
+
+    invalid = {
+        "schemaVersion": 2,
+        "artifactMaxAgeSeconds": True,
+        "scope": {
+            "id": "",
+            "urlPathPrefix": "src",
+            "excludedPathSuffixes": ["main.tsx"],
+        },
+        "thresholds": {"statements": 79},
+    }
+    errors = check_e2e_coverage.validate_config(invalid)
+    assert any("schemaVersion" in error for error in errors)
+    assert any("artifactMaxAgeSeconds" in error for error in errors)
+    assert any("scope id" in error for error in errors)
+    assert any("urlPathPrefix" in error for error in errors)
+    assert any("excludedPathSuffixes" in error for error in errors)
+    assert any("exactly" in error for error in errors)
+    assert any("statements threshold" in error for error in errors)
+
+    invalid["scope"] = None
+    invalid["thresholds"] = None
+    errors = check_e2e_coverage.validate_config(invalid)
+    assert "Invalid E2E coverage scope." in errors
+    assert "Invalid E2E coverage thresholds." in errors
+
+
+def test_config_loading_and_timestamp_validation(tmp_path: Path) -> None:
+    invalid = tmp_path / "invalid.json"
+    invalid.write_text('{"schemaVersion": 2}', encoding="utf-8")
+    with pytest.raises(ValueError, match="schemaVersion"):
+        check_e2e_coverage.load_validated_config(invalid)
+
+    errors: list[str] = []
+    assert check_e2e_coverage._parse_timestamp(1, "time", errors) is None
+    assert check_e2e_coverage._parse_timestamp("bad", "time", errors) is None
+    assert check_e2e_coverage._parse_timestamp("2026-01-01T00:00:00", "time", errors) is None
+    assert len(errors) == 3
+
+
+def test_incomplete_and_invalid_empty_metric_percentages_fail() -> None:
+    errors: list[str] = []
+    assert check_e2e_coverage.normalize_coverage_metric("lines", {}, errors) is None
+    assert "Incomplete E2E coverage metric: lines." in errors
+    errors = []
+    assert (
+        check_e2e_coverage.normalize_coverage_metric(
+            "functions",
+            {"total": 0, "covered": 0, "skipped": 0, "pct": 99},
+            errors,
+            allow_empty=True,
+        )
+        is None
+    )
+    assert "Inconsistent" in errors[0]
+    errors = []
+    assert (
+        check_e2e_coverage.normalize_coverage_metric(
+            "functions",
+            {"total": 0, "covered": 0, "skipped": 0, "pct": 100},
+            errors,
+            allow_empty=False,
+        )
+        is None
+    )
+
+
+def test_artifact_validation_covers_context_time_and_file_shape_errors() -> None:
+    config = _config()
+    now = datetime.now(timezone.utc)
+    artifact = _artifact(config, completed_at=now + timedelta(minutes=1))
+    artifact["schemaVersion"] = 2
+    artifact["producer"] = "other"
+    artifact["context"]["runId"] = ""
+    artifact["context"]["scopeFingerprint"] = "wrong"
+    artifact["context"]["startedAt"] = (now + timedelta(minutes=2)).isoformat()
+    artifact["files"] = True
+    artifact["byFile"] = [None]
+    errors = check_e2e_coverage.validate_artifact_payload(
+        artifact,
+        config,
+        expected_started_at="invalid",
+        now=now,
+    )
+    assert any("artifact schemaVersion" in error for error in errors)
+    assert any("producer" in error for error in errors)
+    assert any("runId" in error for error in errors)
+    assert any("fingerprint" in error for error in errors)
+    assert any("completed before" in error for error in errors)
+    assert any("future" in error for error in errors)
+    assert any("file count" in error for error in errors)
+    assert any("entry at index 0" in error for error in errors)
+
+    artifact = _artifact(config)
+    artifact["context"] = None
+    artifact["byFile"] = []
+    errors = check_e2e_coverage.validate_artifact_payload(artifact, config)
+    assert "Missing E2E coverage execution context." in errors
+    assert "Missing E2E per-file coverage data." in errors
+
+    artifact = _artifact(config)
+    artifact["files"] = 2
+    errors = check_e2e_coverage.validate_artifact_payload(artifact, config)
+    assert "E2E per-file coverage count does not match files." in errors
+
+
+def test_artifact_expected_start_and_file_freshness_are_enforced(tmp_path: Path) -> None:
+    config = _config()
+    artifact = _artifact(config)
+    artifact_path, config_path = _write_inputs(tmp_path, artifact, config)
+    expected = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
+    with pytest.raises(ValueError) as exc:
+        check_e2e_coverage.load_validated_artifact(
+            artifact_path,
+            config_path,
+            expected_started_at=expected,
+            now=datetime.now(timezone.utc) + timedelta(hours=1),
+        )
+    assert "startedAt does not match" in str(exc.value)
+    assert "file predates" in str(exc.value)

@@ -8,8 +8,8 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
 
 - Toute modification d’un point vital doit inclure des tests ciblés.
 - Les tests couvrent les cas nominaux et les cas d’erreur critiques.
-- La couverture est mesurée à partir des artefacts backend, frontend unitaire et E2E de l’exécution
-  complète.
+- La couverture est mesurée à partir de l’artefact Python complet — dont la portion backend — et des
+  artefacts frontend unitaire et E2E de l’exécution complète.
 - Une source vitale absente du rapport ou une métrique réellement mesurable sous 95 % bloque la conformité
   Vitals.
 

@@ -166,3 +166,72 @@ def test_french_accent_guard_is_independent_from_mojibake(
 
     assert pre_commit_guard.check_readme_french_accents() == 0
     assert pre_commit_guard.check_readme_encoding() == 1
+
+
+def test_run_executes_in_repository(monkeypatch) -> None:
+    calls = []
+
+    def fake_run(cmd, **kwargs):
+        calls.append((cmd, kwargs))
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(pre_commit_guard.subprocess, "run", fake_run)
+    pre_commit_guard.run(["tool"])
+    assert calls[0][1]["cwd"] == pre_commit_guard.REPO_ROOT
+
+
+def test_readme_staging_encoding_and_missing_file_errors(
+    workspace_readme: Path, capsys
+) -> None:
+    assert pre_commit_guard.check_readme_staged(["backend/api.py"]) == 1
+    assert "backend/api.py" in capsys.readouterr().err
+    assert pre_commit_guard.check_readme_staged(["backend/api.py", "README.md"]) == 0
+    assert pre_commit_guard.check_readme_staged(["docs/note.md"]) == 0
+
+    assert pre_commit_guard.check_readme_encoding(workspace_readme) == 1
+    assert pre_commit_guard.check_readme_french_accents(workspace_readme) == 1
+    workspace_readme.write_text("Plain valid text", encoding="utf-8")
+    assert pre_commit_guard.check_readme_encoding(workspace_readme) == 0
+    assert pre_commit_guard.check_readme_french_accents(workspace_readme) == 0
+
+
+def test_external_checks_cover_missing_failure_and_success(
+    monkeypatch, tmp_path: Path, capsys
+) -> None:
+    missing = tmp_path / "missing.py"
+    monkeypatch.setattr(pre_commit_guard, "SECRET_CHECK_PATH", missing)
+    monkeypatch.setattr(pre_commit_guard, "DOD_CHECK_PATH", missing)
+    assert pre_commit_guard.check_no_secrets() == 1
+    assert pre_commit_guard.check_dod_compliance() == 1
+
+    script = tmp_path / "check.py"
+    script.write_text("", encoding="utf-8")
+    monkeypatch.setattr(pre_commit_guard, "SECRET_CHECK_PATH", script)
+    monkeypatch.setattr(pre_commit_guard, "DOD_CHECK_PATH", script)
+    monkeypatch.setattr(
+        pre_commit_guard,
+        "run",
+        lambda _cmd: SimpleNamespace(returncode=4, stdout="out\n", stderr="err\n"),
+    )
+    assert pre_commit_guard.check_no_secrets() == 4
+    assert pre_commit_guard.check_dod_compliance() == 4
+    output = capsys.readouterr().err
+    assert "out" in output and "err" in output
+
+    monkeypatch.setattr(
+        pre_commit_guard,
+        "run",
+        lambda _cmd: SimpleNamespace(returncode=0, stdout="", stderr=""),
+    )
+    assert pre_commit_guard.check_no_secrets() == 0
+    assert pre_commit_guard.check_dod_compliance() == 0
+
+
+def test_main_returns_zero_when_all_checks_pass(monkeypatch) -> None:
+    monkeypatch.setattr(pre_commit_guard, "staged_files", lambda: [])
+    monkeypatch.setattr(
+        pre_commit_guard,
+        "guard_plan",
+        lambda _paths: (pre_commit_guard.GuardCheck("ok", (), lambda: 0),),
+    )
+    assert pre_commit_guard.main() == 0

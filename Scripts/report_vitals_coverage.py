@@ -15,7 +15,7 @@ from check_e2e_coverage import load_validated_artifact
 ROOT = Path(__file__).resolve().parents[1]
 MAP_PATH = ROOT / "docs" / "vitals-coverage-map.json"
 FRONTEND_UNIT = ROOT / "frontend" / "coverage" / "coverage-final.json"
-BACKEND_JSON = ROOT / ".coverage.backend.json"
+BACKEND_JSON = ROOT / ".coverage.python.json"
 E2E_JSON = ROOT / "frontend" / "coverage" / "e2e-coverage-summary.json"
 E2E_CONFIG = ROOT / "frontend" / "e2e-coverage.config.json"
 VITALS_REPORT_JSON = ROOT / "frontend" / "coverage" / "vitals-coverage-report.json"
@@ -188,7 +188,7 @@ def _paths(root: Path) -> dict[str, Path]:
     return {
         "mapping": root / "docs" / "vitals-coverage-map.json",
         "frontend_unit": root / "frontend" / "coverage" / "coverage-final.json",
-        "backend": root / ".coverage.backend.json",
+        "backend": root / ".coverage.python.json",
         "e2e": root / "frontend" / "coverage" / "e2e-coverage-summary.json",
         "e2e_config": root / "frontend" / "e2e-coverage.config.json",
     }

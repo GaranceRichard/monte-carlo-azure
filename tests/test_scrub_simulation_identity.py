@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from types import SimpleNamespace
 
 from pymongo.errors import PyMongoError
@@ -184,3 +185,49 @@ def test_main_reports_apply(monkeypatch, capsys):
     assert "mode=apply" in output
     assert "modified_documents=2" in output
     assert collection.update_calls
+
+
+def test_parse_args_and_disabled_mongo(monkeypatch, capsys):
+    monkeypatch.setattr(sys, "argv", ["scrub_simulation_identity.py", "--apply"])
+    assert scrub_simulation_identity.parse_args().apply is True
+    monkeypatch.setattr(
+        scrub_simulation_identity,
+        "parse_args",
+        lambda: SimpleNamespace(apply=False),
+    )
+    monkeypatch.setattr(
+        scrub_simulation_identity,
+        "get_api_config",
+        lambda: SimpleNamespace(mongo_url=""),
+    )
+    assert scrub_simulation_identity.main() == 1
+    assert "Mongo disabled" in capsys.readouterr().out
+
+
+def test_main_closes_client_when_collection_operation_fails(monkeypatch, capsys):
+    class BrokenClient(_FakeMongoClient):
+        def __getitem__(self, _name: str):
+            raise PyMongoError("operation")
+
+    client = BrokenClient(_FakeCollection())
+    monkeypatch.setattr(
+        scrub_simulation_identity,
+        "parse_args",
+        lambda: SimpleNamespace(apply=False),
+    )
+    monkeypatch.setattr(
+        scrub_simulation_identity,
+        "get_api_config",
+        lambda: SimpleNamespace(
+            mongo_url="mongodb://localhost:27017",
+            mongo_db="montecarlo",
+            mongo_collection_simulations="simulations",
+            mongo_server_selection_timeout_ms=1000,
+            mongo_connect_timeout_ms=1000,
+            mongo_socket_timeout_ms=1000,
+        ),
+    )
+    monkeypatch.setattr(scrub_simulation_identity, "MongoClient", lambda *_a, **_k: client)
+    assert scrub_simulation_identity.main() == 1
+    assert client.closed is True
+    assert "Mongo error" in capsys.readouterr().out

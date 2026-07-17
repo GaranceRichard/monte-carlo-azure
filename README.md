@@ -384,6 +384,11 @@ La définition normative des niveaux de validation, des seuils et de la publiabi
 [`docs/definition-of-done.md`](docs/definition-of-done.md). La consommation détaillée des artefacts Vitals
 est décrite dans [`docs/vitals-traceability.md`](docs/vitals-traceability.md).
 
+Le ratchet de maintenabilité bloque uniquement une dette nouvelle ou aggravée sur la taille, la complexité,
+les cycles, les directions de dépendance démontrables et le mojibake. Ses règles, sa baseline versionnée et
+sa procédure explicite de mise à jour sont décrites dans
+[`docs/maintainability.md`](docs/maintainability.md).
+
 ### Variables d'environnement Mongo / purge
 
 - `APP_MONGO_URL` (ex: `mongodb://mongo:27017`)
@@ -442,10 +447,14 @@ Suite E2E découpée:
 - `frontend/tests/e2e/simulation.spec.js`
 - `frontend/tests/e2e/coverage.spec.js`
 
-Sous Windows/VS Code, la couverture backend utilise un `--basetemp` unique sous
+Sous Windows/VS Code, la couverture Python utilise un `--basetemp` unique sous
 `.tmp/pytest/coverage-staged-<PID>-<GUID>`. Seul le répertoire créé par l’exécution courante est supprimé,
 y compris après un échec ou une interruption ; le répertoire temporaire global de l’utilisateur n’est
 jamais supprimé.
+Le périmètre Python est déclaré une seule fois dans `.coveragerc`, avec couverture de branche active.
+`Scripts/check_python_coverage.py` vérifie qu’aucun fichier Python exécutable versionné n’est absent du
+rapport, que les seuils global et par fichier restent respectés et qu’aucune ligne exécutable ne reste
+non couverte. Les tests sont exclus du périmètre mesuré, pas de l’exécution Pytest.
 Le projet désactive aussi le cacheprovider pytest via `pytest.ini` (`-p no:cacheprovider`) pour supprimer les warnings d'écriture `.pytest_cache` en environnement restreint.
 Pour la couverture frontend Vitest sous Windows, le projet utilise une exécution stable (`pool: "forks"` et `coverage.processingConcurrency: 1` dans `frontend/vitest.config.js`) afin d'éviter les pannes d'agrégation V8 de type `ENOENT ... frontend\coverage\.tmp\coverage-*.json`.
 Dans ce repo, une ligne rouge dans le détail d'un rapport de coverage est considérée comme invalide et doit être couverte avant de considérer la tâche acceptable, même si les seuils globaux restent verts.
@@ -460,7 +469,8 @@ scripts PowerShell versionnés `run-coverage-staged.ps1`, `run-e2e-coverage.ps1`
 `run-vitals-staged.ps1`, `run-vitals-coverage.ps1` et `run-vitals-compliance.ps1`, puis termine par la
 convention de nommage. Elle produit ou réutilise notamment :
 
-- `.coverage` et `.coverage.backend.json` pour le backend ;
+- `.coverage` et `.coverage.python.json` pour tous les fichiers exécutables sous `backend/`, `Scripts/`
+  et `run_app.py` ;
 - `frontend/coverage/coverage-final.json` et `frontend/coverage/index.html` pour Vitest ;
 - `frontend/coverage/e2e-coverage-summary.json` pour les E2E ;
 - `frontend/coverage/vitals-coverage-report.json` pour l’agrégation Vitals réutilisée par la conformité.

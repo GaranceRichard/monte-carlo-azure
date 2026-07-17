@@ -200,8 +200,6 @@ def scan_ado_non_prod_values(path: str, text: str) -> List[Finding]:
 
             name = match.group("name")
             value = match.group("value").strip().strip("'\"")
-            if name not in ADO_NON_PROD_ENV_NAMES:
-                continue
             if is_allowed_ado_placeholder(value):
                 continue
 
@@ -277,10 +275,7 @@ def main() -> int:
         if is_probably_binary(data):
             continue
 
-        try:
-            text = data.decode("utf-8", errors="replace")
-        except Exception:
-            continue
+        text = data.decode("utf-8", errors="replace")
 
         all_findings.extend(scan_text(path, text, rules))
         all_findings.extend(scan_ado_non_prod_values(path, text))

@@ -2,6 +2,18 @@
 
 ## Recent
 
+### Qualité et outillage
+
+- ajout d’un ratchet de maintenabilité déterministe sur la taille, la complexité, les cycles, les
+  directions de dépendance démontrables et le mojibake, avec baseline et exceptions justifiées versionnées
+- découpage du moteur de maintenabilité entre collecte des métriques, analyse des dépendances, chargement de
+  configuration, comparaison au ratchet et restitution CLI, tout en conservant un point d’entrée unique
+- extension de la couverture Python à tous les fichiers exécutables versionnés sous `backend/`, `Scripts/`
+  et à `run_app.py`, avec branches actives, seuil global et par fichier, absence de ligne rouge et contrôle
+  bloquant d’un fichier exécutable manquant
+- ajout d’un test unitaire déterministe du repli de téléchargement PDF quand l’API de sauvegarde directe
+  échoue, sans modification du comportement de production ni du contenu PDF
+
 ### Frontend
 
 - ajout d'une page PDF « Comparaison des hypotheses » apres la synthese portefeuille: qualite des historiques
