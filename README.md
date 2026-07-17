@@ -17,6 +17,7 @@ Démo GitHub Pages:
 ## Parcours de lecture
 
 - vision produit et valeur: [`PRODUCT.md`](PRODUCT.md)
+- trajectoire produit: [`docs/roadmap.md`](docs/roadmap.md)
 - architecture, sécurité, API, CI: [`ARCHITECTURE.md`](ARCHITECTURE.md)
   - inclut la convention de nommage: identifiants de code en anglais, textes utilisateur en français
 - historique des évolutions: [`CHANGELOG.md`](CHANGELOG.md)
@@ -104,8 +105,8 @@ Démo GitHub Pages:
 
 Scénarios portefeuille:
 
-- `Independant`: somme des throughputs tirés indépendamment pour chaque équipe
-- `Arrime`: `Independant` réduit au facteur d'arrimage configuré
+- `Indépendant`: somme des throughputs tirés indépendamment pour chaque équipe
+- `Arrimé`: `Indépendant` réduit au facteur d'arrimage configuré
 - `Friction`: application d'un coût d'alignement identique par équipe supplémentaire
 - `Historique corrélé`: somme des throughputs observés sur les mêmes semaines pour toutes les équipes
   afin de conserver les variations communes réellement observées
@@ -131,7 +132,7 @@ Diagnostic comparatif portefeuille:
 
 - le modèle distingue la qualité des historiques observés, la stabilité du résultat simulé et la
   crédibilité de chaque hypothèse d'agrégation
-- `Independant` est une reconstruction bootstrap indépendante, `Arrime` repose sur un taux saisi,
+- `Indépendant` est une reconstruction bootstrap indépendante, `Arrimé` repose sur un taux saisi,
   `Friction` est dérivé de ce taux et `Historique corrélé` repose sur des semaines communes observées
 - une distribution stable ne valide pas une hypothèse; un taux saisi ou dérivé ne constitue pas une preuve
 - l'historique corrélé ne démontre ni la substituabilité des équipes, ni leurs relations opérationnelles,

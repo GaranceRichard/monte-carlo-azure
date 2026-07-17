@@ -284,6 +284,53 @@ describe("decision language", () => {
     );
   });
 
+  it("ignores a zero censorship factor and lets dispersion drive the decision language", () => {
+    const result = buildDecisionLanguage({
+      dataQuality: { level: "sufficient", justification: "Données suffisantes", factors: [] },
+      forecastUncertainty: { level: "high", justification: "Dispersion élevée", factors: [] },
+      decisionRecommendation: {
+        level: "caution",
+        justification: "Prudence",
+        advisedAction: "Prévoir une marge",
+        factors: [
+          { source: "forecastUncertainty", code: "censored_simulations", description: "Simulations censurées", value: 0 },
+          { source: "forecastUncertainty", code: "iqr_ratio", description: "Dispersion élevée", value: 1.2 },
+        ],
+      },
+    });
+
+    expect(result.decisionRecommendation.explanation).toBe(
+      "L'écart entre les scénarios centraux et prudents reste important.",
+    );
+    expect(result.decisionRecommendation.explanation).not.toContain("0 simulations n'aboutissent pas");
+    expect(result.decisionRecommendation.action).toBe(
+      "Planifier sur le P70 et conserver le P90 comme marge de sécurité.",
+    );
+    expect(result.decisionRecommendation.action).not.toContain("Allonger l'horizon");
+  });
+
+  it("combines limited history and high dispersion in an applicable arbitration action", () => {
+    const result = buildDecisionLanguage({
+      dataQuality: { level: "watch", justification: "Historique limité", factors: [] },
+      forecastUncertainty: { level: "high", justification: "Dispersion élevée", factors: [] },
+      decisionRecommendation: {
+        level: "arbitration_required",
+        justification: "Arbitrage nécessaire",
+        advisedAction: "Arbitrer",
+        factors: [
+          { source: "dataQuality", code: "usable_history_weeks", description: "Semaines exploitables", value: 7 },
+          { source: "forecastUncertainty", code: "iqr_ratio", description: "Dispersion élevée", value: 1.2 },
+        ],
+      },
+    });
+
+    expect(result.decisionRecommendation.explanation).toContain("7 semaines d'historique exploitable");
+    expect(result.decisionRecommendation.explanation).toContain("scénarios centraux et prudents");
+    expect(result.decisionRecommendation.action).toContain("P70");
+    expect(result.decisionRecommendation.action).toContain("P90");
+    expect(result.decisionRecommendation.action).toContain("semaines supplémentaires");
+  });
+
   it.each([
     [2, "2 valeurs historiques ne sont pas exploitables."],
     [undefined, "Certaines valeurs historiques ne sont pas exploitables."],

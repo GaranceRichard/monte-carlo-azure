@@ -652,7 +652,9 @@ describe("SimulationResultsPanel history list", () => {
 
     expect(screen.getByText(/Arbitrage nécessaire/i)).not.toBeNull();
     fireEvent.click(screen.getByRole("button", { name: /Voir le diagnostic décisionnel/i }));
-    expect(screen.getByText(/Vérifier la stabilité de la capacité récente sur quelques semaines supplémentaires\./i)).not.toBeNull();
+    expect(screen.getByText(/La dispersion ou la volatilité historique est élevée\./i)).not.toBeNull();
+    expect(screen.getAllByText(/Semaines historiques exploitables : 6/i)).toHaveLength(2);
+    expect(screen.getByText(/Planifier sur le P70, conserver le P90 comme marge de sécurité et vérifier la stabilité de la capacité sur quelques semaines supplémentaires\./i)).not.toBeNull();
   });
 
   it("compares local historical windows and exposes high sensitivity in the summary and dialog", () => {

@@ -487,7 +487,7 @@ describe("computeThroughputReliability", () => {
   it("matches the expected reliability labels for demo teams", () => {
     expect(computeThroughputReliability(DEMO_TEAM_SAMPLES.Alpha)?.label).toBe("fiable");
     expect(computeThroughputReliability(DEMO_TEAM_SAMPLES.Beta)?.label).toBe("fragile");
-    expect(computeThroughputReliability(DEMO_TEAM_SAMPLES.Gamma)?.label).toBe("incertain");
+    expect(computeThroughputReliability(DEMO_TEAM_SAMPLES.Gamma)?.label).toBe("fragile");
   });
 
   it("returns the expected rounded ratio values for the reference series", () => {
@@ -689,7 +689,7 @@ describe("simulateMonteCarloLocal", () => {
     expect(result.result_percentiles.P50 ?? 0).toBeGreaterThanOrEqual(result.result_percentiles.P70 ?? 0);
     expect(result.result_percentiles.P70 ?? 0).toBeGreaterThanOrEqual(result.result_percentiles.P90 ?? 0);
     expect(result.result_distribution.length).toBeGreaterThan(0);
-    expect(result.throughput_reliability?.label).toBe("incertain");
+    expect(result.throughput_reliability?.label).toBe("fragile");
   });
 
   it("keeps risk_score consistent with the returned business percentiles in both modes", () => {

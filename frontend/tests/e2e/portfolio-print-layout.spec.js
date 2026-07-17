@@ -90,7 +90,7 @@ test("portfolio print: synthesis hypotheses remain in the first printable page",
   expect(layout.nextPageStyle.pageBreakAfter).toBe("always");
 });
 
-test("portfolio PDF: the comparison occupies one page before scenario details", async ({ page }) => {
+test("portfolio PDF: the demo report uses nine pages without a comparison continuation", async ({ page }) => {
   await page.goto("/");
 
   const downloadPromise = page.waitForEvent("download");
@@ -123,6 +123,24 @@ test("portfolio PDF: the comparison occupies one page before scenario details", 
       throughputReliability: { cv: 0.3, iqr_ratio: 0.2, slope_norm: 0, label: reliability, samples_count: 8 },
       decisionDiagnostic: diagnostic(decisionLevel),
     }));
+    const sections = ["Alpha", "Beta", "Gamma"].map((selectedTeam, index) => ({
+      selectedTeam,
+      seed: 100 + index,
+      simulationMode: "backlog_to_weeks",
+      includeZeroWeeks: true,
+      backlogSize: 120,
+      targetWeeks: 12,
+      nSims: 20000,
+      types: ["User Story", "Bug"],
+      doneStates: ["Done", "Closed"],
+      resultKind: "weeks",
+      riskScore: 0.2 + index * 0.1,
+      throughputReliability: { cv: 0.3, iqr_ratio: 0.2, slope_norm: 0, label: "fiable", samples_count: 8 },
+      distribution: [{ x: 10 + index, count: 20 }],
+      weeklyThroughput: [{ week: "2026-01-01", throughput: 3 + index }],
+      displayPercentiles: { P50: 10 + index, P70: 12 + index, P90: 15 + index },
+      decisionDiagnostic: diagnostic(index === 0 ? "supportable" : index === 1 ? "caution" : "arbitration_required"),
+    }));
     const html = buildPortfolioPrintReportHtml({
       selectedProject: "Projet A",
       startDate: "2026-01-01",
@@ -133,7 +151,7 @@ test("portfolio PDF: the comparison occupies one page before scenario details", 
       backlogSize: 120,
       targetWeeks: 12,
       scenarios,
-      sections: [],
+      sections,
       portfolioComparisonDiagnostic: {
         historicalData: { quality: "fragile", observedFacts: [], teamFindings: [] },
         simulationStability: [],
@@ -151,12 +169,13 @@ test("portfolio PDF: the comparison occupies one page before scenario details", 
     });
     const reportDocument = document.implementation.createHTMLDocument("portfolio");
     reportDocument.documentElement.innerHTML = html;
-    await downloadPortfolioPdf(reportDocument, "Projet A");
+    await downloadPortfolioPdf(reportDocument, "Projet A", true);
   });
   const download = await downloadPromise;
   const pdf = await readFile(await download.path());
   const pdfText = pdf.toString("latin1");
   const pageCount = (pdfText.match(/\/Type\s*\/Page\b/g) ?? []).length;
 
-  expect(pageCount).toBe(6);
+  expect(pageCount).toBe(9);
+  expect(pdfText).not.toContain("Comparaison des hypothèses — suite");
 });

@@ -261,6 +261,25 @@ const COMPARISON_LINE_HEIGHT = 4;
 const COMPARISON_BLOCK_GAP = 2;
 const COMPARISON_SECTION_GAP = 3;
 const COMPARISON_BOTTOM_MARGIN = 8;
+const COMPARISON_CARD_COLUMN_GAP = 4;
+const COMPARISON_CARD_PADDING = 3;
+
+type ComparisonScenarioCard = {
+  title: string;
+  evidenceType: string;
+  evidence: string;
+  limitsTitle: string;
+  limits: string[];
+};
+
+type MeasuredComparisonScenarioCard = ComparisonScenarioCard & {
+  titleLines: string[];
+  evidenceTypeLines: string[];
+  evidenceLines: string[];
+  limitsTitleLines: string[];
+  limitLines: string[][];
+  height: number;
+};
 
 function ensureSpace(layout: ComparisonPdfLayout, requiredHeight: number, continuationHeading = ""): number {
   if (layout.cursorY + requiredHeight <= layout.pageH - COMPARISON_BOTTOM_MARGIN) return layout.cursorY;
@@ -346,57 +365,128 @@ function drawBulletList(layout: ComparisonPdfLayout, items: string[]): number {
   return layout.cursorY;
 }
 
-function drawScenarioEvidenceBlock(layout: ComparisonPdfLayout, scenario: HTMLElement): number {
-  const title = scenario.querySelector("h3")?.textContent?.trim() ?? "";
-  const evidenceType = scenario.querySelector(".comparison-evidence-type")?.textContent?.trim() ?? "";
-  const evidence = Array.from(scenario.querySelectorAll("p")).find((paragraph) => !paragraph.classList.contains("comparison-evidence-type"))?.textContent?.trim() ?? "";
-  const limitsTitle = scenario.querySelector("h4")?.textContent?.trim() ?? "";
-  const limits = Array.from(scenario.querySelectorAll("li")).map((item) => item.textContent.trim()).filter(Boolean);
-  const paragraphWidth = layout.contentW - 3;
-  const bulletWidth = layout.contentW - 6;
-  const titleLines = splitPdfText(layout.pdf, title, paragraphWidth);
-  const evidenceTypeLines = splitPdfText(layout.pdf, evidenceType, paragraphWidth);
-  const evidenceLines = splitPdfText(layout.pdf, evidence, paragraphWidth);
-  const limitsTitleLines = splitPdfText(layout.pdf, limitsTitle, paragraphWidth);
-  const limitLines = limits.map((limit) => splitPdfText(layout.pdf, limit, bulletWidth));
-  const renderedBlockHeight = 4
+function extractComparisonScenarioCard(scenario: HTMLElement): ComparisonScenarioCard {
+  return {
+    title: scenario.querySelector("h3")?.textContent?.trim() ?? "",
+    evidenceType: scenario.querySelector(".comparison-evidence-type")?.textContent?.trim() ?? "",
+    evidence: Array.from(scenario.querySelectorAll("p"))
+      .find((paragraph) => !paragraph.classList.contains("comparison-evidence-type"))?.textContent?.trim() ?? "",
+    limitsTitle: scenario.querySelector("h4")?.textContent?.trim() ?? "",
+    limits: Array.from(scenario.querySelectorAll("li")).map((item) => item.textContent.trim()).filter(Boolean),
+  };
+}
+
+function measureComparisonScenarioCard(
+  pdf: jsPDF,
+  card: ComparisonScenarioCard,
+  width: number,
+): MeasuredComparisonScenarioCard {
+  const textWidth = width - COMPARISON_CARD_PADDING * 2;
+  const bulletWidth = textWidth - 3;
+  const titleLines = splitPdfText(pdf, card.title, textWidth);
+  const evidenceTypeLines = splitPdfText(pdf, card.evidenceType, textWidth);
+  const evidenceLines = splitPdfText(pdf, card.evidence, textWidth);
+  const limitsTitleLines = splitPdfText(pdf, card.limitsTitle, textWidth);
+  const limitLines = card.limits.map((limit) => splitPdfText(pdf, limit, bulletWidth));
+  const height = COMPARISON_CARD_PADDING
     + (titleLines.length + evidenceTypeLines.length + evidenceLines.length + limitsTitleLines.length) * COMPARISON_LINE_HEIGHT
     + 1
-    + limitLines.reduce((height, lines) => height + lines.length * COMPARISON_LINE_HEIGHT + 1, 0)
-    + COMPARISON_BLOCK_GAP
-    + 2;
+    + limitLines.reduce((total, lines) => total + lines.length * COMPARISON_LINE_HEIGHT + 1, 0)
+    + COMPARISON_CARD_PADDING;
 
-  if (renderedBlockHeight > layout.pageH - layout.margin - COMPARISON_BOTTOM_MARGIN) {
-    drawHeading(layout, title, 2);
-    drawLabelValue(layout, "Type de preuve", evidenceType);
-    drawParagraph(layout, evidence);
-    drawHeading(layout, limitsTitle, 2);
-    return drawBulletList(layout, limits);
+  return {
+    ...card,
+    titleLines,
+    evidenceTypeLines,
+    evidenceLines,
+    limitsTitleLines,
+    limitLines,
+    height,
+  };
+}
+
+function drawMeasuredComparisonScenarioCard(
+  pdf: jsPDF,
+  card: MeasuredComparisonScenarioCard,
+  x: number,
+  y: number,
+  width: number,
+): void {
+  applyThinBlackBorder(pdf);
+  pdf.rect(x, y, width, card.height, "S");
+  let textY = y + COMPARISON_CARD_PADDING;
+  const drawLines = (lines: string[], bold = false, gapAfter = 0): void => {
+    pdf.setFont("helvetica", bold ? "bold" : "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(lines, x + COMPARISON_CARD_PADDING, textY);
+    textY += lines.length * COMPARISON_LINE_HEIGHT + gapAfter;
+  };
+  drawLines(card.titleLines, true);
+  drawLines(card.evidenceTypeLines, true);
+  drawLines(card.evidenceLines, false, 1);
+  drawLines(card.limitsTitleLines, true);
+  card.limitLines.forEach((lines) => {
+    pdf.text(
+      lines.map((line, index) => index === 0 ? `• ${line}` : line),
+      x + COMPARISON_CARD_PADDING,
+      textY,
+    );
+    textY += lines.length * COMPARISON_LINE_HEIGHT + 1;
+  });
+}
+
+function drawComparisonScenarioFallback(
+  layout: ComparisonPdfLayout,
+  card: ComparisonScenarioCard,
+): number {
+  const measuredCard = measureComparisonScenarioCard(layout.pdf, card, layout.contentW);
+  const pageCapacity = layout.pageH - layout.margin - COMPARISON_BOTTOM_MARGIN;
+  if (measuredCard.height <= pageCapacity) {
+    ensureSpace(layout, measuredCard.height, layout.continuationTitle);
+    drawMeasuredComparisonScenarioCard(
+      layout.pdf,
+      measuredCard,
+      layout.margin,
+      layout.cursorY,
+      layout.contentW,
+    );
+    layout.cursorY += measuredCard.height + COMPARISON_SECTION_GAP;
+    return layout.cursorY;
   }
 
-  ensureSpace(layout, renderedBlockHeight, layout.continuationTitle);
-  const blockTop = layout.cursorY;
-  const blockBottom = blockTop + renderedBlockHeight;
-  applyThinBlackBorder(layout.pdf);
-  layout.pdf.rect(layout.margin, blockTop, layout.contentW, renderedBlockHeight, "S");
-  layout.cursorY += 4;
-  const drawBlockLines = (lines: string[], bold = false, indent = 3, gapAfter = 0): void => {
-    layout.pdf.setFont("helvetica", bold ? "bold" : "normal");
-    layout.pdf.setFontSize(8);
-    layout.pdf.setTextColor(0, 0, 0);
-    layout.pdf.text(lines, layout.margin + indent, layout.cursorY);
-    layout.cursorY += lines.length * COMPARISON_LINE_HEIGHT + gapAfter;
-  };
-  drawBlockLines(titleLines, true);
-  drawBlockLines(evidenceTypeLines, true);
-  drawBlockLines(evidenceLines, false, 3, 1);
-  drawBlockLines(limitsTitleLines, true);
-  limitLines.forEach((lines) => {
-    layout.pdf.text(lines.map((line, index) => index === 0 ? `• ${line}` : line), layout.margin + 3, layout.cursorY);
-    layout.cursorY += lines.length * COMPARISON_LINE_HEIGHT + 1;
+  drawHeading(layout, card.title, 2);
+  drawLabelValue(layout, "Type de preuve", card.evidenceType);
+  drawParagraph(layout, card.evidence);
+  drawHeading(layout, card.limitsTitle, 2);
+  return drawBulletList(layout, card.limits);
+}
+
+function drawComparisonScenarioRow(
+  layout: ComparisonPdfLayout,
+  cards: ComparisonScenarioCard[],
+): number {
+  const columnWidth = (layout.contentW - COMPARISON_CARD_COLUMN_GAP) / 2;
+  const measuredCards = cards.map((card) => measureComparisonScenarioCard(layout.pdf, card, columnWidth));
+  const rowHeight = Math.max(...measuredCards.map((card) => card.height));
+  const pageCapacity = layout.pageH - layout.margin - COMPARISON_BOTTOM_MARGIN;
+  if (rowHeight > pageCapacity) {
+    cards.forEach((card) => drawComparisonScenarioFallback(layout, card));
+    return layout.cursorY;
+  }
+
+  ensureSpace(layout, rowHeight, layout.continuationTitle);
+  const rowTop = layout.cursorY;
+  measuredCards.forEach((card, index) => {
+    drawMeasuredComparisonScenarioCard(
+      layout.pdf,
+      card,
+      layout.margin + index * (columnWidth + COMPARISON_CARD_COLUMN_GAP),
+      rowTop,
+      columnWidth,
+    );
   });
-  layout.cursorY += COMPARISON_BLOCK_GAP;
-  layout.cursorY = blockBottom + COMPARISON_SECTION_GAP;
+  layout.cursorY = rowTop + rowHeight + COMPARISON_SECTION_GAP;
   return layout.cursorY;
 }
 
@@ -424,7 +514,10 @@ function addComparisonPage(pdf: jsPDF, section: HTMLElement, margin: number, con
   const scenarioBlocks = Array.from(section.querySelectorAll<HTMLElement>(".comparison-hypothesis"));
   if (scenarioBlocks.length) {
     drawHeading(layout, section.querySelector(".comparison-hypotheses")?.previousElementSibling?.textContent?.trim() ?? "Lecture comparative", 2);
-    scenarioBlocks.forEach((scenario) => drawScenarioEvidenceBlock(layout, scenario));
+    const scenarioCards = scenarioBlocks.map(extractComparisonScenarioCard);
+    for (let index = 0; index < scenarioCards.length; index += 2) {
+      drawComparisonScenarioRow(layout, scenarioCards.slice(index, index + 2));
+    }
   }
 
   const factsHeading = Array.from(section.querySelectorAll<HTMLElement>(".section > h2"))

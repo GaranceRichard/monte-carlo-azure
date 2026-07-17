@@ -825,22 +825,27 @@ describe("simulationPdfDownload", () => {
     expect(firstPageText).toContain("Crédibilité des hypothèses portefeuille");
     expect(firstPageText).not.toMatch(/^Comparaison des hypothèses$/);
     const comparisonRects = pdf.rect.mock.calls
-      .map((call) => ({ y: Number(call[1]), height: Number(call[3]) }))
-      .filter((rect) => Number.isFinite(rect.y) && Number.isFinite(rect.height));
+      .map((call) => ({ x: Number(call[0]), y: Number(call[1]), width: Number(call[2]), height: Number(call[3]) }))
+      .filter((rect) => Number.isFinite(rect.x) && Number.isFinite(rect.y) && Number.isFinite(rect.height));
     expect(comparisonRects).toHaveLength(4);
-    comparisonRects.slice(1).forEach((rect, index) => {
-      const previous = comparisonRects[index]!;
-      expect(rect.y).toBeGreaterThanOrEqual(previous.y + previous.height);
-    });
+    expect(comparisonRects[0]?.y).toBe(comparisonRects[1]?.y);
+    expect(comparisonRects[0]?.x).toBeLessThan(comparisonRects[1]?.x ?? 0);
+    expect(comparisonRects[0]?.width).toBe(comparisonRects[1]?.width);
+    expect(comparisonRects[2]?.y).toBe(comparisonRects[3]?.y);
+    expect(comparisonRects[2]?.x).toBeLessThan(comparisonRects[3]?.x ?? 0);
+    expect(comparisonRects[2]?.y).toBeGreaterThanOrEqual(
+      (comparisonRects[0]?.y ?? 0) + Math.max(comparisonRects[0]?.height ?? 0, comparisonRects[1]?.height ?? 0),
+    );
     const findTextY = (text: string): number => {
       const call = pdf.text.mock.calls.find(([content]) => (Array.isArray(content) ? content.join(" ") : String(content)).includes(text));
       expect(call).toBeDefined();
       return Number(call?.[2]);
     };
-    const correlatedBlock = comparisonRects.at(-1)!;
+    const lastRowBottom = Math.max(
+      ...comparisonRects.slice(2).map((rect) => rect.y + rect.height),
+    );
     const factsY = findTextY("Faits à vérifier");
-    expect(factsY).toBeGreaterThan(correlatedBlock.y + correlatedBlock.height);
-    expect(factsY - (correlatedBlock.y + correlatedBlock.height)).toBeGreaterThan(0);
+    expect(factsY).toBeGreaterThan(lastRowBottom);
     [
       ["Niveau de confiance comparatif", "Confiance insuffisante."],
       ["Recommandation issue des preuves", "Aucune recommandation de scénario issue des preuves disponibles."],
@@ -857,6 +862,8 @@ describe("simulationPdfDownload", () => {
     expect(pdf.text.mock.calls
       .filter((_call, index) => (pdf.text.mock.invocationCallOrder[index] ?? 0) < nextPageOrder)
       .every((call) => Number(call[2]) >= 8 && Number(call[2]) <= 289)).toBe(true);
+    expect(firstPageText).not.toContain("Comparaison des hypothèses — suite");
+    expect(pdf.addPage).toHaveBeenCalledTimes(1);
   });
 
   it("preserves explicit separators between team diagnostic fields in the PDF", async () => {

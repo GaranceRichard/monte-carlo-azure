@@ -11,7 +11,7 @@
   choisir facultativement une reference de pilotage, sans selection par defaut et hors du diagnostic metier
 - distinction explicite dans le rapport entre recommandation issue des preuves, preconisation de demarche et
   reference de pilotage choisie comme convention de gouvernance
-- libelle utilisateur `Independant` harmonise dans la synthese, les legendes et les pages du rapport; lecture
+- libelle utilisateur `Indépendant` harmonise dans la synthese, les legendes et les pages du rapport; lecture
   prudente alignee sur le percentile P90 effectivement expose et diagnostics d'equipe rendus sans concatenation
 - alignement des diagnostics decisionnels entre l'interface et les rapports PDF simulation / portefeuille:
   statuts, justifications, actions conseillees, facteurs, qualite des donnees et incertitude reutilisent

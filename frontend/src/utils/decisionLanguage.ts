@@ -164,6 +164,11 @@ function findRecommendationFactor(
   return recommendation.factors.find((factor) => codes.includes(factor.code));
 }
 
+function isCensoredForecastCause(factor: DecisionLanguageFactor | undefined): boolean {
+  if (!factor) return false;
+  return typeof factor.value === "number" ? factor.value > 0 : true;
+}
+
 function buildRecommendationCauses({
   dataQuality,
   decisionRecommendation,
@@ -217,7 +222,7 @@ function buildRecommendationCauses({
           : "La période récente offre encore peu de recul historique.",
     });
   }
-  if (censoredForecast) {
+  if (censoredForecast && isCensoredForecastCause(censoredForecast)) {
     causes.push({
       kind: "censoredForecast",
       explanation: `${String(censoredForecast.value ?? "Certaines")} simulations n'aboutissent pas dans l'horizon prévu.`,
@@ -278,6 +283,12 @@ function buildRecommendationAction(
       return "Utiliser la période récente comme référence prudente et vérifier si la baisse de capacité se confirme.";
     }
     return "Comparer la période récente à la période longue avant de retenir une référence d'engagement.";
+  }
+  if (
+    kinds.has("highDispersion")
+    && (kinds.has("limitedHistory") || kinds.has("usableHistory"))
+  ) {
+    return "Planifier sur le P70, conserver le P90 comme marge de sécurité et vérifier la stabilité de la capacité sur quelques semaines supplémentaires.";
   }
   if (kinds.has("limitedHistory") || kinds.has("usableHistory")) {
     return "Vérifier la stabilité de la capacité récente sur quelques semaines supplémentaires.";

@@ -164,6 +164,28 @@ describe("usePortfolioReport", () => {
     expect(result.current.portfolioComparisonDiagnostic).not.toBeNull();
   });
 
+  it("keeps four portfolio scenarios and no artificial recommendation in demo mode", async () => {
+    vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
+    vi.mocked(simulateForecastFromSamples).mockResolvedValue(simulationResult);
+    const { result } = setupReportHook({ demoMode: true });
+
+    await act(async () => {
+      await result.current.handleGenerateReport();
+    });
+
+    const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
+    expect(exportArgs.isDemo).toBe(true);
+    expect(exportArgs.scenarios.map((scenario) => scenario.label)).toEqual([
+      "Optimiste",
+      "Arrime (80%)",
+      "Friction (80%)",
+      "Historique corrélé",
+    ]);
+    expect(exportArgs.portfolioComparisonDiagnostic?.preferredScenario).toBeNull();
+    expect(vi.mocked(fetchTeamThroughput).mock.calls.every(([input]) => input.demoMode === true)).toBe(true);
+    expect(vi.mocked(simulateForecastFromSamples).mock.calls.every(([input]) => input.demoMode === true)).toBe(true);
+  });
+
   it("uses local calendar dates for synthetic scenario weeks", async () => {
     vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
     vi.mocked(simulateForecastFromSamples).mockResolvedValue(simulationResult);

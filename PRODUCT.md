@@ -169,8 +169,8 @@ Le mode portefeuille permet de :
 
 Les scenarios actuellement proposes sont :
 
-- `Independant`
-- `Arrime`
+- `Indépendant`
+- `Arrimé`
 - `Friction`
 - `Historique corrélé`
 

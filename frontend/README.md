@@ -108,8 +108,8 @@ Le frontend couvre notamment :
 - historique local versionné : les anciennes entrées sans `schemaVersion` sont migrées une seule fois
   de semaines vers jours calendaires pour le `Cycle Time`
 - mode portefeuille multi-équipes
-  - scénario `Independant` : somme des tirages indépendants par équipe
-  - scénario `Arrime` : réduction du scénario indépendant par le facteur d’arrimage
+  - scénario `Indépendant` : somme des tirages indépendants par équipe
+  - scénario `Arrimé` : réduction du scénario indépendant par le facteur d’arrimage
   - scénario `Friction` : facteur `alignmentRate^(teamCount - 1)`
   - `1` équipe conserve `100 %` de capacité ; la pénalité commence à la `2e` équipe
   - le pourcentage affiché dans le rapport reprend exactement le facteur appliqué

@@ -1,8 +1,8 @@
 # Roadmap
 
 Monte Carlo Azure est un outil d’aide à la décision pour la planification sous incertitude.
-Cette roadmap exprime les priorités en termes de valeur livrée et de confiance décisionnelle ;
-elle ne constitue pas un backlog technique.
+Cette roadmap exprime une trajectoire produit orientée valeur et confiance décisionnelle ;
+elle ne constitue pas un backlog technique ni une promesse de calendrier.
 
 ---
 
@@ -10,114 +10,123 @@ elle ne constitue pas un backlog technique.
 
 - Simulation Monte Carlo à partir du throughput réel Azure DevOps, en mode équipe et portefeuille,
   pour répondre aux questions « en combien de temps ? » et « combien d’items en N semaines ? ».
-- Restitutions interface et PDF des percentiles, distributions, censures à l’horizon et `Risk Score`,
-  avec export CSV du throughput et rapports directement téléchargeables.
-- Quatre hypothèses d’agrégation portefeuille comparables : `Independant`, `Arrime`, `Friction` et
-  `Historique corrélé`.
-- Comparaison de crédibilité des hypothèses portefeuille : la qualité des données historiques, la
-  stabilité des résultats simulés et la crédibilité de l’hypothèse sont trois diagnostics distincts.
-- Types de preuve explicites : `observed`, `calculated`, `user_input` et `unsupported`.
-- Absence de recommandation automatique lorsqu’aucune preuve ne permet de privilégier une hypothèse :
-  cette conclusion est un résultat métier, pas une erreur à masquer.
-- Distinction entre une recommandation fondée sur les données et une référence de pilotage choisie par
-  l’utilisateur ; cette dernière est facultative et ne modifie ni les calculs ni la crédibilité attribuée
-  aux scénarios.
+- Contrat de simulation borné, tirages reproductibles par `seed` et traitement explicite des censures
+  lorsque le backlog n’est pas terminé à l’horizon.
+- Restitutions dans l’interface et les PDF des percentiles, distributions et diagnostics, avec export CSV
+  du throughput et rapports directement téléchargeables.
+- Qualité des données, incertitude de prévision et recommandation d’arbitrage séparées du `Risk Score` ;
+  lorsque des historiques locaux comparables existent, la sensibilité entre période récente et période
+  longue complète cette lecture.
+- Quatre hypothèses d’agrégation portefeuille comparables : `Indépendant`, `Arrimé`, `Friction` et
+  `Historique corrélé`, avec une lecture distincte de la qualité des historiques, de la stabilité des
+  résultats simulés et de la crédibilité de chaque hypothèse.
+- Aucune recommandation automatique de scénario lorsque les preuves sont insuffisantes. Une référence de
+  pilotage peut être choisie comme convention de gouvernance, sans modifier les calculs ni la crédibilité
+  attribuée aux hypothèses.
 - Connexion Azure DevOps Cloud et Server/TFS depuis le navigateur, sans faire transiter le PAT ou le
-  contexte Azure DevOps par le backend.
-- Contrôles qualité adaptatifs livrés avec trois niveaux explicables (`targeted`, `impacted`, `massive`) :
-  le pré-commit valide l’index Git, le pré-push valide les commits poussés dans des worktrees détachés et
-  la CI conserve le plan complet avec smoke test Docker.
-- Chaîne de couverture fiabilisée : suppression des doubles exécutions, seuils E2E réellement bloquants,
-  artefacts identifiés et réutilisés par les Vitals, et temporaires Pytest isolés dans le workspace.
-- Documentation normative réalignée sur les gates, la couverture, la traçabilité et les critères de
-  validation complète, de conformité DoD et de publiabilité.
+  contexte Azure DevOps par le backend. Le throughput et le `Cycle Time` conservent des définitions, des
+  sources et des unités distinctes.
+- Chaîne qualité adaptative et contrôles de couverture livrés, avec traçabilité des points vitaux et
+  critères distincts pour la validation complète, la conformité DoD et la publiabilité.
 
 ---
 
-## Maintenant — Fiabiliser les données qui fondent l’arbitrage
+## Maintenant — Consolider la confiance dans les données et les prévisions
 
-**Une baseline de performance reproductible**
+**Fiabilité des données Azure DevOps**
 
-Établir une baseline de performance reproductible afin de mesurer les régressions de façon comparable et
-de prioriser les optimisations sur des faits, maintenant que la chaîne de validation adaptative est en
-place.
+Continuer à rendre visibles la profondeur d’historique, les collectes partielles et les limites de
+complétude, sans confondre qualité du throughput et qualité du `Cycle Time`, et sans fragiliser la
+compatibilité Cloud et Server/TFS.
 
-*Valeur : préserver la confiance dans les projections, les exports et les parcours critiques tout en
-disposant d’un repère objectif de vitesse et de capacité.*
+*Valeur : permettre de savoir si les données disponibles soutiennent réellement l’arbitrage avant de lire
+la projection.*
 
-**Une collecte Azure DevOps qui ne mélange pas les signaux**
+**Contexte d’itération observable**
 
-Fiabiliser la collecte Azure DevOps en découplant clairement le throughput et le cycle time : chacun doit
-conserver sa définition, ses sources et ses limites de qualité. Intégrer les limites de sprint disponibles
-dans Azure DevOps Cloud et Server, sans dégrader la compatibilité entre les deux environnements.
+Collecter progressivement les itérations pertinentes sur Azure DevOps Cloud et Server/TFS, puis rendre
+leurs limites visibles dans les graphiques et les rapports en signalant les périodes partielles ou
+indisponibles. Les variations de throughput et de `Cycle Time` pourront ainsi être mises en regard du
+contexte d’itération, tout en conservant des définitions et des sources distinctes pour ces deux mesures.
 
-*Valeur : éviter qu’un indicateur de flux ou de délai ne soit interprété à partir de données incomplètes,
-ou d’une règle de sprint implicite.*
+*Valeur : replacer les variations observées dans leur contexte opérationnel sans transformer une
+coïncidence temporelle en relation de causalité.*
 
-**Des limites de sprint visibles au moment de décider**
+**Robustesse statistique et crédibilité des hypothèses**
 
-Restituer les limites de sprint Azure DevOps dans l’interface et dans les PDF, avec une formulation qui
-permet de comprendre leur effet sur la lecture de la projection et du portefeuille.
+Outiller progressivement la calibration et le backtesting des hypothèses de prévision et d’agrégation
+portefeuille. Ces travaux doivent éprouver les hypothèses face aux observations, sans transformer la
+stabilité d’une distribution en preuve ni sélectionner automatiquement un scénario.
 
-*Valeur : rendre les hypothèses de capacité vérifiables en comité, au même titre que les percentiles et
-les diagnostics déjà affichés.*
+*Valeur : distinguer une projection calculable d’une hypothèse suffisamment étayée pour soutenir une
+décision.*
 
----
+**Socle de maintenabilité vérifiable**
 
-## Ensuite — Renforcer la robustesse des prévisions et préparer la croissance
+Établir une baseline de maintenabilité et de complexité, puis protéger progressivement le produit contre
+de nouvelles concentrations de responsabilités. La séparation des responsabilités métier, applicatives,
+d’infrastructure et de présentation, la cohérence des contrats entre Python et TypeScript ainsi que les
+règles statistiques et décisionnelles partagées doivent rester vérifiables et démontrables. Cette démarche
+vise d’abord les nouvelles dérives et les risques prioritaires, sans imposer la résorption immédiate de
+toute la dette existante.
 
-**Des projections vérifiables dans le temps**
+*Valeur : préserver la confiance dans les résultats et réduire le risque de régression à mesure que le
+produit évolue.*
 
-Renforcer la robustesse statistique avec des contrats cohérents entre Python et TypeScript, du backtesting
-des hypothèses et des diagnostics de concentration de fin de sprint. Compléter cette lecture par la
-comparaison de périodes, afin d’identifier l’effet d’un changement d’organisation, de périmètre ou
-d’onboarding sur le delivery.
+**Performance mesurable**
 
-*Valeur : distinguer une projection calculable d’une projection dont les hypothèses restent crédibles face
-aux résultats observés.*
+Établir une baseline reproductible pour la collecte Azure DevOps, les simulations, la génération des
+rapports et les parcours utilisateur associés avant de prioriser les optimisations.
 
-**Un socle qui évolue sans fragiliser le produit**
-
-Restructurer progressivement l’architecture afin d’isoler les responsabilités métier et de conserver les
-invariants de sécurité. Optimiser les performances à partir de la baseline et préparer le passage à
-l’échelle des simulations, de la collecte et de la génération de rapports.
-
-*Valeur : maintenir une expérience fluide et des résultats cohérents lorsque les volumes, les équipes et
-les usages augmentent.*
-
-**Des restitutions adaptées aux instances existantes**
-
-Ajouter des exports structurés pour les outils de reporting programme lorsque les décisions doivent être
-réutilisées au-delà du PDF de comité.
-
-*Valeur : réduire la préparation manuelle des instances de gouvernance sans dupliquer les chiffres ou les
-hypothèses.*
+*Valeur : préserver des parcours et des exports fiables à mesure que les volumes et les usages augmentent.*
 
 ---
 
-## Plus tard — Faire du portefeuille un outil d’arbitrage de programme
+## Ensuite — Faire évoluer le socle et les restitutions
 
-**Un portefeuille qui explicite les relations entre équipes**
+**Architecture évolutive**
 
-Enrichir le pilotage portefeuille avec les dépendances, contraintes, règles de substituabilité et diagnostics
-multi-équipes. Les scénarios actuels rendent les hypothèses comparables ; cette étape rendra visibles les
-relations opérationnelles qui peuvent les justifier, les limiter ou les invalider.
+Réduire progressivement les concentrations de responsabilités et faire évoluer les frontières de la
+collecte Azure DevOps, de l’orchestration des simulations, des rapports et exports, du backend et de
+l’infrastructure qualité. Cette évolution doit préserver la frontière d’identité Azure DevOps ; ses choix
+restent à valider à partir des besoins et des mesures, sans imposer de réécriture ni de modèle
+d’architecture prédéterminé.
 
-*Valeur : anticiper les effets de cascade et rendre les arbitrages de ressources plus explicites avant que
-les retards ne se matérialisent.*
+*Valeur : faire évoluer le produit sans dégrader la cohérence des résultats ni ses invariants de sécurité.*
 
-**Une vue direction de programme**
+**Exports pour le reporting programme**
 
-Consolider plusieurs projets dans une vue de portefeuille avec des niveaux de risque, des contraintes et des
-signaux de maturité comparables. Cette vue s’appuiera sur les diagnostics d’historique, de prévision et de
-crédibilité, sans les réduire à un score unique.
+Ajouter des restitutions structurées pour réutiliser les décisions, les chiffres et leurs hypothèses dans
+les outils de reporting existants, au-delà des PDF de comité.
 
-*Valeur : permettre aux directions programme et transformation d’arbitrer priorités et capacité sur une
-base probabiliste commune, tout en conservant les limites des données visibles.*
+*Valeur : réduire la préparation manuelle des instances de gouvernance sans dupliquer ni décontextualiser
+les résultats.*
 
 ---
 
-## Ce qui ne fait pas partie de la roadmap
+## Plus tard — Étendre le pilotage de programme
+
+**Relations opérationnelles entre équipes**
+
+Enrichir le portefeuille avec des dépendances, contraintes et règles de substituabilité explicites. Les
+scénarios actuels comparent des hypothèses ; ils ne démontrent pas à eux seuls les relations opérationnelles
+qui pourraient les justifier ou les invalider.
+
+*Valeur : rendre les effets de cascade et les arbitrages de ressources discutables sur des éléments
+observables.*
+
+**Vue direction de programme**
+
+Consolider plusieurs projets dans une vue commune avec des risques, des contraintes et des signaux de
+maturité comparables. Cette vue devra conserver séparées la qualité des données, l’incertitude de prévision,
+la crédibilité des hypothèses et la décision humaine, sans les réduire à un score unique.
+
+*Valeur : soutenir les arbitrages de priorité et de capacité à l’échelle programme tout en gardant les
+limites des données visibles.*
+
+---
+
+## Hors roadmap
 
 - gestion de backlog : l’outil lit Azure DevOps, il ne le remplace pas ;
 - estimation par story points : le modèle repose intentionnellement sur le throughput réel ;
