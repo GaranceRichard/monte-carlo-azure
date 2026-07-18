@@ -2,12 +2,12 @@
 
 ## Monte Carlo Azure
 
-Monte Carlo Azure est un outil d'aide a la decision pour la planification sous incertitude.
+Monte Carlo Azure est un outil d'aide à la décision pour la planification sous incertitude.
 Il transforme un historique Azure DevOps en projections probabilistes exploitables, sans exposer le PAT Azure DevOps au backend.
 
 ## Positionnement
 
-Le produit s'adresse en priorite a :
+Le produit s'adresse en priorité à :
 
 - directeur de projet
 - PMO
@@ -15,227 +15,227 @@ Le produit s'adresse en priorite a :
 - responsables portefeuille
 - directions programme ou transformation
 
-Le produit ne remplace pas le jugement managerial. Il rend l'incertitude visible, mesurable et actionnable.
+Le produit ne remplace pas le jugement managérial. Il rend l'incertitude visible, mesurable et actionnable.
 
-Trois dimensions metier restent distinctes :
+Trois dimensions métier restent distinctes :
 
-- la qualite des donnees qualifie la profondeur historique, la completude et les collectes Azure DevOps partielles ;
-- l'incertitude de prevision qualifie la dispersion, la volatilite, les censures et la possibilite de calculer les percentiles requis ;
-- la recommandation d'arbitrage traduit ces diagnostics en decision supportable, decision sous precautions, arbitrage humain ou blocage.
+- la qualité des données qualifie la profondeur historique, la complétude et les collectes Azure DevOps partielles ;
+- l'incertitude de prévision qualifie la dispersion, la volatilité, les censures et la possibilité de calculer les percentiles requis ;
+- la recommandation d'arbitrage traduit ces diagnostics en décision supportable, décision sous précautions, arbitrage humain ou blocage.
 
-Le `Risk Score` conserve son calcul actuel a partir de `P50` et `P90` : il n'est ni une mesure de qualite des donnees, ni un substitut aux diagnostics ou a la recommandation.
+Le `Risk Score` conserve son calcul actuel à partir de `P50` et `P90` : il n'est ni une mesure de qualité des données, ni un substitut aux diagnostics ou à la recommandation.
 
-## Probleme traite
+## Problème traité
 
-Les decisions de planification reposent encore souvent sur :
+Les décisions de planification reposent encore souvent sur :
 
 - des estimations subjectives
 - des moyennes historiques peu explicites
-- des story points heterogenes
-- des engagements calendaires non probabilises
+- des story points hétérogènes
+- des engagements calendaires non probabilisés
 
-Les effets observes sont connus :
+Les effets observés sont connus :
 
 - engagements intenables
 - arbitrages tardifs
-- tensions operationnelles
-- perte de credibilite en comite
+- tensions opérationnelles
+- perte de crédibilité en comité
 
-Monte Carlo Azure repond a ce probleme en produisant des distributions probabilistes a partir du throughput reel.
+Monte Carlo Azure répond à ce problème en produisant des distributions probabilistes à partir du throughput réel.
 
 ## Proposition de valeur
 
 Le produit permet de :
 
-- securiser une date a partir d'un backlog restant
-- convertir un horizon cible en capacite livrable probable
-- visualiser la dispersion et la stabilite d'un scenario
-- consolider plusieurs equipes dans une lecture portefeuille
+- sécuriser une date à partir d'un backlog restant
+- convertir un horizon cible en capacité livrable probable
+- visualiser la dispersion et la stabilité d'un scénario
+- consolider plusieurs équipes dans une lecture portefeuille
 - expliciter un niveau de risque via percentiles et `Risk Score`
 
 Valeur attendue :
 
-- decisions explicitees par niveau de confiance
-- arbitrages scope / delai plus structures
+- décisions explicitées par niveau de confiance
+- arbitrages scope / délai plus structurés
 - dialogue directionnel plus serein
-- preparation COPIL plus rapide
+- préparation COPIL plus rapide
 
-## Capacites produit actuelles
+## Capacités produit actuelles
 
-Fonctionnalites actuellement presentes dans le produit :
+Fonctionnalités actuellement présentes dans le produit :
 
-- page publique GitHub Pages pour decouvrir le produit sans backend
-- mode demo accessible publiquement pour illustrer le parcours et les restitutions
-- notice publique de connexion pour expliquer le mode Azure DevOps reel
-- connexion Azure DevOps avec PAT cote navigateur
-- selection organisation -> projet -> equipe
-- simulation Monte Carlo cote backend via `POST /simulate`
+- page publique GitHub Pages pour découvrir le produit sans backend
+- mode démo accessible publiquement pour illustrer le parcours et les restitutions
+- notice publique de connexion pour expliquer le mode Azure DevOps réel
+- connexion Azure DevOps avec PAT côté navigateur
+- sélection organisation -> projet -> équipe
+- simulation Monte Carlo côté backend via `POST /simulate`
 - deux modes de projection :
   - backlog vers semaines
   - semaines vers items
 - visualisation des percentiles et distributions
 - affichage d'un `Risk Score`
-- en `backlog_to_weeks`, les censures a l'horizon sont explicites et lues a part
+- en `backlog_to_weeks`, les censures à l'horizon sont explicites et lues à part
 - export CSV du throughput hebdomadaire
-- historique local des simulations recentes, contextualise par equipe dans le navigateur
-- cookie client `IDMontecarlo` pour relier un client anonyme a son historique persiste
-- persistence MongoDB et restitution des 10 dernieres simulations statistiques anonymes via `/simulations/history`
-- configuration rapide des filtres types + etats, memorisee localement
-- mode `Portefeuille` multi-equipes
-- rapport PDF portefeuille avec synthese decisionnelle et pages detaillees
+- historique local des simulations récentes, contextualisé par équipe dans le navigateur
+- cookie client `IDMontecarlo` pour relier un client anonyme à son historique persisté
+- persistance MongoDB et restitution des 10 dernières simulations statistiques anonymes via `/simulations/history`
+- configuration rapide des filtres types + états, mémorisée localement
+- mode `Portefeuille` multi-équipes
+- rapport PDF portefeuille avec synthèse décisionnelle et pages détaillées
 
-Regle produit sur l'historique hebdomadaire :
+Règle produit sur l'historique hebdomadaire :
 
-- une semaine utilisable est une semaine complete du lundi au dimanche
-- elle doit etre entierement comprise dans la periode selectionnee
-- elle doit etre deja completement ecoulee au moment du calcul
-- la semaine courante n'est donc jamais injectee partiellement dans la simulation
+- une semaine utilisable est une semaine complète du lundi au dimanche
+- elle doit être entièrement comprise dans la période sélectionnée
+- elle doit être déjà complètement écoulée au moment du calcul
+- la semaine courante n'est donc jamais injectée partiellement dans la simulation
 
-## Parcours de demo
+## Parcours de démo
 
-Le produit propose un parcours de demonstration publique via GitHub Pages pour permettre une prise en main immediate sans prerequis technique ni backend actif.
+Le produit propose un parcours de démonstration publique via GitHub Pages pour permettre une prise en main immédiate sans prérequis technique ni backend actif.
 
 Processus cible :
 
-- l'utilisateur arrive directement sur la demo publique
-- il commence sur un ecran de choix d'equipe qui presente les deux parcours disponibles
+- l'utilisateur arrive directement sur la démo publique
+- il commence sur un écran de choix d'équipe qui présente les deux parcours disponibles
 - il peut ensuite ouvrir la notice de connexion Azure DevOps
-- la demo permet d'explorer le flux et les ecrans avec des donnees preconfigurees
-- les ecrans de choix d'equipe et de simulation signalent explicitement ce contexte via un badge `Démo` dans l'en-tete
-- la notice publique explique ensuite comment basculer vers un usage reel avec Azure DevOps
+- la démo permet d'explorer le flux et les écrans avec des données préconfigurées
+- les écrans de choix d'équipe et de simulation signalent explicitement ce contexte via un badge `Démo` dans l'en-tête
+- la notice publique explique ensuite comment basculer vers un usage réel avec Azure DevOps
 
 Objectif produit :
 
 - rendre la valeur du produit visible avant toute configuration
 - montrer le flux complet sans demander de `PAT`
-- laisser l'utilisateur choisir explicitement entre une lecture equipe et une lecture portefeuille
-- separer clairement la decouverte produit du mode reel connecte a Azure DevOps
+- laisser l'utilisateur choisir explicitement entre une lecture équipe et une lecture portefeuille
+- séparer clairement la découverte produit du mode réel connecté à Azure DevOps
 
 ## Cas d'usage
 
-### 1. Securiser une date
+### 1. Sécuriser une date
 
 Exemple :
 
 - 80 items restants
 - historique de throughput sur plusieurs semaines
-- simulation de plusieurs milliers d'iterations
+- simulation de plusieurs milliers d'itérations
 
 Restitution attendue :
 
-- `P50` pour une lecture mediane
+- `P50` pour une lecture médiane
 - `P90` pour une lecture prudente
   - en `backlog_to_weeks`, prudent = plus de semaines
-- si certaines simulations n'atteignent pas le backlog avant l'horizon, elles sont comptees
-  a part comme censures et n'entrent ni dans la distribution ni dans les percentiles
-  - mais l'identifiabilite d'un `Pxx` continue, elle, d'etre jugee sur le total de simulations
-    lancees: si le rang n'est pas atteignable dans `n_sims`, le percentile reste absent
-- la courbe de probabilite backlog reste plafonnee au taux reel de completion, sans remonter
-  artificiellement a `100%`
+- si certaines simulations n'atteignent pas le backlog avant l'horizon, elles sont comptées
+  à part comme censures et n'entrent ni dans la distribution ni dans les percentiles
+  - mais l'identifiabilité d'un `Pxx` continue, elle, d'être jugée sur le total de simulations
+    lancées : si le rang n'est pas atteignable dans `n_sims`, le percentile reste absent
+- la courbe de probabilité backlog reste plafonnée au taux réel de complétion, sans remonter
+  artificiellement à `100%`
 - `Risk Score` pour objectiver la dispersion
 
-Decision supportee :
+Décision supportée :
 
 - accepter le niveau de risque
-- ajuster le perimetre
-- renforcer la capacite
+- ajuster le périmètre
+- renforcer la capacité
 
-### 2. Arbitrer une capacite cible
+### 2. Arbitrer une capacité cible
 
-Question metier :
+Question métier :
 
-"Combien d'items peut-on livrer en N semaines avec un niveau de confiance donne ?"
+"Combien d'items peut-on livrer en N semaines avec un niveau de confiance donné ?"
 
-Le produit repond a cette question via le mode `weeks_to_items`.
+Le produit répond à cette question via le mode `weeks_to_items`.
 
 Lecture attendue :
 
-- `P50` pour une lecture mediane
+- `P50` pour une lecture médiane
 - `P90` pour une lecture prudente
   - en `weeks_to_items`, prudent = moins d'items garantis
-- `Risk Score` calcule sur les percentiles metier du mode
+- `Risk Score` calculé sur les percentiles métier du mode
   - `backlog_to_weeks`: `(P90 - P50) / P50`
   - `weeks_to_items`: `(P50 - P90) / P50`
-  - si `P50` ou `P90` manque, le score n'est pas affiche
+  - si `P50` ou `P90` manque, le score n'est pas affiché
 
 ### 3. Piloter un portefeuille
 
 Le mode portefeuille permet de :
 
-- selectionner plusieurs equipes
+- sélectionner plusieurs équipes
 - consolider les projections
-- comparer plusieurs hypotheses d'agregation
+- comparer plusieurs hypothèses d'agrégation
 - produire un support exportable pour revue de pilotage
 
-Les scenarios actuellement proposes sont :
+Les scénarios actuellement proposés sont :
 
 - `Indépendant`
 - `Arrimé`
 - `Friction`
 - `Historique corrélé`
 
-Lecture produit du scenario `Historique corrélé` :
+Lecture produit du scénario `Historique corrélé` :
 
-- il ne s'agit pas d'un tirage independant par equipe
-- le portefeuille additionne les throughputs observes sur les memes semaines pour toutes les equipes
-- seules les semaines communes completes sont conservees
-- ce scenario conserve les variations simultanees observees, sans demontrer leurs causes, les dependances
-  operationnelles, la substituabilite des equipes ou leur validite future
+- il ne s'agit pas d'un tirage indépendant par équipe
+- le portefeuille additionne les throughputs observés sur les mêmes semaines pour toutes les équipes
+- seules les semaines communes complètes sont conservées
+- ce scénario conserve les variations simultanées observées, sans démontrer leurs causes, les dépendances
+  opérationnelles, la substituabilité des équipes ou leur validité future
 
-Le diagnostic comparatif portefeuille separe explicitement :
+Le diagnostic comparatif portefeuille sépare explicitement :
 
-- la qualite des historiques observes par equipe et les faits a verifier au niveau portefeuille;
-- la stabilite ou l'incertitude de chaque resultat simule;
-- la credibilite de l'hypothese sous-jacente et son type de preuve: observation, calcul, saisie utilisateur ou
+- la qualité des historiques observés par équipe et les faits à vérifier au niveau portefeuille;
+- la stabilité ou l'incertitude de chaque résultat simulé;
+- la crédibilité de l'hypothèse sous-jacente et son type de preuve: observation, calcul, saisie utilisateur ou
   absence de preuve comparative.
 
-Une distribution stable ne valide pas une hypothese. Avec les seules donnees historiques, les resultats simules
-et un taux d'alignement manuel, le produit ne privilegie aucun scenario unique: la conclusion « preuves
-insuffisantes pour privilegier une hypothese » est un resultat metier valide. Le diagnostic detaille n'est pas
-affiche dans l'interface de generation; il est restitue dans une page dediee du rapport portefeuille PDF, apres
-la synthese et avant le detail des scenarios.
+Une distribution stable ne valide pas une hypothèse. Avec les seules données historiques, les résultats simulés
+et un taux d'alignement manuel, le produit ne privilégie aucun scénario unique: la conclusion « preuves
+insuffisantes pour privilégier une hypothèse » est un résultat métier valide. Le diagnostic détaillé n'est pas
+affiché dans l'interface de génération; il est restitué dans une page dédiée du rapport portefeuille PDF, après
+la synthèse et avant le détail des scénarios.
 
-L'utilisateur peut choisir, sans selection par defaut, un scenario de reference de pilotage. Ce choix facultatif
+L'utilisateur peut choisir, sans sélection par défaut, un scénario de référence de pilotage. Ce choix facultatif
 est une convention de gouvernance distincte de la recommandation issue des preuves: il ne modifie ni
-`preferredScenario`, ni la credibilite des hypotheses, ni les calculs. Lorsque les preuves sont insuffisantes,
-la preconisation porte sur la demarche de documentation, de calibration et de backtest, pas sur un scenario.
+`preferredScenario`, ni la crédibilité des hypothèses, ni les calculs. Lorsque les preuves sont insuffisantes,
+la préconisation porte sur la démarche de documentation, de calibration et de backtest, pas sur un scénario.
 
-Le rapport portefeuille gere aussi la progression de generation et la tolerance aux echecs partiels par equipe.
+Le rapport portefeuille gère aussi la progression de génération et la tolérance aux échecs partiels par équipe.
 
-La restitution graphique du rapport distingue explicitement les donnees affichees :
+La restitution graphique du rapport distingue explicitement les données affichées :
 
-- historique equipe : `Throughput hebdomadaire`
-- scenario bootstrap synthetique : `D\u00E9bit simul\u00E9 du sc\u00E9nario`, avec une note de provenance
-- historique reel aligne entre equipes : `Throughput historique corr\u00E9l\u00E9`
-- comparaison multi-scenarios : `Courbes de probabilit\u00E9s compar\u00E9es`
-- resultats Monte Carlo : `Distribution Monte Carlo` et `Courbe de probabilit\u00E9`
+- historique équipe : `Throughput hebdomadaire`
+- scénario bootstrap synthétique : `Débit simulé du scénario`, avec une note de provenance
+- historique réel aligné entre équipes : `Throughput historique corrélé`
+- comparaison multi-scénarios : `Courbes de probabilités comparées`
+- résultats Monte Carlo : `Distribution Monte Carlo` et `Courbe de probabilité`
 
-## Modele de simulation
+## Modèle de simulation
 
-Le coeur du produit repose sur :
+Le cœur du produit repose sur :
 
-- le throughput reel observe
+- le throughput réel observé
 - la simulation Monte Carlo
-- l'agregation des iterations simulees
-- le recalcul des percentiles selon le mode utilise
+- l'agrégation des itérations simulées
+- le recalcul des percentiles selon le mode utilisé
   - `backlog_to_weeks`: quantile discret conservateur sur `P(X <= semaines)`
   - `weeks_to_items`: quantile de survie sur `P(X >= items)`
-- en `backlog_to_weeks`, une simulation non terminee a l'horizon maximal est une censure
-  explicite, distincte d'une fin exacte a l'horizon
+- en `backlog_to_weeks`, une simulation non terminée à l'horizon maximal est une censure
+  explicite, distincte d'une fin exacte à l'horizon
 
-En mode portefeuille, le produit compare plusieurs hypotheses d'agregation plutot que de masquer l'incertitude derriere une seule projection.
+En mode portefeuille, le produit compare plusieurs hypothèses d'agrégation plutôt que de masquer l'incertitude derrière une seule projection.
 
-## Invariants de securite et de gouvernance
+## Invariants de sécurité et de gouvernance
 
-Principe non negociable :
+Principe non négociable :
 
-- le PAT Azure DevOps est utilise uniquement dans le navigateur
-- aucune donnee d'identification Azure DevOps ne doit transiter par le backend
-- le backend ne recoit que des donnees anonymisees de throughput et des parametres de simulation
-- `mc_client_id` est un identifiant anonyme et non derive du contexte Azure DevOps
+- le PAT Azure DevOps est utilisé uniquement dans le navigateur
+- aucune donnée d'identification Azure DevOps ne doit transiter par le backend
+- le backend ne reçoit que des données anonymisées de throughput et des paramètres de simulation
+- `mc_client_id` est un identifiant anonyme et non dérivé du contexte Azure DevOps
 
-Cette frontiere d'identite est un invariant produit autant qu'un invariant d'architecture.
-Elle est protegee par des controles CI dedies.
+Cette frontière d'identité est un invariant produit autant qu'un invariant d'architecture.
+Elle est protégée par des contrôles CI dédiés.
 
 ## Non-objectifs
 
@@ -243,52 +243,52 @@ Monte Carlo Azure :
 
 - ne remplace pas Azure DevOps
 - ne fait pas de gestion de backlog
-- ne remplace pas la decision humaine
-- ne promet pas un resultat certain
-- explicite une probabilite plutot qu'un engagement artificiellement precis
+- ne remplace pas la décision humaine
+- ne promet pas un résultat certain
+- explicite une probabilité plutôt qu'un engagement artificiellement précis
 
 ## Indicateurs de pilotage
 
-Le produit cherche a rester :
+Le produit cherche à rester :
 
-- rapide a calculer
+- rapide à calculer
 - stable dans ses simulations
-- explicite dans ses hypotheses
+- explicite dans ses hypothèses
 - fiable dans ses exports et ses parcours critiques
 
 Indicateurs utiles :
 
 - temps moyen de calcul
-- stabilite des resultats
-- variance observee
+- stabilité des résultats
+- variance observée
 - taux d'erreur API
 - usage du mode portefeuille
-- qualite de restitution des scenarios
+- qualité de restitution des scénarios
 
-## Etat recent du produit
+## État récent du produit
 
-Les evolutions recentes les plus structurantes sont :
+Les évolutions récentes les plus structurantes sont :
 
-- refonte du mode portefeuille autour de 4 scenarios explicites
-- harmonisation du calcul du `Risk Score` avec les percentiles affiches
+- refonte du mode portefeuille autour de 4 scénarios explicites
+- harmonisation du calcul du `Risk Score` avec les percentiles affichés
 - suppression des divergences restantes entre backend, interface et export PDF
-- ajout de tests de coherence dedies sur `Risk Score`, `cv`, `iqr_ratio` et `slope_norm`
-- generation parallele du rapport portefeuille avec progression visible
-- tolerance aux echecs partiels lors de l'agregation portefeuille
-- enrichissement du rapport PDF avec une page de synthese orientee decision
-- durcissement des tests, de la CI et des controles de conformite repo
-- mise sous controle des points vitaux via traceabilite et coverage dediee
+- ajout de tests de cohérence dédiés sur `Risk Score`, `cv`, `iqr_ratio` et `slope_norm`
+- génération parallèle du rapport portefeuille avec progression visible
+- tolérance aux échecs partiels lors de l'agrégation portefeuille
+- enrichissement du rapport PDF avec une page de synthèse orientée décision
+- durcissement des tests, de la CI et des contrôles de conformité repo
+- mise sous contrôle des points vitaux via traçabilité et coverage dédiée
 
 ## Vision
 
 La trajectoire produit est claire :
 
-- passer d'un outil equipe a un outil portefeuille robuste
+- passer d'un outil équipe à un outil portefeuille robuste
 - mieux soutenir les arbitrages de direction
-- rendre les hypotheses de simulation plus lisibles et plus gouvernables
-- conserver une architecture stricte ou l'identite Azure DevOps reste cote navigateur
+- rendre les hypothèses de simulation plus lisibles et plus gouvernables
+- conserver une architecture stricte où l'identité Azure DevOps reste côté navigateur
 
-## Resume executif
+## Résumé exécutif
 
-Monte Carlo Azure transforme des donnees operationnelles en decisions probabilisees.
-Le produit aide a arbitrer delai, capacite et perimetre avec un niveau de confiance explicite, tout en preservant une frontiere de securite stricte entre Azure DevOps et le backend.
+Monte Carlo Azure transforme des données opérationnelles en décisions probabilisées.
+Le produit aide à arbitrer délai, capacité et périmètre avec un niveau de confiance explicite, tout en préservant une frontière de sécurité stricte entre Azure DevOps et le backend.

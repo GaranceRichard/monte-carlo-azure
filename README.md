@@ -1,4 +1,4 @@
-﻿# Monte Carlo Azure
+# Monte Carlo Azure
 
 [![CI](https://github.com/GaranceRichard/monte-carlo-azure/actions/workflows/ci.yml/badge.svg)](https://github.com/GaranceRichard/monte-carlo-azure/actions/workflows/ci.yml)
 
@@ -88,7 +88,7 @@ Démo GitHub Pages:
       `caution` → « Décision possible avec prudence », `arbitration_required` → « Arbitrage
       nécessaire », `not_recommended` → « Décision non recommandée »
 - le `Risk Score` conserve son calcul actuel et ne constitue pas une mesure de qualité
-    des données ni une recommandation d'arbitrage
+  des données ni une recommandation d'arbitrage
 - export CSV du throughput hebdomadaire
 - téléchargement direct du rapport PDF simulation sans fenêtre intermédiaire
 - historique local des dernières simulations, contextualisé par équipe dans le navigateur
@@ -220,7 +220,7 @@ Frontière d'identité Azure DevOps :
 ## Prérequis
 
 - Python 3.10+
-- Node.js 20+
+- Node.js `^20.19.0` ou `>=22.12.0`
 - accès Azure DevOps + PAT
 - Docker (optionnel, recommandé pour un déploiement rapide)
 
@@ -294,8 +294,8 @@ Le mode démo est activé par `?demo=true` ou par le build GitHub Pages ; le wor
 
 Le frontend détecte automatiquement le mode Azure DevOps à partir de l'URL saisie :
 
-- URL vide ou hote `dev.azure.com` / `*.visualstudio.com` => Cloud
-- tout autre hote => on-prem
+- URL vide ou hôte `dev.azure.com` / `*.visualstudio.com` => Cloud
+- tout autre hôte => on-prem
 
 En on-prem, l'URL attendue est l'URL serveur + collection, par exemple :
 

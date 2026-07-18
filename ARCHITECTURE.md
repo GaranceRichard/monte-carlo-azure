@@ -1,4 +1,4 @@
-﻿# Architecture
+# Architecture
 
 ## Vue d’ensemble
 

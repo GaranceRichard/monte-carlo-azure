@@ -1,20 +1,20 @@
-# Deploiement Production
+# Déploiement en production
 
-Ce guide privilegie un deploiement simple et reproductible via Docker Compose.
-L'objectif est de lancer une instance complete, backend et frontend statique servi par FastAPI, sans configuration manuelle de `nginx` ou `systemd`.
+Ce guide privilégie un déploiement simple et reproductible via Docker Compose.
+L'objectif est de lancer une instance complète, backend et frontend statique servi par FastAPI, sans configuration manuelle de `nginx` ou `systemd`.
 
 ## Option A: Docker Compose
 
-### 1) Pre-requis
+### 1) Prérequis
 
 - Docker Engine
 - Plugin `docker compose`
 - Redis pour le rate limiting:
   - soit service local via `docker-compose.yml` avec le service `redis`
-  - soit instance geree externe en pointant `APP_REDIS_URL`
-- MongoDB pour la persistence:
+  - soit instance gérée externe en pointant `APP_REDIS_URL`
+- MongoDB pour la persistance:
   - soit service local via `docker-compose.yml` avec le service `mongo`
-  - soit instance managee externe en pointant `APP_MONGO_URL`
+  - soit instance gérée externe en pointant `APP_MONGO_URL`
 
 ### 2) Depuis la racine du repo
 
@@ -30,8 +30,8 @@ Si le endpoint retourne `{"status":"ok"}`, l'application est disponible sur :
 
 ### 3) Variables d'environnement
 
-Le fichier `.env` est charge par `docker-compose.yml`.
-Base recommandee pour la production multi-workers :
+Le fichier `.env` est chargé par `docker-compose.yml`.
+Base recommandée pour la production multi-workers :
 
 ```dotenv
 APP_PORT=8000
@@ -54,14 +54,14 @@ APP_PURGE_RETENTION_DAYS=90
 
 Note rate limiting:
 
-- en developpement local, ne pas definir `APP_REDIS_URL`; l'application retombe sur `memory://`, ce qui est suffisant avec un seul processus
+- en développement local, ne pas définir `APP_REDIS_URL`; l'application retombe sur `memory://`, ce qui est suffisant avec un seul processus
 - en production avec `uvicorn --workers 2`, `APP_REDIS_URL` est requise pour partager le compteur entre les workers
-- si Redis est indisponible, l'application reste permissive mais ecrit un log `warning`; il faut donc surveiller les logs backend
+- si Redis est indisponible, l'application reste permissive mais écrit un log `warning`; il faut donc surveiller les logs backend
 
-### 4) Verification persistence Mongo
+### 4) Vérification de la persistance Mongo
 
-Verifier au demarrage que la persistence est active, pas seulement le health global.
-Si Mongo est configure mais indisponible, l'application doit echouer au startup plutot que d'attendre la premiere requete :
+Vérifier au démarrage que la persistance est active, pas seulement le health global.
+Si Mongo est configuré mais indisponible, l'application doit échouer au startup plutôt que d'attendre la première requête :
 
 ```bash
 docker compose logs -f backend
@@ -70,18 +70,18 @@ curl -sS http://127.0.0.1:8000/health/mongo
 
 Le endpoint `/health/mongo` doit retourner `{"status":"ok"}` en production.
 
-Verifier ensuite la lecture d'historique avec cookie client :
+Vérifier ensuite la lecture d'historique avec cookie client :
 
 ```bash
 curl -sS -H 'Cookie: IDMontecarlo=ops-smoke-client' \
   http://127.0.0.1:8000/simulations/history
 ```
 
-Si Mongo est indisponible, l'API doit remonter une erreur explicite sur les chemins de persistence.
+Si Mongo est indisponible, l'API doit remonter une erreur explicite sur les chemins de persistance.
 
-### 5) Verification rate limiting Redis
+### 5) Vérification du rate limiting Redis
 
-Verifier que la limitation est bien partagee par Redis et qu'elle retourne `429` apres depassement du seuil :
+Vérifier que la limitation est bien partagée par Redis et qu'elle retourne `429` après dépassement du seuil :
 
 ```bash
 for i in $(seq 1 21); do
@@ -93,8 +93,8 @@ for i in $(seq 1 21); do
 done
 ```
 
-Les 20 premieres reponses doivent etre `200`, puis la 21e doit etre `429`.
-Si Redis tombe, la limitation peut devenir permissive; dans ce cas, verifier les logs :
+Les 20 premières réponses doivent être `200`, puis la 21e doit être `429`.
+Si Redis tombe, la limitation peut devenir permissive; dans ce cas, vérifier les logs :
 
 ```bash
 docker compose logs -f backend
@@ -103,21 +103,21 @@ docker compose logs -f redis
 
 ### 6) Nettoyage des anciens champs Azure DevOps
 
-Le nettoyage des anciens champs d'identite Azure DevOps n'est jamais lance automatiquement au demarrage.
-Executer explicitement le script suivant :
+Le nettoyage des anciens champs d'identité Azure DevOps n'est jamais lancé automatiquement au démarrage.
+Exécuter explicitement le script suivant :
 
 ```bash
 python Scripts/scrub_simulation_identity.py
 python Scripts/scrub_simulation_identity.py --apply
 ```
 
-- le mode par defaut est `dry-run`
-- `--apply` execute le `$unset`
-- `mc_client_id` reste un identifiant anonyme non derive du contexte Azure DevOps
+- le mode par défaut est `dry-run`
+- `--apply` exécute le `$unset`
+- `mc_client_id` reste un identifiant anonyme non dérivé du contexte Azure DevOps
 
 ### 7) Cron de purge
 
-Planifier une execution quotidienne de `Scripts/purge_inactive_clients.py` sur l'hote.
+Planifier une exécution quotidienne de `Scripts/purge_inactive_clients.py` sur l'hôte.
 Exemple `crontab -e` :
 
 ```cron
@@ -140,12 +140,12 @@ docker compose down -v
 
 Cette option reste valable pour des environnements qui imposent un runtime Linux natif.
 
-### 1) Pre-requis
+### 1) Prérequis
 
 - Python 3.12
 - Nginx
 - Redis joignable par `APP_REDIS_URL`
-- utilisateur systeme dedie, par exemple `montecarlo`
+- utilisateur système dédié, par exemple `montecarlo`
 
 ### 2) Installation backend
 
@@ -190,7 +190,7 @@ sudo systemctl enable --now montecarlo-api
 sudo systemctl status montecarlo-api
 ```
 
-Avec `--workers 2`, Redis doit etre disponible via `APP_REDIS_URL`; sans cela, chaque worker comptera ses requetes localement.
+Avec `--workers 2`, Redis doit être disponible via `APP_REDIS_URL`; sans cela, chaque worker comptera ses requêtes localement.
 
 ### 4) Reverse proxy Nginx
 
@@ -220,13 +220,13 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-## Notes securite
+## Notes de sécurité
 
-- ne jamais exposer de PAT cote serveur
-- conserver seulement les endpoints applicatifs documentes et necessaires
+- ne jamais exposer de PAT côté serveur
+- conserver seulement les endpoints applicatifs documentés et nécessaires
 - endpoints attendus:
-- `POST /simulate`
-- `GET /simulations/history`
-- `GET /health`
-- `GET /health/mongo`
+  - `POST /simulate`
+  - `GET /simulations/history`
+  - `GET /health`
+  - `GET /health/mongo`
 - conserver `python Scripts/check_identity_boundary.py` en CI
