@@ -326,6 +326,11 @@ En `backlog_to_weeks`, `completion_summary` peut aussi être présent :
 
 ## Qualité technique
 
+Le standard [`STD-TEST-001`](docs/standards/STD-TEST-001.md) définit la norme de classification, de qualité
+et de pilotage des tests. Son versionnement constitue la référence normative de la stratégie de test ; il
+n’implique pas que le dépôt satisfait déjà l’ensemble de ses exigences. Les conditions opérationnelles et
+les exigences plus strictes de la [`Definition of Done`](docs/definition-of-done.md) restent applicables.
+
 La sélection des contrôles est centralisée dans `Scripts/quality_gate.py` :
 
 - `targeted` exécute les contrôles généraux et les tests directs identifiables ;

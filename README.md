@@ -22,6 +22,8 @@ Démo GitHub Pages:
   - inclut la convention de nommage: identifiants de code en anglais, textes utilisateur en français
 - historique des évolutions: [`CHANGELOG.md`](CHANGELOG.md)
 - guide frontend: [`frontend/README.md`](frontend/README.md)
+- standard de classification, de qualité et de pilotage des tests :
+  [`docs/standards/STD-TEST-001.md`](docs/standards/STD-TEST-001.md)
 - Definition of Done : [`docs/definition-of-done.md`](docs/definition-of-done.md)
 - chemins critiques: [`docs/critical-paths.md`](docs/critical-paths.md)
 - traçabilité vitals -> tests: [`docs/vitals-traceability.md`](docs/vitals-traceability.md)

@@ -4,6 +4,8 @@
 
 ### Qualité et outillage
 
+- versionnement de `STD-TEST-001`, standard de classification, de qualité et de pilotage des tests, et
+  alignement des références normatives dans le README, la DoD et l’architecture
 - correction de la portabilité Linux des tests de la gate : la détection Windows passe par un seam dédié,
   le fallback `cmd.exe /c mklink /J` force d’abord l’échec du lien symbolique, et aucun test ne modifie plus
   globalement `os.name` ; les retries de suppression read-only et la suppression d’une jonction sont

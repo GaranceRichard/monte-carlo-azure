@@ -4,6 +4,11 @@ Une tâche est « Done » uniquement lorsque la validation complète est verte e
 ci-dessous sont respectés. Une validation ciblée réussie constitue un retour rapide, pas une preuve de
 conformité DoD.
 
+Le standard [`STD-TEST-001`](standards/STD-TEST-001.md) définit la norme de classification, de qualité et
+de pilotage des tests. La présente DoD conserve les conditions opérationnelles de validation, de conformité
+et de publiabilité du dépôt. En cas d’exigences plus strictes dans la DoD ou les gates existantes, celles-ci
+restent applicables.
+
 ## 1. Niveaux de validation
 
 - **Validation ciblée** : plan `targeted` ou `impacted` construit à partir des chemins modifiés. Elle couvre
