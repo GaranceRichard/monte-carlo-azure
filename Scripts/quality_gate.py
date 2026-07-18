@@ -1280,6 +1280,10 @@ def _checkout_index(snapshot_root: Path, repository_root: Path = ROOT) -> None:
         raise RuntimeError("git checkout-index failed")
 
 
+def _is_windows() -> bool:
+    return os.name == "nt"
+
+
 def _link_directory(source: Path, destination: Path) -> None:
     is_junction = getattr(os.path, "isjunction", lambda _path: False)
     if destination.exists() or destination.is_symlink() or is_junction(destination):
@@ -1289,7 +1293,7 @@ def _link_directory(source: Path, destination: Path) -> None:
         destination.symlink_to(source, target_is_directory=True)
         return
     except OSError:
-        if os.name != "nt":
+        if not _is_windows():
             raise
     creation_flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
     result = subprocess.run(
@@ -1412,9 +1416,7 @@ def detached_commit_worktree(
             )
             if result.returncode:
                 detail = result.stderr.strip() or result.stdout.strip()
-                raise RuntimeError(
-                    f"Unable to create detached worktree for {commit_sha}: {detail}"
-                )
+                raise RuntimeError(f"Unable to create detached worktree for {commit_sha}: {detail}")
             yield worktree_root
         except BaseException:
             active_exception = True

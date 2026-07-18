@@ -376,6 +376,10 @@ Les trois modes ne lisent pas le même état du dépôt :
 - `ci`, réservé à GitHub Actions, exécute le plan complet sur le checkout CI et ajoute le smoke test
   Docker. Les dépendances sont installées par le workflow, jamais par le gate.
 
+Les worktrees détachés réutilisent les dépendances frontend par lien symbolique sous POSIX et, seulement si
+ce lien échoue sous Windows, par jonction `mklink /J`. Les tests de plateforme simulent le seam
+`_is_windows()` sans remplacer globalement `os.name`, ce qui conserve les chemins natifs de l’hôte.
+
 Dans un plan complet `push` ou `ci`, les suites avec couverture remplacent les mêmes suites simples :
 Pytest n’est pas exécuté une première fois sans couverture, et Vitest n’est pas exécuté une première fois
 via `test:unit`. L’ordre applicatif reste lint, typecheck, tests, build, puis E2E.

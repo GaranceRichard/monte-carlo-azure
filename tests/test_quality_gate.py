@@ -2186,7 +2186,6 @@ def test_frontend_link_guards_and_platform_paths(tmp_path: Path, monkeypatch) ->
         quality_gate._link_directory(source, destination)
 
     destination.rmdir()
-    monkeypatch.setattr(quality_gate.os, "name", "posix")
 
     class FakeLink:
         def __init__(self, target: Path) -> None:
@@ -2249,14 +2248,23 @@ def test_windows_link_failure_and_worktree_cleanup_errors(
     source = tmp_path / "source"
     source.mkdir()
     destination = tmp_path / "destination"
-    monkeypatch.setattr(quality_gate.os, "name", "nt")
-    monkeypatch.setattr(
-        quality_gate.subprocess,
-        "run",
-        lambda *_a, **_k: subprocess.CompletedProcess([], 1, stdout="", stderr="junction"),
-    )
+    junction_calls: list[list[str]] = []
+
+    def fail_symlink(*_args, **_kwargs) -> None:
+        raise OSError("symlink failed")
+
+    def fail_junction(command, **_kwargs):
+        junction_calls.append(command)
+        return subprocess.CompletedProcess(command, 1, stdout="", stderr="junction")
+
+    monkeypatch.setattr(quality_gate, "_is_windows", lambda: True)
+    monkeypatch.setattr(Path, "symlink_to", fail_symlink)
+    monkeypatch.setattr(quality_gate.subprocess, "run", fail_junction)
     with pytest.raises(OSError, match="junction"):
         quality_gate._link_directory(source, destination)
+    assert junction_calls == [
+        ["cmd.exe", "/c", "mklink", "/J", str(destination), str(source)]
+    ]
 
     monkeypatch.setattr(
         quality_gate,
@@ -2467,7 +2475,7 @@ def test_link_rethrow_unexpected_exposure_and_cleanup_propagation(
         def symlink_to(self, *_a, **_k):
             raise OSError("symlink failed")
 
-    monkeypatch.setattr(quality_gate.os, "name", "posix")
+    monkeypatch.setattr(quality_gate, "_is_windows", lambda: False)
     with pytest.raises(OSError, match="symlink failed"):
         quality_gate._link_directory(source, BrokenDestination())
 
@@ -2490,10 +2498,7 @@ def test_link_rethrow_unexpected_exposure_and_cleanup_propagation(
         with quality_gate.exposed_frontend_dependencies(tmp_path):
             pass
 
-    monkeypatch.setattr(quality_gate.os, "name", "nt")
-    calls = iter(
-        [subprocess.CompletedProcess([], 0, stdout="", stderr="")]
-    )
+    calls = iter([subprocess.CompletedProcess([], 0, stdout="", stderr="")])
     monkeypatch.setattr(quality_gate, "_run_worktree_command", lambda *_a, **_k: next(calls))
     monkeypatch.setattr(
         quality_gate,

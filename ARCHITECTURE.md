@@ -343,6 +343,11 @@ Les sources de changement sont distinctes : index Git pour le pré-commit, commi
 pré-push, checkout de travail pour la CI. Le pré-push valide chaque SHA terminal distinct dans un worktree
 détaché temporaire et n’utilise pas le workspace courant.
 
+Dans un worktree détaché, les dépendances frontend installées sont exposées par un lien symbolique. Si sa
+création échoue sous Windows, la gate utilise une jonction `cmd.exe /c mklink /J` ; sous POSIX, l’erreur du
+lien symbolique est propagée. La décision de plateforme est isolée derrière `_is_windows()` afin que les
+tests couvrent les deux branches sans modifier globalement `os.name` ni le type de chemin natif de l’hôte.
+
 CI GitHub Actions :
 
 - job unique `quality-gate` avec service MongoDB réel (`mongo:7`) ;
