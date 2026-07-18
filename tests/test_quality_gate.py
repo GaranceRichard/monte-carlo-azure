@@ -1603,7 +1603,7 @@ def test_pytest_basetemp_cleanup_removes_only_the_expected_directory(
     assert sibling.exists()
 
 
-@pytest.mark.skipif(quality_gate.os.name != "nt", reason="Windows read-only semantics")
+@pytest.mark.skipif(not quality_gate._is_windows(), reason="Windows read-only semantics")
 def test_pytest_basetemp_cleanup_removes_a_readonly_file(tmp_path: Path) -> None:
     runtime_temp_root = tmp_path / ".tmp" / "pytest"
     basetemp = runtime_temp_root / "backend-tests-123-readonly"
@@ -1621,7 +1621,7 @@ def test_pytest_basetemp_cleanup_removes_a_readonly_file(tmp_path: Path) -> None
     assert not basetemp.exists()
 
 
-@pytest.mark.skipif(quality_gate.os.name != "nt", reason="Windows read-only semantics")
+@pytest.mark.skipif(not quality_gate._is_windows(), reason="Windows read-only semantics")
 def test_pytest_basetemp_cleanup_handles_readonly_git_objects(tmp_path: Path) -> None:
     runtime_temp_root = tmp_path / ".tmp" / "pytest"
     basetemp = runtime_temp_root / "backend-tests-123-git"
@@ -1639,7 +1639,6 @@ def test_pytest_basetemp_cleanup_handles_readonly_git_objects(tmp_path: Path) ->
     assert not basetemp.exists()
 
 
-@pytest.mark.skipif(quality_gate.os.name != "nt", reason="Windows retry semantics")
 def test_pytest_basetemp_cleanup_retries_the_failing_path(
     tmp_path: Path, monkeypatch
 ) -> None:
@@ -1658,6 +1657,7 @@ def test_pytest_basetemp_cleanup_retries_the_failing_path(
         onexc(retry, str(blocked_file), PermissionError("read-only"))
         Path(path).rmdir()
 
+    monkeypatch.setattr(quality_gate, "_is_windows", lambda: True)
     monkeypatch.setattr(quality_gate.shutil, "rmtree", rmtree)
 
     quality_gate._remove_pytest_basetemp(
@@ -1670,7 +1670,6 @@ def test_pytest_basetemp_cleanup_retries_the_failing_path(
     assert not basetemp.exists()
 
 
-@pytest.mark.skipif(quality_gate.os.name != "nt", reason="Windows retry semantics")
 def test_pytest_basetemp_cleanup_propagates_a_persistent_permission_error(
     tmp_path: Path, monkeypatch
 ) -> None:
@@ -1686,6 +1685,7 @@ def test_pytest_basetemp_cleanup_propagates_a_persistent_permission_error(
 
         onexc(retry, str(blocked_file), PermissionError("read-only"))
 
+    monkeypatch.setattr(quality_gate, "_is_windows", lambda: True)
     monkeypatch.setattr(quality_gate.shutil, "rmtree", rmtree)
 
     with pytest.raises(PermissionError, match="still locked"):
@@ -1694,6 +1694,54 @@ def test_pytest_basetemp_cleanup_propagates_a_persistent_permission_error(
             runtime_temp_root,
             expected_prefix="backend-tests-123-",
         )
+
+
+def test_retry_windows_readonly_removal_restores_permissions_and_retries(
+    monkeypatch,
+) -> None:
+    chmod_calls: list[tuple[str, int]] = []
+    retry_calls: list[str] = []
+    path = "readonly.txt"
+
+    monkeypatch.setattr(quality_gate, "_is_windows", lambda: True)
+    monkeypatch.setattr(
+        quality_gate.os,
+        "chmod",
+        lambda value, mode: chmod_calls.append((value, mode)),
+    )
+
+    quality_gate._retry_windows_readonly_removal(
+        retry_calls.append,
+        path,
+        PermissionError("read-only"),
+    )
+
+    assert chmod_calls == [(path, stat.S_IREAD | stat.S_IWRITE)]
+    assert retry_calls == [path]
+
+
+def test_retry_windows_readonly_removal_rethrows_unsupported_errors(monkeypatch) -> None:
+    retry_calls: list[str] = []
+    permission_error = PermissionError("read-only")
+    monkeypatch.setattr(quality_gate, "_is_windows", lambda: False)
+    with pytest.raises(PermissionError) as non_windows:
+        quality_gate._retry_windows_readonly_removal(
+            retry_calls.append,
+            "readonly.txt",
+            permission_error,
+        )
+    assert non_windows.value is permission_error
+
+    other_error = OSError("other")
+    monkeypatch.setattr(quality_gate, "_is_windows", lambda: True)
+    with pytest.raises(OSError) as incompatible:
+        quality_gate._retry_windows_readonly_removal(
+            retry_calls.append,
+            "readonly.txt",
+            other_error,
+        )
+    assert incompatible.value is other_error
+    assert retry_calls == []
 
 
 def test_pytest_basetemp_cleanup_rejects_a_path_outside_runtime_root(
@@ -2240,6 +2288,40 @@ def test_frontend_link_guards_and_platform_paths(tmp_path: Path, monkeypatch) ->
     with pytest.raises(FileNotFoundError, match="dependencies are missing"):
         with quality_gate.exposed_frontend_dependencies(missing_root):
             pass
+
+
+def test_is_windows_matches_the_host_platform() -> None:
+    assert quality_gate._is_windows() is (os.name == "nt")
+
+
+def test_frontend_dependency_junction_removal_uses_rmdir(
+    tmp_path: Path, monkeypatch
+) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+
+    class JunctionPath:
+        def __fspath__(self) -> str:
+            return str(tmp_path / "junction")
+
+        def is_symlink(self) -> bool:
+            return False
+
+        def resolve(self) -> Path:
+            return source.resolve()
+
+    destination = JunctionPath()
+    removed: list[object] = []
+    monkeypatch.setattr(
+        quality_gate.os.path,
+        "isjunction",
+        lambda candidate: candidate is destination,
+    )
+    monkeypatch.setattr(quality_gate.os, "rmdir", removed.append)
+
+    quality_gate._remove_frontend_dependency_link(destination, source)
+
+    assert removed == [destination]
 
 
 def test_windows_link_failure_and_worktree_cleanup_errors(

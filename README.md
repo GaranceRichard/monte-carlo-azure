@@ -379,6 +379,9 @@ Les trois modes ne lisent pas le même état du dépôt :
 Les worktrees détachés réutilisent les dépendances frontend par lien symbolique sous POSIX et, seulement si
 ce lien échoue sous Windows, par jonction `mklink /J`. Les tests de plateforme simulent le seam
 `_is_windows()` sans remplacer globalement `os.name`, ce qui conserve les chemins natifs de l’hôte.
+Ce seam couvre aussi le retry des suppressions read-only : les branches Windows et POSIX sont exécutées
+par des tests unitaires sur tous les systèmes. Les seuls skips de plateforme conservés vérifient les
+attributs read-only réels de Windows et ne laissent aucune ligne Python non couverte sous Linux.
 
 Dans un plan complet `push` ou `ci`, les suites avec couverture remplacent les mêmes suites simples :
 Pytest n’est pas exécuté une première fois sans couverture, et Vitest n’est pas exécuté une première fois

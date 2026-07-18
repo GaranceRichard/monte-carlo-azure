@@ -6,7 +6,9 @@
 
 - correction de la portabilité Linux des tests de la gate : la détection Windows passe par un seam dédié,
   le fallback `cmd.exe /c mklink /J` force d’abord l’échec du lien symbolique, et aucun test ne modifie plus
-  globalement `os.name`
+  globalement `os.name` ; les retries de suppression read-only et la suppression d’une jonction sont
+  simulés sans skip de plateforme, tandis que les deux tests du comportement réel du système de fichiers
+  Windows restent explicitement conditionnels
 - ajout d’un ratchet de maintenabilité déterministe sur la taille, la complexité, les cycles, les
   directions de dépendance démontrables et le mojibake, avec baseline et exceptions justifiées versionnées
 - découpage du moteur de maintenabilité entre collecte des métriques, analyse des dépendances, chargement de

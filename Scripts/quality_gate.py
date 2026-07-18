@@ -858,7 +858,7 @@ def _retry_windows_readonly_removal(
     path: str,
     exception: BaseException,
 ) -> None:
-    if os.name != "nt" or not isinstance(exception, PermissionError):
+    if not _is_windows() or not isinstance(exception, PermissionError):
         raise exception
     os.chmod(path, stat.S_IREAD | stat.S_IWRITE)
     function(path)

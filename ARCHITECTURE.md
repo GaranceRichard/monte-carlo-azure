@@ -348,6 +348,11 @@ création échoue sous Windows, la gate utilise une jonction `cmd.exe /c mklink 
 lien symbolique est propagée. La décision de plateforme est isolée derrière `_is_windows()` afin que les
 tests couvrent les deux branches sans modifier globalement `os.name` ni le type de chemin natif de l’hôte.
 
+Le même seam pilote le retry de suppression des fichiers read-only dans les répertoires temporaires Pytest.
+Les branches `chmod`, nouvelle tentative, rejet POSIX et erreur incompatible sont testées avec des doubles
+indépendants de l’hôte. Seuls les deux tests qui vérifient réellement les attributs read-only du système de
+fichiers Windows restent conditionnels ; ils ne portent aucune couverture exclusive de code de production.
+
 CI GitHub Actions :
 
 - job unique `quality-gate` avec service MongoDB réel (`mongo:7`) ;
