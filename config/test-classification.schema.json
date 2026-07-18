@@ -1,0 +1,255 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/test-classification/1.0.0",
+  "x-schemaVersion": "1.0.0",
+  "title": "Test classification record",
+  "description": "Machine-readable classification of one logical test case under STD-TEST-001.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "logicalCaseId",
+    "framework",
+    "sourcePath",
+    "selector",
+    "status"
+  ],
+  "properties": {
+    "logicalCaseId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable identifier shared by all parameterized execution instances of the logical case."
+    },
+    "framework": {
+      "type": "string",
+      "enum": [
+        "pytest",
+        "vitest",
+        "playwright"
+      ]
+    },
+    "sourcePath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Repository-relative path of the source declaring the logical case."
+    },
+    "selector": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Framework-native selector for the logical case, without parameter instance suffixes."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "classified",
+        "unresolved",
+        "exempted"
+      ]
+    },
+    "nature": {
+      "type": "string",
+      "enum": [
+        "unit",
+        "component",
+        "integration",
+        "contract",
+        "e2e"
+      ]
+    },
+    "purposes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "functional",
+          "security",
+          "performance",
+          "resilience",
+          "accessibility",
+          "compatibility",
+          "migration_recovery",
+          "observability",
+          "data_quality"
+        ]
+      }
+    },
+    "executionProfile": {
+      "type": "string",
+      "enum": [
+        "pr",
+        "main",
+        "nightly",
+        "release"
+      ]
+    },
+    "domains": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "identity",
+          "azure_devops",
+          "data",
+          "statistical_engine",
+          "api",
+          "history",
+          "persistence",
+          "portfolio",
+          "reporting",
+          "user_interface",
+          "deployment",
+          "quality_chain"
+        ]
+      }
+    },
+    "criticality": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "risks": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^RISK-[0-9]{3}$"
+      }
+    },
+    "criticalPaths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^CP-[0-9]{3}$"
+      }
+    },
+    "unresolvedReason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "exemption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "justification",
+        "owner",
+        "approver",
+        "expiresOn"
+      ],
+      "properties": {
+        "justification": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approver": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expiresOn": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    }
+  },
+  "dependentRequired": {
+    "risks": [
+      "criticality"
+    ],
+    "criticalPaths": [
+      "criticality"
+    ]
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "classified"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "nature",
+          "purposes",
+          "executionProfile"
+        ],
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "unresolvedReason"
+              ]
+            },
+            {
+              "required": [
+                "exemption"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "unresolved"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "unresolvedReason"
+        ],
+        "not": {
+          "required": [
+            "exemption"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "exempted"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "exemption"
+        ],
+        "not": {
+          "required": [
+            "unresolvedReason"
+          ]
+        }
+      }
+    }
+  ]
+}

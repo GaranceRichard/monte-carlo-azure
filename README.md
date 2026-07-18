@@ -24,6 +24,10 @@ Démo GitHub Pages:
 - guide frontend: [`frontend/README.md`](frontend/README.md)
 - standard de classification, de qualité et de pilotage des tests :
   [`docs/standards/STD-TEST-001.md`](docs/standards/STD-TEST-001.md)
+- contrat et guide du modèle de classification :
+  [`docs/test-classification.md`](docs/test-classification.md),
+  [`config/test-classification.json`](config/test-classification.json) et
+  [`config/test-classification.schema.json`](config/test-classification.schema.json)
 - Definition of Done : [`docs/definition-of-done.md`](docs/definition-of-done.md)
 - chemins critiques: [`docs/critical-paths.md`](docs/critical-paths.md)
 - matrice risques–contrôles: [`docs/risk-control-matrix.md`](docs/risk-control-matrix.md)
@@ -348,6 +352,11 @@ while ($true) { try { Invoke-RestMethod http://127.0.0.1:8000/health/mongo -Time
 ---
 
 ## Tests et couverture
+
+Le modèle versionné de classification des cas logiques est décrit dans
+[`docs/test-classification.md`](docs/test-classification.md). Il sépare nature, finalités, profil
+d'exécution, domaines et criticité. Le PBI 1.4 définit uniquement ce contrat : aucun test existant n'est
+encore classifié et la CI ne bloque pas sur ces métadonnées.
 
 Depuis la racine:
 

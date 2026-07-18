@@ -1,0 +1,184 @@
+{
+  "catalogVersion": "1.0.0",
+  "recordSchema": {
+    "version": "1.0.0",
+    "path": "config/test-classification.schema.json",
+    "draft": "https://json-schema.org/draft/2020-12/schema"
+  },
+  "standard": {
+    "reference": "STD-TEST-001",
+    "version": "1.0",
+    "path": "docs/standards/STD-TEST-001.md"
+  },
+  "dimensions": {
+    "nature": {
+      "recordField": "nature",
+      "cardinality": {
+        "minimum": 1,
+        "maximum": 1,
+        "requiredForStatuses": [
+          "classified"
+        ]
+      },
+      "values": [
+        "unit",
+        "component",
+        "integration",
+        "contract",
+        "e2e"
+      ]
+    },
+    "purpose": {
+      "recordField": "purposes",
+      "cardinality": {
+        "minimum": 1,
+        "maximum": null,
+        "requiredForStatuses": [
+          "classified"
+        ],
+        "unique": true
+      },
+      "values": [
+        "functional",
+        "security",
+        "performance",
+        "resilience",
+        "accessibility",
+        "compatibility",
+        "migration_recovery",
+        "observability",
+        "data_quality"
+      ]
+    },
+    "executionProfile": {
+      "recordField": "executionProfile",
+      "cardinality": {
+        "minimum": 1,
+        "maximum": 1,
+        "requiredForStatuses": [
+          "classified"
+        ]
+      },
+      "values": [
+        "pr",
+        "main",
+        "nightly",
+        "release"
+      ]
+    },
+    "criticality": {
+      "recordField": "criticality",
+      "cardinality": {
+        "minimum": 0,
+        "maximum": 1,
+        "requiredWhenAnyFieldPresent": [
+          "risks",
+          "criticalPaths"
+        ]
+      },
+      "values": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "status": {
+      "recordField": "status",
+      "cardinality": {
+        "minimum": 1,
+        "maximum": 1,
+        "requiredForAllRecords": true
+      },
+      "values": [
+        "classified",
+        "unresolved",
+        "exempted"
+      ]
+    },
+    "framework": {
+      "recordField": "framework",
+      "cardinality": {
+        "minimum": 1,
+        "maximum": 1,
+        "requiredForAllRecords": true
+      },
+      "values": [
+        "pytest",
+        "vitest",
+        "playwright"
+      ]
+    },
+    "domain": {
+      "recordField": "domains",
+      "cardinality": {
+        "minimum": 0,
+        "maximum": null,
+        "unique": true
+      },
+      "values": [
+        "identity",
+        "azure_devops",
+        "data",
+        "statistical_engine",
+        "api",
+        "history",
+        "persistence",
+        "portfolio",
+        "reporting",
+        "user_interface",
+        "deployment",
+        "quality_chain"
+      ]
+    }
+  },
+  "identifierFormats": {
+    "risk": "^RISK-[0-9]{3}$",
+    "criticalPath": "^CP-[0-9]{3}$"
+  },
+  "resolutionRules": [
+    {
+      "priority": 1,
+      "id": "actual_behavior_first",
+      "rule": "Resolve from the scope, dependencies and boundaries actually executed; names, paths and frameworks are evidence only."
+    },
+    {
+      "priority": 2,
+      "id": "single_maximum_scope_nature",
+      "rule": "Assign exactly one primary nature from the maximum scope actually executed."
+    },
+    {
+      "priority": 3,
+      "id": "metadata_contradiction_invalid",
+      "rule": "Reject metadata that contradicts observed test behavior."
+    },
+    {
+      "priority": 4,
+      "id": "ambiguity_unresolved",
+      "rule": "Keep an ambiguous logical case unresolved and record the reason; do not guess."
+    },
+    {
+      "priority": 5,
+      "id": "logical_case_identity",
+      "rule": "Classify the logical case once; parameter data creates execution instances, not new logical cases."
+    },
+    {
+      "priority": 6,
+      "id": "non_case_artifacts",
+      "rule": "Fixtures, helpers and test data are not autonomous logical cases."
+    },
+    {
+      "priority": 7,
+      "id": "explicit_temporary_exemption",
+      "rule": "An exemption is explicit, justified, owned, approved and time-bounded."
+    }
+  ],
+  "nonClassificationConcepts": {
+    "qualityGateLevels": [
+      "targeted",
+      "impacted",
+      "massive"
+    ],
+    "note": "Quality-gate selection levels are not execution profiles and are not record fields."
+  }
+}

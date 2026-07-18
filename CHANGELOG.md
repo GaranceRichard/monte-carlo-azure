@@ -4,6 +4,9 @@
 
 ### Qualité et outillage
 
+- ajout du modèle versionné de classification des cas logiques selon `STD-TEST-001` : catalogue de
+  vocabulaires, domaines et règles de résolution, schéma JSON Draft 2020-12, documentation et tests de
+  cohérence, sans classification du patrimoine ni modification des gates
 - création de la matrice risques–contrôles et enrichissement des parcours critiques, avec distinction explicite
   entre maîtrise démontrée, couverture partielle et lacune planifiée
 - audit de tous les fichiers Markdown suivis par Git, correction des accents, encodages et échappements

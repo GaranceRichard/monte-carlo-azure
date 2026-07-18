@@ -334,6 +334,13 @@ La lecture factuelle des risques, contrôles présents, preuves et lacunes rési
 [`matrice risques–contrôles`](docs/risk-control-matrix.md), sans que son existence vaille conformité complète
 au standard.
 
+Le contrat de classification est versionné dans
+[`config/test-classification.json`](config/test-classification.json) et son schéma d'enregistrement Draft
+2020-12 dans [`config/test-classification.schema.json`](config/test-classification.schema.json). Les domaines
+stables reflètent les frontières du produit et de la chaîne qualité ; les règles d'interprétation sont
+documentées dans [`docs/test-classification.md`](docs/test-classification.md). Ce modèle reste déclaratif :
+il ne modifie ni l'architecture d'exécution des tests, ni la sélection des gates, ni la CI.
+
 La sélection des contrôles est centralisée dans `Scripts/quality_gate.py` :
 
 - `targeted` exécute les contrôles généraux et les tests directs identifiables ;
