@@ -226,20 +226,20 @@
 
 # Synthèse du backlog
 
-|                                       Feature | Nombre de PBI |
-| --------------------------------------------: | ------------: |
-|                  1 — Preuve qualité gouvernée |            10 |
-|             2 — Fiabilité du cœur statistique |             8 |
-|                 3 — Réutilisabilité du moteur |             5 |
-|            4 — Mise en production personnelle |             6 |
-|            5 — Valeur d’usage du portefeuille |             3 |
-| 6 — Qualité réelle et limites opérationnelles |             8 |
-|        7 — Architecture applicative évolutive |             8 |
-|           8 — Données Azure DevOps et sprints |            13 |
-|       9 — Calibration et évolution temporelle |             7 |
-|               10 — Expérience et restitutions |             9 |
-|                              11 — Scalabilité |             8 |
-|                    12 — Pilotage de programme |             7 |
-|                                     **Total** |    **92 PBI** |
+|                                       Feature | Nombre de PBI | Réalisés |
+| --------------------------------------------: | ------------: |:--------:|
+|                  1 — Preuve qualité gouvernée |            10 |        1 |
+|             2 — Fiabilité du cœur statistique |             8 |          |
+|                 3 — Réutilisabilité du moteur |             5 |          |
+|            4 — Mise en production personnelle |             6 |          |
+|            5 — Valeur d’usage du portefeuille |             3 |          |
+| 6 — Qualité réelle et limites opérationnelles |             8 |          |
+|        7 — Architecture applicative évolutive |             8 |          |
+|           8 — Données Azure DevOps et sprints |            13 |          |
+|       9 — Calibration et évolution temporelle |             7 |          |
+|               10 — Expérience et restitutions |             9 |          |
+|                              11 — Scalabilité |             8 |          |
+|                    12 — Pilotage de programme |             7 |          |
+|                                     **Total** |    **92 PBI** |        1 |
 
 Aucun PBI n’est classé XL. Les PBI de réalisation technique, même de complexité M, utilisent généralement **Sol High** lorsque le risque porte sur les statistiques, l’architecture, la sécurité, la CI/CD ou les contrats.
