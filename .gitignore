@@ -66,3 +66,4 @@ frontend/playwright-report/
 frontend/test-results/
 test-results/
 frontend/*.tsbuildinfo
+reports/test-execution-native/

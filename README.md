@@ -369,6 +369,22 @@ exceptions auditables résident respectivement dans
 [`config/test-classification-overrides.json`](config/test-classification-overrides.json). La classification
 reste informative à ce stade : elle ne modifie ni la sélection des tests ni les gates CI/CD.
 
+Le comptage d'exécution est distinct de cet inventaire. Après une exécution complète de chaque framework,
+les hooks/reporters natifs écrivent les artefacts intermédiaires ignorés par Git, puis la commande suivante
+produit le rapport consolidé versionné :
+
+```bash
+python -m pytest -q
+npm --prefix frontend run test:unit
+npm --prefix frontend run test:e2e
+python Scripts/report_test_execution_counts.py
+```
+
+[`reports/test-execution-counts.json`](reports/test-execution-counts.json) expose les cas logiques, les
+instances collectées et exécutées, les skips, les tentatives et les retries globalement, par framework,
+statut, nature et `logicalCaseId`. Son empreinte SHA-256 identifie exactement l'inventaire de classification
+utilisé. Le rapport est trié et ne contient ni timestamp, durée, chemin absolu ni autre donnée volatile.
+
 Depuis la racine:
 
 ```bash

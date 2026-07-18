@@ -23,6 +23,8 @@ export default defineConfig({
     pool: "forks",
     fileParallelism: false,
     maxWorkers: 1,
+    includeTaskLocation: true,
+    reporters: ["default", "./scripts/vitest-execution-reporter.mjs"],
     include: ["src/**/*.{test,spec}.{js,jsx,ts,tsx}"],
     exclude: ["tests/**", "node_modules/**", "dist/**"],
     coverage: {

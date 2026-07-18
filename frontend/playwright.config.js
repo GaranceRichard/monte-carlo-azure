@@ -24,7 +24,7 @@ export default defineConfig({
   timeout: 30_000,
   fullyParallel: false,
   workers: Number.isFinite(configuredWorkers) ? configuredWorkers : undefined,
-  reporter: [["list"]],
+  reporter: [["list"], ["./scripts/playwright-execution-reporter.mjs"]],
   use: {
     baseURL: `http://127.0.0.1:${webPort}`,
     headless: true,

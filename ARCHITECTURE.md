@@ -347,6 +347,16 @@ et justifiées de `config/test-classification-overrides.json`. Il écrit l’inv
 `reports/test-classification-inventory.json`; aucune horloge ni information d’environnement n’entre dans sa
 sérialisation.
 
+Le comptage du PBI 1.6 forme une couche séparée. Les hooks Pytest et les reporters Vitest/Playwright observent
+les collections et résultats natifs, puis `Scripts/report_test_execution_counts.py` rattache chaque instance
+à l'identité de l'inventaire. La classification décrit ce qu'est un cas logique ; la collecte décrit les
+instances développées par les paramètres et projets ; l'exécution décrit les instances réellement tentées ;
+les retries ajoutent des tentatives à la même instance. Le consolidateur ne redécouvre aucun test, refuse les
+rattachements absents ou ambigus et conserve les profils et gates existants inchangés.
+
+Les artefacts natifs sous `reports/test-execution-native/` sont des entrées locales régénérables. Seul le
+rapport déterministe `reports/test-execution-counts.json`, lié par SHA-256 à l'inventaire, est versionné.
+
 Ce composant est actuellement hors du chemin d’enforcement. Il ne modifie ni l’architecture d’exécution des
 tests, ni la sélection des gates, ni la CI. Les cas insuffisamment prouvés restent explicitement
 `unresolved`; le PBI 1.7 décidera du contrôle bloquant et le PBI 1.8 de la recomposition des profils.

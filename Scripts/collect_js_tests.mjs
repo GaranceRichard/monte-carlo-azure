@@ -159,7 +159,16 @@ function collectFile(ts, root, absolute) {
           (name) => descriptor.modifiers.includes(name),
         );
         if (isTest && !ignoredHelper) {
-          const position = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
+          // Vitest anchors every expanded `.each` task on the closing parenthesis of the
+          // inner data-table call. Persist that exact AST position so parameters and dynamic
+          // titles map without any title heuristic.
+          const declarationOffset =
+            framework === "vitest" &&
+            descriptor.modifiers.includes("each") &&
+            ts.isCallExpression(node.expression)
+              ? node.expression.getEnd() - 1
+              : node.getStart(sourceFile);
+          const position = sourceFile.getLineAndCharacterOfPosition(declarationOffset);
           const title = staticTitle(ts, node.arguments[0], sourceFile);
           const selector = [...suites, title].join(" > ") + ` [${position.line + 1}:${position.character + 1}]`;
           const callback = callbackArgument(ts, node);

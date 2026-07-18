@@ -4,6 +4,9 @@
 
 ### Qualité et outillage
 
+- ajout du comptage déterministe des cas logiques, instances natives collectées/exécutées, skips, tentatives
+  et retries pour Pytest, Vitest et Playwright, avec rapprochement exact à l'inventaire, schéma versionné,
+  invariants détaillés et rejet explicite des collections incomplètes, orphelines ou ambiguës
 - ajout du classificateur automatique du patrimoine Pytest, Vitest et Playwright : découverte AST des cas
   logiques, règles comportementales priorisées, rattachement aux finalités, domaines, risques et parcours,
   overrides exacts auditables et inventaire JSON reproductible, sans enforcement ni modification des profils

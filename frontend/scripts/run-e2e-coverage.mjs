@@ -48,7 +48,15 @@ if (!fs.existsSync(playwrightCli)) {
 }
 const playwright = spawnSync(
   process.execPath,
-  [playwrightCli, "test", ...process.argv.slice(2)],
+  [
+    playwrightCli,
+    "test",
+    ...process.argv.slice(2).map((argument) =>
+      argument.startsWith("--reporter=")
+        ? `${argument},./scripts/playwright-execution-reporter.mjs`
+        : argument
+    ),
+  ],
   {
     cwd: frontendRoot,
     env: {

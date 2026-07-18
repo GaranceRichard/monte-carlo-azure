@@ -134,12 +134,43 @@ Ces exemples illustrent des décisions désormais produites dans l’inventaire 
 - `frontend/tests/e2e/onboarding.spec.js` pilote un navigateur à travers le parcours assemblé avec services
   contrôlés : exemples `e2e`, domaines `identity`, `azure_devops` et `user_interface`.
 
-## Limites actuelles
+## Comptage des collections et exécutions
+
+Le rapport [`reports/test-execution-counts.json`](../reports/test-execution-counts.json) applique les
+définitions communes suivantes :
+
+- `logicalCases` : déclarations uniques présentes dans l'inventaire de classification ;
+- `collectedInstances` : instances natives après expansion des paramètres et projets ;
+- `executedInstances` : instances uniques ayant eu au moins une tentative, hors skip/todo non exécuté ;
+- `skippedInstances` : instances collectées sans tentative ;
+- `attempts` : toutes les tentatives, y compris une erreur de setup ou d'infrastructure attachée ;
+- `retries` : tentatives supplémentaires d'une instance déjà exécutée.
+
+Les invariants sont `collectedInstances = executedInstances + skippedInstances` et
+`attempts = executedInstances + retries`. Un paramètre ou un projet développe une instance, jamais un cas
+logique ; un retry ne développe ni cas logique ni instance. Un résultat `skipped` peut appartenir à une
+instance exécutée lorsque le skip/xfail a été décidé pendant sa tentative.
+
+Pytest est rapproché par node ID, chemin et déclaration Python après retrait du suffixe paramétré. Vitest
+utilise le chemin et la position AST native, y compris l'ancre du tableau de `.each` et les titres dynamiques.
+Playwright utilise chemin, ligne, colonne et projet ; son identifiant natif conserve retries et répétitions
+sur la même instance. Aucun framework n'est rapproché par le seul titre. Une instance orpheline ou ambiguë,
+un cas logique absent ou une collecte qui ne couvre pas les trois frameworks invalide la consolidation.
+
+Les résultats disponibles sont `passed`, `failed`, `skipped`, `todo` et `infrastructureError`. Les erreurs de
+setup/hook identifiables restent des tentatives exécutées. Une limite native demeure : un framework peut
+exposer un échec attaché sans distinguer une assertion d'une erreur d'infrastructure ; le rapport conserve
+alors l'état natif le plus précis sans inférence sur le texte de la console.
+
+Les 16 cas `unresolved` gardent leur identité et participent à tous les totaux. Ils sont volontairement exclus
+de la ventilation par nature, puisque leur ambiguïté concerne précisément cette dimension.
+
+## Limites de classification
 
 L’analyse reste statique. Elle ne développe pas les titres calculés, ne suit pas toutes les fabriques de tests
 et ne reconstitue pas automatiquement le comportement d’une fixture définie ailleurs. Ces cas restent
-`unresolved` lorsqu’aucune autre preuve n’est suffisante. Le PBI 1.6 approfondira la distinction entre cas
-logiques et instances exécutées.
+`unresolved` lorsqu’aucune autre preuve n’est suffisante. Le comptage d'exécution n'essaie pas de résoudre
+ces ambiguïtés de nature.
 
 Ce PBI n’ajoute aucun marqueur, ne modifie aucune configuration de framework, aucun profil CI/CD et aucune
 gate. L’inventaire est une preuve versionnée, pas encore un contrôle bloquant; l’enforcement relève du

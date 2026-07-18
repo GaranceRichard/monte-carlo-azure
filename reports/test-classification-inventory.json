@@ -7134,6 +7134,143 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_test_execution_counts.py::test_aggregate_invariants_and_cross_artifact_conflicts_are_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_counts.py",
+    "selector": "test_aggregate_invariants_and_cross_artifact_conflicts_are_rejected",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "accessibility",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_execution_counts.py::test_consolidation_separates_logical_instances_attempts_and_results",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_counts.py",
+    "selector": "test_consolidation_separates_logical_instances_attempts_and_results",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_execution_counts.py::test_incomplete_ambiguous_or_malformed_collection_is_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_counts.py",
+    "selector": "test_incomplete_ambiguous_or_malformed_collection_is_rejected",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience",
+      "data_quality"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_execution_counts.py::test_invalid_native_instances_are_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_counts.py",
+    "selector": "test_invalid_native_instances_are_rejected",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_execution_counts.py::test_missing_framework_duplicate_json_and_invalid_inventory_are_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_counts.py",
+    "selector": "test_missing_framework_duplicate_json_and_invalid_inventory_are_rejected",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_execution_counts.py::test_native_instance_contract_rejects_invalid_fields",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_counts.py",
+    "selector": "test_native_instance_contract_rejects_invalid_fields",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_execution_counts.py::test_pytest_native_hooks_count_parameters_classes_skip_xfail_and_setup_error",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_counts.py",
+    "selector": "test_pytest_native_hooks_count_parameters_classes_skip_xfail_and_setup_error",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_execution_counts.py::test_report_shape_conforms_to_versioned_schema",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_counts.py",
+    "selector": "test_report_shape_conforms_to_versioned_schema",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_execution_counts.py::test_script_entrypoint_uses_cli_arguments",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_counts.py",
+    "selector": "test_script_entrypoint_uses_cli_arguments",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_execution_counts.py::test_two_consolidations_are_byte_identical_and_cli_writes_the_report",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_counts.py",
+    "selector": "test_two_consolidations_are_byte_identical_and_cli_writes_the_report",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_metrics_below_threshold",
     "framework": "pytest",
     "sourcePath": "tests/test_vitals_compliance.py",
@@ -7720,10 +7857,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/AppFlowContent.test.tsx::AppFlowContent > passes demo mode %s to the team step [159:3]",
+    "logicalCaseId": "vitest:frontend/src/AppFlowContent.test.tsx::AppFlowContent > passes demo mode %s to the team step [162:4]",
     "framework": "vitest",
     "sourcePath": "frontend/src/AppFlowContent.test.tsx",
-    "selector": "AppFlowContent > passes demo mode %s to the team step [159:3]",
+    "selector": "AppFlowContent > passes demo mode %s to the team step [162:4]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "component",
@@ -11347,10 +11484,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/portfolioPrintReport.test.ts::portfolioPrintReport > keeps the user pilot reference %s separate from evidence [268:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/portfolioPrintReport.test.ts::portfolioPrintReport > keeps the user pilot reference %s separate from evidence [273:13]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/portfolioPrintReport.test.ts",
-    "selector": "portfolioPrintReport > keeps the user pilot reference %s separate from evidence [268:3]",
+    "selector": "portfolioPrintReport > keeps the user pilot reference %s separate from evidence [273:13]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "unit",
@@ -13416,10 +13553,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > keeps the %s decision wording aligned with the interface [134:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > keeps the %s decision wording aligned with the interface [138:13]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > keeps the %s decision wording aligned with the interface [134:3]",
+    "selector": "simulationPrintReport > keeps the %s decision wording aligned with the interface [138:13]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "unit",
@@ -13553,10 +13690,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > renders high historical sensitivity for %s [151:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > renders high historical sensitivity for %s [151:58]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > renders high historical sensitivity for %s [151:3]",
+    "selector": "simulationPrintReport > renders high historical sensitivity for %s [151:58]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "unit",
@@ -13931,10 +14068,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > produces the expected decision profile for %s through production diagnostics [115:3]",
+    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > produces the expected decision profile for %s through production diagnostics [119:13]",
     "framework": "vitest",
     "sourcePath": "frontend/src/demoData.test.ts",
-    "selector": "demoData > produces the expected decision profile for %s through production diagnostics [115:3]",
+    "selector": "demoData > produces the expected decision profile for %s through production diagnostics [119:13]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "unit",
@@ -14676,10 +14813,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/probability.test.ts::buildProbabilityCurve > matches the completion rate ceiling for weeks at $expectedMax% [68:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/probability.test.ts::buildProbabilityCurve > matches the completion rate ceiling for weeks at $expectedMax% [74:4]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/probability.test.ts",
-    "selector": "buildProbabilityCurve > matches the completion rate ceiling for weeks at $expectedMax% [68:3]",
+    "selector": "buildProbabilityCurve > matches the completion rate ceiling for weeks at $expectedMax% [74:4]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "unit",
@@ -15838,10 +15975,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/usePortfolioReport.test.tsx::usePortfolioReport > forwards the explicit %s pilot reference without changing the domain recommendation [116:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/usePortfolioReport.test.tsx::usePortfolioReport > forwards the explicit %s pilot reference without changing the domain recommendation [116:72]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/usePortfolioReport.test.tsx",
-    "selector": "usePortfolioReport > forwards the explicit %s pilot reference without changing the domain recommendation [116:3]",
+    "selector": "usePortfolioReport > forwards the explicit %s pilot reference without changing the domain recommendation [116:72]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "component",
@@ -16108,10 +16245,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulation.test.tsx::useSimulation > invalidates result and chart data without recalculating after changing %s [200:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulation.test.tsx::useSimulation > invalidates result and chart data without recalculating after changing %s [205:4]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulation.test.tsx",
-    "selector": "useSimulation > invalidates result and chart data without recalculating after changing %s [200:3]",
+    "selector": "useSimulation > invalidates result and chart data without recalculating after changing %s [205:4]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "component",
@@ -17249,10 +17386,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > describes short historical depth from available public diagnostics [227:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > describes short historical depth from available public diagnostics [243:4]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/decisionLanguage.test.ts",
-    "selector": "decision language > describes short historical depth from available public diagnostics [227:3]",
+    "selector": "decision language > describes short historical depth from available public diagnostics [243:4]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "unit",
@@ -17288,10 +17425,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > explains censored forecasts and recommends an applicable horizon change [264:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > explains censored forecasts and recommends an applicable horizon change [267:4]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/decisionLanguage.test.ts",
-    "selector": "decision language > explains censored forecasts and recommends an applicable horizon change [264:3]",
+    "selector": "decision language > explains censored forecasts and recommends an applicable horizon change [267:4]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "unit",
@@ -17303,10 +17440,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > explains discarded history values and recommends correcting them [334:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > explains discarded history values and recommends correcting them [337:4]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/decisionLanguage.test.ts",
-    "selector": "decision language > explains discarded history values and recommends correcting them [334:3]",
+    "selector": "decision language > explains discarded history values and recommends correcting them [337:4]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "unit",
@@ -17318,10 +17455,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > formats %s sensitivity for %s [474:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > formats %s sensitivity for %s [480:13]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/decisionLanguage.test.ts",
-    "selector": "decision language > formats %s sensitivity for %s [474:3]",
+    "selector": "decision language > formats %s sensitivity for %s [480:13]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "unit",
@@ -17483,10 +17620,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > uses optional usable-history values for %s data [410:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > uses optional usable-history values for %s data [413:13]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/decisionLanguage.test.ts",
-    "selector": "decision language > uses optional usable-history values for %s data [410:3]",
+    "selector": "decision language > uses optional usable-history values for %s data [413:13]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "unit",
@@ -17510,10 +17647,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > uses the sensitivity trend to select the decision action [377:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > uses the sensitivity trend to select the decision action [388:4]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/decisionLanguage.test.ts",
-    "selector": "decision language > uses the sensitivity trend to select the decision action [377:3]",
+    "selector": "decision language > uses the sensitivity trend to select the decision action [388:4]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "unit",

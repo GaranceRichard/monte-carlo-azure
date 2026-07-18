@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/test-execution-counts/1.0.0",
+  "x-schemaVersion": "1.0.0",
+  "title": "Logical test cases and native execution counts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "classificationInventorySha256",
+    "totals",
+    "frameworks",
+    "classificationStatuses",
+    "natures",
+    "logicalCases",
+    "anomalies"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "classificationInventorySha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "totals": { "$ref": "#/$defs/counts" },
+    "frameworks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["playwright", "pytest", "vitest"],
+      "properties": {
+        "playwright": { "$ref": "#/$defs/counts" },
+        "pytest": { "$ref": "#/$defs/counts" },
+        "vitest": { "$ref": "#/$defs/counts" }
+      }
+    },
+    "classificationStatuses": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/counts" }
+    },
+    "natures": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/counts" }
+    },
+    "logicalCases": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/logicalCase" }
+    },
+    "anomalies": {
+      "type": "array",
+      "maxItems": 0
+    }
+  },
+  "$defs": {
+    "results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "failed", "skipped", "todo", "infrastructureError"],
+      "properties": {
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "skipped": { "type": "integer", "minimum": 0 },
+        "todo": { "type": "integer", "minimum": 0 },
+        "infrastructureError": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "logicalCases",
+        "collectedInstances",
+        "executedInstances",
+        "skippedInstances",
+        "attempts",
+        "retries",
+        "results"
+      ],
+      "properties": {
+        "logicalCases": { "type": "integer", "minimum": 0 },
+        "collectedInstances": { "type": "integer", "minimum": 0 },
+        "executedInstances": { "type": "integer", "minimum": 0 },
+        "skippedInstances": { "type": "integer", "minimum": 0 },
+        "attempts": { "type": "integer", "minimum": 0 },
+        "retries": { "type": "integer", "minimum": 0 },
+        "results": { "$ref": "#/$defs/results" }
+      }
+    },
+    "logicalCase": {
+      "allOf": [
+        { "$ref": "#/$defs/counts" },
+        {
+          "type": "object",
+          "required": [
+            "logicalCaseId",
+            "framework",
+            "sourcePath",
+            "selector",
+            "classificationStatus"
+          ],
+          "properties": {
+            "logicalCaseId": { "type": "string", "minLength": 1 },
+            "framework": { "enum": ["pytest", "vitest", "playwright"] },
+            "sourcePath": { "type": "string", "minLength": 1 },
+            "selector": { "type": "string", "minLength": 1 },
+            "classificationStatus": { "enum": ["classified", "unresolved", "exempted"] },
+            "nature": { "enum": ["unit", "component", "integration", "contract", "e2e"] }
+          }
+        }
+      ]
+    }
+  }
+}
