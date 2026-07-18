@@ -338,8 +338,18 @@ Le contrat de classification est versionné dans
 [`config/test-classification.json`](config/test-classification.json) et son schéma d'enregistrement Draft
 2020-12 dans [`config/test-classification.schema.json`](config/test-classification.schema.json). Les domaines
 stables reflètent les frontières du produit et de la chaîne qualité ; les règles d'interprétation sont
-documentées dans [`docs/test-classification.md`](docs/test-classification.md). Ce modèle reste déclaratif :
-il ne modifie ni l'architecture d'exécution des tests, ni la sélection des gates, ni la CI.
+documentées dans [`docs/test-classification.md`](docs/test-classification.md).
+
+`Scripts/classify_tests.py` orchestre deux collecteurs statiques : l’AST Python pour les cas Pytest et un
+collecteur JavaScript séparé fondé sur le compilateur TypeScript installé pour Vitest et Playwright. Le moteur
+applique les signaux versionnés de `config/test-classification-rules.json`, puis les seules exceptions exactes
+et justifiées de `config/test-classification-overrides.json`. Il écrit l’inventaire trié
+`reports/test-classification-inventory.json`; aucune horloge ni information d’environnement n’entre dans sa
+sérialisation.
+
+Ce composant est actuellement hors du chemin d’enforcement. Il ne modifie ni l’architecture d’exécution des
+tests, ni la sélection des gates, ni la CI. Les cas insuffisamment prouvés restent explicitement
+`unresolved`; le PBI 1.7 décidera du contrôle bloquant et le PBI 1.8 de la recomposition des profils.
 
 La sélection des contrôles est centralisée dans `Scripts/quality_gate.py` :
 

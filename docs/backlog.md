@@ -12,7 +12,7 @@
 |    1.2 | Auditer et résorber la dette documentaire Markdown                   |      L     |   Sol High   | 18/07/2026 |
 |    1.3 | Cartographier les risques et les parcours critiques                  |      L     |  Sol Medium  | 18/07/2026 |
 |    1.4 | Définir le modèle de classification des tests                        |      M     |   Sol High   | 18/07/2026 |
-|    1.5 | Classifier automatiquement le patrimoine de tests existant           |      L     |   Sol High   |            |
+|    1.5 | Classifier automatiquement le patrimoine de tests existant           |      L     |   Sol High   | 18/07/2026 |
 |    1.6 | Distinguer les cas logiques des instances exécutées                  |      L     |   Sol High   |            |
 |    1.7 | Bloquer les classifications absentes ou invalides                    |      M     |   Sol High   |            |
 |    1.8 | Recomposer les profils d’exécution CI/CD                             |      L     |   Sol High   |            |
@@ -228,7 +228,7 @@
 
 |                                       Feature | Nombre de PBI | Réalisés |
 | --------------------------------------------: | ------------: |:--------:|
-|                  1 — Preuve qualité gouvernée |            10 |        4 |
+|                  1 — Preuve qualité gouvernée |            10 |        5 |
 |             2 — Fiabilité du cœur statistique |             8 |          |
 |                 3 — Réutilisabilité du moteur |             5 |          |
 |            4 — Mise en production personnelle |             6 |          |
@@ -240,6 +240,6 @@
 |               10 — Expérience et restitutions |             9 |          |
 |                              11 — Scalabilité |             8 |          |
 |                    12 — Pilotage de programme |             7 |          |
-|                                     **Total** |    **92 PBI** |        4 |
+|                                     **Total** |    **92 PBI** |        5 |
 
 Aucun PBI n’est classé XL. Les PBI de réalisation technique, même de complexité M, utilisent généralement **Sol High** lorsque le risque porte sur les statistiques, l’architecture, la sécurité, la CI/CD ou les contrats.

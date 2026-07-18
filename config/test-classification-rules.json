@@ -1,0 +1,214 @@
+{
+  "rulesVersion": "1.0.0",
+  "priorityPolicy": "Lower numeric values win for the single nature; additive dimensions accumulate.",
+  "automation": {
+    "currentExecutionProfile": "main",
+    "evidence": [
+      ".github/workflows/ci.yml runs Scripts/quality_gate.py ci on push and pull_request.",
+      "Scripts/quality_gate.py ci executes full Pytest and Vitest coverage plus Playwright E2E.",
+      "PBI 1.8, not this inventory, owns future profile recomposition."
+    ]
+  },
+  "defaults": {
+    "purpose": "functional"
+  },
+  "natureRules": [
+    {
+      "id": "assembled_browser_scenario",
+      "priority": 10,
+      "nature": "e2e",
+      "requiresBehaviorEvidence": true,
+      "match": {
+        "frameworks": ["playwright"],
+        "any": {
+          "calls": ["(?:^|\\.)page\\.", "expect\\(", "setupAppRoutes"]
+        }
+      }
+    },
+    {
+      "id": "real_technical_boundary",
+      "priority": 20,
+      "nature": "integration",
+      "requiresBehaviorEvidence": true,
+      "match": {
+        "frameworks": ["pytest", "vitest"],
+        "any": {
+          "fixtures": ["^(?:tmp_path|tmpdir|tmp_path_factory)$"],
+          "calls": [
+            "(?:subprocess\\.)?(?:run|Popen|check_call|check_output)$",
+            "(?:^|\\.)(?:write_text|write_bytes|read_text|read_bytes|mkdir|unlink|rename|replace)$",
+            "(?:MongoClient|create_index|insert_one|insert_many|delete_many)$",
+            "(?:fs\\.|node:fs)"
+          ]
+        }
+      }
+    },
+    {
+      "id": "interface_contract_behavior",
+      "priority": 30,
+      "nature": "contract",
+      "requiresBehaviorEvidence": true,
+      "match": {
+        "frameworks": ["pytest", "vitest"],
+        "any": {
+          "calls": [
+            "(?:client|response|r)\\.(?:get|post|put|delete|options|json)$",
+            "(?:model_validate|model_json_schema|validate_python|parse_obj)$",
+            "(?:fetch|requestForecast|fetchSimulationHistory)$"
+          ]
+        },
+        "none": {
+          "fixtures": ["^(?:tmp_path|tmpdir|tmp_path_factory)$"]
+        }
+      }
+    },
+    {
+      "id": "react_component_or_hook",
+      "priority": 40,
+      "nature": "component",
+      "requiresBehaviorEvidence": true,
+      "match": {
+        "frameworks": ["vitest"],
+        "any": {
+          "imports": ["^@testing-library/(?:react|user-event)$"],
+          "calls": ["^(?:render|renderHook|fireEvent\\.|userEvent\\.)"]
+        }
+      }
+    },
+    {
+      "id": "module_with_replaced_collaboration",
+      "priority": 45,
+      "nature": "component",
+      "requiresBehaviorEvidence": true,
+      "match": {
+        "frameworks": ["pytest", "vitest"],
+        "any": {
+          "fixtures": ["^(?:monkeypatch|mocker)$"],
+          "calls": ["^(?:vi\\.(?:mock|spyOn|mocked)|jest\\.(?:mock|spyOn))"]
+        },
+        "none": {
+          "fixtures": ["^(?:tmp_path|tmpdir|tmp_path_factory)$"]
+        }
+      }
+    },
+    {
+      "id": "isolated_python_logic",
+      "priority": 60,
+      "nature": "unit",
+      "requiresBehaviorEvidence": true,
+      "match": {
+        "frameworks": ["pytest"],
+        "any": {
+          "imports": ["^(?:backend|Scripts|run_app)(?:\\.|$)|^(?:check_|quality_gate$|maintainability_|pre_commit_guard$|report_vitals|scrub_|setup_|purge_)"]
+        },
+        "none": {
+          "fixtures": ["^(?:tmp_path|tmpdir|tmp_path_factory|monkeypatch|mocker)$"],
+          "calls": ["(?:client|response|r)\\.(?:get|post|put|delete|options|json)$"]
+        }
+      }
+    },
+    {
+      "id": "isolated_frontend_logic",
+      "priority": 60,
+      "nature": "unit",
+      "requiresBehaviorEvidence": true,
+      "match": {
+        "frameworks": ["vitest"],
+        "any": {
+          "imports": ["^\\."]
+        },
+        "none": {
+          "imports": ["^@testing-library/"],
+          "calls": ["^(?:vi\\.(?:mock|spyOn|mocked)|jest\\.(?:mock|spyOn)|fetch)"]
+        }
+      }
+    }
+  ],
+  "purposeRules": [
+    {
+      "id": "security_behavior",
+      "priority": 10,
+      "values": ["security"],
+      "match": {
+        "any": {
+          "calls": ["secret|identity|cookie|rate.?limit|cors|credential"],
+          "resources": ["dev\\.azure\\.com|app\\.vssps\\.visualstudio\\.com"],
+          "selector": ["PAT|secret|identity|cookie|rate.?limit|cors|credential"]
+        }
+      }
+    },
+    {
+      "id": "performance_behavior",
+      "priority": 20,
+      "values": ["performance"],
+      "match": {"any": {"selector": ["timeout|batch|duration|performance|n_sims|max.*size"]}}
+    },
+    {
+      "id": "resilience_behavior",
+      "priority": 20,
+      "values": ["resilience"],
+      "match": {"any": {"selector": ["unavailable|unreachable|fail|retry|recovery|fallback|timeout|503|malformed"]}}
+    },
+    {
+      "id": "accessibility_behavior",
+      "priority": 20,
+      "values": ["accessibility"],
+      "match": {
+        "any": {
+          "calls": ["getByRole|aria|keyboard|keyDown"],
+          "selector": ["aria|keyboard|backspace|accessible|focus|dialog"]
+        }
+      }
+    },
+    {
+      "id": "compatibility_behavior",
+      "priority": 20,
+      "values": ["compatibility"],
+      "match": {"any": {"selector": ["legacy|compatib|platform|browser|fallback|on.?prem|server"]}}
+    },
+    {
+      "id": "migration_recovery_behavior",
+      "priority": 20,
+      "values": ["migration_recovery"],
+      "match": {"any": {"selector": ["legacy|migrat|restore|replay|scrub|purge|recover"]}}
+    },
+    {
+      "id": "observability_behavior",
+      "priority": 20,
+      "values": ["observability"],
+      "match": {"any": {"selector": ["log|health|coverage|artifact|report|metric|vital"]}}
+    },
+    {
+      "id": "data_quality_behavior",
+      "priority": 20,
+      "values": ["data_quality"],
+      "match": {"any": {"selector": ["data.?quality|reliab|sample|incomplete|partial|missing.*data|malformed"]}}
+    }
+  ],
+  "domainRules": [
+    {"id": "identity", "priority": 10, "values": ["identity"], "match": {"any": {"sourcePath": ["identity|clientId"], "selector": ["identity|cookie|PAT|client.?id"]}}},
+    {"id": "azure_devops", "priority": 10, "values": ["azure_devops"], "match": {"any": {"sourcePath": ["ado|onboarding|OrgStep|PatStep|ProjectStep|TeamStep"], "selector": ["Azure|ADO|organization|project|team|PAT"]}}},
+    {"id": "data", "priority": 10, "values": ["data"], "match": {"any": {"sourcePath": ["demoData|cycleTime"], "selector": ["sample|throughput|data.?quality|cycle.?time"]}}},
+    {"id": "statistical_engine", "priority": 10, "values": ["statistical_engine"], "match": {"any": {"sourcePath": ["mc_core|simulation|probability|forecastDiagnostic|math"], "selector": ["percentile|simulation|forecast|risk.?score|histogram|probability|censor"]}}},
+    {"id": "api", "priority": 10, "values": ["api"], "match": {"any": {"sourcePath": ["test_api_|/api\\.test|apiHelpers"], "calls": ["(?:client|response|r)\\.(?:get|post|options|json)$", "fetch"]}}},
+    {"id": "history", "priority": 10, "values": ["history"], "match": {"any": {"sourcePath": ["history|storage|simulationSignature"], "selector": ["history|restore|legacy|replay|cache"]}}},
+    {"id": "persistence", "priority": 10, "values": ["persistence"], "match": {"any": {"sourcePath": ["simulation_store|storage|purge|scrub"], "selector": ["mongo|persist|save|store|database"]}}},
+    {"id": "portfolio", "priority": 10, "values": ["portfolio"], "match": {"any": {"sourcePath": ["Portfolio|portfolio"], "selector": ["portfolio|scenario|team comparison"]}}},
+    {"id": "reporting", "priority": 10, "values": ["reporting"], "match": {"any": {"sourcePath": ["Report|report|Export|export|Pdf|PDF|print"], "selector": ["report|export|PDF|CSV|print"]}}},
+    {"id": "user_interface", "priority": 10, "values": ["user_interface"], "match": {"any": {"imports": ["^@testing-library/", "^@playwright/test$"], "calls": ["render|page\\."]}}},
+    {"id": "deployment", "priority": 10, "values": ["deployment"], "match": {"any": {"sourcePath": ["run_app|e2e_web_server|operational"], "selector": ["docker|server|entrypoint|startup"]}}},
+    {"id": "quality_chain", "priority": 10, "values": ["quality_chain"], "match": {"any": {"sourcePath": ["test_(?:quality_gate|python_coverage|e2e_coverage|vitals|maintainability|repo_compliance|naming|pre_commit|check_no_secrets|test_classifier)"], "selector": ["coverage|quality.?gate|maintainability|compliance|naming"]}}}
+  ],
+  "traceabilityRules": [
+    {"id": "identity_boundary", "priority": 10, "risks": ["RISK-001"], "criticalPaths": ["CP-001"], "criticality": "critical", "match": {"all": {"sourcePath": ["test_identity_boundary\\.py"], "selector": ["identity|payload|backend|frontend|ado"]}}},
+    {"id": "anonymous_cookie", "priority": 10, "risks": ["RISK-002"], "criticalPaths": ["CP-002"], "criticality": "critical", "match": {"all": {"sourcePath": ["clientId\\.test\\.ts"], "selector": ["cookie|client|credential|request"]}}},
+    {"id": "statistical_correctness", "priority": 10, "risks": ["RISK-003", "RISK-004"], "criticalPaths": ["CP-003"], "criticality": "critical", "match": {"all": {"sourcePath": ["test_mc_core\\.py|utils/simulation\\.test\\.ts"], "selector": ["percentile|seed|histogram|censor|simulation|risk"]}}},
+    {"id": "simulate_contract", "priority": 10, "risks": ["RISK-005"], "criticalPaths": ["CP-003"], "criticality": "critical", "match": {"all": {"sourcePath": ["test_api_simulate\\.py|src/api\\.test\\.ts"], "selector": ["contract|reject|requires|boundary|payload|response"]}}},
+    {"id": "simulate_capacity", "priority": 10, "risks": ["RISK-016"], "criticalPaths": ["CP-003"], "criticality": "critical", "match": {"all": {"sourcePath": ["test_api_simulate\\.py|test_mc_core\\.py"], "selector": ["timeout|batch|n_sims|range|horizon|large"]}}},
+    {"id": "rate_limit", "priority": 10, "risks": ["RISK-013", "RISK-017"], "criticalPaths": ["CP-003"], "criticality": "critical", "match": {"all": {"sourcePath": ["test_api_simulate\\.py"], "selector": ["rate.?limit|redis|client.?key|forwarded"]}}},
+    {"id": "onboarding", "priority": 10, "risks": ["RISK-001", "RISK-002", "RISK-006", "RISK-007", "RISK-018", "RISK-019"], "criticalPaths": ["CP-004"], "criticality": "critical", "match": {"all": {"sourcePath": ["onboarding\\.spec\\.js|selection\\.spec\\.js"], "selector": ["onboarding|selection|navigation|organization|portfolio"]}}},
+    {"id": "report_export", "priority": 10, "risks": ["RISK-009", "RISK-010", "RISK-018", "RISK-019"], "criticalPaths": ["CP-005"], "criticality": "critical", "match": {"all": {"sourcePath": ["PrintReport\\.test|ExportModules\\.test|PdfDownload\\.fallback\\.test|portfolio-print-layout\\.spec"], "selector": ["report|PDF|export|print|fallback|layout|page"]}}},
+    {"id": "mongo_history", "priority": 10, "risks": ["RISK-011", "RISK-012", "RISK-017"], "criticalPaths": ["CP-003", "CP-007"], "criticality": "high", "match": {"all": {"sourcePath": ["test_simulation_store\\.py|test_api_history\\.py|test_api_health\\.py"], "selector": ["mongo|store|persist|history|retention|reconnect|health"]}}},
+    {"id": "quality_evidence", "priority": 10, "risks": ["RISK-020"], "criticalPaths": ["CP-008"], "criticality": "critical", "match": {"all": {"sourcePath": ["test_(?:quality_gate|python_coverage|e2e_coverage|vitals_compliance|maintainability|repo_compliance|test_classifier)"], "selector": ["coverage|gate|artifact|inventory|classifier|compliance|maintainability"]}}}
+  ]
+}

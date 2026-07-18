@@ -4,6 +4,9 @@
 
 ### Qualité et outillage
 
+- ajout du classificateur automatique du patrimoine Pytest, Vitest et Playwright : découverte AST des cas
+  logiques, règles comportementales priorisées, rattachement aux finalités, domaines, risques et parcours,
+  overrides exacts auditables et inventaire JSON reproductible, sans enforcement ni modification des profils
 - ajout du modèle versionné de classification des cas logiques selon `STD-TEST-001` : catalogue de
   vocabulaires, domaines et règles de résolution, schéma JSON Draft 2020-12, documentation et tests de
   cohérence, sans classification du patrimoine ni modification des gates

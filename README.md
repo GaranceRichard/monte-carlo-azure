@@ -355,8 +355,19 @@ while ($true) { try { Invoke-RestMethod http://127.0.0.1:8000/health/mongo -Time
 
 Le modèle versionné de classification des cas logiques est décrit dans
 [`docs/test-classification.md`](docs/test-classification.md). Il sépare nature, finalités, profil
-d'exécution, domaines et criticité. Le PBI 1.4 définit uniquement ce contrat : aucun test existant n'est
-encore classifié et la CI ne bloque pas sur ces métadonnées.
+d'exécution, domaines et criticité. L’inventaire déterministe du patrimoine Pytest, Vitest et Playwright se
+reconstruit depuis la racine avec :
+
+```bash
+python Scripts/classify_tests.py
+```
+
+Le résultat est versionné dans
+[`reports/test-classification-inventory.json`](reports/test-classification-inventory.json). Les règles et
+exceptions auditables résident respectivement dans
+[`config/test-classification-rules.json`](config/test-classification-rules.json) et
+[`config/test-classification-overrides.json`](config/test-classification-overrides.json). La classification
+reste informative à ce stade : elle ne modifie ni la sélection des tests ni les gates CI/CD.
 
 Depuis la racine:
 
