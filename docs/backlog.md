@@ -10,7 +10,7 @@
 | -----: | -------------------------------------------------------------------- | :--------: | :----------: |:----------:|
 |    1.1 | Versionner le standard de test et aligner la documentation normative |      M     |  Sol Medium  | 18/07/2026 |
 |    1.2 | Auditer et résorber la dette documentaire Markdown                   |      L     |   Sol High   |            |
-|    1.3 | Cartographier les risques et les parcours critiques                  |      L     |  Sol Medium  |            |
+|    1.3 | Cartographier les risques et les parcours critiques                  |      L     |  Sol Medium  | 18/07/2026 |
 |    1.4 | Définir le modèle de classification des tests                        |      M     |   Sol High   |            |
 |    1.5 | Classifier automatiquement le patrimoine de tests existant           |      L     |   Sol High   |            |
 |    1.6 | Distinguer les cas logiques des instances exécutées                  |      L     |   Sol High   |            |

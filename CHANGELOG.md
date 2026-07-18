@@ -4,6 +4,8 @@
 
 ### Qualité et outillage
 
+- création de la matrice risques–contrôles et enrichissement des parcours critiques, avec distinction explicite
+  entre maîtrise démontrée, couverture partielle et lacune planifiée
 - audit de tous les fichiers Markdown suivis par Git, correction des accents, encodages et échappements
   Unicode, et vérification des liens internes et de la cohérence factuelle
 - versionnement de `STD-TEST-001`, standard de classification, de qualité et de pilotage des tests, et

@@ -26,6 +26,7 @@ Démo GitHub Pages:
   [`docs/standards/STD-TEST-001.md`](docs/standards/STD-TEST-001.md)
 - Definition of Done : [`docs/definition-of-done.md`](docs/definition-of-done.md)
 - chemins critiques: [`docs/critical-paths.md`](docs/critical-paths.md)
+- matrice risques–contrôles: [`docs/risk-control-matrix.md`](docs/risk-control-matrix.md)
 - traçabilité vitals -> tests: [`docs/vitals-traceability.md`](docs/vitals-traceability.md)
 - mapping coverage vitals: [`docs/vitals-coverage-map.json`](docs/vitals-coverage-map.json)
 - déploiement production: [`docs/deployment.md`](docs/deployment.md)

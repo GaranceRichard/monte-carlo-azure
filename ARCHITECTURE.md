@@ -330,6 +330,9 @@ Le standard [`STD-TEST-001`](docs/standards/STD-TEST-001.md) définit la norme d
 et de pilotage des tests. Son versionnement constitue la référence normative de la stratégie de test ; il
 n’implique pas que le dépôt satisfait déjà l’ensemble de ses exigences. Les conditions opérationnelles et
 les exigences plus strictes de la [`Definition of Done`](docs/definition-of-done.md) restent applicables.
+La lecture factuelle des risques, contrôles présents, preuves et lacunes résiduelles est maintenue dans la
+[`matrice risques–contrôles`](docs/risk-control-matrix.md), sans que son existence vaille conformité complète
+au standard.
 
 La sélection des contrôles est centralisée dans `Scripts/quality_gate.py` :
 
