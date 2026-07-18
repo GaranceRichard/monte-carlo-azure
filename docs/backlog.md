@@ -6,18 +6,18 @@
 
 **Flux de valeur :** rendre mesurable et vérifiable la confiance apportée par la stratégie de test, plutôt que de s’appuyer uniquement sur le volume de tests ou la couverture du code.
 
-| Numéro | Titre                                                                | Complexité | Modèle Codex |
-| -----: | -------------------------------------------------------------------- | :--------: | :----------: |
-|    1.1 | Versionner le standard de test et aligner la documentation normative |      M     |  Sol Medium  |
-|    1.2 | Auditer et résorber la dette documentaire Markdown                   |      L     |   Sol High   |
-|    1.3 | Cartographier les risques et les parcours critiques                  |      L     |  Sol Medium  |
-|    1.4 | Définir le modèle de classification des tests                        |      M     |   Sol High   |
-|    1.5 | Classifier automatiquement le patrimoine de tests existant           |      L     |   Sol High   |
-|    1.6 | Distinguer les cas logiques des instances exécutées                  |      L     |   Sol High   |
-|    1.7 | Bloquer les classifications absentes ou invalides                    |      M     |   Sol High   |
-|    1.8 | Recomposer les profils d’exécution CI/CD                             |      L     |   Sol High   |
-|    1.9 | Gouverner les tests ignorés, intermittents et en quarantaine         |      M     |   Sol High   |
-|   1.10 | Publier un reporting consolidé de la stratégie de test               |      L     |   Sol High   |
+| Numéro | Titre                                                                | Complexité | Modèle Codex | Réalisé le |
+| -----: | -------------------------------------------------------------------- | :--------: | :----------: |:----------:|
+|    1.1 | Versionner le standard de test et aligner la documentation normative |      M     |  Sol Medium  | 18/07/2026 |
+|    1.2 | Auditer et résorber la dette documentaire Markdown                   |      L     |   Sol High   |            |
+|    1.3 | Cartographier les risques et les parcours critiques                  |      L     |  Sol Medium  |            |
+|    1.4 | Définir le modèle de classification des tests                        |      M     |   Sol High   |            |
+|    1.5 | Classifier automatiquement le patrimoine de tests existant           |      L     |   Sol High   |            |
+|    1.6 | Distinguer les cas logiques des instances exécutées                  |      L     |   Sol High   |            |
+|    1.7 | Bloquer les classifications absentes ou invalides                    |      M     |   Sol High   |            |
+|    1.8 | Recomposer les profils d’exécution CI/CD                             |      L     |   Sol High   |            |
+|    1.9 | Gouverner les tests ignorés, intermittents et en quarantaine         |      M     |   Sol High   |            |
+|   1.10 | Publier un reporting consolidé de la stratégie de test               |      L     |   Sol High   |            |
 
 ---
 
