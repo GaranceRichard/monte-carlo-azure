@@ -379,6 +379,28 @@ def test_record_validation_rejects_contract_violations() -> None:
     }
     assert any("cannot contain" in error for error in validate_record(classified, catalog, schema))
 
+    unresolved_with_exemption = unresolved | {
+        "unresolvedReason": "Ambiguous boundary.",
+        "exemption": {"justification": "invalid for unresolved"},
+    }
+    assert any(
+        "unresolved records cannot contain exemption" in error
+        for error in validate_record(unresolved_with_exemption, catalog, schema)
+    )
+    exempted_without_governance = invalid | {"status": "exempted", "framework": "pytest"}
+    assert any(
+        "exempted records require exemption" in error
+        for error in validate_record(exempted_without_governance, catalog, schema)
+    )
+    exempted_with_reason = exempted_without_governance | {
+        "unresolvedReason": "incompatible",
+        "exemption": {"justification": "Temporary."},
+    }
+    assert any(
+        "exempted records cannot contain unresolvedReason" in error
+        for error in validate_record(exempted_with_reason, catalog, schema)
+    )
+
 
 def test_unresolved_override_preserves_its_explicit_reason() -> None:
     rules, _overrides, catalog, _schema = _configuration()

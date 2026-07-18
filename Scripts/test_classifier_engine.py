@@ -6,6 +6,7 @@ import re
 from copy import deepcopy
 from typing import Any
 
+from Scripts.test_classification_contract import validate_record_engine
 from Scripts.test_classifier_discovery import LogicalCase
 
 EVIDENCE_FIELDS = ("imports", "calls", "fixtures", "resources", "modifiers")
@@ -136,7 +137,7 @@ def _apply_override(record: dict[str, Any], override: dict[str, Any]) -> dict[st
         )
     result = deepcopy(record)
     result.update(override["classification"])
-    if result["status"] == "classified":
+    if result["status"] in {"classified", "exempted"}:
         result.pop("unresolvedReason", None)
     return result
 
@@ -166,65 +167,10 @@ def classify_case(
     return _apply_override(record, override) if override else record
 
 
-def _validate_values(record: dict[str, Any], catalog: dict[str, Any]) -> list[str]:
-    errors: list[str] = []
-    mappings = {
-        "framework": ("framework", False),
-        "nature": ("nature", False),
-        "purposes": ("purpose", True),
-        "executionProfile": ("executionProfile", False),
-        "domains": ("domain", True),
-        "criticality": ("criticality", False),
-        "status": ("status", False),
-    }
-    for field, (dimension, multiple) in mappings.items():
-        if field not in record:
-            continue
-        allowed = catalog["dimensions"][dimension]["values"]
-        values = record[field] if multiple else [record[field]]
-        if (
-            not values
-            or len(values) != len(set(values))
-            or any(value not in allowed for value in values)
-        ):
-            errors.append(f"{field} has invalid values")
-    return errors
-
-
-def _validate_status(record: dict[str, Any]) -> list[str]:
-    errors: list[str] = []
-    status = record.get("status")
-    if status == "classified" and not {"nature", "purposes", "executionProfile"} <= set(record):
-        errors.append("classified records require nature, purposes and executionProfile")
-    if status == "unresolved" and not record.get("unresolvedReason"):
-        errors.append("unresolved records require unresolvedReason")
-    if status == "classified" and ("unresolvedReason" in record or "exemption" in record):
-        errors.append("classified records cannot contain unresolvedReason or exemption")
-    return errors
-
-
-def _validate_traceability(record: dict[str, Any]) -> list[str]:
-    errors: list[str] = []
-    for field, pattern in (("risks", r"RISK-[0-9]{3}"), ("criticalPaths", r"CP-[0-9]{3}")):
-        if field in record and any(re.fullmatch(pattern, item) is None for item in record[field]):
-            errors.append(f"{field} has invalid identifiers")
-        if field in record and "criticality" not in record:
-            errors.append(f"{field} requires criticality")
-    return errors
-
-
 def validate_record(
     record: dict[str, Any], catalog: dict[str, Any], schema: dict[str, Any]
 ) -> list[str]:
-    errors = _validate_values(record, catalog) + _validate_status(record)
-    allowed = set(schema["properties"])
-    missing = set(schema["required"]) - set(record)
-    if missing:
-        errors.append(f"missing required fields: {', '.join(sorted(missing))}")
-    unknown = set(record) - allowed
-    if unknown:
-        errors.append(f"unknown fields: {', '.join(sorted(unknown))}")
-    return errors + _validate_traceability(record)
+    return validate_record_engine(record, catalog, schema)
 
 
 def classify_inventory(

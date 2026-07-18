@@ -16,8 +16,8 @@ restent applicables.
   domaine concerné.
 - **Validation massive** : plan complet déclenché par un changement transverse, structurel, central,
   inconnu ou ambigu. Toute résolution incertaine se replie vers `massive`.
-- **Validation complète** : task VS Code `Coverage: 8 terminaux`, avec lint, typecheck, couvertures Python
-  et frontend, build, E2E, Vitals et convention de nommage.
+- **Validation complète** : task VS Code `Coverage: 8 terminaux`, avec conformité de classification, lint,
+  typecheck, couvertures Python et frontend, build, E2E, Vitals et convention de nommage.
 - **Conformité DoD** : validation complète verte, seuils respectés, documentation normative cohérente,
   sécurité et traçabilité vérifiées.
 - **Publiabilité** : conformité DoD, worktree Git valide, branche courante identifiée et remote GitHub
@@ -98,11 +98,13 @@ répertoire de l’exécution courante est nettoyé ; le temporaire global de l�
   test négatif ou garde-fou.
 - Les tests d’intégration couvrent les frontières réelles : API, base de données, cache et authentification
   lorsque ces composants sont concernés.
-- Tout futur enregistrement de classification respecte le catalogue
+- Tout enregistrement de classification respecte le catalogue
   [`test-classification.json`](../config/test-classification.json) et son schéma
-  [`test-classification.schema.json`](../config/test-classification.schema.json). Le PBI 1.4 définit ce
-  contrat sans classifier les tests existants et sans ajouter de contrôle bloquant ; ces étapes restent
-  explicitement réservées aux PBI suivants.
+  [`test-classification.schema.json`](../config/test-classification.schema.json). Le contrôle
+  `python Scripts/check_test_classification.py` doit confirmer l'égalité exacte entre cas découverts et
+  inventoriés, `unresolved = 0`, l'absence d'override orphelin et d'exemption expirée, ainsi que la concordance
+  de l'empreinte du rapport d'exécution. Un ajout, une suppression ou une modification de test exige la
+  régénération de l'inventaire et du rapport d'exécution.
 - Les déclarations logiques, instances collectées, instances exécutées et tentatives sont des mesures
   distinctes. Un paramètre, un projet ou un retry ne doit jamais gonfler le nombre de cas logiques, et un
   retry ne doit jamais gonfler le nombre d'instances exécutées.
@@ -125,6 +127,8 @@ Seuls le code trivial et le code purement déclaratif sans logique peuvent reste
 
 - [ ] Plan adapté au changement exécuté sans repli non traité.
 - [ ] Task `Coverage: 8 terminaux` entièrement verte.
+- [ ] Classification bloquante verte : inventaire exact, déterministe et sans `unresolved` ni exception
+      invalide.
 - [ ] Lint frontend et backend, typecheck, tests, build et E2E verts.
 - [ ] Couvertures Python et frontend >= 80 % ; chaque source Python mesurée est sans ligne rouge.
 - [ ] Couvertures E2E `statements`, `branches`, `functions` et `lines` >= 80 %.

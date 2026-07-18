@@ -3,7 +3,7 @@
 Le catalogue versionné [`config/test-classification.json`](../config/test-classification.json) définit les
 vocabulaires et règles de résolution du projet. Le schéma Draft 2020-12
 [`config/test-classification.schema.json`](../config/test-classification.schema.json) valide un enregistrement
-par cas logique. Ils rendent opérationnel le modèle de `STD-TEST-001` sans classifier le patrimoine actuel.
+par cas logique. Ils rendent opérationnel le modèle de `STD-TEST-001` sur tout le patrimoine découvert.
 
 ## Dimensions indépendantes
 
@@ -57,9 +57,9 @@ champs d'un enregistrement de classification.
 
 ## Collecte et génération de l’inventaire
 
-Le PBI 1.4 définit le contrat : il ne crée aucun inventaire complet, ne classe aucun test existant et ne
-rend pas la classification bloquante. Le présent PBI 1.5 ajoute la collecte et la classification informative
-décrites ci-dessous, sans modifier le contrat.
+Le PBI 1.4 a défini le contrat et le PBI 1.5 a ajouté la collecte et la classification automatiques. Le PBI
+1.7 rend désormais cet inventaire bloquant dans les validations locales et CI, sans modifier les profils
+d'exécution.
 
 La commande suivante reconstruit l’inventaire complet, sans donnée volatile :
 
@@ -71,6 +71,32 @@ Le résultat est écrit dans
 [`reports/test-classification-inventory.json`](../reports/test-classification-inventory.json). Les
 enregistrements sont triés par `logicalCaseId`; l’écriture UTF-8, les listes ordonnées et l’absence de
 timestamp rendent deux générations successives identiques octet pour octet.
+
+Le diagnostic bloquant, strictement en lecture seule, s'exécute avec :
+
+```bash
+python Scripts/check_test_classification.py
+```
+
+Il redécouvre tous les cas, régénère l'inventaire en mémoire, compare sa sérialisation exacte au fichier
+versionné et refuse les cas absents ou obsolètes, les doublons, les contrats invalides, les `unresolved`, les
+overrides orphelins ou incomplets et les exemptions non approuvées, incomplètes ou expirées. Il vérifie aussi
+que l'empreinte de `reports/test-execution-counts.json` correspond aux octets de l'inventaire versionné. Le
+contrôle n'écrit aucun fichier et ne régénère jamais silencieusement un artefact.
+
+Après ajout, suppression, renommage ou modification d'un test, la procédure de régénération est :
+
+```bash
+python Scripts/classify_tests.py
+python -m pytest -q
+npm --prefix frontend run test:unit
+npm --prefix frontend run test:e2e
+python Scripts/report_test_execution_counts.py
+python Scripts/check_test_classification.py
+```
+
+Les trois exécutions complètes reconstruisent les artefacts natifs nécessaires au rapport d'exécution. Une
+modification de règles ou d'override exige la même régénération, même si aucun fichier de test n'a changé.
 
 La découverte ne lance pas les tests :
 
@@ -115,8 +141,9 @@ un chemin et un sélecteur, puis fournit une classification ou un statut, une ju
 observable. Les doublons de ciblage sont refusés. Un override ne doit ni utiliser de motif global, ni
 remplacer les règles génériques, ni convertir en masse les ambiguïtés en saisie manuelle.
 
-Le fichier reste vide tant qu’aucune exception nécessaire et auditée n’est identifiée. Les cas ambigus sont
-donc visibles dans l’inventaire au lieu d’être masqués.
+Le fichier reste vide tant qu’aucune exception nécessaire et auditée n’est identifiée. Les 16 ambiguïtés
+historiques ont été résolues par des preuves comportementales plus précises ; aucun override ni aucune
+exemption n'a été créé. Toute nouvelle ambiguïté fait échouer la gate au lieu d'être masquée.
 
 ## Exemples vérifiés dans le dépôt
 
@@ -162,16 +189,19 @@ setup/hook identifiables restent des tentatives exécutées. Une limite native d
 exposer un échec attaché sans distinguer une assertion d'une erreur d'infrastructure ; le rapport conserve
 alors l'état natif le plus précis sans inférence sur le texte de la console.
 
-Les 16 cas `unresolved` gardent leur identité et participent à tous les totaux. Ils sont volontairement exclus
-de la ventilation par nature, puisque leur ambiguïté concerne précisément cette dimension.
+Le dépôt versionné exige désormais `unresolved = 0`. Une ambiguïté nouvelle doit être résolue par une preuve
+automatique ou, si l'analyse statique ne peut réellement pas conclure, par un override exact, justifié et
+appuyé par une preuve observable. Une exemption nécessite en plus une approbation réelle et une expiration
+future.
 
 ## Limites de classification
 
 L’analyse reste statique. Elle ne développe pas les titres calculés, ne suit pas toutes les fabriques de tests
-et ne reconstitue pas automatiquement le comportement d’une fixture définie ailleurs. Ces cas restent
-`unresolved` lorsqu’aucune autre preuve n’est suffisante. Le comptage d'exécution n'essaie pas de résoudre
-ces ambiguïtés de nature.
+et ne reconstitue pas automatiquement le comportement d’une fixture définie ailleurs. Ces limites ne
+permettent plus de versionner un cas `unresolved` : elles imposent une preuve automatique améliorée ou un
+override strictement ciblé et auditable. Le comptage d'exécution ne change pas la nature attribuée.
 
-Ce PBI n’ajoute aucun marqueur, ne modifie aucune configuration de framework, aucun profil CI/CD et aucune
-gate. L’inventaire est une preuve versionnée, pas encore un contrôle bloquant; l’enforcement relève du
-PBI 1.7.
+Le contrôle est exécuté une seule fois par plan `fast`, `push` et `ci` via `Scripts/quality_gate.py`, avec
+respectivement l'index Git, le commit détaché et le workspace comme source. La task `Coverage: 8 terminaux`
+l'exécute par `run-coverage-staged.ps1`. Aucun marqueur, profil CI/CD, skip, retry ou mécanisme de quarantaine
+n'est ajouté par ce PBI.

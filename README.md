@@ -367,7 +367,18 @@ Le résultat est versionné dans
 exceptions auditables résident respectivement dans
 [`config/test-classification-rules.json`](config/test-classification-rules.json) et
 [`config/test-classification-overrides.json`](config/test-classification-overrides.json). La classification
-reste informative à ce stade : elle ne modifie ni la sélection des tests ni les gates CI/CD.
+est bloquante : le contrôle en lecture seule redécouvre les cas et compare exactement l'inventaire généré au
+fichier versionné.
+
+```bash
+python Scripts/check_test_classification.py
+```
+
+Après ajout, suppression, renommage ou modification d'un test, exécutez `python Scripts/classify_tests.py`,
+les suites complètes Pytest, Vitest et Playwright, puis `python Scripts/report_test_execution_counts.py` et le
+diagnostic ci-dessus. La gate refuse tout cas absent, obsolète, dupliqué, invalide ou `unresolved`, tout
+override orphelin ou sans preuve et toute exemption incomplète ou expirée. Le dépôt courant conserve zéro
+override, zéro exemption et zéro `unresolved`.
 
 Le comptage d'exécution est distinct de cet inventaire. Après une exécution complète de chaque framework,
 les hooks/reporters natifs écrivent les artefacts intermédiaires ignorés par Git, puis la commande suivante
@@ -513,7 +524,8 @@ production n'est exclu par convenance.
 La task VS Code `Coverage: 8 terminaux` conserve l’orchestration manuelle complète. Elle appelle les
 scripts PowerShell versionnés `run-coverage-staged.ps1`, `run-e2e-coverage.ps1`,
 `run-vitals-staged.ps1`, `run-vitals-coverage.ps1` et `run-vitals-compliance.ps1`, puis termine par la
-convention de nommage. Elle produit ou réutilise notamment :
+convention de nommage. `run-coverage-staged.ps1` exécute aussi le contrôle bloquant de classification avant
+les couvertures. Elle produit ou réutilise notamment :
 
 - `.coverage` et `.coverage.python.json` pour tous les fichiers exécutables sous `backend/`, `Scripts/`
   et `run_app.py` ;
@@ -573,6 +585,9 @@ Le mode `fast` exécute notamment:
   - les vérifications de tasks VS Code sont appliquées seulement si `.vscode/tasks.json` est présent
 - `python Scripts/check_naming_convention.py`
   - bloque les identifiants de code contenant les termes français explicitement bannis par la convention repo
+- `python Scripts/check_test_classification.py`
+  - bloque les inventaires absents, obsolètes, invalides ou non déterministes ainsi que les exceptions non
+    auditables
 
 Une validation ciblée verte confirme uniquement le plan sélectionné. La validation complète correspond à
 la task `Coverage: 8 terminaux`. La conformité DoD ajoute les exigences normatives et documentaires. Enfin,

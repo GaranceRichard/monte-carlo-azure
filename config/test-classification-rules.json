@@ -54,7 +54,11 @@
           "calls": [
             "(?:client|response|r)\\.(?:get|post|put|delete|options|json)$",
             "(?:model_validate|model_json_schema|validate_python|parse_obj)$",
-            "(?:fetch|requestForecast|fetchSimulationHistory)$"
+            "(?:fetch|requestForecast|fetchSimulationHistory)$",
+            "^_validate_schema_subset$"
+          ],
+          "fixtures": [
+            "^(?:catalog|schema)$"
           ]
         },
         "none": {
@@ -84,7 +88,7 @@
         "frameworks": ["pytest", "vitest"],
         "any": {
           "fixtures": ["^(?:monkeypatch|mocker)$"],
-          "calls": ["^(?:vi\\.(?:mock|spyOn|mocked)|jest\\.(?:mock|spyOn))"]
+          "calls": ["^(?:vi\\.(?:doMock|mock|spyOn|mocked)|jest\\.(?:mock|spyOn))"]
         },
         "none": {
           "fixtures": ["^(?:tmp_path|tmpdir|tmp_path_factory)$"]
@@ -115,11 +119,12 @@
       "match": {
         "frameworks": ["vitest"],
         "any": {
-          "imports": ["^\\."]
+          "imports": ["^\\."],
+          "resources": ["^\\./[^<].*"]
         },
         "none": {
           "imports": ["^@testing-library/"],
-          "calls": ["^(?:vi\\.(?:mock|spyOn|mocked)|jest\\.(?:mock|spyOn)|fetch)"]
+          "calls": ["^(?:vi\\.(?:doMock|mock|spyOn|mocked)|jest\\.(?:mock|spyOn)|fetch$)"]
         }
       }
     }

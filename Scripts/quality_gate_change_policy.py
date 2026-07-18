@@ -1,0 +1,102 @@
+"""Central path and command policy used by the repository quality gate."""
+
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any
+
+MASSIVE_EXACT_PATHS = {
+    "requirements.txt",
+    "pyproject.toml",
+    "frontend/package.json",
+    "frontend/package-lock.json",
+    "frontend/vitest.config.js",
+    "frontend/playwright.config.js",
+    "config/maintainability.json",
+    "config/maintainability-baseline.json",
+    "config/maintainability-exceptions.json",
+    ".coveragerc",
+    "config/test-classification.json",
+    "config/test-classification.schema.json",
+    "config/test-classification-rules.json",
+    "config/test-classification-overrides.json",
+    "config/test-execution-counts.schema.json",
+    "reports/test-classification-inventory.json",
+    "reports/test-execution-counts.json",
+    "backend/mc_core.py",
+    "backend/api_models.py",
+    "backend/api_routes_simulate.py",
+    "backend/simulation_limits.py",
+    "frontend/src/api.ts",
+    "frontend/src/types.ts",
+    "frontend/src/simulationLimits.ts",
+    "frontend/src/hooks/simulationForecastCore.ts",
+    "frontend/src/hooks/simulationForecastService.ts",
+    "frontend/src/hooks/simulationTypes.ts",
+    "frontend/src/utils/simulation.ts",
+    "Dockerfile",
+    "docker-compose.yml",
+}
+MASSIVE_SCRIPT_NAMES = {
+    "check_dod_compliance.py",
+    "check_identity_boundary.py",
+    "check_maintainability.py",
+    "check_python_coverage.py",
+    "check_naming_convention.py",
+    "check_no_secrets.py",
+    "check_vitals_compliance.py",
+    "pre_commit_guard.py",
+    "quality_gate.py",
+    "quality_gate_change_policy.py",
+    "maintainability_common.py",
+    "maintainability_config.py",
+    "maintainability_dependencies.py",
+    "maintainability_metrics.py",
+    "maintainability_ratchet.py",
+    "report_vitals_coverage.py",
+    "setup_git_hooks.py",
+    "check_test_classification.py",
+    "classify_tests.py",
+    "test_classification_catalog_validation.py",
+    "test_classification_compliance.py",
+    "test_classification_contract.py",
+    "test_classification_inventory_validation.py",
+    "test_classification_overrides_validation.py",
+    "test_classification_rules_validation.py",
+    "test_classifier_discovery.py",
+    "test_classifier_engine.py",
+    "report_test_execution_counts.py",
+    "collect_js_tests.mjs",
+}
+MASSIVE_TEST_PATHS = {
+    "tests/test_identity_boundary.py",
+    "tests/test_maintainability.py",
+    "tests/test_python_coverage.py",
+    "tests/test_pre_commit_guard.py",
+    "tests/test_quality_gate.py",
+    "tests/test_repo_compliance.py",
+    "tests/test_vitals_compliance.py",
+    "tests/test_test_classification_model.py",
+    "tests/test_test_classifier.py",
+    "tests/test_test_classification_compliance.py",
+    "tests/test_test_execution_counts.py",
+    "tests/execution_counts_plugin.py",
+    "frontend/scripts/test-execution-inventory.mjs",
+    "frontend/scripts/vitest-execution-reporter.mjs",
+    "frontend/scripts/playwright-execution-reporter.mjs",
+    "frontend/tests/e2e/coverage.spec.js",
+    "frontend/tests/e2e/helpers/coverage.js",
+}
+
+
+def classification_gate_command(
+    command_factory: Callable[..., Any],
+    python_executable: str,
+    input_sources: tuple[Any, ...],
+) -> Any:
+    return command_factory(
+        "Test classification compliance",
+        (python_executable, "Scripts/check_test_classification.py"),
+        "Regenerate and correct the test classification inventory, rules, or overrides.",
+        input_sources=input_sources,
+    )

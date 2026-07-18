@@ -357,9 +357,16 @@ rattachements absents ou ambigus et conserve les profils et gates existants inch
 Les artefacts natifs sous `reports/test-execution-native/` sont des entrées locales régénérables. Seul le
 rapport déterministe `reports/test-execution-counts.json`, lié par SHA-256 à l'inventaire, est versionné.
 
-Ce composant est actuellement hors du chemin d’enforcement. Il ne modifie ni l’architecture d’exécution des
-tests, ni la sélection des gates, ni la CI. Les cas insuffisamment prouvés restent explicitement
-`unresolved`; le PBI 1.7 décidera du contrôle bloquant et le PBI 1.8 de la recomposition des profils.
+`Scripts/check_test_classification.py` redécouvre les cas et reconstruit l'inventaire en mémoire sans écrire
+dans le workspace. Il valide le catalogue, le schéma, les règles, overrides et exemptions, compare la
+sérialisation exacte au rapport versionné, impose `unresolved = 0` et vérifie l'empreinte du rapport
+d'exécution. Les 16 ambiguïtés initiales sont résolues par l'analyse comportementale, sans override ni
+exemption.
+
+Le contrôle est un invariant commun construit une seule fois dans chaque plan de `Scripts/quality_gate.py` :
+`fast` l'exécute sur le snapshot de l'index, `push` sur le worktree temporaire du commit détaché et `ci` sur
+le workspace. La task `Coverage: 8 terminaux` le reçoit via `run-coverage-staged.ps1`. Cette intégration ne
+recompose pas les profils d'exécution ; ce sujet reste réservé au PBI 1.8.
 
 La sélection des contrôles est centralisée dans `Scripts/quality_gate.py` :
 

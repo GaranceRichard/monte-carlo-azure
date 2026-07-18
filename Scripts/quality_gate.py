@@ -21,6 +21,15 @@ from enum import Enum
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from Scripts.quality_gate_change_policy import (  # noqa: E402
+    MASSIVE_EXACT_PATHS,
+    MASSIVE_SCRIPT_NAMES,
+    MASSIVE_TEST_PATHS,
+    classification_gate_command,
+)
+
 DOCUMENTATION_PATHS = {"README.md", "LICENSE", "NOTICE"}
 NPM_COMMAND = "npm.cmd" if os.name == "nt" else "npm"
 BACKEND_TEST_ENV = {
@@ -186,61 +195,11 @@ CHANGE_LEVEL_PRIORITY = {
     ChangeLevel.IMPACTED: 2,
     ChangeLevel.MASSIVE: 3,
 }
-MASSIVE_EXACT_PATHS = {
-    "requirements.txt",
-    "pyproject.toml",
-    "frontend/package.json",
-    "frontend/package-lock.json",
-    "frontend/vitest.config.js",
-    "frontend/playwright.config.js",
-    "config/maintainability.json", "config/maintainability-baseline.json",
-    "config/maintainability-exceptions.json", ".coveragerc",
-    "backend/mc_core.py",
-    "backend/api_models.py",
-    "backend/api_routes_simulate.py",
-    "backend/simulation_limits.py",
-    "frontend/src/api.ts",
-    "frontend/src/types.ts",
-    "frontend/src/simulationLimits.ts",
-    "frontend/src/hooks/simulationForecastCore.ts",
-    "frontend/src/hooks/simulationForecastService.ts",
-    "frontend/src/hooks/simulationTypes.ts",
-    "frontend/src/utils/simulation.ts",
-    "Dockerfile",
-    "docker-compose.yml",
-}
 MASSIVE_PREFIXES = (
     ".github/",
     ".githooks/",
     ".vscode/",
 )
-MASSIVE_SCRIPT_NAMES = {
-    "check_dod_compliance.py",
-    "check_identity_boundary.py",
-    "check_maintainability.py",
-    "check_python_coverage.py",
-    "check_naming_convention.py",
-    "check_no_secrets.py",
-    "check_vitals_compliance.py",
-    "pre_commit_guard.py",
-    "quality_gate.py",
-    "maintainability_common.py", "maintainability_config.py",
-    "maintainability_dependencies.py", "maintainability_metrics.py",
-    "maintainability_ratchet.py",
-    "report_vitals_coverage.py",
-    "setup_git_hooks.py",
-}
-MASSIVE_TEST_PATHS = {
-    "tests/test_identity_boundary.py",
-    "tests/test_maintainability.py",
-    "tests/test_python_coverage.py",
-    "tests/test_pre_commit_guard.py",
-    "tests/test_quality_gate.py",
-    "tests/test_repo_compliance.py",
-    "tests/test_vitals_compliance.py",
-    "frontend/tests/e2e/coverage.spec.js",
-    "frontend/tests/e2e/helpers/coverage.js",
-}
 IMPACTED_EXACT_PATHS = {
     "backend/api.py",
     "backend/simulation_store.py",
@@ -998,16 +957,17 @@ def _python_coverage_commands(command_input: tuple[InputSource, ...]) -> tuple[G
     )
 
 
+def _gate_input_sources(mode: str) -> tuple[InputSource, ...]:
+    return ({"fast": InputSource.GIT_INDEX, "push": InputSource.HEAD}.get(
+        mode, InputSource.WORKSPACE
+    ),)
+
+
 def build_execution_plan(context: ChangeContext) -> GateExecutionPlan:
     """Build the immutable ordered command plan for a resolved context."""
     if context.mode not in {"fast", "push", "ci"}:
         raise ValueError(f"Unsupported mode: {context.mode}")
-    if context.mode == "fast":
-        command_input = (InputSource.GIT_INDEX,)
-    elif context.mode == "push":
-        command_input = (InputSource.HEAD,)
-    else:
-        command_input = (InputSource.WORKSPACE,)
+    command_input = _gate_input_sources(context.mode)
     commands = [
         GateCommand(
             "Repository hygiene (README, encoding, secrets and DoD)",
@@ -1015,6 +975,7 @@ def build_execution_plan(context: ChangeContext) -> GateExecutionPlan:
             "Correct the reported README, encoding, secret, or DoD issue and stage the fix.",
             input_sources=command_input,
         ),
+        classification_gate_command(GateCommand, sys.executable, command_input),
         GateCommand(
             "Identity boundary",
             (sys.executable, "Scripts/check_identity_boundary.py"),

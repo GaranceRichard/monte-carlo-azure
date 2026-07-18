@@ -30,6 +30,10 @@ try {
   Push-Location $WorkspaceRoot
   $locationPushed = $true
 
+  Write-Host "[coverage] test classification compliance"
+  & "$WorkspaceRoot\.venv\Scripts\python.exe" Scripts/check_test_classification.py
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
   Write-Host "[coverage] lint"
   npm --prefix frontend run lint
   if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

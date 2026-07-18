@@ -6713,13 +6713,272 @@
     "criticality": "high"
   },
   {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_added_test_without_regeneration_is_blocking",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_added_test_without_regeneration_is_blocking",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_catalog_schema_and_rule_contract_defects_are_blocking",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_catalog_schema_and_rule_contract_defects_are_blocking",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_classification_files_are_massive_changes",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_classification_files_are_massive_changes",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_cli_reports_failure_success_and_main_guard",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_cli_reports_failure_success_and_main_guard",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_control_is_in_coverage_eight_terminals_once",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_control_is_in_coverage_eight_terminals_once",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_control_is_present_once_with_the_correct_input_in_each_gate_plan",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_control_is_present_once_with_the_correct_input_in_each_gate_plan",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_duplicate_discovery_and_inventory_are_blocking",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_duplicate_discovery_and_inventory_are_blocking",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_expired_or_incomplete_exemption_is_blocking",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_expired_or_incomplete_exemption_is_blocking",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_generated_and_versioned_inventory_divergence_is_blocking",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_generated_and_versioned_inventory_divergence_is_blocking",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_invalid_record_values_fields_and_cardinalities_are_blocking",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_invalid_record_values_fields_and_cardinalities_are_blocking",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_orphan_duplicate_or_unproven_override_is_blocking",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_orphan_duplicate_or_unproven_override_is_blocking",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_real_repository_is_compliant_with_zero_unresolved",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_real_repository_is_compliant_with_zero_unresolved",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_record_override_and_exemption_shape_failures_are_reported",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_record_override_and_exemption_shape_failures_are_reported",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "resilience",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_removed_test_still_in_inventory_is_blocking",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_removed_test_still_in_inventory_is_blocking",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_repository_detects_nondeterminism_and_read_races",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_repository_detects_nondeterminism_and_read_races",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_repository_operational_failures_are_blocking",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_repository_operational_failures_are_blocking",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_unresolved_classification_is_blocking",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_unresolved_classification_is_blocking",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_valid_approved_non_expired_exemption_is_accepted",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_valid_approved_non_expired_exemption_is_accepted",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_valid_strict_override_resolves_an_ambiguous_case",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_valid_strict_override_resolves_an_ambiguous_case",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_validation_helpers_reject_malformed_contract_shapes",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classification_compliance.py",
+    "selector": "test_validation_helpers_reject_malformed_contract_shapes",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience",
+      "data_quality"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_test_classification_model.py::test_catalog_and_schema_are_valid_duplicate_free_json",
     "framework": "pytest",
     "sourcePath": "tests/test_test_classification_model.py",
     "selector": "test_catalog_and_schema_are_valid_duplicate_free_json",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "contract",
     "purposes": [
       "functional",
       "observability"
@@ -6730,9 +6989,9 @@
     "framework": "pytest",
     "sourcePath": "tests/test_test_classification_model.py",
     "selector": "test_catalog_vocabulary_matches_schema",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "contract",
     "purposes": [
       "functional",
       "observability"
@@ -6743,9 +7002,9 @@
     "framework": "pytest",
     "sourcePath": "tests/test_test_classification_model.py",
     "selector": "test_classified_status_requires_nature_purpose_and_profile",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "contract",
     "purposes": [
       "functional"
     ]
@@ -6767,9 +7026,9 @@
     "framework": "pytest",
     "sourcePath": "tests/test_test_classification_model.py",
     "selector": "test_domains_cover_stable_product_architecture",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "contract",
     "purposes": [
       "functional"
     ]
@@ -6779,9 +7038,9 @@
     "framework": "pytest",
     "sourcePath": "tests/test_test_classification_model.py",
     "selector": "test_execution_profiles_do_not_mix_with_quality_gate_levels",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "contract",
     "purposes": [
       "functional"
     ],
@@ -6794,9 +7053,9 @@
     "framework": "pytest",
     "sourcePath": "tests/test_test_classification_model.py",
     "selector": "test_exempted_status_requires_governance_and_expiration",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "contract",
     "purposes": [
       "functional"
     ]
@@ -6806,9 +7065,9 @@
     "framework": "pytest",
     "sourcePath": "tests/test_test_classification_model.py",
     "selector": "test_risk_and_critical_path_formats_require_criticality",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "contract",
     "purposes": [
       "functional",
       "security"
@@ -6823,9 +7082,9 @@
     "framework": "pytest",
     "sourcePath": "tests/test_test_classification_model.py",
     "selector": "test_unresolved_status_requires_reason",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "contract",
     "purposes": [
       "functional"
     ]
@@ -6835,9 +7094,9 @@
     "framework": "pytest",
     "sourcePath": "tests/test_test_classification_model.py",
     "selector": "test_vocabularies_and_cardinalities",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "contract",
     "purposes": [
       "functional"
     ]
@@ -14394,9 +14653,9 @@
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
     "selector": "demo mode et normalisation > filters out zero weeks in demo mode when includeZeroWeeks is false [105:3]",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "unit",
     "purposes": [
       "functional"
     ],
@@ -16939,9 +17198,9 @@
     "framework": "vitest",
     "sourcePath": "frontend/src/main.test.tsx",
     "selector": "main bootstrap > renders the app into #root [10:3]",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "component",
     "purposes": [
       "functional"
     ],
@@ -16954,9 +17213,9 @@
     "framework": "vitest",
     "sourcePath": "frontend/src/main.test.tsx",
     "selector": "main bootstrap > throws when #root is missing [28:3]",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "component",
     "purposes": [
       "functional"
     ]
@@ -16966,9 +17225,9 @@
     "framework": "vitest",
     "sourcePath": "frontend/src/runtime.test.ts",
     "selector": "resolveAppRuntime > defaults to standard mode when pages flag is disabled [15:3]",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "unit",
     "purposes": [
       "functional"
     ]
@@ -16978,9 +17237,9 @@
     "framework": "vitest",
     "sourcePath": "frontend/src/runtime.test.ts",
     "selector": "resolveAppRuntime > resolves connect mode on pages builds [39:3]",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "unit",
     "purposes": [
       "functional"
     ]
@@ -16990,9 +17249,9 @@
     "framework": "vitest",
     "sourcePath": "frontend/src/runtime.test.ts",
     "selector": "resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "unit",
     "purposes": [
       "functional"
     ]
@@ -17002,9 +17261,9 @@
     "framework": "vitest",
     "sourcePath": "frontend/src/runtime.test.ts",
     "selector": "resolveAppRuntime > resolves demo mode on pages builds without query flags [51:3]",
-    "status": "unresolved",
+    "status": "classified",
     "executionProfile": "main",
-    "unresolvedReason": "No nature rule has sufficient behavioral evidence.",
+    "nature": "unit",
     "purposes": [
       "functional"
     ]

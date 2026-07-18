@@ -4,6 +4,10 @@
 
 ### Qualité et outillage
 
+- ajout du contrôle bloquant de classification des tests dans les gates `fast`, `push`, `ci` et
+  `Coverage: 8 terminaux` : redécouverte en lecture seule, comparaison exacte de l'inventaire, validation du
+  contrat, des règles, overrides et exemptions, empreinte du rapport d'exécution et exigence
+  `unresolved = 0`; les 16 ambiguïtés historiques sont résolues automatiquement sans override ni exemption
 - ajout du comptage déterministe des cas logiques, instances natives collectées/exécutées, skips, tentatives
   et retries pour Pytest, Vitest et Playwright, avec rapprochement exact à l'inventaire, schéma versionné,
   invariants détaillés et rejet explicite des collections incomplètes, orphelines ou ambiguës

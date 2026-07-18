@@ -281,13 +281,14 @@ def test_documentation_states_essential_rules() -> None:
         "périmètre maximal réellement exécuté",
         "Le comportement observé prime",
         "métadonnée qui contredit",
-        "reste `unresolved`",
+        "Toute nouvelle ambiguïté fait échouer la gate",
         "Les fixtures, helpers et données de test ne sont pas des cas logiques autonomes",
         "plusieurs instances exécutées, pas plusieurs cas logiques",
         "`targeted`, `impacted` et `massive`",
-        "ne crée aucun inventaire complet",
-        "ne classe aucun test existant",
-        "ne rend pas la classification bloquante",
+        "strictement en lecture seule",
+        "compare sa sérialisation exacte",
+        "`unresolved = 0`",
+        "run-coverage-staged.ps1",
     ]
     for phrase in required_phrases:
         assert phrase in documentation, f"Missing classification rule in documentation: {phrase}"
