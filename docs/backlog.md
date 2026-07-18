@@ -9,7 +9,7 @@
 | Numéro | Titre                                                                | Complexité | Modèle Codex | Réalisé le |
 | -----: | -------------------------------------------------------------------- | :--------: | :----------: |:----------:|
 |    1.1 | Versionner le standard de test et aligner la documentation normative |      M     |  Sol Medium  | 18/07/2026 |
-|    1.2 | Auditer et résorber la dette documentaire Markdown                   |      L     |   Sol High   |            |
+|    1.2 | Auditer et résorber la dette documentaire Markdown                   |      L     |   Sol High   | 18/07/2026 |
 |    1.3 | Cartographier les risques et les parcours critiques                  |      L     |  Sol Medium  | 18/07/2026 |
 |    1.4 | Définir le modèle de classification des tests                        |      M     |   Sol High   |            |
 |    1.5 | Classifier automatiquement le patrimoine de tests existant           |      L     |   Sol High   |            |
@@ -228,7 +228,7 @@
 
 |                                       Feature | Nombre de PBI | Réalisés |
 | --------------------------------------------: | ------------: |:--------:|
-|                  1 — Preuve qualité gouvernée |            10 |        1 |
+|                  1 — Preuve qualité gouvernée |            10 |        2 |
 |             2 — Fiabilité du cœur statistique |             8 |          |
 |                 3 — Réutilisabilité du moteur |             5 |          |
 |            4 — Mise en production personnelle |             6 |          |
