@@ -4,6 +4,11 @@
 
 ### Qualité et outillage
 
+- migration des actions JavaScript de la CI vers leurs versions Node 24 natives : `actions/checkout@v6`,
+  `actions/setup-python@v6`, `actions/setup-node@v6`, `actions/upload-artifact@v7`,
+  `actions/download-artifact@v8`, `docker/login-action@v4` et `docker/build-push-action@v7` ; retrait de
+  `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` et ajout d’une conformité bloquante contre les anciennes versions ou
+  la réintroduction du forçage, sans modifier le DAG, les chemins d’artefacts ni la publication GHCR
 - recomposition des profils CI/CD `pr`, `main`, `nightly` et `release` autour d’un contrat JSON versionné,
   avec hiérarchie d’inclusion explicite, attribution factuelle de chaque cas et séparation stricte des
   portées `targeted`, `impacted` et `massive`

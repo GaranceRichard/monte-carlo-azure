@@ -9,9 +9,6 @@ on:
   release:
     types: [published]
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-
 jobs:
   preflight:
     runs-on: ubuntu-latest
@@ -123,7 +120,7 @@ jobs:
           --profile ${{ needs.preflight.outputs.profile }}
           --node backend-tests
       - name: Upload backend evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backend-tests-${{ needs.preflight.outputs.profile }}
           path: reports/test-execution-artifacts
@@ -146,7 +143,7 @@ jobs:
           --profile ${{ needs.preflight.outputs.profile }}
           --node frontend-tests
       - name: Upload frontend evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-tests-${{ needs.preflight.outputs.profile }}
           path: reports/test-execution-artifacts
@@ -175,7 +172,7 @@ jobs:
           --profile ${{ needs.preflight.outputs.profile }}
           --node e2e
       - name: Upload browser evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-${{ needs.preflight.outputs.profile }}
           path: reports/test-execution-artifacts
@@ -197,7 +194,7 @@ jobs:
           --profile ${{ needs.preflight.outputs.profile }}
           --node release-or-container-checks
       - name: Upload release evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-checks-${{ needs.preflight.outputs.profile }}
           path: reports/test-execution-artifacts
@@ -219,7 +216,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Download node evidence
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: "*-${{ needs.preflight.outputs.profile }}"
           path: reports/test-execution-artifacts
@@ -247,14 +244,14 @@ jobs:
           echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
       - name: Log in to GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           tags: |

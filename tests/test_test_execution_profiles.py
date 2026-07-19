@@ -667,7 +667,7 @@ def test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate() -> 
     producer_jobs = {
         job
         for job, block in branch_blocks.items()
-        if "actions/upload-artifact@v4" in block
+        if "actions/upload-artifact@v7" in block
     }
     assert producer_jobs == {
         "backend-tests",
@@ -677,13 +677,13 @@ def test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate() -> 
     }
     for job in producer_jobs:
         block = branch_blocks[job]
-        assert block.count("actions/upload-artifact@v4") == 1
+        assert block.count("actions/upload-artifact@v7") == 1
         assert block.count("path: reports/test-execution-artifacts") == 1
 
     aggregate_tail = workflow.split("  aggregate:\n", maxsplit=1)[1]
     next_job = re.search(r"(?m)^  [a-z][a-z0-9-]*:\s*$", aggregate_tail)
     aggregate = aggregate_tail[: next_job.start()] if next_job else aggregate_tail
-    assert aggregate.count("actions/download-artifact@v4") == 1
+    assert aggregate.count("actions/download-artifact@v8") == 1
     assert aggregate.count("path: reports/test-execution-artifacts") == 1
     assert "merge-multiple: true" in aggregate
 

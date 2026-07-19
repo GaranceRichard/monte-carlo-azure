@@ -152,6 +152,8 @@ Dans GitHub Actions, chaque producteur uploade la racine `reports/test-execution
 télécharge les artefacts avec fusion multiple dans ce même répertoire, ce qui préserve les chemins
 `<profil>/backend-tests`, `<profil>/frontend-tests` et `<profil>/e2e`. Le promoteur peut alors copier les
 couvertures et résultats natifs vers leurs emplacements consolidés sans réécrire les chemins du contrat.
+Le transport repose sur `actions/upload-artifact@v7` et `actions/download-artifact@v8`, qui utilisent
+nativement Node 24 ; aucune variable de forçage du runtime JavaScript n’est nécessaire dans le workflow.
 
 Les jobs GitHub Actions étant isolés, chaque branche prépare les dépendances qu’elle consomme. Le nœud
 `backend-tests` installe Python, configure Node 22 avec le cache npm, puis exécute

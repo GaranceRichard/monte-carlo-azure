@@ -120,6 +120,11 @@ répertoire de l’exécution courante est nettoyé ; le temporaire global de l�
 - Tout job CI exécutant les tests Pytest qui chargent la classification JavaScript configure Node 22 avec le
   cache npm et exécute `npm --prefix frontend ci` avant la quality gate. L’installation des navigateurs
   Playwright reste limitée au job `e2e`.
+- Les actions JavaScript de la CI utilisent leurs versions Node 24 verrouillées : `actions/checkout@v6`,
+  `actions/setup-python@v6`, `actions/setup-node@v6`, `actions/upload-artifact@v7`,
+  `actions/download-artifact@v8`, `docker/login-action@v4` et `docker/build-push-action@v7`. La variable
+  `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` est absente et sa réintroduction, comme celle d’une ancienne version,
+  fait échouer la conformité du dépôt.
 - Les déclarations logiques, instances collectées, instances exécutées et tentatives sont des mesures
   distinctes. Un paramètre, un projet ou un retry ne doit jamais gonfler le nombre de cas logiques, et un
   retry ne doit jamais gonfler le nombre d'instances exécutées.

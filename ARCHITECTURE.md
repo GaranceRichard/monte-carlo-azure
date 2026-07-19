@@ -421,6 +421,11 @@ CI GitHub Actions :
   `python Scripts/quality_gate.py ci --profile ... --node ...` ;
 - `aggregate` dépend de toutes les branches et `publish` dépend de `aggregate` uniquement pour un push
   sur `main` ;
+- les actions JavaScript s’exécutent nativement sous Node 24 avec les versions verrouillées
+  `actions/checkout@v6`, `actions/setup-python@v6`, `actions/setup-node@v6`,
+  `actions/upload-artifact@v7`, `actions/download-artifact@v8`, `docker/login-action@v4` et
+  `docker/build-push-action@v7` ; aucun `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` n’est défini et la conformité
+  bloque les versions antérieures comme la réintroduction du forçage ;
 - les producteurs uploadent `reports/test-execution-artifacts` et `aggregate` télécharge avec
   `merge-multiple` dans ce même répertoire avant de promouvoir les preuves backend, Vitest et E2E ;
 - installation explicite des dépendances utiles dans chaque runner et de Chromium dans le job E2E ;

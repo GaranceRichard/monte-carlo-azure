@@ -316,6 +316,12 @@ branches indépendantes sur des runners séparés. `aggregate` attend toutes les
 GHCR sur un push `main` dépend de cet agrégateur. Le déploiement GitHub Pages attend le succès du workflow
 CI du même SHA avant de construire et publier le frontend.
 
+Les actions JavaScript du workflow utilisent nativement Node 24 : `actions/checkout@v6`,
+`actions/setup-python@v6`, `actions/setup-node@v6`, `actions/upload-artifact@v7`,
+`actions/download-artifact@v8`, `docker/login-action@v4` et `docker/build-push-action@v7`. Le workflow ne
+définit pas `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` ; la conformité du dépôt bloque toute ancienne version de
+ces actions et toute réintroduction de ce forçage.
+
 Chaque runner installe ses propres dépendances. En particulier, `backend-tests` prépare Python et Node 22,
 active le cache npm puis exécute `npm --prefix frontend ci` avant la quality gate. Les tests Pytest de
 classification peuvent ainsi charger `frontend/node_modules/typescript/lib/typescript.js` et importer

@@ -110,6 +110,22 @@ def test_ci_enforces_required_checks() -> None:
     gate = _read("Scripts/quality_gate.py") + _read("Scripts/quality_gate_plan.py")
     pages = _read(".github/workflows/pages.yml")
 
+    node24_action_versions = {
+        "actions/checkout": "v6",
+        "actions/setup-python": "v6",
+        "actions/setup-node": "v6",
+        "actions/upload-artifact": "v7",
+        "actions/download-artifact": "v8",
+        "docker/login-action": "v4",
+        "docker/build-push-action": "v7",
+    }
+    for action, expected_version in node24_action_versions.items():
+        versions = set(re.findall(rf"uses:\s*{re.escape(action)}@([^\s#]+)", ci))
+        assert versions == {expected_version}, (
+            f"{action} must use its current Node 24 version {expected_version}"
+        )
+    assert "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24" not in ci
+
     assert "python Scripts/quality_gate.py ci" in ci
     assert "npm run lint" not in ci
     assert "npm run test:e2e" not in ci
