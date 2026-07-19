@@ -109,7 +109,14 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - run: pip install -r requirements.txt
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: |
+          pip install -r requirements.txt
+          npm --prefix frontend ci
       - name: Run backend test node
         run: >-
           python Scripts/quality_gate.py ci

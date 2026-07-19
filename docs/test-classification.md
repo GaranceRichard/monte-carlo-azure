@@ -148,6 +148,12 @@ rapport liste les cas, frameworks, natures, criticités, commandes et dépendanc
 `release-or-container-checks`; `aggregate` dépend de ces six branches. Les écritures intermédiaires sont
 isolées par profil et nœud, et tout conflit entre branches parallèles est bloquant.
 
+Les jobs GitHub Actions étant isolés, chaque branche prépare les dépendances qu’elle consomme. Le nœud
+`backend-tests` installe Python, configure Node 22 avec le cache npm, puis exécute
+`npm --prefix frontend ci` avant la quality gate. Cette installation rend disponibles le moteur TypeScript
+utilisé par la classification et `@playwright/test`, importé par `frontend/playwright.config.js`. Aucun
+navigateur Playwright n’est installé dans ce nœud ; leur installation appartient exclusivement à `e2e`.
+
 ## Overrides auditables
 
 [`config/test-classification-overrides.json`](../config/test-classification-overrides.json) est réservé aux

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import runpy
 import sys
 from copy import deepcopy
@@ -608,6 +609,7 @@ def test_dag_impossible_ready_set_and_quality_gate_cli_options(tmp_path: Path, m
 
 def test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate() -> None:
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    branch_blocks: dict[str, str] = {}
     for job in (
         "backend-static",
         "frontend-static",
@@ -617,8 +619,32 @@ def test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate() -> 
         "release-or-container-checks",
     ):
         assert f"  {job}:" in workflow
-        block = workflow.split(f"  {job}:\n", maxsplit=1)[1].split("\n  ", maxsplit=1)[0]
+        job_tail = workflow.split(f"  {job}:\n", maxsplit=1)[1]
+        next_job = re.search(r"(?m)^  [a-z][a-z0-9-]*:\s*$", job_tail)
+        block = job_tail[: next_job.start()] if next_job else job_tail
+        branch_blocks[job] = block
         assert "needs: preflight" in block
+
+    pytest_jobs = {
+        job: block
+        for job, block in branch_blocks.items()
+        if "--node backend-tests" in block
+    }
+    assert set(pytest_jobs) == {"backend-tests"}
+    for block in pytest_jobs.values():
+        assert "actions/setup-node@v6" in block
+        assert 'node-version: "22"' in block
+        assert "cache: npm" in block
+        assert "cache-dependency-path: frontend/package-lock.json" in block
+        assert "npm --prefix frontend ci" in block
+        assert "playwright install" not in block
+        assert block.index("actions/setup-node@v6") < block.index(
+            "npm --prefix frontend ci"
+        )
+        assert block.index("npm --prefix frontend ci") < block.index(
+            "python Scripts/quality_gate.py ci"
+        )
+
     assert "schedule:" in workflow
     assert "release:" in workflow
     publish = workflow.split("  publish:", maxsplit=1)[1]

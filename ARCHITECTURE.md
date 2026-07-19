@@ -420,6 +420,9 @@ CI GitHub Actions :
 - `aggregate` dépend de toutes les branches et `publish` dépend de `aggregate` uniquement pour un push
   sur `main` ;
 - installation explicite des dépendances utiles dans chaque runner et de Chromium dans le job E2E ;
+- `backend-tests` configure Node 22 avec le cache npm et exécute `npm --prefix frontend ci` avant la gate,
+  car la classification Pytest charge TypeScript et importe la configuration Playwright ; il ne télécharge
+  aucun navigateur et conserve `preflight` comme unique dépendance ;
 - le smoke test Docker reste bloquant dans la branche `release-or-container-checks` des profils complets ;
 - les suites avec couverture remplacent leurs suites simples équivalentes afin d’éviter une double
   exécution de Pytest ou Vitest ;

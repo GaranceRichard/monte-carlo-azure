@@ -316,6 +316,12 @@ branches indépendantes sur des runners séparés. `aggregate` attend toutes les
 GHCR sur un push `main` dépend de cet agrégateur. Le déploiement GitHub Pages attend le succès du workflow
 CI du même SHA avant de construire et publier le frontend.
 
+Chaque runner installe ses propres dépendances. En particulier, `backend-tests` prépare Python et Node 22,
+active le cache npm puis exécute `npm --prefix frontend ci` avant la quality gate. Les tests Pytest de
+classification peuvent ainsi charger `frontend/node_modules/typescript/lib/typescript.js` et importer
+`frontend/playwright.config.js`, qui dépend de `@playwright/test`. Ce job n’installe pas les navigateurs
+Playwright : cette responsabilité reste limitée au job `e2e`.
+
 ### Mode manuel en 5 terminaux
 
 Terminal 1 (mongo local dev):
