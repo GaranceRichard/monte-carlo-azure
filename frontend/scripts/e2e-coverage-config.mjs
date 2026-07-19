@@ -1,16 +1,15 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 const frontendRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 export const E2E_COVERAGE_CONFIG_PATH = path.join(frontendRoot, "e2e-coverage.config.json");
-export const E2E_COVERAGE_ARTIFACT_PATH = path.join(
-  frontendRoot,
-  "coverage",
-  "e2e-coverage-summary.json",
-);
+export const E2E_COVERAGE_ARTIFACT_PATH = process.env.E2E_COVERAGE_ARTIFACT_PATH
+  ? path.resolve(process.env.E2E_COVERAGE_ARTIFACT_PATH)
+  : path.join(frontendRoot, "coverage", "e2e-coverage-summary.json");
 
 function canonicalJson(value) {
   if (Array.isArray(value)) {

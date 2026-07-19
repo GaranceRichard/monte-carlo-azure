@@ -114,6 +114,19 @@ def _add_traceability(record: dict[str, Any], case: LogicalCase, rules: dict[str
         record["criticality"] = max(criticalities, key=rank.get)
 
 
+def _execution_profile(case: LogicalCase, rules: dict[str, Any]) -> str:
+    matches = _matching_rules(case, rules["executionProfileRules"])
+    if not matches:
+        return rules["defaults"]["executionProfile"]
+    best_priority = matches[0]["priority"]
+    profiles = {rule["profile"] for rule in matches if rule["priority"] == best_priority}
+    if len(profiles) != 1:
+        raise ValueError(
+            f"Execution-profile rules with equal priority contradict {case.logical_case_id}"
+        )
+    return profiles.pop()
+
+
 def _override_for(case: LogicalCase, overrides: dict[str, Any]) -> dict[str, Any] | None:
     matches = []
     for override in overrides.get("overrides", []):
@@ -155,7 +168,7 @@ def classify_case(
         "sourcePath": case.source_path,
         "selector": case.selector,
         "status": "classified" if nature else "unresolved",
-        "executionProfile": rules["automation"]["currentExecutionProfile"],
+        "executionProfile": _execution_profile(case, rules),
     }
     if nature:
         record["nature"] = nature

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import runpy
 import subprocess
 import sys
@@ -22,6 +23,7 @@ def _logical(
     *,
     status: str = "classified",
     nature: str | None = "unit",
+    execution_profile: str = "pr",
 ) -> dict[str, Any]:
     extension = "py" if framework == "pytest" else "ts"
     source = f"tests/{framework}.{extension}"
@@ -32,6 +34,7 @@ def _logical(
         "sourcePath": source,
         "selector": selector,
         "status": status,
+        "executionProfile": execution_profile,
     }
     if nature is not None:
         record["nature"] = nature
@@ -393,6 +396,13 @@ def test_setup_error(broken):
     (reports / "test-classification-inventory.json").write_text(
         json.dumps(logical), encoding="utf-8"
     )
+    environment = os.environ.copy()
+    for name in (
+        "TEST_EXECUTION_NATIVE_DIR",
+        "TEST_EXECUTION_NODE",
+        "TEST_EXECUTION_PROFILE",
+    ):
+        environment.pop(name, None)
     completed = subprocess.run(
         [
             sys.executable,
@@ -409,6 +419,7 @@ def test_setup_error(broken):
         capture_output=True,
         text=True,
         check=False,
+        env=environment,
     )
     assert completed.returncode == 1, completed.stdout + completed.stderr
     native = json.loads((reports / "test-execution-native/pytest.json").read_text(encoding="utf-8"))

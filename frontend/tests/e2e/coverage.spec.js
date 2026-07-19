@@ -1,8 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
-import { cwd, env } from "node:process";
+import { env } from "node:process";
 import { test, expect } from "@playwright/test";
 import {
+  E2E_COVERAGE_ARTIFACT_PATH,
   isIncludedCoverageUrl,
   loadE2ECoverageConfig,
 } from "../../scripts/e2e-coverage-config.mjs";
@@ -72,10 +73,10 @@ test.describe("e2e istanbul coverage", () => {
       },
       ...summary,
     };
-    const reportDir = path.resolve(cwd(), "coverage");
+    const reportDir = path.dirname(E2E_COVERAGE_ARTIFACT_PATH);
     fs.mkdirSync(reportDir, { recursive: true });
     fs.writeFileSync(
-      path.join(reportDir, "e2e-coverage-summary.json"),
+      E2E_COVERAGE_ARTIFACT_PATH,
       JSON.stringify(artifact, null, 2),
     );
     const metricLabels = {

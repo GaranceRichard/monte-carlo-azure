@@ -23,7 +23,7 @@ from Scripts.test_classification_contract import (
 from Scripts.test_classification_overrides_validation import validate_overrides
 from Scripts.test_classification_rules_validation import validate_match, validate_rules
 from Scripts.test_classifier_discovery import LogicalCase
-from Scripts.test_classifier_engine import classify_inventory
+from Scripts.test_classifier_engine import classify_case, classify_inventory
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATHS = (
@@ -75,6 +75,11 @@ def _build_repository(
         strict=True,
     ):
         _write_json(root / path, value)
+    for path in (
+        compliance.EXECUTION_PROFILES_PATH,
+        compliance.EXECUTION_PROFILES_SCHEMA_PATH,
+    ):
+        _write_json(root / path, compliance.load_json(ROOT / path))
     inventory = classify_inventory(cases, rules, selected_overrides, catalog, schema)
     inventory_path = root / compliance.INVENTORY_PATH
     inventory_path.parent.mkdir(parents=True, exist_ok=True)
@@ -325,6 +330,67 @@ def test_catalog_schema_and_rule_contract_defects_are_blocking(tmp_path: Path) -
     assert any("duplicates another rule" in error for error in errors)
 
 
+def test_execution_profile_rule_and_plan_contract_defects_are_blocking(
+    tmp_path: Path, monkeypatch
+) -> None:
+    case = _case()
+    _build_repository(tmp_path, [case])
+    schema = compliance.load_json(tmp_path / compliance.EXECUTION_PROFILES_SCHEMA_PATH)
+    schema["x-schemaVersion"] = "invalid"
+    _write_json(tmp_path / compliance.EXECUTION_PROFILES_SCHEMA_PATH, schema)
+    assert any(
+        "contract and schema versions differ" in error
+        for error in _validate(tmp_path, [case])
+    )
+
+    _build_repository(tmp_path, [case])
+    calls = iter([{"value": 1}, {"value": 2}])
+    monkeypatch.setattr(compliance, "build_plan_report", lambda *_args: next(calls))
+    assert any("plans are not deterministic" in error for error in _validate(tmp_path, [case]))
+
+
+def test_execution_profile_rule_evidence_and_priority_conflicts_are_rejected() -> None:
+    catalog, _schema, rules, overrides = _load_configuration()
+    malformed = deepcopy(rules)
+    malformed["executionProfileRules"] = [
+        {
+            "id": "bad-profile",
+            "priority": 1,
+            "profile": "invalid",
+            "match": {},
+            "evidence": None,
+        },
+        {
+            "id": "bad-evidence",
+            "priority": 2,
+            "profile": "pr",
+            "match": {},
+            "evidence": {
+                "nature": "",
+                "purposes": [],
+                "criticality": "proof",
+                "costAndInfrastructure": "proof",
+                "determinism": "proof",
+                "deliveryRole": "proof",
+            },
+        },
+    ]
+    errors = validate_rules(malformed, catalog)
+    assert any("profile is outside" in error for error in errors)
+    assert any("must document all" in error for error in errors)
+    assert any("text must be non-empty" in error for error in errors)
+    assert any("purposes must contain" in error for error in errors)
+
+    conflict = deepcopy(rules)
+    first = deepcopy(conflict["executionProfileRules"][0])
+    second = deepcopy(first)
+    first.update(id="first", priority=0, profile="pr", match={})
+    second.update(id="second", priority=0, profile="main", match={})
+    conflict["executionProfileRules"] = [first, second]
+    with pytest.raises(ValueError, match="equal priority contradict"):
+        classify_case(_case(), conflict, overrides, catalog)
+
+
 def test_validation_helpers_reject_malformed_contract_shapes(tmp_path: Path) -> None:
     duplicate = tmp_path / "duplicate.json"
     duplicate.write_text('{"x": 1, "x": 2}', encoding="utf-8")
@@ -470,7 +536,7 @@ def test_validation_helpers_reject_malformed_contract_shapes(tmp_path: Path) -> 
         "risks contains an invalid",
         "criticalPaths contains an invalid",
         "criticality is outside",
-        "automation profile is outside",
+            "default execution profile is outside",
         "default purpose is outside",
     ):
         assert any(expected in error for error in rule_errors), expected
@@ -655,15 +721,25 @@ def test_control_is_present_once_with_the_correct_input_in_each_gate_plan() -> N
         assert matches[0].input_sources == (source,)
 
 
-def test_control_is_in_coverage_eight_terminals_once() -> None:
+def test_control_is_in_main_profile_validation_once() -> None:
     tasks = json.loads((ROOT / ".vscode/tasks.json").read_text(encoding="utf-8"))
-    by_label = {task["label"]: task for task in tasks["tasks"]}
-    aggregate = by_label["Coverage: 8 terminaux"]
-    assert aggregate["dependsOn"].count("Coverage (Staged)") == 1
-    staged_script = (ROOT / ".vscode/scripts/run-coverage-staged.ps1").read_text(
-        encoding="utf-8"
+    matching = [
+        task for task in tasks["tasks"] if task["label"] == "Validation : profil main"
+    ]
+    plan = quality_gate.build_execution_plan(
+        quality_gate.build_change_context("ci", [], execution_profile="main")
     )
-    assert staged_script.count("Scripts/check_test_classification.py") == 1
+
+    assert len(matching) == 1
+    assert matching[0]["args"] == [
+        "Scripts/quality_gate.py",
+        "ci",
+        "--profile",
+        "main",
+    ]
+    assert sum(
+        command.step == "Test classification compliance" for command in plan.commands
+    ) == 1
 
 
 def test_classification_files_are_massive_changes() -> None:

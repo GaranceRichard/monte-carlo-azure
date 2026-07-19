@@ -288,7 +288,7 @@ def test_documentation_states_essential_rules() -> None:
         "strictement en lecture seule",
         "compare sa sérialisation exacte",
         "`unresolved = 0`",
-        "run-coverage-staged.ps1",
+        "`Validation : profil main`",
     ]
     for phrase in required_phrases:
         assert phrase in documentation, f"Missing classification rule in documentation: {phrase}"

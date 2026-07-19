@@ -80,7 +80,10 @@ def _is_probably_binary(data: bytes) -> bool:
 def _mojibake_debt(root: Path, paths: list[str]) -> list[dict[str, Any]]:
     debt: list[dict[str, Any]] = []
     for path in paths:
-        data = (root / path).read_bytes()
+        tracked_path = root / path
+        if not tracked_path.is_file():
+            continue
+        data = tracked_path.read_bytes()
         if _is_probably_binary(data):
             continue
         try:

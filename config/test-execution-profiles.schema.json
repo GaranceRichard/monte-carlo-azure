@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/test-execution-profiles/1.0.0",
+  "x-schemaVersion": "1.0.0",
+  "title": "CI/CD test execution profiles and dependency DAG",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "schema", "profiles", "nodes"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "schema": { "const": "config/test-execution-profiles.schema.json" },
+    "profiles": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": { "$ref": "#/$defs/profile" }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/node" }
+    }
+  },
+  "$defs": {
+    "profileId": { "enum": ["pr", "main", "nightly", "release"] },
+    "nonEmptyStrings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "includes", "description"],
+      "properties": {
+        "id": { "$ref": "#/$defs/profileId" },
+        "includes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/profileId" }
+        },
+        "description": { "type": "string", "minLength": 1 }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "order", "needs", "commands", "profiles", "reads", "writes",
+        "resources", "aggregator"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "order": { "type": "integer", "minimum": 0 },
+        "needs": { "$ref": "#/$defs/nonEmptyStrings" },
+        "commands": { "$ref": "#/$defs/nonEmptyStrings" },
+        "profiles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/profileId" }
+        },
+        "reads": { "$ref": "#/$defs/nonEmptyStrings" },
+        "writes": { "$ref": "#/$defs/nonEmptyStrings" },
+        "resources": { "$ref": "#/$defs/nonEmptyStrings" },
+        "aggregator": { "type": "boolean" }
+      }
+    }
+  }
+}

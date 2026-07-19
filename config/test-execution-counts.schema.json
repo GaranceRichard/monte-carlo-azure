@@ -12,6 +12,7 @@
     "frameworks",
     "classificationStatuses",
     "natures",
+    "executionProfiles",
     "logicalCases",
     "anomalies"
   ],
@@ -36,6 +37,17 @@
     "natures": {
       "type": "object",
       "additionalProperties": { "$ref": "#/$defs/counts" }
+    },
+    "executionProfiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pr", "main", "nightly", "release"],
+      "properties": {
+        "pr": { "$ref": "#/$defs/counts" },
+        "main": { "$ref": "#/$defs/counts" },
+        "nightly": { "$ref": "#/$defs/counts" },
+        "release": { "$ref": "#/$defs/counts" }
+      }
     },
     "logicalCases": {
       "type": "array",
@@ -91,6 +103,7 @@
             "sourcePath",
             "selector",
             "classificationStatus"
+            ,"executionProfile"
           ],
           "properties": {
             "logicalCaseId": { "type": "string", "minLength": 1 },
@@ -98,6 +111,7 @@
             "sourcePath": { "type": "string", "minLength": 1 },
             "selector": { "type": "string", "minLength": 1 },
             "classificationStatus": { "enum": ["classified", "unresolved", "exempted"] },
+            "executionProfile": { "enum": ["pr", "main", "nightly", "release"] },
             "nature": { "enum": ["unit", "component", "integration", "contract", "e2e"] }
           }
         }

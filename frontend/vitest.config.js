@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
+import process from "node:process";
 
 const standardCoverageExclude = [
   "**/*.css",
@@ -31,7 +32,7 @@ export default defineConfig({
       include: ["src/**/*.{js,jsx,ts,tsx}"],
       provider: "v8",
       reporter: ["text", "html", "json"],
-      reportsDirectory: "./coverage",
+      reportsDirectory: process.env.VITEST_COVERAGE_DIR || "./coverage",
       processingConcurrency: 1,
       exclude: standardCoverageExclude,
       thresholds: {

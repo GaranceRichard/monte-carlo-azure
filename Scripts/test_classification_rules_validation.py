@@ -22,6 +22,10 @@ EVIDENCE_FIELDS = {
     "dynamicTitle",
 }
 RULE_GROUPS = {
+    "executionProfileRules": (
+        {"id", "priority", "profile", "match", "evidence"},
+        "executionProfile",
+    ),
     "natureRules": (
         {"id", "priority", "nature", "requiresBehaviorEvidence", "match"},
         "nature",
@@ -102,7 +106,6 @@ def _rules_top_level_errors(
         {
             "rulesVersion",
             "priorityPolicy",
-            "automation",
             "defaults",
             *RULE_GROUPS,
         },
@@ -111,11 +114,10 @@ def _rules_top_level_errors(
     if rules.get("rulesVersion") != "1.0.0":
         errors.append("classification rules version must be 1.0.0")
     dimensions = catalog.get("dimensions", {})
-    automation = rules.get("automation")
-    profile = automation.get("currentExecutionProfile") if isinstance(automation, dict) else None
-    if profile not in dimensions.get("executionProfile", {}).get("values", []):
-        errors.append("rules automation profile is outside the catalog")
     defaults = rules.get("defaults")
+    profile = defaults.get("executionProfile") if isinstance(defaults, dict) else None
+    if profile not in dimensions.get("executionProfile", {}).get("values", []):
+        errors.append("rules default execution profile is outside the catalog")
     purpose = defaults.get("purpose") if isinstance(defaults, dict) else None
     if purpose not in dimensions.get("purpose", {}).get("values", []):
         errors.append("rules default purpose is outside the catalog")
@@ -193,10 +195,44 @@ def _kind_validator(
 ) -> Callable[[dict[str, Any], str, dict[str, Any]], list[str]]:
     return {
         "nature": _nature_rule_errors,
+        "executionProfile": _execution_profile_rule_errors,
         "purpose": _dimension_rule_errors("purpose"),
         "domain": _dimension_rule_errors("domain"),
         "traceability": _traceability_rule_errors,
     }[kind]
+
+
+def _execution_profile_rule_errors(
+    rule: dict[str, Any], label: str, catalog: dict[str, Any]
+) -> list[str]:
+    errors: list[str] = []
+    allowed = catalog.get("dimensions", {}).get("executionProfile", {}).get("values", [])
+    if rule.get("profile") not in allowed:
+        errors.append(f"{label}.profile is outside the catalog")
+    evidence = rule.get("evidence")
+    required = {
+        "nature",
+        "purposes",
+        "criticality",
+        "costAndInfrastructure",
+        "determinism",
+        "deliveryRole",
+    }
+    if not isinstance(evidence, dict) or set(evidence) != required:
+        errors.append(f"{label}.evidence must document all execution-profile criteria")
+        return errors
+    if not all(
+        isinstance(value, str) and value.strip()
+        for key, value in evidence.items()
+        if key != "purposes"
+    ):
+        errors.append(f"{label}.evidence text must be non-empty")
+    purposes = evidence.get("purposes")
+    if not isinstance(purposes, list) or not purposes or not all(
+        isinstance(value, str) and value for value in purposes
+    ):
+        errors.append(f"{label}.evidence.purposes must contain non-empty strings")
+    return errors
 
 
 def _nature_rule_errors(

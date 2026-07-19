@@ -21,13 +21,13 @@ from enum import Enum
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+DOCKER_SMOKE_PORT = 18080
 sys.path.insert(0, str(ROOT))
 
 from Scripts.quality_gate_change_policy import (  # noqa: E402
     MASSIVE_EXACT_PATHS,
     MASSIVE_SCRIPT_NAMES,
     MASSIVE_TEST_PATHS,
-    classification_gate_command,
 )
 
 DOCUMENTATION_PATHS = {"README.md", "LICENSE", "NOTICE"}
@@ -119,6 +119,7 @@ class ChangeContext:
     introduced_commit_shas: tuple[str, ...] = ()
     revision_ranges: tuple[tuple[str, ...], ...] = ()
     classification: ChangeClassification | None = None
+    execution_profile: str | None = None
 
 
 @dataclass(frozen=True)
@@ -129,6 +130,7 @@ class GateExecutionPlan:
     commands: tuple[GateCommand, ...]
     docker_smoke: bool
     resolution: TestResolution | None = None
+    execution_profile: str = "pr"
 
     @property
     def coverage_artifacts(self) -> tuple[str, ...]:
@@ -889,9 +891,14 @@ def _command_argv(
         )
 
 
-def build_change_context(mode: str, paths: list[str] | tuple[str, ...]) -> ChangeContext:
+def build_change_context(
+    mode: str,
+    paths: list[str] | tuple[str, ...],
+    *,
+    execution_profile: str | None = None,
+) -> ChangeContext:
     """Build a pure change context from already-resolved paths."""
-    if mode not in {"fast", "push", "ci"}:
+    if mode not in {"fast", "push", "ci", "nightly", "release"}:
         raise ValueError(f"Unsupported mode: {mode}")
     changed_paths = tuple(paths)
     if mode == "fast":
@@ -906,6 +913,7 @@ def build_change_context(mode: str, paths: list[str] | tuple[str, ...]) -> Chang
         changed_paths_source=changed_paths_source,
         documentation_only=mode == "fast" and is_documentation_only(list(changed_paths)),
         classification=classify_changes(changed_paths),
+        execution_profile=execution_profile,
     )
 
 
@@ -932,29 +940,15 @@ def build_push_change_context(target: PushValidationTarget) -> ChangeContext:
     )
 
 
-def resolve_change_context(mode: str, paths: list[str] | None = None) -> ChangeContext:
+def resolve_change_context(
+    mode: str,
+    paths: list[str] | None = None,
+    *,
+    execution_profile: str | None = None,
+) -> ChangeContext:
     """Resolve the current change paths without changing gate selection semantics."""
     resolved_paths = staged_files() if paths is None and mode == "fast" else (paths or [])
-    return build_change_context(mode, resolved_paths)
-
-
-def _python_coverage_commands(command_input: tuple[InputSource, ...]) -> tuple[GateCommand, ...]:
-    return (
-        GateCommand(
-            "Versioned Python coverage",
-            (sys.executable, "-m", "pytest", "--cov", "--cov-config=.coveragerc",
-             "--cov-report=json:.coverage.python.json", "--cov-report=term-missing", "-q"),
-            "Add tests until every declared Python source has no uncovered line.",
-            backend_test=True, input_sources=command_input,
-            coverage_artifacts=(".coverage", ".coverage.python.json"),
-        ),
-        GateCommand(
-            "Python coverage scope and per-file compliance",
-            (sys.executable, "Scripts/check_python_coverage.py"),
-            "Restore the declared Python scope, branch coverage, and per-file compliance.",
-            input_sources=command_input,
-        ),
-    )
+    return build_change_context(mode, resolved_paths, execution_profile=execution_profile)
 
 
 def _gate_input_sources(mode: str) -> tuple[InputSource, ...]:
@@ -965,208 +959,9 @@ def _gate_input_sources(mode: str) -> tuple[InputSource, ...]:
 
 def build_execution_plan(context: ChangeContext) -> GateExecutionPlan:
     """Build the immutable ordered command plan for a resolved context."""
-    if context.mode not in {"fast", "push", "ci"}:
-        raise ValueError(f"Unsupported mode: {context.mode}")
-    command_input = _gate_input_sources(context.mode)
-    commands = [
-        GateCommand(
-            "Repository hygiene (README, encoding, secrets and DoD)",
-            (sys.executable, "Scripts/pre_commit_guard.py"),
-            "Correct the reported README, encoding, secret, or DoD issue and stage the fix.",
-            input_sources=command_input,
-        ),
-        classification_gate_command(GateCommand, sys.executable, command_input),
-        GateCommand(
-            "Identity boundary",
-            (sys.executable, "Scripts/check_identity_boundary.py"),
-            "Remove Azure DevOps identity data from the browser/backend boundary.",
-            input_sources=command_input,
-        ),
-        GateCommand(
-            "Naming convention",
-            (sys.executable, "Scripts/check_naming_convention.py"),
-            "Rename the reported code identifier in English.",
-            input_sources=command_input,
-        ),
-        GateCommand(
-            "Maintainability ratchet",
-            (sys.executable, "Scripts/check_maintainability.py"),
-            "Remove the new maintainability drift or explicitly review the versioned baseline.",
-            input_sources=command_input,
-        ),
-    ]
-    resolution = resolve_tests(context)
-    if (
-        context.documentation_only
-        and context.mode == "fast"
-        and resolution.level != ChangeLevel.MASSIVE
-    ):
-        return GateExecutionPlan(
-            context=context,
-            commands=tuple(commands),
-            docker_smoke=False,
-            resolution=resolution,
-        )
+    from Scripts.quality_gate_plan import build_execution_plan as build_profile_plan
 
-    if resolution.level != ChangeLevel.MASSIVE:
-        selected: list[GateCommand] = list(commands)
-        seen_argv = {command.argv for command in selected}
-
-        def append_unique(command: GateCommand) -> None:
-            if command.argv not in seen_argv:
-                seen_argv.add(command.argv)
-                selected.append(command)
-
-        if ChangeDomain.BACKEND in resolution.impacted_domains:
-            append_unique(
-                GateCommand(
-                    "Backend lint (Ruff)",
-                    (sys.executable, "-m", "ruff", "check", "."),
-                    "Run `python -m ruff check .` and correct the reported lint issue.",
-                    input_sources=command_input,
-                )
-            )
-
-        if ChangeDomain.FRONTEND in resolution.impacted_domains:
-            append_unique(
-                GateCommand(
-                    "Frontend lint (ESLint, zero warning)",
-                    (
-                        NPM_COMMAND,
-                        "--prefix",
-                        "frontend",
-                        "run",
-                        "lint",
-                        "--",
-                        "--max-warnings",
-                        "0",
-                    ),
-                    "Run the displayed ESLint command and correct all errors and warnings.",
-                    input_sources=command_input,
-                )
-            )
-            append_unique(
-                GateCommand(
-                    "Frontend typecheck (TypeScript)",
-                    (NPM_COMMAND, "--prefix", "frontend", "run", "typecheck"),
-                    "Run `npm --prefix frontend run typecheck` and correct the type errors.",
-                    input_sources=command_input,
-                )
-            )
-        if resolution.backend_tests:
-            append_unique(
-                GateCommand(
-                    "Selected backend tests",
-                    (sys.executable, "-m", "pytest", "-q", *resolution.backend_tests),
-                    "Correct the backend tests directly related to the changed files.",
-                    backend_test=True,
-                    input_sources=command_input,
-                )
-            )
-        if resolution.frontend_tests:
-            frontend_test_paths = tuple(
-                path.removeprefix("frontend/") for path in resolution.frontend_tests
-            )
-            append_unique(
-                GateCommand(
-                    "Selected frontend unit tests (Vitest)",
-                    (
-                        NPM_COMMAND,
-                        "--prefix",
-                        "frontend",
-                        "run",
-                        "test:unit",
-                        "--",
-                        *frontend_test_paths,
-                    ),
-                    "Correct the frontend tests directly related to the changed files.",
-                    input_sources=command_input,
-                )
-            )
-
-        return GateExecutionPlan(
-            context=context,
-            commands=tuple(selected),
-            docker_smoke=False,
-            resolution=resolution,
-        )
-
-    commands.extend(
-        [
-            GateCommand(
-                "Backend lint (Ruff)",
-                (sys.executable, "-m", "ruff", "check", "."),
-                "Run `python -m ruff check .` and correct the reported lint issue.",
-                input_sources=command_input,
-            ),
-            GateCommand(
-                "Frontend lint (ESLint, zero warning)",
-                (NPM_COMMAND, "--prefix", "frontend", "run", "lint", "--", "--max-warnings", "0"),
-                "Run the displayed ESLint command and correct all errors and warnings.",
-                input_sources=command_input,
-            ),
-            GateCommand(
-                "Frontend typecheck (TypeScript)",
-                (NPM_COMMAND, "--prefix", "frontend", "run", "typecheck"),
-                "Run `npm --prefix frontend run typecheck` and correct the type errors.",
-                input_sources=command_input,
-            ),
-        ]
-    )
-    if context.mode in {"push", "ci"}:
-        commands.extend(
-            [
-                *_python_coverage_commands(command_input),
-                GateCommand(
-                    "Frontend unit coverage",
-                    (NPM_COMMAND, "--prefix", "frontend", "run", "test:unit:coverage"),
-                    "Add frontend unit tests until all configured coverage thresholds pass.",
-                    input_sources=command_input,
-                    coverage_artifacts=(
-                        "frontend/coverage/coverage-final.json",
-                        "frontend/coverage/index.html",
-                    ),
-                ),
-                GateCommand(
-                    "Frontend build",
-                    (NPM_COMMAND, "--prefix", "frontend", "run", "build"),
-                    "Run `npm --prefix frontend run build` and correct the build error.",
-                    input_sources=command_input,
-                ),
-                GateCommand(
-                    "End-to-end tests (Playwright)",
-                    (NPM_COMMAND, "--prefix", "frontend", "run", "test:e2e"),
-                    "Install Playwright browsers explicitly if missing, then correct the failing "
-                    "E2E test.",
-                    input_sources=command_input,
-                    coverage_artifacts=("frontend/coverage/e2e-coverage-summary.json",),
-                ),
-            ]
-        )
-    else:
-        commands.extend(
-            [
-                GateCommand(
-                    "Backend tests",
-                    (sys.executable, "-m", "pytest", "-q"),
-                    "Run `python -m pytest -q` and correct the failing backend test.",
-                    backend_test=True,
-                    input_sources=command_input,
-                ),
-                GateCommand(
-                    "Frontend unit tests (Vitest)",
-                    (NPM_COMMAND, "--prefix", "frontend", "run", "test:unit"),
-                    "Run `npm --prefix frontend run test:unit` and correct the failing test.",
-                    input_sources=command_input,
-                ),
-            ]
-        )
-    return GateExecutionPlan(
-        context=context,
-        commands=tuple(commands),
-        docker_smoke=context.mode == "ci",
-        resolution=resolution,
-    )
+    return build_profile_plan(context, sys.modules[__name__])
 
 
 def execution_plan(mode: str, documentation_only: bool) -> list[GateCommand]:
@@ -1449,9 +1244,10 @@ def _validate_docker_smoke_configuration(repository_root: Path | None = None) ->
 def _run_docker_http_smoke() -> None:
     print("\n==> Docker smoke test")
     print("$ HTTP health, Mongo persistence, and shared rate-limit checks")
+    base_url = f"http://127.0.0.1:{DOCKER_SMOKE_PORT}"
     for _ in range(30):
         try:
-            status, _ = _request("http://127.0.0.1:8000/health")
+            status, _ = _request(f"{base_url}/health")
         except (urllib.error.URLError, OSError):
             status = 0
         if status == 200:
@@ -1460,7 +1256,7 @@ def _run_docker_http_smoke() -> None:
     else:
         raise RuntimeError("The health endpoint did not become ready within 60 seconds.")
 
-    mongo_status, mongo_body = _request("http://127.0.0.1:8000/health/mongo")
+    mongo_status, mongo_body = _request(f"{base_url}/health/mongo")
     if mongo_status != 200 or '"status":"ok"' not in mongo_body:
         raise RuntimeError("Mongo health endpoint is not OK.")
 
@@ -1472,11 +1268,11 @@ def _run_docker_http_smoke() -> None:
         "Content-Type": "application/json",
         "Cookie": "IDMontecarlo=ci-smoke-idmontecarlo",
     }
-    simulate_status, _ = _request("http://127.0.0.1:8000/simulate", payload, headers)
+    simulate_status, _ = _request(f"{base_url}/simulate", payload, headers)
     if simulate_status != 200:
         raise RuntimeError(f"POST /simulate returned HTTP {simulate_status}.")
     history_status, history_body = _request(
-        "http://127.0.0.1:8000/simulations/history", headers={"Cookie": headers["Cookie"]}
+        f"{base_url}/simulations/history", headers={"Cookie": headers["Cookie"]}
     )
     if history_status != 200 or '"mode":"backlog_to_weeks"' not in history_body:
         raise RuntimeError("Simulation history did not return the persisted simulation.")
@@ -1492,7 +1288,7 @@ def _run_docker_http_smoke() -> None:
     last_status = 0
     for attempt in range(1, 22):
         last_status, _ = _request(
-            "http://127.0.0.1:8000/simulate", rate_payload, rate_headers
+            f"{base_url}/simulate", rate_payload, rate_headers
         )
         if attempt <= 20 and last_status != 200:
             raise RuntimeError(
@@ -1509,6 +1305,7 @@ def _run_docker_smoke() -> int:
         return 1
 
     started = False
+    compose_env = {"APP_PORT": str(DOCKER_SMOKE_PORT)}
     try:
         for command in (
             GateCommand(
@@ -1522,7 +1319,7 @@ def _run_docker_smoke() -> int:
                 "Install and start Docker Desktop, then correct the Docker startup error.",
             ),
         ):
-            code = _run_command(command)
+            code = _run_command(command, extra_env=compose_env)
             if code:
                 return code
             started = True
@@ -1546,12 +1343,13 @@ def _run_docker_smoke() -> int:
                     "Docker cleanup",
                     ("docker", "compose", "down", "-v"),
                     "Stop the Docker services manually after resolving the failure.",
-                )
+                ),
+                extra_env=compose_env,
             )
     return 0
 
 
-def _execute_gate_plan(
+def _execute_commands_sequentially(
     plan: GateExecutionPlan,
     *,
     validation_root: Path,
@@ -1562,36 +1360,64 @@ def _execute_gate_plan(
     execution_env = dict(command_env or {})
     if isolated_validation:
         execution_env["MONTECARLO_E2E_PYTHON"] = sys.executable
-    has_frontend_commands = any(command.argv[0] == NPM_COMMAND for command in plan.commands)
-    if has_frontend_commands:
-        code = _ensure_frontend_dependencies()
+    for command in plan.commands:
+        code = _run_command(
+            command,
+            validation_root=validation_root,
+            runtime_temp_root=runtime_temp_root,
+            isolated_validation=isolated_validation,
+            extra_env=execution_env or None,
+        )
         if code:
             return code
-    dependency_manager = (
-        exposed_frontend_dependencies(validation_root)
-        if has_frontend_commands and isolated_validation
-        else nullcontext()
-    )
-    try:
-        with dependency_manager:
-            for command in plan.commands:
-                code = _run_command(
-                    command,
+    return 0
+
+
+def _execute_gate_plan(
+    plan: GateExecutionPlan,
+    *,
+    validation_root: Path,
+    runtime_temp_root: Path,
+    isolated_validation: bool,
+    command_env: dict[str, str] | None = None,
+    selected_node: str | None = None,
+    parallel: bool = False,
+) -> int:
+    if not parallel and selected_node is None:
+        has_frontend = any(command.argv[0] == NPM_COMMAND for command in plan.commands)
+        if has_frontend:
+            code = _ensure_frontend_dependencies()
+            if code:
+                return code
+        dependencies = (
+            exposed_frontend_dependencies(validation_root)
+            if has_frontend and isolated_validation
+            else nullcontext()
+        )
+        try:
+            with dependencies:
+                return _execute_commands_sequentially(
+                    plan,
                     validation_root=validation_root,
                     runtime_temp_root=runtime_temp_root,
                     isolated_validation=isolated_validation,
-                    extra_env=execution_env or None,
+                    command_env=command_env,
                 )
-                if code:
-                    return code
-    except OSError as exc:
-        print(
-            "ERROR: unable to expose frontend dependencies to isolated checkout: "
-            f"{exc}",
-            file=sys.stderr,
-        )
-        return 1
-    return 0
+        except OSError as exc:
+            print(f"ERROR: unable to expose frontend dependencies: {exc}", file=sys.stderr)
+            return 1
+    from Scripts.quality_gate_dag import execute_gate_plan
+
+    return execute_gate_plan(
+        sys.modules[__name__],
+        plan,
+        validation_root=validation_root,
+        runtime_temp_root=runtime_temp_root,
+        isolated_validation=isolated_validation,
+        command_env=command_env,
+        selected_node=selected_node,
+        parallel=parallel,
+    )
 
 
 def _print_plan_selection(plan: GateExecutionPlan) -> None:
@@ -1614,11 +1440,18 @@ def _print_plan_selection(plan: GateExecutionPlan) -> None:
         print(f"  - {command.step}: {command_text(command.argv)}")
 
 
-def run_gate(mode: str, paths: list[str] | None = None) -> int:
+def run_gate(
+    mode: str,
+    paths: list[str] | None = None,
+    *,
+    execution_profile: str | None = None,
+    selected_node: str | None = None,
+) -> int:
     """Run a gate and propagate the first failing command exit code."""
-    context = resolve_change_context(mode, paths)
+    context = resolve_change_context(mode, paths, execution_profile=execution_profile)
     plan = build_execution_plan(context)
     print(f"Quality gate mode: {mode}")
+    print(f"Execution profile: {plan.execution_profile}")
     if context.documentation_only:
         print("Documentation-only change detected: expensive code checks are skipped.")
     _print_plan_selection(plan)
@@ -1637,11 +1470,14 @@ def run_gate(mode: str, paths: list[str] | None = None) -> int:
             runtime_temp_root=runtime_temp_root,
             isolated_validation=isolated_validation,
             command_env=command_env,
+            selected_node=selected_node,
+            parallel=(
+                selected_node is None
+                and (validation_root / "config" / "test-execution-profiles.json").is_file()
+            ),
         )
         if code:
             return code
-    if plan.docker_smoke:
-        return _run_docker_smoke()
     print("\nQuality gate passed.")
     return 0
 
@@ -1692,6 +1528,7 @@ def run_pre_push_gate(
                         isolated_validation=True,
                     ),
                     isolated_validation=True,
+                    parallel=True,
                 )
         except (KeyboardInterrupt, RuntimeError) as exc:
             print(f"ERROR: pre-push validation interrupted: {exc}", file=sys.stderr)
@@ -1707,11 +1544,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "mode",
-        choices=("fast", "push", "ci"),
-        help="fast for pre-commit, push for pre-push, ci for GitHub Actions",
+        choices=("fast", "push", "ci", "nightly", "release"),
+        help="hook or automation mode used to resolve the execution profile",
     )
     parser.add_argument("--remote-name", default="")
     parser.add_argument("--remote-url", default="")
+    parser.add_argument("--profile", choices=("pr", "main", "nightly", "release"))
+    parser.add_argument("--node")
     return parser.parse_args(argv)
 
 
@@ -1723,7 +1562,12 @@ def main(argv: list[str] | None = None) -> int:
             remote_name=args.remote_name,
             remote_url=args.remote_url,
         )
-    return run_gate(args.mode)
+    options = {}
+    if args.profile is not None:
+        options["execution_profile"] = args.profile
+    if args.node is not None:
+        options["selected_node"] = args.node
+    return run_gate(args.mode, **options)
 
 
 if __name__ == "__main__":

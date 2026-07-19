@@ -55,11 +55,15 @@ niveaux `targeted`, `impacted` et `massive` décrivent au contraire l'étendue d
 gate à partir des changements. Ils ne sont ni des profils, ni des valeurs acceptées par le schéma, ni des
 champs d'un enregistrement de classification.
 
+L’inclusion versionnée est `pr = pr`, `main = pr + main`,
+`nightly = pr + main + nightly` et `release = pr + main + release`. Elle est définie dans
+[`config/test-execution-profiles.json`](../config/test-execution-profiles.json), indépendamment des niveaux
+de portée.
+
 ## Collecte et génération de l’inventaire
 
-Le PBI 1.4 a défini le contrat et le PBI 1.5 a ajouté la collecte et la classification automatiques. Le PBI
-1.7 rend désormais cet inventaire bloquant dans les validations locales et CI, sans modifier les profils
-d'exécution.
+Le PBI 1.4 a défini le contrat, le PBI 1.5 a ajouté la collecte et la classification automatiques, le PBI
+1.7 a rendu l’inventaire bloquant et le PBI 1.8 rend les profils exécutables par un DAG commun.
 
 La commande suivante reconstruit l’inventaire complet, sans donnée volatile :
 
@@ -118,7 +122,8 @@ déterministe framework, chemin relatif et sélecteur.
 ## Preuves et résolution
 
 [`config/test-classification-rules.json`](../config/test-classification-rules.json) versionne les signaux,
-leur priorité et la preuve d’automatisation du profil actuel. Le moteur combine imports, appels, fixtures,
+leur priorité et les preuves de chaque règle de profil. Ces preuves documentent nature, finalités,
+criticité, coût et infrastructure, déterminisme et rôle dans la livraison. Le moteur combine imports, appels, fixtures,
 ressources, modificateurs, framework et mode d’exécution. Le chemin et le titre complètent ces preuves pour
 les domaines, finalités et rattachements connus, mais une règle de nature ne peut pas réussir avec ces seuls
 signaux secondaires.
@@ -129,9 +134,19 @@ de preuve suffisante produit `unresolved` et une `unresolvedReason`; le moteur n
 Les finalités et domaines sont additifs. Les rattachements `RISK-xxx` et `CP-xxx` exigent une correspondance
 précise avec les preuves versionnées dans la matrice de risques et les parcours critiques.
 
-Le profil courant est `main` car le workflow principal exécute `Scripts/quality_gate.py ci`, qui inclut les
-couvertures Pytest et Vitest ainsi que Playwright. Cette observation ne recompose aucun profil : ce travail
-reste réservé au PBI 1.8.
+Il n’existe plus d’attribution globale `currentExecutionProfile`. Chaque cas conserve exactement un profil
+principal calculé par les preuves prioritaires ; le défaut `pr` ne s’applique qu’en l’absence d’une preuve
+plus spécifique. Le chemin ou le framework ne suffisent pas à justifier une règle : la configuration porte
+la justification opérationnelle complète.
+
+## Plan d’exécution déterministe
+
+`Scripts/test_execution_profiles.py` valide le contrat et produit
+[`reports/test-execution-plan.json`](../reports/test-execution-plan.json). Pour chaque profil et nœud, ce
+rapport liste les cas, frameworks, natures, criticités, commandes et dépendances. `preflight` précède
+`backend-static`, `frontend-static`, `backend-tests`, `frontend-tests`, `e2e` et
+`release-or-container-checks`; `aggregate` dépend de ces six branches. Les écritures intermédiaires sont
+isolées par profil et nœud, et tout conflit entre branches parallèles est bloquant.
 
 ## Overrides auditables
 
@@ -201,7 +216,8 @@ et ne reconstitue pas automatiquement le comportement d’une fixture définie a
 permettent plus de versionner un cas `unresolved` : elles imposent une preuve automatique améliorée ou un
 override strictement ciblé et auditable. Le comptage d'exécution ne change pas la nature attribuée.
 
-Le contrôle est exécuté une seule fois par plan `fast`, `push` et `ci` via `Scripts/quality_gate.py`, avec
-respectivement l'index Git, le commit détaché et le workspace comme source. La task `Coverage: 8 terminaux`
-l'exécute par `run-coverage-staged.ps1`. Aucun marqueur, profil CI/CD, skip, retry ou mécanisme de quarantaine
-n'est ajouté par ce PBI.
+Le contrôle est exécuté une seule fois par plan `fast`, `push`, `ci`, `nightly` et `release` via `Scripts/quality_gate.py`, avec
+respectivement l'index Git, le commit détaché et le workspace comme source. La task
+`Validation : profil main` l'exécute directement avec `ci --profile main`. Le PBI 1.8 ne modifie aucun skip,
+retry, état flaky ou mécanisme de
+quarantaine, qui restent du ressort du PBI 1.9.

@@ -4,8 +4,24 @@
 
 ### Qualité et outillage
 
+- recomposition des profils CI/CD `pr`, `main`, `nightly` et `release` autour d’un contrat JSON versionné,
+  avec hiérarchie d’inclusion explicite, attribution factuelle de chaque cas et séparation stricte des
+  portées `targeted`, `impacted` et `massive`
+- remplacement du plan CI monolithique par un DAG `preflight` → branches backend/frontend/tests/E2E/release
+  → `aggregate`, artefacts intermédiaires isolés, validation des cycles et conflits parallèles, jobs GitHub
+  réellement parallèles et publication GHCR conservée après l’agrégateur du profil `main`
+- La tâche historique « Coverage: 8 terminaux » est remplacée par
+  « Validation : profil main », fondée sur un DAG parallélisable.
+- le contrôle de maintenabilité ignore uniquement les chemins suivis supprimés du workspace courant, afin
+  qu’un retrait de l’ancien orchestrateur puisse être validé ; tous les fichiers suivis encore présents
+  restent analysés avec les mêmes règles et seuils.
+- justification des adaptations des contrôles qualité : la politique classe les nouveaux contrats,
+  orchestrateurs et rapports en portée `massive` afin qu’ils ne puissent pas contourner le gate complet ;
+  le contrôle DoD lit aussi le plan extrait afin de continuer à vérifier les commandes obligatoires. Aucun
+  contrôle ni seuil n’est supprimé ou abaissé.
+
 - ajout du contrôle bloquant de classification des tests dans les gates `fast`, `push`, `ci` et
-  `Coverage: 8 terminaux` : redécouverte en lecture seule, comparaison exacte de l'inventaire, validation du
+  `Validation : profil main` : redécouverte en lecture seule, comparaison exacte de l'inventaire, validation du
   contrat, des règles, overrides et exemptions, empreinte du rapport d'exécution et exigence
   `unresolved = 0`; les 16 ambiguïtés historiques sont résolues automatiquement sans override ni exemption
 - ajout du comptage déterministe des cas logiques, instances natives collectées/exécutées, skips, tentatives

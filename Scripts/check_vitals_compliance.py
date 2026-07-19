@@ -6,6 +6,7 @@ Fail fast if the repository no longer maintains an explicit traceability map for
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -16,6 +17,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CRITICAL_PATHS = ROOT / "docs" / "critical-paths.md"
 TRACEABILITY = ROOT / "docs" / "vitals-traceability.md"
 TASKS = ROOT / ".vscode" / "tasks.json"
+EXECUTION_PROFILES = ROOT / "config" / "test-execution-profiles.json"
+MAIN_VALIDATION_TASK = "Validation : profil main"
+LEGACY_VALIDATION_TASK = "Coverage:" + " 8 terminaux"
 VITALS_THRESHOLD = 95.0
 
 
@@ -108,6 +112,34 @@ def _append_vitals_rate_errors(
                     )
 
 
+def _append_main_validation_errors(errors: list[str]) -> None:
+    if TASKS.exists():
+        tasks_payload = json.loads(_read(TASKS))
+        tasks = tasks_payload.get("tasks", [])
+        labels = [task.get("label") for task in tasks]
+        if "Coverage Vitals Compliance" not in labels:
+            errors.append("Missing VS Code task: Coverage Vitals Compliance")
+        if "Coverage Vitals Rates" not in labels:
+            errors.append("Missing VS Code task: Coverage Vitals Rates")
+        if labels.count(MAIN_VALIDATION_TASK) != 1:
+            errors.append("Main-profile validation task must exist exactly once")
+        if LEGACY_VALIDATION_TASK in labels:
+            errors.append("Legacy coverage validation task must be removed")
+        if EXECUTION_PROFILES.exists():
+            contract = json.loads(_read(EXECUTION_PROFILES))
+            aggregate = next(
+                (node for node in contract.get("nodes", []) if node.get("id") == "aggregate"),
+                {},
+            )
+            commands = aggregate.get("commands", [])
+            if commands.count("Vitals coverage report") != 1:
+                errors.append("Main DAG aggregate must include Vitals coverage report once")
+            if commands.count("Vitals compliance") != 1:
+                errors.append("Main DAG aggregate must include Vitals compliance once")
+        else:
+            errors.append("Missing versioned execution-profile contract")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--report-json", type=Path)
@@ -138,18 +170,7 @@ def main(argv: list[str] | None = None) -> int:
             if not (ROOT / relpath).exists():
                 errors.append(f"Missing referenced test file for vital {title}: {relpath}")
 
-    if TASKS.exists():
-        tasks_content = _read(TASKS)
-        if '"label": "Coverage Vitals Compliance"' not in tasks_content:
-            errors.append("Missing VS Code task: Coverage Vitals Compliance")
-        if '"label": "Coverage Vitals Rates"' not in tasks_content:
-            errors.append("Missing VS Code task: Coverage Vitals Rates")
-        if '"label": "Coverage: 8 terminaux"' not in tasks_content:
-            errors.append("Coverage aggregate task should be 'Coverage: 8 terminaux'")
-        if '"Coverage Vitals Compliance"' not in tasks_content:
-            errors.append("Coverage aggregate task must include Vitals Compliance")
-        if '"Coverage Vitals Rates"' not in tasks_content:
-            errors.append("Coverage aggregate task must include Vitals Rates")
+    _append_main_validation_errors(errors)
 
     report = None
     if args.report_json is not None:

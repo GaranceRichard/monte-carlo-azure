@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "1.0.0",
+  "schema": "config/test-execution-profiles.schema.json",
+  "profiles": [
+    {
+      "id": "pr",
+      "includes": ["pr"],
+      "description": "Retour rapide, déterministe et protection immédiate des changements."
+    },
+    {
+      "id": "main",
+      "includes": ["pr", "main"],
+      "description": "Régression complète et contrôles d'intégration après fusion sur main."
+    },
+    {
+      "id": "nightly",
+      "includes": ["pr", "main", "nightly"],
+      "description": "Contrôles lourds, larges et non fonctionnels planifiés."
+    },
+    {
+      "id": "release",
+      "includes": ["pr", "main", "release"],
+      "description": "Preuves de packaging, déploiement, migration et publication."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "preflight",
+      "order": 10,
+      "needs": [],
+      "commands": [
+        "Repository hygiene (README, encoding, secrets and DoD)",
+        "Test classification compliance",
+        "Identity boundary",
+        "Naming convention",
+        "Maintainability ratchet"
+      ],
+      "profiles": ["pr", "main", "nightly", "release"],
+      "reads": ["workspace", "git-index", "HEAD"],
+      "writes": ["reports/test-execution-artifacts/{profile}/preflight/result.json"],
+      "resources": [],
+      "aggregator": false
+    },
+    {
+      "id": "backend-static",
+      "order": 20,
+      "needs": ["preflight"],
+      "commands": ["Backend lint (Ruff)"],
+      "profiles": ["pr", "main", "nightly", "release"],
+      "reads": ["backend", "Scripts", "tests", "pyproject.toml"],
+      "writes": ["reports/test-execution-artifacts/{profile}/backend-static/result.json"],
+      "resources": [],
+      "aggregator": false
+    },
+    {
+      "id": "frontend-static",
+      "order": 30,
+      "needs": ["preflight"],
+      "commands": [
+        "Frontend lint (ESLint, zero warning)",
+        "Frontend typecheck (TypeScript)",
+        "Frontend build"
+      ],
+      "profiles": ["pr", "main", "nightly", "release"],
+      "reads": ["frontend/src", "frontend/package-lock.json"],
+      "writes": ["reports/test-execution-artifacts/{profile}/frontend-static/dist"],
+      "resources": [],
+      "aggregator": false
+    },
+    {
+      "id": "backend-tests",
+      "order": 40,
+      "needs": ["preflight"],
+      "commands": [
+        "Prepare backend test selection",
+        "Selected backend tests",
+        "Backend tests",
+        "Versioned Python coverage",
+        "Python coverage scope and per-file compliance"
+      ],
+      "profiles": ["pr", "main", "nightly", "release"],
+      "reads": ["backend", "Scripts", "tests", "reports/test-classification-inventory.json"],
+      "writes": [
+        "reports/test-execution-artifacts/{profile}/backend-tests/coverage.json",
+        "reports/test-execution-artifacts/{profile}/backend-tests/pytest-args.txt",
+        "reports/test-execution-artifacts/{profile}/backend-tests/pytest.json"
+      ],
+      "resources": ["mongo-backend-tests"],
+      "aggregator": false
+    },
+    {
+      "id": "frontend-tests",
+      "order": 50,
+      "needs": ["preflight"],
+      "commands": [
+        "Selected frontend unit tests (Vitest)",
+        "Frontend unit tests (Vitest)",
+        "Frontend unit coverage"
+      ],
+      "profiles": ["pr", "main", "nightly", "release"],
+      "reads": ["frontend/src", "reports/test-classification-inventory.json"],
+      "writes": [
+        "reports/test-execution-artifacts/{profile}/frontend-tests/coverage/coverage-final.json",
+        "reports/test-execution-artifacts/{profile}/frontend-tests/vitest.json"
+      ],
+      "resources": [],
+      "aggregator": false
+    },
+    {
+      "id": "e2e",
+      "order": 60,
+      "needs": ["preflight"],
+      "commands": ["End-to-end tests (Playwright)"],
+      "profiles": ["pr", "main", "nightly", "release"],
+      "reads": ["frontend/src", "backend", "reports/test-classification-inventory.json"],
+      "writes": [
+        "reports/test-execution-artifacts/{profile}/e2e/e2e-coverage-summary.json",
+        "reports/test-execution-artifacts/{profile}/e2e/playwright.json"
+      ],
+      "resources": ["ports-8000-4173"],
+      "aggregator": false
+    },
+    {
+      "id": "release-or-container-checks",
+      "order": 70,
+      "needs": ["preflight"],
+      "commands": ["Release or container checks"],
+      "profiles": ["pr", "main", "nightly", "release"],
+      "reads": ["Dockerfile", "docker-compose.yml", ".env"],
+      "writes": ["reports/test-execution-artifacts/{profile}/release-or-container-checks/result.json"],
+      "resources": ["docker-compose-project", "port-18080"],
+      "aggregator": false
+    },
+    {
+      "id": "aggregate",
+      "order": 100,
+      "needs": [
+        "backend-static",
+        "frontend-static",
+        "backend-tests",
+        "frontend-tests",
+        "e2e",
+        "release-or-container-checks"
+      ],
+      "commands": [
+        "Aggregate execution evidence",
+        "Vitals coverage report",
+        "Vitals compliance"
+      ],
+      "profiles": ["pr", "main", "nightly", "release"],
+      "reads": ["reports/test-execution-artifacts/{profile}"],
+      "writes": [
+        "reports/test-execution-counts.json",
+        "reports/test-execution-plan.json",
+        "frontend/coverage/vitals-coverage-report.json"
+      ],
+      "resources": [],
+      "aggregator": true
+    }
+  ]
+}

@@ -2,22 +2,35 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
+  schedule:
+    - cron: "17 3 * * *"
+  release:
+    types: [published]
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  quality-gate:
+  preflight:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
-    services:
-      mongo:
-        image: mongo:7
-        ports:
-          - 27017:27017
-
+    timeout-minutes: 15
+    outputs:
+      profile: ${{ steps.profile.outputs.value }}
     steps:
+      - name: Resolve execution profile
+        id: profile
+        shell: bash
+        run: |
+          case "${{ github.event_name }}" in
+            schedule) value=nightly ;;
+            release) value=release ;;
+            push) value=main ;;
+            *) value=pr ;;
+          esac
+          echo "value=$value" >> "$GITHUB_OUTPUT"
+
       - name: Checkout
         uses: actions/checkout@v6
 
@@ -30,28 +43,188 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "22"
-          cache: "npm"
+          cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install Python dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          npm --prefix frontend ci
 
-      - name: Install frontend dependencies
-        run: npm --prefix frontend ci
+      - name: Run preflight node
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ steps.profile.outputs.value }}
+          --node preflight
 
-      - name: Install Playwright browsers
-        run: npx --prefix frontend playwright install --with-deps chromium
+  backend-static:
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Run backend static node
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node backend-static
 
+  frontend-static:
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm --prefix frontend ci
+      - name: Run frontend static node
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node frontend-static
+
+  backend-tests:
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Run backend test node
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node backend-tests
+      - name: Upload backend evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-tests-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+
+  frontend-tests:
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm --prefix frontend ci
+      - name: Run frontend test node
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node frontend-tests
+      - name: Upload frontend evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-tests-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+
+  e2e:
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: |
+          pip install -r requirements.txt
+          npm --prefix frontend ci
+          npx --prefix frontend playwright install --with-deps chromium
+      - name: Run browser node
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node e2e
+      - name: Upload browser evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+
+  release-or-container-checks:
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
       - name: Prepare Docker environment
         run: cp .env.example .env
+      - name: Run release or container node
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node release-or-container-checks
+      - name: Upload release evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-checks-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
 
-      - name: Run shared CI quality gate
-        run: python Scripts/quality_gate.py ci
+  aggregate:
+    needs:
+      - preflight
+      - backend-static
+      - frontend-static
+      - backend-tests
+      - frontend-tests
+      - e2e
+      - release-or-container-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Download node evidence
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-${{ needs.preflight.outputs.profile }}"
+          path: .
+          merge-multiple: true
+      - name: Run final aggregator
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node aggregate
 
   publish:
-    needs: [quality-gate]
+    needs: [aggregate]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:

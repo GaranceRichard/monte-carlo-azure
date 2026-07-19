@@ -20,6 +20,8 @@ from Scripts.test_classification_inventory_validation import (
 from Scripts.test_classification_overrides_validation import validate_overrides
 from Scripts.test_classification_rules_validation import validate_match, validate_rules
 from Scripts.test_classifier_discovery import LogicalCase, discover_all
+from Scripts.test_execution_profiles import build_plan_report
+from Scripts.test_execution_profiles_validation import validate_contract, validate_inventory
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = Path("config/test-classification.json")
@@ -28,6 +30,8 @@ RULES_PATH = Path("config/test-classification-rules.json")
 OVERRIDES_PATH = Path("config/test-classification-overrides.json")
 INVENTORY_PATH = Path("reports/test-classification-inventory.json")
 EXECUTION_REPORT_PATH = Path("reports/test-execution-counts.json")
+EXECUTION_PROFILES_PATH = Path("config/test-execution-profiles.json")
+EXECUTION_PROFILES_SCHEMA_PATH = Path("config/test-execution-profiles.schema.json")
 ARTIFACT_PATHS = (
     CATALOG_PATH,
     SCHEMA_PATH,
@@ -35,6 +39,8 @@ ARTIFACT_PATHS = (
     OVERRIDES_PATH,
     INVENTORY_PATH,
     EXECUTION_REPORT_PATH,
+    EXECUTION_PROFILES_PATH,
+    EXECUTION_PROFILES_SCHEMA_PATH,
 )
 
 
@@ -54,6 +60,7 @@ def validate_repository(
         artifacts[INVENTORY_PATH], artifacts[CATALOG_PATH], today or date.today()
     )
     errors.extend(record_errors)
+    errors.extend(_execution_profile_errors(artifacts))
     errors.extend(inventory_identity_errors(cases, records))
     errors.extend(_generation_errors(root, artifacts, cases))
     errors.extend(
@@ -61,6 +68,23 @@ def validate_repository(
             root, INVENTORY_PATH, artifacts[EXECUTION_REPORT_PATH]
         )
     )
+    return errors
+
+
+def _execution_profile_errors(artifacts: dict[Path, Any]) -> list[str]:
+    contract = artifacts[EXECUTION_PROFILES_PATH]
+    schema = artifacts[EXECUTION_PROFILES_SCHEMA_PATH]
+    inventory = artifacts[INVENTORY_PATH]
+    errors = validate_contract(contract) + validate_inventory(inventory)
+    if not isinstance(contract, dict) or not isinstance(schema, dict):
+        return errors
+    if schema.get("x-schemaVersion") != contract.get("schemaVersion"):
+        errors.append("execution-profile contract and schema versions differ")
+    if errors or not isinstance(inventory, list):
+        return errors
+    first = build_plan_report(contract, inventory)
+    if first != build_plan_report(contract, inventory):
+        errors.append("execution-profile plans are not deterministic")
     return errors
 
 
@@ -133,6 +157,8 @@ __all__ = [
     "OVERRIDES_PATH",
     "INVENTORY_PATH",
     "EXECUTION_REPORT_PATH",
+    "EXECUTION_PROFILES_PATH",
+    "EXECUTION_PROFILES_SCHEMA_PATH",
     "compliance_summary",
     "inventory_bytes",
     "load_json",

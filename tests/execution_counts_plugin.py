@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,21 @@ class _Run:
 
 
 _run = _Run()
+
+
+def _included_profiles(root: Path) -> set[str] | None:
+    profile = os.environ.get("TEST_EXECUTION_PROFILE")
+    if not profile:
+        return None
+    try:
+        contract = json.loads(
+            (root / "config" / "test-execution-profiles.json").read_text(encoding="utf-8")
+        )
+        entry = next(item for item in contract["profiles"] if item["id"] == profile)
+    except (OSError, KeyError, StopIteration, json.JSONDecodeError) as error:
+        _run.anomalies.append(f"execution profile unavailable: {error}")
+        return set()
+    return set(entry["includes"])
 
 
 def _relative(root: Path, path: Path) -> str:
@@ -52,8 +68,11 @@ def pytest_sessionstart(session: Any) -> None:
     except (OSError, json.JSONDecodeError) as error:
         _run.anomalies.append(f"classification inventory unavailable: {error}")
         return
+    included = _included_profiles(root)
     for record in inventory:
         if record.get("framework") != "pytest":
+            continue
+        if included is not None and record.get("executionProfile") not in included:
             continue
         logical_id = record.get("logicalCaseId")
         identity = (record.get("sourcePath"), record.get("selector"))
@@ -157,4 +176,8 @@ def pytest_sessionfinish(session: Any) -> None:
         "instances": native_instances,
         "anomalies": sorted(set(_run.anomalies)),
     }
-    _write_payload(_run.root / "reports/test-execution-native/pytest.json", payload)
+    configured = os.environ.get("TEST_EXECUTION_NATIVE_DIR")
+    report_root = Path(configured).resolve() if configured else (
+        _run.root / "reports" / "test-execution-native"
+    )
+    _write_payload(report_root / "pytest.json", payload)

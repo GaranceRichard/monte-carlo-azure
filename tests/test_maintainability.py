@@ -280,7 +280,8 @@ def test_mojibake_scanner_handles_binary_invalid_utf8_empty_and_control_data(
     (tmp_path / "empty.txt").write_bytes(b"")
     (tmp_path / "controls.txt").write_bytes(bytes(range(1, 9)))
     debt = check_maintainability._mojibake_debt(
-        tmp_path, ["binary.bin", "controls.txt", "empty.txt", "invalid.txt"]
+        tmp_path,
+        ["binary.bin", "controls.txt", "deleted.txt", "empty.txt", "invalid.txt"],
     )
     assert debt == [{"path": "invalid.txt", "pattern": "invalid-utf8", "count": 1}]
     assert not check_maintainability._is_probably_binary(b"")

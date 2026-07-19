@@ -35,9 +35,7 @@ Thumbs.db
 !.vscode/tasks.json
 !.vscode/scripts/
 .vscode/scripts/*
-!.vscode/scripts/run-coverage-staged.ps1
 !.vscode/scripts/run-e2e-coverage.ps1
-!.vscode/scripts/run-vitals-staged.ps1
 !.vscode/scripts/run-vitals-coverage.ps1
 !.vscode/scripts/run-vitals-compliance.ps1
 .idea/
@@ -67,3 +65,4 @@ frontend/test-results/
 test-results/
 frontend/*.tsbuildinfo
 reports/test-execution-native/
+reports/test-execution-artifacts/

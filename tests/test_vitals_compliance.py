@@ -62,15 +62,23 @@ def test_each_critical_vital_has_traceability_section_and_existing_test_files() 
             )
 
 
-def test_coverage_task_runs_vitals_compliance() -> None:
+def test_main_validation_dag_runs_vitals_compliance() -> None:
     tasks_path = ROOT / ".vscode" / "tasks.json"
     if not tasks_path.exists():
         pytest.skip(".vscode/tasks.json is optional in this checkout")
-    content = tasks_path.read_text(encoding="utf-8")
-    assert '"label": "Coverage: 8 terminaux"' in content
-    assert '"label": "Coverage Vitals Compliance"' in content
-    assert '"label": "Coverage Vitals Rates"' in content
-    assert '"Coverage Vitals Compliance"' in content
+    tasks = __import__("json").loads(tasks_path.read_text(encoding="utf-8"))["tasks"]
+    labels = [task["label"] for task in tasks]
+    contract = __import__("json").loads(
+        (ROOT / "config/test-execution-profiles.json").read_text(encoding="utf-8")
+    )
+    aggregate = next(node for node in contract["nodes"] if node["id"] == "aggregate")
+
+    assert labels.count("Validation : profil main") == 1
+    assert "Coverage:" + " 8 terminaux" not in labels
+    assert "Coverage Vitals Compliance" in labels
+    assert "Coverage Vitals Rates" in labels
+    assert aggregate["commands"].count("Vitals coverage report") == 1
+    assert aggregate["commands"].count("Vitals compliance") == 1
 
 
 def test_vitals_compliance_script_exists() -> None:
@@ -291,6 +299,11 @@ def test_vitals_compliance_main_success_and_structural_failures(
     monkeypatch.setattr(vitals_compliance, "CRITICAL_PATHS", critical)
     monkeypatch.setattr(vitals_compliance, "TRACEABILITY", traceability)
     monkeypatch.setattr(vitals_compliance, "TASKS", tasks)
+    monkeypatch.setattr(
+        vitals_compliance,
+        "EXECUTION_PROFILES",
+        tmp_path / "config/test-execution-profiles.json",
+    )
     monkeypatch.setattr(vitals_compliance, "ROOT", tmp_path)
 
     assert vitals_compliance.main([]) == 1
@@ -314,6 +327,27 @@ def test_vitals_compliance_main_success_and_structural_failures(
     assert "Missing traceability section for vital: Ghost" in error
     assert "Missing VS Code task" in error
 
+    vitals_compliance.EXECUTION_PROFILES.parent.mkdir()
+    vitals_compliance.EXECUTION_PROFILES.write_text('{"nodes": []}', encoding="utf-8")
+    legacy = "Coverage:" + " 8 terminaux"
+    tasks.write_text(
+        __import__("json").dumps(
+            {
+                "tasks": [
+                    {"label": "Coverage Vitals Compliance"},
+                    {"label": "Coverage Vitals Rates"},
+                    {"label": legacy},
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    assert vitals_compliance.main([]) == 1
+    error = capsys.readouterr().err
+    assert "Legacy coverage validation task must be removed" in error
+    assert "Main DAG aggregate must include Vitals coverage report once" in error
+    assert "Main DAG aggregate must include Vitals compliance once" in error
+
     test_file = tmp_path / "tests" / "ok.py"
     test_file.parent.mkdir()
     test_file.write_text("", encoding="utf-8")
@@ -322,9 +356,16 @@ def test_vitals_compliance_main_success_and_structural_failures(
         "## Liste officielle des points vitaux\n- Vital: detail\n", encoding="utf-8"
     )
     tasks.write_text(
-        '"label": "Coverage Vitals Compliance"\n'
-        '"label": "Coverage Vitals Rates"\n'
-        '"label": "Coverage: 8 terminaux"\n',
+        '{"tasks": ['
+        '{"label": "Coverage Vitals Compliance"},'
+        '{"label": "Coverage Vitals Rates"},'
+        '{"label": "Validation : profil main"}'
+        "]}",
+        encoding="utf-8",
+    )
+    vitals_compliance.EXECUTION_PROFILES.write_text(
+        '{"nodes": [{"id": "aggregate", "commands": '
+        '["Vitals coverage report", "Vitals compliance"]}]}',
         encoding="utf-8",
     )
     assert vitals_compliance.main([]) == 0

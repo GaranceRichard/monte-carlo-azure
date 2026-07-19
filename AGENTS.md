@@ -2,7 +2,7 @@
 
 ## Hard rules
 
-1. A task is never done until the full **Coverage 8 terminaux** task is green.
+1. A task is never done until the full **Validation : profil main** task is green.
 2. **DoD compliance is mandatory**.
 3. **No modification of quality controls** without explicit written justification.
 4. A task is never considered **publishable** until `git remote -v` confirms the GitHub remote is present.
@@ -14,7 +14,7 @@
 For every task:
 1. Read impacted files first.
 2. Implement the smallest coherent change.
-3. Run the full **Coverage 8 terminaux** task.
+3. Run the full **Validation : profil main** task.
 4. Fix failures and rerun until fully green.
 5. Check publication safety:
    - valid git worktree

@@ -352,7 +352,7 @@ les collections et résultats natifs, puis `Scripts/report_test_execution_counts
 à l'identité de l'inventaire. La classification décrit ce qu'est un cas logique ; la collecte décrit les
 instances développées par les paramètres et projets ; l'exécution décrit les instances réellement tentées ;
 les retries ajoutent des tentatives à la même instance. Le consolidateur ne redécouvre aucun test, refuse les
-rattachements absents ou ambigus et conserve les profils et gates existants inchangés.
+rattachements absents ou ambigus. Le rapport agrège aussi les quatre profils principaux.
 
 Les artefacts natifs sous `reports/test-execution-native/` sont des entrées locales régénérables. Seul le
 rapport déterministe `reports/test-execution-counts.json`, lié par SHA-256 à l'inventaire, est versionné.
@@ -364,9 +364,25 @@ d'exécution. Les 16 ambiguïtés initiales sont résolues par l'analyse comport
 exemption.
 
 Le contrôle est un invariant commun construit une seule fois dans chaque plan de `Scripts/quality_gate.py` :
-`fast` l'exécute sur le snapshot de l'index, `push` sur le worktree temporaire du commit détaché et `ci` sur
-le workspace. La task `Coverage: 8 terminaux` le reçoit via `run-coverage-staged.ps1`. Cette intégration ne
-recompose pas les profils d'exécution ; ce sujet reste réservé au PBI 1.8.
+`fast` l'exécute sur le snapshot de l'index, `push` sur le worktree temporaire du commit détaché et les modes
+d’automatisation sur le workspace. La task `Validation : profil main` appelle directement ce même gate avec
+`ci --profile main` et exécute son DAG parallélisable.
+
+Le contrat [`config/test-execution-profiles.json`](config/test-execution-profiles.json) est la source de
+vérité du DAG. `Scripts/test_execution_profiles.py` valide les inclusions, identifiants, dépendances,
+cycles, accessibilité, agrégateur final, conflits d’écriture et ressources exclusives, puis produit
+`reports/test-execution-plan.json`. Les inclusions sont :
+
+- `pr = pr` ;
+- `main = pr + main` ;
+- `nightly = pr + main + nightly` ;
+- `release = pr + main + release`.
+
+`Scripts/quality_gate_plan.py` traduit un mode en profil sans modifier la classification de portée, tandis
+que `Scripts/quality_gate_dag.py` regroupe les commandes par nœud et exécute les branches prêtes en parallèle.
+Chaque cas logique est affecté exactement une fois au nœud de son framework. Les artefacts intermédiaires
+sont isolés sous `reports/test-execution-artifacts/<profil>/<nœud>/`, puis lus par `aggregate`.
+Le smoke Docker utilise le port hôte isolé `18080`, distinct des ports `8000/4173` de la branche E2E.
 
 La sélection des contrôles est centralisée dans `Scripts/quality_gate.py` :
 
@@ -397,11 +413,14 @@ fichiers Windows restent conditionnels ; ils ne portent aucune couverture exclus
 
 CI GitHub Actions :
 
-- job unique `quality-gate` avec service MongoDB réel (`mongo:7`) ;
-- installation explicite de Python, Node.js, des dépendances et de Chromium ;
-- exécution de `python Scripts/quality_gate.py ci` ;
-- plan massif ordonné : contrôles de dépôt, de sécurité et de maintenabilité, Ruff, ESLint, TypeScript,
-  couvertures Python et frontend, build, E2E, puis smoke test Docker ;
+- `pull_request` sélectionne `pr`, le push sur `main` sélectionne `main`, la planification sélectionne
+  `nightly` et l’événement de release publié sélectionne `release` ;
+- `preflight` précède six jobs frères réellement parallélisables, chacun appelant
+  `python Scripts/quality_gate.py ci --profile ... --node ...` ;
+- `aggregate` dépend de toutes les branches et `publish` dépend de `aggregate` uniquement pour un push
+  sur `main` ;
+- installation explicite des dépendances utiles dans chaque runner et de Chromium dans le job E2E ;
+- le smoke test Docker reste bloquant dans la branche `release-or-container-checks` des profils complets ;
 - les suites avec couverture remplacent leurs suites simples équivalentes afin d’éviter une double
   exécution de Pytest ou Vitest ;
 - smoke tests `/health`, `/health/mongo`, `/simulate`, `/simulations/history` et limitation `429`.

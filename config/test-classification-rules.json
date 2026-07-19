@@ -1,17 +1,93 @@
 {
   "rulesVersion": "1.0.0",
-  "priorityPolicy": "Lower numeric values win for the single nature; additive dimensions accumulate.",
-  "automation": {
-    "currentExecutionProfile": "main",
-    "evidence": [
-      ".github/workflows/ci.yml runs Scripts/quality_gate.py ci on push and pull_request.",
-      "Scripts/quality_gate.py ci executes full Pytest and Vitest coverage plus Playwright E2E.",
-      "PBI 1.8, not this inventory, owns future profile recomposition."
-    ]
-  },
+  "priorityPolicy": "Lower numeric values win for the single nature and execution profile; additive dimensions accumulate.",
   "defaults": {
-    "purpose": "functional"
+    "purpose": "functional",
+    "executionProfile": "pr"
   },
+  "executionProfileRules": [
+    {
+      "id": "release_delivery_evidence",
+      "priority": 10,
+      "profile": "release",
+      "match": {
+        "any": {
+          "selector": [
+            "github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate|ci_enforces_required_checks"
+          ]
+        }
+      },
+      "evidence": {
+        "nature": "Entrypoints, scripts d'exploitation et transformation de données livrées.",
+        "purposes": ["functional", "migration_recovery"],
+        "criticality": "Preuves nécessaires avant publication, sans protéger chaque édition locale.",
+        "costAndInfrastructure": "Processus, système de fichiers et configuration de démarrage.",
+        "determinism": "Déterministe sur un workspace isolé.",
+        "deliveryRole": "Validation de packaging, démarrage, migration et opérations de release."
+      }
+    },
+    {
+      "id": "nightly_heavy_or_non_functional",
+      "priority": 20,
+      "profile": "nightly",
+      "match": {
+        "all": {
+          "sourcePath": [
+            "tests/test_test_execution_profiles\\.py"
+          ],
+          "selector": [
+            "plans_are_deterministic_and_dependencies_are_stable"
+          ]
+        }
+      },
+      "evidence": {
+        "nature": "Scénarios larges ou contrôles transverses sur volumes et agrégats.",
+        "purposes": ["performance", "observability", "data_quality"],
+        "criticality": "Détecte une dérive large sans retarder systématiquement les PR.",
+        "costAndInfrastructure": "Parcours de volumes, inventaires complets ou mesures temporelles.",
+        "determinism": "Assertions déterministes malgré un coût supérieur.",
+        "deliveryRole": "Surveillance planifiée de la santé non fonctionnelle."
+      }
+    },
+    {
+      "id": "main_assembled_browser_regression",
+      "priority": 30,
+      "profile": "main",
+      "match": {
+        "frameworks": ["playwright"]
+      },
+      "evidence": {
+        "nature": "Parcours navigateur assemblés de bout en bout.",
+        "purposes": ["functional", "accessibility", "compatibility"],
+        "criticality": "Protège les parcours intégrés après fusion.",
+        "costAndInfrastructure": "Navigateurs, serveurs frontend et backend et ports locaux.",
+        "determinism": "Réseau simulé ou services locaux contrôlés.",
+        "deliveryRole": "Régression complète de main avant publication d'image."
+      }
+    },
+    {
+      "id": "main_real_technical_boundaries",
+      "priority": 40,
+      "profile": "main",
+      "match": {
+        "any": {
+          "fixtures": ["^(?:tmp_path|tmpdir|tmp_path_factory)$"],
+          "calls": [
+            "(?:subprocess\\.)?(?:run|Popen|check_call|check_output)$",
+            "(?:MongoClient|create_index|insert_one|insert_many|delete_many)$"
+          ]
+        }
+      },
+      "evidence": {
+        "nature": "Intégrations avec processus, fichiers temporaires ou persistance.",
+        "purposes": ["functional", "resilience"],
+        "criticality": "Régression requise après intégration des changements.",
+        "costAndInfrastructure": "Sous-processus, stockage ou ressources système.",
+        "determinism": "Environnement de test isolé et données contrôlées.",
+        "deliveryRole": "Protection de la branche main contre les ruptures d'intégration."
+      }
+    }
+  ],
   "natureRules": [
     {
       "id": "assembled_browser_scenario",

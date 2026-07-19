@@ -310,10 +310,11 @@ En on-prem, l'URL attendue est l'URL serveur + collection, par exemple :
 Le détail du flux Cloud / on-prem est documenté dans [`frontend/README.md`](frontend/README.md).
 
 En E2E local, Playwright force aussi `VITE_API_BASE=http://127.0.0.1:8000` pour garder les mocks backend cohérents avec les appels `simulate` et `simulations/history`.
-En CI GitHub Actions, le job `quality-gate` installe explicitement `requirements.txt`, les
-dépendances frontend et Chromium avant d’exécuter le plan massif commun au pré-push, puis le smoke test
-Docker réservé à la CI.
-Le déploiement GitHub Pages attend ce job unique avant de construire et publier le frontend.
+En CI GitHub Actions, `preflight` choisit le profil selon l’événement, puis les jobs `backend-static`,
+`frontend-static`, `backend-tests`, `frontend-tests`, `e2e` et `release-or-container-checks` exécutent les
+branches indépendantes sur des runners séparés. `aggregate` attend toutes les branches ; la publication
+GHCR sur un push `main` dépend de cet agrégateur. Le déploiement GitHub Pages attend le succès du workflow
+CI du même SHA avant de construire et publier le frontend.
 
 ### Mode manuel en 5 terminaux
 
@@ -370,6 +371,13 @@ exceptions auditables résident respectivement dans
 est bloquante : le contrôle en lecture seule redécouvre les cas et compare exactement l'inventaire généré au
 fichier versionné.
 
+Le DAG commun est versionné dans
+[`config/test-execution-profiles.json`](config/test-execution-profiles.json), validé par
+[`config/test-execution-profiles.schema.json`](config/test-execution-profiles.schema.json) et rendu de façon
+déterministe dans [`reports/test-execution-plan.json`](reports/test-execution-plan.json). Sa hiérarchie est
+`pr = pr`, `main = pr + main`, `nightly = pr + main + nightly` et
+`release = pr + main + release`.
+
 ```bash
 python Scripts/check_test_classification.py
 ```
@@ -393,7 +401,7 @@ python Scripts/report_test_execution_counts.py
 
 [`reports/test-execution-counts.json`](reports/test-execution-counts.json) expose les cas logiques, les
 instances collectées et exécutées, les skips, les tentatives et les retries globalement, par framework,
-statut, nature et `logicalCaseId`. Son empreinte SHA-256 identifie exactement l'inventaire de classification
+statut, nature, profil et `logicalCaseId`. Son empreinte SHA-256 identifie exactement l'inventaire de classification
 utilisé. Le rapport est trié et ne contient ni timestamp, durée, chemin absolu ni autre donnée volatile.
 
 Depuis la racine:
@@ -402,6 +410,8 @@ Depuis la racine:
 python Scripts/quality_gate.py fast
 python Scripts/quality_gate.py push
 python Scripts/quality_gate.py ci
+python Scripts/quality_gate.py nightly
+python Scripts/quality_gate.py release
 ```
 
 Le plan est construit à partir des chemins réellement modifiés, puis classé selon trois niveaux :
@@ -414,7 +424,7 @@ Un chemin inconnu, une dépendance impossible à résoudre ou une ambiguïté pr
 conservateur vers `massive`. Un changement backend seul ne lance pas les suites frontend, et
 réciproquement. Un changement mixte agrège les commandes sans doublon.
 
-Les trois modes ne lisent pas le même état du dépôt :
+Les modes ne lisent pas le même état du dépôt :
 
 - `fast`, appelé par le pré-commit, prend la liste des fichiers dans `git diff --cached` et exécute tous
   ses contrôles dans un instantané du contenu indexé. Une modification non indexée ne peut donc ni faire
@@ -423,8 +433,16 @@ Les trois modes ne lisent pas le même état du dépôt :
   fichiers introduits, puis valide une seule fois le SHA terminal de chaque référence dans un worktree
   détaché temporaire. Les suppressions de références n’exécutent pas de suite et le workspace courant,
   même sale, est ignoré ;
-- `ci`, réservé à GitHub Actions, exécute le plan complet sur le checkout CI et ajoute le smoke test
-  Docker. Les dépendances sont installées par le workflow, jamais par le gate.
+- `ci`, réservé à GitHub Actions, reçoit explicitement `--profile pr|main|nightly|release` et
+  `--node <id>` ; les dépendances sont installées par chaque job, jamais par la gate ;
+- `nightly` et `release` rendent les profils homonymes disponibles pour une validation locale explicite.
+
+Le profil est orthogonal au niveau `targeted`, `impacted` ou `massive` : le premier sélectionne les cas par
+sa hiérarchie d’inclusion, le second limite la portée de `fast`. À partir de `preflight`, les branches
+statiques, backend, frontend, E2E et release/conteneur sont parallélisables. Leurs rapports et couvertures
+intermédiaires utilisent `reports/test-execution-artifacts/<profil>/<nœud>/`; seul `aggregate`, qui dépend de
+toutes les branches, consolide le plan final. Deux nœuds sans relation de dépendance ne peuvent déclarer ni
+le même artefact écrit ni la même ressource exclusive.
 
 Les worktrees détachés réutilisent les dépendances frontend par lien symbolique sous POSIX et, seulement si
 ce lien échoue sous Windows, par jonction `mklink /J`. Les tests de plateforme simulent le seam
@@ -433,9 +451,10 @@ Ce seam couvre aussi le retry des suppressions read-only : les branches Windows 
 par des tests unitaires sur tous les systèmes. Les seuls skips de plateforme conservés vérifient les
 attributs read-only réels de Windows et ne laissent aucune ligne Python non couverte sous Linux.
 
-Dans un plan complet `push` ou `ci`, les suites avec couverture remplacent les mêmes suites simples :
+Dans un plan complet `main`, `nightly` ou `release`, les suites avec couverture remplacent les mêmes suites simples :
 Pytest n’est pas exécuté une première fois sans couverture, et Vitest n’est pas exécuté une première fois
-via `test:unit`. L’ordre applicatif reste lint, typecheck, tests, build, puis E2E.
+via `test:unit`. L’ordre interne de chaque nœud reste déterministe ; les nœuds indépendants ne sont plus
+forcés dans un ordre global séquentiel.
 
 La définition normative des niveaux de validation, des seuils et de la publiabilité se trouve dans
 [`docs/definition-of-done.md`](docs/definition-of-done.md). La consommation détaillée des artefacts Vitals
@@ -521,11 +540,12 @@ les tests/E2E, les déclarations `*.d.ts`, les fichiers générés et les deux m
 strictement déclaratifs (`src/types.ts`, `src/hooks/simulationTypes.ts`). Ainsi, tout nouveau
 fichier exécutable non testé apparaît dans le rapport et fait échouer la gate; aucun module de
 production n'est exclu par convenance.
-La task VS Code `Coverage: 8 terminaux` conserve l’orchestration manuelle complète. Elle appelle les
-scripts PowerShell versionnés `run-coverage-staged.ps1`, `run-e2e-coverage.ps1`,
-`run-vitals-staged.ps1`, `run-vitals-coverage.ps1` et `run-vitals-compliance.ps1`, puis termine par la
-convention de nommage. `run-coverage-staged.ps1` exécute aussi le contrôle bloquant de classification avant
-les couvertures. Elle produit ou réutilise notamment :
+La task VS Code `Validation : profil main` exécute directement
+`python Scripts/quality_gate.py ci --profile main`. Elle utilise le contrat versionné des profils, lance en
+parallèle les branches indépendantes, isole leurs artefacts et termine par l’agrégateur bloquant. Celui-ci
+produit le rapport Vitals puis contrôle sa conformité après promotion des couvertures backend, frontend et
+E2E. Les scripts PowerShell `run-e2e-coverage.ps1`, `run-vitals-coverage.ps1` et
+`run-vitals-compliance.ps1` restent disponibles pour le diagnostic ciblé. La validation produit notamment :
 
 - `.coverage` et `.coverage.python.json` pour tous les fichiers exécutables sous `backend/`, `Scripts/`
   et `run_app.py` ;
@@ -590,7 +610,7 @@ Le mode `fast` exécute notamment:
     auditables
 
 Une validation ciblée verte confirme uniquement le plan sélectionné. La validation complète correspond à
-la task `Coverage: 8 terminaux`. La conformité DoD ajoute les exigences normatives et documentaires. Enfin,
+la task `Validation : profil main`. La conformité DoD ajoute les exigences normatives et documentaires. Enfin,
 un changement n’est publiable qu’après validation complète, vérification du worktree et de la branche, et
 présence confirmée du remote GitHub.
 

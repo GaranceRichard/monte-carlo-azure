@@ -140,26 +140,14 @@
       }
     },
     {
-      "label": "Coverage: 8 terminaux",
-      "dependsOn": [
-        "Coverage (Staged)",
-        "Coverage Naming Convention"
-      ],
-      "dependsOrder": "sequence",
-      "problemMatcher": []
-    },
-    {
-      "label": "Coverage (Staged)",
-      "type": "shell",
-      "command": "powershell",
+      "label": "Validation : profil main",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}\\.vscode\\scripts\\run-coverage-staged.ps1",
-        "-WorkspaceRoot",
-        "${workspaceFolder}"
+        "Scripts/quality_gate.py",
+        "ci",
+        "--profile",
+        "main"
       ],
       "options": {
         "cwd": "${workspaceFolder}"

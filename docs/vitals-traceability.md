@@ -22,8 +22,9 @@ de couverture. La sélection machine des fichiers sources reste définie dans
   `total = covered = skipped = 0` avec `pct = 100`. Une valeur globale sous le seuil n’est jamais masquée
   par cette règle.
 
-La task `Coverage: 8 terminaux` enchaîne les scripts PowerShell versionnés de couverture et de Vitals, puis
-le contrôle de convention de nommage. Les taux Vitals minimaux restent fixés à 95 %.
+La task `Validation : profil main` exécute le DAG versionné. Les couvertures sont produites dans des branches
+isolées, puis l’agrégateur construit le rapport Vitals et exécute sa conformité. Les taux Vitals minimaux
+restent fixés à 95 %.
 
 ## Matrice officielle
 
@@ -146,6 +147,6 @@ Sources de couverture configurées : `frontend/src/components/steps/simulationPr
 `frontend/src/components/steps/simulationPdfDownload.ts` et
 `frontend/src/components/steps/portfolioPrintReport.ts`.
 
-Contrôle local recommandé : lancer la task `Coverage: 8 terminaux`. Les scripts Vitals peuvent aussi être
+Contrôle local recommandé : lancer la task `Validation : profil main`. Les scripts Vitals peuvent aussi être
 appelés séparément pour diagnostiquer un artefact déjà produit, mais cela ne remplace pas la validation
 complète.

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import process from "node:process";
 
 export const frontendRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const repositoryRoot = path.resolve(frontendRoot, "..");
@@ -12,10 +13,20 @@ function normalizedRelative(absolute) {
 export function loadPositionInventory(framework) {
   const inventoryPath = path.join(repositoryRoot, "reports", "test-classification-inventory.json");
   const inventory = JSON.parse(fs.readFileSync(inventoryPath, "utf8"));
+  const profile = process.env.TEST_EXECUTION_PROFILE;
+  let includedProfiles = null;
+  if (profile) {
+    const contractPath = path.join(repositoryRoot, "config", "test-execution-profiles.json");
+    const contract = JSON.parse(fs.readFileSync(contractPath, "utf8"));
+    const entry = contract.profiles.find((item) => item.id === profile);
+    if (!entry) throw new Error(`Unknown execution profile: ${profile}`);
+    includedProfiles = new Set(entry.includes);
+  }
   const ids = new Set();
   const positions = new Map();
   for (const record of inventory) {
     if (record.framework !== framework) continue;
+    if (includedProfiles && !includedProfiles.has(record.executionProfile)) continue;
     ids.add(record.logicalCaseId);
     const match = record.selector.match(/ \[(\d+):(\d+)\]$/);
     if (!match) throw new Error(`Missing declaration position for ${record.logicalCaseId}`);
@@ -51,12 +62,10 @@ export function repositoryPath(absolute) {
 }
 
 export function writeNative(framework, payload) {
-  const destination = path.join(
-    repositoryRoot,
-    "reports",
-    "test-execution-native",
-    `${framework}.json`,
-  );
+  const reportRoot = process.env.TEST_EXECUTION_NATIVE_DIR
+    ? path.resolve(process.env.TEST_EXECUTION_NATIVE_DIR)
+    : path.join(repositoryRoot, "reports", "test-execution-native");
+  const destination = path.join(reportRoot, `${framework}.json`);
   fs.mkdirSync(path.dirname(destination), { recursive: true });
   fs.writeFileSync(destination, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 }

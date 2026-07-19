@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -241,7 +241,20 @@ def _aggregates(inventory: list[dict[str, Any]]) -> tuple[dict[str, Any], ...]:
         )
         for nature in nature_names
     }
-    return _empty_totals(len(inventory)), framework_totals, status_totals, nature_totals
+    profile_counts = Counter(map(lambda item: item["executionProfile"], inventory))
+    profile_totals = {
+        "pr": _empty_totals(profile_counts["pr"]),
+        "main": _empty_totals(profile_counts["main"]),
+        "nightly": _empty_totals(profile_counts["nightly"]),
+        "release": _empty_totals(profile_counts["release"]),
+    }
+    return (
+        _empty_totals(len(inventory)),
+        framework_totals,
+        status_totals,
+        nature_totals,
+        profile_totals,
+    )
 
 
 def _detail(logical: dict[str, Any], case_counts: dict[str, Any]) -> dict[str, Any]:
@@ -251,6 +264,7 @@ def _detail(logical: dict[str, Any], case_counts: dict[str, Any]) -> dict[str, A
         "sourcePath": logical["sourcePath"],
         "selector": logical["selector"],
         "classificationStatus": logical["status"],
+        "executionProfile": logical["executionProfile"],
         **({"nature": logical["nature"]} if "nature" in logical else {}),
         **case_counts,
     }
@@ -261,12 +275,14 @@ def _validate_aggregates(
     framework_totals: dict[str, Any],
     status_totals: dict[str, Any],
     nature_totals: dict[str, Any],
+    profile_totals: dict[str, Any],
 ) -> None:
     groups = (
         [("global totals", global_totals)]
         + [(f"framework {key}", value) for key, value in framework_totals.items()]
         + [(f"status {key}", value) for key, value in status_totals.items()]
         + [(f"nature {key}", value) for key, value in nature_totals.items()]
+        + [(f"execution profile {key}", value) for key, value in profile_totals.items()]
     )
     for label, totals in groups:
         _validate_counts(totals, label)
@@ -286,7 +302,13 @@ def consolidate(
     instances_by_case, covered = _collect_native(root, native_paths, inventory_by_id)
     _require_complete(inventory, instances_by_case, covered)
     logical_details: list[dict[str, Any]] = []
-    global_totals, framework_totals, status_totals, nature_totals = _aggregates(inventory)
+    (
+        global_totals,
+        framework_totals,
+        status_totals,
+        nature_totals,
+        profile_totals,
+    ) = _aggregates(inventory)
     for logical in inventory:
         case_counts = _case_counts(instances_by_case[logical["logicalCaseId"]])
         logical_details.append(_detail(logical, case_counts))
@@ -296,7 +318,10 @@ def consolidate(
         _add(status_totals[logical["status"]], execution_counts)
         if logical["status"] != "unresolved" and "nature" in logical:
             _add(nature_totals[logical["nature"]], execution_counts)
-    _validate_aggregates(global_totals, framework_totals, status_totals, nature_totals)
+        _add(profile_totals[logical["executionProfile"]], execution_counts)
+    _validate_aggregates(
+        global_totals, framework_totals, status_totals, nature_totals, profile_totals
+    )
     return {
         "schemaVersion": SCHEMA_VERSION,
         "classificationInventorySha256": hashlib.sha256(inventory_bytes).hexdigest(),
@@ -304,6 +329,7 @@ def consolidate(
         "frameworks": framework_totals,
         "classificationStatuses": status_totals,
         "natures": nature_totals,
+        "executionProfiles": profile_totals,
         "logicalCases": logical_details,
         "anomalies": [],
     }

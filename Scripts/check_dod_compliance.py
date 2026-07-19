@@ -14,6 +14,33 @@ from check_e2e_coverage import load_validated_config
 from check_python_coverage import load_policy
 
 ROOT = Path(__file__).resolve().parents[1]
+MAIN_VALIDATION_TASK = "Validation : profil main"
+LEGACY_VALIDATION_TASK = "Coverage:" + " 8 terminaux"
+ACTIVE_TEXT_SUFFIXES = {
+    ".json",
+    ".jsx",
+    ".js",
+    ".md",
+    ".mjs",
+    ".ps1",
+    ".py",
+    ".ts",
+    ".tsx",
+    ".yaml",
+    ".yml",
+}
+IGNORED_REFERENCE_DIRECTORIES = {
+    ".git",
+    ".pytest_cache",
+    ".tmp",
+    ".venv",
+    "__pycache__",
+    "coverage",
+    "coverage-vitals",
+    "node_modules",
+    "playwright-report",
+    "test-results",
+}
 
 
 def _read(relpath: str, root: Path = ROOT) -> str:
@@ -116,6 +143,7 @@ def _append_maintainability_errors(root: Path, errors: list[str]) -> None:
         "Scripts/maintainability_dependencies.py",
         "Scripts/maintainability_metrics.py",
         "Scripts/maintainability_ratchet.py",
+        "Scripts/quality_gate_plan.py",
         "config/maintainability.json",
         "config/maintainability-baseline.json",
         "config/maintainability-exceptions.json",
@@ -129,10 +157,11 @@ def _append_maintainability_errors(root: Path, errors: list[str]) -> None:
         "README must link docs/maintainability.md",
         errors,
     )
-    gate_path = root / "Scripts" / "quality_gate.py"
-    if gate_path.exists():
+    gate_paths = (root / "Scripts" / "quality_gate.py", root / "Scripts" / "quality_gate_plan.py")
+    if all(path.exists() for path in gate_paths):
+        gate = "\n".join(path.read_text(encoding="utf-8") for path in gate_paths)
         _ok(
-            "Scripts/check_maintainability.py" in gate_path.read_text(encoding="utf-8"),
+            "Scripts/check_maintainability.py" in gate,
             "Shared quality gate must run the maintainability ratchet",
             errors,
         )
@@ -157,6 +186,63 @@ def _append_python_coverage_errors(root: Path, errors: list[str]) -> None:
     )
     for condition, message in checks:
         _ok(condition, message, errors)
+
+
+def active_legacy_validation_references(root: Path) -> list[str]:
+    references: list[str] = []
+    for path in root.rglob("*"):
+        if not path.is_file() or path.name == "CHANGELOG.md":
+            continue
+        relative = path.relative_to(root)
+        if any(part in IGNORED_REFERENCE_DIRECTORIES for part in relative.parts):
+            continue
+        if path.suffix.lower() not in ACTIVE_TEXT_SUFFIXES and path.name != ".gitignore":
+            continue
+        for line_number, line in enumerate(
+            path.read_text(encoding="utf-8").splitlines(), start=1
+        ):
+            if LEGACY_VALIDATION_TASK in line:
+                references.append(f"{relative.as_posix()}:{line_number}")
+    return references
+
+
+def _append_main_validation_task_errors(root: Path, errors: list[str]) -> None:
+    tasks_path = root / ".vscode" / "tasks.json"
+    if not tasks_path.exists():
+        return
+    payload = json.loads(tasks_path.read_text(encoding="utf-8"))
+    tasks = payload.get("tasks", [])
+    matching = [task for task in tasks if task.get("label") == MAIN_VALIDATION_TASK]
+    _ok(len(matching) == 1, "Main validation task must exist exactly once", errors)
+    _ok(
+        all(task.get("label") != LEGACY_VALIDATION_TASK for task in tasks),
+        "Legacy coverage task label must not remain active",
+        errors,
+    )
+    if len(matching) == 1:
+        task = matching[0]
+        _ok(
+            task.get("args")
+            == ["Scripts/quality_gate.py", "ci", "--profile", "main"],
+            "Main validation task must execute the shared main-profile DAG",
+            errors,
+        )
+        _ok(
+            "dependsOn" not in task and "dependsOrder" not in task,
+            "Main validation task must not alias a second orchestration plan",
+            errors,
+        )
+    _ok(
+        not (root / ".vscode" / "scripts" / ("run-" + "coverage-staged.ps1")).exists(),
+        "Legacy sequential coverage orchestration must be removed",
+        errors,
+    )
+    references = active_legacy_validation_references(root)
+    _ok(
+        not references,
+        "Active legacy validation references remain: " + ", ".join(references),
+        errors,
+    )
 
 
 def collect_dod_errors(root: Path = ROOT) -> list[str]:
@@ -250,7 +336,7 @@ def collect_dod_errors(root: Path = ROOT) -> list[str]:
         "CI must delegate backend tests to the shared quality gate",
         errors,
     )
-    gate = _read("Scripts/quality_gate.py", root)
+    gate = _read("Scripts/quality_gate.py", root) + _read("Scripts/quality_gate_plan.py", root)
     _ok("--cov-config=.coveragerc" in gate, "Shared quality gate must use .coveragerc", errors)
     _ok(
         "Scripts/check_python_coverage.py" in gate,
@@ -265,15 +351,11 @@ def collect_dod_errors(root: Path = ROOT) -> list[str]:
     pages = _read(".github/workflows/pages.yml", root)
     errors.extend(pages_workflow_run_errors(pages, "CI"))
 
-    # Coverage task integration checks (VS Code): optional local developer file.
+    # Main-profile validation task integration (VS Code): optional local developer file.
     tasks_path = root / ".vscode" / "tasks.json"
     if tasks_path.exists():
         tasks = tasks_path.read_text(encoding="utf-8")
-        _ok(
-            '"label": "Coverage: 8 terminaux"' in tasks,
-            "Missing coverage aggregate task (8 terminaux)",
-            errors,
-        )
+        _append_main_validation_task_errors(root, errors)
         _ok(
             '"label": "Coverage Vitals Compliance"' in tasks,
             "Missing vitals compliance coverage task",

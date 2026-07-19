@@ -71,7 +71,7 @@ def test_maintainability_control_is_versioned_documented_and_delegated() -> None
 
     assert all((ROOT / path).is_file() for path in required)
     assert "docs/maintainability.md" in _read("README.md")
-    assert "Scripts/check_maintainability.py" in _read("Scripts/quality_gate.py")
+    assert "Scripts/check_maintainability.py" in _read("Scripts/quality_gate_plan.py")
 
 
 def test_frontend_unit_coverage_thresholds_are_at_least_80() -> None:
@@ -107,7 +107,7 @@ def test_e2e_coverage_thresholds_are_at_least_80() -> None:
 
 def test_ci_enforces_required_checks() -> None:
     ci = _read(".github/workflows/ci.yml")
-    gate = _read("Scripts/quality_gate.py")
+    gate = _read("Scripts/quality_gate.py") + _read("Scripts/quality_gate_plan.py")
     pages = _read(".github/workflows/pages.yml")
 
     assert "python Scripts/quality_gate.py ci" in ci
@@ -205,7 +205,7 @@ def test_coverage_tasks_separate_repo_compliance_and_python_full() -> None:
         # Optional local developer tooling file; may be absent in CI checkouts.
         return
     tasks_content = tasks_path.read_text(encoding="utf-8")
-    assert '"label": "Coverage: 8 terminaux"' in tasks_content
+    assert tasks_content.count('"label": "Validation : profil main"') == 1
     assert '"label": "Coverage Python (Full)"' in tasks_content
     assert '"label": "Coverage Vitals Compliance"' in tasks_content
     assert '"label": "Coverage Vitals Rates"' in tasks_content
@@ -215,3 +215,24 @@ def test_coverage_tasks_separate_repo_compliance_and_python_full() -> None:
     assert "--cov=tests.test_repo_compliance" not in tasks_content
     assert "--cov-config=.coveragerc" in tasks_content
     assert ".coverage.python.json" in tasks_content
+
+
+def test_no_active_legacy_validation_reference_remains(tmp_path: Path) -> None:
+    legacy = "Coverage:" + " 8 terminaux"
+    changelog = tmp_path / "CHANGELOG.md"
+    ignored = tmp_path / ".tmp" / "ignored.md"
+    residual = tmp_path / "docs" / "active.md"
+    changelog.write_text(legacy, encoding="utf-8")
+    ignored.parent.mkdir()
+    ignored.write_text(legacy, encoding="utf-8")
+    residual.parent.mkdir()
+    residual.write_text(f"prefix {legacy} suffix\n", encoding="utf-8")
+
+    assert check_dod_compliance.active_legacy_validation_references(tmp_path) == [
+        "docs/active.md:1"
+    ]
+    assert check_dod_compliance.active_legacy_validation_references(ROOT) == []
+
+    errors: list[str] = []
+    check_dod_compliance._append_main_validation_task_errors(tmp_path / "absent", errors)
+    assert errors == []

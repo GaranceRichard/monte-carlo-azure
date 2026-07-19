@@ -226,7 +226,7 @@ def test_primary_nature_rules_follow_executed_boundaries(case: LogicalCase, natu
     assert classify_case(case, rules, overrides, catalog)["nature"] == nature
 
 
-def test_multiple_purposes_domains_risks_and_current_main_profile_are_inferred() -> None:
+def test_multiple_purposes_domains_risks_and_main_browser_profile_are_inferred() -> None:
     rules, overrides, catalog, _schema = _configuration()
     case = LogicalCase(
         "playwright",

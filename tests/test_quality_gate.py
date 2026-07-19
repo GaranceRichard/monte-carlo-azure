@@ -117,6 +117,7 @@ def _copy_dod_fixture(destination: Path) -> None:
         ".github/workflows/ci.yml",
         ".github/workflows/pages.yml",
         "Scripts/quality_gate.py",
+        "Scripts/quality_gate_plan.py",
         ".vscode/tasks.json",
     ]
     for relpath in paths:
@@ -552,7 +553,7 @@ def test_fast_push_and_ci_modes_have_the_expected_scope() -> None:
     push_steps = [command.step for command in quality_gate.execution_plan("push", False)]
     ci_steps = [command.step for command in quality_gate.execution_plan("ci", False)]
 
-    assert push_steps == ci_steps
+    assert fast_steps == ci_steps
     assert "Backend tests" in fast_steps
     assert "Frontend unit tests (Vitest)" in fast_steps
     assert "Versioned Python coverage" not in fast_steps
@@ -563,6 +564,8 @@ def test_fast_push_and_ci_modes_have_the_expected_scope() -> None:
     assert "Python coverage scope and per-file compliance" in push_steps
     assert "Frontend unit coverage" in push_steps
     assert "End-to-end tests (Playwright)" in push_steps
+    assert "Release or container checks" in push_steps
+    assert "Versioned Python coverage" not in ci_steps
     push_commands = quality_gate.execution_plan("push", False)
     assert all("docker" not in " ".join(command.argv).lower() for command in push_commands)
 
@@ -1405,15 +1408,32 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
         (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run", "typecheck"),
         (
             sys.executable,
+            "Scripts/test_execution_profiles.py",
+            "--check",
+            "--select-profile",
+            "main",
+            "--select-framework",
+            "pytest",
+            "--selection-output",
+            "reports/test-execution-artifacts/main/backend-tests/pytest-args.txt",
+        ),
+        (
+            sys.executable,
             "-m",
             "pytest",
             "--cov",
             "--cov-config=.coveragerc",
-            "--cov-report=json:.coverage.python.json",
+            "--cov-report=json:reports/test-execution-artifacts/main/backend-tests/coverage.json",
             "--cov-report=term-missing",
             "-q",
+            "@reports/test-execution-artifacts/main/backend-tests/pytest-args.txt",
         ),
-        (sys.executable, "Scripts/check_python_coverage.py"),
+        (
+            sys.executable,
+            "Scripts/check_python_coverage.py",
+            "--report",
+            "reports/test-execution-artifacts/main/backend-tests/coverage.json",
+        ),
         (
             quality_gate.NPM_COMMAND,
             "--prefix",
@@ -1423,6 +1443,19 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
         ),
         (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run", "build"),
         (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run", "test:e2e"),
+        (sys.executable, "Scripts/test_execution_profiles.py", "--check"),
+        (
+            sys.executable,
+            "Scripts/report_vitals_coverage.py",
+            "--output",
+            "frontend/coverage/vitals-coverage-report.json",
+        ),
+        (
+            sys.executable,
+            "Scripts/check_vitals_compliance.py",
+            "--report-json",
+            "frontend/coverage/vitals-coverage-report.json",
+        ),
     ]
     assert plan.commands[0].input_sources == (quality_gate.InputSource.HEAD,)
     assert all(
@@ -1442,6 +1475,9 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
         "End-to-end tests (Playwright)": (
             "frontend/coverage/e2e-coverage-summary.json",
         ),
+        "Vitals coverage report": (
+            "frontend/coverage/vitals-coverage-report.json",
+        ),
     }
     assert plan.coverage_artifacts == (
         ".coverage",
@@ -1449,13 +1485,21 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
         "frontend/coverage/coverage-final.json",
         "frontend/coverage/index.html",
         "frontend/coverage/e2e-coverage-summary.json",
+        "frontend/coverage/vitals-coverage-report.json",
     )
     assert not plan.docker_smoke
 
 
-def test_push_and_ci_use_coverage_suites_without_simple_test_duplicates() -> None:
-    for mode in ("push", "ci"):
-        commands = quality_gate.execution_plan(mode, False)
+def test_main_nightly_and_release_use_coverage_without_simple_test_duplicates() -> None:
+    plans = [
+        quality_gate.execution_plan("push", False),
+        quality_gate.execution_plan("nightly", False),
+        quality_gate.execution_plan("release", False),
+        quality_gate.build_execution_plan(
+            quality_gate.build_change_context("ci", [], execution_profile="main")
+        ).commands,
+    ]
+    for commands in plans:
         pytest_commands = [
             command
             for command in commands
@@ -1883,8 +1927,14 @@ def test_external_snapshot_basetemp_supports_a_nested_git_repository(
 
 
 def test_first_failed_command_exit_code_is_propagated(monkeypatch) -> None:
-    failure = quality_gate.GateCommand("failing check", ("missing-command",), "Fix it.")
-    skipped = quality_gate.GateCommand("must not run", ("also-missing",), "Fix it.")
+    failure = quality_gate.GateCommand(
+        "Repository hygiene (README, encoding, secrets and DoD)",
+        ("missing-command",),
+        "Fix it.",
+    )
+    skipped = quality_gate.GateCommand(
+        "Test classification compliance", ("also-missing",), "Fix it."
+    )
     calls: list[str] = []
 
     monkeypatch.setattr(
@@ -1913,7 +1963,7 @@ def test_first_failed_command_exit_code_is_propagated(monkeypatch) -> None:
     monkeypatch.setattr(quality_gate, "_run_command", fake_run)
 
     assert quality_gate.run_gate("fast", paths=["README.md"]) == 23
-    assert calls == ["failing check"]
+    assert calls == ["Repository hygiene (README, encoding, secrets and DoD)"]
 
 
 def test_push_never_runs_docker_but_ci_runs_the_docker_smoke(monkeypatch) -> None:
@@ -1930,7 +1980,9 @@ def test_push_never_runs_docker_but_ci_runs_the_docker_smoke(monkeypatch) -> Non
 
     assert quality_gate.run_gate("push", paths=["backend/api.py"]) == 0
     assert not docker_called
-    assert quality_gate.run_gate("ci", paths=["backend/api.py"]) == 0
+    assert quality_gate.run_gate(
+        "ci", paths=["backend/api.py"], execution_profile="main"
+    ) == 0
     assert docker_called
 
 
@@ -1963,7 +2015,10 @@ def test_docker_smoke_retries_a_transient_connection_reset(monkeypatch) -> None:
 
     monkeypatch.setattr(quality_gate.time, "sleep", lambda _: None)
 
-    def request(*_args: object, **_kwargs: object) -> tuple[int, str]:
+    urls: list[str] = []
+
+    def request(url: str, *_args: object, **_kwargs: object) -> tuple[int, str]:
+        urls.append(url)
         response = next(responses)
         if isinstance(response, OSError):
             raise response
@@ -1972,6 +2027,7 @@ def test_docker_smoke_retries_a_transient_connection_reset(monkeypatch) -> None:
     monkeypatch.setattr(quality_gate, "_request", request)
 
     assert quality_gate._run_docker_http_smoke() is None
+    assert all(url.startswith("http://127.0.0.1:18080/") for url in urls)
 
 
 def test_hooks_and_ci_delegate_to_the_central_command() -> None:
@@ -1989,48 +2045,63 @@ def test_hooks_and_ci_delegate_to_the_central_command() -> None:
 
 
 def test_ci_mode_statically_keeps_the_docker_smoke() -> None:
-    gate = (ROOT / "Scripts" / "quality_gate.py").read_text(encoding="utf-8")
+    gate = (ROOT / "Scripts" / "quality_gate_dag.py").read_text(encoding="utf-8")
+    plan = (ROOT / "Scripts" / "quality_gate_plan.py").read_text(encoding="utf-8")
+    docker = (ROOT / "Scripts" / "quality_gate.py").read_text(encoding="utf-8")
 
-    assert 'docker_smoke=context.mode == "ci"' in gate
-    assert "if plan.docker_smoke:" in gate
-    assert '("docker", "compose", "build")' in gate
+    assert 'context.mode in {"ci", "nightly", "release"}' in plan
+    assert 'plan.docker_smoke and node == "release-or-container-checks"' in gate
+    assert '("docker", "compose", "build")' in docker
 
 
-def test_vscode_coverage_task_characterizes_current_orchestration() -> None:
+def test_vscode_main_validation_task_is_unique_and_uses_the_shared_dag() -> None:
     tasks = json.loads((ROOT / ".vscode" / "tasks.json").read_text(encoding="utf-8"))
-    by_label = {task["label"]: task for task in tasks["tasks"]}
+    labels = [task["label"] for task in tasks["tasks"]]
+    label = "Validation : profil main"
+    legacy = "Coverage:" + " 8 terminaux"
 
-    assert by_label["Coverage: 8 terminaux"]["dependsOn"] == [
-        "Coverage (Staged)",
-        "Coverage Naming Convention",
-    ]
-    assert by_label["Coverage: 8 terminaux"]["dependsOrder"] == "sequence"
+    assert labels.count(label) == 1
+    assert legacy not in labels
+    task = next(task for task in tasks["tasks"] if task["label"] == label)
+    assert task["args"] == ["Scripts/quality_gate.py", "ci", "--profile", "main"]
+    assert "dependsOn" not in task
+    assert "dependsOrder" not in task
+    assert not (ROOT / ".vscode/scripts" / ("run-" + "coverage-staged.ps1")).exists()
 
-    staged_script = (ROOT / ".vscode" / "scripts" / "run-coverage-staged.ps1").read_text(
-        encoding="utf-8"
+
+def test_main_validation_preserves_each_historical_control_once_in_the_dag() -> None:
+    plan = quality_gate.build_execution_plan(
+        quality_gate.build_change_context("ci", [], execution_profile="main")
     )
-    ordered_commands = [
-        "npm --prefix frontend run lint",
-        "npm --prefix frontend run typecheck",
-        "npm --prefix frontend run build",
-        "-m pytest --cov --cov-config=.coveragerc "
-        "--cov-report=json:.coverage.python.json "
-        "--cov-report=term-missing -q",
-        "Scripts/check_python_coverage.py",
-        "npm --prefix frontend run test:unit:coverage",
-        'run-e2e-coverage.ps1" -workspaceRoot $WorkspaceRoot -Workers 2',
-        'run-vitals-staged.ps1" -WorkspaceRoot $WorkspaceRoot',
-    ]
-    positions = [staged_script.index(command) for command in ordered_commands]
-    assert positions == sorted(positions)
-    assert '".tmp\\pytest"' in staged_script
-    assert '"coverage-staged-{0}-{1}"' in staged_script
-    assert "[System.Guid]::NewGuid()" in staged_script
-    assert '--basetemp "$pytestBaseTemp"' in staged_script
-    assert "finally {" in staged_script
-    assert "if ($locationPushed)" in staged_script
-    assert "Remove-Item -LiteralPath $pytestBaseTempFullPath -Recurse -Force" in staged_script
-    assert "pytest-of-" not in staged_script
+    steps = [command.step for command in plan.commands]
+    historical_controls = (
+        "Test classification compliance",
+        "Naming convention",
+        "Frontend lint (ESLint, zero warning)",
+        "Frontend typecheck (TypeScript)",
+        "Frontend build",
+        "Versioned Python coverage",
+        "Python coverage scope and per-file compliance",
+        "Frontend unit coverage",
+        "End-to-end tests (Playwright)",
+        "Vitals coverage report",
+        "Vitals compliance",
+    )
+    contract = json.loads(
+        (ROOT / "config/test-execution-profiles.json").read_text(encoding="utf-8")
+    )
+    aggregate = next(node for node in contract["nodes"] if node["id"] == "aggregate")
+
+    assert plan.execution_profile == "main"
+    assert all(steps.count(control) == 1 for control in historical_controls)
+    assert set(aggregate["needs"]) == {
+        "backend-static",
+        "frontend-static",
+        "backend-tests",
+        "frontend-tests",
+        "e2e",
+        "release-or-container-checks",
+    }
 
 
 def test_workspace_pytest_temporaries_are_git_ignored() -> None:
@@ -2042,9 +2113,7 @@ def test_workspace_pytest_temporaries_are_git_ignored() -> None:
 def test_complete_coverage_task_scripts_are_selectively_publishable() -> None:
     gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
     required_scripts = {
-        ".vscode/scripts/run-coverage-staged.ps1",
         ".vscode/scripts/run-e2e-coverage.ps1",
-        ".vscode/scripts/run-vitals-staged.ps1",
         ".vscode/scripts/run-vitals-coverage.ps1",
         ".vscode/scripts/run-vitals-compliance.ps1",
     }
@@ -2083,10 +2152,6 @@ def test_vscode_coverage_artifacts_and_e2e_threshold_state_are_locked() -> None:
     package_scripts = json.loads(
         (ROOT / "frontend" / "package.json").read_text(encoding="utf-8")
     )["scripts"]
-    vitals_staged = (
-        ROOT / ".vscode" / "scripts" / "run-vitals-staged.ps1"
-    ).read_text(encoding="utf-8")
-
     for script in (vitals_rates, vitals_compliance):
         assert 'frontend\\coverage\\coverage-final.json' in script
         assert '".coverage.python.json"' in script
@@ -2100,7 +2165,6 @@ def test_vscode_coverage_artifacts_and_e2e_threshold_state_are_locked() -> None:
     }
     assert all(value >= 80 for value in e2e_config["thresholds"].values())
     assert package_scripts["test:e2e"] == "node scripts/run-e2e-coverage.mjs"
-    assert "-ReuseExistingReport" in vitals_staged
 
 
 def test_dod_reports_invalid_python_and_e2e_policies(tmp_path: Path) -> None:
