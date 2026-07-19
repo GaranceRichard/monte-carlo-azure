@@ -481,9 +481,19 @@ def test_dag_node_execution_aggregation_and_error_paths(tmp_path: Path, monkeypa
         selected_node="missing",
     ) == 2
 
-    artifact = root / "reports/test-execution-artifacts/main/backend-tests/coverage.json"
-    artifact.parent.mkdir(parents=True)
-    artifact.write_text("{}", encoding="utf-8")
+    merged_artifacts = {
+        "backend-tests/coverage.json": "backend coverage",
+        "backend-tests/pytest.json": "backend results",
+        "frontend-tests/coverage/coverage-final.json": "vitest coverage",
+        "frontend-tests/vitest.json": "vitest results",
+        "e2e/e2e-coverage-summary.json": "e2e coverage",
+        "e2e/playwright.json": "e2e results",
+    }
+    artifact_root = root / "reports/test-execution-artifacts/main"
+    for relative_path, content in merged_artifacts.items():
+        artifact = artifact_root / relative_path
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text(content, encoding="utf-8")
     aggregate_plan = _dag_plan()
     assert quality_gate_dag.execute_gate_plan(
         quality_gate,
@@ -493,7 +503,16 @@ def test_dag_node_execution_aggregation_and_error_paths(tmp_path: Path, monkeypa
         isolated_validation=False,
         selected_node="aggregate",
     ) == 0
-    assert (root / ".coverage.python.json").is_file()
+    promoted_artifacts = {
+        ".coverage.python.json": "backend coverage",
+        "reports/test-execution-native/pytest.json": "backend results",
+        "frontend/coverage/coverage-final.json": "vitest coverage",
+        "reports/test-execution-native/vitest.json": "vitest results",
+        "frontend/coverage/e2e-coverage-summary.json": "e2e coverage",
+        "reports/test-execution-native/playwright.json": "e2e results",
+    }
+    for relative_path, content in promoted_artifacts.items():
+        assert (root / relative_path).read_text(encoding="utf-8") == content
     assert (root / "reports/test-execution-plan.json").is_file()
 
     frontend = quality_gate.GateCommand(
@@ -644,6 +663,29 @@ def test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate() -> 
         assert block.index("npm --prefix frontend ci") < block.index(
             "python Scripts/quality_gate.py ci"
         )
+
+    producer_jobs = {
+        job
+        for job, block in branch_blocks.items()
+        if "actions/upload-artifact@v4" in block
+    }
+    assert producer_jobs == {
+        "backend-tests",
+        "frontend-tests",
+        "e2e",
+        "release-or-container-checks",
+    }
+    for job in producer_jobs:
+        block = branch_blocks[job]
+        assert block.count("actions/upload-artifact@v4") == 1
+        assert block.count("path: reports/test-execution-artifacts") == 1
+
+    aggregate_tail = workflow.split("  aggregate:\n", maxsplit=1)[1]
+    next_job = re.search(r"(?m)^  [a-z][a-z0-9-]*:\s*$", aggregate_tail)
+    aggregate = aggregate_tail[: next_job.start()] if next_job else aggregate_tail
+    assert aggregate.count("actions/download-artifact@v4") == 1
+    assert aggregate.count("path: reports/test-execution-artifacts") == 1
+    assert "merge-multiple: true" in aggregate
 
     assert "schedule:" in workflow
     assert "release:" in workflow

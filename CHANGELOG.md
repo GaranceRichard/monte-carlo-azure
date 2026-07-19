@@ -13,6 +13,9 @@
 - correction de l’autonomie du job GitHub Actions `backend-tests` : le runner configure Node 22 avec le cache
   npm et installe les dépendances frontend avant la quality gate, afin que Pytest puisse charger TypeScript et
   `@playwright/test` ; les navigateurs Playwright restent installés uniquement dans le job `e2e`
+- correction du transport des preuves vers `aggregate` : tous les producteurs publient
+  `reports/test-execution-artifacts` et l’agrégateur fusionne les téléchargements dans ce même répertoire,
+  ce qui restitue l’arborescence attendue pour promouvoir les artefacts backend, Vitest et E2E
 - La tâche historique « Coverage: 8 terminaux » est remplacée par
   « Validation : profil main », fondée sur un DAG parallélisable.
 - le contrôle de maintenabilité ignore uniquement les chemins suivis supprimés du workspace courant, afin

@@ -381,7 +381,9 @@ cycles, accessibilité, agrégateur final, conflits d’écriture et ressources 
 `Scripts/quality_gate_plan.py` traduit un mode en profil sans modifier la classification de portée, tandis
 que `Scripts/quality_gate_dag.py` regroupe les commandes par nœud et exécute les branches prêtes en parallèle.
 Chaque cas logique est affecté exactement une fois au nœud de son framework. Les artefacts intermédiaires
-sont isolés sous `reports/test-execution-artifacts/<profil>/<nœud>/`, puis lus par `aggregate`.
+sont isolés sous `reports/test-execution-artifacts/<profil>/<nœud>/`. Les producteurs publient la racine
+`reports/test-execution-artifacts` et `aggregate` fusionne les téléchargements dans cette même racine ;
+`_promote_artifacts()` retrouve ainsi l’arborescence par profil et nœud avant consolidation.
 Le smoke Docker utilise le port hôte isolé `18080`, distinct des ports `8000/4173` de la branche E2E.
 
 La sélection des contrôles est centralisée dans `Scripts/quality_gate.py` :
@@ -419,6 +421,8 @@ CI GitHub Actions :
   `python Scripts/quality_gate.py ci --profile ... --node ...` ;
 - `aggregate` dépend de toutes les branches et `publish` dépend de `aggregate` uniquement pour un push
   sur `main` ;
+- les producteurs uploadent `reports/test-execution-artifacts` et `aggregate` télécharge avec
+  `merge-multiple` dans ce même répertoire avant de promouvoir les preuves backend, Vitest et E2E ;
 - installation explicite des dépendances utiles dans chaque runner et de Chromium dans le job E2E ;
 - `backend-tests` configure Node 22 avec le cache npm et exécute `npm --prefix frontend ci` avant la gate,
   car la classification Pytest charge TypeScript et importe la configuration Playwright ; il ne télécharge

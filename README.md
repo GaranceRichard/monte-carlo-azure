@@ -322,6 +322,11 @@ classification peuvent ainsi charger `frontend/node_modules/typescript/lib/types
 `frontend/playwright.config.js`, qui dépend de `@playwright/test`. Ce job n’installe pas les navigateurs
 Playwright : cette responsabilité reste limitée au job `e2e`.
 
+Les jobs producteurs publient tous `reports/test-execution-artifacts`. Le job `aggregate` télécharge et
+fusionne leurs preuves directement dans ce même répertoire, afin de reconstituer
+`<profil>/<nœud>/…`. `_promote_artifacts()` peut alors retrouver et promouvoir les couvertures et résultats
+backend, Vitest et E2E sans modifier les chemins internes du DAG.
+
 ### Mode manuel en 5 terminaux
 
 Terminal 1 (mongo local dev):

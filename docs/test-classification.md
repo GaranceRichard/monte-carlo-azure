@@ -148,6 +148,11 @@ rapport liste les cas, frameworks, natures, criticités, commandes et dépendanc
 `release-or-container-checks`; `aggregate` dépend de ces six branches. Les écritures intermédiaires sont
 isolées par profil et nœud, et tout conflit entre branches parallèles est bloquant.
 
+Dans GitHub Actions, chaque producteur uploade la racine `reports/test-execution-artifacts`. `aggregate`
+télécharge les artefacts avec fusion multiple dans ce même répertoire, ce qui préserve les chemins
+`<profil>/backend-tests`, `<profil>/frontend-tests` et `<profil>/e2e`. Le promoteur peut alors copier les
+couvertures et résultats natifs vers leurs emplacements consolidés sans réécrire les chemins du contrat.
+
 Les jobs GitHub Actions étant isolés, chaque branche prépare les dépendances qu’elle consomme. Le nœud
 `backend-tests` installe Python, configure Node 22 avec le cache npm, puis exécute
 `npm --prefix frontend ci` avant la quality gate. Cette installation rend disponibles le moteur TypeScript

@@ -222,7 +222,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: "*-${{ needs.preflight.outputs.profile }}"
-          path: .
+          path: reports/test-execution-artifacts
           merge-multiple: true
       - name: Run final aggregator
         run: >-

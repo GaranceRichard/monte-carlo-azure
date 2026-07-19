@@ -42,6 +42,9 @@ restent applicables.
   est requise, la même suite simple n’est pas exécutée auparavant.
 - Deux branches parallèles ne partagent ni artefact écrit ni ressource exclusive. Leurs artefacts sont
   isolés sous `reports/test-execution-artifacts/<profil>/<nœud>/` avant consolidation.
+- Tous les jobs producteurs uploadent `reports/test-execution-artifacts`. `aggregate` télécharge et fusionne
+  les preuves dans ce même répertoire, puis le promoteur retrouve les artefacts backend, Vitest et E2E sous
+  leur arborescence versionnée par profil et nœud.
 
 ## 3. Vérifications obligatoires
 
