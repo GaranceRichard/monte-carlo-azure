@@ -63,7 +63,8 @@ de portée.
 ## Collecte et génération de l’inventaire
 
 Le PBI 1.4 a défini le contrat, le PBI 1.5 a ajouté la collecte et la classification automatiques, le PBI
-1.7 a rendu l’inventaire bloquant et le PBI 1.8 rend les profils exécutables par un DAG commun.
+1.7 a rendu l’inventaire bloquant, le PBI 1.8 rend les profils exécutables par un DAG commun et le PBI 1.9
+ajoute une gouvernance indépendante des mécanismes qui modifient l'exécution.
 
 La commande suivante reconstruit l’inventaire complet, sans donnée volatile :
 
@@ -229,8 +230,40 @@ et ne reconstitue pas automatiquement le comportement d’une fixture définie a
 permettent plus de versionner un cas `unresolved` : elles imposent une preuve automatique améliorée ou un
 override strictement ciblé et auditable. Le comptage d'exécution ne change pas la nature attribuée.
 
-Le contrôle est exécuté une seule fois par plan `fast`, `push`, `ci`, `nightly` et `release` via `Scripts/quality_gate.py`, avec
-respectivement l'index Git, le commit détaché et le workspace comme source. La task
-`Validation : profil main` l'exécute directement avec `ci --profile main`. Le PBI 1.8 ne modifie aucun skip,
-retry, état flaky ou mécanisme de
-quarantaine, qui restent du ressort du PBI 1.9.
+Le contrôle de classification est exécuté une seule fois par plan `fast`, `push`, `ci`, `nightly` et `release`
+via `Scripts/quality_gate.py`, avec respectivement l'index Git, le commit détaché et le workspace comme source.
+La task `Validation : profil main` l'exécute directement avec `ci --profile main`.
+
+## Gouvernance distincte des états d'exécution
+
+[`config/test-governance.json`](../config/test-governance.json) est un contrat versionné séparé de la
+classification et validé par
+[`config/test-governance.schema.json`](../config/test-governance.schema.json). Il réutilise uniquement
+`logicalCaseId` comme clé de rattachement. Une entrée exige état normalisé, justification, cause, responsable,
+ticket, criticité, risque, date d'entrée, échéance et profil d'exécution. Une quarantaine critique exige en
+plus une mesure compensatoire ; tout retry par cas exige `preserveFirstFailure: true` et un maximum explicite
+de tentatives.
+
+`Scripts/check_test_governance.py` combine l'AST Python et les preuves AST TypeScript déjà découvertes. Il
+détecte les appels et marqueurs Pytest `skip`, `skipif`, `xfail`, quarantaine et retry ; les variantes Vitest
+`skip`, `skipIf`, `runIf`, `todo`, `only`, `fails` et retry ; les variantes Playwright `skip`, `fixme`, `fail`,
+tag `@quarantine` et retry. Il inspecte aussi les configurations globales et refuse les marqueurs inconnus.
+Un mécanisme global de retry est toujours invalide, car il ne peut pas être gouverné par cas logique.
+
+La gate bloque tout mécanisme sans entrée, état incohérent, entrée expirée ou orpheline, test critique ignoré,
+quarantaine non exécutable et quarantaine critique sans mesure compensatoire. Une quarantaine est une
+annotation exécutable, jamais un alias de `skip`. Son `executionProfile` doit rester identique au profil issu
+des preuves de classification et l'inclusion `pr`/`main`/`nightly`/`release` détermine sa sélection.
+
+Les reporters natifs écrivent pour chaque instance `attemptResults`, `initialResult`, `attempts`,
+`finalResult` et `result`. Le contrôle complet refuse une séquence incomplète ou un premier échec masqué. Le
+rapport [`reports/test-governance-report.json`](../reports/test-governance-report.json), conforme à
+[`config/test-governance-report.schema.json`](../config/test-governance-report.schema.json), agrège nombres,
+détails, échéances et taux d'instabilité sans timestamp ni chemin absolu. Il est produit par l'unique commande
+`Test governance compliance`, rattachée au nœud `aggregate` sans ajouter de branche au DAG.
+
+L'audit initial du PBI 1.9 a trouvé trois appels `pytest.skip(...)` et deux sélections `skipif` de plateforme.
+Les deux préconditions de fichiers versionnés et les deux sélections Windows étaient devenues inutiles ; elles
+ont été supprimées. Le test Mongo réel échoue désormais explicitement si le service requis par son profil
+`main` est absent. L'inventaire final ne contient aucun mécanisme de skip, expected failure, quarantaine ou
+retry et le contrat reste donc vide, sans métadonnée fabriquée.

@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 905,
+      "logicalCases": 916,
       "nodes": [
         {
           "id": "preflight",
@@ -179,7 +179,6 @@
             "pytest:tests/test_check_no_secrets.py::test_ignores_real_ado_values_outside_ci_and_tests",
             "pytest:tests/test_check_no_secrets.py::test_main_covers_repository_empty_and_finding_paths",
             "pytest:tests/test_e2e_coverage.py::test_artifact_validation_covers_context_time_and_file_shape_errors",
-            "pytest:tests/test_e2e_coverage.py::test_current_complete_e2e_artifact_is_accepted_after_normalization",
             "pytest:tests/test_e2e_coverage.py::test_e2e_artifact_from_another_execution_or_scope_fails",
             "pytest:tests/test_e2e_coverage.py::test_each_e2e_metric_below_threshold_fails",
             "pytest:tests/test_e2e_coverage.py::test_empty_metric_percentage_is_normalized_deterministically",
@@ -384,6 +383,18 @@
             "pytest:tests/test_test_execution_profiles.py::test_parallel_write_and_exclusive_resource_conflicts_are_rejected",
             "pytest:tests/test_test_execution_profiles.py::test_profile_inclusions_and_change_levels_are_orthogonal",
             "pytest:tests/test_test_execution_profiles.py::test_real_contract_and_all_four_profile_attributions_are_valid",
+            "pytest:tests/test_test_governance.py::test_attempt_history_contract_accepts_visible_nonexecution_and_rejects_bad_types",
+            "pytest:tests/test_test_governance.py::test_contract_validation_accepts_executable_quarantine_with_preserved_retry",
+            "pytest:tests/test_test_governance.py::test_contract_validation_blocks_shape_date_and_retry_policy_defects",
+            "pytest:tests/test_test_governance.py::test_contract_validation_blocks_top_level_orphan_and_lifecycle_defects",
+            "pytest:tests/test_test_governance.py::test_contract_validation_blocks_ungoverned_mismatch_and_invalid_container_types",
+            "pytest:tests/test_test_governance.py::test_governance_control_occurs_once_in_every_gate_plan_and_maps_to_aggregate",
+            "pytest:tests/test_test_governance.py::test_javascript_detection_accepts_neutral_modifiers_and_zero_position",
+            "pytest:tests/test_test_governance.py::test_pytest_attempt_reporting_covers_pass_fail_rerun_skip_and_infrastructure",
+            "pytest:tests/test_test_governance.py::test_real_repository_has_no_ignored_or_retry_mechanism_after_audit",
+            "pytest:tests/test_test_governance.py::test_runtime_governance_blocks_dynamic_ignores_blind_retries_and_quarantine_nonexecution",
+            "pytest:tests/test_test_governance.py::test_script_entrypoint_uses_main",
+            "pytest:tests/test_test_governance.py::test_versioned_contract_and_report_schemas_are_distinct_and_complete",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_metrics_below_threshold",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_missing_matches",
             "pytest:tests/test_vitals_compliance.py::test_backend_aggregation_and_report_building_cover_each_source",
@@ -397,18 +408,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 283
+            "pytest": 294
           },
           "natures": {
-            "component": 64,
+            "component": 65,
             "contract": 43,
-            "integration": 21,
-            "unit": 155
+            "integration": 20,
+            "unit": 166
           },
           "criticalities": {
-            "critical": 72,
+            "critical": 71,
             "high": 16,
-            "unassigned": 195
+            "unassigned": 207
           }
         },
         {
@@ -1133,7 +1144,8 @@
           "commands": [
             "Aggregate execution evidence",
             "Vitals coverage report",
-            "Vitals compliance"
+            "Vitals compliance",
+            "Test governance compliance"
           ],
           "reads": [
             "reports/test-execution-artifacts/{profile}"
@@ -1141,6 +1153,7 @@
           "writes": [
             "reports/test-execution-counts.json",
             "reports/test-execution-plan.json",
+            "reports/test-governance-report.json",
             "frontend/coverage/vitals-coverage-report.json"
           ],
           "resources": [],
@@ -1159,7 +1172,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1068,
+      "logicalCases": 1088,
       "nodes": [
         {
           "id": "preflight",
@@ -1626,6 +1639,7 @@
             "pytest:tests/test_test_classifier.py::test_generation_is_byte_identical_and_summary_is_stable",
             "pytest:tests/test_test_classifier.py::test_invalid_classified_override_is_rejected_by_inventory_contract",
             "pytest:tests/test_test_classifier.py::test_inventory_is_unique_exhaustive_sorted_and_contract_compliant",
+            "pytest:tests/test_test_classifier.py::test_javascript_collector_surfaces_unknown_and_retry_controls",
             "pytest:tests/test_test_classifier.py::test_javascript_discovery_reports_process_and_payload_errors",
             "pytest:tests/test_test_classifier.py::test_javascript_dynamic_and_conditional_titles_have_stable_selectors",
             "pytest:tests/test_test_classifier.py::test_json_loading_paths_cli_and_main_guard",
@@ -1660,6 +1674,25 @@
             "pytest:tests/test_test_execution_profiles.py::test_profile_inclusions_and_change_levels_are_orthogonal",
             "pytest:tests/test_test_execution_profiles.py::test_real_contract_and_all_four_profile_attributions_are_valid",
             "pytest:tests/test_test_execution_profiles.py::test_strict_json_report_and_cli_paths",
+            "pytest:tests/test_test_governance.py::test_attempt_history_contract_accepts_visible_nonexecution_and_rejects_bad_types",
+            "pytest:tests/test_test_governance.py::test_check_repository_and_cli_success_failure_and_input_error",
+            "pytest:tests/test_test_governance.py::test_consolidated_report_contains_counts_expirations_profiles_and_instability",
+            "pytest:tests/test_test_governance.py::test_contract_validation_accepts_executable_quarantine_with_preserved_retry",
+            "pytest:tests/test_test_governance.py::test_contract_validation_blocks_shape_date_and_retry_policy_defects",
+            "pytest:tests/test_test_governance.py::test_contract_validation_blocks_top_level_orphan_and_lifecycle_defects",
+            "pytest:tests/test_test_governance.py::test_contract_validation_blocks_ungoverned_mismatch_and_invalid_container_types",
+            "pytest:tests/test_test_governance.py::test_detection_covers_pytest_vitest_playwright_unknown_markers_and_global_retries",
+            "pytest:tests/test_test_governance.py::test_duplicate_and_invalid_json_are_rejected",
+            "pytest:tests/test_test_governance.py::test_governance_control_occurs_once_in_every_gate_plan_and_maps_to_aggregate",
+            "pytest:tests/test_test_governance.py::test_javascript_detection_accepts_neutral_modifiers_and_zero_position",
+            "pytest:tests/test_test_governance.py::test_pytest_attempt_reporting_covers_pass_fail_rerun_skip_and_infrastructure",
+            "pytest:tests/test_test_governance.py::test_real_repository_has_no_ignored_or_retry_mechanism_after_audit",
+            "pytest:tests/test_test_governance.py::test_runtime_collection_preserves_attempt_history_and_profile_selection",
+            "pytest:tests/test_test_governance.py::test_runtime_collection_rejects_missing_incomplete_malformed_and_hidden_history",
+            "pytest:tests/test_test_governance.py::test_runtime_collection_reports_framework_mismatch_and_missing_cases",
+            "pytest:tests/test_test_governance.py::test_runtime_governance_blocks_dynamic_ignores_blind_retries_and_quarantine_nonexecution",
+            "pytest:tests/test_test_governance.py::test_script_entrypoint_uses_main",
+            "pytest:tests/test_test_governance.py::test_versioned_contract_and_report_schemas_are_distinct_and_complete",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_metrics_below_threshold",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_missing_matches",
             "pytest:tests/test_vitals_compliance.py::test_backend_aggregation_and_report_building_cover_each_source",
@@ -1678,18 +1711,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 414
+            "pytest": 434
           },
           "natures": {
-            "component": 64,
+            "component": 65,
             "contract": 43,
-            "integration": 152,
-            "unit": 155
+            "integration": 160,
+            "unit": 166
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 310
+            "unassigned": 330
           }
         },
         {
@@ -2454,7 +2487,8 @@
           "commands": [
             "Aggregate execution evidence",
             "Vitals coverage report",
-            "Vitals compliance"
+            "Vitals compliance",
+            "Test governance compliance"
           ],
           "reads": [
             "reports/test-execution-artifacts/{profile}"
@@ -2462,6 +2496,7 @@
           "writes": [
             "reports/test-execution-counts.json",
             "reports/test-execution-plan.json",
+            "reports/test-governance-report.json",
             "frontend/coverage/vitals-coverage-report.json"
           ],
           "resources": [],
@@ -2481,7 +2516,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1069,
+      "logicalCases": 1089,
       "nodes": [
         {
           "id": "preflight",
@@ -2948,6 +2983,7 @@
             "pytest:tests/test_test_classifier.py::test_generation_is_byte_identical_and_summary_is_stable",
             "pytest:tests/test_test_classifier.py::test_invalid_classified_override_is_rejected_by_inventory_contract",
             "pytest:tests/test_test_classifier.py::test_inventory_is_unique_exhaustive_sorted_and_contract_compliant",
+            "pytest:tests/test_test_classifier.py::test_javascript_collector_surfaces_unknown_and_retry_controls",
             "pytest:tests/test_test_classifier.py::test_javascript_discovery_reports_process_and_payload_errors",
             "pytest:tests/test_test_classifier.py::test_javascript_dynamic_and_conditional_titles_have_stable_selectors",
             "pytest:tests/test_test_classifier.py::test_json_loading_paths_cli_and_main_guard",
@@ -2983,6 +3019,25 @@
             "pytest:tests/test_test_execution_profiles.py::test_profile_inclusions_and_change_levels_are_orthogonal",
             "pytest:tests/test_test_execution_profiles.py::test_real_contract_and_all_four_profile_attributions_are_valid",
             "pytest:tests/test_test_execution_profiles.py::test_strict_json_report_and_cli_paths",
+            "pytest:tests/test_test_governance.py::test_attempt_history_contract_accepts_visible_nonexecution_and_rejects_bad_types",
+            "pytest:tests/test_test_governance.py::test_check_repository_and_cli_success_failure_and_input_error",
+            "pytest:tests/test_test_governance.py::test_consolidated_report_contains_counts_expirations_profiles_and_instability",
+            "pytest:tests/test_test_governance.py::test_contract_validation_accepts_executable_quarantine_with_preserved_retry",
+            "pytest:tests/test_test_governance.py::test_contract_validation_blocks_shape_date_and_retry_policy_defects",
+            "pytest:tests/test_test_governance.py::test_contract_validation_blocks_top_level_orphan_and_lifecycle_defects",
+            "pytest:tests/test_test_governance.py::test_contract_validation_blocks_ungoverned_mismatch_and_invalid_container_types",
+            "pytest:tests/test_test_governance.py::test_detection_covers_pytest_vitest_playwright_unknown_markers_and_global_retries",
+            "pytest:tests/test_test_governance.py::test_duplicate_and_invalid_json_are_rejected",
+            "pytest:tests/test_test_governance.py::test_governance_control_occurs_once_in_every_gate_plan_and_maps_to_aggregate",
+            "pytest:tests/test_test_governance.py::test_javascript_detection_accepts_neutral_modifiers_and_zero_position",
+            "pytest:tests/test_test_governance.py::test_pytest_attempt_reporting_covers_pass_fail_rerun_skip_and_infrastructure",
+            "pytest:tests/test_test_governance.py::test_real_repository_has_no_ignored_or_retry_mechanism_after_audit",
+            "pytest:tests/test_test_governance.py::test_runtime_collection_preserves_attempt_history_and_profile_selection",
+            "pytest:tests/test_test_governance.py::test_runtime_collection_rejects_missing_incomplete_malformed_and_hidden_history",
+            "pytest:tests/test_test_governance.py::test_runtime_collection_reports_framework_mismatch_and_missing_cases",
+            "pytest:tests/test_test_governance.py::test_runtime_governance_blocks_dynamic_ignores_blind_retries_and_quarantine_nonexecution",
+            "pytest:tests/test_test_governance.py::test_script_entrypoint_uses_main",
+            "pytest:tests/test_test_governance.py::test_versioned_contract_and_report_schemas_are_distinct_and_complete",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_metrics_below_threshold",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_missing_matches",
             "pytest:tests/test_vitals_compliance.py::test_backend_aggregation_and_report_building_cover_each_source",
@@ -3001,18 +3056,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 415
+            "pytest": 435
           },
           "natures": {
-            "component": 64,
+            "component": 65,
             "contract": 43,
-            "integration": 152,
-            "unit": 156
+            "integration": 160,
+            "unit": 167
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 311
+            "unassigned": 331
           }
         },
         {
@@ -3777,7 +3832,8 @@
           "commands": [
             "Aggregate execution evidence",
             "Vitals coverage report",
-            "Vitals compliance"
+            "Vitals compliance",
+            "Test governance compliance"
           ],
           "reads": [
             "reports/test-execution-artifacts/{profile}"
@@ -3785,6 +3841,7 @@
           "writes": [
             "reports/test-execution-counts.json",
             "reports/test-execution-plan.json",
+            "reports/test-governance-report.json",
             "frontend/coverage/vitals-coverage-report.json"
           ],
           "resources": [],
@@ -3804,7 +3861,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1070,
+      "logicalCases": 1090,
       "nodes": [
         {
           "id": "preflight",
@@ -4272,6 +4329,7 @@
             "pytest:tests/test_test_classifier.py::test_generation_is_byte_identical_and_summary_is_stable",
             "pytest:tests/test_test_classifier.py::test_invalid_classified_override_is_rejected_by_inventory_contract",
             "pytest:tests/test_test_classifier.py::test_inventory_is_unique_exhaustive_sorted_and_contract_compliant",
+            "pytest:tests/test_test_classifier.py::test_javascript_collector_surfaces_unknown_and_retry_controls",
             "pytest:tests/test_test_classifier.py::test_javascript_discovery_reports_process_and_payload_errors",
             "pytest:tests/test_test_classifier.py::test_javascript_dynamic_and_conditional_titles_have_stable_selectors",
             "pytest:tests/test_test_classifier.py::test_json_loading_paths_cli_and_main_guard",
@@ -4307,6 +4365,25 @@
             "pytest:tests/test_test_execution_profiles.py::test_profile_inclusions_and_change_levels_are_orthogonal",
             "pytest:tests/test_test_execution_profiles.py::test_real_contract_and_all_four_profile_attributions_are_valid",
             "pytest:tests/test_test_execution_profiles.py::test_strict_json_report_and_cli_paths",
+            "pytest:tests/test_test_governance.py::test_attempt_history_contract_accepts_visible_nonexecution_and_rejects_bad_types",
+            "pytest:tests/test_test_governance.py::test_check_repository_and_cli_success_failure_and_input_error",
+            "pytest:tests/test_test_governance.py::test_consolidated_report_contains_counts_expirations_profiles_and_instability",
+            "pytest:tests/test_test_governance.py::test_contract_validation_accepts_executable_quarantine_with_preserved_retry",
+            "pytest:tests/test_test_governance.py::test_contract_validation_blocks_shape_date_and_retry_policy_defects",
+            "pytest:tests/test_test_governance.py::test_contract_validation_blocks_top_level_orphan_and_lifecycle_defects",
+            "pytest:tests/test_test_governance.py::test_contract_validation_blocks_ungoverned_mismatch_and_invalid_container_types",
+            "pytest:tests/test_test_governance.py::test_detection_covers_pytest_vitest_playwright_unknown_markers_and_global_retries",
+            "pytest:tests/test_test_governance.py::test_duplicate_and_invalid_json_are_rejected",
+            "pytest:tests/test_test_governance.py::test_governance_control_occurs_once_in_every_gate_plan_and_maps_to_aggregate",
+            "pytest:tests/test_test_governance.py::test_javascript_detection_accepts_neutral_modifiers_and_zero_position",
+            "pytest:tests/test_test_governance.py::test_pytest_attempt_reporting_covers_pass_fail_rerun_skip_and_infrastructure",
+            "pytest:tests/test_test_governance.py::test_real_repository_has_no_ignored_or_retry_mechanism_after_audit",
+            "pytest:tests/test_test_governance.py::test_runtime_collection_preserves_attempt_history_and_profile_selection",
+            "pytest:tests/test_test_governance.py::test_runtime_collection_rejects_missing_incomplete_malformed_and_hidden_history",
+            "pytest:tests/test_test_governance.py::test_runtime_collection_reports_framework_mismatch_and_missing_cases",
+            "pytest:tests/test_test_governance.py::test_runtime_governance_blocks_dynamic_ignores_blind_retries_and_quarantine_nonexecution",
+            "pytest:tests/test_test_governance.py::test_script_entrypoint_uses_main",
+            "pytest:tests/test_test_governance.py::test_versioned_contract_and_report_schemas_are_distinct_and_complete",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_metrics_below_threshold",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_missing_matches",
             "pytest:tests/test_vitals_compliance.py::test_backend_aggregation_and_report_building_cover_each_source",
@@ -4325,18 +4402,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 416
+            "pytest": 436
           },
           "natures": {
-            "component": 64,
+            "component": 65,
             "contract": 43,
-            "integration": 153,
-            "unit": 156
+            "integration": 161,
+            "unit": 167
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 312
+            "unassigned": 332
           }
         },
         {
@@ -5101,7 +5178,8 @@
           "commands": [
             "Aggregate execution evidence",
             "Vitals coverage report",
-            "Vitals compliance"
+            "Vitals compliance",
+            "Test governance compliance"
           ],
           "reads": [
             "reports/test-execution-artifacts/{profile}"
@@ -5109,6 +5187,7 @@
           "writes": [
             "reports/test-execution-counts.json",
             "reports/test-execution-plan.json",
+            "reports/test-governance-report.json",
             "frontend/coverage/vitals-coverage-report.json"
           ],
           "resources": [],

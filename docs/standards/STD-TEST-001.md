@@ -1441,6 +1441,9 @@ Un test critique ne peut être mis en quarantaine qu’avec une mesure compensat
 
 La réexécution automatique NE DOIT PAS masquer le premier échec.
 
+Un retry global, appliqué sans rattachement exact à un cas logique, est interdit. Un retry gouverné DOIT
+indiquer un nombre maximal de tentatives et garantir la conservation du premier résultat.
+
 Le rapport doit conserver :
 
 * résultat initial ;
@@ -1449,6 +1452,10 @@ Le rapport doit conserver :
 * historique d’instabilité.
 
 Un test ne doit pas rester indéfiniment en quarantaine.
+
+Une quarantaine DOIT rester collectée, visible et exécutée dans le profil qui lui est attribué. Elle ne DOIT
+PAS être implémentée par un skip ou une désactivation. Son résultat initial, chaque tentative et son résultat
+final doivent être exploitables par le reporting consolidé.
 
 ---
 
@@ -1465,6 +1472,14 @@ Tout test ignoré doit posséder :
 Les tests ignorés sans justification doivent faire échouer la CI.
 
 Les tests désactivés doivent rester visibles dans les rapports.
+
+Le contrat de gouvernance DOIT être versionné séparément de la classification des tests. Chaque entrée cible
+un cas logique exact et porte au minimum l'état normalisé, la justification, la cause, le responsable, le
+ticket, la criticité, l'analyse du risque, la date d'entrée et l'échéance. Une entrée absente, invalide, expirée
+ou orpheline DOIT faire échouer la quality gate, de même qu'un marqueur inconnu.
+
+Un test critique ignoré est interdit. Une quarantaine critique n'est admise qu'avec une mesure compensatoire
+explicite et vérifiable.
 
 ---
 

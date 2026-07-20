@@ -431,3 +431,10 @@ def test_setup_error(broken):
     assert by_id["tests/test_native.py::test_xfail"]["executed"] is True
     assert by_id["tests/test_native.py::test_setup_error"]["result"] == "infrastructureError"
     assert all(item["attempts"] == int(item["executed"]) for item in native["instances"])
+    assert all(
+        len(item["attemptResults"]) == item["attempts"] for item in native["instances"]
+    )
+    assert by_id["tests/test_native.py::test_xfail"]["initialResult"] == "skipped"
+    assert by_id["tests/test_native.py::test_setup_error"]["finalResult"] == (
+        "infrastructureError"
+    )

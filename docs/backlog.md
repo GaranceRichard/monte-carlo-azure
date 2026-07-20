@@ -16,7 +16,7 @@
 |    1.6 | Distinguer les cas logiques des instances exécutées                  |      L     | Sol Très élevé | 18/07/2026 |
 |    1.7 | Bloquer les classifications absentes ou invalides                    |      M     | Sol Très élevé | 18/07/2026 |
 |    1.8 | Recomposer les profils d’exécution CI/CD                             |      L     | Sol Très élevé | 18/07/2026 |
-|    1.9 | Gouverner les tests ignorés, intermittents et en quarantaine         |      M     | Sol Très élevé |            |
+|    1.9 | Gouverner les tests ignorés, intermittents et en quarantaine         |      M     | Sol Très élevé | 20/07/2026 |
 |   1.10 | Publier un reporting consolidé de la stratégie de test               |      L     |    Sol Élevé   |            |
 
 ---
@@ -229,7 +229,7 @@
 |                                       Feature | Nombre de PBI | Réalisés |
 | --------------------------------------------: | ------------: | :------: |
 |                  1 — Preuve qualité gouvernée |            10 |     8    |
-|             2 — Fiabilité du cœur statistique |             8 |          |
+|             2 — Fiabilité du cœur statistique |             9 |          |
 |                 3 — Réutilisabilité du moteur |             5 |          |
 |            4 — Mise en production personnelle |             6 |          |
 |            5 — Valeur d’usage du portefeuille |             3 |          |

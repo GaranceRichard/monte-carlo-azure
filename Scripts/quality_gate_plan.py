@@ -258,12 +258,43 @@ def _aggregate_commands(q: Any, inputs: tuple[Any, ...]) -> tuple[Any, ...]:
     )
 
 
+def _test_governance_command(
+    q: Any,
+    inputs: tuple[Any, ...],
+    profile: str,
+    *,
+    require_runtime: bool,
+) -> Any:
+    argv = [
+        sys.executable,
+        "Scripts/check_test_governance.py",
+        "--profile",
+        profile,
+    ]
+    if require_runtime:
+        argv.append("--require-runtime")
+    return q.GateCommand(
+        "Test governance compliance",
+        tuple(argv),
+        "Govern or remove the reported test control without hiding its first failure.",
+        input_sources=inputs,
+    )
+
+
 def build_execution_plan(context: Any, q: Any) -> Any:
     """Build the immutable deterministic command list and its DAG profile."""
     profile = execution_profile_for_mode(context.mode, context.execution_profile)
     inputs = q._gate_input_sources(context.mode)
     commands = _base_commands(q, inputs)
     resolution = q.resolve_tests(context)
+    commands.append(
+        _test_governance_command(
+            q,
+            inputs,
+            profile,
+            require_runtime=resolution.level == q.ChangeLevel.MASSIVE,
+        )
+    )
     if context.documentation_only and context.mode == "fast" and (
         resolution.level != q.ChangeLevel.MASSIVE
     ):

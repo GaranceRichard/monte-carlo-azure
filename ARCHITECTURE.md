@@ -357,6 +357,18 @@ rattachements absents ou ambigus. Le rapport agrège aussi les quatre profils pr
 Les artefacts natifs sous `reports/test-execution-native/` sont des entrées locales régénérables. Seul le
 rapport déterministe `reports/test-execution-counts.json`, lié par SHA-256 à l'inventaire, est versionné.
 
+Le PBI 1.9 ajoute une couche indépendante dans `config/test-governance.json`, avec son propre schéma Draft
+2020-12. Elle cible les `logicalCaseId` sans enrichir ni surcharger la classification. Le détecteur statique
+reconnaît les skips, désactivations, expected failures, quarantaines et retries des trois frameworks, ainsi que
+les marqueurs inconnus et les retries globaux. Le validateur bloque les cas non gouvernés, les entrées
+invalides, expirées ou orphelines, les tests critiques ignorés et les quarantaines critiques non compensées.
+
+Les reporters Pytest, Vitest et Playwright conservent désormais la séquence des résultats par tentative, le
+résultat initial et le résultat final. `Scripts/check_test_governance.py` rapproche ces preuves du contrat et
+produit `reports/test-governance-report.json` avec nombres, détails, expirations et taux d'instabilité. La
+commande `Test governance compliance` est construite une seule fois par plan et rattachée au nœud existant
+`aggregate` ; aucun nœud ni seuil du DAG n'est supprimé ou contourné.
+
 `Scripts/check_test_classification.py` redécouvre les cas et reconstruit l'inventaire en mémoire sans écrire
 dans le workspace. Il valide le catalogue, le schéma, les règles, overrides et exemptions, compare la
 sérialisation exacte au rapport versionné, impose `unresolved = 0` et vérifie l'empreinte du rapport
@@ -408,10 +420,10 @@ création échoue sous Windows, la gate utilise une jonction `cmd.exe /c mklink 
 lien symbolique est propagée. La décision de plateforme est isolée derrière `_is_windows()` afin que les
 tests couvrent les deux branches sans modifier globalement `os.name` ni le type de chemin natif de l’hôte.
 
-Le même seam pilote le retry de suppression des fichiers read-only dans les répertoires temporaires Pytest.
-Les branches `chmod`, nouvelle tentative, rejet POSIX et erreur incompatible sont testées avec des doubles
-indépendants de l’hôte. Seuls les deux tests qui vérifient réellement les attributs read-only du système de
-fichiers Windows restent conditionnels ; ils ne portent aucune couverture exclusive de code de production.
+Le même seam pilote le retry interne de suppression des fichiers read-only dans les répertoires temporaires
+Pytest. Les branches `chmod`, nouvelle tentative, rejet POSIX et erreur incompatible sont testées avec des
+doubles indépendants de l’hôte. Les deux tests du système de fichiers réel sont maintenant portables et ne
+reposent plus sur un `skipif` de plateforme.
 
 CI GitHub Actions :
 

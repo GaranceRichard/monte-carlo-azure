@@ -4,6 +4,18 @@
 
 ### Qualité et outillage
 
+- ajout du contrat indépendant `config/test-governance.json` et de son schéma pour gouverner par cas logique
+  les skips, désactivations, expected failures, quarantaines et retries de Pytest, Vitest et Playwright, avec
+  responsables, tickets, risques, échéances et mesure compensatoire obligatoire pour une quarantaine critique
+- ajout d'un contrôle AST multi-framework unique dans `aggregate` : rejet des mécanismes non gouvernés,
+  marqueurs inconnus, entrées invalides, expirées ou orphelines, tests critiques ignorés, quarantaines non
+  exécutables et retries globaux ou masquant le premier échec, sans abaisser ni déplacer aucun seuil existant
+- extension des reporters natifs avec résultat initial, séquence des tentatives et résultat final, puis
+  production de `reports/test-governance-report.json` avec nombres, détails, expirations et taux d'instabilité
+  exploitables par le PBI 1.10
+- audit des trois appels `pytest.skip(...)` et des deux `skipif` existants : suppression des quatre gardes
+  devenues inutiles et remplacement du skip Mongo par un échec explicite lorsque le service requis par le
+  profil `main` est absent ; inventaire final sans skip ni métadonnée de gouvernance inventée
 - migration des actions JavaScript de la CI vers leurs versions Node 24 natives : `actions/checkout@v6`,
   `actions/setup-python@v6`, `actions/setup-node@v6`, `actions/upload-artifact@v7`,
   `actions/download-artifact@v8`, `docker/login-action@v4` et `docker/build-push-action@v7` ; retrait de
@@ -52,9 +64,8 @@
   alignement des références normatives dans le README, la DoD et l’architecture
 - correction de la portabilité Linux des tests de la gate : la détection Windows passe par un seam dédié,
   le fallback `cmd.exe /c mklink /J` force d’abord l’échec du lien symbolique, et aucun test ne modifie plus
-  globalement `os.name` ; les retries de suppression read-only et la suppression d’une jonction sont
-  simulés sans skip de plateforme, tandis que les deux tests du comportement réel du système de fichiers
-  Windows restent explicitement conditionnels
+  globalement `os.name` ; les retries de suppression read-only, la suppression d’une jonction et les deux
+  tests du comportement réel du système de fichiers sont couverts sans skip de plateforme
 - ajout d’un ratchet de maintenabilité déterministe sur la taille, la complexité, les cycles, les
   directions de dépendance démontrables et le mojibake, avec baseline et exceptions justifiées versionnées
 - découpage du moteur de maintenabilité entre collecte des métriques, analyse des dépendances, chargement de

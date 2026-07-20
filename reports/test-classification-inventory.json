@@ -2260,7 +2260,7 @@
     "sourcePath": "tests/test_e2e_coverage.py",
     "selector": "test_current_complete_e2e_artifact_is_accepted_after_normalization",
     "status": "classified",
-    "executionProfile": "pr",
+    "executionProfile": "main",
     "nature": "integration",
     "purposes": [
       "functional",
@@ -7266,6 +7266,22 @@
     "criticality": "critical"
   },
   {
+    "logicalCaseId": "pytest:tests/test_test_classifier.py::test_javascript_collector_surfaces_unknown_and_retry_controls",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_classifier.py",
+    "selector": "test_javascript_collector_surfaces_unknown_and_retry_controls",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_test_classifier.py::test_javascript_discovery_reports_process_and_payload_errors",
     "framework": "pytest",
     "sourcePath": "tests/test_test_classifier.py",
@@ -7778,6 +7794,269 @@
     "domains": [
       "identity",
       "azure_devops",
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_attempt_history_contract_accepts_visible_nonexecution_and_rejects_bad_types",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_attempt_history_contract_accepts_visible_nonexecution_and_rejects_bad_types",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_check_repository_and_cli_success_failure_and_input_error",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_check_repository_and_cli_success_failure_and_input_error",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_consolidated_report_contains_counts_expirations_profiles_and_instability",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_consolidated_report_contains_counts_expirations_profiles_and_instability",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_contract_validation_accepts_executable_quarantine_with_preserved_retry",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_contract_validation_accepts_executable_quarantine_with_preserved_retry",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_contract_validation_blocks_shape_date_and_retry_policy_defects",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_contract_validation_blocks_shape_date_and_retry_policy_defects",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_contract_validation_blocks_top_level_orphan_and_lifecycle_defects",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_contract_validation_blocks_top_level_orphan_and_lifecycle_defects",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_contract_validation_blocks_ungoverned_mismatch_and_invalid_container_types",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_contract_validation_blocks_ungoverned_mismatch_and_invalid_container_types",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_detection_covers_pytest_vitest_playwright_unknown_markers_and_global_retries",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_detection_covers_pytest_vitest_playwright_unknown_markers_and_global_retries",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_duplicate_and_invalid_json_are_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_duplicate_and_invalid_json_are_rejected",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_governance_control_occurs_once_in_every_gate_plan_and_maps_to_aggregate",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_governance_control_occurs_once_in_every_gate_plan_and_maps_to_aggregate",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_javascript_detection_accepts_neutral_modifiers_and_zero_position",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_javascript_detection_accepts_neutral_modifiers_and_zero_position",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_pytest_attempt_reporting_covers_pass_fail_rerun_skip_and_infrastructure",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_pytest_attempt_reporting_covers_pass_fail_rerun_skip_and_infrastructure",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "resilience",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_real_repository_has_no_ignored_or_retry_mechanism_after_audit",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_real_repository_has_no_ignored_or_retry_mechanism_after_audit",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_runtime_collection_preserves_attempt_history_and_profile_selection",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_runtime_collection_preserves_attempt_history_and_profile_selection",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_runtime_collection_rejects_missing_incomplete_malformed_and_hidden_history",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_runtime_collection_rejects_missing_incomplete_malformed_and_hidden_history",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience",
+      "data_quality"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_runtime_collection_reports_framework_mismatch_and_missing_cases",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_runtime_collection_reports_framework_mismatch_and_missing_cases",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_runtime_governance_blocks_dynamic_ignores_blind_retries_and_quarantine_nonexecution",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_runtime_governance_blocks_dynamic_ignores_blind_retries_and_quarantine_nonexecution",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_script_entrypoint_uses_main",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_script_entrypoint_uses_main",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_governance.py::test_versioned_contract_and_report_schemas_are_distinct_and_complete",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_governance.py",
+    "selector": "test_versioned_contract_and_report_schemas_are_distinct_and_complete",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
       "reporting"
     ]
   },

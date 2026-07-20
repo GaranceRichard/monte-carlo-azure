@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0.0",
+  "schema": "config/test-governance-report.schema.json",
+  "contractVersion": "1.0.0",
+  "profile": "main",
+  "runtimeComplete": true,
+  "summary": {
+    "logicalCases": 1091,
+    "governedEntries": 0,
+    "detectedMechanisms": 0,
+    "skippedCases": 0,
+    "disabledCases": 0,
+    "expectedFailureCases": 0,
+    "quarantinedCases": 0,
+    "retryCases": 0,
+    "expiredEntries": 0,
+    "dueWithin30Days": 0,
+    "executedInstances": 1195,
+    "attempts": 1195,
+    "retries": 0,
+    "unstableInstances": 0,
+    "instabilityRatePercent": 0.0
+  },
+  "expirations": {
+    "expired": [],
+    "dueWithin30Days": []
+  },
+  "entries": [],
+  "runtimeDetails": [],
+  "violations": []
+}

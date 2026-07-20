@@ -64,8 +64,6 @@ def test_each_critical_vital_has_traceability_section_and_existing_test_files() 
 
 def test_main_validation_dag_runs_vitals_compliance() -> None:
     tasks_path = ROOT / ".vscode" / "tasks.json"
-    if not tasks_path.exists():
-        pytest.skip(".vscode/tasks.json is optional in this checkout")
     tasks = __import__("json").loads(tasks_path.read_text(encoding="utf-8"))["tasks"]
     labels = [task["label"] for task in tasks]
     contract = __import__("json").loads(

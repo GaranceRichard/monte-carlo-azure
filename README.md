@@ -28,6 +28,9 @@ Démo GitHub Pages:
   [`docs/test-classification.md`](docs/test-classification.md),
   [`config/test-classification.json`](config/test-classification.json) et
   [`config/test-classification.schema.json`](config/test-classification.schema.json)
+- contrat de gouvernance des tests ignorés, intermittents et en quarantaine :
+  [`config/test-governance.json`](config/test-governance.json) et
+  [`config/test-governance.schema.json`](config/test-governance.schema.json)
 - Definition of Done : [`docs/definition-of-done.md`](docs/definition-of-done.md)
 - chemins critiques: [`docs/critical-paths.md`](docs/critical-paths.md)
 - matrice risques–contrôles: [`docs/risk-control-matrix.md`](docs/risk-control-matrix.md)
@@ -420,6 +423,26 @@ python Scripts/report_test_execution_counts.py
 instances collectées et exécutées, les skips, les tentatives et les retries globalement, par framework,
 statut, nature, profil et `logicalCaseId`. Son empreinte SHA-256 identifie exactement l'inventaire de classification
 utilisé. Le rapport est trié et ne contient ni timestamp, durée, chemin absolu ni autre donnée volatile.
+
+La gouvernance reste un contrat distinct de la classification. La commande suivante détecte par AST les
+`skip`, désactivations, expected failures, quarantaines, marqueurs inconnus et retries de Pytest, Vitest et
+Playwright, valide responsables, tickets, risques et échéances, puis consolide les résultats du profil :
+
+```bash
+python Scripts/check_test_governance.py --profile main --require-runtime
+```
+
+Le contrat [`config/test-governance.json`](config/test-governance.json) cible les mêmes `logicalCaseId`, sans
+modifier leur classification. Toute entrée doit être exacte, non expirée et rattachée à un mécanisme détecté.
+Un test critique ne peut pas être ignoré ; une quarantaine critique exige une mesure compensatoire et reste
+exécutée dans son profil. Les retries globaux sont refusés. Lorsqu'un retry gouverné existe, les reporters
+conservent `attemptResults`, `initialResult`, le nombre de tentatives et `finalResult`, de sorte que le premier
+échec ne puisse jamais disparaître.
+
+[`reports/test-governance-report.json`](reports/test-governance-report.json) est l'artefact consolidé destiné
+au reporting du PBI 1.10 : nombres par état, détails, expirations, tentatives et taux d'instabilité. Le contrôle
+`Test governance compliance` apparaît exactement une fois dans chaque plan et s'exécute dans `aggregate`,
+après les producteurs de preuves natives pour les plans complets.
 
 Depuis la racine:
 

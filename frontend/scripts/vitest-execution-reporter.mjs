@@ -83,10 +83,14 @@ export default class VitestExecutionReporter {
         if (result.state === "skipped" && testCase.options.mode === "todo") outcome = "todo";
         else if (result.state === "failed" && hookFailure) outcome = "infrastructureError";
         else if (result.state === "pending") outcome = "infrastructureError";
+        const attemptResults = executed ? [...Array(retryCount).fill("failed"), outcome] : [];
         return {
           ...identity,
           executed,
           attempts: executed ? 1 + retryCount : 0,
+          attemptResults,
+          initialResult: attemptResults.at(0) ?? outcome,
+          finalResult: attemptResults.at(-1) ?? outcome,
           result: outcome,
         };
       })

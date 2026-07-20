@@ -128,6 +128,12 @@ répertoire de l’exécution courante est nettoyé ; le temporaire global de l�
 - Les déclarations logiques, instances collectées, instances exécutées et tentatives sont des mesures
   distinctes. Un paramètre, un projet ou un retry ne doit jamais gonfler le nombre de cas logiques, et un
   retry ne doit jamais gonfler le nombre d'instances exécutées.
+- Tout skip, désactivation, expected failure, mécanisme de quarantaine ou retry détecté dans Pytest, Vitest ou
+  Playwright possède une entrée valide dans `config/test-governance.json`. Les entrées orphelines, expirées ou
+  incohérentes et les marqueurs inconnus sont interdits.
+- Un test critique n'est jamais ignoré. Une quarantaine critique reste exécutée dans son profil et possède une
+  mesure compensatoire. Aucun retry global ou automatique aveugle n'est autorisé ; toute tentative conserve
+  son résultat initial dans `reports/test-governance-report.json`.
 
 Seuls le code trivial et le code purement déclaratif sans logique peuvent rester sans tests.
 
@@ -149,6 +155,8 @@ Seuls le code trivial et le code purement déclaratif sans logique peuvent reste
 - [ ] Task `Validation : profil main` entièrement verte.
 - [ ] Classification bloquante verte : inventaire exact, déterministe et sans `unresolved` ni exception
       invalide.
+- [ ] Gouvernance bloquante verte : aucun mécanisme non gouverné, marqueur inconnu, état critique ignoré,
+      quarantaine non compensée, entrée invalide, expirée ou orpheline, ni premier échec masqué.
 - [ ] Les quatre plans de profil sont complets, acycliques, déterministes et sans conflit d’artefact.
 - [ ] Lint frontend et backend, typecheck, tests, build et E2E verts.
 - [ ] Couvertures Python et frontend >= 80 % ; chaque source Python mesurée est sans ligne rouge.

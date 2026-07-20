@@ -303,6 +303,7 @@ def test_documentation_only_selects_only_general_mandatory_controls() -> None:
         "Identity boundary",
         "Naming convention",
         "Maintainability ratchet",
+        "Test governance compliance",
     ]
 
 
@@ -379,6 +380,7 @@ def test_shared_frontend_utility_adds_domain_controls_and_nearby_tests() -> None
         "Identity boundary",
         "Naming convention",
         "Maintainability ratchet",
+        "Test governance compliance",
         "Frontend lint (ESLint, zero warning)",
         "Frontend typecheck (TypeScript)",
         "Selected frontend unit tests (Vitest)",
@@ -406,6 +408,7 @@ def test_combined_backend_and_frontend_change_aggregates_without_cross_domain_su
         "Identity boundary",
         "Naming convention",
         "Maintainability ratchet",
+        "Test governance compliance",
         "Selected backend tests",
         "Selected frontend unit tests (Vitest)",
     ]
@@ -483,6 +486,7 @@ def test_impacted_backend_plan_is_ordered_and_contains_no_duplicate_commands() -
         "Identity boundary",
         "Naming convention",
         "Maintainability ratchet",
+        "Test governance compliance",
         "Backend lint (Ruff)",
         "Selected backend tests",
     ]
@@ -501,6 +505,7 @@ def test_impacted_frontend_plan_is_ordered_and_contains_no_duplicate_commands() 
         "Identity boundary",
         "Naming convention",
         "Maintainability ratchet",
+        "Test governance compliance",
         "Frontend lint (ESLint, zero warning)",
         "Frontend typecheck (TypeScript)",
         "Selected frontend unit tests (Vitest)",
@@ -523,6 +528,7 @@ def test_mixed_impacted_plan_keeps_lint_typecheck_tests_order_without_repetition
         "Identity boundary",
         "Naming convention",
         "Maintainability ratchet",
+        "Test governance compliance",
         "Backend lint (Ruff)",
         "Frontend lint (ESLint, zero warning)",
         "Frontend typecheck (TypeScript)",
@@ -1208,6 +1214,7 @@ def test_fast_executes_composite_dod_identity_and_naming_from_snapshot(
         "Identity boundary",
         "Naming convention",
         "Maintainability ratchet",
+        "Test governance compliance",
     ]
     assert all(root == snapshot for _step, root, _temp, _isolated, _env in calls)
     assert all(
@@ -1394,6 +1401,13 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
         (sys.executable, "Scripts/check_identity_boundary.py"),
         (sys.executable, "Scripts/check_naming_convention.py"),
         (sys.executable, "Scripts/check_maintainability.py"),
+        (
+            sys.executable,
+            "Scripts/check_test_governance.py",
+            "--profile",
+            "main",
+            "--require-runtime",
+        ),
         (sys.executable, "-m", "ruff", "check", "."),
         (
             quality_gate.NPM_COMMAND,
@@ -1552,6 +1566,7 @@ def test_documentation_only_fast_path_skips_expensive_checks() -> None:
         "Identity boundary",
         "Naming convention",
         "Maintainability ratchet",
+        "Test governance compliance",
     ]
     assert not quality_gate.is_documentation_only(["README.md", "backend/api.py"])
 
@@ -1656,7 +1671,6 @@ def test_pytest_basetemp_cleanup_removes_only_the_expected_directory(
     assert sibling.exists()
 
 
-@pytest.mark.skipif(not quality_gate._is_windows(), reason="Windows read-only semantics")
 def test_pytest_basetemp_cleanup_removes_a_readonly_file(tmp_path: Path) -> None:
     runtime_temp_root = tmp_path / ".tmp" / "pytest"
     basetemp = runtime_temp_root / "backend-tests-123-readonly"
@@ -1674,7 +1688,6 @@ def test_pytest_basetemp_cleanup_removes_a_readonly_file(tmp_path: Path) -> None
     assert not basetemp.exists()
 
 
-@pytest.mark.skipif(not quality_gate._is_windows(), reason="Windows read-only semantics")
 def test_pytest_basetemp_cleanup_handles_readonly_git_objects(tmp_path: Path) -> None:
     runtime_temp_root = tmp_path / ".tmp" / "pytest"
     basetemp = runtime_temp_root / "backend-tests-123-git"

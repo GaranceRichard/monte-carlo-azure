@@ -140,6 +140,27 @@ def _result(reports: list[Any], executed: bool) -> str:
     return "skipped"
 
 
+def _attempt_results(reports: list[Any], executed: bool) -> list[str]:
+    calls = [report for report in reports if report.when == "call"]
+    results = []
+    for report in calls:
+        if report.outcome == "passed":
+            results.append("passed")
+        elif report.outcome in {"failed", "rerun"}:
+            results.append("failed")
+        else:
+            results.append("skipped")
+    phase_failure = any(
+        report.when in {"setup", "teardown"} and report.outcome == "failed"
+        for report in reports
+    )
+    if phase_failure and results:
+        results[-1] = "infrastructureError"
+    if not results and executed:
+        results.append("infrastructureError")
+    return results
+
+
 def pytest_sessionfinish(session: Any) -> None:
     if _run.root is None:
         return
@@ -158,12 +179,17 @@ def pytest_sessionfinish(session: Any) -> None:
         )
         retry_reports = sum(report.outcome == "rerun" for report in reports)
         attempts = (1 + retry_reports) if executed else 0
+        result = _result(reports, executed)
+        attempt_results = _attempt_results(reports, executed)
         native_instances.append(
             {
                 **instance,
                 "executed": executed,
                 "attempts": attempts,
-                "result": _result(reports, executed),
+                "attemptResults": attempt_results,
+                "initialResult": attempt_results[0] if attempt_results else result,
+                "finalResult": attempt_results[-1] if attempt_results else result,
+                "result": result,
             }
         )
     matched_ids = {item["logicalCaseId"] for item in native_instances}

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/test-governance-report/1.0.0",
+  "x-schemaVersion": "1.0.0",
+  "title": "Consolidated test-governance evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "schema",
+    "contractVersion",
+    "profile",
+    "runtimeComplete",
+    "summary",
+    "expirations",
+    "entries",
+    "runtimeDetails",
+    "violations"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "schema": { "const": "config/test-governance-report.schema.json" },
+    "contractVersion": { "const": "1.0.0" },
+    "profile": { "enum": ["pr", "main", "nightly", "release"] },
+    "runtimeComplete": { "type": "boolean" },
+    "summary": {
+      "type": "object",
+      "additionalProperties": { "type": ["integer", "number"] }
+    },
+    "expirations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expired", "dueWithin30Days"],
+      "properties": {
+        "expired": { "type": "array", "items": { "type": "string" } },
+        "dueWithin30Days": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "entries": { "type": "array", "items": { "type": "object" } },
+    "runtimeDetails": { "type": "array", "items": { "type": "object" } },
+    "violations": { "type": "array", "items": { "type": "string" } }
+  }
+}

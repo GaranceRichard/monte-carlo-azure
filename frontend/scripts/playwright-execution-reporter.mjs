@@ -70,16 +70,22 @@ export default class PlaywrightExecutionReporter {
   onEnd() {
     const instances = [...this.instances.values()]
       .map(({ results, ...identity }) => {
-        const attempts = results.filter((status) => status !== "skipped").length;
+        const normalized = (status) =>
+          status === "timedOut" || status === "interrupted" ? "infrastructureError" : status;
+        const attemptResults = results
+          .filter((status) => status !== "skipped")
+          .map(normalized);
+        const attempts = attemptResults.length;
         const finalStatus = results.at(-1) ?? "interrupted";
-        let result = finalStatus;
-        if (finalStatus === "timedOut" || finalStatus === "interrupted") {
-          result = "infrastructureError";
-        }
+        const observedFinal = normalized(finalStatus);
+        const result = attemptResults.at(-1) ?? observedFinal;
         return {
           ...identity,
           executed: attempts > 0,
           attempts,
+          attemptResults,
+          initialResult: attemptResults.at(0) ?? result,
+          finalResult: result,
           result,
         };
       })

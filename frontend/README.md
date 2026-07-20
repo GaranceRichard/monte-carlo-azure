@@ -164,6 +164,11 @@ tests. Les E2E appliquent un seuil global de 80 % sur `statements`, `branches`, 
 produisent `coverage/e2e-coverage-summary.json`. Les règles de fraîcheur et de cohérence de cet artefact
 sont décrites dans [`../docs/definition-of-done.md`](../docs/definition-of-done.md).
 
+Les reporters Vitest et Playwright conservent aussi `attemptResults`, `initialResult`, `attempts` et
+`finalResult`. Les `.skip`, `.todo`, `.only`, `.fails`, `.fixme`, tags `@quarantine`, marqueurs inconnus et
+retries sont détectés par `../Scripts/check_test_governance.py`. Ils ne peuvent être ajoutés sans une entrée
+exacte et non expirée dans `../config/test-governance.json`; aucun retry global aveugle n'est autorisé.
+
 ## Liens utiles
 
 - vue produit : [`../PRODUCT.md`](../PRODUCT.md)

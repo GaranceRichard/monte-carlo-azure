@@ -145,13 +145,15 @@
       "commands": [
         "Aggregate execution evidence",
         "Vitals coverage report",
-        "Vitals compliance"
+        "Vitals compliance",
+        "Test governance compliance"
       ],
       "profiles": ["pr", "main", "nightly", "release"],
       "reads": ["reports/test-execution-artifacts/{profile}"],
       "writes": [
         "reports/test-execution-counts.json",
         "reports/test-execution-plan.json",
+        "reports/test-governance-report.json",
         "frontend/coverage/vitals-coverage-report.json"
       ],
       "resources": [],

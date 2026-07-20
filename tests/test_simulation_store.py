@@ -448,8 +448,8 @@ def test_save_and_list_recent_with_real_mongo():
             client.admin.command("ping")
             mongo_available = True
         except PyMongoError as exc:
-            pytest.skip(
-                f"MongoDB integration test skipped: no reachable Mongo instance at {mongo_url} "
+            pytest.fail(
+                f"MongoDB integration test requires a reachable Mongo instance at {mongo_url} "
                 f"(override with APP_MONGO_URL). Error: {exc}"
             )
 

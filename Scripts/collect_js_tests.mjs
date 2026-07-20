@@ -110,6 +110,22 @@ function callbackArgument(ts, call) {
   return null;
 }
 
+function optionControls(ts, call, sourceFile) {
+  const controls = [];
+  for (const argument of call.arguments) {
+    if (!ts.isObjectLiteralExpression(argument)) continue;
+    for (const property of argument.properties) {
+      if (!ts.isPropertyAssignment(property)) continue;
+      const name = property.name.getText(sourceFile).replaceAll(/["']/g, "");
+      if (name !== "retry") continue;
+      if (!ts.isNumericLiteral(property.initializer) || Number(property.initializer.text) > 0) {
+        controls.push("retry");
+      }
+    }
+  }
+  return controls;
+}
+
 function collectFile(ts, root, absolute) {
   const relative = path.relative(root, absolute).replaceAll(path.sep, "/");
   const framework = relative.startsWith("frontend/tests/e2e/") ? "playwright" : "vitest";
@@ -125,39 +141,34 @@ function collectFile(ts, root, absolute) {
   const imports = importEvidence(ts, sourceFile);
   const cases = [];
 
-  const walk = (node, suites, conditional) => {
+  const walk = (node, suites, conditional, inheritedModifiers = []) => {
     if (ts.isCallExpression(node)) {
       const descriptor = invocation(ts, node);
       if (descriptor) {
         const isSuite =
-          (bindings.suites.has(descriptor.root) && descriptor.modifiers.includes("describe")) ||
-          (bindings.suites.has(descriptor.root) &&
-            !bindings.tests.has(descriptor.root) &&
-            descriptor.modifiers.length === 0);
+          bindings.suites.has(descriptor.root) &&
+          (descriptor.modifiers.includes("describe") || !bindings.tests.has(descriptor.root));
         if (isSuite) {
           const callback = callbackArgument(ts, node);
-          if (callback) walk(callback.body, [...suites, staticTitle(ts, node.arguments[0], sourceFile)], conditional);
+          const suiteModifiers = descriptor.modifiers.filter((modifier) => modifier !== "describe");
+          const inherited = [...new Set([...inheritedModifiers, ...suiteModifiers])];
+          if (callback) {
+            walk(
+              callback.body,
+              [...suites, staticTitle(ts, node.arguments[0], sourceFile)],
+              conditional,
+              inherited,
+            );
+          }
           return;
         }
-        const testModifiers = new Set([
-          "skip",
-          "only",
-          "each",
-          "todo",
-          "fixme",
-          "fail",
-          "concurrent",
-          "sequential",
-          "skipIf",
-          "runIf",
-        ]);
+        const ignoredHelper = ["beforeEach", "afterEach", "beforeAll", "afterAll", "setTimeout", "use"].some(
+          (name) => descriptor.modifiers.includes(name),
+        );
         const isTest =
           bindings.tests.has(descriptor.root) &&
           !descriptor.modifiers.includes("describe") &&
-          descriptor.modifiers.every((modifier) => testModifiers.has(modifier));
-        const ignoredHelper = ["beforeEach", "afterEach", "beforeAll", "afterAll", "setTimeout"].some(
-          (name) => descriptor.modifiers.includes(name),
-        );
+          !ignoredHelper;
         if (isTest && !ignoredHelper) {
           // Vitest anchors every expanded `.each` task on the closing parenthesis of the
           // inner data-table call. Persist that exact AST position so parameters and dynamic
@@ -182,7 +193,14 @@ function collectFile(ts, root, absolute) {
               calls: evidence.calls,
               fixtures: callback?.parameters.map((parameter) => parameter.name.getText(sourceFile)).sort() ?? [],
               resources: evidence.resources,
-              modifiers: descriptor.modifiers,
+              modifiers: [
+                ...new Set([...inheritedModifiers, ...descriptor.modifiers]),
+                ...optionControls(ts, node, sourceFile).filter(
+                  (modifier) =>
+                    !descriptor.modifiers.includes(modifier) &&
+                    !inheritedModifiers.includes(modifier),
+                ),
+              ],
               conditional,
               dynamicTitle: title.startsWith("<dynamic@"),
             },
@@ -192,7 +210,9 @@ function collectFile(ts, root, absolute) {
       }
     }
     const nextConditional = conditional || ts.isIfStatement(node) || ts.isConditionalExpression(node);
-    ts.forEachChild(node, (child) => walk(child, suites, nextConditional));
+    ts.forEachChild(node, (child) =>
+      walk(child, suites, nextConditional, inheritedModifiers),
+    );
   };
   walk(sourceFile, [], false);
   return cases;

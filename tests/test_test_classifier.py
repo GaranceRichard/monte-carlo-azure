@@ -174,6 +174,43 @@ if (enabled) it(title, () => compute());
     assert first[0].evidence["conditional"] is True
 
 
+def test_javascript_collector_surfaces_unknown_and_retry_controls(tmp_path: Path) -> None:
+    _write(
+        tmp_path,
+        "frontend/src/controls.test.ts",
+        """
+import { describe, test } from "vitest";
+test.mystery("unknown", () => true);
+test("retried", () => true, { retry: 2 });
+test("not retried", () => true, { retry: 0 });
+describe.skip("suspended suite", () => {
+  test("inherited skip", () => true);
+});
+""",
+    )
+    _write(
+        tmp_path,
+        "frontend/tests/e2e/controls.spec.ts",
+        """
+import { test } from "@playwright/test";
+test.describe.fixme("blocked suite", () => {
+  test("inherited fixme", async () => true);
+});
+""",
+    )
+
+    cases = discover_javascript(tmp_path)
+    by_title = {case.selector.split(" [", 1)[0]: case for case in cases}
+
+    assert by_title["unknown"].evidence["modifiers"] == ["mystery"]
+    assert by_title["retried"].evidence["modifiers"] == ["retry"]
+    assert by_title["not retried"].evidence["modifiers"] == []
+    assert by_title["suspended suite > inherited skip"].evidence["modifiers"] == ["skip"]
+    assert by_title["blocked suite > inherited fixme"].evidence["modifiers"] == [
+        "fixme"
+    ]
+
+
 def test_javascript_discovery_reports_process_and_payload_errors(
     monkeypatch, tmp_path: Path
 ) -> None:

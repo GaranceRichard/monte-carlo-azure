@@ -278,31 +278,42 @@ def test_e2e_validator_exit_code_reflects_artifact_validity(
     ) == 1
 
 
-def test_current_complete_e2e_artifact_is_accepted_after_normalization() -> None:
-    artifact_path = ROOT / "frontend" / "coverage" / "e2e-coverage-summary.json"
-    if not artifact_path.exists():
-        pytest.skip("The generated E2E coverage artifact is not present.")
-    raw = json.loads(artifact_path.read_text(encoding="utf-8"))
+def test_current_complete_e2e_artifact_is_accepted_after_normalization(
+    tmp_path: Path,
+) -> None:
+    config = _config()
+    artifact = _artifact(config)
+
+    empty_metric = {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100,
+    }
+    artifact["byFile"][0]["branches"] = dict(empty_metric)
+    artifact["byFile"][0]["functions"] = dict(empty_metric)
+
+    artifact_path, config_path = _write_inputs(tmp_path, artifact, config)
     completed_at = datetime.fromisoformat(
-        raw["context"]["completedAt"].replace("Z", "+00:00")
+        artifact["context"]["completedAt"].replace("Z", "+00:00")
     )
 
-    artifact = check_e2e_coverage.load_validated_artifact(
+    normalized = check_e2e_coverage.load_validated_artifact(
         artifact_path,
+        config_path,
+        expected_run_id=artifact["context"]["runId"],
+        expected_started_at=artifact["context"]["startedAt"],
         now=completed_at + timedelta(minutes=1),
     )
 
     empty_metrics = [
         entry[metric]
-        for entry in artifact["byFile"]
+        for entry in normalized["byFile"]
         for metric in ("branches", "functions")
         if entry[metric]["total"] == 0
     ]
-    assert empty_metrics
-    assert all(
-        metric == {"total": 0, "covered": 0, "skipped": 0, "pct": 100}
-        for metric in empty_metrics
-    )
+
+    assert empty_metrics == [empty_metric, empty_metric]
 
 
 def test_json_loader_rejects_non_object_and_config_validation_covers_each_field(
