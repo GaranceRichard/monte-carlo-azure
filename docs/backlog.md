@@ -27,16 +27,16 @@
 
 **Flux de valeur :** assurer que les projections, diagnostics et décisions reposent sur des calculs cohérents, reproductibles et explicables, quel que soit le chemin d’exécution utilisé.
 
-| Numéro | Titre                                                         | Complexité |  Modèle Codex  |
-| -----: | ------------------------------------------------------------- | :--------: | :------------: |
-|    2.1 | Auditer les divergences statistiques Python et TypeScript     |      M     | Sol Très élevé |
-|    2.2 | Définir le contrat normatif de parité statistique             |      M     | Sol Très élevé |
-|    2.3 | Séparer les DTO des modèles statistiques métier               |      L     | Sol Très élevé |
-|    2.4 | Introduire les Value Objects statistiques prioritaires        |      L     | Sol Très élevé |
-|    2.5 | Injecter l’aléatoire, l’horloge et les identifiants variables |      M     | Sol Très élevé |
-|    2.6 | Construire les jeux de référence statistiques partagés        |      M     | Sol Très élevé |
-|    2.7 | Aligner les implémentations statistiques                      |      L     | Sol Très élevé |
-|    2.8 | Bloquer les régressions de parité entre les moteurs           |      L     | Sol Très élevé |
+| Numéro | Titre                                                         | Complexité |  Modèle Codex  | Réalisé le |
+| -----: | ------------------------------------------------------------- | :--------: | :------------: | :--------: |
+|    2.1 | Auditer les divergences statistiques Python et TypeScript     |      M     | Sol Très élevé | 22/07/2026 |
+|    2.2 | Définir le contrat normatif de parité statistique             |      M     | Sol Très élevé |            |
+|    2.3 | Séparer les DTO des modèles statistiques métier               |      L     | Sol Très élevé |            |
+|    2.4 | Introduire les Value Objects statistiques prioritaires        |      L     | Sol Très élevé |            |
+|    2.5 | Injecter l’aléatoire, l’horloge et les identifiants variables |      M     | Sol Très élevé |            |
+|    2.6 | Construire les jeux de référence statistiques partagés        |      M     | Sol Très élevé |            |
+|    2.7 | Aligner les implémentations statistiques                      |      L     | Sol Très élevé |            |
+|    2.8 | Bloquer les régressions de parité entre les moteurs           |      L     | Sol Très élevé |            |
 
 ---
 

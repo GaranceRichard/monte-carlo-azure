@@ -2,6 +2,20 @@
 
 ## Recent
 
+### Documentation statistique
+
+- publication de l'audit factuel du PBI 2.1 : 51 responsabilités Python/TypeScript inventoriées, chemins
+  backend, démo et portefeuille cartographiés, équivalences déterministes séparées de l'égalité seed-à-seed
+  et de l'équivalence distributionnelle, divergences reproductibles qualifiées puis orientées vers les PBI
+  2.2 à 2.8, sans modification des moteurs, formules, seuils, tests ou gates
+- consolidation de la frontière censurée sur 1 000 seeds : aucun biais interlangage démontré, sensibilité
+  bidirectionnelle de P90 confirmée, et distinction explicite de la garde TypeScript qui produit un Risk
+  Score nul lorsque P90 manque; précision brute des seuils de pente 0,05 et 0,10 également consignée
+- clôture du PBI 2.1 après validation normative complète du profil `main`, Docker smoke compris; les risques
+  statistiques restent `Partiellement couvert` jusqu'aux décisions et travaux des PBI 2.2 à 2.8
+- précision de `RISK-003` à `RISK-005` avec les preuves de l'audit; ces risques restent partiellement couverts
+  tant que le contrat, le corpus, l'alignement et la gate de parité ne sont pas réalisés
+
 ### Qualité et outillage
 
 - ajout du reporting consolidé de stratégie de test : contrat JSON strict, modèle déterministe séparant
