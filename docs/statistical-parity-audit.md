@@ -4,6 +4,11 @@ Date de l'audit : 22 juillet 2026
 
 Périmètre : PBI **2.1 — Auditer les divergences statistiques Python et TypeScript**
 
+> **Décision normative postérieure — PBI 2.2.** Les décisions ouvertes par cet audit ont été tranchées et
+> versionnées dans [`STD-STAT-001` — Standard de parité et de reproductibilité statistiques](standards/STD-STAT-001.md),
+> version 1.0. Ce standard fait désormais autorité pour les travaux 2.3 à 2.8. Les constats, expériences,
+> statuts et conclusions ci-dessous restent le relevé historique factuel du PBI 2.1 et ne sont pas réécrits.
+
 ## 1. Objet et périmètre
 
 Cet audit cartographie les responsabilités statistiques du dépôt, les chemins qui les exécutent et les

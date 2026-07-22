@@ -4,6 +4,13 @@
 
 ### Documentation statistique
 
+- adoption de `STD-STAT-001` version 1.0, contrat normatif de parité et de reproductibilité statistiques :
+  parité de rejeu exacte Python/TypeScript comme cible, seed uint32 explicite, entrées strictes, censure et
+  percentiles absents, Risk Score d'autorité, fiabilité normalisée, histogramme commun, forme de réponse et
+  frontière frontend-only orientés vers les PBI 2.3 à 2.8, sans modification des moteurs ni des tests
+- ajout de la traçabilité complète entre les 49 exigences `STAT-PAR-*` et les 51 responsabilités `ST-*` de
+  l'audit ; `RISK-003`, `RISK-004` et `RISK-005` restent `Partiellement couvert` tant que le contrat n'est
+  ni implémenté, ni démontré par un corpus partagé, ni rendu bloquant
 - publication de l'audit factuel du PBI 2.1 : 51 responsabilités Python/TypeScript inventoriées, chemins
   backend, démo et portefeuille cartographiés, équivalences déterministes séparées de l'égalité seed-à-seed
   et de l'équivalence distributionnelle, divergences reproductibles qualifiées puis orientées vers les PBI

@@ -30,7 +30,7 @@
 | Numéro | Titre                                                         | Complexité |  Modèle Codex  | Réalisé le |
 | -----: | ------------------------------------------------------------- | :--------: | :------------: | :--------: |
 |    2.1 | Auditer les divergences statistiques Python et TypeScript     |      M     | Sol Très élevé | 22/07/2026 |
-|    2.2 | Définir le contrat normatif de parité statistique             |      M     | Sol Très élevé |            |
+|    2.2 | Définir le contrat normatif de parité statistique             |      M     | Sol Très élevé | 22/07/2026 |
 |    2.3 | Séparer les DTO des modèles statistiques métier               |      L     | Sol Très élevé |            |
 |    2.4 | Introduire les Value Objects statistiques prioritaires        |      L     | Sol Très élevé |            |
 |    2.5 | Injecter l’aléatoire, l’horloge et les identifiants variables |      M     | Sol Très élevé |            |
@@ -229,7 +229,7 @@
 |                                       Feature | Nombre de PBI | Réalisés |
 | --------------------------------------------: | ------------: | :------: |
 |                  1 — Preuve qualité gouvernée |            10 |     10   |
-|             2 — Fiabilité du cœur statistique |             9 |      1   |
+|             2 — Fiabilité du cœur statistique |             9 |      2   |
 |                 3 — Réutilisabilité du moteur |             5 |          |
 |            4 — Mise en production personnelle |             6 |          |
 |            5 — Valeur d’usage du portefeuille |             3 |          |
@@ -240,7 +240,7 @@
 |               10 — Expérience et restitutions |             9 |          |
 |                              11 — Scalabilité |             8 |          |
 |                    12 — Pilotage de programme |             7 |          |
-|                                     **Total** |    **92 PBI** |  **11**  |
+|                                     **Total** |    **92 PBI** |  **12**  |
 
 Aucun PBI n’est classé XL.
 
