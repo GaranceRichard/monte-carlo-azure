@@ -7,6 +7,7 @@ import shutil
 import stat
 import subprocess
 import sys
+import tempfile
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -125,6 +126,214 @@ def _copy_dod_fixture(destination: Path) -> None:
         target = destination / relpath
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
+
+
+def _write_current_proof_contract(root: Path) -> dict[str, object]:
+    nodes = [
+        {
+            "id": "preflight",
+            "order": 10,
+            "needs": [],
+            "commands": ["Current preflight"],
+            "profiles": ["pr", "main"],
+            "aggregator": False,
+        },
+        {
+            "id": "backend-static",
+            "order": 20,
+            "needs": ["preflight"],
+            "commands": ["Current backend static"],
+            "profiles": ["pr", "main"],
+            "aggregator": False,
+        },
+        {
+            "id": "frontend-static",
+            "order": 30,
+            "needs": ["backend-static"],
+            "commands": ["Current frontend static"],
+            "profiles": ["pr", "main"],
+            "aggregator": False,
+        },
+        {
+            "id": "aggregate",
+            "order": 100,
+            "needs": ["frontend-static"],
+            "commands": ["Current aggregate"],
+            "profiles": ["pr", "main"],
+            "aggregator": True,
+        },
+    ]
+    contract: dict[str, object] = {
+        "profiles": [
+            {"id": "pr", "includes": ["pr"]},
+            {"id": "main", "includes": ["pr", "main"]},
+        ],
+        "nodes": nodes,
+    }
+    destination = root / "config/test-execution-profiles.json"
+    destination.parent.mkdir(parents=True)
+    destination.write_text(json.dumps(contract), encoding="utf-8")
+    return contract
+
+
+@contextmanager
+def _temporary_repository_snapshot():
+    with tempfile.TemporaryDirectory(prefix="quality-gate-test-") as directory:
+        yield Path(directory)
+
+
+def _assert_current_proofs_replace_residuals(
+    root: Path,
+    monkeypatch,
+    *,
+    parallel: bool,
+    profile: str,
+) -> None:
+    import Scripts.quality_gate_dag as quality_gate_dag
+    from Scripts.test_strategy_nodes import node_evidence
+    from Scripts.test_strategy_summary import quality_gate_conclusion
+
+    contract = _write_current_proof_contract(root)
+    commands = tuple(
+        quality_gate.GateCommand(step, (sys.executable, "-V"), "Correct the test.")
+        for step in (
+            "Current preflight",
+            "Current backend static",
+            "Current frontend static",
+            "Current aggregate",
+        )
+    )
+    plan = quality_gate.GateExecutionPlan(
+        context=quality_gate.build_change_context("fast", ["Scripts/quality_gate.py"]),
+        commands=commands,
+        docker_smoke=False,
+        execution_profile=profile,
+    )
+    quality_gate_dag._write_result(root, profile, "preflight", 23, 9.0)
+    quality_gate_dag._write_result(root, profile, "backend-static", 19, 8.0)
+    observed: dict[str, object] = {}
+
+    def fake_run(
+        command: quality_gate.GateCommand,
+        *,
+        validation_root: Path,
+        extra_env: dict[str, str],
+        **_kwargs: object,
+    ) -> int:
+        assert extra_env["TEST_EXECUTION_NODE"] == {
+            "Current preflight": "preflight",
+            "Current backend static": "backend-static",
+            "Current frontend static": "frontend-static",
+            "Current aggregate": "aggregate",
+        }[command.step]
+        if command.step == "Current backend static":
+            quality_gate_dag._write_result(validation_root, profile, "preflight", 23, 7.0)
+        elif command.step == "Current frontend static":
+            quality_gate_dag._write_result(
+                validation_root, profile, "backend-static", 19, 6.0
+            )
+        elif command.step == "Current aggregate":
+            nodes, evidence, violations = node_evidence(
+                validation_root,
+                profile,
+                contract,
+                [{"framework": "pytest"}],
+            )
+            observed["codes"] = {
+                item["id"]: item["exitCode"] for item in nodes if item["required"]
+            }
+            observed["conclusion"] = quality_gate_conclusion(evidence, violations)["status"]
+            observed["aggregateExisted"] = (
+                validation_root
+                / f"reports/test-execution-artifacts/{profile}/aggregate/result.json"
+            ).exists()
+        return 0
+
+    with monkeypatch.context() as patch:
+        patch.setattr(quality_gate, "_run_command", fake_run)
+        patch.setattr(quality_gate_dag, "_prepare_aggregate_inputs", lambda *_args: None)
+        assert (
+            quality_gate._execute_gate_plan(
+                plan,
+                validation_root=root,
+                runtime_temp_root=root / ".tmp",
+                isolated_validation=False,
+                parallel=parallel,
+            )
+            == 0
+        )
+    assert observed == {
+        "codes": {"preflight": 0, "backend-static": 0, "frontend-static": 0},
+        "conclusion": "compliant",
+        "aggregateExisted": False,
+    }
+    result = json.loads(
+        (root / f"reports/test-execution-artifacts/{profile}/aggregate/result.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert set(result) == {
+        "schemaVersion",
+        "profile",
+        "node",
+        "exitCode",
+        "durationSeconds",
+    }
+    assert result["profile"] == profile
+    assert result["node"] == "aggregate"
+    assert result["exitCode"] == 0
+
+
+def _assert_current_failure_replaces_residual_success(
+    root: Path,
+    monkeypatch,
+    *,
+    parallel: bool,
+) -> None:
+    import Scripts.quality_gate_dag as quality_gate_dag
+
+    _write_current_proof_contract(root)
+    plan = quality_gate.GateExecutionPlan(
+        context=quality_gate.build_change_context("fast", ["Scripts/quality_gate.py"]),
+        commands=tuple(
+            quality_gate.GateCommand(step, (sys.executable, "-V"), "Correct the test.")
+            for step in (
+                "Current preflight",
+                "Current backend static",
+                "Current frontend static",
+                "Current aggregate",
+            )
+        ),
+        docker_smoke=False,
+        execution_profile="pr",
+    )
+    quality_gate_dag._write_result(root, "pr", "preflight", 0, 4.0)
+    calls: list[str] = []
+
+    def fake_run(command: quality_gate.GateCommand, **_kwargs: object) -> int:
+        calls.append(command.step)
+        return 23 if command.step == "Current preflight" else 0
+
+    with monkeypatch.context() as patch:
+        patch.setattr(quality_gate, "_run_command", fake_run)
+        patch.setattr(quality_gate_dag, "_prepare_aggregate_inputs", lambda *_args: None)
+        assert (
+            quality_gate._execute_gate_plan(
+                plan,
+                validation_root=root,
+                runtime_temp_root=root / ".tmp",
+                isolated_validation=False,
+                parallel=parallel,
+            )
+            == 23
+        )
+    assert calls == ["Current preflight"]
+    result = json.loads(
+        (root / "reports/test-execution-artifacts/pr/preflight/result.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert result["exitCode"] == 23
 
 
 @pytest.fixture
@@ -1255,6 +1464,28 @@ def test_isolated_sequential_execution_injects_the_host_python(
         isolated_validation=True,
     ) == 0
     assert observed_environments == [{"MONTECARLO_E2E_PYTHON": sys.executable}]
+    _assert_current_proofs_replace_residuals(
+        tmp_path / "sequential-current",
+        monkeypatch,
+        parallel=False,
+        profile="pr",
+    )
+    _assert_current_proofs_replace_residuals(
+        tmp_path / "parallel-current",
+        monkeypatch,
+        parallel=True,
+        profile="main",
+    )
+    _assert_current_failure_replaces_residual_success(
+        tmp_path / "sequential-failure",
+        monkeypatch,
+        parallel=False,
+    )
+    _assert_current_failure_replaces_residual_success(
+        tmp_path / "parallel-failure",
+        monkeypatch,
+        parallel=True,
+    )
 
 
 @pytest.mark.parametrize(
@@ -1481,13 +1712,6 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
         (sys.executable, "Scripts/check_identity_boundary.py"),
         (sys.executable, "Scripts/check_naming_convention.py"),
         (sys.executable, "Scripts/check_maintainability.py"),
-        (
-            sys.executable,
-            "Scripts/check_test_governance.py",
-            "--profile",
-            "main",
-            "--require-runtime",
-        ),
         (sys.executable, "-m", "ruff", "check", "."),
         (
             quality_gate.NPM_COMMAND,
@@ -1538,6 +1762,7 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
         (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run", "build"),
         (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run", "test:e2e"),
         (sys.executable, "Scripts/test_execution_profiles.py", "--check"),
+        (sys.executable, "Scripts/report_test_execution_counts.py", "--check"),
         (
             sys.executable,
             "Scripts/report_vitals_coverage.py",
@@ -1549,6 +1774,19 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
             "Scripts/check_vitals_compliance.py",
             "--report-json",
             "frontend/coverage/vitals-coverage-report.json",
+        ),
+        (
+            sys.executable,
+            "Scripts/check_test_governance.py",
+            "--profile",
+            "main",
+            "--require-runtime",
+        ),
+        (
+            sys.executable,
+            "Scripts/report_test_strategy.py",
+            "--profile",
+            "main",
         ),
     ]
     assert plan.commands[0].input_sources == (quality_gate.InputSource.HEAD,)
@@ -2042,7 +2280,8 @@ def test_first_failed_command_exit_code_is_propagated(monkeypatch) -> None:
 
     @contextmanager
     def fake_snapshot():
-        yield ROOT
+        with _temporary_repository_snapshot() as snapshot:
+            yield snapshot
 
     monkeypatch.setattr(quality_gate, "staged_index_snapshot", fake_snapshot)
 
@@ -2179,6 +2418,8 @@ def test_main_validation_preserves_each_historical_control_once_in_the_dag() -> 
         "End-to-end tests (Playwright)",
         "Vitals coverage report",
         "Vitals compliance",
+        "Verify global execution count reference",
+        "Test strategy reporting",
     )
     contract = json.loads(
         (ROOT / "config/test-execution-profiles.json").read_text(encoding="utf-8")

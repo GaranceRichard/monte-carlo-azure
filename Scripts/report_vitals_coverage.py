@@ -10,7 +10,10 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from check_e2e_coverage import load_validated_artifact
+if __package__:
+    from Scripts.check_e2e_coverage import load_validated_artifact
+else:
+    from check_e2e_coverage import load_validated_artifact
 
 ROOT = Path(__file__).resolve().parents[1]
 MAP_PATH = ROOT / "docs" / "vitals-coverage-map.json"
@@ -225,8 +228,7 @@ def load_coverage_artifacts(root: Path = ROOT) -> dict:
     e2e_files = {
         entry["file"]: {
             "summary": {
-                metric: entry[metric]
-                for metric in ["statements", "branches", "functions", "lines"]
+                metric: entry[metric] for metric in ["statements", "branches", "functions", "lines"]
             }
         }
         for entry in e2e_raw.get("byFile", [])
@@ -283,9 +285,7 @@ def build_vitals_report_bundle(root: Path = ROOT) -> dict:
     return {
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-        "sourceArtifacts": [
-            _artifact_identity(path, root) for path in source_paths
-        ],
+        "sourceArtifacts": [_artifact_identity(path, root) for path in source_paths],
         "report": build_vitals_report(artifacts, root=root),
     }
 
@@ -310,9 +310,7 @@ def load_vitals_report_bundle(path: Path, root: Path = ROOT) -> dict:
             raise ValueError(f"Missing Vitals source artifact: {source_path}")
         current = _artifact_identity(source_path, root)
         if current != identity:
-            raise ValueError(
-                f"Stale Vitals coverage report; source changed: {identity['path']}"
-            )
+            raise ValueError(f"Stale Vitals coverage report; source changed: {identity['path']}")
     return bundle
 
 

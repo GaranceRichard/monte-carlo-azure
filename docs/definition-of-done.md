@@ -48,6 +48,9 @@ restent applicables.
 - Tous les jobs producteurs uploadent `reports/test-execution-artifacts`. `aggregate` télécharge et fusionne
   les preuves dans ce même répertoire, puis le promoteur retrouve les artefacts backend, Vitest et E2E sous
   leur arborescence versionnée par profil et nœud.
+- `aggregate` vérifie le dénombrement global versionné, produit les preuves Vitals et de gouvernance dans
+  l'ordre contractuel, puis écrit `reports/test-strategy-report.json` et `.md` depuis un modèle unique. Le
+  rapport n'exige pas le résultat final du nœud qui est encore en train de le produire.
 - Le job `aggregate` installe Node 22 et les dépendances verrouillées par `frontend/package-lock.json` avant
   son agrégateur final : le contrôle de gouvernance redécouvre les tests Vitest et Playwright avec TypeScript.
 
@@ -139,6 +142,12 @@ répertoire de l’exécution courante est nettoyé ; le temporaire global de l�
 - Un test critique n'est jamais ignoré. Une quarantaine critique reste exécutée dans son profil et possède une
   mesure compensatoire. Aucun retry global ou automatique aveugle n'est autorisé ; toute tentative conserve
   son résultat initial dans `reports/test-governance-report.json`.
+- Le rapport stratégique distingue patrimoine global, exécution profilée et dimensions stratégiques. Son
+  `qualityGateStatus` ne masque aucune preuve obligatoire absente, invalide, périmée ou incohérente ; son
+  `strategyEvidenceStatus` conserve les capacités futures en `not_measured` sans les transformer en succès.
+- Le JSON respecte `config/test-strategy-report.schema.json`, le Markdown provient du même modèle et les deux
+  rendus sont déterministes. `evidenceBundleId` identifie seulement le bundle de preuves, pas une exécution
+  physique commune. Le snapshot versionné et l'artefact CI conservent des portées distinctes.
 
 Seuls le code trivial et le code purement déclaratif sans logique peuvent rester sans tests.
 
@@ -163,6 +172,8 @@ Seuls le code trivial et le code purement déclaratif sans logique peuvent reste
 - [ ] Gouvernance bloquante verte : aucun mécanisme non gouverné, marqueur inconnu, état critique ignoré,
       quarantaine non compensée, entrée invalide, expirée ou orpheline, ni premier échec masqué.
 - [ ] Les quatre plans de profil sont complets, acycliques, déterministes et sans conflit d’artefact.
+- [ ] Le reporting stratégique JSON/Markdown du profil est valide, déterministe et produit une seule fois par
+      `aggregate`, avec des conclusions et preuves cohérentes.
 - [ ] Lint frontend et backend, typecheck, tests, build et E2E verts.
 - [ ] Couvertures Python et frontend >= 80 % ; chaque source Python mesurée est sans ligne rouge.
 - [ ] Couvertures E2E `statements`, `branches`, `functions` et `lines` >= 80 %.

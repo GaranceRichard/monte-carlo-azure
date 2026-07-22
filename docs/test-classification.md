@@ -267,3 +267,23 @@ Les deux préconditions de fichiers versionnés et les deux sélections Windows 
 ont été supprimées. Le test Mongo réel échoue désormais explicitement si le service requis par son profil
 `main` est absent. L'inventaire final ne contient aucun mécanisme de skip, expected failure, quarantaine ou
 retry et le contrat reste donc vide, sans métadonnée fabriquée.
+
+## Reporting stratégique consolidé
+
+`Scripts/report_test_strategy.py` consomme les preuves existantes sans redécouvrir les tests ni lancer les
+suites. `globalReference` conserve la classification et le dénombrement de tout le patrimoine ;
+`profileExecution` ne compte que les cas inclus par le profil courant et ses instances natives ;
+`strategicCoverage` présente classification, exécution, profils, gouvernance, couvertures, Vitals, durées et
+dimensions futures. Tendances, mutation testing et démonstration complète des risques restent
+`not_measured` tant qu'un contrat ultérieur ne les rend pas mesurables.
+
+La conclusion `qualityGateStatus` est bloquante selon une priorité stable : violation confirmée, puis preuve
+obligatoire absente, invalide, périmée ou incohérente, puis conformité. `strategyEvidenceStatus` reste une
+conclusion indépendante sur la complétude globale du standard. Une association de classification à un risque
+ou parcours critique est donc publiée comme relation, jamais comme démonstration automatique de maîtrise.
+
+Le manifest des preuves expose leurs chemins relatifs, producteurs, portées, empreintes et limites de
+fraîcheur. `evidenceBundleId` identifie le bundle exact sans prétendre à un identifiant commun d'exécution.
+Dans `aggregate`, la référence globale est vérifiée avant Vitals, gouvernance et reporting. Le rapport ne
+consomme pas le résultat final de son propre nœud ; le DAG l'écrit après succès. Les snapshots versionnés
+`reports/test-strategy-report.json` et `.md` restent distincts des artefacts de la CI.

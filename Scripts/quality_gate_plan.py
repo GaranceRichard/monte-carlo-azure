@@ -175,9 +175,7 @@ def _selected_commands(q: Any, resolution: Any, inputs: tuple[Any, ...]) -> list
     return selected
 
 
-def _full_test_commands(
-    q: Any, profile: str, inputs: tuple[Any, ...]
-) -> tuple[list[Any], bool]:
+def _full_test_commands(q: Any, profile: str, inputs: tuple[Any, ...]) -> tuple[list[Any], bool]:
     if profile == "pr":
         return [
             _prepare_backend_selection(q, profile, inputs),
@@ -229,33 +227,67 @@ def _full_test_commands(
     ], True
 
 
-def _aggregate_commands(q: Any, inputs: tuple[Any, ...]) -> tuple[Any, ...]:
+def _aggregate_commands(
+    q: Any,
+    inputs: tuple[Any, ...],
+    profile: str,
+    *,
+    require_runtime: bool,
+) -> tuple[Any, ...]:
     report = "frontend/coverage/vitals-coverage-report.json"
-    return (
+    commands = [
         q.GateCommand(
-            "Vitals coverage report",
-            (
-                sys.executable,
-                "Scripts/report_vitals_coverage.py",
-                "--output",
-                report,
-            ),
-            "Restore the coverage artifacts required to calculate critical-path rates.",
+            "Verify global execution count reference",
+            (sys.executable, "Scripts/report_test_execution_counts.py", "--check"),
+            "Regenerate the global count snapshot from a complete three-framework run.",
             input_sources=inputs,
-            coverage_artifacts=(report,),
-        ),
-        q.GateCommand(
-            "Vitals compliance",
+        )
+    ]
+    if profile != "pr":
+        commands.extend(
             (
-                sys.executable,
-                "Scripts/check_vitals_compliance.py",
-                "--report-json",
-                report,
+                q.GateCommand(
+                    "Vitals coverage report",
+                    (
+                        sys.executable,
+                        "Scripts/report_vitals_coverage.py",
+                        "--output",
+                        report,
+                    ),
+                    "Restore the coverage artifacts required to calculate critical-path rates.",
+                    input_sources=inputs,
+                    coverage_artifacts=(report,),
+                ),
+                q.GateCommand(
+                    "Vitals compliance",
+                    (
+                        sys.executable,
+                        "Scripts/check_vitals_compliance.py",
+                        "--report-json",
+                        report,
+                    ),
+                    "Restore every critical-path coverage rate to the versioned threshold.",
+                    input_sources=inputs,
+                ),
+            )
+        )
+    commands.extend(
+        (
+            _test_governance_command(q, inputs, profile, require_runtime=require_runtime),
+            q.GateCommand(
+                "Test strategy reporting",
+                (
+                    sys.executable,
+                    "Scripts/report_test_strategy.py",
+                    "--profile",
+                    profile,
+                ),
+                "Restore the required profile evidence or correct the confirmed violation.",
+                input_sources=inputs,
             ),
-            "Restore every critical-path coverage rate to the versioned threshold.",
-            input_sources=inputs,
-        ),
+        )
     )
+    return tuple(commands)
 
 
 def _test_governance_command(
@@ -287,19 +319,15 @@ def build_execution_plan(context: Any, q: Any) -> Any:
     inputs = q._gate_input_sources(context.mode)
     commands = _base_commands(q, inputs)
     resolution = q.resolve_tests(context)
-    commands.append(
-        _test_governance_command(
-            q,
-            inputs,
-            profile,
-            require_runtime=resolution.level == q.ChangeLevel.MASSIVE,
-        )
-    )
-    if context.documentation_only and context.mode == "fast" and (
-        resolution.level != q.ChangeLevel.MASSIVE
+    if (
+        context.documentation_only
+        and context.mode == "fast"
+        and (resolution.level != q.ChangeLevel.MASSIVE)
     ):
+        commands.append(_test_governance_command(q, inputs, profile, require_runtime=False))
         return q.GateExecutionPlan(context, tuple(commands), False, resolution, profile)
     if resolution.level != q.ChangeLevel.MASSIVE:
+        commands.append(_test_governance_command(q, inputs, profile, require_runtime=False))
         known = {command.argv for command in commands}
         for command in _selected_commands(q, resolution, inputs):
             if command.argv not in known:
@@ -310,8 +338,7 @@ def build_execution_plan(context: Any, q: Any) -> Any:
     commands.extend(_frontend_commands(q, inputs))
     test_commands, has_release_checks = _full_test_commands(q, profile, inputs)
     commands.extend(test_commands)
-    if has_release_checks:
-        commands.extend(_aggregate_commands(q, inputs))
+    commands.extend(_aggregate_commands(q, inputs, profile, require_runtime=True))
     docker_smoke = has_release_checks and context.mode in {"ci", "nightly", "release"}
     return q.GateExecutionPlan(context, tuple(commands), docker_smoke, resolution, profile)
 

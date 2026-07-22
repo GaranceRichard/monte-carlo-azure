@@ -628,6 +628,12 @@ def test_dag_impossible_ready_set_and_quality_gate_cli_options(tmp_path: Path, m
 
 def test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate() -> None:
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    preflight = workflow.split("  preflight:\n", maxsplit=1)[1].split(
+        "  backend-static:\n", maxsplit=1
+    )[0]
+    assert preflight.count("actions/upload-artifact@v7") == 1
+    assert "name: preflight-${{ steps.profile.outputs.value }}" in preflight
+    assert "path: reports/test-execution-artifacts" in preflight
     branch_blocks: dict[str, str] = {}
     for job in (
         "backend-static",
@@ -670,6 +676,8 @@ def test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate() -> 
         if "actions/upload-artifact@v7" in block
     }
     assert producer_jobs == {
+        "backend-static",
+        "frontend-static",
         "backend-tests",
         "frontend-tests",
         "e2e",
@@ -686,6 +694,9 @@ def test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate() -> 
     assert aggregate.count("actions/download-artifact@v8") == 1
     assert aggregate.count("path: reports/test-execution-artifacts") == 1
     assert "merge-multiple: true" in aggregate
+    assert aggregate.count("actions/upload-artifact@v7") == 1
+    assert "reports/test-strategy-report.json" in aggregate
+    assert "reports/test-strategy-report.md" in aggregate
     assert "actions/setup-node@v6" in aggregate
     assert 'node-version: "22"' in aggregate
     assert "cache: npm" in aggregate

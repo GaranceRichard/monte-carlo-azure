@@ -3,12 +3,24 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
+import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Iterable
+
+if not __package__:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from Scripts.test_execution_counts_reference import (
+    execution_counts_main,
+    reference_validator,
+)
+from Scripts.test_execution_counts_reference import (
+    reject_duplicate_keys as _reject_duplicate_keys,
+)
+from Scripts.test_execution_counts_reference import write_report as write_report
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_VERSION = "1.0.0"
@@ -25,15 +37,6 @@ COUNT_FIELDS = (
 DEFAULT_INVENTORY = Path("reports/test-classification-inventory.json")
 DEFAULT_OUTPUT = Path("reports/test-execution-counts.json")
 DEFAULT_NATIVE = tuple(Path(f"reports/test-execution-native/{name}.json") for name in FRAMEWORKS)
-
-
-def _reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-    value: dict[str, Any] = {}
-    for key, item in pairs:
-        if key in value:
-            raise ValueError(f"Duplicate JSON property: {key}")
-        value[key] = item
-    return value
 
 
 def load_json(path: Path) -> Any:
@@ -129,9 +132,7 @@ def _case_counts(instances: Iterable[dict[str, Any]]) -> dict[str, Any]:
 
 
 def _validate_counts(counts: dict[str, Any], label: str) -> None:
-    if counts["collectedInstances"] != (
-        counts["executedInstances"] + counts["skippedInstances"]
-    ):
+    if counts["collectedInstances"] != (counts["executedInstances"] + counts["skippedInstances"]):
         raise ValueError(f"Invalid {label}: collectedInstances invariant failed.")
     if counts["attempts"] != counts["executedInstances"] + counts["retries"]:
         raise ValueError(f"Invalid {label}: attempts invariant failed.")
@@ -203,16 +204,13 @@ def _require_complete(
     if missing_frameworks:
         raise ValueError(f"Incomplete native collection; missing: {', '.join(missing_frameworks)}")
     missing_cases = [
-        item["logicalCaseId"]
-        for item in inventory
-        if not instances_by_case[item["logicalCaseId"]]
+        item["logicalCaseId"] for item in inventory if not instances_by_case[item["logicalCaseId"]]
     ]
     if missing_cases:
         preview = ", ".join(missing_cases[:5])
         suffix = " ..." if len(missing_cases) > 5 else ""
         raise ValueError(
-            "Classification inventory absent from complete collection: "
-            f"{preview}{suffix}"
+            f"Classification inventory absent from complete collection: {preview}{suffix}"
         )
 
 
@@ -335,30 +333,29 @@ def consolidate(
     }
 
 
-def write_report(report: dict[str, Any], destination: Path) -> bytes:
-    payload = (json.dumps(report, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_bytes(payload)
-    return payload
+validate_report_reference = reference_validator(
+    ROOT,
+    DEFAULT_INVENTORY,
+    DEFAULT_OUTPUT,
+    schema_version=SCHEMA_VERSION,
+    reject_duplicates=_reject_duplicate_keys,
+    validate_inventory=_validate_inventory,
+    load_json=load_json,
+    validate_counts=_validate_counts,
+)
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--inventory", type=Path, default=DEFAULT_INVENTORY)
-    parser.add_argument("--native", type=Path, action="append")
-    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
-    return parser
-
-
-def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
-    root = args.root.resolve()
-    report = consolidate(root, args.inventory, args.native or DEFAULT_NATIVE)
-    destination = args.output if args.output.is_absolute() else root / args.output
-    write_report(report, destination)
-    print(json.dumps(report["totals"], sort_keys=True))
-    return 0
+main = execution_counts_main(
+    description=str(__doc__),
+    default_root=ROOT,
+    default_inventory=DEFAULT_INVENTORY,
+    default_output=DEFAULT_OUTPUT,
+    default_native=DEFAULT_NATIVE,
+    validate_report=validate_report_reference,
+    load_json=load_json,
+    consolidate=consolidate,
+    report_writer=write_report,
+)
 
 
 if __name__ == "__main__":

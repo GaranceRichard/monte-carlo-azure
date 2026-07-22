@@ -4,6 +4,14 @@
 
 ### Qualité et outillage
 
+- ajout du reporting consolidé de stratégie de test : contrat JSON strict, modèle déterministe séparant
+  référence globale, exécution profilée et couverture stratégique, restitution Markdown issue du même modèle,
+  manifest de preuves et conclusions distinctes de conformité de gate et de complétude stratégique
+- intégration du reporter au nœud `aggregate` pour les quatre profils, après vérification du dénombrement,
+  Vitals et gouvernance, sans relancer les suites ni exiger le résultat final circulaire de l'agrégateur
+- transport CI explicite des résultats `preflight`, `backend-static` et `frontend-static`, puis publication
+  des snapshots JSON et Markdown comme artefacts du job `aggregate`
+
 - correction du job CI `aggregate` : Node 22, le cache npm et `npm --prefix frontend ci` sont préparés avant
   l’agrégateur final, afin que la gouvernance des tests redécouvre Vitest et Playwright avec TypeScript
 - correction du pré-push isolé : tous les chemins d’exécution du DAG (séquentiel, parallèle et nœud

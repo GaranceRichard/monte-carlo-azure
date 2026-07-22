@@ -7637,6 +7637,34 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_test_execution_counts.py::test_versioned_global_reference_can_be_verified_without_replaying_suites",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_counts.py",
+    "selector": "test_versioned_global_reference_can_be_verified_without_replaying_suites",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "migration_recovery"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_execution_counts.py::test_versioned_reference_rejects_every_invalid_contract_shape",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_counts.py",
+    "selector": "test_versioned_reference_rejects_every_invalid_contract_shape",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_test_execution_profiles.py::test_command_mapping_and_batches_preserve_parallel_branches",
     "framework": "pytest",
     "sourcePath": "tests/test_test_execution_profiles.py",
@@ -8103,6 +8131,422 @@
     ],
     "domains": [
       "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_bundle_identity_is_stable_and_is_not_a_run_identity",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_bundle_identity_is_stable_and_is_not_a_run_identity",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_classification_axes_and_associations_do_not_claim_risk_control",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_classification_axes_and_associations_do_not_claim_risk_control",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_coverage_thresholds_and_e2e_freshness",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_coverage_thresholds_and_e2e_freshness",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting",
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_duplicate_node_json_is_rejected_as_materially_invalid",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_duplicate_node_json_is_rejected_as_materially_invalid",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_execution_counts_keep_instances_attempts_retries_and_results_distinct",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_execution_counts_keep_instances_attempts_retries_and_results_distinct",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_future_dimensions_are_visible_non_blocking_and_strategy_incomplete",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_future_dimensions_are_visible_non_blocking_and_strategy_incomplete",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_global_reference_and_profile_execution_are_independent",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_global_reference_and_profile_execution_are_independent",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_governance_zeroes_are_explicit_and_violation_is_non_compliant",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_governance_zeroes_are_explicit_and_violation_is_non_compliant",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_inconsistent_runtime_governance_failed_execution_and_node_are_violations",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_inconsistent_runtime_governance_failed_execution_and_node_are_violations",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_invalid_and_missing_source_native_and_node_evidence",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_invalid_and_missing_source_native_and_node_evidence",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_invalid_governance_and_low_vital_are_reported",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_invalid_governance_and_low_vital_are_reported",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_main_profile_adapts_all_coverage_sources_and_five_vitals",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_main_profile_adapts_all_coverage_sources_and_five_vitals",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting",
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_missing_node_result_is_not_inferred_from_ci_dependency",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_missing_node_result_is_not_inferred_from_ci_dependency",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_module_entrypoint_and_schema_contract",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_module_entrypoint_and_schema_contract",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting",
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_nominal_pr_model_is_strict_deterministic_and_honest",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_nominal_pr_model_is_strict_deterministic_and_honest",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting",
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_pr_has_no_required_e2e_and_aggregate_does_not_require_itself",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_pr_has_no_required_e2e_and_aggregate_does_not_require_itself",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_profiles_keep_distinct_cumulative_compositions",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_profiles_keep_distinct_cumulative_compositions",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_quality_gate_conclusion_priority",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_quality_gate_conclusion_priority",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting",
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_remaining_inconsistency_and_violation_branches_are_structured",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_remaining_inconsistency_and_violation_branches_are_structured",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_renderers_normalize_paths_omit_wall_clock_and_share_one_model",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_renderers_normalize_paths_omit_wall_clock_and_share_one_model",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops",
+      "reporting",
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_report_validator_rejects_unknown_fields_and_invalid_numbers",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_report_validator_rejects_unknown_fields_and_invalid_numbers",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_reporting_is_planned_once_for_every_execution_profile",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_reporting_is_planned_once_for_every_execution_profile",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_stale_e2e_and_below_threshold_coverage_are_distinguished",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_stale_e2e_and_below_threshold_coverage_are_distinguished",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting",
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_unknown_source_version_and_inventory_hash_are_incomplete",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_unknown_source_version_and_inventory_hash_are_incomplete",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_validator_and_cli_error_paths_are_explicit",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_validator_and_cli_error_paths_are_explicit",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops",
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_test_strategy_reporting.py::test_write_reports_and_cli_do_not_launch_test_runners",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_strategy_reporting.py",
+    "selector": "test_write_reports_and_cli_do_not_launch_test_runners",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting",
+      "user_interface"
     ]
   },
   {

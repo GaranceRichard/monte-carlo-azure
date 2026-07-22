@@ -369,6 +369,21 @@ produit `reports/test-governance-report.json` avec nombres, détails, expiration
 commande `Test governance compliance` est construite une seule fois par plan et rattachée au nœud existant
 `aggregate` ; aucun nœud ni seuil du DAG n'est supprimé ou contourné.
 
+Le PBI 1.10 ajoute une consolidation au même nœud, sans faire du dénombrement son agrégateur général.
+`Scripts/report_test_strategy.py` construit une fois un modèle pur à partir de l'inventaire, du plan, du
+snapshot de dénombrement, de la gouvernance, des résultats de nœuds et des couvertures déjà produits. Les
+adaptateurs de preuves sont séparés du résumé stratégique et des renderers ; JSON et Markdown reçoivent le
+même modèle et ne relisent aucune source. Le modèle sépare `globalReference`, `profileExecution` et
+`strategicCoverage`, ainsi que la conformité de la gate et la complétude de la preuve stratégique.
+
+Le manifest conserve l'identité, l'empreinte et les états observables de chaque preuve. Son
+`evidenceBundleId` est un hash déterministe du bundle, jamais un `runId` supposé commun. La fraîcheur E2E
+réutilise le contrat existant ; l'absence d'identité temporelle équivalente pour Pytest et Vitest reste
+explicitement non mesurable. L'agrégateur courant n'exige pas son propre résultat final, ce qui évite une
+dépendance circulaire ; son succès est matérialisé après le reporting par le code de sortie du DAG et le job
+CI. Les snapshots `reports/test-strategy-report.{json,md}` sont versionnés, tandis que leur upload CI atteste
+une exécution distante donnée.
+
 `Scripts/check_test_classification.py` redécouvre les cas et reconstruit l'inventaire en mémoire sans écrire
 dans le workspace. Il valide le catalogue, le schéma, les règles, overrides et exemptions, compare la
 sérialisation exacte au rapport versionné, impose `unresolved = 0` et vérifie l'empreinte du rapport

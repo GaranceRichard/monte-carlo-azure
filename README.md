@@ -446,6 +446,31 @@ au reporting du PBI 1.10 : nombres par état, détails, expirations, tentatives 
 `Test governance compliance` apparaît exactement une fois dans chaque plan et s'exécute dans `aggregate`,
 après les producteurs de preuves natives pour les plans complets.
 
+Le reporting stratégique consolide ces preuves sans relancer Pytest, Vitest ou Playwright :
+
+```bash
+python Scripts/report_test_strategy.py --profile main
+```
+
+Le contrat machine strict [`config/test-strategy-report.schema.json`](config/test-strategy-report.schema.json)
+encadre [`reports/test-strategy-report.json`](reports/test-strategy-report.json), tandis que
+[`reports/test-strategy-report.md`](reports/test-strategy-report.md) est rendu depuis le même modèle en mémoire.
+`globalReference` décrit tout le patrimoine connu ; `profileExecution` décrit uniquement la sélection et les
+preuves du profil demandé ; `strategicCoverage` rend visibles les dimensions démontrées et celles qui restent
+`not_measured`. `qualityGateStatus` conclut sur les règles actuellement applicables (`compliant`,
+`non_compliant` ou `incomplete_evidence`) et `strategyEvidenceStatus` indique séparément si toutes les
+dimensions du standard sont mesurées. Une gate peut donc être conforme alors que la preuve stratégique reste
+incomplète, sans score agrégé ni preuve inventée.
+
+Chaque source consommée apparaît dans un manifest avec son empreinte et ses états de présence, validité,
+fraîcheur et cohérence. `evidenceBundleId` identifie déterministement cet ensemble exact de fichiers ; il ne
+prouve pas qu'ils proviennent de la même exécution physique. La fraîcheur E2E réutilise sa fenêtre
+contractuelle ; aucune fenêtre arbitraire n'est ajoutée pour Pytest ou Vitest. Le nœud `aggregate` vérifie la
+référence globale versionnée, produit Vitals et gouvernance, puis écrit les deux restitutions une seule fois.
+Le rapport n'exige pas le `result.json` final de son propre nœud : ce succès reste attesté par le code de sortie
+de la gate et par la CI. Les fichiers sous `reports/` sont les snapshots versionnés ; les artefacts uploadés par
+GitHub Actions prouvent l'exécution distante correspondante et ne remplacent pas ces snapshots.
+
 Depuis la racine:
 
 ```bash
@@ -598,6 +623,8 @@ E2E. Les scripts PowerShell `run-e2e-coverage.ps1`, `run-vitals-coverage.ps1` et
 - `frontend/coverage/coverage-final.json` et `frontend/coverage/index.html` pour Vitest ;
 - `frontend/coverage/e2e-coverage-summary.json` pour les E2E ;
 - `frontend/coverage/vitals-coverage-report.json` pour l’agrégation Vitals réutilisée par la conformité.
+- `reports/test-strategy-report.json` et `reports/test-strategy-report.md` pour la consolidation stratégique
+  machine et humaine du profil.
 
 Les E2E appliquent réellement un seuil de 80 % sur `statements`, `branches`, `functions` et `lines`.
 L’artefact doit être un JSON complet et cohérent, porter l’identité du run courant, ses timestamps,

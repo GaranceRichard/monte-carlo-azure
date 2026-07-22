@@ -49,9 +49,7 @@ def _node_environment(validation_root: Path, profile: str, node: str) -> dict[st
     if node == "frontend-tests":
         environment["VITEST_COVERAGE_DIR"] = str(artifact_root / "coverage")
     if node == "e2e":
-        environment["E2E_COVERAGE_ARTIFACT_PATH"] = str(
-            artifact_root / "e2e-coverage-summary.json"
-        )
+        environment["E2E_COVERAGE_ARTIFACT_PATH"] = str(artifact_root / "e2e-coverage-summary.json")
     return environment
 
 
@@ -81,6 +79,16 @@ def _write_result(
     )
 
 
+def _restore_current_results(
+    validation_root: Path,
+    profile: str,
+    outcomes: dict[str, tuple[int, float]],
+) -> None:
+    """Restore this execution's node proofs before aggregate consumers run."""
+    for node, (code, duration) in outcomes.items():
+        _write_result(validation_root, profile, node, code, duration)
+
+
 def _run_node(
     q: Any,
     plan: Any,
@@ -94,7 +102,7 @@ def _run_node(
 ) -> tuple[int, float]:
     started = time.perf_counter()
     if node == "aggregate":
-        _promote_artifacts(validation_root, plan.execution_profile)
+        _prepare_aggregate_inputs(validation_root, plan.execution_profile)
     environment = {
         **command_env,
         **_node_environment(validation_root, plan.execution_profile, node),
@@ -141,10 +149,17 @@ def _execute_parallel(
     pending = set(nodes) - {identifier for identifier, commands in grouped.items() if not commands}
     completed = set(nodes) - pending
     durations: dict[str, float] = {}
+    outcomes_by_node: dict[str, tuple[int, float]] = {}
     while pending:
         ready = _ready_nodes(pending, completed, nodes)
         if not ready:
             return 2, durations
+        if "aggregate" in ready:
+            _restore_current_results(
+                kwargs["validation_root"],
+                plan.execution_profile,
+                outcomes_by_node,
+            )
         with ThreadPoolExecutor(max_workers=len(ready)) as executor:
             futures = {
                 node: executor.submit(_run_node, q, plan, node, grouped[node], **kwargs)
@@ -154,10 +169,38 @@ def _execute_parallel(
         for node in ready:
             code, duration = outcomes[node]
             durations[node] = duration
+            outcomes_by_node[node] = (code, duration)
             if code:
                 return code, durations
             pending.remove(node)
             completed.add(node)
+    return 0, durations
+
+
+def _execute_sequential(
+    q: Any,
+    plan: Any,
+    grouped: dict[str, tuple[Any, ...]],
+    contract: dict[str, Any],
+    **kwargs: Any,
+) -> tuple[int, dict[str, float]]:
+    durations: dict[str, float] = {}
+    outcomes: dict[str, tuple[int, float]] = {}
+    for node in topological_node_ids(contract, plan.execution_profile):
+        commands = grouped[node]
+        if not commands:
+            continue
+        if node == "aggregate":
+            _restore_current_results(
+                kwargs["validation_root"],
+                plan.execution_profile,
+                outcomes,
+            )
+        code, duration = _run_node(q, plan, node, commands, **kwargs)
+        durations[node] = duration
+        outcomes[node] = (code, duration)
+        if code:
+            return code, durations
     return 0, durations
 
 
@@ -187,14 +230,18 @@ def _promote_artifacts(validation_root: Path, profile: str) -> None:
             shutil.copy2(source, destination)
 
 
-def _aggregate(validation_root: Path, plan: Any, durations: dict[str, float]) -> None:
+def _prepare_aggregate_inputs(validation_root: Path, profile: str) -> None:
+    _promote_artifacts(validation_root, profile)
     contract = _contract(validation_root)
-    _promote_artifacts(validation_root, plan.execution_profile)
-    inventory = load_json(validation_root / "reports" / "test-classification-inventory.json")
+    inventory = load_json(validation_root / "reports/test-classification-inventory.json")
     write_report(
         build_plan_report(contract, inventory),
-        validation_root / "reports" / "test-execution-plan.json",
+        validation_root / "reports/test-execution-plan.json",
     )
+
+
+def _aggregate(validation_root: Path, plan: Any, durations: dict[str, float]) -> None:
+    contract = _contract(validation_root)
     sequential = sum(durations.values())
     nodes = active_nodes(contract, plan.execution_profile)
     longest: dict[str, float] = {}
@@ -235,9 +282,7 @@ def _execute_inside_manager(
         return code, {selected_node: duration}
     if parallel:
         return _execute_parallel(q, plan, grouped, contract, **kwargs)
-    started = time.perf_counter()
-    code = q._execute_commands_sequentially(plan, **kwargs)
-    return code, {"sequential": time.perf_counter() - started}
+    return _execute_sequential(q, plan, grouped, contract, **kwargs)
 
 
 def execute_gate_plan(

@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 917,
+      "logicalCases": 921,
       "nodes": [
         {
           "id": "preflight",
@@ -75,7 +75,8 @@
             "frontend/package-lock.json"
           ],
           "writes": [
-            "reports/test-execution-artifacts/{profile}/frontend-static/dist"
+            "reports/test-execution-artifacts/{profile}/frontend-static/dist",
+            "reports/test-execution-artifacts/{profile}/frontend-static/result.json"
           ],
           "resources": [],
           "aggregator": false,
@@ -396,6 +397,10 @@
             "pytest:tests/test_test_governance.py::test_runtime_governance_blocks_dynamic_ignores_blind_retries_and_quarantine_nonexecution",
             "pytest:tests/test_test_governance.py::test_script_entrypoint_uses_main",
             "pytest:tests/test_test_governance.py::test_versioned_contract_and_report_schemas_are_distinct_and_complete",
+            "pytest:tests/test_test_strategy_reporting.py::test_coverage_thresholds_and_e2e_freshness",
+            "pytest:tests/test_test_strategy_reporting.py::test_future_dimensions_are_visible_non_blocking_and_strategy_incomplete",
+            "pytest:tests/test_test_strategy_reporting.py::test_quality_gate_conclusion_priority",
+            "pytest:tests/test_test_strategy_reporting.py::test_reporting_is_planned_once_for_every_execution_profile",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_metrics_below_threshold",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_missing_matches",
             "pytest:tests/test_vitals_compliance.py::test_backend_aggregation_and_report_building_cover_each_source",
@@ -409,18 +414,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 295
+            "pytest": 299
           },
           "natures": {
             "component": 65,
             "contract": 43,
             "integration": 20,
-            "unit": 167
+            "unit": 171
           },
           "criticalities": {
             "critical": 71,
             "high": 16,
-            "unassigned": 208
+            "unassigned": 212
           }
         },
         {
@@ -1143,18 +1148,25 @@
             "release-or-container-checks"
           ],
           "commands": [
-            "Aggregate execution evidence",
+            "Verify global execution count reference",
             "Vitals coverage report",
             "Vitals compliance",
-            "Test governance compliance"
+            "Test governance compliance",
+            "Test strategy reporting"
           ],
           "reads": [
-            "reports/test-execution-artifacts/{profile}"
+            "reports/test-execution-artifacts/{profile}",
+            "tests",
+            "frontend/src",
+            "frontend/tests/e2e",
+            "frontend/package-lock.json"
           ],
           "writes": [
             "reports/test-execution-counts.json",
             "reports/test-execution-plan.json",
             "reports/test-governance-report.json",
+            "reports/test-strategy-report.json",
+            "reports/test-strategy-report.md",
             "frontend/coverage/vitals-coverage-report.json"
           ],
           "resources": [],
@@ -1173,7 +1185,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1091,
+      "logicalCases": 1119,
       "nodes": [
         {
           "id": "preflight",
@@ -1239,7 +1251,8 @@
             "frontend/package-lock.json"
           ],
           "writes": [
-            "reports/test-execution-artifacts/{profile}/frontend-static/dist"
+            "reports/test-execution-artifacts/{profile}/frontend-static/dist",
+            "reports/test-execution-artifacts/{profile}/frontend-static/result.json"
           ],
           "resources": [],
           "aggregator": false,
@@ -1665,6 +1678,8 @@
             "pytest:tests/test_test_execution_counts.py::test_report_shape_conforms_to_versioned_schema",
             "pytest:tests/test_test_execution_counts.py::test_script_entrypoint_uses_cli_arguments",
             "pytest:tests/test_test_execution_counts.py::test_two_consolidations_are_byte_identical_and_cli_writes_the_report",
+            "pytest:tests/test_test_execution_counts.py::test_versioned_global_reference_can_be_verified_without_replaying_suites",
+            "pytest:tests/test_test_execution_counts.py::test_versioned_reference_rejects_every_invalid_contract_shape",
             "pytest:tests/test_test_execution_profiles.py::test_command_mapping_and_batches_preserve_parallel_branches",
             "pytest:tests/test_test_execution_profiles.py::test_contract_and_inventory_shape_failures_are_reported",
             "pytest:tests/test_test_execution_profiles.py::test_dag_impossible_ready_set_and_quality_gate_cli_options",
@@ -1697,6 +1712,32 @@
             "pytest:tests/test_test_governance.py::test_runtime_governance_blocks_dynamic_ignores_blind_retries_and_quarantine_nonexecution",
             "pytest:tests/test_test_governance.py::test_script_entrypoint_uses_main",
             "pytest:tests/test_test_governance.py::test_versioned_contract_and_report_schemas_are_distinct_and_complete",
+            "pytest:tests/test_test_strategy_reporting.py::test_bundle_identity_is_stable_and_is_not_a_run_identity",
+            "pytest:tests/test_test_strategy_reporting.py::test_classification_axes_and_associations_do_not_claim_risk_control",
+            "pytest:tests/test_test_strategy_reporting.py::test_coverage_thresholds_and_e2e_freshness",
+            "pytest:tests/test_test_strategy_reporting.py::test_duplicate_node_json_is_rejected_as_materially_invalid",
+            "pytest:tests/test_test_strategy_reporting.py::test_execution_counts_keep_instances_attempts_retries_and_results_distinct",
+            "pytest:tests/test_test_strategy_reporting.py::test_future_dimensions_are_visible_non_blocking_and_strategy_incomplete",
+            "pytest:tests/test_test_strategy_reporting.py::test_global_reference_and_profile_execution_are_independent",
+            "pytest:tests/test_test_strategy_reporting.py::test_governance_zeroes_are_explicit_and_violation_is_non_compliant",
+            "pytest:tests/test_test_strategy_reporting.py::test_inconsistent_runtime_governance_failed_execution_and_node_are_violations",
+            "pytest:tests/test_test_strategy_reporting.py::test_invalid_and_missing_source_native_and_node_evidence",
+            "pytest:tests/test_test_strategy_reporting.py::test_invalid_governance_and_low_vital_are_reported",
+            "pytest:tests/test_test_strategy_reporting.py::test_main_profile_adapts_all_coverage_sources_and_five_vitals",
+            "pytest:tests/test_test_strategy_reporting.py::test_missing_node_result_is_not_inferred_from_ci_dependency",
+            "pytest:tests/test_test_strategy_reporting.py::test_module_entrypoint_and_schema_contract",
+            "pytest:tests/test_test_strategy_reporting.py::test_nominal_pr_model_is_strict_deterministic_and_honest",
+            "pytest:tests/test_test_strategy_reporting.py::test_pr_has_no_required_e2e_and_aggregate_does_not_require_itself",
+            "pytest:tests/test_test_strategy_reporting.py::test_profiles_keep_distinct_cumulative_compositions",
+            "pytest:tests/test_test_strategy_reporting.py::test_quality_gate_conclusion_priority",
+            "pytest:tests/test_test_strategy_reporting.py::test_remaining_inconsistency_and_violation_branches_are_structured",
+            "pytest:tests/test_test_strategy_reporting.py::test_renderers_normalize_paths_omit_wall_clock_and_share_one_model",
+            "pytest:tests/test_test_strategy_reporting.py::test_report_validator_rejects_unknown_fields_and_invalid_numbers",
+            "pytest:tests/test_test_strategy_reporting.py::test_reporting_is_planned_once_for_every_execution_profile",
+            "pytest:tests/test_test_strategy_reporting.py::test_stale_e2e_and_below_threshold_coverage_are_distinguished",
+            "pytest:tests/test_test_strategy_reporting.py::test_unknown_source_version_and_inventory_hash_are_incomplete",
+            "pytest:tests/test_test_strategy_reporting.py::test_validator_and_cli_error_paths_are_explicit",
+            "pytest:tests/test_test_strategy_reporting.py::test_write_reports_and_cli_do_not_launch_test_runners",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_metrics_below_threshold",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_missing_matches",
             "pytest:tests/test_vitals_compliance.py::test_backend_aggregation_and_report_building_cover_each_source",
@@ -1715,18 +1756,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 437
+            "pytest": 465
           },
           "natures": {
             "component": 65,
             "contract": 43,
-            "integration": 162,
-            "unit": 167
+            "integration": 186,
+            "unit": 171
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 333
+            "unassigned": 361
           }
         },
         {
@@ -2489,18 +2530,25 @@
             "release-or-container-checks"
           ],
           "commands": [
-            "Aggregate execution evidence",
+            "Verify global execution count reference",
             "Vitals coverage report",
             "Vitals compliance",
-            "Test governance compliance"
+            "Test governance compliance",
+            "Test strategy reporting"
           ],
           "reads": [
-            "reports/test-execution-artifacts/{profile}"
+            "reports/test-execution-artifacts/{profile}",
+            "tests",
+            "frontend/src",
+            "frontend/tests/e2e",
+            "frontend/package-lock.json"
           ],
           "writes": [
             "reports/test-execution-counts.json",
             "reports/test-execution-plan.json",
             "reports/test-governance-report.json",
+            "reports/test-strategy-report.json",
+            "reports/test-strategy-report.md",
             "frontend/coverage/vitals-coverage-report.json"
           ],
           "resources": [],
@@ -2520,7 +2568,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1092,
+      "logicalCases": 1120,
       "nodes": [
         {
           "id": "preflight",
@@ -2586,7 +2634,8 @@
             "frontend/package-lock.json"
           ],
           "writes": [
-            "reports/test-execution-artifacts/{profile}/frontend-static/dist"
+            "reports/test-execution-artifacts/{profile}/frontend-static/dist",
+            "reports/test-execution-artifacts/{profile}/frontend-static/result.json"
           ],
           "resources": [],
           "aggregator": false,
@@ -3012,6 +3061,8 @@
             "pytest:tests/test_test_execution_counts.py::test_report_shape_conforms_to_versioned_schema",
             "pytest:tests/test_test_execution_counts.py::test_script_entrypoint_uses_cli_arguments",
             "pytest:tests/test_test_execution_counts.py::test_two_consolidations_are_byte_identical_and_cli_writes_the_report",
+            "pytest:tests/test_test_execution_counts.py::test_versioned_global_reference_can_be_verified_without_replaying_suites",
+            "pytest:tests/test_test_execution_counts.py::test_versioned_reference_rejects_every_invalid_contract_shape",
             "pytest:tests/test_test_execution_profiles.py::test_command_mapping_and_batches_preserve_parallel_branches",
             "pytest:tests/test_test_execution_profiles.py::test_contract_and_inventory_shape_failures_are_reported",
             "pytest:tests/test_test_execution_profiles.py::test_dag_impossible_ready_set_and_quality_gate_cli_options",
@@ -3045,6 +3096,32 @@
             "pytest:tests/test_test_governance.py::test_runtime_governance_blocks_dynamic_ignores_blind_retries_and_quarantine_nonexecution",
             "pytest:tests/test_test_governance.py::test_script_entrypoint_uses_main",
             "pytest:tests/test_test_governance.py::test_versioned_contract_and_report_schemas_are_distinct_and_complete",
+            "pytest:tests/test_test_strategy_reporting.py::test_bundle_identity_is_stable_and_is_not_a_run_identity",
+            "pytest:tests/test_test_strategy_reporting.py::test_classification_axes_and_associations_do_not_claim_risk_control",
+            "pytest:tests/test_test_strategy_reporting.py::test_coverage_thresholds_and_e2e_freshness",
+            "pytest:tests/test_test_strategy_reporting.py::test_duplicate_node_json_is_rejected_as_materially_invalid",
+            "pytest:tests/test_test_strategy_reporting.py::test_execution_counts_keep_instances_attempts_retries_and_results_distinct",
+            "pytest:tests/test_test_strategy_reporting.py::test_future_dimensions_are_visible_non_blocking_and_strategy_incomplete",
+            "pytest:tests/test_test_strategy_reporting.py::test_global_reference_and_profile_execution_are_independent",
+            "pytest:tests/test_test_strategy_reporting.py::test_governance_zeroes_are_explicit_and_violation_is_non_compliant",
+            "pytest:tests/test_test_strategy_reporting.py::test_inconsistent_runtime_governance_failed_execution_and_node_are_violations",
+            "pytest:tests/test_test_strategy_reporting.py::test_invalid_and_missing_source_native_and_node_evidence",
+            "pytest:tests/test_test_strategy_reporting.py::test_invalid_governance_and_low_vital_are_reported",
+            "pytest:tests/test_test_strategy_reporting.py::test_main_profile_adapts_all_coverage_sources_and_five_vitals",
+            "pytest:tests/test_test_strategy_reporting.py::test_missing_node_result_is_not_inferred_from_ci_dependency",
+            "pytest:tests/test_test_strategy_reporting.py::test_module_entrypoint_and_schema_contract",
+            "pytest:tests/test_test_strategy_reporting.py::test_nominal_pr_model_is_strict_deterministic_and_honest",
+            "pytest:tests/test_test_strategy_reporting.py::test_pr_has_no_required_e2e_and_aggregate_does_not_require_itself",
+            "pytest:tests/test_test_strategy_reporting.py::test_profiles_keep_distinct_cumulative_compositions",
+            "pytest:tests/test_test_strategy_reporting.py::test_quality_gate_conclusion_priority",
+            "pytest:tests/test_test_strategy_reporting.py::test_remaining_inconsistency_and_violation_branches_are_structured",
+            "pytest:tests/test_test_strategy_reporting.py::test_renderers_normalize_paths_omit_wall_clock_and_share_one_model",
+            "pytest:tests/test_test_strategy_reporting.py::test_report_validator_rejects_unknown_fields_and_invalid_numbers",
+            "pytest:tests/test_test_strategy_reporting.py::test_reporting_is_planned_once_for_every_execution_profile",
+            "pytest:tests/test_test_strategy_reporting.py::test_stale_e2e_and_below_threshold_coverage_are_distinguished",
+            "pytest:tests/test_test_strategy_reporting.py::test_unknown_source_version_and_inventory_hash_are_incomplete",
+            "pytest:tests/test_test_strategy_reporting.py::test_validator_and_cli_error_paths_are_explicit",
+            "pytest:tests/test_test_strategy_reporting.py::test_write_reports_and_cli_do_not_launch_test_runners",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_metrics_below_threshold",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_missing_matches",
             "pytest:tests/test_vitals_compliance.py::test_backend_aggregation_and_report_building_cover_each_source",
@@ -3063,18 +3140,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 438
+            "pytest": 466
           },
           "natures": {
             "component": 65,
             "contract": 43,
-            "integration": 162,
-            "unit": 168
+            "integration": 186,
+            "unit": 172
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 334
+            "unassigned": 362
           }
         },
         {
@@ -3837,18 +3914,25 @@
             "release-or-container-checks"
           ],
           "commands": [
-            "Aggregate execution evidence",
+            "Verify global execution count reference",
             "Vitals coverage report",
             "Vitals compliance",
-            "Test governance compliance"
+            "Test governance compliance",
+            "Test strategy reporting"
           ],
           "reads": [
-            "reports/test-execution-artifacts/{profile}"
+            "reports/test-execution-artifacts/{profile}",
+            "tests",
+            "frontend/src",
+            "frontend/tests/e2e",
+            "frontend/package-lock.json"
           ],
           "writes": [
             "reports/test-execution-counts.json",
             "reports/test-execution-plan.json",
             "reports/test-governance-report.json",
+            "reports/test-strategy-report.json",
+            "reports/test-strategy-report.md",
             "frontend/coverage/vitals-coverage-report.json"
           ],
           "resources": [],
@@ -3868,7 +3952,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1093,
+      "logicalCases": 1121,
       "nodes": [
         {
           "id": "preflight",
@@ -3934,7 +4018,8 @@
             "frontend/package-lock.json"
           ],
           "writes": [
-            "reports/test-execution-artifacts/{profile}/frontend-static/dist"
+            "reports/test-execution-artifacts/{profile}/frontend-static/dist",
+            "reports/test-execution-artifacts/{profile}/frontend-static/result.json"
           ],
           "resources": [],
           "aggregator": false,
@@ -4361,6 +4446,8 @@
             "pytest:tests/test_test_execution_counts.py::test_report_shape_conforms_to_versioned_schema",
             "pytest:tests/test_test_execution_counts.py::test_script_entrypoint_uses_cli_arguments",
             "pytest:tests/test_test_execution_counts.py::test_two_consolidations_are_byte_identical_and_cli_writes_the_report",
+            "pytest:tests/test_test_execution_counts.py::test_versioned_global_reference_can_be_verified_without_replaying_suites",
+            "pytest:tests/test_test_execution_counts.py::test_versioned_reference_rejects_every_invalid_contract_shape",
             "pytest:tests/test_test_execution_profiles.py::test_command_mapping_and_batches_preserve_parallel_branches",
             "pytest:tests/test_test_execution_profiles.py::test_contract_and_inventory_shape_failures_are_reported",
             "pytest:tests/test_test_execution_profiles.py::test_dag_impossible_ready_set_and_quality_gate_cli_options",
@@ -4394,6 +4481,32 @@
             "pytest:tests/test_test_governance.py::test_runtime_governance_blocks_dynamic_ignores_blind_retries_and_quarantine_nonexecution",
             "pytest:tests/test_test_governance.py::test_script_entrypoint_uses_main",
             "pytest:tests/test_test_governance.py::test_versioned_contract_and_report_schemas_are_distinct_and_complete",
+            "pytest:tests/test_test_strategy_reporting.py::test_bundle_identity_is_stable_and_is_not_a_run_identity",
+            "pytest:tests/test_test_strategy_reporting.py::test_classification_axes_and_associations_do_not_claim_risk_control",
+            "pytest:tests/test_test_strategy_reporting.py::test_coverage_thresholds_and_e2e_freshness",
+            "pytest:tests/test_test_strategy_reporting.py::test_duplicate_node_json_is_rejected_as_materially_invalid",
+            "pytest:tests/test_test_strategy_reporting.py::test_execution_counts_keep_instances_attempts_retries_and_results_distinct",
+            "pytest:tests/test_test_strategy_reporting.py::test_future_dimensions_are_visible_non_blocking_and_strategy_incomplete",
+            "pytest:tests/test_test_strategy_reporting.py::test_global_reference_and_profile_execution_are_independent",
+            "pytest:tests/test_test_strategy_reporting.py::test_governance_zeroes_are_explicit_and_violation_is_non_compliant",
+            "pytest:tests/test_test_strategy_reporting.py::test_inconsistent_runtime_governance_failed_execution_and_node_are_violations",
+            "pytest:tests/test_test_strategy_reporting.py::test_invalid_and_missing_source_native_and_node_evidence",
+            "pytest:tests/test_test_strategy_reporting.py::test_invalid_governance_and_low_vital_are_reported",
+            "pytest:tests/test_test_strategy_reporting.py::test_main_profile_adapts_all_coverage_sources_and_five_vitals",
+            "pytest:tests/test_test_strategy_reporting.py::test_missing_node_result_is_not_inferred_from_ci_dependency",
+            "pytest:tests/test_test_strategy_reporting.py::test_module_entrypoint_and_schema_contract",
+            "pytest:tests/test_test_strategy_reporting.py::test_nominal_pr_model_is_strict_deterministic_and_honest",
+            "pytest:tests/test_test_strategy_reporting.py::test_pr_has_no_required_e2e_and_aggregate_does_not_require_itself",
+            "pytest:tests/test_test_strategy_reporting.py::test_profiles_keep_distinct_cumulative_compositions",
+            "pytest:tests/test_test_strategy_reporting.py::test_quality_gate_conclusion_priority",
+            "pytest:tests/test_test_strategy_reporting.py::test_remaining_inconsistency_and_violation_branches_are_structured",
+            "pytest:tests/test_test_strategy_reporting.py::test_renderers_normalize_paths_omit_wall_clock_and_share_one_model",
+            "pytest:tests/test_test_strategy_reporting.py::test_report_validator_rejects_unknown_fields_and_invalid_numbers",
+            "pytest:tests/test_test_strategy_reporting.py::test_reporting_is_planned_once_for_every_execution_profile",
+            "pytest:tests/test_test_strategy_reporting.py::test_stale_e2e_and_below_threshold_coverage_are_distinguished",
+            "pytest:tests/test_test_strategy_reporting.py::test_unknown_source_version_and_inventory_hash_are_incomplete",
+            "pytest:tests/test_test_strategy_reporting.py::test_validator_and_cli_error_paths_are_explicit",
+            "pytest:tests/test_test_strategy_reporting.py::test_write_reports_and_cli_do_not_launch_test_runners",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_metrics_below_threshold",
             "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_missing_matches",
             "pytest:tests/test_vitals_compliance.py::test_backend_aggregation_and_report_building_cover_each_source",
@@ -4412,18 +4525,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 439
+            "pytest": 467
           },
           "natures": {
             "component": 65,
             "contract": 43,
-            "integration": 163,
-            "unit": 168
+            "integration": 187,
+            "unit": 172
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 335
+            "unassigned": 363
           }
         },
         {
@@ -5186,18 +5299,25 @@
             "release-or-container-checks"
           ],
           "commands": [
-            "Aggregate execution evidence",
+            "Verify global execution count reference",
             "Vitals coverage report",
             "Vitals compliance",
-            "Test governance compliance"
+            "Test governance compliance",
+            "Test strategy reporting"
           ],
           "reads": [
-            "reports/test-execution-artifacts/{profile}"
+            "reports/test-execution-artifacts/{profile}",
+            "tests",
+            "frontend/src",
+            "frontend/tests/e2e",
+            "frontend/package-lock.json"
           ],
           "writes": [
             "reports/test-execution-counts.json",
             "reports/test-execution-plan.json",
             "reports/test-governance-report.json",
+            "reports/test-strategy-report.json",
+            "reports/test-strategy-report.md",
             "frontend/coverage/vitals-coverage-report.json"
           ],
           "resources": [],

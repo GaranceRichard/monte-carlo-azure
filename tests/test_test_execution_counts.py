@@ -135,6 +135,49 @@ def test_consolidation_separates_logical_instances_attempts_and_results(tmp_path
     assert report["classificationInventorySha256"] == hashlib.sha256(raw_inventory).hexdigest()
 
 
+def test_versioned_global_reference_can_be_verified_without_replaying_suites(
+    tmp_path: Path,
+) -> None:
+    _repository(tmp_path)
+    report = counts.consolidate(tmp_path)
+    counts.write_report(report, tmp_path / counts.DEFAULT_OUTPUT)
+
+    assert counts.validate_report_reference(tmp_path) == []
+    assert counts.main(["--root", str(tmp_path), "--check"]) == 0
+    changed = json.loads((tmp_path / counts.DEFAULT_OUTPUT).read_text(encoding="utf-8"))
+    changed["classificationInventorySha256"] = "0" * 64
+    counts.write_report(changed, tmp_path / counts.DEFAULT_OUTPUT)
+    assert any(
+        "inventory fingerprint" in item for item in counts.validate_report_reference(tmp_path)
+    )
+
+
+def test_versioned_reference_rejects_every_invalid_contract_shape(
+    tmp_path: Path,
+) -> None:
+    _repository(tmp_path)
+    report = counts.consolidate(tmp_path)
+    report["anomalies"] = ["unexpected"]
+    report["totals"]["logicalCases"] = 99
+    report["totals"]["collectedInstances"] += 1
+    report["logicalCases"] = list(reversed(report["logicalCases"]))
+    counts.write_report(report, tmp_path / counts.DEFAULT_OUTPUT)
+    errors = counts.validate_report_reference(tmp_path)
+    assert any("anomalies" in item for item in errors)
+    assert any("logical-case total" in item for item in errors)
+    assert any("logical-case details" in item for item in errors)
+    assert any("invariant" in item for item in errors)
+    assert counts.main(["--root", str(tmp_path), "--check"]) == 1
+
+    report["schemaVersion"] = "unknown"
+    counts.write_report(report, tmp_path / counts.DEFAULT_OUTPUT)
+    assert counts.validate_report_reference(tmp_path) == [
+        "Invalid versioned execution-count report schema."
+    ]
+    (tmp_path / counts.DEFAULT_OUTPUT).unlink()
+    assert "Unable to validate" in counts.validate_report_reference(tmp_path)[0]
+
+
 def test_two_consolidations_are_byte_identical_and_cli_writes_the_report(tmp_path: Path) -> None:
     _repository(tmp_path)
     first = counts.write_report(counts.consolidate(tmp_path), tmp_path / "first.json")
@@ -431,10 +474,6 @@ def test_setup_error(broken):
     assert by_id["tests/test_native.py::test_xfail"]["executed"] is True
     assert by_id["tests/test_native.py::test_setup_error"]["result"] == "infrastructureError"
     assert all(item["attempts"] == int(item["executed"]) for item in native["instances"])
-    assert all(
-        len(item["attemptResults"]) == item["attempts"] for item in native["instances"]
-    )
+    assert all(len(item["attemptResults"]) == item["attempts"] for item in native["instances"])
     assert by_id["tests/test_native.py::test_xfail"]["initialResult"] == "skipped"
-    assert by_id["tests/test_native.py::test_setup_error"]["finalResult"] == (
-        "infrastructureError"
-    )
+    assert by_id["tests/test_native.py::test_setup_error"]["finalResult"] == ("infrastructureError")

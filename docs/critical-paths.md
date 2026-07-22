@@ -148,9 +148,10 @@ réelle et le multi-worker ne sont pas maîtrisés. Traitement prévu par les PB
 ### CP-008 — Produire une preuve qualité fiable
 
 Important pour `RISK-020`, ce parcours orchestre couvertures, fraîcheur des artefacts, Vitals et ratchet. Il
-inclut maintenant classification, dénombrement et gouvernance des skips, quarantaines et retries. Il reste
-partiellement couvert tant que le mutation testing et le reporting stratégique complet ne sont pas en place.
-Traitement résiduel prévu par les PBI 1.10 et 6.3.
+inclut maintenant classification, dénombrement, gouvernance des skips, quarantaines et retries, ainsi qu'un
+reporting stratégique consolidé qui distingue conformité opérationnelle et complétude des preuves. Il reste
+partiellement couvert : le rapport rend le mutation testing et la démonstration complète du risque
+`not_measured` au lieu de les assimiler à une maîtrise. Traitement résiduel prévu par le PBI 6.3.
 
 ### CP-009 — Construire un historique ADO temporellement cohérent
 

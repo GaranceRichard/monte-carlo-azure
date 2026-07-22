@@ -1396,7 +1396,10 @@ def _execute_gate_plan(
         command_env,
         isolated_validation=isolated_validation,
     )
-    if not parallel and selected_node is None:
+    contract_available = (
+        validation_root / "config" / "test-execution-profiles.json"
+    ).is_file()
+    if not parallel and selected_node is None and not contract_available:
         has_frontend = any(command.argv[0] == NPM_COMMAND for command in plan.commands)
         if has_frontend:
             code = _ensure_frontend_dependencies()

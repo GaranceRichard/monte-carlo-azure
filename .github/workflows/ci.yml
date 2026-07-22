@@ -54,6 +54,11 @@ jobs:
           python Scripts/quality_gate.py ci
           --profile ${{ steps.profile.outputs.value }}
           --node preflight
+      - name: Upload preflight evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: preflight-${{ steps.profile.outputs.value }}
+          path: reports/test-execution-artifacts
 
   backend-static:
     needs: preflight
@@ -70,6 +75,11 @@ jobs:
           python Scripts/quality_gate.py ci
           --profile ${{ needs.preflight.outputs.profile }}
           --node backend-static
+      - name: Upload backend static evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-static-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
 
   frontend-static:
     needs: preflight
@@ -91,6 +101,11 @@ jobs:
           python Scripts/quality_gate.py ci
           --profile ${{ needs.preflight.outputs.profile }}
           --node frontend-static
+      - name: Upload frontend static evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-static-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
 
   backend-tests:
     needs: preflight
@@ -232,6 +247,13 @@ jobs:
           python Scripts/quality_gate.py ci
           --profile ${{ needs.preflight.outputs.profile }}
           --node aggregate
+      - name: Upload consolidated test-strategy reports
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-strategy-${{ needs.preflight.outputs.profile }}
+          path: |
+            reports/test-strategy-report.json
+            reports/test-strategy-report.md
 
   publish:
     needs: [aggregate]

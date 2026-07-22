@@ -1,0 +1,341 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/test-strategy-report/1.0.0",
+  "x-schemaVersion": "1.0.0",
+  "title": "Consolidated test-strategy evidence report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "schema",
+    "profile",
+    "evidenceBundleId",
+    "evidenceBundleIdentityDisclaimer",
+    "globalReference",
+    "profileExecution",
+    "strategicCoverage",
+    "evidenceManifest",
+    "conclusions"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "schema": { "const": "config/test-strategy-report.schema.json" },
+    "profile": { "$ref": "#/$defs/profile" },
+    "evidenceBundleId": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "evidenceBundleIdentityDisclaimer": { "type": "string", "minLength": 1 },
+    "globalReference": { "$ref": "#/$defs/globalReference" },
+    "profileExecution": { "$ref": "#/$defs/profileExecution" },
+    "strategicCoverage": {
+      "type": "array",
+      "minItems": 10,
+      "items": { "$ref": "#/$defs/dimension" }
+    },
+    "evidenceManifest": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "conclusions": { "$ref": "#/$defs/conclusions" }
+  },
+  "$defs": {
+    "profile": { "enum": ["pr", "main", "nightly", "release"] },
+    "evidenceStatus": {
+      "enum": [
+        "valid",
+        "missing",
+        "invalid",
+        "stale",
+        "inconsistent",
+        "not_applicable",
+        "not_measured"
+      ]
+    },
+    "nonNegativeInteger": { "type": "integer", "minimum": 0 },
+    "percentage": { "type": "number", "minimum": 0, "maximum": 100 },
+    "stringArray": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "countsByName": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/nonNegativeInteger" }
+    },
+    "reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "evidenceIds"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z0-9_.-]+$" },
+        "message": { "type": "string", "minLength": 1 },
+        "evidenceIds": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "reasons": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reason" }
+    },
+    "results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "failed", "skipped", "todo", "infrastructureError"],
+      "properties": {
+        "passed": { "$ref": "#/$defs/nonNegativeInteger" },
+        "failed": { "$ref": "#/$defs/nonNegativeInteger" },
+        "skipped": { "$ref": "#/$defs/nonNegativeInteger" },
+        "todo": { "$ref": "#/$defs/nonNegativeInteger" },
+        "infrastructureError": { "$ref": "#/$defs/nonNegativeInteger" }
+      }
+    },
+    "executionCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "logicalCases",
+        "collectedInstances",
+        "executedInstances",
+        "skippedInstances",
+        "attempts",
+        "retries",
+        "results"
+      ],
+      "properties": {
+        "logicalCases": { "$ref": "#/$defs/nonNegativeInteger" },
+        "collectedInstances": { "$ref": "#/$defs/nonNegativeInteger" },
+        "executedInstances": { "$ref": "#/$defs/nonNegativeInteger" },
+        "skippedInstances": { "$ref": "#/$defs/nonNegativeInteger" },
+        "attempts": { "$ref": "#/$defs/nonNegativeInteger" },
+        "retries": { "$ref": "#/$defs/nonNegativeInteger" },
+        "results": { "$ref": "#/$defs/results" }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "breakdowns",
+        "riskAssociations",
+        "criticalPathAssociations",
+        "associationDisclaimer",
+        "unresolvedCases",
+        "overrides"
+      ],
+      "properties": {
+        "breakdowns": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "framework", "nature", "purpose", "primaryProfile", "domain", "criticality"],
+          "properties": {
+            "status": { "$ref": "#/$defs/countsByName" },
+            "framework": { "$ref": "#/$defs/countsByName" },
+            "nature": { "$ref": "#/$defs/countsByName" },
+            "purpose": { "$ref": "#/$defs/countsByName" },
+            "primaryProfile": { "$ref": "#/$defs/countsByName" },
+            "domain": { "$ref": "#/$defs/countsByName" },
+            "criticality": { "$ref": "#/$defs/countsByName" }
+          }
+        },
+        "riskAssociations": { "$ref": "#/$defs/countsByName" },
+        "criticalPathAssociations": { "$ref": "#/$defs/countsByName" },
+        "associationDisclaimer": { "type": "string", "minLength": 1 },
+        "unresolvedCases": { "$ref": "#/$defs/stringArray" },
+        "overrides": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "profilePlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "includedProfiles", "logicalCases", "frameworks", "nodes"],
+      "properties": {
+        "profile": { "$ref": "#/$defs/profile" },
+        "includedProfiles": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/profile" }
+        },
+        "logicalCases": { "$ref": "#/$defs/nonNegativeInteger" },
+        "frameworks": { "$ref": "#/$defs/countsByName" },
+        "nodes": { "$ref": "#/$defs/countsByName" }
+      }
+    },
+    "globalReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inventory", "classification", "executionCounts", "profiles"],
+      "properties": {
+        "inventory": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256", "logicalCases"],
+          "properties": {
+            "path": { "const": "reports/test-classification-inventory.json" },
+            "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "logicalCases": { "$ref": "#/$defs/nonNegativeInteger" }
+          }
+        },
+        "classification": { "$ref": "#/$defs/classification" },
+        "executionCounts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "schemaVersion", "inventorySha256", "totals"],
+          "properties": {
+            "path": { "const": "reports/test-execution-counts.json" },
+            "schemaVersion": { "type": "string", "minLength": 1 },
+            "inventorySha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "totals": { "$ref": "#/$defs/executionCounts" }
+          }
+        },
+        "profiles": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": { "$ref": "#/$defs/profilePlan" }
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "required", "status", "evidencePath", "exitCode", "durationSeconds", "reasons"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "required": { "type": "boolean" },
+        "status": { "$ref": "#/$defs/evidenceStatus" },
+        "evidencePath": { "type": ["string", "null"] },
+        "exitCode": { "type": ["integer", "null"] },
+        "durationSeconds": { "type": ["number", "null"], "minimum": 0 },
+        "reasons": { "$ref": "#/$defs/reasons" }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skips", "disabled", "expectedFailures", "quarantines", "retries", "exemptions", "expirations", "violations", "instabilities", "instabilityRatePercent", "initialResults", "finalResults"],
+      "properties": {
+        "skips": { "$ref": "#/$defs/nonNegativeInteger" },
+        "disabled": { "$ref": "#/$defs/nonNegativeInteger" },
+        "expectedFailures": { "$ref": "#/$defs/nonNegativeInteger" },
+        "quarantines": { "$ref": "#/$defs/nonNegativeInteger" },
+        "retries": { "$ref": "#/$defs/nonNegativeInteger" },
+        "exemptions": { "$ref": "#/$defs/nonNegativeInteger" },
+        "expirations": { "$ref": "#/$defs/nonNegativeInteger" },
+        "violations": { "$ref": "#/$defs/nonNegativeInteger" },
+        "instabilities": { "$ref": "#/$defs/nonNegativeInteger" },
+        "instabilityRatePercent": { "$ref": "#/$defs/percentage" },
+        "initialResults": { "$ref": "#/$defs/results" },
+        "finalResults": { "$ref": "#/$defs/results" }
+      }
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "covered", "pct"],
+      "properties": {
+        "total": { "$ref": "#/$defs/nonNegativeInteger" },
+        "covered": { "$ref": "#/$defs/nonNegativeInteger" },
+        "pct": { "$ref": "#/$defs/percentage" }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "scope", "status", "source", "thresholdSource", "metrics", "thresholds", "reasons"],
+      "properties": {
+        "id": { "enum": ["python", "vitest", "e2e", "vitals"] },
+        "scope": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/evidenceStatus" },
+        "source": { "type": "string", "minLength": 1 },
+        "thresholdSource": { "type": "string", "minLength": 1 },
+        "metrics": { "type": "object", "additionalProperties": { "$ref": "#/$defs/metric" } },
+        "thresholds": { "type": "object", "additionalProperties": { "$ref": "#/$defs/percentage" } },
+        "reasons": { "$ref": "#/$defs/reasons" }
+      }
+    },
+    "profileExecution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "includedProfiles", "selectedLogicalCases", "logicalCaseIds", "byFramework", "nodes", "collectedInstances", "executedInstances", "skippedInstances", "attempts", "retries", "initialResults", "finalResults", "governance", "coverage", "vitals"],
+      "properties": {
+        "profile": { "$ref": "#/$defs/profile" },
+        "includedProfiles": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/profile" } },
+        "selectedLogicalCases": { "$ref": "#/$defs/nonNegativeInteger" },
+        "logicalCaseIds": { "$ref": "#/$defs/stringArray" },
+        "byFramework": { "type": "object", "additionalProperties": { "$ref": "#/$defs/executionCounts" } },
+        "nodes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/node" } },
+        "collectedInstances": { "$ref": "#/$defs/nonNegativeInteger" },
+        "executedInstances": { "$ref": "#/$defs/nonNegativeInteger" },
+        "skippedInstances": { "$ref": "#/$defs/nonNegativeInteger" },
+        "attempts": { "$ref": "#/$defs/nonNegativeInteger" },
+        "retries": { "$ref": "#/$defs/nonNegativeInteger" },
+        "initialResults": { "$ref": "#/$defs/results" },
+        "finalResults": { "$ref": "#/$defs/results" },
+        "governance": { "$ref": "#/$defs/governance" },
+        "coverage": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "$ref": "#/$defs/coverage" } },
+        "vitals": { "type": "array", "items": { "$ref": "#/$defs/vital" } }
+      }
+    },
+    "vitalSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "metrics"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "metrics": { "type": "object", "additionalProperties": { "$ref": "#/$defs/metric" } }
+      }
+    },
+    "vital": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "status", "threshold", "sources", "reasons"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^CP-[0-9]{3}$" },
+        "title": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["valid", "violation", "missing", "invalid", "stale"] },
+        "threshold": { "$ref": "#/$defs/percentage" },
+        "sources": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/vitalSource" } },
+        "reasons": { "$ref": "#/$defs/reasons" }
+      }
+    },
+    "dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "reasons"],
+      "properties": {
+        "id": { "enum": ["classification", "execution", "profiles", "governance", "coverage", "vitals", "durations", "trends", "mutation_testing", "critical_risk_demonstration"] },
+        "status": { "$ref": "#/$defs/evidenceStatus" },
+        "reasons": { "$ref": "#/$defs/reasons" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "producer", "scope", "requirement", "required", "presence", "validity", "freshness", "consistency", "fingerprint", "schemaVersion", "status", "reasons"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "path": { "type": "string", "minLength": 1 },
+        "producer": { "type": "string", "minLength": 1 },
+        "scope": { "enum": ["globalReference", "profileExecution", "strategicCoverage"] },
+        "requirement": { "enum": ["required", "informative", "not_applicable", "not_measured"] },
+        "required": { "type": "boolean" },
+        "presence": { "enum": ["present", "missing", "not_applicable", "not_measured"] },
+        "validity": { "enum": ["valid", "invalid", "unknown", "not_applicable", "not_measured"] },
+        "freshness": { "enum": ["current", "stale", "not_measurable", "not_applicable", "not_measured"] },
+        "consistency": { "enum": ["consistent", "inconsistent", "unknown", "not_applicable", "not_measured"] },
+        "fingerprint": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "schemaVersion": { "type": ["string", "integer", "null"] },
+        "status": { "$ref": "#/$defs/evidenceStatus" },
+        "reasons": { "$ref": "#/$defs/reasons" }
+      }
+    },
+    "conclusions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["qualityGateStatus", "qualityGateReasons", "strategyEvidenceStatus", "strategyEvidenceReasons"],
+      "properties": {
+        "qualityGateStatus": { "enum": ["compliant", "non_compliant", "incomplete_evidence"] },
+        "qualityGateReasons": { "$ref": "#/$defs/reasons" },
+        "strategyEvidenceStatus": { "enum": ["complete", "incomplete"] },
+        "strategyEvidenceReasons": { "$ref": "#/$defs/reasons" }
+      }
+    }
+  }
+}

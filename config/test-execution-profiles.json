@@ -63,7 +63,10 @@
       ],
       "profiles": ["pr", "main", "nightly", "release"],
       "reads": ["frontend/src", "frontend/package-lock.json"],
-      "writes": ["reports/test-execution-artifacts/{profile}/frontend-static/dist"],
+      "writes": [
+        "reports/test-execution-artifacts/{profile}/frontend-static/dist",
+        "reports/test-execution-artifacts/{profile}/frontend-static/result.json"
+      ],
       "resources": [],
       "aggregator": false
     },
@@ -143,10 +146,11 @@
         "release-or-container-checks"
       ],
       "commands": [
-        "Aggregate execution evidence",
+        "Verify global execution count reference",
         "Vitals coverage report",
         "Vitals compliance",
-        "Test governance compliance"
+        "Test governance compliance",
+        "Test strategy reporting"
       ],
       "profiles": ["pr", "main", "nightly", "release"],
       "reads": [
@@ -160,6 +164,8 @@
         "reports/test-execution-counts.json",
         "reports/test-execution-plan.json",
         "reports/test-governance-report.json",
+        "reports/test-strategy-report.json",
+        "reports/test-strategy-report.md",
         "frontend/coverage/vitals-coverage-report.json"
       ],
       "resources": [],

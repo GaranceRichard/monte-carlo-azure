@@ -17,7 +17,7 @@
 |    1.7 | Bloquer les classifications absentes ou invalides                    |      M     | Sol Très élevé | 18/07/2026 |
 |    1.8 | Recomposer les profils d’exécution CI/CD                             |      L     | Sol Très élevé | 18/07/2026 |
 |    1.9 | Gouverner les tests ignorés, intermittents et en quarantaine         |      M     | Sol Très élevé | 22/07/2026 |
-|   1.10 | Publier un reporting consolidé de la stratégie de test               |      L     |    Sol Élevé   |            |
+|   1.10 | Publier un reporting consolidé de la stratégie de test               |      L     |    Sol Élevé   | 22/07/2026 |
 
 ---
 
@@ -228,7 +228,7 @@
 
 |                                       Feature | Nombre de PBI | Réalisés |
 | --------------------------------------------: | ------------: | :------: |
-|                  1 — Preuve qualité gouvernée |            10 |     8    |
+|                  1 — Preuve qualité gouvernée |            10 |     10   |
 |             2 — Fiabilité du cœur statistique |             9 |          |
 |                 3 — Réutilisabilité du moteur |             5 |          |
 |            4 — Mise en production personnelle |             6 |          |
@@ -240,7 +240,7 @@
 |               10 — Expérience et restitutions |             9 |          |
 |                              11 — Scalabilité |             8 |          |
 |                    12 — Pilotage de programme |             7 |          |
-|                                     **Total** |    **92 PBI** |   **8**  |
+|                                     **Total** |    **92 PBI** |  **10**  |
 
 Aucun PBI n’est classé XL.
 
