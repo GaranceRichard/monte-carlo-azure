@@ -4549,6 +4549,21 @@
     "criticality": "critical"
   },
   {
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_command_environment_preserves_existing_values_without_mutating_input",
+    "framework": "pytest",
+    "sourcePath": "tests/test_quality_gate.py",
+    "selector": "test_command_environment_preserves_existing_values_without_mutating_input",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_quality_gate.py::test_complete_coverage_task_scripts_are_selectively_publishable",
     "framework": "pytest",
     "sourcePath": "tests/test_quality_gate.py",
@@ -5022,6 +5037,21 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_isolated_dag_execution_injects_the_host_python",
+    "framework": "pytest",
+    "sourcePath": "tests/test_quality_gate.py",
+    "selector": "test_isolated_dag_execution_injects_the_host_python",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_quality_gate.py::test_isolated_frontend_plan_reports_missing_host_dependencies",
     "framework": "pytest",
     "sourcePath": "tests/test_quality_gate.py",
@@ -5043,6 +5073,21 @@
     "framework": "pytest",
     "sourcePath": "tests/test_quality_gate.py",
     "selector": "test_isolated_frontend_plan_shares_one_dependency_exposure_and_cleans_it",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_isolated_sequential_execution_injects_the_host_python",
+    "framework": "pytest",
+    "sourcePath": "tests/test_quality_gate.py",
+    "selector": "test_isolated_sequential_execution_injects_the_host_python",
     "status": "classified",
     "executionProfile": "main",
     "nature": "integration",

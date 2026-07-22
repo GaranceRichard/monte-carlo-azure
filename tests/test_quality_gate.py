@@ -1232,6 +1232,86 @@ def test_fast_executes_composite_dod_identity_and_naming_from_snapshot(
     )
 
 
+def test_isolated_sequential_execution_injects_the_host_python(
+    tmp_path: Path, monkeypatch
+) -> None:
+    command = quality_gate.GateCommand("Check", ("python", "-V"), "Fix the check.")
+    plan = quality_gate.GateExecutionPlan(
+        context=quality_gate.build_change_context("push", ["README.md"]),
+        commands=(command,),
+        docker_smoke=False,
+    )
+    observed_environments: list[dict[str, str] | None] = []
+    monkeypatch.setattr(
+        quality_gate,
+        "_run_command",
+        lambda *_args, extra_env, **_kwargs: observed_environments.append(extra_env) or 0,
+    )
+
+    assert quality_gate._execute_gate_plan(
+        plan,
+        validation_root=tmp_path,
+        runtime_temp_root=tmp_path / ".tmp",
+        isolated_validation=True,
+    ) == 0
+    assert observed_environments == [{"MONTECARLO_E2E_PYTHON": sys.executable}]
+
+
+@pytest.mark.parametrize(
+    ("parallel", "selected_node"),
+    [(True, None), (False, "e2e")],
+    ids=("parallel", "selected-node"),
+)
+def test_isolated_dag_execution_injects_the_host_python(
+    tmp_path: Path, monkeypatch, parallel: bool, selected_node: str | None
+) -> None:
+    command = quality_gate.GateCommand("Check", ("python", "-V"), "Fix the check.")
+    plan = quality_gate.GateExecutionPlan(
+        context=quality_gate.build_change_context("push", ["README.md"]),
+        commands=(command,),
+        docker_smoke=False,
+    )
+    observed_options: dict[str, object] = {}
+
+    import Scripts.quality_gate_dag as quality_gate_dag
+
+    def fake_execute_gate_plan(*_args: object, **options: object) -> int:
+        observed_options.update(options)
+        return 0
+
+    monkeypatch.setattr(quality_gate_dag, "execute_gate_plan", fake_execute_gate_plan)
+
+    assert quality_gate._execute_gate_plan(
+        plan,
+        validation_root=tmp_path,
+        runtime_temp_root=tmp_path / ".tmp",
+        isolated_validation=True,
+        selected_node=selected_node,
+        parallel=parallel,
+    ) == 0
+    assert observed_options["command_env"] == {"MONTECARLO_E2E_PYTHON": sys.executable}
+
+
+@pytest.mark.parametrize("isolated_validation", [False, True])
+def test_command_environment_preserves_existing_values_without_mutating_input(
+    isolated_validation: bool,
+) -> None:
+    command_env = {"EXISTING": "value"}
+
+    environment = quality_gate._command_environment(
+        command_env,
+        isolated_validation=isolated_validation,
+    )
+
+    assert environment["EXISTING"] == "value"
+    if isolated_validation:
+        assert environment["MONTECARLO_E2E_PYTHON"] == sys.executable
+    else:
+        assert "MONTECARLO_E2E_PYTHON" not in environment
+    assert environment is not command_env
+    assert command_env == {"EXISTING": "value"}
+
+
 @pytest.mark.parametrize("failing_step", [None, "Frontend build"])
 def test_isolated_frontend_plan_shares_one_dependency_exposure_and_cleans_it(
     tmp_path: Path, monkeypatch, failing_step: str | None

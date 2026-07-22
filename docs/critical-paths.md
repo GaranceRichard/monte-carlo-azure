@@ -12,6 +12,8 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   artefacts frontend unitaire et E2E de l’exécution complète.
 - Une source vitale absente du rapport ou une métrique réellement mesurable sous 95 % bloque la conformité
   Vitals.
+- Les validations isolées de worktree transmettent explicitement l’interpréteur Python hôte au serveur
+  Playwright (`MONTECARLO_E2E_PYTHON`) dans les chemins séquentiel, parallèle du DAG et de nœud sélectionné.
 
 ## Liste officielle des points vitaux
 

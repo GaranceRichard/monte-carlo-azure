@@ -30,6 +30,9 @@ restent applicables.
 - Le pré-push lit les références transmises par Git, calcule les commits introduits et valide chaque SHA
   terminal distinct dans un worktree détaché temporaire. Il n’utilise aucun stash et ignore le workspace
   courant.
+- Toute validation isolée transmet `MONTECARLO_E2E_PYTHON` avec l’interpréteur Python hôte à chaque chemin
+  d’exécution : séquence, branches parallèles du DAG et nœud sélectionné. Le serveur Playwright du worktree
+  réutilise ainsi explicitement les dépendances Python hôte.
 - La CI résout explicitement `pr`, `main`, `nightly` ou `release`, puis exécute
   `python Scripts/quality_gate.py ci --profile <profil> --node <nœud>` dans plusieurs jobs. `preflight`
   précède les branches indépendantes et `aggregate` dépend de toutes les branches.

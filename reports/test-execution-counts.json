@@ -1,15 +1,15 @@
 {
   "schemaVersion": "1.0.0",
-  "classificationInventorySha256": "f87f77c11dddc7bccc188c003d0c2722ce2cb40755e7957600ee3edf532bbdbb",
+  "classificationInventorySha256": "7e45861451eb7e62b214bad1a8561290585511d5565010e58de25e5bda464209",
   "totals": {
-    "logicalCases": 1091,
-    "collectedInstances": 1198,
-    "executedInstances": 1198,
+    "logicalCases": 1094,
+    "collectedInstances": 1203,
+    "executedInstances": 1203,
     "skippedInstances": 0,
-    "attempts": 1198,
+    "attempts": 1203,
     "retries": 0,
     "results": {
-      "passed": 1198,
+      "passed": 1203,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -33,14 +33,14 @@
       }
     },
     "pytest": {
-      "logicalCases": 437,
-      "collectedInstances": 515,
-      "executedInstances": 515,
+      "logicalCases": 440,
+      "collectedInstances": 520,
+      "executedInstances": 520,
       "skippedInstances": 0,
-      "attempts": 515,
+      "attempts": 520,
       "retries": 0,
       "results": {
-        "passed": 515,
+        "passed": 520,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -65,14 +65,14 @@
   },
   "classificationStatuses": {
     "classified": {
-      "logicalCases": 1091,
-      "collectedInstances": 1198,
-      "executedInstances": 1198,
+      "logicalCases": 1094,
+      "collectedInstances": 1203,
+      "executedInstances": 1203,
       "skippedInstances": 0,
-      "attempts": 1198,
+      "attempts": 1203,
       "retries": 0,
       "results": {
-        "passed": 1198,
+        "passed": 1203,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -127,14 +127,14 @@
       }
     },
     "integration": {
-      "logicalCases": 163,
-      "collectedInstances": 185,
-      "executedInstances": 185,
+      "logicalCases": 165,
+      "collectedInstances": 188,
+      "executedInstances": 188,
       "skippedInstances": 0,
-      "attempts": 185,
+      "attempts": 188,
       "retries": 0,
       "results": {
-        "passed": 185,
+        "passed": 188,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -142,14 +142,14 @@
       }
     },
     "unit": {
-      "logicalCases": 462,
-      "collectedInstances": 522,
-      "executedInstances": 522,
+      "logicalCases": 463,
+      "collectedInstances": 524,
+      "executedInstances": 524,
       "skippedInstances": 0,
-      "attempts": 522,
+      "attempts": 524,
       "retries": 0,
       "results": {
-        "passed": 522,
+        "passed": 524,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -159,14 +159,14 @@
   },
   "executionProfiles": {
     "pr": {
-      "logicalCases": 916,
-      "collectedInstances": 1001,
-      "executedInstances": 1001,
+      "logicalCases": 917,
+      "collectedInstances": 1003,
+      "executedInstances": 1003,
       "skippedInstances": 0,
-      "attempts": 1001,
+      "attempts": 1003,
       "retries": 0,
       "results": {
-        "passed": 1001,
+        "passed": 1003,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -174,14 +174,14 @@
       }
     },
     "main": {
-      "logicalCases": 172,
-      "collectedInstances": 194,
-      "executedInstances": 194,
+      "logicalCases": 174,
+      "collectedInstances": 197,
+      "executedInstances": 197,
       "skippedInstances": 0,
-      "attempts": 194,
+      "attempts": 197,
       "retries": 0,
       "results": {
-        "passed": 194,
+        "passed": 197,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -5303,6 +5303,28 @@
       }
     },
     {
+      "logicalCaseId": "pytest:tests/test_quality_gate.py::test_command_environment_preserves_existing_values_without_mutating_input",
+      "framework": "pytest",
+      "sourcePath": "tests/test_quality_gate.py",
+      "selector": "test_command_environment_preserves_existing_values_without_mutating_input",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 2,
+      "executedInstances": 2,
+      "skippedInstances": 0,
+      "attempts": 2,
+      "retries": 0,
+      "results": {
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
       "logicalCaseId": "pytest:tests/test_quality_gate.py::test_complete_coverage_task_scripts_are_selectively_publishable",
       "framework": "pytest",
       "sourcePath": "tests/test_quality_gate.py",
@@ -5919,6 +5941,28 @@
       }
     },
     {
+      "logicalCaseId": "pytest:tests/test_quality_gate.py::test_isolated_dag_execution_injects_the_host_python",
+      "framework": "pytest",
+      "sourcePath": "tests/test_quality_gate.py",
+      "selector": "test_isolated_dag_execution_injects_the_host_python",
+      "classificationStatus": "classified",
+      "executionProfile": "main",
+      "nature": "integration",
+      "logicalCases": 1,
+      "collectedInstances": 2,
+      "executedInstances": 2,
+      "skippedInstances": 0,
+      "attempts": 2,
+      "retries": 0,
+      "results": {
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
       "logicalCaseId": "pytest:tests/test_quality_gate.py::test_isolated_frontend_plan_reports_missing_host_dependencies",
       "framework": "pytest",
       "sourcePath": "tests/test_quality_gate.py",
@@ -5956,6 +6000,28 @@
       "retries": 0,
       "results": {
         "passed": 2,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "pytest:tests/test_quality_gate.py::test_isolated_sequential_execution_injects_the_host_python",
+      "framework": "pytest",
+      "sourcePath": "tests/test_quality_gate.py",
+      "selector": "test_isolated_sequential_execution_injects_the_host_python",
+      "classificationStatus": "classified",
+      "executionProfile": "main",
+      "nature": "integration",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
         "failed": 0,
         "skipped": 0,
         "todo": 0,

@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 916,
+      "logicalCases": 917,
       "nodes": [
         {
           "id": "preflight",
@@ -265,6 +265,7 @@
             "pytest:tests/test_quality_gate.py::test_change_context_rejects_unknown_modes",
             "pytest:tests/test_quality_gate.py::test_ci_mode_statically_keeps_the_docker_smoke",
             "pytest:tests/test_quality_gate.py::test_combined_backend_and_frontend_change_aggregates_without_cross_domain_suites",
+            "pytest:tests/test_quality_gate.py::test_command_environment_preserves_existing_values_without_mutating_input",
             "pytest:tests/test_quality_gate.py::test_complete_coverage_task_scripts_are_selectively_publishable",
             "pytest:tests/test_quality_gate.py::test_docker_http_smoke_reports_protocol_failures",
             "pytest:tests/test_quality_gate.py::test_docker_smoke_retries_a_transient_connection_reset",
@@ -408,18 +409,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 294
+            "pytest": 295
           },
           "natures": {
             "component": 65,
             "contract": 43,
             "integration": 20,
-            "unit": 166
+            "unit": 167
           },
           "criticalities": {
             "critical": 71,
             "high": 16,
-            "unassigned": 207
+            "unassigned": 208
           }
         },
         {
@@ -1172,7 +1173,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1088,
+      "logicalCases": 1091,
       "nodes": [
         {
           "id": "preflight",
@@ -1474,6 +1475,7 @@
             "pytest:tests/test_quality_gate.py::test_change_context_rejects_unknown_modes",
             "pytest:tests/test_quality_gate.py::test_ci_mode_statically_keeps_the_docker_smoke",
             "pytest:tests/test_quality_gate.py::test_combined_backend_and_frontend_change_aggregates_without_cross_domain_suites",
+            "pytest:tests/test_quality_gate.py::test_command_environment_preserves_existing_values_without_mutating_input",
             "pytest:tests/test_quality_gate.py::test_complete_coverage_task_scripts_are_selectively_publishable",
             "pytest:tests/test_quality_gate.py::test_detached_worktree_cleanup_runs_after_success_and_failure",
             "pytest:tests/test_quality_gate.py::test_docker_http_smoke_reports_protocol_failures",
@@ -1502,8 +1504,10 @@
             "pytest:tests/test_quality_gate.py::test_invalid_staged_readme_and_code_are_blocked_even_if_workspace_is_valid",
             "pytest:tests/test_quality_gate.py::test_is_windows_matches_the_host_platform",
             "pytest:tests/test_quality_gate.py::test_isolated_backend_test_selects_only_that_test_and_no_frontend",
+            "pytest:tests/test_quality_gate.py::test_isolated_dag_execution_injects_the_host_python",
             "pytest:tests/test_quality_gate.py::test_isolated_frontend_plan_reports_missing_host_dependencies",
             "pytest:tests/test_quality_gate.py::test_isolated_frontend_plan_shares_one_dependency_exposure_and_cleans_it",
+            "pytest:tests/test_quality_gate.py::test_isolated_sequential_execution_injects_the_host_python",
             "pytest:tests/test_quality_gate.py::test_isolated_validation_rejects_a_runtime_temp_descendant",
             "pytest:tests/test_quality_gate.py::test_link_rethrow_unexpected_exposure_and_cleanup_propagation",
             "pytest:tests/test_quality_gate.py::test_local_backend_module_selects_its_direct_test",
@@ -1711,18 +1715,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 434
+            "pytest": 437
           },
           "natures": {
             "component": 65,
             "contract": 43,
-            "integration": 160,
-            "unit": 166
+            "integration": 162,
+            "unit": 167
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 330
+            "unassigned": 333
           }
         },
         {
@@ -2516,7 +2520,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1089,
+      "logicalCases": 1092,
       "nodes": [
         {
           "id": "preflight",
@@ -2818,6 +2822,7 @@
             "pytest:tests/test_quality_gate.py::test_change_context_rejects_unknown_modes",
             "pytest:tests/test_quality_gate.py::test_ci_mode_statically_keeps_the_docker_smoke",
             "pytest:tests/test_quality_gate.py::test_combined_backend_and_frontend_change_aggregates_without_cross_domain_suites",
+            "pytest:tests/test_quality_gate.py::test_command_environment_preserves_existing_values_without_mutating_input",
             "pytest:tests/test_quality_gate.py::test_complete_coverage_task_scripts_are_selectively_publishable",
             "pytest:tests/test_quality_gate.py::test_detached_worktree_cleanup_runs_after_success_and_failure",
             "pytest:tests/test_quality_gate.py::test_docker_http_smoke_reports_protocol_failures",
@@ -2846,8 +2851,10 @@
             "pytest:tests/test_quality_gate.py::test_invalid_staged_readme_and_code_are_blocked_even_if_workspace_is_valid",
             "pytest:tests/test_quality_gate.py::test_is_windows_matches_the_host_platform",
             "pytest:tests/test_quality_gate.py::test_isolated_backend_test_selects_only_that_test_and_no_frontend",
+            "pytest:tests/test_quality_gate.py::test_isolated_dag_execution_injects_the_host_python",
             "pytest:tests/test_quality_gate.py::test_isolated_frontend_plan_reports_missing_host_dependencies",
             "pytest:tests/test_quality_gate.py::test_isolated_frontend_plan_shares_one_dependency_exposure_and_cleans_it",
+            "pytest:tests/test_quality_gate.py::test_isolated_sequential_execution_injects_the_host_python",
             "pytest:tests/test_quality_gate.py::test_isolated_validation_rejects_a_runtime_temp_descendant",
             "pytest:tests/test_quality_gate.py::test_link_rethrow_unexpected_exposure_and_cleanup_propagation",
             "pytest:tests/test_quality_gate.py::test_local_backend_module_selects_its_direct_test",
@@ -3056,18 +3063,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 435
+            "pytest": 438
           },
           "natures": {
             "component": 65,
             "contract": 43,
-            "integration": 160,
-            "unit": 167
+            "integration": 162,
+            "unit": 168
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 331
+            "unassigned": 334
           }
         },
         {
@@ -3861,7 +3868,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1090,
+      "logicalCases": 1093,
       "nodes": [
         {
           "id": "preflight",
@@ -4163,6 +4170,7 @@
             "pytest:tests/test_quality_gate.py::test_change_context_rejects_unknown_modes",
             "pytest:tests/test_quality_gate.py::test_ci_mode_statically_keeps_the_docker_smoke",
             "pytest:tests/test_quality_gate.py::test_combined_backend_and_frontend_change_aggregates_without_cross_domain_suites",
+            "pytest:tests/test_quality_gate.py::test_command_environment_preserves_existing_values_without_mutating_input",
             "pytest:tests/test_quality_gate.py::test_complete_coverage_task_scripts_are_selectively_publishable",
             "pytest:tests/test_quality_gate.py::test_detached_worktree_cleanup_runs_after_success_and_failure",
             "pytest:tests/test_quality_gate.py::test_docker_http_smoke_reports_protocol_failures",
@@ -4191,8 +4199,10 @@
             "pytest:tests/test_quality_gate.py::test_invalid_staged_readme_and_code_are_blocked_even_if_workspace_is_valid",
             "pytest:tests/test_quality_gate.py::test_is_windows_matches_the_host_platform",
             "pytest:tests/test_quality_gate.py::test_isolated_backend_test_selects_only_that_test_and_no_frontend",
+            "pytest:tests/test_quality_gate.py::test_isolated_dag_execution_injects_the_host_python",
             "pytest:tests/test_quality_gate.py::test_isolated_frontend_plan_reports_missing_host_dependencies",
             "pytest:tests/test_quality_gate.py::test_isolated_frontend_plan_shares_one_dependency_exposure_and_cleans_it",
+            "pytest:tests/test_quality_gate.py::test_isolated_sequential_execution_injects_the_host_python",
             "pytest:tests/test_quality_gate.py::test_isolated_validation_rejects_a_runtime_temp_descendant",
             "pytest:tests/test_quality_gate.py::test_link_rethrow_unexpected_exposure_and_cleanup_propagation",
             "pytest:tests/test_quality_gate.py::test_local_backend_module_selects_its_direct_test",
@@ -4402,18 +4412,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 436
+            "pytest": 439
           },
           "natures": {
             "component": 65,
             "contract": 43,
-            "integration": 161,
-            "unit": 167
+            "integration": 163,
+            "unit": 168
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 332
+            "unassigned": 335
           }
         },
         {

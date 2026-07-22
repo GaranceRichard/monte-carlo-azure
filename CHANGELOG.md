@@ -4,6 +4,9 @@
 
 ### Qualité et outillage
 
+- correction du pré-push isolé : tous les chemins d’exécution du DAG (séquentiel, parallèle et nœud
+  sélectionné) transmettent explicitement `MONTECARLO_E2E_PYTHON` avec l’interpréteur Python hôte au
+  worktree, ce qui permet au serveur Playwright de retrouver `uvicorn` sans modifier les dépendances
 - ajout du contrat indépendant `config/test-governance.json` et de son schéma pour gouverner par cas logique
   les skips, désactivations, expected failures, quarantaines et retries de Pytest, Vitest et Playwright, avec
   responsables, tickets, risques, échéances et mesure compensatoire obligatoire pour une quarantaine critique

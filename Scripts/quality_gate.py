@@ -1349,6 +1349,18 @@ def _run_docker_smoke() -> int:
     return 0
 
 
+def _command_environment(
+    command_env: dict[str, str] | None,
+    *,
+    isolated_validation: bool,
+) -> dict[str, str]:
+    """Build the command environment without mutating the caller's mapping."""
+    environment = dict(command_env or {})
+    if isolated_validation:
+        environment["MONTECARLO_E2E_PYTHON"] = sys.executable
+    return environment
+
+
 def _execute_commands_sequentially(
     plan: GateExecutionPlan,
     *,
@@ -1357,16 +1369,13 @@ def _execute_commands_sequentially(
     isolated_validation: bool,
     command_env: dict[str, str] | None = None,
 ) -> int:
-    execution_env = dict(command_env or {})
-    if isolated_validation:
-        execution_env["MONTECARLO_E2E_PYTHON"] = sys.executable
     for command in plan.commands:
         code = _run_command(
             command,
             validation_root=validation_root,
             runtime_temp_root=runtime_temp_root,
             isolated_validation=isolated_validation,
-            extra_env=execution_env or None,
+            extra_env=command_env or None,
         )
         if code:
             return code
@@ -1383,6 +1392,10 @@ def _execute_gate_plan(
     selected_node: str | None = None,
     parallel: bool = False,
 ) -> int:
+    execution_env = _command_environment(
+        command_env,
+        isolated_validation=isolated_validation,
+    )
     if not parallel and selected_node is None:
         has_frontend = any(command.argv[0] == NPM_COMMAND for command in plan.commands)
         if has_frontend:
@@ -1401,7 +1414,7 @@ def _execute_gate_plan(
                     validation_root=validation_root,
                     runtime_temp_root=runtime_temp_root,
                     isolated_validation=isolated_validation,
-                    command_env=command_env,
+                    command_env=execution_env,
                 )
         except OSError as exc:
             print(f"ERROR: unable to expose frontend dependencies: {exc}", file=sys.stderr)
@@ -1414,7 +1427,7 @@ def _execute_gate_plan(
         validation_root=validation_root,
         runtime_temp_root=runtime_temp_root,
         isolated_validation=isolated_validation,
-        command_env=command_env,
+        command_env=execution_env,
         selected_node=selected_node,
         parallel=parallel,
     )

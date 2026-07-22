@@ -491,6 +491,10 @@ Ce seam couvre aussi le retry des suppressions read-only : les branches Windows 
 par des tests unitaires sur tous les systèmes. Les seuls skips de plateforme conservés vérifient les
 attributs read-only réels de Windows et ne laissent aucune ligne Python non couverte sous Linux.
 
+Dans toute validation isolée, la gate transmet aussi `MONTECARLO_E2E_PYTHON` avec l’interpréteur Python
+hôte aux chemins séquentiel, parallèle et de nœud sélectionné, afin que le serveur Playwright du worktree
+réutilise les dépendances Python hôte.
+
 Dans un plan complet `main`, `nightly` ou `release`, les suites avec couverture remplacent les mêmes suites simples :
 Pytest n’est pas exécuté une première fois sans couverture, et Vitest n’est pas exécuté une première fois
 via `test:unit`. L’ordre interne de chaque nœud reste déterministe ; les nœuds indépendants ne sont plus

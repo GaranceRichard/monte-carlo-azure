@@ -415,6 +415,11 @@ Les sources de changement sont distinctes : index Git pour le pré-commit, commi
 pré-push, checkout de travail pour la CI. Le pré-push valide chaque SHA terminal distinct dans un worktree
 détaché temporaire et n’utilise pas le workspace courant.
 
+Pour toute validation isolée, l’environnement de commande commun fixe explicitement
+`MONTECARLO_E2E_PYTHON` sur l’interpréteur Python hôte. Cette règle est appliquée de façon identique à la
+séquence, aux branches parallèles du DAG et à l’exécution d’un nœud sélectionné, afin que le serveur
+Playwright du worktree utilise les dépendances Python hôte.
+
 Dans un worktree détaché, les dépendances frontend installées sont exposées par un lien symbolique. Si sa
 création échoue sous Windows, la gate utilise une jonction `cmd.exe /c mklink /J` ; sous POSIX, l’erreur du
 lien symbolique est propagée. La décision de plateforme est isolée derrière `_is_windows()` afin que les
