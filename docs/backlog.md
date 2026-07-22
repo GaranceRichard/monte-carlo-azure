@@ -229,7 +229,7 @@
 |                                       Feature | Nombre de PBI | Réalisés |
 | --------------------------------------------: | ------------: | :------: |
 |                  1 — Preuve qualité gouvernée |            10 |     10   |
-|             2 — Fiabilité du cœur statistique |             9 |          |
+|             2 — Fiabilité du cœur statistique |             9 |      1   |
 |                 3 — Réutilisabilité du moteur |             5 |          |
 |            4 — Mise en production personnelle |             6 |          |
 |            5 — Valeur d’usage du portefeuille |             3 |          |
@@ -240,7 +240,7 @@
 |               10 — Expérience et restitutions |             9 |          |
 |                              11 — Scalabilité |             8 |          |
 |                    12 — Pilotage de programme |             7 |          |
-|                                     **Total** |    **92 PBI** |  **10**  |
+|                                     **Total** |    **92 PBI** |  **11**  |
 
 Aucun PBI n’est classé XL.
 
