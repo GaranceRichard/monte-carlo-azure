@@ -686,6 +686,17 @@ def test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate() -> 
     assert aggregate.count("actions/download-artifact@v8") == 1
     assert aggregate.count("path: reports/test-execution-artifacts") == 1
     assert "merge-multiple: true" in aggregate
+    assert "actions/setup-node@v6" in aggregate
+    assert 'node-version: "22"' in aggregate
+    assert "cache: npm" in aggregate
+    assert "cache-dependency-path: frontend/package-lock.json" in aggregate
+    assert "npm --prefix frontend ci" in aggregate
+    assert aggregate.index("actions/setup-node@v6") < aggregate.index(
+        "npm --prefix frontend ci"
+    )
+    assert aggregate.index("npm --prefix frontend ci") < aggregate.index(
+        "python Scripts/quality_gate.py ci"
+    )
 
     assert "schedule:" in workflow
     assert "release:" in workflow

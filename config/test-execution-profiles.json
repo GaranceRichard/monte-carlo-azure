@@ -149,7 +149,13 @@
         "Test governance compliance"
       ],
       "profiles": ["pr", "main", "nightly", "release"],
-      "reads": ["reports/test-execution-artifacts/{profile}"],
+      "reads": [
+        "reports/test-execution-artifacts/{profile}",
+        "tests",
+        "frontend/src",
+        "frontend/tests/e2e",
+        "frontend/package-lock.json"
+      ],
       "writes": [
         "reports/test-execution-counts.json",
         "reports/test-execution-plan.json",

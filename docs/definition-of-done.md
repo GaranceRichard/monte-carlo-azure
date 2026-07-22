@@ -48,6 +48,8 @@ restent applicables.
 - Tous les jobs producteurs uploadent `reports/test-execution-artifacts`. `aggregate` télécharge et fusionne
   les preuves dans ce même répertoire, puis le promoteur retrouve les artefacts backend, Vitest et E2E sous
   leur arborescence versionnée par profil et nœud.
+- Le job `aggregate` installe Node 22 et les dépendances verrouillées par `frontend/package-lock.json` avant
+  son agrégateur final : le contrôle de gouvernance redécouvre les tests Vitest et Playwright avec TypeScript.
 
 ## 3. Vérifications obligatoires
 

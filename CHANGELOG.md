@@ -4,6 +4,8 @@
 
 ### Qualité et outillage
 
+- correction du job CI `aggregate` : Node 22, le cache npm et `npm --prefix frontend ci` sont préparés avant
+  l’agrégateur final, afin que la gouvernance des tests redécouvre Vitest et Playwright avec TypeScript
 - correction du pré-push isolé : tous les chemins d’exécution du DAG (séquentiel, parallèle et nœud
   sélectionné) transmettent explicitement `MONTECARLO_E2E_PYTHON` avec l’interpréteur Python hôte au
   worktree, ce qui permet au serveur Playwright de retrouver `uvicorn` sans modifier les dépendances

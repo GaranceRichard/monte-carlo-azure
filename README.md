@@ -330,6 +330,8 @@ active le cache npm puis exécute `npm --prefix frontend ci` avant la quality ga
 classification peuvent ainsi charger `frontend/node_modules/typescript/lib/typescript.js` et importer
 `frontend/playwright.config.js`, qui dépend de `@playwright/test`. Ce job n’installe pas les navigateurs
 Playwright : cette responsabilité reste limitée au job `e2e`.
+Le job `aggregate` configure également Node 22, le cache npm et ces dépendances avant son agrégateur final,
+car le contrôle de gouvernance redécouvre les tests Vitest et Playwright avec TypeScript.
 
 Les jobs producteurs publient tous `reports/test-execution-artifacts`. Le job `aggregate` télécharge et
 fusionne leurs preuves directement dans ce même répertoire, afin de reconstituer
