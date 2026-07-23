@@ -92,7 +92,7 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
   }, [riskScoreValue]);
 
   const reliability =
-    s.result?.throughput_reliability ??
+    s.result?.throughputReliability ??
     computeThroughputReliability((s.throughputData ?? []).map((point) => point.throughput));
   const reliabilityNotice = getProjectionReliabilityNotice(reliability);
 
@@ -113,7 +113,7 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
       includeZeroWeeks: s.includeZeroWeeks,
       adoDataWarning: s.warning,
       percentiles: s.displayPercentiles,
-      completionSummary: s.result?.completion_summary,
+      completionSummary: s.result?.completionSummary,
       riskScore: riskScoreValue,
       throughputReliability: reliability,
       selectedOrg: s.selectedOrg,
@@ -200,11 +200,11 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
         <div className="space-y-2">
           {decisionDiagnostic && <DecisionDiagnostic diagnostic={decisionDiagnostic} />}
           <div className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Percentiles</div>
-          {s.result.completion_summary && s.result.completion_summary.censored_count > 0 && (
+          {s.result.completionSummary && s.result.completionSummary.censoredCount > 0 && (
             <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-950">
-              Horizon de simulation: {s.result.completion_summary.horizon_weeks} semaines.{" "}
-              {s.result.completion_summary.censored_count}/{s.result.completion_summary.completed_count + s.result.completion_summary.censored_count} simulations
-              {" "}n'ont pas termine ({formatCoefficient(s.result.completion_summary.censored_rate)}). La distribution ne montre que les simulations terminees et un percentile absent signifie qu'il n'est pas identifiable avant l'horizon.
+              Horizon de simulation: {s.result.completionSummary.horizonWeeks} semaines.{" "}
+              {s.result.completionSummary.censoredCount}/{s.result.completionSummary.completedCount + s.result.completionSummary.censoredCount} simulations
+              {" "}n'ont pas termine ({formatCoefficient(s.result.completionSummary.censoredRate)}). La distribution ne montre que les simulations terminees et un percentile absent signifie qu'il n'est pas identifiable avant l'horizon.
             </div>
           )}
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -217,7 +217,7 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
               >
                 <span className="block text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{k}</span>
                 <span className="mt-1 block whitespace-nowrap text-sm font-extrabold leading-tight text-[var(--text)]">
-                  {s.displayPercentiles?.[k]} {s.result?.result_kind === "items" ? "items" : "sem"}
+                  {s.displayPercentiles?.[k]} {s.result?.resultKind === "items" ? "items" : "sem"}
                 </span>
               </div>
             ))}

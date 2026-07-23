@@ -22,12 +22,12 @@ const throughputData = {
 };
 
 const simulationResult = {
-  result_kind: "weeks" as const,
-  samples_count: 100,
+  resultKind: "weeks" as const,
+  samplesCount: 100,
   seed: 123456,
-  risk_score: 0.3,
-  result_percentiles: { P50: 10, P70: 12, P90: 15 },
-  result_distribution: [{ x: 10, count: 25 }],
+  riskScore: 0.3,
+  resultPercentiles: { P50: 10, P70: 12, P90: 15 },
+  resultDistribution: [{ x: 10, count: 25 }],
 };
 
 function setupReportHook(overrides: Partial<Parameters<typeof usePortfolioReport>[0]> = {}) {
@@ -136,9 +136,9 @@ describe("usePortfolioReport", () => {
     const monteCarloResult = {
       ...simulationResult,
       seed: 24680,
-      risk_score: 0.42,
-      result_percentiles: { P50: 11, P70: 13, P90: 17 },
-      result_distribution: [
+      riskScore: 0.42,
+      resultPercentiles: { P50: 11, P70: 13, P90: 17 },
+      resultDistribution: [
         { x: 11, count: 40 },
         { x: 17, count: 60 },
       ],
@@ -154,11 +154,11 @@ describe("usePortfolioReport", () => {
     expect(exportArgs.scenarios).toHaveLength(4);
     for (const scenario of exportArgs.scenarios) {
       expect(scenario.seed).toBe(monteCarloResult.seed);
-      expect(scenario.percentiles).toEqual(monteCarloResult.result_percentiles);
-      expect(scenario.distribution).toEqual(monteCarloResult.result_distribution);
+      expect(scenario.percentiles).toEqual(monteCarloResult.resultPercentiles);
+      expect(scenario.distribution).toEqual(monteCarloResult.resultDistribution);
       expect(scenario.riskScore).toBe(computeRiskScoreFromPercentiles(
         "backlog_to_weeks",
-        monteCarloResult.result_percentiles,
+        monteCarloResult.resultPercentiles,
       ));
     }
     expect(result.current.portfolioComparisonDiagnostic).not.toBeNull();
@@ -316,12 +316,12 @@ describe("usePortfolioReport", () => {
   it("computes section riskScore from business percentiles when result_kind is items", async () => {
     vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
     vi.mocked(simulateForecastFromSamples).mockResolvedValue({
-      result_kind: "items",
-      samples_count: 100,
+      resultKind: "items",
+      samplesCount: 100,
       seed: 98765,
-      risk_score: 0,
-      result_percentiles: { P50: 24, P70: 22, P90: 18 },
-      result_distribution: [
+      riskScore: 0,
+      resultPercentiles: { P50: 24, P70: 22, P90: 18 },
+      resultDistribution: [
         { x: 10, count: 10 },
         { x: 20, count: 80 },
         { x: 30, count: 10 },
@@ -491,11 +491,11 @@ describe("usePortfolioReport", () => {
     vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
     vi.mocked(simulateForecastFromSamples).mockResolvedValue({
       ...simulationResult,
-      risk_score: undefined,
-      result_kind: "items",
+      riskScore: undefined,
+      resultKind: "items",
       seed: 54321,
-      result_percentiles: { P50: 24, P70: 22, P90: 18 },
-      result_distribution: [
+      resultPercentiles: { P50: 24, P70: 22, P90: 18 },
+      resultDistribution: [
         { x: 10, count: 10 },
         { x: 20, count: 80 },
         { x: 30, count: 10 },

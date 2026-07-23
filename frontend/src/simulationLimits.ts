@@ -1,4 +1,4 @@
-import type { ForecastMode } from "./types";
+import type { SimulationMode } from "./domain/simulation";
 
 export const SIMULATION_N_SIMS_MIN = 1_000;
 export const SIMULATION_N_SIMS_MAX = 200_000;
@@ -45,7 +45,7 @@ export function validateSimulationInputContract({
 }: {
   throughputSamples: number[];
   includeZeroWeeks?: boolean;
-  mode: ForecastMode;
+  mode: SimulationMode;
   backlogSize?: number | string;
   targetWeeks?: number | string;
   nSims: number | string;

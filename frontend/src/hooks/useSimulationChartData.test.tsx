@@ -48,11 +48,11 @@ describe("useSimulationChartData", () => {
         cycleTimeDaysData: [],
         includeZeroWeeks: true,
         result: {
-          result_kind: "weeks",
-          samples_count: 4,
+          resultKind: "weeks",
+          samplesCount: 4,
           seed: 1,
-          result_percentiles: { P50: 10, P70: 12, P90: 15 },
-          result_distribution: [
+          resultPercentiles: { P50: 10, P70: 12, P90: 15 },
+          resultDistribution: [
             { x: 15, count: 1 },
             { x: 10, count: 2 },
             { x: 12, count: 1 },
@@ -93,11 +93,11 @@ describe("useSimulationChartData", () => {
         cycleTimeDaysData: [],
         includeZeroWeeks: true,
         result: {
-          result_kind: "items",
-          samples_count: 3,
+          resultKind: "items",
+          samplesCount: 3,
           seed: 2,
-          result_percentiles: { P50: 1, P70: 2, P90: 3 },
-          result_distribution: [
+          resultPercentiles: { P50: 1, P70: 2, P90: 3 },
+          resultDistribution: [
             { x: Number.NaN, count: 1 },
             { x: 5, count: 0 },
             { x: 8, count: Number.NaN },
@@ -122,11 +122,11 @@ describe("useSimulationChartData", () => {
         cycleTimeDaysData: [],
         includeZeroWeeks: true,
         result: {
-          result_kind: "items",
-          samples_count: 5,
+          resultKind: "items",
+          samplesCount: 5,
           seed: 3,
-          result_percentiles: { P50: 24, P70: 22, P90: 18 },
-          result_distribution: [
+          resultPercentiles: { P50: 24, P70: 22, P90: 18 },
+          resultDistribution: [
             { x: 18, count: 1 },
             { x: 22, count: 1 },
             { x: 24, count: 1 },
@@ -150,11 +150,11 @@ describe("useSimulationChartData", () => {
         cycleTimeDaysData: [],
         includeZeroWeeks: true,
         result: {
-          result_kind: "items",
-          samples_count: 5,
+          resultKind: "items",
+          samplesCount: 5,
           seed: 4,
-          result_percentiles: { P50: 24, P70: 25, P90: 27 },
-          result_distribution: [
+          resultPercentiles: { P50: 24, P70: 25, P90: 27 },
+          resultDistribution: [
             { x: 18, count: 1 },
             { x: 22, count: 1 },
             { x: 24, count: 1 },

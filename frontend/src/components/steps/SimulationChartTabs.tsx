@@ -71,11 +71,11 @@ export default function SimulationChartTabs() {
   }, [s.throughputData]);
 
   const reliability = useMemo(() => {
-    if (s.result?.throughput_reliability) {
-      return s.result.throughput_reliability;
+    if (s.result?.throughputReliability) {
+      return s.result.throughputReliability;
     }
     return computeThroughputReliability((s.throughputData ?? []).map((point) => point.throughput)) ?? undefined;
-  }, [s.result?.throughput_reliability, s.throughputData]);
+  }, [s.result?.throughputReliability, s.throughputData]);
 
   const reliabilityTone = useMemo(() => getReliabilityTone(reliability?.label), [reliability?.label]);
   const decisionDiagnostic = useMemo(() => buildSimulationDecisionLanguage({
@@ -84,7 +84,7 @@ export default function SimulationChartTabs() {
     includeZeroWeeks: s.includeZeroWeeks,
     adoDataWarning: s.warning,
     percentiles: s.displayPercentiles,
-    completionSummary: s.result?.completion_summary,
+    completionSummary: s.result?.completionSummary,
     riskScore: computeRiskScoreFromPercentiles(s.simulationMode, s.displayPercentiles),
     throughputReliability: reliability,
     selectedOrg: s.selectedOrg,
@@ -243,9 +243,9 @@ export default function SimulationChartTabs() {
         backlogSize: s.backlogSize,
         targetWeeks: s.targetWeeks,
         nSims: s.nSims,
-        resultKind: s.result.result_kind,
+        resultKind: s.result.resultKind,
         displayPercentiles: s.displayPercentiles,
-        completionSummary: s.result.completion_summary,
+        completionSummary: s.result.completionSummary,
         throughputReliability: reliability,
         cycleTimePoints: s.cycleTimeDaysData,
         cycleTimeTrendPoints: s.cycleTimeTrendData,
@@ -374,7 +374,7 @@ export default function SimulationChartTabs() {
               {reliability && (
                 <span
                   className={`inline-flex items-center self-start rounded-full border px-3 py-1 text-xs font-semibold ${reliabilityTone}`}
-                  title={`CV ${formatReliabilityMetric(reliability.cv)} · IQR ${formatReliabilityMetric(reliability.iqr_ratio)} · pente ${formatReliabilityMetric(reliability.slope_norm)} · ${reliability.samples_count} semaines`}
+                  title={`CV ${formatReliabilityMetric(reliability.cv)} · IQR ${formatReliabilityMetric(reliability.iqrRatio)} · pente ${formatReliabilityMetric(reliability.slopeNorm)} · ${reliability.samplesCount} semaines`}
                 >
                   Fiabilite {reliability.label} · CV {formatReliabilityMetric(reliability.cv)}
                 </span>
@@ -447,7 +447,7 @@ export default function SimulationChartTabs() {
 
           <TabsContent value="probability">
             <h4 className="m-0 text-base font-bold">
-              {s.result?.result_kind === "items"
+              {s.result?.resultKind === "items"
                 ? "Probabilité d'atteindre au moins X items"
                 : "Probabilité de terminer en au plus X semaines"}
             </h4>
@@ -464,7 +464,7 @@ export default function SimulationChartTabs() {
                     {...s.tooltipBaseProps}
                     formatter={(v) => [
                       `${Number(v).toFixed(1)}%`,
-                      s.result?.result_kind === "items" ? "P(X >= valeur)" : "P(X <= valeur)",
+                      s.result?.resultKind === "items" ? "P(X >= valeur)" : "P(X <= valeur)",
                     ]}
                   />
                   <Legend {...sharedLegendProps} content={renderChartLegend(["probability"])} />

@@ -51,6 +51,7 @@ def _js_imports(path: str, text: str, source_paths: set[str]) -> set[str]:
         for match in pattern.finditer(text):
             specifier = match.group(1)
             if not specifier.startswith("."):
+                imports.add(normalize_path(specifier))
                 continue
             base = normalize_path(
                 posixpath.normpath(posixpath.join(posixpath.dirname(path), specifier))

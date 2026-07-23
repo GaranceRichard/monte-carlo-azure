@@ -1,10 +1,10 @@
-import type { ForecastKind } from "../types";
+import type { SimulationResultKind } from "../domain/simulation";
 
 export type ProbabilityPoint = { x: number; probability: number };
 
 export function buildProbabilityCurve(
   points: Array<{ x: number; count: number }>,
-  resultKind: ForecastKind,
+  resultKind: SimulationResultKind,
   totalCount?: number,
 ): ProbabilityPoint[] {
   if (!points.length) return [];

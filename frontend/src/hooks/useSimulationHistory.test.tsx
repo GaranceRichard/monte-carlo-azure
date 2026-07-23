@@ -1,7 +1,8 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { storageGetItem, storageRemoveItem, storageSetItem } from "../storage";
-import type { SimulationHistoryEntry } from "./simulationTypes";
+import type { SimulationHistoryEntry } from "../domain/simulationHistory";
+import { simulationHistoryModelToDto } from "../storage/simulationHistoryMappers";
 import { useSimulationHistory } from "./useSimulationHistory";
 
 vi.mock("../storage", () => ({
@@ -33,15 +34,19 @@ function buildLocalEntry(
     sampleStats: { totalWeeks: 24, zeroWeeks: 0, usedWeeks: 24 },
     weeklyThroughput: [],
     result: {
-      result_kind: "weeks",
-      samples_count: 24,
+      resultKind: "weeks",
+      samplesCount: 24,
       seed: 123456,
-      result_percentiles: { P50: 7, P70: 9, P90: 12 },
-      risk_score: 0.71,
-      result_distribution: [],
+      resultPercentiles: { P50: 7, P70: 9, P90: 12 },
+      riskScore: 0.71,
+      resultDistribution: [],
     },
     ...overrides,
   };
+}
+
+function buildStoredEntry(overrides: Record<string, unknown> = {}) {
+  return { ...simulationHistoryModelToDto(buildLocalEntry()), ...overrides };
 }
 
 describe("useSimulationHistory", () => {
@@ -52,7 +57,9 @@ describe("useSimulationHistory", () => {
 
   it("starts from local storage only", async () => {
     const localEntry = buildLocalEntry();
-    vi.mocked(storageGetItem).mockReturnValue(JSON.stringify([localEntry]));
+    vi.mocked(storageGetItem).mockReturnValue(
+      JSON.stringify([simulationHistoryModelToDto(localEntry)]),
+    );
 
     const { result } = renderHook(() => useSimulationHistory());
 
@@ -73,7 +80,7 @@ describe("useSimulationHistory", () => {
     vi.mocked(storageGetItem).mockReturnValue(
       JSON.stringify([
         {
-          ...buildLocalEntry(),
+          ...buildStoredEntry(),
           schemaVersion: undefined,
           cycleTimeData: [{ week: "2026-01-05", cycleTime: 2, count: 3 }],
         },
@@ -151,11 +158,11 @@ describe("useSimulationHistory", () => {
             { week: "2026-01-12", cycleTimeDays: 3, count: 0 },
           ],
           result: {
-            result_kind: "weeks",
-            samples_count: 0,
+            resultKind: "weeks",
+            samplesCount: 0,
             seed: 0,
-            result_percentiles: {},
-            result_distribution: [],
+            resultPercentiles: {},
+            resultDistribution: [],
           },
           warning: undefined,
         },
@@ -215,11 +222,11 @@ describe("useSimulationHistory", () => {
           weeklyThroughput: [],
           cycleTimeDaysData: [],
           result: {
-            result_kind: "weeks",
-            samples_count: 0,
+            resultKind: "weeks",
+            samplesCount: 0,
             seed: 0,
-            result_percentiles: {},
-            result_distribution: [],
+            resultPercentiles: {},
+            resultDistribution: [],
           },
           warning: "warning conserve",
         },

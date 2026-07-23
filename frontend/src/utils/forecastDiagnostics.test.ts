@@ -8,7 +8,7 @@ import {
 import type { HistoricalWindowSimulation } from "./forecastDiagnostics";
 
 const percentiles = { P50: 10, P70: 12, P90: 15 };
-const lowReliability = { cv: 0.1, iqr_ratio: 0.1, slope_norm: 0.01, label: "fiable" as const, samples_count: 12 };
+const lowReliability = { cv: 0.1, iqrRatio: 0.1, slopeNorm: 0.01, label: "fiable" as const, samplesCount: 12 };
 
 function windowSimulation(overrides: Partial<HistoricalWindowSimulation> = {}): HistoricalWindowSimulation {
   return {
@@ -55,8 +55,8 @@ describe("forecast diagnostics", () => {
   it("distinguishes low, moderate and high uncertainty from dispersion and censures", () => {
     expect(diagnoseForecastUncertainty({ percentiles, throughputReliability: lowReliability }).level).toBe("low");
     expect(diagnoseForecastUncertainty({ percentiles, throughputReliability: { ...lowReliability, cv: 0.5 } }).level).toBe("moderate");
-    expect(diagnoseForecastUncertainty({ percentiles, throughputReliability: lowReliability, completionSummary: { completed_count: 8, censored_count: 2, censored_rate: 0.2, horizon_weeks: 20 } }).level).toBe("moderate");
-    expect(diagnoseForecastUncertainty({ percentiles, throughputReliability: { ...lowReliability, iqr_ratio: 1 } }).level).toBe("high");
+    expect(diagnoseForecastUncertainty({ percentiles, throughputReliability: lowReliability, completionSummary: { completedCount: 8, censoredCount: 2, censoredRate: 0.2, horizonWeeks: 20 } }).level).toBe("moderate");
+    expect(diagnoseForecastUncertainty({ percentiles, throughputReliability: { ...lowReliability, iqrRatio: 1 } }).level).toBe("high");
     expect(diagnoseForecastUncertainty({ percentiles, riskScore: 0.8 }).level).toBe("high");
   });
 
@@ -69,7 +69,7 @@ describe("forecast diagnostics", () => {
     expect(recommendArbitration({ dataQuality: diagnoseDataQuality({ throughputSamples: [1,2,3,4,5,6,7,8] }), forecastUncertainty: unmeasurable })).toMatchObject({ level: "not_recommended", advisedAction: expect.stringContaining("percentiles") });
 
     const watched = diagnoseDataQuality({ throughputSamples: [1,2,3,4,5,6], adoDataWarning: "partiel" });
-    const high = diagnoseForecastUncertainty({ percentiles, throughputReliability: { ...lowReliability, slope_norm: 0.1 } });
+    const high = diagnoseForecastUncertainty({ percentiles, throughputReliability: { ...lowReliability, slopeNorm: 0.1 } });
     expect(recommendArbitration({ dataQuality: watched, forecastUncertainty: high }).level).toBe("arbitration_required");
     expect(recommendArbitration({ dataQuality: watched, forecastUncertainty: low }).level).toBe("caution");
     expect(recommendArbitration({ dataQuality: diagnoseDataQuality({ throughputSamples: [1,2,3,4,5,6,7,8] }), forecastUncertainty: low }).level).toBe("supportable");

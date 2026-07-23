@@ -2,6 +2,26 @@
 
 ## Recent
 
+### Gate README de commit
+
+- rétablissement de l'obligation d'inclure une évolution pertinente du `README.md` racine dans tout index
+  Git non vide avant commit, quel que soit le type de changement stagé
+- lecture explicite des statuts ajout, modification, suppression et renommage afin qu'un README supprimé,
+  renommé, imbriqué ou modifié seulement dans le worktree ne puisse pas satisfaire la règle
+- couverture de la garde par des scénarios purs et des mocks de commandes Git en lecture seule, sans
+  modification de l'index réel
+
+### Séparation DTO, domaine et persistance
+
+- séparation des DTO HTTP, des modèles statistiques métier et des formats de persistance en Python et en
+  TypeScript, avec conversions explicites aux frontières et modèles internes TypeScript en `camelCase`
+- extraction de l'orchestration statistique Python hors de la route FastAPI et convergence des chemins
+  backend et local vers un même `SimulationResult` métier côté frontend
+- préservation des contrats JSON `/simulate` et historique, des documents Mongo, du schéma `localStorage`
+  version 2, des migrations legacy et de tous les calculs statistiques existants
+- ajout de contrôles architecturaux bloquant le recouplage du domaine, du moteur local, de l'UI et de la
+  persistance avec les DTO HTTP
+
 ### Documentation statistique
 
 - adoption de `STD-STAT-001` version 1.0, contrat normatif de parité et de reproductibilité statistiques :

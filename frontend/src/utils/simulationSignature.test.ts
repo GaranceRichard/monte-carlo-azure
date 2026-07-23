@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { SimulationHistoryEntry } from "../hooks/simulationTypes";
+import type { SimulationHistoryEntry } from "../domain/simulationHistory";
 import {
   buildHistoryEntrySignature,
   buildSimulationExecutionSnapshot,
@@ -29,12 +29,12 @@ function historyEntry(overrides: Partial<SimulationHistoryEntry> = {}): Simulati
     weeklyThroughput: [{ week: "2026-01-05", throughput: 8 }],
     cycleTimeDaysData: [],
     result: {
-      result_kind: "items",
-      samples_count: 20_000,
+      resultKind: "items",
+      samplesCount: 20_000,
       seed: 42,
-      result_percentiles: { P50: 20, P70: 18, P90: 15 },
-      risk_score: 0.25,
-      result_distribution: [{ x: 15, count: 10 }],
+      resultPercentiles: { P50: 20, P70: 18, P90: 15 },
+      riskScore: 0.25,
+      resultDistribution: [{ x: 15, count: 10 }],
     },
     ...overrides,
   };

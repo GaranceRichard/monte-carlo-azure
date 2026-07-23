@@ -31,6 +31,8 @@ FORBIDDEN_BACKEND_FIELDS = (
 TARGET_FILES = (
     "frontend/src/types.ts",
     "frontend/src/api.ts",
+    "frontend/src/api/simulationDtos.ts",
+    "frontend/src/api/simulationMappers.ts",
     "frontend/src/hooks/simulationForecastCore.ts",
     "frontend/src/hooks/simulationForecastService.ts",
     "backend/api_models.py",
@@ -56,7 +58,7 @@ RULE_DETAILS = {
     ),
     "IDENTITY-004": (
         "Forbidden Azure DevOps context field in simulation request contract.",
-        "Remove the Azure DevOps field from ForecastRequestPayload or SimulateRequest.",
+        "Remove the Azure DevOps field from SimulateRequestDto or SimulateRequest.",
     ),
     "IDENTITY-005": (
         "Forbidden Azure DevOps context field in POST /simulate payload construction.",
@@ -317,16 +319,24 @@ def _collect_identity_003(root: Path) -> list[Violation]:
 
 def _collect_identity_004(root: Path) -> list[Violation]:
     violations: list[Violation] = []
-    frontend_path = root / "frontend/src/types.ts"
     backend_path = root / "backend/api_models.py"
-    violations.extend(
-        _collect_tokens_in_block(
-            frontend_path,
-            "IDENTITY-004",
-            _extract_ts_brace_block(frontend_path, r"export\s+type\s+ForecastRequestPayload\s*="),
-            FORBIDDEN_BACKEND_FIELDS,
+    for frontend_path, type_name in (
+        (root / "frontend/src/api/simulationDtos.ts", "SimulateRequestDto"),
+        (root / "frontend/src/types.ts", "ForecastRequestPayload"),
+    ):
+        if not frontend_path.exists():
+            continue
+        violations.extend(
+            _collect_tokens_in_block(
+                frontend_path,
+                "IDENTITY-004",
+                _extract_ts_brace_block(
+                    frontend_path,
+                    rf"export\s+type\s+{type_name}\s*=",
+                ),
+                FORBIDDEN_BACKEND_FIELDS,
+            )
         )
-    )
     violations.extend(
         _collect_tokens_in_block(
             backend_path,
@@ -341,6 +351,8 @@ def _collect_identity_004(root: Path) -> list[Violation]:
 def _payload_candidate_files(root: Path) -> list[Path]:
     files = {
         root / "frontend/src/api.ts",
+        root / "frontend/src/api/simulationDtos.ts",
+        root / "frontend/src/api/simulationMappers.ts",
         root / "frontend/src/hooks/simulationForecastCore.ts",
         root / "frontend/src/hooks/simulationForecastService.ts",
     }
@@ -351,7 +363,11 @@ def _payload_candidate_files(root: Path) -> list[Path]:
         if path.suffix not in {".ts", ".tsx", ".js", ".jsx"}:
             continue
         text = _read_text(path)
-        if "postSimulate(" in text or "ForecastRequestPayload" in text:
+        if (
+            "postSimulate(" in text
+            or "ForecastRequestPayload" in text
+            or "SimulateRequestDto" in text
+        ):
             files.add(path)
     return sorted(files)
 
@@ -365,6 +381,7 @@ def _collect_identity_005(root: Path) -> list[Violation]:
         blocks = [
             _extract_ts_brace_block(path, r"export\s+async\s+function\s+postSimulate\s*\("),
             _extract_ts_brace_block(path, r":\s*ForecastRequestPayload\s*=\s*"),
+            _extract_ts_brace_block(path, r":\s*SimulateRequestDto\s*=\s*"),
             _extract_ts_brace_block(path, r"postSimulate\s*\(\s*\{"),
         ]
         for block in blocks:

@@ -1,11 +1,12 @@
 import type {
   CompletionSummary,
-  ForecastMode,
-  ForecastPercentiles,
-  ForecastResponse,
+  SimulationCommand,
+  SimulationMode,
+  SimulationPercentiles,
+  SimulationResult,
   ThroughputReliability,
-  WeeklyThroughputRow,
-} from "../types";
+} from "../domain/simulation";
+import type { WeeklyThroughputRow } from "../types";
 import {
   SIMULATION_HORIZON_WEEKS_MAX,
   validateSimulationInputContract,
@@ -123,10 +124,10 @@ function discreteQuantile(values: number[], q: number, mode: "higher" | "lower")
 
 export function discretePercentiles(
   values: number[],
-  simulationMode: ForecastMode,
+  simulationMode: SimulationMode,
   ps: number[],
   totalCount?: number,
-) : ForecastPercentiles {
+) : SimulationPercentiles {
   if (!values.length) return {};
   return Object.fromEntries(
     ps.flatMap((p) => {
@@ -154,15 +155,7 @@ export function simulateMonteCarloLocal({
   targetWeeks,
   nSims,
   seed,
-}: {
-  throughputSamples: number[];
-  includeZeroWeeks?: boolean;
-  mode: ForecastMode;
-  backlogSize?: number;
-  targetWeeks?: number;
-  nSims: number;
-  seed: number;
-}): ForecastResponse {
+}: SimulationCommand): SimulationResult {
   const samples = normalizeSamples(throughputSamples, includeZeroWeeks);
   const contract = validateSimulationInputContract({
     throughputSamples,
@@ -210,10 +203,10 @@ export function simulateMonteCarloLocal({
     const censoredCount = results.length - completedCount;
     percentileTotalCount = results.length;
     completionSummary = {
-      completed_count: completedCount,
-      censored_count: censoredCount,
-      censored_rate: Number((censoredCount / results.length).toFixed(4)),
-      horizon_weeks: horizonWeeks,
+      completedCount,
+      censoredCount,
+      censoredRate: Number((censoredCount / results.length).toFixed(4)),
+      horizonWeeks,
     };
   }
 
@@ -225,14 +218,14 @@ export function simulateMonteCarloLocal({
   );
   const resolvedRiskScore = computeRiskScoreFromPercentiles(mode, resultPercentiles);
   return {
-    result_kind: mode === "backlog_to_weeks" ? "weeks" : "items",
-    samples_count: samples.length,
+    resultKind: mode === "backlog_to_weeks" ? "weeks" : "items",
+    samplesCount: samples.length,
     seed,
-    result_percentiles: resultPercentiles,
-    risk_score: resolvedRiskScore == null ? undefined : Number(resolvedRiskScore.toFixed(4)),
-    result_distribution: histogramBuckets(mode === "backlog_to_weeks" ? distributionValues : results),
-    completion_summary: completionSummary,
-    throughput_reliability: computeThroughputReliability(samples) ?? undefined,
+    resultPercentiles,
+    riskScore: resolvedRiskScore == null ? undefined : Number(resolvedRiskScore.toFixed(4)),
+    resultDistribution: histogramBuckets(mode === "backlog_to_weeks" ? distributionValues : results),
+    completionSummary,
+    throughputReliability: computeThroughputReliability(samples) ?? undefined,
   };
 }
 
@@ -351,8 +344,8 @@ export function computeRiskLegend(score: number): "fiable" | "incertain" | "frag
 }
 
 export function computeRiskScoreFromPercentiles(
-  mode: ForecastMode,
-  percentiles: ForecastPercentiles,
+  mode: SimulationMode,
+  percentiles: SimulationPercentiles,
 ): number | null {
   const p50 = Number(percentiles?.P50 ?? 0);
   const p90 = Number(percentiles?.P90 ?? 0);
@@ -405,16 +398,16 @@ export function computeThroughputReliability(samples: number[]): ThroughputRelia
 
   return {
     cv: Number(cv.toFixed(4)),
-    iqr_ratio: Number(iqrRatio.toFixed(4)),
-    slope_norm: Number(slopeNorm.toFixed(4)),
+    iqrRatio: Number(iqrRatio.toFixed(4)),
+    slopeNorm: Number(slopeNorm.toFixed(4)),
     label,
-    samples_count: sampleCount,
+    samplesCount: sampleCount,
   };
 }
 
 export function getProjectionReliabilityNotice(reliability?: ThroughputReliability | null): string | null {
   if (!reliability) return null;
-  if (reliability.cv >= 1 || reliability.iqr_ratio >= 1) {
+  if (reliability.cv >= 1 || reliability.iqrRatio >= 1) {
     return "Historique trop volatil pour fonder une projection fiable. Les percentiles restent utiles pour explorer des scenarios, pas pour soutenir un engagement.";
   }
   if (reliability.label === "non fiable") {

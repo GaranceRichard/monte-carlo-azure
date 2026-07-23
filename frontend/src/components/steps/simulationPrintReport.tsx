@@ -16,7 +16,7 @@ import {
   computeThroughputReliability,
   getProjectionReliabilityNotice,
 } from "../../utils/simulation";
-import type { CompletionSummary, ForecastPercentiles, ThroughputReliability } from "../../types";
+import type { CompletionSummary, SimulationPercentiles, ThroughputReliability } from "../../domain/simulation";
 import type { DecisionLanguage } from "../../utils/decisionLanguage";
 import { renderDecisionDiagnosticHtml } from "../../utils/simulationDecisionDiagnostic";
 
@@ -35,25 +35,25 @@ function formatMetric(value: number): string {
   return Number(value ?? 0).toFixed(2).replace(".", ",");
 }
 
-function renderPercentileKpis(displayPercentiles: ForecastPercentiles, resultLabel: string): string {
+function renderPercentileKpis(displayPercentiles: SimulationPercentiles, resultLabel: string): string {
   return ["P50", "P70", "P90"]
-    .filter((key) => typeof displayPercentiles?.[key as keyof ForecastPercentiles] === "number")
+    .filter((key) => typeof displayPercentiles?.[key as keyof SimulationPercentiles] === "number")
     .map(
       (key) =>
-        `<div class="kpi"><span class="kpi-label">${key}</span><span class="kpi-value">${Number(displayPercentiles[key as keyof ForecastPercentiles] ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>`,
+        `<div class="kpi"><span class="kpi-label">${key}</span><span class="kpi-value">${Number(displayPercentiles[key as keyof SimulationPercentiles] ?? 0).toFixed(0)} ${escapeHtml(resultLabel)}</span></div>`,
     )
     .join("");
 }
 
 function buildReliabilitySummary(reliability?: ThroughputReliability): string {
   if (!reliability) return "Non disponible";
-  if (reliability.samples_count < 6) return "Historique trop court pour projeter avec confiance.";
-  if (reliability.slope_norm <= -0.15) return "Throughput en forte baisse sur les dernieres semaines.";
-  if (reliability.slope_norm <= -0.05) return "Throughput en baisse sur les dernieres semaines.";
-  if (reliability.slope_norm >= 0.10) return "Throughput en forte hausse sur les dernieres semaines.";
-  if (reliability.slope_norm >= 0.05) return "Throughput en hausse sur les dernieres semaines.";
-  if (reliability.cv >= 1 || reliability.iqr_ratio >= 1) return "Dispersion elevee du throughput historique.";
-  if (reliability.samples_count < 8) return "Volume historique encore limite.";
+  if (reliability.samplesCount < 6) return "Historique trop court pour projeter avec confiance.";
+  if (reliability.slopeNorm <= -0.15) return "Throughput en forte baisse sur les dernieres semaines.";
+  if (reliability.slopeNorm <= -0.05) return "Throughput en baisse sur les dernieres semaines.";
+  if (reliability.slopeNorm >= 0.10) return "Throughput en forte hausse sur les dernieres semaines.";
+  if (reliability.slopeNorm >= 0.05) return "Throughput en hausse sur les dernieres semaines.";
+  if (reliability.cv >= 1 || reliability.iqrRatio >= 1) return "Dispersion elevee du throughput historique.";
+  if (reliability.samplesCount < 8) return "Volume historique encore limite.";
   return "Historique globalement stable.";
 }
 
@@ -94,7 +94,7 @@ export function buildSimulationPrintReportHtml({
   targetWeeks: number | string;
   nSims: number | string;
   resultKind: "items" | "weeks";
-  displayPercentiles: ForecastPercentiles;
+  displayPercentiles: SimulationPercentiles;
   completionSummary?: CompletionSummary;
   throughputReliability?: ThroughputReliability;
   cycleTimePoints: CycleTimeExportPoint[];
@@ -136,7 +136,7 @@ export function buildSimulationPrintReportHtml({
   const reliabilitySummary = buildReliabilitySummary(effectiveReliability);
   const reliabilityNotice = getProjectionReliabilityNotice(effectiveReliability);
   const totalSimulationCount = completionSummary
-    ? completionSummary.completed_count + completionSummary.censored_count
+    ? completionSummary.completedCount + completionSummary.censoredCount
     : undefined;
   const effectiveProbabilityPoints = probabilityPoints.length
     ? buildProbabilityCurve(
@@ -214,9 +214,9 @@ export function buildSimulationPrintReportHtml({
               <h2 class="diagnostic-title">Diagnostic</h2>
               <div class="meta-row"><b>Lecture:</b> ${escapeHtml(reliabilitySummary)}</div>
               <div class="meta-row"><b>CV:</b> ${escapeHtml(formatMetric(effectiveReliability?.cv ?? 0))}</div>
-              <div class="meta-row"><b>IQR ratio:</b> ${escapeHtml(formatMetric(effectiveReliability?.iqr_ratio ?? 0))}</div>
-              <div class="meta-row"><b>Pente normalisee:</b> ${escapeHtml(formatMetric(effectiveReliability?.slope_norm ?? 0))}</div>
-              <div class="meta-row"><b>Semaines utilisees:</b> ${escapeHtml(String(effectiveReliability?.samples_count ?? 0))}</div>
+              <div class="meta-row"><b>IQR ratio:</b> ${escapeHtml(formatMetric(effectiveReliability?.iqrRatio ?? 0))}</div>
+              <div class="meta-row"><b>Pente normalisee:</b> ${escapeHtml(formatMetric(effectiveReliability?.slopeNorm ?? 0))}</div>
+              <div class="meta-row"><b>Semaines utilisees:</b> ${escapeHtml(String(effectiveReliability?.samplesCount ?? 0))}</div>
               ${
                 reliabilityNotice
                   ? `<div class="meta-row"><b>Decision:</b> ${escapeHtml(reliabilityNotice)}</div>`
@@ -239,8 +239,8 @@ export function buildSimulationPrintReportHtml({
         </section>
         ${renderDecisionDiagnosticHtml(decisionDiagnostic)}
         ${
-          completionSummary && completionSummary.censored_count > 0
-            ? `<section class="section"><div class="meta"><div class="meta-row"><b>Limite d'horizon:</b> ${escapeHtml(String(completionSummary.horizon_weeks))} semaines</div><div class="meta-row"><b>Censures:</b> ${escapeHtml(String(completionSummary.censored_count))} sur ${escapeHtml(String(completionSummary.completed_count + completionSummary.censored_count))} (${escapeHtml(formatMetric(completionSummary.censored_rate))})</div><div class="meta-row"><b>Lecture:</b> la distribution et les percentiles ne couvrent que les simulations terminees. Un percentile absent n'est pas identifiable avant l'horizon.</div></div></section>`
+          completionSummary && completionSummary.censoredCount > 0
+            ? `<section class="section"><div class="meta"><div class="meta-row"><b>Limite d'horizon:</b> ${escapeHtml(String(completionSummary.horizonWeeks))} semaines</div><div class="meta-row"><b>Censures:</b> ${escapeHtml(String(completionSummary.censoredCount))} sur ${escapeHtml(String(completionSummary.completedCount + completionSummary.censoredCount))} (${escapeHtml(formatMetric(completionSummary.censoredRate))})</div><div class="meta-row"><b>Lecture:</b> la distribution et les percentiles ne couvrent que les simulations terminees. Un percentile absent n'est pas identifiable avant l'horizon.</div></div></section>`
             : ""
         }
         <section class="section">

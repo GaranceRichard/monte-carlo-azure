@@ -1,10 +1,10 @@
 import { SIMULATION_THROUGHPUT_SAMPLES_MIN } from "../simulationLimits";
 import type {
   CompletionSummary,
-  ForecastMode,
-  ForecastPercentiles,
+  SimulationMode,
+  SimulationPercentiles,
   ThroughputReliability,
-} from "../types";
+} from "../domain/simulation";
 import {
   computeRiskLegend,
   computeThroughputReliability,
@@ -17,7 +17,7 @@ export type ArbitrationRecommendationLevel =
   | "caution"
   | "arbitration_required"
   | "not_recommended";
-export type ForecastPercentileKey = keyof ForecastPercentiles;
+export type ForecastPercentileKey = keyof SimulationPercentiles;
 
 export type DiagnosticFactor = {
   code: string;
@@ -49,7 +49,7 @@ export type HistoricalWindowSimulation = {
   selectedTeam: string;
   startDate: string;
   endDate: string;
-  simulationMode: ForecastMode;
+  simulationMode: SimulationMode;
   includeZeroWeeks: boolean;
   backlogSize: number;
   targetWeeks: number;
@@ -69,7 +69,7 @@ export type HistoricalWindowSimulationSummary = {
 
 export type HistoricalWindowSensitivityDiagnostic = {
   level: HistoricalWindowSensitivityLevel;
-  simulationMode: ForecastMode;
+  simulationMode: SimulationMode;
   comparedSimulations: HistoricalWindowSimulationSummary[];
   p90Minimum: number | null;
   p90Maximum: number | null;
@@ -105,7 +105,7 @@ export type DataQualityInput = {
 };
 
 export type ForecastUncertaintyInput = {
-  percentiles: ForecastPercentiles;
+  percentiles: SimulationPercentiles;
   requiredPercentiles?: readonly ForecastPercentileKey[];
   completionSummary?: CompletionSummary | null;
   riskScore?: number | null;
@@ -175,7 +175,7 @@ function summarizeHistoricalWindow(
 }
 
 function buildUnavailableHistoricalSensitivity(
-  simulationMode: ForecastMode,
+  simulationMode: SimulationMode,
 ): HistoricalWindowSensitivityDiagnostic {
   return {
     level: "unavailable",
@@ -436,25 +436,25 @@ export function diagnoseForecastUncertainty({
       {
         code: "iqr_ratio",
         description: "Dispersion interquartile relative",
-        value: reliability.iqr_ratio,
+        value: reliability.iqrRatio,
         threshold: "modérée dès 0,5 ; élevée dès 1",
       },
       {
         code: "normalized_slope",
         description: "Pente normalisée du throughput",
-        value: reliability.slope_norm,
+        value: reliability.slopeNorm,
         threshold: "modérée dès |0,05| ; élevée dès |0,1|",
       },
     );
   }
 
-  const censoredCount = completionSummary?.censored_count ?? 0;
+  const censoredCount = completionSummary?.censoredCount ?? 0;
   if (completionSummary) {
     factors.push({
       code: "censored_simulations",
       description: "Simulations censurées à l'horizon",
       value: censoredCount,
-      threshold: `sur ${completionSummary.completed_count + completionSummary.censored_count} simulations`,
+      threshold: `sur ${completionSummary.completedCount + completionSummary.censoredCount} simulations`,
     });
   }
 
@@ -465,8 +465,8 @@ export function diagnoseForecastUncertainty({
       reliability
       && (
         reliability.cv >= 1
-        || reliability.iqr_ratio >= 1
-        || Math.abs(reliability.slope_norm) >= 0.1
+        || reliability.iqrRatio >= 1
+        || Math.abs(reliability.slopeNorm) >= 0.1
       )
     ),
   );
@@ -484,8 +484,8 @@ export function diagnoseForecastUncertainty({
       reliability
       && (
         reliability.cv >= 0.5
-        || reliability.iqr_ratio >= 0.5
-        || Math.abs(reliability.slope_norm) >= 0.05
+        || reliability.iqrRatio >= 0.5
+        || Math.abs(reliability.slopeNorm) >= 0.05
       )
     ),
   );

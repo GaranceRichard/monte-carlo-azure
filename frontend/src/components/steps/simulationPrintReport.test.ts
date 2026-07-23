@@ -76,7 +76,7 @@ function buildBaseArgs() {
     nSims: 20000,
     resultKind: "weeks" as const,
     displayPercentiles: { P50: 8, P70: 10, P90: 13 },
-    throughputReliability: { cv: 0.62, iqr_ratio: 0.55, slope_norm: -0.07, label: "incertain" as const, samples_count: 10 },
+    throughputReliability: { cv: 0.62, iqrRatio: 0.55, slopeNorm: -0.07, label: "incertain" as const, samplesCount: 10 },
     cycleTimePoints: [
       { week: "2025-01-06", cycleTimeDays: 1.4, count: 2 },
       { week: "2025-01-13", cycleTimeDays: 1.9, count: 1 },
@@ -227,10 +227,10 @@ describe("simulationPrintReport", () => {
       ...buildBaseArgs(),
       throughputReliability: {
         cv: undefined as unknown as number,
-        iqr_ratio: 0.2,
-        slope_norm: 0,
+        iqrRatio: 0.2,
+        slopeNorm: 0,
         label: "incertain",
-        samples_count: 8,
+        samplesCount: 8,
       },
       throughputPoints: [
         { week: "2025-01-06", throughput: undefined as unknown as number, movingAverage: 0 },
@@ -247,10 +247,10 @@ describe("simulationPrintReport", () => {
       displayPercentiles: undefined as unknown as Record<string, number>,
       throughputReliability: {
         cv: 0.2,
-        iqr_ratio: 0.2,
-        slope_norm: 0,
+        iqrRatio: 0.2,
+        slopeNorm: 0,
         label: "incertain",
-        samples_count: 7,
+        samplesCount: 7,
       },
     });
 
@@ -262,19 +262,19 @@ describe("simulationPrintReport", () => {
   it("covers diagnostic summary variants and fragile risk legend", () => {
     const variants = [
       {
-        throughputReliability: { cv: 0.2, iqr_ratio: 0.2, slope_norm: -0.2, label: "fragile" as const, samples_count: 10 },
+        throughputReliability: { cv: 0.2, iqrRatio: 0.2, slopeNorm: -0.2, label: "fragile" as const, samplesCount: 10 },
         expected: "Throughput en forte baisse sur les dernieres semaines.",
       },
       {
-        throughputReliability: { cv: 0.2, iqr_ratio: 0.2, slope_norm: 0.12, label: "fragile" as const, samples_count: 10 },
+        throughputReliability: { cv: 0.2, iqrRatio: 0.2, slopeNorm: 0.12, label: "fragile" as const, samplesCount: 10 },
         expected: "Throughput en forte hausse sur les dernieres semaines.",
       },
       {
-        throughputReliability: { cv: 0.2, iqr_ratio: 0.2, slope_norm: 0.06, label: "incertain" as const, samples_count: 10 },
+        throughputReliability: { cv: 0.2, iqrRatio: 0.2, slopeNorm: 0.06, label: "incertain" as const, samplesCount: 10 },
         expected: "Throughput en hausse sur les dernieres semaines.",
       },
       {
-        throughputReliability: { cv: 1.2, iqr_ratio: 0.2, slope_norm: 0, label: "fragile" as const, samples_count: 10 },
+        throughputReliability: { cv: 1.2, iqrRatio: 0.2, slopeNorm: 0, label: "fragile" as const, samplesCount: 10 },
         expected: "Dispersion elevee du throughput historique.",
       },
     ];
@@ -296,10 +296,10 @@ describe("simulationPrintReport", () => {
       displayPercentiles: { P50: 10, P70: 12, P90: 14 },
       throughputReliability: {
         cv: 0.2,
-        iqr_ratio: 0.2,
-        slope_norm: 0,
+        iqrRatio: 0.2,
+        slopeNorm: 0,
         label: "incertain",
-        samples_count: 5,
+        samplesCount: 5,
       },
     });
 
@@ -312,10 +312,10 @@ describe("simulationPrintReport", () => {
       ...buildBaseArgs(),
       throughputReliability: {
         cv: 1.2,
-        iqr_ratio: 1.1,
-        slope_norm: 0.01,
+        iqrRatio: 1.1,
+        slopeNorm: 0.01,
         label: "fragile",
-        samples_count: 12,
+        samplesCount: 12,
       },
     });
 
@@ -353,10 +353,10 @@ describe("simulationPrintReport", () => {
       ...buildBaseArgs(),
       displayPercentiles: { P50: 12 },
       completionSummary: {
-        completed_count: 4,
-        censored_count: 6,
-        censored_rate: 0.6,
-        horizon_weeks: 521,
+        completedCount: 4,
+        censoredCount: 6,
+        censoredRate: 0.6,
+        horizonWeeks: 521,
       },
     });
 

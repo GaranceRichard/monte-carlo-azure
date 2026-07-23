@@ -1,19 +1,19 @@
 # Consolidated test-strategy report
 
-Profile: `main`
-qualityGateStatus: `compliant`
+Profile: `pr`
+qualityGateStatus: `non_compliant`
 strategyEvidenceStatus: `incomplete`
 
 ## Global reference
 
-Known logical cases: 1122
+Known logical cases: 1144
 
 ## Profile execution
 
-Selected logical cases: 1119
-Collected instances: 1235
-Executed instances: 1235
-Attempts: 1235
+Selected logical cases: 938
+Collected instances: 1038
+Executed instances: 1038
+Attempts: 1038
 Retries: 0
 
 ## Evidence manifest
@@ -23,24 +23,18 @@ Retries: 0
 | `classification-catalog` | `globalReference` | yes | `valid` | `config/test-classification.json` |
 | `classification-inventory` | `globalReference` | yes | `valid` | `reports/test-classification-inventory.json` |
 | `classification-overrides` | `globalReference` | yes | `valid` | `config/test-classification-overrides.json` |
-| `coverage-e2e` | `profileExecution` | yes | `valid` | `frontend/coverage/e2e-coverage-summary.json` |
-| `coverage-python` | `profileExecution` | yes | `valid` | `.coverage.python.json` |
-| `coverage-vitals` | `profileExecution` | yes | `valid` | `frontend/coverage/vitals-coverage-report.json` |
-| `coverage-vitest` | `profileExecution` | yes | `valid` | `frontend/coverage/coverage-final.json` |
 | `execution-counts` | `globalReference` | yes | `valid` | `reports/test-execution-counts.json` |
 | `execution-plan` | `globalReference` | yes | `valid` | `reports/test-execution-plan.json` |
 | `execution-profiles` | `globalReference` | yes | `valid` | `config/test-execution-profiles.json` |
 | `governance` | `profileExecution` | yes | `valid` | `reports/test-governance-report.json` |
-| `node-backend-static` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/backend-static/result.json` |
-| `node-backend-tests` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/backend-tests/result.json` |
-| `node-e2e` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/e2e/result.json` |
-| `node-frontend-static` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/frontend-static/result.json` |
-| `node-frontend-tests` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/frontend-tests/result.json` |
-| `node-preflight` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/preflight/result.json` |
-| `node-release-or-container-checks` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/release-or-container-checks/result.json` |
-| `runtime-playwright` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/e2e/playwright.json` |
-| `runtime-pytest` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/backend-tests/pytest.json` |
-| `runtime-vitest` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/frontend-tests/vitest.json` |
+| `node-backend-static` | `profileExecution` | yes | `missing` | `reports/test-execution-artifacts/pr/backend-static/result.json` |
+| `node-backend-tests` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/pr/backend-tests/result.json` |
+| `node-frontend-static` | `profileExecution` | yes | `missing` | `reports/test-execution-artifacts/pr/frontend-static/result.json` |
+| `node-frontend-tests` | `profileExecution` | yes | `missing` | `reports/test-execution-artifacts/pr/frontend-tests/result.json` |
+| `node-preflight` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/pr/preflight/result.json` |
+| `runtime-playwright` | `profileExecution` | no | `not_applicable` | `reports/test-execution-native/playwright.json` |
+| `runtime-pytest` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/pr/backend-tests/pytest.json` |
+| `runtime-vitest` | `profileExecution` | yes | `valid` | `reports/test-execution-native/vitest.json` |
 
 ## Strategic coverage
 
@@ -50,9 +44,9 @@ Retries: 0
 | `execution` | `valid` |
 | `profiles` | `valid` |
 | `governance` | `valid` |
-| `coverage` | `valid` |
-| `vitals` | `valid` |
-| `durations` | `valid` |
+| `coverage` | `not_applicable` |
+| `vitals` | `not_applicable` |
+| `durations` | `missing` |
 | `trends` | `not_measured` |
 | `mutation_testing` | `not_measured` |
 | `critical_risk_demonstration` | `not_measured` |

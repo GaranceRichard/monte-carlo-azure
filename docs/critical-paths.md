@@ -69,8 +69,9 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   façon contrôlée aux entrées invalides, limites et dépendances indisponibles.
 - **Acteurs ou composants** : client frontend, FastAPI/Pydantic, rate limiter, moteur Python, MongoDB et Redis.
 - **Préconditions** : un historique de throughput et les paramètres du mode sont disponibles.
-- **Étapes principales** : validation du payload; filtrage des échantillons; calcul par lots; calcul des
-  percentiles, censures, histogramme et score; réponse; persistance asynchrone éventuelle.
+- **Étapes principales** : validation du DTO HTTP; conversion en commande métier; filtrage des échantillons;
+  orchestration du moteur et calcul des percentiles, censures, histogramme et score; conversion du résultat
+  vers le DTO de réponse; persistance asynchrone éventuelle par conversion dédiée.
 - **Résultat attendu** : réponse conforme et reproductible avec seed, ou erreur HTTP explicite sans calcul
   hors bornes.
 - **Risques associés** : `RISK-003`, `RISK-004`, `RISK-005`, `RISK-011`, `RISK-013`, `RISK-016`, `RISK-017`.
@@ -78,12 +79,18 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   contrôle de contrat par modèles Pydantic.
 - **Contrôles non fonctionnels** : sécurité, performance bornée, timeout, limitation de débit, résilience
   partielle et observabilité par logs.
-- **Preuves existantes** : `backend/api_models.py`, `backend/api_routes_simulate.py`, `backend/mc_core.py`,
-  `tests/test_api_simulate.py`, `tests/test_mc_core.py`, `tests/test_api_history.py`,
-  `tests/test_simulation_store.py`.
+- **Preuves existantes** : `backend/api_models.py`, `backend/api_routes_simulate.py`,
+  `backend/simulation_models.py`, `backend/simulation_mappers.py`, `backend/simulation_service.py`,
+  `backend/simulation_store.py`, `backend/mc_core.py`, `frontend/src/api/simulationDtos.ts`,
+  `frontend/src/api/simulationMappers.ts`, `frontend/src/domain/simulation.ts`,
+  `frontend/src/storage/simulationHistoryDtos.ts`, `frontend/src/storage/simulationHistoryMappers.ts`,
+  `tests/test_api_simulate.py`, `tests/test_mc_core.py`, `tests/test_simulation_mappers.py`,
+  `tests/test_simulation_service.py`, `tests/test_api_history.py`, `tests/test_simulation_store.py`,
+  `frontend/src/api/simulationMappers.test.ts`, `frontend/src/storage/simulationHistoryMappers.test.ts`.
 - **État** : partiellement couvert.
-- **Lacunes connues** : absence de contrat partagé Python/TypeScript, de test de charge, de preuve
-  d'annulation du thread après timeout et de politique de proxy de confiance.
+- **Lacunes connues** : les frontières DTO/domaine/persistance sont explicites, mais le contrat statistique
+  n'est pas encore aligné Python/TypeScript; absence de test de charge, de preuve d'annulation du thread
+  après timeout et de politique de proxy de confiance.
 
 ### CP-004 — Flux onboarding critique
 
@@ -149,9 +156,12 @@ réelle et le multi-worker ne sont pas maîtrisés. Traitement prévu par les PB
 
 Important pour `RISK-020`, ce parcours orchestre couvertures, fraîcheur des artefacts, Vitals et ratchet. Il
 inclut maintenant classification, dénombrement, gouvernance des skips, quarantaines et retries, ainsi qu'un
-reporting stratégique consolidé qui distingue conformité opérationnelle et complétude des preuves. Il reste
-partiellement couvert : le rapport rend le mutation testing et la démonstration complète du risque
-`not_measured` au lieu de les assimiler à une maîtrise. Traitement résiduel prévu par le PBI 6.3.
+reporting stratégique consolidé qui distingue conformité opérationnelle et complétude des preuves. Le chemin
+de commit impose aussi, via `Scripts/pre_commit_guard.py`, un `README.md` racine ajouté ou modifié dans tout
+index non vide ; `tests/test_pre_commit_guard.py` couvre les statuts et les cas de refus sans muter l'index
+réel. Le parcours reste partiellement couvert : le rapport rend le mutation testing et la démonstration
+complète du risque `not_measured` au lieu de les assimiler à une maîtrise. Traitement résiduel prévu par le
+PBI 6.3.
 
 ### CP-009 — Construire un historique ADO temporellement cohérent
 

@@ -4,7 +4,6 @@ import logging
 import secrets
 import time
 
-import numpy as np
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
@@ -13,22 +12,17 @@ from starlette.concurrency import run_in_threadpool
 from .api_config import get_api_config
 from .api_models import (
     SIMULATION_SEED_MAX,
-    CompletionSummary,
     SimulateRequest,
     SimulateResponse,
     SimulationHistoryItem,
-    ThroughputReliability,
 )
-from .mc_core import (
-    FinishWeeksSimulation,
-    histogram_buckets,
-    mc_finish_weeks,
-    mc_items_done_for_weeks,
-    percentiles,
-    risk_score,
-    throughput_reliability,
+from .simulation_mappers import (
+    persistence_row_to_history_item,
+    request_to_command,
+    result_to_response,
 )
-from .simulation_limits import SIMULATION_THROUGHPUT_SAMPLES_MIN
+from .simulation_models import SimulationCommand, SimulationResult
+from .simulation_service import InsufficientSimulationSamplesError, run_simulation
 from .simulation_store import SimulationStore
 
 router = APIRouter()
@@ -116,37 +110,6 @@ limiter = ObservableLimiter(
 )
 
 
-def _compute_simulation_result(
-    req: SimulateRequest,
-    samples: np.ndarray,
-    seed: int,
-) -> tuple[np.ndarray | FinishWeeksSimulation, str]:
-    if req.mode == "backlog_to_weeks":
-        assert req.backlog_size is not None
-        return (
-            mc_finish_weeks(
-                req.backlog_size,
-                samples,
-                req.n_sims,
-                include_zero_weeks=req.include_zero_weeks,
-                seed=seed,
-            ),
-            "weeks",
-        )
-
-    assert req.target_weeks is not None
-    return (
-        mc_items_done_for_weeks(
-            req.target_weeks,
-            samples,
-            req.n_sims,
-            include_zero_weeks=req.include_zero_weeks,
-            seed=seed,
-        ),
-        "items",
-    )
-
-
 def _resolve_simulation_seed(requested_seed: int | None) -> int:
     if requested_seed is not None:
         return requested_seed
@@ -155,21 +118,21 @@ def _resolve_simulation_seed(requested_seed: int | None) -> int:
 
 def _persist_simulation(
     mc_client_id: str,
-    req: SimulateRequest,
-    response_model: SimulateResponse,
+    command: SimulationCommand,
+    result: SimulationResult,
 ) -> None:
     if not simulation_store.enabled or not mc_client_id:
         return
 
     try:
-        simulation_store.save_simulation(mc_client_id, req, response_model)
+        simulation_store.save_simulation(mc_client_id, command, result)
     except Exception as exc:
         logger.warning(
             "Simulation persistence failed; returning computed result without history entry.",
             extra={
                 "event": "simulation_persistence_failed",
-                "mode": req.mode,
-                "n_sims": req.n_sims,
+                "mode": command.mode,
+                "n_sims": command.n_sims,
                 "client_id_prefix": mc_client_id[:8],
             },
             exc_info=exc,
@@ -185,27 +148,15 @@ async def simulate(
 ) -> SimulateResponse:
     started_at = time.perf_counter()
     seed = _resolve_simulation_seed(req.seed)
-    samples = np.array(req.throughput_samples)
-    if req.include_zero_weeks:
-        samples = samples[samples >= 0]
-    else:
-        samples = samples[samples > 0]
-    if len(samples) < SIMULATION_THROUGHPUT_SAMPLES_MIN:
-        detail = (
-            f"Historique insuffisant (moins de {SIMULATION_THROUGHPUT_SAMPLES_MIN} semaines)."
-            if req.include_zero_weeks
-            else (
-                "Historique insuffisant (moins de "
-                f"{SIMULATION_THROUGHPUT_SAMPLES_MIN} semaines non nulles)."
-            )
-        )
-        raise HTTPException(422, detail)
+    command = request_to_command(req, seed)
 
     try:
-        result, kind = await asyncio.wait_for(
-            run_in_threadpool(_compute_simulation_result, req, samples, seed),
+        result = await asyncio.wait_for(
+            run_in_threadpool(run_simulation, command),
             timeout=cfg.forecast_timeout_seconds,
         )
+    except InsufficientSimulationSamplesError as exc:
+        raise HTTPException(422, str(exc)) from exc
     except TimeoutError as exc:
         logger.warning(
             json.dumps(
@@ -214,7 +165,7 @@ async def simulate(
                     "mode": req.mode,
                     "n_sims": req.n_sims,
                     "timeout_seconds": cfg.forecast_timeout_seconds,
-                    "samples_count": int(len(samples)),
+                    "samples_count": len(command.throughput_samples),
                     "duration_ms": round((time.perf_counter() - started_at) * 1000, 2),
                 },
                 ensure_ascii=True,
@@ -225,44 +176,11 @@ async def simulate(
             "Simulation trop longue. Reessayez avec moins de simulations ou plus tard.",
         ) from exc
 
-    completion_summary = None
-    distribution_values = result
-    percentile_values = result
-    percentile_total_count = None
-    if isinstance(result, FinishWeeksSimulation):
-        completion_summary = CompletionSummary(
-            completed_count=result.completed_count,
-            censored_count=result.censored_count,
-            censored_rate=round(result.censored_rate, 4),
-            horizon_weeks=result.horizon_weeks,
-        )
-        distribution_values = result.completed_weeks
-        percentile_values = result.completed_weeks
-        percentile_total_count = int(result.weeks_needed.size)
-
-    simulation_percentiles = percentiles(
-        percentile_values,
-        req.mode,
-        ps=(50, 70, 90),
-        total_count=percentile_total_count,
-    )
-    p50 = simulation_percentiles.get("P50")
-    p90 = simulation_percentiles.get("P90")
-    reliability = ThroughputReliability(**throughput_reliability(samples))
-    response_model = SimulateResponse(
-        result_kind=kind,
-        result_percentiles=simulation_percentiles,
-        risk_score=risk_score(req.mode, p50, p90),
-        result_distribution=histogram_buckets(distribution_values),
-        completion_summary=completion_summary,
-        samples_count=int(len(samples)),
-        throughput_reliability=reliability,
-        seed=seed,
-    )
+    response_model = result_to_response(result)
 
     mc_client_id = (request.cookies.get(cfg.client_cookie_name) or "").strip()
     if mc_client_id and simulation_store.enabled:
-        background_tasks.add_task(_persist_simulation, mc_client_id, req, response_model)
+        background_tasks.add_task(_persist_simulation, mc_client_id, command, result)
 
     logger.info(
         json.dumps(
@@ -270,7 +188,7 @@ async def simulate(
                 "event": "simulation_completed",
                 "mode": req.mode,
                 "n_sims": req.n_sims,
-                "samples_count": response_model.samples_count,
+                "samples_count": result.samples_count,
                 "duration_ms": round((time.perf_counter() - started_at) * 1000, 2),
             },
             ensure_ascii=True,
@@ -290,6 +208,6 @@ def simulation_history(request: Request) -> list[SimulationHistoryItem]:
 
     try:
         rows = simulation_store.list_recent(mc_client_id)
-        return [SimulationHistoryItem(**row) for row in rows]
+        return [persistence_row_to_history_item(row) for row in rows]
     except Exception as exc:
         raise HTTPException(503, "Historique indisponible temporairement.") from exc

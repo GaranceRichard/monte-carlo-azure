@@ -1,4 +1,4 @@
-import type { CompletionSummary, ForecastKind, ForecastPercentiles, ThroughputReliability } from "../../types";
+import type { CompletionSummary, SimulationResultKind, SimulationPercentiles, ThroughputReliability } from "../../domain/simulation";
 import type { PortfolioScenarioResult } from "../../hooks/simulationTypes";
 import { buildProbabilityCurve } from "../../hooks/probability";
 import {
@@ -63,12 +63,12 @@ type PortfolioSectionInput = {
   nSims: number;
   types?: string[];
   doneStates?: string[];
-  resultKind: ForecastKind;
+  resultKind: SimulationResultKind;
   riskScore?: number;
   throughputReliability?: ThroughputReliability | null;
   distribution: Array<{ x: number; count: number }>;
   weeklyThroughput: Array<{ week: string; throughput: number }>;
-  displayPercentiles: ForecastPercentiles;
+  displayPercentiles: SimulationPercentiles;
   completionSummary?: CompletionSummary;
   decisionDiagnostic?: DecisionLanguage;
 };
@@ -114,7 +114,7 @@ function riskColor(label: string): string {
 
 function formatRiskScore(
   mode: "backlog_to_weeks" | "weeks_to_items",
-  percentiles: ForecastPercentiles,
+  percentiles: SimulationPercentiles,
 ): { score: number; label: string; valueLabel: string } | null {
   const score = computeRiskScoreFromPercentiles(mode, percentiles);
   if (score == null) return null;
@@ -160,31 +160,31 @@ function buildReliabilitySummary(reliability?: ThroughputReliability | null): st
 
   const summary = [
     {
-      matches: reliability.samples_count < 6,
+      matches: reliability.samplesCount < 6,
       text: "Historique trop court pour projeter avec confiance.",
     },
     {
-      matches: reliability.slope_norm <= -0.15,
+      matches: reliability.slopeNorm <= -0.15,
       text: "Throughput en forte baisse sur les dernières semaines.",
     },
     {
-      matches: reliability.slope_norm <= -0.05,
+      matches: reliability.slopeNorm <= -0.05,
       text: "Throughput en baisse sur les dernières semaines.",
     },
     {
-      matches: reliability.slope_norm >= 0.1,
+      matches: reliability.slopeNorm >= 0.1,
       text: "Throughput en forte hausse sur les dernières semaines.",
     },
     {
-      matches: reliability.slope_norm >= 0.05,
+      matches: reliability.slopeNorm >= 0.05,
       text: "Throughput en hausse sur les dernières semaines.",
     },
     {
-      matches: reliability.cv >= 1 || reliability.iqr_ratio >= 1,
+      matches: reliability.cv >= 1 || reliability.iqrRatio >= 1,
       text: "Dispersion élevée du throughput historique.",
     },
     {
-      matches: reliability.samples_count < 8,
+      matches: reliability.samplesCount < 8,
       text: "Volume historique encore limité.",
     },
   ].find((entry) => entry.matches);
@@ -211,7 +211,7 @@ function resolveRiskScore({
   riskScore,
 }: {
   simulationMode: "backlog_to_weeks" | "weeks_to_items";
-  displayPercentiles: ForecastPercentiles;
+  displayPercentiles: SimulationPercentiles;
   riskScore?: number;
 }): { score: number; label: string; valueLabel: string } | null {
   if (typeof riskScore === "number" && Number.isFinite(riskScore)) {
@@ -258,10 +258,10 @@ function buildTeamLikePageHtml({
   nSims: number;
   types?: string[];
   doneStates?: string[];
-  resultKind: ForecastKind;
+  resultKind: SimulationResultKind;
   distribution: Array<{ x: number; count: number }>;
   weeklyThroughput: Array<{ week: string; throughput: number }>;
-  displayPercentiles: ForecastPercentiles;
+  displayPercentiles: SimulationPercentiles;
   riskScore?: number;
   completionSummary?: CompletionSummary;
   throughputReliability?: ThroughputReliability | null;
@@ -295,7 +295,7 @@ function buildTeamLikePageHtml({
     gauss: smoothed[i],
   }));
   const totalSimulationCount = completionSummary
-    ? completionSummary.completed_count + completionSummary.censored_count
+    ? completionSummary.completedCount + completionSummary.censoredCount
     : undefined;
   const probabilityPoints = buildProbabilityCurve(sortedDistribution, resultKind, totalSimulationCount);
   const effectivePercentiles = displayPercentiles;
@@ -338,9 +338,9 @@ function buildTeamLikePageHtml({
             <h2 class="diagnostic-title">Diagnostic</h2>
             <div class="meta-row"><b>Lecture:</b> ${escapeHtml(reliabilitySummary)}</div>
             ${renderTechnicalMetricRow("CV", throughputReliability.cv)}
-            ${renderTechnicalMetricRow("IQR ratio", throughputReliability.iqr_ratio)}
-            ${renderTechnicalMetricRow("Pente normalisée", throughputReliability.slope_norm)}
-            ${Number.isFinite(throughputReliability.samples_count) ? `<div class="meta-row"><b>Semaines utilisées:</b> ${escapeHtml(String(throughputReliability.samples_count))}</div>` : ""}
+            ${renderTechnicalMetricRow("IQR ratio", throughputReliability.iqrRatio)}
+            ${renderTechnicalMetricRow("Pente normalisée", throughputReliability.slopeNorm)}
+            ${Number.isFinite(throughputReliability.samplesCount) ? `<div class="meta-row"><b>Semaines utilisées:</b> ${escapeHtml(String(throughputReliability.samplesCount))}</div>` : ""}
           </aside>` : ""}
         </div>
       </header>
@@ -348,12 +348,12 @@ function buildTeamLikePageHtml({
       <section class="kpis">
         ${["P50", "P70", "P90"]
           .filter((key) => {
-            const value = effectivePercentiles?.[key as keyof ForecastPercentiles];
+            const value = effectivePercentiles?.[key as keyof SimulationPercentiles];
             return typeof value === "number" && Number.isFinite(value);
           })
           .map(
             (key) =>
-              `<div class="kpi"><span class="kpi-label">${key}</span><span class="kpi-value">${formatPercentile(effectivePercentiles?.[key as keyof ForecastPercentiles])} ${escapeHtml(resultLabel)}</span></div>`,
+              `<div class="kpi"><span class="kpi-label">${key}</span><span class="kpi-value">${formatPercentile(effectivePercentiles?.[key as keyof SimulationPercentiles])} ${escapeHtml(resultLabel)}</span></div>`,
           )
           .join("")}
       </section>
@@ -367,8 +367,8 @@ function buildTeamLikePageHtml({
       </section>
       ${showSourceDiagnostic ? renderDecisionDiagnosticHtml(decisionDiagnostic) : ""}
       ${
-        completionSummary && completionSummary.censored_count > 0
-          ? `<section class="section"><div class="meta"><div class="meta-row"><b>Limite d'horizon:</b> ${escapeHtml(String(completionSummary.horizon_weeks))} semaines</div><div class="meta-row"><b>Censures:</b> ${escapeHtml(String(completionSummary.censored_count))} sur ${escapeHtml(String(completionSummary.completed_count + completionSummary.censored_count))} (${escapeHtml(formatMetric(completionSummary.censored_rate))})</div><div class="meta-row"><b>Lecture:</b> la distribution et les percentiles ne couvrent que les simulations terminées. Un percentile absent n'est pas identifiable avant l'horizon.</div></div></section>`
+        completionSummary && completionSummary.censoredCount > 0
+          ? `<section class="section"><div class="meta"><div class="meta-row"><b>Limite d'horizon:</b> ${escapeHtml(String(completionSummary.horizonWeeks))} semaines</div><div class="meta-row"><b>Censures:</b> ${escapeHtml(String(completionSummary.censoredCount))} sur ${escapeHtml(String(completionSummary.completedCount + completionSummary.censoredCount))} (${escapeHtml(formatMetric(completionSummary.censoredRate))})</div><div class="meta-row"><b>Lecture:</b> la distribution et les percentiles ne couvrent que les simulations terminées. Un percentile absent n'est pas identifiable avant l'horizon.</div></div></section>`
           : ""
       }
 
@@ -440,13 +440,13 @@ function buildSummaryPage({
     .join("");
 
   const overlaySeries: OverlayProbabilitySeries[] = orderedScenarios.map((scenario) => {
-    const summaryResultKind: ForecastKind = simulationMode === "weeks_to_items" ? "items" : "weeks";
+    const summaryResultKind: SimulationResultKind = simulationMode === "weeks_to_items" ? "items" : "weeks";
     const sortedDistribution = [...scenario.distribution]
       .map((p) => ({ x: Number(p.x), count: Number(p.count) }))
       .filter((p) => Number.isFinite(p.x) && Number.isFinite(p.count) && p.count > 0)
       .sort((a, b) => a.x - b.x);
     const totalSimulationCount = scenario.completionSummary
-      ? scenario.completionSummary.completed_count + scenario.completionSummary.censored_count
+      ? scenario.completionSummary.completedCount + scenario.completionSummary.censoredCount
       : undefined;
     const points = buildProbabilityCurve(sortedDistribution, summaryResultKind, totalSimulationCount);
     const color = scenario.label === "Optimiste"

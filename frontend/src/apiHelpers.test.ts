@@ -1,11 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { getApiBase, normalizeSimulateResponse, readJsonOr, toApiErrorMessage } from "./apiHelpers";
+import { getApiBase, readJsonOr, toApiErrorMessage } from "./apiHelpers";
 
 describe("api helpers", () => {
-  it("uses the configured API base and keeps the public simulation response unchanged", () => {
+  it("uses the configured API base", () => {
     expect(getApiBase()).toBe(import.meta.env.VITE_API_BASE ?? "");
-    const response = { result_kind: "weeks" as const, samples_count: 1, seed: 7, result_percentiles: {}, result_distribution: [] };
-    expect(normalizeSimulateResponse(response)).toBe(response);
   });
 
   it("reads JSON and falls back when the response body is invalid", async () => {

@@ -2621,6 +2621,63 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_git_staging.py::test_explicit_repository_ignores_an_inherited_foreign_git_context",
+    "framework": "pytest",
+    "sourcePath": "tests/test_git_staging.py",
+    "selector": "test_explicit_repository_ignores_an_inherited_foreign_git_context",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_git_staging.py::test_git_staging_errors_fail_closed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_git_staging.py",
+    "selector": "test_git_staging_errors_fail_closed",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_git_staging.py::test_parser_and_path_projection_cover_every_name_status_shape",
+    "framework": "pytest",
+    "sourcePath": "tests/test_git_staging.py",
+    "selector": "test_parser_and_path_projection_cover_every_name_status_shape",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_git_staging.py::test_relative_commit_index_is_read_and_exported_as_one_absolute_authority",
+    "framework": "pytest",
+    "sourcePath": "tests/test_git_staging.py",
+    "selector": "test_relative_commit_index_is_read_and_exported_as_one_absolute_authority",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_identity_boundary.py::test_backend_fetch_to_dev_azure_com_triggers_identity_008",
     "framework": "pytest",
     "sourcePath": "tests/test_identity_boundary.py",
@@ -4175,10 +4232,10 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_readme_requirement_scope_is_prefix_based",
+    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_readme_gate_accepts_only_commits_containing_an_added_or_modified_root_readme",
     "framework": "pytest",
     "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_readme_requirement_scope_is_prefix_based",
+    "selector": "test_readme_gate_accepts_only_commits_containing_an_added_or_modified_root_readme",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -4186,6 +4243,38 @@
       "functional"
     ],
     "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_readme_gate_rejects_every_staged_change_without_a_modified_root_readme",
+    "framework": "pytest",
+    "sourcePath": "tests/test_pre_commit_guard.py",
+    "selector": "test_readme_gate_rejects_every_staged_change_without_a_modified_root_readme",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_readme_gate_reports_when_readme_is_modified_only_in_worktree",
+    "framework": "pytest",
+    "sourcePath": "tests/test_pre_commit_guard.py",
+    "selector": "test_readme_gate_reports_when_readme_is_modified_only_in_worktree",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting",
       "quality_chain"
     ]
   },
@@ -4220,10 +4309,10 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_staged_files_exits_two_when_the_index_cannot_be_read",
+    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_staged_changes_exits_two_when_the_index_cannot_be_read",
     "framework": "pytest",
     "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_staged_files_exits_two_when_the_index_cannot_be_read",
+    "selector": "test_staged_changes_exits_two_when_the_index_cannot_be_read",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -4235,17 +4324,51 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_staged_files_reads_only_added_copied_modified_or_renamed_index_entries",
+    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_staged_changes_reads_added_modified_deleted_and_renamed_index_entries",
     "framework": "pytest",
     "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_staged_files_reads_only_added_copied_modified_or_renamed_index_entries",
+    "selector": "test_staged_changes_reads_added_modified_deleted_and_renamed_index_entries",
     "status": "classified",
     "executionProfile": "pr",
-    "nature": "component",
+    "nature": "unit",
     "purposes": [
       "functional"
     ],
     "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_worktree_readme_probe_is_read_only_and_fails_closed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_pre_commit_guard.py",
+    "selector": "test_worktree_readme_probe_is_read_only_and_fails_closed",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional",
+      "resilience"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_pre_commit_hook_integration.py::test_real_fast_path_uses_the_isolated_commit_index_for_the_readme_gate",
+    "framework": "pytest",
+    "sourcePath": "tests/test_pre_commit_hook_integration.py",
+    "selector": "test_real_fast_path_uses_the_isolated_commit_index_for_the_readme_gate",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops",
       "quality_chain"
     ]
   },
@@ -4985,6 +5108,22 @@
     "nature": "unit",
     "purposes": [
       "functional"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_index_environment_resolution_fails_closed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_quality_gate.py",
+    "selector": "test_index_environment_resolution_fails_closed",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
     ],
     "domains": [
       "quality_chain"
@@ -6407,6 +6546,134 @@
       "identity",
       "statistical_engine",
       "persistence"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_mappers.py::test_persistence_row_to_history_item_preserves_legacy_optional_fields",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_mappers.py",
+    "selector": "test_persistence_row_to_history_item_preserves_legacy_optional_fields",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "compatibility",
+      "migration_recovery"
+    ],
+    "domains": [
+      "statistical_engine",
+      "history",
+      "persistence"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_mappers.py::test_request_to_command_resolves_transport_values_and_seed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_mappers.py",
+    "selector": "test_request_to_command_resolves_transport_values_and_seed",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_mappers.py::test_result_to_response_preserves_public_json_and_omits_none_values",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_mappers.py",
+    "selector": "test_result_to_response_preserves_public_json_and_omits_none_values",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_service.py::test_service_has_no_http_or_pydantic_dependency",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_service.py",
+    "selector": "test_service_has_no_http_or_pydantic_dependency",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_service.py::test_service_preserves_histogram_reliability_and_risk_score",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_service.py",
+    "selector": "test_service_preserves_histogram_reliability_and_risk_score",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_service.py::test_service_preserves_total_and_partial_censure",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_service.py",
+    "selector": "test_service_preserves_total_and_partial_censure",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_service.py::test_service_rejects_insufficient_filtered_samples",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_service.py",
+    "selector": "test_service_rejects_insufficient_filtered_samples",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_service.py::test_service_runs_both_modes_without_changing_seeded_results",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_service.py",
+    "selector": "test_service_runs_both_modes_without_changing_seeded_results",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
     ]
   },
   {
@@ -10020,10 +10287,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/api.test.ts::postSimulate > keeps network errors observable to callers [20:3]",
+    "logicalCaseId": "vitest:frontend/src/api.test.ts::postSimulate > keeps network errors observable to callers [24:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/api.test.ts",
-    "selector": "postSimulate > keeps network errors observable to callers [20:3]",
+    "selector": "postSimulate > keeps network errors observable to callers [24:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -10057,10 +10324,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/api.test.ts::postSimulate > reports HTTP failures, including invalid JSON bodies [15:3]",
+    "logicalCaseId": "vitest:frontend/src/api.test.ts::postSimulate > reports HTTP failures, including invalid JSON bodies [19:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/api.test.ts",
-    "selector": "postSimulate > reports HTTP failures, including invalid JSON bodies [15:3]",
+    "selector": "postSimulate > reports HTTP failures, including invalid JSON bodies [19:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -10075,40 +10342,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [16:3]",
+    "logicalCaseId": "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > keeps absent optional response and history values absent [77:3]",
     "framework": "vitest",
-    "sourcePath": "frontend/src/apiHelpers.test.ts",
-    "selector": "api helpers > prefers the API error detail and otherwise uses the HTTP status [16:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "api"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [11:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/apiHelpers.test.ts",
-    "selector": "api helpers > reads JSON and falls back when the response body is invalid [11:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "api"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/apiHelpers.test.ts::api helpers > uses the configured API base and keeps the public simulation response unchanged [5:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/apiHelpers.test.ts",
-    "selector": "api helpers > uses the configured API base and keeps the public simulation response unchanged [5:3]",
+    "sourcePath": "frontend/src/api/simulationMappers.test.ts",
+    "selector": "simulation HTTP mappers > keeps absent optional response and history values absent [77:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -10117,6 +10354,81 @@
     ],
     "domains": [
       "statistical_engine",
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a business command to the unchanged public request DTO [20:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/api/simulationMappers.test.ts",
+    "selector": "simulation HTTP mappers > maps a business command to the unchanged public request DTO [20:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a complete response DTO to the camelCase business result [33:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/api/simulationMappers.test.ts",
+    "selector": "simulation HTTP mappers > maps a complete response DTO to the camelCase business result [33:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/apiHelpers.test.ts",
+    "selector": "api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "api"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [9:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/apiHelpers.test.ts",
+    "selector": "api helpers > reads JSON and falls back when the response body is invalid [9:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "api"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/apiHelpers.test.ts::api helpers > uses the configured API base [5:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/apiHelpers.test.ts",
+    "selector": "api helpers > uses the configured API base [5:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
       "api"
     ]
   },
@@ -17794,10 +18106,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > falls back to empty local state when storage contains invalid JSON [230:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > falls back to empty local state when storage contains invalid JSON [237:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > falls back to empty local state when storage contains invalid JSON [230:3]",
+    "selector": "useSimulationHistory > falls back to empty local state when storage contains invalid JSON [237:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -17811,10 +18123,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > ignores non-array stored values [240:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > ignores non-array stored values [247:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > ignores non-array stored values [240:3]",
+    "selector": "useSimulationHistory > ignores non-array stored values [247:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -17829,10 +18141,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > migrates versionless legacy cycle time weeks to schema v2 calendar days [72:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > migrates versionless legacy cycle time weeks to schema v2 calendar days [79:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > migrates versionless legacy cycle time weeks to schema v2 calendar days [72:3]",
+    "selector": "useSimulationHistory > migrates versionless legacy cycle time weeks to schema v2 calendar days [79:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -17849,10 +18161,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > normalizes schema v2 stored entries with mixed weekly throughput and cycle time rows [93:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > normalizes schema v2 stored entries with mixed weekly throughput and cycle time rows [100:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > normalizes schema v2 stored entries with mixed weekly throughput and cycle time rows [93:3]",
+    "selector": "useSimulationHistory > normalizes schema v2 stored entries with mixed weekly throughput and cycle time rows [100:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -17868,10 +18180,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > pushes entries with max history size and clears storage [250:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > pushes entries with max history size and clears storage [257:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > pushes entries with max history size and clears storage [250:3]",
+    "selector": "useSimulationHistory > pushes entries with max history size and clears storage [257:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -17886,10 +18198,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > skips non-object rows and preserves string warnings when optional collections are malformed [166:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > skips non-object rows and preserves string warnings when optional collections are malformed [173:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > skips non-object rows and preserves string warnings when optional collections are malformed [166:3]",
+    "selector": "useSimulationHistory > skips non-object rows and preserves string warnings when optional collections are malformed [173:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -17905,10 +18217,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > starts from local storage only [53:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > starts from local storage only [58:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > starts from local storage only [53:3]",
+    "selector": "useSimulationHistory > starts from local storage only [58:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -17922,10 +18234,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > uses a dedicated storage key in demo mode [272:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > uses a dedicated storage key in demo mode [279:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > uses a dedicated storage key in demo mode [272:3]",
+    "selector": "useSimulationHistory > uses a dedicated storage key in demo mode [279:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -18465,6 +18777,43 @@
       "functional"
     ],
     "domains": [
+      "history",
+      "persistence"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > preserves the legacy versionless cycle-time migration [84:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/storage/simulationHistoryMappers.test.ts",
+    "selector": "simulation history storage mappers > preserves the legacy versionless cycle-time migration [84:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "compatibility",
+      "migration_recovery"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine",
+      "history",
+      "persistence"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > writes the unchanged schema v2 JSON and reads it back to the business model [55:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/storage/simulationHistoryMappers.test.ts",
+    "selector": "simulation history storage mappers > writes the unchanged schema v2 JSON and reads it back to the business model [55:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine",
       "history",
       "persistence"
     ]

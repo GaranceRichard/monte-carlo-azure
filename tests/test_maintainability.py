@@ -262,6 +262,7 @@ def test_dependency_collection_resolves_relative_external_and_js_imports() -> No
     assert ("pkg/a.py", "pkg/helper.py") in dependencies
     assert ("pkg/helper.py", "external/package.py") in dependencies
     assert ("web/a.ts", "web/b.ts") in dependencies
+    assert ("web/a.ts", "external") in dependencies
 
 
 def test_cycles_include_self_edges_and_ignore_edges_outside_graph() -> None:

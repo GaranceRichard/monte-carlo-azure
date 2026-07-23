@@ -9,7 +9,7 @@ from pymongo.collection import Collection
 from pymongo.errors import OperationFailure, PyMongoError
 
 from .api_config import ApiConfig
-from .api_models import SimulateRequest, SimulateResponse
+from .simulation_models import SimulationCommand, SimulationResult
 
 SENSITIVE_HISTORY_FIELDS = {
     "selected_org": 0,
@@ -149,8 +149,8 @@ class SimulationStore:
     def save_simulation(
         self,
         mc_client_id: str,
-        req: SimulateRequest,
-        response: SimulateResponse,
+        command: SimulationCommand,
+        result: SimulationResult,
     ) -> None:
         if not self.enabled or not mc_client_id:
             return
@@ -163,21 +163,35 @@ class SimulationStore:
                 "mc_client_id": mc_client_id,
                 "created_at": now,
                 "last_seen": now,
-                "mode": req.mode,
-                "backlog_size": req.backlog_size,
-                "target_weeks": req.target_weeks,
-                "n_sims": req.n_sims,
-                "samples_count": response.samples_count,
-                "percentiles": response.result_percentiles,
-                "distribution": [bucket.model_dump() for bucket in response.result_distribution],
+                "mode": command.mode,
+                "backlog_size": command.backlog_size,
+                "target_weeks": command.target_weeks,
+                "n_sims": command.n_sims,
+                "samples_count": result.samples_count,
+                "percentiles": dict(result.result_percentiles),
+                "distribution": [
+                    {"x": bucket.x, "count": bucket.count}
+                    for bucket in result.result_distribution
+                ],
                 "completion_summary": (
-                    response.completion_summary.model_dump()
-                    if response.completion_summary is not None
+                    {
+                        "completed_count": result.completion_summary.completed_count,
+                        "censored_count": result.completion_summary.censored_count,
+                        "censored_rate": result.completion_summary.censored_rate,
+                        "horizon_weeks": result.completion_summary.horizon_weeks,
+                    }
+                    if result.completion_summary is not None
                     else None
                 ),
-                "throughput_reliability": response.throughput_reliability.model_dump(),
-                "include_zero_weeks": req.include_zero_weeks,
-                "seed": response.seed,
+                "throughput_reliability": {
+                    "cv": result.throughput_reliability.cv,
+                    "iqr_ratio": result.throughput_reliability.iqr_ratio,
+                    "slope_norm": result.throughput_reliability.slope_norm,
+                    "label": result.throughput_reliability.label,
+                    "samples_count": result.throughput_reliability.samples_count,
+                },
+                "include_zero_weeks": command.include_zero_weeks,
+                "seed": result.seed,
             }
             coll.insert_one(doc)
             coll.update_many({"mc_client_id": mc_client_id}, {"$set": {"last_seen": now}})

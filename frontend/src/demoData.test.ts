@@ -29,10 +29,10 @@ function buildDemoDiagnostic(teamName: string) {
   });
   const dataQuality = diagnoseDataQuality({ throughputSamples, includeZeroWeeks: true });
   const forecastUncertainty = diagnoseForecastUncertainty({
-    percentiles: result.result_percentiles,
-    completionSummary: result.completion_summary,
-    riskScore: result.risk_score,
-    throughputReliability: result.throughput_reliability,
+    percentiles: result.resultPercentiles,
+    completionSummary: result.completionSummary,
+    riskScore: result.riskScore,
+    throughputReliability: result.throughputReliability,
     throughputSamples,
   });
   return {
@@ -44,10 +44,10 @@ function buildDemoDiagnostic(teamName: string) {
       hasResult: true,
       throughputSamples,
       includeZeroWeeks: true,
-      percentiles: result.result_percentiles,
-      completionSummary: result.completion_summary,
-      riskScore: result.risk_score,
-      throughputReliability: result.throughput_reliability,
+      percentiles: result.resultPercentiles,
+      completionSummary: result.completionSummary,
+      riskScore: result.riskScore,
+      throughputReliability: result.throughputReliability,
       selectedOrg: DEMO_CONFIG.org,
       selectedProject: DEMO_CONFIG.project,
       selectedTeam: teamName,
@@ -136,7 +136,7 @@ describe("demoData", () => {
       status: "Décision appuyée par les données",
       action: "Utiliser la prévision en conservant les hypothèses documentées.",
     });
-    expect(beta.result.completion_summary?.censored_count).toBe(0);
+    expect(beta.result.completionSummary?.censoredCount).toBe(0);
     expect(beta.language?.decisionRecommendation.explanation).toContain("scénarios centraux et prudents");
     expect(beta.language?.decisionRecommendation.explanation).not.toContain("simulations n'aboutissent pas");
     expect(beta.language?.decisionRecommendation.action).toBe(

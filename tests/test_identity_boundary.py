@@ -252,8 +252,8 @@ def test_pat_in_forecast_request_payload_triggers_identity_004(repo_root: Path) 
     repo = _build_repo(
         repo_root,
         {
-            "frontend/src/types.ts": """
-                export type ForecastRequestPayload = {
+            "frontend/src/api/simulationDtos.ts": """
+                export type SimulateRequestDto = {
                   throughput_samples: number[];
                   mode: "backlog_to_weeks" | "weeks_to_items";
                   pat: string;

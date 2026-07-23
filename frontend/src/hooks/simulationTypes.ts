@@ -1,10 +1,14 @@
 import type {
   CompletionSummary,
-  CycleTimePoint,
-  ForecastMode,
-  ForecastPercentiles,
-  ForecastResponse,
+  HistogramBucket,
+  SimulationMode,
+  SimulationPercentiles,
+  SimulationResult as DomainSimulationResult,
   ThroughputReliability,
+} from "../domain/simulation";
+import type { SampleStats } from "../domain/simulationHistory";
+import type {
+  CycleTimePoint,
   WeeklyThroughputRow,
 } from "../types";
 import type { DecisionLanguage } from "../utils/decisionLanguage";
@@ -32,44 +36,14 @@ export type TooltipBaseProps = {
   itemStyle: Record<string, string | number>;
 };
 
-export type SampleStats = {
-  totalWeeks: number;
-  zeroWeeks: number;
-  usedWeeks: number;
-};
-
 export type StoredSimulationPrefs = {
   startDate?: string;
   endDate?: string;
-  simulationMode?: ForecastMode;
+  simulationMode?: SimulationMode;
   includeZeroWeeks?: boolean;
   backlogSize?: number;
   targetWeeks?: number;
   nSims?: number;
-};
-
-export type SimulationHistoryEntry = {
-  schemaVersion: 2;
-  id: string;
-  seed: number | null;
-  createdAt: string;
-  selectedOrg: string;
-  selectedProject: string;
-  selectedTeam: string;
-  startDate: string;
-  endDate: string;
-  simulationMode: ForecastMode;
-  includeZeroWeeks: boolean;
-  backlogSize: number;
-  targetWeeks: number;
-  nSims: number;
-  types: string[];
-  doneStates: string[];
-  sampleStats: SampleStats | null;
-  weeklyThroughput: WeeklyThroughputRow[];
-  cycleTimeDaysData?: CycleTimePoint[];
-  result: ForecastResponse;
-  warning?: string;
 };
 
 export type SimulationForecastControls = {
@@ -79,8 +53,8 @@ export type SimulationForecastControls = {
   setTargetWeeks: (value: number | string) => void;
   nSims: number | string;
   setNSims: (value: number | string) => void;
-  simulationMode: ForecastMode;
-  setSimulationMode: (value: ForecastMode) => void;
+  simulationMode: SimulationMode;
+  setSimulationMode: (value: SimulationMode) => void;
   includeZeroWeeks: boolean;
   setIncludeZeroWeeks: (value: boolean) => void;
 };
@@ -93,8 +67,8 @@ export type SimulationDateRange = {
 };
 
 export type SimulationResult = {
-  result: ForecastResponse | null;
-  displayPercentiles: ForecastPercentiles;
+  result: DomainSimulationResult | null;
+  displayPercentiles: SimulationPercentiles;
   throughputData: ThroughputPoint[];
   cycleTimeDaysData: CycleTimePoint[];
   cycleTimeTrendData: CycleTimeTrendPoint[];
@@ -114,17 +88,12 @@ export type PortfolioScenarioResult = {
   seed: number;
   samples: number[];
   weeklyData: WeeklyThroughputRow[];
-  percentiles: ForecastPercentiles;
+  percentiles: SimulationPercentiles;
   riskScore?: number;
   riskLegend?: "fiable" | "incertain" | "fragile" | "non fiable";
-  distribution: DistributionBucket[];
+  distribution: HistogramBucket[];
   completionSummary?: CompletionSummary;
   throughputReliability?: ThroughputReliability | null;
   decisionDiagnostic?: DecisionLanguage;
-};
-
-type DistributionBucket = {
-  x: number;
-  count: number;
 };
 

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { runSimulationForecast } from "./simulationForecastService";
 import { useSimulation } from "./useSimulation";
 import type { SimulationViewModel } from "./useSimulation";
-import type { SimulationHistoryEntry } from "./simulationTypes";
+import type { SimulationHistoryEntry } from "../domain/simulationHistory";
 
 const pushSimulationHistory = vi.fn();
 const clearSimulationHistory = vi.fn();
@@ -35,7 +35,7 @@ vi.mock("./useSimulationChartData", () => ({ useSimulationChartData: ({ weeklyTh
   cycleTimeSummary: { itemCount: 0, averageDays: null, hasSufficientData: false },
   mcHistData: result ? [{ x: 1, count: 1, gauss: 1 }] : [],
   probabilityCurveData: result ? [{ x: 1, probability: 100 }] : [],
-  displayPercentiles: result?.result_percentiles ?? {},
+  displayPercentiles: result?.resultPercentiles ?? {},
 }) }));
 
 function setup(overrides: Partial<Parameters<typeof useSimulation>[0]> = {}) {
@@ -46,7 +46,7 @@ const forecast = {
   sampleStats: { totalWeeks: 8, zeroWeeks: 1, usedWeeks: 7 },
   weeklyThroughput: [{ week: "2026-01-05", throughput: 3 }],
   cycleTimeDaysData: [],
-  result: { result_kind: "weeks" as const, samples_count: 8, seed: 42, result_percentiles: { P50: 3 }, result_distribution: [] },
+  result: { resultKind: "weeks" as const, samplesCount: 8, seed: 42, resultPercentiles: { P50: 3 }, resultDistribution: [] },
   warning: "partiel",
   historyEntry: { id: "history" },
 };
@@ -76,14 +76,14 @@ function reusableHistoryEntry(
     weeklyThroughput: [{ week: "2026-01-05", throughput: 8 }],
     cycleTimeDaysData: [],
     result: {
-      result_kind: simulation.simulationMode === "weeks_to_items" ? "items" : "weeks",
-      samples_count: Number(simulation.nSims),
+      resultKind: simulation.simulationMode === "weeks_to_items" ? "items" : "weeks",
+      samplesCount: Number(simulation.nSims),
       seed: 77,
-      result_percentiles: { P50: 10, P70: 12, P90: 15 },
-      risk_score: 0.5,
-      result_distribution: [{ x: 10, count: 5 }],
-      completion_summary: simulation.simulationMode === "backlog_to_weeks"
-        ? { completed_count: Number(simulation.nSims), censored_count: 0, censored_rate: 0, horizon_weeks: 521 }
+      resultPercentiles: { P50: 10, P70: 12, P90: 15 },
+      riskScore: 0.5,
+      resultDistribution: [{ x: 10, count: 5 }],
+      completionSummary: simulation.simulationMode === "backlog_to_weeks"
+        ? { completedCount: Number(simulation.nSims), censoredCount: 0, censoredRate: 0, horizonWeeks: 521 }
         : undefined,
     },
     ...overrides,
@@ -253,7 +253,7 @@ describe("useSimulation", () => {
     expect(pushSimulationHistory).not.toHaveBeenCalled();
     expect(result.current.notice).toBe("Simulation existante rechargée");
     expect(result.current.result).toEqual(entry.result);
-    expect(result.current.displayPercentiles).toEqual(entry.result.result_percentiles);
+    expect(result.current.displayPercentiles).toEqual(entry.result.resultPercentiles);
     expect(result.current.throughputData).toEqual(entry.weeklyThroughput);
   });
 

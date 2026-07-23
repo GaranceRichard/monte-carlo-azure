@@ -1,11 +1,14 @@
 import { getTeamDeliveryDataDirect } from "../adoClient";
 import { postSimulate } from "../api";
+import {
+  simulateResponseDtoToResult,
+  simulationCommandToDto,
+} from "../api/simulationMappers";
 import { getDemoCycleTime, getDemoThroughputSamples, getDemoWeeklyThroughput } from "../demoData";
 import type {
-  ForecastHistogramBucket,
-  ForecastRequestPayload,
-  ForecastResponse,
-} from "../types";
+  SimulationCommand,
+  SimulationResult,
+} from "../domain/simulation";
 import { toSafeNumber } from "../utils/math";
 import {
   SIMULATION_THROUGHPUT_SAMPLES_MIN,
@@ -23,7 +26,7 @@ import type {
   RunSimulationForecastResult,
   SimulateFromSamplesParams,
 } from "./simulationForecastService";
-import type { SampleStats, SimulationHistoryEntry } from "./simulationTypes";
+import type { SampleStats, SimulationHistoryEntry } from "../domain/simulationHistory";
 
 export async function fetchTeamThroughputCore(
   params: FetchTeamThroughputParams,
@@ -94,7 +97,7 @@ export async function fetchTeamThroughputCore(
 
 export async function simulateForecastFromSamplesCore(
   params: SimulateFromSamplesParams,
-): Promise<ForecastResponse> {
+): Promise<SimulationResult> {
   const {
     demoMode = false,
     seed,
@@ -114,40 +117,29 @@ export async function simulateForecastFromSamplesCore(
     targetWeeks,
     nSims,
   });
-
-  if (demoMode) {
-    return simulateMonteCarloLocal({
-      seed: simulationSeed,
-      throughputSamples,
-      includeZeroWeeks,
-      mode: simulationMode,
-      backlogSize: contract.backlogSize,
-      targetWeeks: contract.targetWeeks,
-      nSims: contract.nSims,
-    });
-  }
-
-  const payload: ForecastRequestPayload = {
-    throughput_samples: throughputSamples,
-    include_zero_weeks: includeZeroWeeks,
-    mode: simulationMode,
-    backlog_size: contract.backlogSize,
-    target_weeks: contract.targetWeeks,
-    n_sims: contract.nSims,
+  const command: SimulationCommand = {
     seed: simulationSeed,
+    throughputSamples,
+    includeZeroWeeks,
+    mode: simulationMode,
+    backlogSize: contract.backlogSize,
+    targetWeeks: contract.targetWeeks,
+    nSims: contract.nSims,
   };
 
-  const response = await postSimulate(payload);
-  const resolvedRiskScore = response.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, response.result_percentiles);
+  if (demoMode) {
+    return simulateMonteCarloLocal(command);
+  }
+
+  const response = simulateResponseDtoToResult(
+    await postSimulate(simulationCommandToDto(command)),
+  );
+  const resolvedRiskScore = response.riskScore
+    ?? computeRiskScoreFromPercentiles(simulationMode, response.resultPercentiles);
   return {
-    result_kind: response.result_kind,
-    samples_count: response.samples_count,
-    seed: response.seed,
-    result_percentiles: response.result_percentiles,
-    risk_score: resolvedRiskScore ?? undefined,
-    result_distribution: (response.result_distribution ?? []) as ForecastHistogramBucket[],
-    completion_summary: response.completion_summary,
-    throughput_reliability: response.throughput_reliability,
+    ...response,
+    riskScore: resolvedRiskScore ?? undefined,
+    resultDistribution: response.resultDistribution ?? [],
   };
 }
 
@@ -200,7 +192,7 @@ export async function runSimulationForecastCore(
 
   const historyEntry: SimulationHistoryEntry = {
     schemaVersion: 2,
-    id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${adjusted.seed}-${generateSimulationSeed()}`,
+    id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${String(adjusted.seed)}-${String(generateSimulationSeed())}`,
     seed: adjusted.seed,
     createdAt: new Date().toISOString(),
     selectedOrg,

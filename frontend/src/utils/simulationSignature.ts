@@ -1,5 +1,5 @@
-import type { ForecastMode } from "../types";
-import type { SimulationHistoryEntry } from "../hooks/simulationTypes";
+import type { SimulationMode } from "../domain/simulation";
+import type { SimulationHistoryEntry } from "../domain/simulationHistory";
 
 export type SimulationSignatureInput = {
   selectedOrg: string;
@@ -7,7 +7,7 @@ export type SimulationSignatureInput = {
   selectedTeam: string;
   startDate: string;
   endDate: string;
-  simulationMode: ForecastMode;
+  simulationMode: SimulationMode;
   includeZeroWeeks: boolean;
   backlogSize: number | string;
   targetWeeks: number | string;
@@ -22,7 +22,7 @@ export type CanonicalSimulationParameters = {
   selectedTeam: string;
   startDate: string;
   endDate: string;
-  simulationMode: ForecastMode;
+  simulationMode: SimulationMode;
   includeZeroWeeks: boolean;
   objective: { kind: "backlogSize" | "targetWeeks"; value: number };
   nSims: number;
@@ -71,7 +71,7 @@ export function buildHistoryEntrySignature(entry: SimulationHistoryEntry): strin
 }
 
 function hasFinitePercentiles(entry: SimulationHistoryEntry): boolean {
-  const values = Object.values(entry.result.result_percentiles ?? {});
+  const values = Object.values(entry.result.resultPercentiles ?? {});
   return values.length > 0
     && values.every((value) => typeof value === "number" && Number.isFinite(value));
 }
@@ -79,17 +79,17 @@ function hasFinitePercentiles(entry: SimulationHistoryEntry): boolean {
 export function isReusableSimulationHistoryEntry(entry: SimulationHistoryEntry): boolean {
   const expectedResultKind = entry.simulationMode === "weeks_to_items" ? "items" : "weeks";
   const result = entry.result;
-  const hasRiskInputs = typeof result.result_percentiles?.P50 === "number"
-    && Number.isFinite(result.result_percentiles.P50)
-    && typeof result.result_percentiles?.P90 === "number"
-    && Number.isFinite(result.result_percentiles.P90);
+  const hasRiskInputs = typeof result.resultPercentiles?.P50 === "number"
+    && Number.isFinite(result.resultPercentiles.P50)
+    && typeof result.resultPercentiles?.P90 === "number"
+    && Number.isFinite(result.resultPercentiles.P90);
   const hasCompletionSummary = entry.simulationMode !== "backlog_to_weeks"
     || Boolean(
-      result.completion_summary
-      && Number.isFinite(result.completion_summary.completed_count)
-      && Number.isFinite(result.completion_summary.censored_count)
-      && Number.isFinite(result.completion_summary.censored_rate)
-      && Number.isFinite(result.completion_summary.horizon_weeks),
+      result.completionSummary
+      && Number.isFinite(result.completionSummary.completedCount)
+      && Number.isFinite(result.completionSummary.censoredCount)
+      && Number.isFinite(result.completionSummary.censoredRate)
+      && Number.isFinite(result.completionSummary.horizonWeeks),
     );
 
   return entry.schemaVersion === 2
@@ -109,15 +109,15 @@ export function isReusableSimulationHistoryEntry(entry: SimulationHistoryEntry):
     && entry.weeklyThroughput.length > 0
     && entry.weeklyThroughput.every((point) => Boolean(point.week) && Number.isFinite(point.throughput))
     && Array.isArray(entry.cycleTimeDaysData)
-    && result.result_kind === expectedResultKind
-    && result.samples_count > 0
+    && result.resultKind === expectedResultKind
+    && result.samplesCount > 0
     && Number.isFinite(result.seed)
     && result.seed === entry.seed
-    && Boolean(result.result_percentiles)
+    && Boolean(result.resultPercentiles)
     && hasFinitePercentiles(entry)
-    && Array.isArray(result.result_distribution)
-    && result.result_distribution.every((point) => Number.isFinite(point.x) && Number.isFinite(point.count))
-    && (!hasRiskInputs || (typeof result.risk_score === "number" && Number.isFinite(result.risk_score)))
+    && Array.isArray(result.resultDistribution)
+    && result.resultDistribution.every((point) => Number.isFinite(point.x) && Number.isFinite(point.count))
+    && (!hasRiskInputs || (typeof result.riskScore === "number" && Number.isFinite(result.riskScore)))
     && hasCompletionSummary;
 }
 

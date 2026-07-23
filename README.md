@@ -202,6 +202,63 @@ bit à bit.
 
 ---
 
+## Architecture des simulations : DTO, domaine et persistance
+
+Les formes de transport ne servent plus de modèles statistiques internes. La séparation introduite par le
+PBI 2.3 rend chaque frontière explicite sans modifier les résultats produits :
+
+- `backend/api_models.py` reste réservé aux DTO Pydantic de `POST /simulate` et de l'historique HTTP ;
+- [`backend/simulation_models.py`](backend/simulation_models.py) définit les conteneurs métier immuables
+  `SimulationCommand`, `SimulationResult`, `HistogramBucket`, `CompletionSummary` et
+  `ThroughputReliability`, sans dépendance à FastAPI, Pydantic ou MongoDB ;
+- [`backend/simulation_service.py`](backend/simulation_service.py) orchestre les fonctions statistiques
+  existantes de `backend/mc_core.py`, puis retourne un `SimulationResult` ;
+- [`backend/simulation_mappers.py`](backend/simulation_mappers.py) convertit explicitement les DTO HTTP vers
+  le domaine et le résultat métier vers les DTO de réponse ou d'historique ;
+- `backend/simulation_store.py` reçoit la commande et le résultat métier, puis construit à sa frontière le
+  document Mongo existant.
+
+Côté TypeScript :
+
+- [`frontend/src/domain/`](frontend/src/domain/) contient les modèles métier en `camelCase`, indépendants de
+  React, de l'API et du stockage ;
+- [`frontend/src/api/`](frontend/src/api/) contient les DTO HTTP en `snake_case` et leurs mappers ;
+- [`frontend/src/storage/`](frontend/src/storage/) contient le DTO `localStorage` schema v2, ses mappers et
+  les migrations legacy existantes ;
+- `frontend/src/types.ts` conserve uniquement les types transverses, tandis que
+  `frontend/src/hooks/simulationTypes.ts` porte les types de présentation.
+
+Le chemin backend est désormais :
+
+```text
+SimulationCommand
+→ SimulateRequestDto
+→ POST /simulate
+→ SimulationCommand Python
+→ simulation_service / mc_core
+→ SimulationResult Python
+→ SimulateResponseDto
+→ SimulationResult TypeScript
+```
+
+Le chemin démo reste entièrement local :
+
+```text
+SimulationCommand TypeScript
+→ moteur Monte Carlo TypeScript
+→ SimulationResult TypeScript
+```
+
+Les hooks, le portefeuille, l'interface, les graphiques, les exports CSV et les rapports PDF consomment donc
+le même `SimulationResult` métier après les deux chemins. Les contrats JSON HTTP, les documents Mongo et les
+clés/formats `localStorage` restent inchangés ; aucune migration de données n'est requise. Cette évolution est
+strictement structurelle : elle ne change ni formule statistique, ni PRNG, ni ordre de tirage, ni percentile,
+ni censure, ni Risk Score, ni histogramme. Elle prépare les PBI 2.4 à 2.8, qui traiteront séparément les Value
+Objects, l'injection des sources variables, les jeux de référence, l'alignement statistique et la gate de
+parité.
+
+---
+
 ## Sécurité
 
 Le PAT Azure DevOps:
@@ -660,7 +717,11 @@ Vérification manuelle (si nécessaire):
 git config core.hooksPath .githooks
 ```
 
-Le hook `pre-commit` exécute `python Scripts/quality_gate.py fast` sur l’index Git. Le hook `pre-push`
+Le hook `pre-commit` exécute `python Scripts/quality_gate.py fast` sur l’index Git. Dès que cet index contient
+au moins un changement, `README.md` racine doit lui-même y être ajouté ou modifié. Une modification présente
+uniquement dans le worktree, un autre README, ou une suppression/renommage du README racine ne satisfait pas
+la règle. La pertinence de l'évolution documentée reste contrôlée par la DoD et la revue, sans heuristique
+fragile sur la longueur ou les mots employés. Le hook `pre-push`
 transmet ses références à `python Scripts/quality_gate.py push`, qui valide les commits poussés dans des
 worktrees détachés. GitHub Actions exécute `python Scripts/quality_gate.py ci` sur son checkout. La
 définition des contrôles reste donc unique ; le smoke test Docker est réservé à la CI. Les hooks restent
@@ -668,7 +729,7 @@ fail-fast et affichent la commande ainsi que la correction attendue.
 
 Le mode `fast` exécute notamment:
 
-- validation de mise à jour du `README.md` si des fichiers code/config sont committés
+- refus de tout index non vide qui ne contient pas un `README.md` racine ajouté ou modifié
 - validation que `README.md` ne contient ni mojibake (accents cassés), ni désaccentuation massive du texte français
 - `python Scripts/check_no_secrets.py`
   - bloque aussi les valeurs Azure DevOps non factices (`ADO_ORG`, `ADO_PROJECT`, etc.) dans la CI et les tests

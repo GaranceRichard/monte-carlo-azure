@@ -27,12 +27,12 @@ const throughputData = {
 };
 
 const simulationResult = {
-  result_kind: "weeks" as const,
-  samples_count: 100,
+  resultKind: "weeks" as const,
+  samplesCount: 100,
   seed: 123456,
-  risk_score: 0.3,
-  result_percentiles: { P50: 10, P70: 12, P90: 15 },
-  result_distribution: [{ x: 10, count: 25 }],
+  riskScore: 0.3,
+  resultPercentiles: { P50: 10, P70: 12, P90: 15 },
+  resultDistribution: [{ x: 10, count: 25 }],
 };
 
 function setup(teams = [{ name: "Team A" }, { name: "Team B" }]) {

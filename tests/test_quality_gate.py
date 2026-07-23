@@ -347,12 +347,15 @@ def indexed_repository(tmp_path: Path) -> Path:
 def test_change_context_characterizes_mode_inputs(monkeypatch) -> None:
     staged_calls = 0
 
-    def fake_staged_files() -> list[str]:
+    def fake_staged_changes() -> tuple[quality_gate.StagedChange, ...]:
         nonlocal staged_calls
         staged_calls += 1
-        return ["README.md", "docs/definition-of-done.md"]
+        return (
+            quality_gate.StagedChange("M", ("README.md",)),
+            quality_gate.StagedChange("M", ("docs/definition-of-done.md",)),
+        )
 
-    monkeypatch.setattr(quality_gate, "staged_files", fake_staged_files)
+    monkeypatch.setattr(quality_gate, "staged_changes", fake_staged_changes)
 
     fast = quality_gate.resolve_change_context("fast")
     push = quality_gate.resolve_change_context("push")
@@ -362,6 +365,7 @@ def test_change_context_characterizes_mode_inputs(monkeypatch) -> None:
     assert fast.mode == "fast"
     assert fast.changed_paths == ("README.md", "docs/definition-of-done.md")
     assert fast.changed_paths_source == quality_gate.InputSource.GIT_INDEX
+    assert fast.staged_changes == fake_staged_changes()
     assert fast.documentation_only
     assert fast.classification is not None
     assert fast.classification.level == quality_gate.ChangeLevel.MASSIVE
@@ -761,6 +765,20 @@ def test_plan_selection_output_explains_level_triggers_and_commands(capsys) -> N
     assert "Selected commands:" in output
     assert "Frontend lint (ESLint, zero warning)" in output
     assert "Selected frontend unit tests (Vitest)" in output
+
+    staged_context = quality_gate.build_change_context(
+        "fast",
+        ["README.md", "backend/api.py"],
+        staged_change_entries=(
+            quality_gate.StagedChange("M", ("README.md",)),
+            quality_gate.StagedChange("R", ("backend/old.py", "backend/api.py")),
+        ),
+    )
+    quality_gate._print_plan_selection(
+        quality_gate.build_execution_plan(staged_context)
+    )
+    staged_output = capsys.readouterr().out
+    assert "Staged changes: M README.md, R backend/old.py -> backend/api.py" in staged_output
 
 
 def test_fast_push_and_ci_modes_have_the_expected_scope() -> None:
@@ -2215,6 +2233,11 @@ def test_external_snapshot_basetemp_supports_a_nested_git_repository(
     run_process = subprocess.run
     monkeypatch.setenv("GIT_DIR", str(validation_root / ".git-from-index"))
     monkeypatch.setenv("GIT_WORK_TREE", str(validation_root))
+    monkeypatch.setenv("GIT_INDEX_FILE", str(validation_root / ".git-index-from-index"))
+    monkeypatch.setenv(
+        "GIT_OBJECT_DIRECTORY",
+        str(validation_root / ".git-objects-from-index"),
+    )
 
     def run(argv: tuple[str, ...], **_kwargs: object) -> subprocess.CompletedProcess[str]:
         nonlocal observed_basetemp
@@ -2224,6 +2247,8 @@ def test_external_snapshot_basetemp_supports_a_nested_git_repository(
         assert isinstance(command_env, dict)
         assert "GIT_DIR" not in command_env
         assert "GIT_WORK_TREE" not in command_env
+        assert "GIT_INDEX_FILE" not in command_env
+        assert "GIT_OBJECT_DIRECTORY" not in command_env
         result = run_process(
             ["git", "init", str(nested_repository)],
             check=False,
@@ -2264,7 +2289,9 @@ def test_first_failed_command_exit_code_is_propagated(monkeypatch) -> None:
         "Fix it.",
     )
     skipped = quality_gate.GateCommand(
-        "Test classification compliance", ("also-missing",), "Fix it."
+        "Test classification compliance",
+        ("also-missing",),
+        "Fix it.",
     )
     calls: list[str] = []
 
@@ -2284,6 +2311,7 @@ def test_first_failed_command_exit_code_is_propagated(monkeypatch) -> None:
             yield snapshot
 
     monkeypatch.setattr(quality_gate, "staged_index_snapshot", fake_snapshot)
+    monkeypatch.setattr(quality_gate, "_index_git_environment", lambda: {})
 
     def fake_run(
         command: quality_gate.GateCommand,
@@ -2558,9 +2586,30 @@ def test_git_helpers_and_staged_listing_cover_failures(tmp_path: Path, monkeypat
     )
     with pytest.raises(RuntimeError, match="checkout-index"):
         quality_gate._checkout_index(tmp_path, tmp_path)
+
+    monkeypatch.setattr(
+        quality_gate,
+        "read_staged_changes",
+        lambda *_a, **_k: (_ for _ in ()).throw(
+            quality_gate.GitStagingError("index failed")
+        ),
+    )
     with pytest.raises(RuntimeError, match="git diff"):
         quality_gate.staged_files()
     assert "index failed" in capsys.readouterr().err
+
+
+def test_index_environment_resolution_fails_closed(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(
+        quality_gate,
+        "index_git_environment",
+        lambda _root: (_ for _ in ()).throw(
+            quality_gate.GitStagingError("missing commit index")
+        ),
+    )
+
+    with pytest.raises(RuntimeError, match="missing commit index"):
+        quality_gate._index_git_environment(tmp_path)
 
 
 def test_push_plan_rejects_missing_remote_git_errors_and_invalid_revisions(
@@ -2913,13 +2962,19 @@ def test_remaining_quality_gate_success_and_cleanup_paths(tmp_path: Path, monkey
     monkeypatch.setattr(quality_gate, "_git_output", lambda *_a, **_k: oid.upper())
     assert quality_gate.resolve_commit_sha(oid, tmp_path) == oid
 
-    class Result:
-        returncode = 0
-        stdout = "backend/api.py\n\n"
-        stderr = ""
-
-    monkeypatch.setattr(quality_gate.subprocess, "run", lambda *_a, **_k: Result())
+    monkeypatch.setattr(
+        quality_gate,
+        "read_staged_changes",
+        lambda *_a, **_k: (
+            quality_gate.StagedChange("M", ("backend/api.py",)),
+        ),
+    )
     assert quality_gate.staged_files() == ["backend/api.py"]
+    monkeypatch.setattr(
+        quality_gate.subprocess,
+        "run",
+        lambda *_a, **_k: subprocess.CompletedProcess(["git"], 0, "", ""),
+    )
     assert quality_gate._run_worktree_command(["prune"], repository_root=tmp_path).returncode == 0
 
     with pytest.raises(RuntimeError, match="plain"):

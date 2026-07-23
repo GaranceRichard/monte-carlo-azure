@@ -132,8 +132,8 @@ describe("demo mode et normalisation", () => {
       nSims: 1000,
     });
 
-    expect(result.result_kind).toBe("items");
-    expect(result.result_percentiles.P50).toBeGreaterThan(0);
+    expect(result.resultKind).toBe("items");
+    expect(result.resultPercentiles.P50).toBeGreaterThan(0);
     expect(vi.mocked(postSimulate)).not.toHaveBeenCalled();
   });
 
@@ -148,8 +148,8 @@ describe("demo mode et normalisation", () => {
       nSims: 1000,
     });
 
-    expect(result.result_kind).toBe("weeks");
-    expect(result.result_percentiles.P50).toBeGreaterThan(0);
+    expect(result.resultKind).toBe("weeks");
+    expect(result.resultPercentiles.P50).toBeGreaterThan(0);
     expect(vi.mocked(postSimulate)).not.toHaveBeenCalled();
   });
 
@@ -167,7 +167,7 @@ describe("demo mode et normalisation", () => {
       nSims: 20000,
     });
 
-    expect(result.risk_score).toBeCloseTo((13 - 8) / 8);
+    expect(result.riskScore).toBeCloseTo((13 - 8) / 8);
   });
 
   it("laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent", async () => {
@@ -185,7 +185,7 @@ describe("demo mode et normalisation", () => {
       nSims: 20000,
     });
 
-    expect(result.risk_score).toBeUndefined();
+    expect(result.riskScore).toBeUndefined();
   });
 });
 
@@ -303,13 +303,13 @@ describe("appels réseau", () => {
 
     const result = await runSimulationForecast(baseParams());
 
-    expect(result.result.result_distribution).toEqual([]);
+    expect(result.result.resultDistribution).toEqual([]);
   });
 
   it("propage throughput_reliability tel quel", async () => {
     const result = await runSimulationForecast(baseParams());
 
-    expect(result.result.throughput_reliability).toEqual(API_RESPONSE_WEEKS.throughput_reliability);
+    expect(result.result.throughputReliability).toEqual({ cv: 0.22, iqrRatio: 0.3, slopeNorm: -0.02, label: "fiable", samplesCount: 6 });
   });
 });
 

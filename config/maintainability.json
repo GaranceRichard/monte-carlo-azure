@@ -32,6 +32,42 @@
       "evidence": "ARCHITECTURE.md: le backend FastAPI constitue la frontière serveur séparée du code navigateur.",
       "sourcePatterns": ["backend/**"],
       "forbiddenPatterns": ["frontend/src/**"]
+    },
+    {
+      "id": "simulation-service-must-not-depend-on-http",
+      "evidence": "PBI 2.3 et ARCHITECTURE.md: le service statistique est une couche métier sans Pydantic, FastAPI, Starlette ni DTO HTTP.",
+      "sourcePatterns": ["backend/simulation_service.py"],
+      "forbiddenPatterns": ["backend/api_models.py", "pydantic.py", "fastapi.py", "starlette.py"]
+    },
+    {
+      "id": "simulation-store-must-not-depend-on-http-dtos",
+      "evidence": "PBI 2.3 et ARCHITECTURE.md: la persistance sérialise les modèles métier et ne dépend pas des DTO Pydantic.",
+      "sourcePatterns": ["backend/simulation_store.py"],
+      "forbiddenPatterns": ["backend/api_models.py"]
+    },
+    {
+      "id": "simulation-domain-must-remain-framework-free",
+      "evidence": "PBI 2.3 et ARCHITECTURE.md: le domaine frontend ne dépend ni de HTTP, ni de React/hooks, ni du stockage.",
+      "sourcePatterns": ["frontend/src/domain/**"],
+      "forbiddenPatterns": [
+        "frontend/src/api.ts",
+        "frontend/src/api/**",
+        "frontend/src/hooks/**",
+        "frontend/src/storage/**",
+        "react"
+      ]
+    },
+    {
+      "id": "simulation-ui-must-not-depend-on-http-dtos",
+      "evidence": "PBI 2.3 et ARCHITECTURE.md: les composants consomment les modèles métier et non les formes JSON de transport.",
+      "sourcePatterns": ["frontend/src/components/**"],
+      "forbiddenPatterns": ["frontend/src/api/simulationDtos.ts"]
+    },
+    {
+      "id": "local-simulation-engine-must-not-depend-on-http-dtos",
+      "evidence": "PBI 2.3 et ARCHITECTURE.md: le moteur local produit SimulationResult sans importer les DTO API.",
+      "sourcePatterns": ["frontend/src/utils/simulation.ts"],
+      "forbiddenPatterns": ["frontend/src/api/simulationDtos.ts"]
     }
   ]
 }

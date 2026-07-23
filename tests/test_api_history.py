@@ -10,10 +10,10 @@ class _FakeStore:
         self.fail = fail
         self.saved: list[tuple[str, dict, dict]] = []
 
-    def save_simulation(self, mc_client_id, req, response):
+    def save_simulation(self, mc_client_id, command, result):
         if self.fail:
             raise RuntimeError("mongo down")
-        self.saved.append((mc_client_id, req.model_dump(), response.model_dump()))
+        self.saved.append((mc_client_id, command, result))
 
     def list_recent(self, mc_client_id):
         if self.fail:
@@ -40,13 +40,13 @@ def test_simulate_persists_when_cookie_present(monkeypatch):
 
     assert r.status_code == 200
     assert len(fake.saved) == 1
-    saved_id, saved_req, saved_resp = fake.saved[0]
+    saved_id, saved_command, saved_result = fake.saved[0]
     assert saved_id.startswith("f47ac10b")
-    assert "capacity_percent" not in saved_req
-    assert "client_context" not in saved_req
-    assert "result_percentiles" in saved_resp
-    assert "seed" in saved_resp
-    assert saved_resp["throughput_reliability"]["samples_count"] == 6
+    assert not hasattr(saved_command, "capacity_percent")
+    assert not hasattr(saved_command, "client_context")
+    assert saved_result.result_percentiles
+    assert saved_result.seed is not None
+    assert saved_result.throughput_reliability.samples_count == 6
 
 
 def test_simulate_rejects_legacy_client_context(monkeypatch):

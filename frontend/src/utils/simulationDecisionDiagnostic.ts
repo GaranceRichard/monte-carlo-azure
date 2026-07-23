@@ -1,5 +1,5 @@
-import type { CompletionSummary, ForecastMode, ForecastPercentiles, ThroughputReliability } from "../types";
-import type { SimulationHistoryEntry } from "../hooks/simulationTypes";
+import type { CompletionSummary, SimulationMode, SimulationPercentiles, ThroughputReliability } from "../domain/simulation";
+import type { SimulationHistoryEntry } from "../domain/simulationHistory";
 import {
   countUsableThroughputSamples,
   diagnoseDataQuality,
@@ -21,7 +21,7 @@ type SimulationDecisionDiagnosticInput = {
   throughputSamples: readonly number[];
   includeZeroWeeks: boolean;
   adoDataWarning?: string | null;
-  percentiles: ForecastPercentiles;
+  percentiles: SimulationPercentiles;
   completionSummary?: CompletionSummary;
   riskScore?: number | null;
   throughputReliability?: ThroughputReliability | null;
@@ -30,7 +30,7 @@ type SimulationDecisionDiagnosticInput = {
   selectedTeam: string;
   startDate: string;
   endDate: string;
-  simulationMode: ForecastMode;
+  simulationMode: SimulationMode;
   backlogSize: number | string;
   targetWeeks: number | string;
   types: readonly string[];
@@ -63,7 +63,7 @@ export function buildSimulationDecisionLanguage({
 }: SimulationDecisionDiagnosticInput): DecisionLanguage | undefined {
   const hasDisplayPercentile = ["P50", "P70", "P90"].some(
     (key) => {
-      const value = percentiles[key as keyof ForecastPercentiles];
+      const value = percentiles[key as keyof SimulationPercentiles];
       return typeof value === "number" && Number.isFinite(value);
     },
   );
@@ -111,7 +111,7 @@ export function buildSimulationDecisionLanguage({
       targetWeeks: entry.targetWeeks,
       types: entry.types,
       doneStates: entry.doneStates,
-      p90: entry.result.result_percentiles?.P90,
+      p90: entry.result.resultPercentiles?.P90,
       usableWeeks: entry.sampleStats?.usedWeeks
         ?? countUsableThroughputSamples(
           entry.weeklyThroughput.map((point) => point.throughput),

@@ -10,10 +10,10 @@ from pymongo.errors import AutoReconnect, OperationFailure, PyMongoError
 
 import backend.simulation_store as simulation_store_module
 from backend.api_config import ApiConfig
-from backend.api_models import (
-    DistributionBucket,
-    SimulateRequest,
-    SimulateResponse,
+from backend.simulation_models import (
+    HistogramBucket,
+    SimulationCommand,
+    SimulationResult,
     ThroughputReliability,
 )
 from backend.simulation_store import SENSITIVE_HISTORY_FIELDS, SimulationStore
@@ -124,19 +124,21 @@ def _cfg(mongo_url: str) -> ApiConfig:
 
 
 def _req_resp():
-    req = SimulateRequest(
-        throughput_samples=[1, 2, 3, 4, 5, 6],
+    req = SimulationCommand(
+        throughput_samples=(1, 2, 3, 4, 5, 6),
         include_zero_weeks=False,
         mode="backlog_to_weeks",
         backlog_size=20,
+        target_weeks=None,
         n_sims=2000,
         seed=98765,
     )
-    resp = SimulateResponse(
+    resp = SimulationResult(
         result_kind="weeks",
         result_percentiles={"P50": 10, "P70": 12, "P90": 14},
         risk_score=0.4,
-        result_distribution=[DistributionBucket(x=8, count=12)],
+        result_distribution=(HistogramBucket(x=8, count=12),),
+        completion_summary=None,
         samples_count=6,
         throughput_reliability=ThroughputReliability(
             cv=0.25,

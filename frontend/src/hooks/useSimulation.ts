@@ -3,16 +3,15 @@ import type { Dispatch, SetStateAction } from "react";
 import type {
   AppStep,
   CycleTimePoint,
-  ForecastResponse,
   WeeklyThroughputRow,
 } from "../types";
+import type { SimulationResult as DomainSimulationResult } from "../domain/simulation";
+import type { SampleStats, SimulationHistoryEntry } from "../domain/simulationHistory";
 import type {
   ChartTab,
-  SampleStats,
   SimulationDateRange,
   SimulationForecastControls,
-  SimulationHistoryEntry,
-  SimulationResult,
+  SimulationResult as SimulationViewResult,
   TooltipBaseProps,
 } from "./simulationTypes";
 import { exportThroughputCsv as exportCsv } from "../utils/export";
@@ -43,7 +42,7 @@ const TOOLTIP_BASE_PROPS: TooltipBaseProps = {
 
 export type SimulationViewModel = SimulationForecastControls &
   SimulationDateRange &
-  SimulationResult & {
+  SimulationViewResult & {
   selectedOrg: string;
   selectedProject: string;
   loading: boolean;
@@ -124,7 +123,7 @@ export function useSimulation({
   const [notice, setNotice] = useState("");
   const [doneStates, setDoneStates] = useState<string[]>([]);
   const [types, setTypes] = useState<string[]>([]);
-  const [result, setResult] = useState<ForecastResponse | null>(null);
+  const [result, setResult] = useState<DomainSimulationResult | null>(null);
   const [weeklyThroughput, setWeeklyThroughput] = useState<WeeklyThroughputRow[]>([]);
   const [cycleTimeDaysData, setCycleTimeDaysData] = useState<CycleTimePoint[]>([]);
   const [activeChartTab, setActiveChartTab] = useState<ChartTab>("cycle_time");

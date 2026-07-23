@@ -117,14 +117,14 @@ vi.mock("../../hooks/SimulationContext", () => ({
 function buildSimulation(overrides: Partial<Record<string, unknown>> = {}) {
   return {
     result: {
-      result_kind: "weeks",
+      resultKind: "weeks",
       seed: 123,
-      throughput_reliability: {
+      throughputReliability: {
         label: "fiable",
         cv: 0.12,
-        iqr_ratio: 0.34,
-        slope_norm: 0.05,
-        samples_count: 12,
+        iqrRatio: 0.34,
+        slopeNorm: 0.05,
+        samplesCount: 12,
       },
     },
     activeChartTab: "cycle_time",
@@ -266,14 +266,14 @@ describe("SimulationChartTabs", () => {
     computeThroughputReliability.mockReturnValue({
       label: "fragile",
       cv: 0.91,
-      iqr_ratio: 0.48,
-      slope_norm: 0.27,
-      samples_count: 8,
+      iqrRatio: 0.48,
+      slopeNorm: 0.27,
+      samplesCount: 8,
     });
     simulationContextValue = {
       selectedTeam: "Team Alpha",
       simulation: buildSimulation({
-        result: { result_kind: "weeks", seed: 234 },
+        result: { resultKind: "weeks", seed: 234 },
       }),
     };
 
@@ -288,7 +288,7 @@ describe("SimulationChartTabs", () => {
     simulationContextValue = {
       selectedTeam: "Team Alpha",
       simulation: buildSimulation({
-        result: { result_kind: "weeks", seed: 345 },
+        result: { resultKind: "weeks", seed: 345 },
       }),
     };
 
@@ -409,14 +409,14 @@ describe("SimulationChartTabs", () => {
       selectedTeam: "Team Alpha",
       simulation: buildSimulation({
         result: {
-          result_kind: "weeks",
+          resultKind: "weeks",
           seed: 456,
-          throughput_reliability: {
+          throughputReliability: {
             label: "mystere",
             cv: 0.33,
-            iqr_ratio: 0.22,
-            slope_norm: 0.11,
-            samples_count: 7,
+            iqrRatio: 0.22,
+            slopeNorm: 0.11,
+            samplesCount: 7,
           },
         },
         cycleTimeDaysData: [{ week: "2026-W01", cycleTimeDays: 1.2, count: 0 }],
@@ -450,14 +450,14 @@ describe("SimulationChartTabs", () => {
       selectedTeam: "Team Alpha",
       simulation: buildSimulation({
         result: {
-          result_kind: "items",
+          resultKind: "items",
           seed: 567,
-          throughput_reliability: {
+          throughputReliability: {
             label: "incertain",
             cv: 0.42,
-            iqr_ratio: 0.3,
-            slope_norm: 0.14,
-            samples_count: 9,
+            iqrRatio: 0.3,
+            slopeNorm: 0.14,
+            samplesCount: 9,
           },
         },
       }),

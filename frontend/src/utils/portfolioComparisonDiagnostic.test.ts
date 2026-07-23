@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ThroughputReliability } from "../types";
+import type { ThroughputReliability } from "../domain/simulation";
 import {
   buildPortfolioComparisonDiagnostic,
   type PortfolioComparisonDiagnosticInput,
@@ -11,10 +11,10 @@ function reliability(
 ): ThroughputReliability {
   return {
     cv: label === "fragile" ? 1.1 : 0.2,
-    iqr_ratio: label === "fragile" ? 1.1 : 0.2,
-    slope_norm: slope,
+    iqrRatio: label === "fragile" ? 1.1 : 0.2,
+    slopeNorm: slope,
     label,
-    samples_count: 12,
+    samplesCount: 12,
   };
 }
 

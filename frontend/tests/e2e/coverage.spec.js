@@ -2659,9 +2659,9 @@ test.describe("e2e istanbul coverage", () => {
           objectThroughputWarning: objectThroughput.warning,
           demoFilteredSamples: demoFilteredThroughput.throughputSamples.length,
           warningThroughputMessage: warningThroughput.warning,
-          backlogKind: backlogResponse.result_kind,
-          demoBacklogKind: demoBacklogResponse.result_kind,
-          itemsKind: itemsResponse.result_kind,
+          backlogKind: backlogResponse.resultKind,
+          demoBacklogKind: demoBacklogResponse.resultKind,
+          itemsKind: itemsResponse.resultKind,
           fallbackProject: forecast.historyEntry.result ? forecast.historyEntry.selectedProject : "",
           simulateDetailError,
           simulateHttpError,
@@ -2910,9 +2910,9 @@ test.describe("e2e istanbul coverage", () => {
           [{ week: "2026-01-05", throughput: 10 }, { week: "2026-01-12", throughput: 20 }],
           [{ week: "2026-01-05", throughput: 5 }, { week: "2026-01-12", throughput: 15 }],
         ], true)[0],
-        backlogKind: backlogResult.result_kind,
-        itemsKind: itemsResult.result_kind,
-        histogramBuckets: histogramResult.result_distribution.length,
+        backlogKind: backlogResult.resultKind,
+        itemsKind: itemsResult.resultKind,
+        histogramBuckets: histogramResult.resultDistribution.length,
       };
     });
 

@@ -38,10 +38,10 @@ function setContext({
   resetSimulationResults?: ReturnType<typeof vi.fn>;
   throughputReliability?: {
     cv: number;
-    iqr_ratio: number;
-    slope_norm: number;
+    iqrRatio: number;
+    slopeNorm: number;
     label: "fiable" | "incertain" | "fragile" | "non fiable";
-    samples_count: number;
+    samplesCount: number;
   };
 }): ReturnType<typeof vi.fn> {
   vi.mocked(useSimulationContext).mockReturnValue({
@@ -64,7 +64,7 @@ function setContext({
       targetWeeks: 12,
       includeZeroWeeks: true,
       nSims: 20000,
-      result: throughputReliability ? { throughput_reliability: throughputReliability } : null,
+      result: throughputReliability ? { throughputReliability: throughputReliability } : null,
     },
   } as never);
   return runForecast;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { ForecastMode } from "../types";
+import type { SimulationMode } from "../domain/simulation";
 import { nWeeksAgo, today } from "../date";
 import { storageGetItem, storageSetItem } from "../storage";
 import type { StoredSimulationPrefs } from "./simulationTypes";
@@ -23,8 +23,8 @@ export type SimulationPrefsState = {
   setStartDate: (value: string) => void;
   endDate: string;
   setEndDate: (value: string) => void;
-  simulationMode: ForecastMode;
-  setSimulationMode: (value: ForecastMode) => void;
+  simulationMode: SimulationMode;
+  setSimulationMode: (value: SimulationMode) => void;
   includeZeroWeeks: boolean;
   setIncludeZeroWeeks: (value: boolean) => void;
   backlogSize: number | string;
@@ -45,7 +45,7 @@ export function useSimulationPrefs(
   const [endDate, setEndDate] = useState(() =>
     defaults.forceDefaults ? defaults.endDate || today() : prefs.endDate || defaults.endDate || today(),
   );
-  const [simulationMode, setSimulationMode] = useState<ForecastMode>(() => prefs.simulationMode || "backlog_to_weeks");
+  const [simulationMode, setSimulationMode] = useState<SimulationMode>(() => prefs.simulationMode || "backlog_to_weeks");
   const [includeZeroWeeks, setIncludeZeroWeeks] = useState(() => prefs.includeZeroWeeks ?? true);
   const [backlogSize, setBacklogSize] = useState<number | string>(prefs.backlogSize ?? 120);
   const [targetWeeks, setTargetWeeks] = useState<number | string>(prefs.targetWeeks ?? 12);

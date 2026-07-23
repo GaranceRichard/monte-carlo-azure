@@ -1,5 +1,3 @@
-import type { SimulateResponse } from "./api";
-
 export function getApiBase(): string {
   return import.meta.env.VITE_API_BASE ?? "";
 }
@@ -10,8 +8,4 @@ export async function readJsonOr<T>(response: Response, fallback: T): Promise<T>
 
 export function toApiErrorMessage(status: number, data: { detail?: string }): string {
   return data.detail ?? `HTTP ${status}`;
-}
-
-export function normalizeSimulateResponse(data: SimulateResponse): SimulateResponse {
-  return data;
 }

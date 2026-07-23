@@ -9,7 +9,11 @@ describe("postSimulate", () => {
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(data), { status: 200 }));
 
     await expect(postSimulate({ throughput_samples: [1, 2], mode: "backlog_to_weeks", backlog_size: 3, n_sims: 1000 })).resolves.toEqual(data);
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringMatching(/\/simulate$/), expect.objectContaining({ method: "POST", credentials: "include" }));
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringMatching(/\/simulate$/), expect.objectContaining({
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify({ throughput_samples: [1, 2], mode: "backlog_to_weeks", backlog_size: 3, n_sims: 1000 }),
+    }));
   });
 
   it("reports HTTP failures, including invalid JSON bodies", async () => {

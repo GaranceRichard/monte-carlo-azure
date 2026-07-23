@@ -1,5 +1,5 @@
-import type { ForecastMode, ForecastResponse } from "../types";
-import type { SampleStats, SimulationHistoryEntry } from "./simulationTypes";
+import type { SimulationMode, SimulationResult } from "../domain/simulation";
+import type { SampleStats, SimulationHistoryEntry } from "../domain/simulationHistory";
 import {
   fetchTeamThroughputCore,
   runSimulationForecastCore,
@@ -19,7 +19,7 @@ export type RunSimulationForecastParams = {
   doneStates: string[];
   types: string[];
   includeZeroWeeks: boolean;
-  simulationMode: ForecastMode;
+  simulationMode: SimulationMode;
   backlogSize: number | string;
   targetWeeks: number | string;
   nSims: number | string;
@@ -29,7 +29,7 @@ export type RunSimulationForecastResult = {
   weeklyThroughput: SimulationHistoryEntry["weeklyThroughput"];
   cycleTimeDaysData: NonNullable<SimulationHistoryEntry["cycleTimeDaysData"]>;
   sampleStats: SampleStats;
-  result: ForecastResponse;
+  result: SimulationResult;
   historyEntry: SimulationHistoryEntry;
   warning?: string;
 };
@@ -61,7 +61,7 @@ export type SimulateFromSamplesParams = {
   seed?: number;
   throughputSamples: number[];
   includeZeroWeeks?: boolean;
-  simulationMode: ForecastMode;
+  simulationMode: SimulationMode;
   backlogSize: number | string;
   targetWeeks: number | string;
   nSims: number | string;
@@ -71,7 +71,7 @@ export function fetchTeamThroughput(params: FetchTeamThroughputParams): Promise<
   return fetchTeamThroughputCore(params);
 }
 
-export function simulateForecastFromSamples(params: SimulateFromSamplesParams): Promise<ForecastResponse> {
+export function simulateForecastFromSamples(params: SimulateFromSamplesParams): Promise<SimulationResult> {
   return simulateForecastFromSamplesCore(params);
 }
 

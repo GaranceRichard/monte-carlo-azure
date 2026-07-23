@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import type { CycleTimePoint, ForecastPercentiles, ForecastResponse, WeeklyThroughputRow } from "../types";
+import type { SimulationPercentiles, SimulationResult } from "../domain/simulation";
+import type { CycleTimePoint, WeeklyThroughputRow } from "../types";
 import { buildAtLeastPercentiles, buildProbabilityCurve } from "./probability";
 import type { ChartPoint, ProbabilityPoint, ThroughputPoint } from "./simulationTypes";
 import { buildCycleTimeTrendData, summarizeCycleTime } from "../utils/cycleTime";
@@ -22,7 +23,7 @@ function smoothHistogramCounts(points: Array<{ x: number; count: number }>): num
   });
 }
 
-function isLegacyItemsPercentiles(percentiles: ForecastPercentiles): boolean {
+function isLegacyItemsPercentiles(percentiles: SimulationPercentiles): boolean {
   const p50 = Number(percentiles.P50);
   const p70 = Number(percentiles.P70);
   const p90 = Number(percentiles.P90);
@@ -38,7 +39,7 @@ export function useSimulationChartData({
   weeklyThroughput: WeeklyThroughputRow[];
   cycleTimeDaysData: CycleTimePoint[];
   includeZeroWeeks: boolean;
-  result: ForecastResponse | null;
+  result: SimulationResult | null;
 }) {
   const throughputData = useMemo((): ThroughputPoint[] => {
     const rows = includeZeroWeeks ? weeklyThroughput : weeklyThroughput.filter((row) => row.throughput > 0);
@@ -52,7 +53,7 @@ export function useSimulationChartData({
   const cycleTimeSummary = useMemo(() => summarizeCycleTime(cycleTimeDaysData), [cycleTimeDaysData]);
 
   const mcHistData = useMemo((): ChartPoint[] => {
-    const buckets = result?.result_distribution;
+    const buckets = result?.resultDistribution;
     if (!buckets?.length) return [];
 
     const points = buckets
@@ -71,30 +72,30 @@ export function useSimulationChartData({
   }, [result]);
 
   const probabilityCurveData = useMemo((): ProbabilityPoint[] => {
-    if (!result?.result_distribution?.length) return [];
+    if (!result?.resultDistribution?.length) return [];
 
-    const points = result.result_distribution
+    const points = result.resultDistribution
       .map((b) => ({ x: Number(b.x), count: Number(b.count) }))
       .filter((b) => Number.isFinite(b.x) && Number.isFinite(b.count) && b.count > 0)
       .sort((a, b) => a.x - b.x);
     if (!points.length) return [];
 
-    const totalCount = result.completion_summary
-      ? result.completion_summary.completed_count + result.completion_summary.censored_count
+    const totalCount = result.completionSummary
+      ? result.completionSummary.completedCount + result.completionSummary.censoredCount
       : undefined;
-    return buildProbabilityCurve(points, result.result_kind, totalCount);
+    return buildProbabilityCurve(points, result.resultKind, totalCount);
   }, [result]);
 
-  const displayPercentiles = useMemo((): ForecastPercentiles => {
+  const displayPercentiles = useMemo((): SimulationPercentiles => {
     if (!result) return {};
-    if (result.result_kind !== "items") return result.result_percentiles;
-    if (!isLegacyItemsPercentiles(result.result_percentiles)) return result.result_percentiles;
+    if (result.resultKind !== "items") return result.resultPercentiles;
+    if (!isLegacyItemsPercentiles(result.resultPercentiles)) return result.resultPercentiles;
 
-    const points = result.result_distribution
+    const points = result.resultDistribution
       .map((b) => ({ x: Number(b.x), count: Number(b.count) }))
       .filter((b) => Number.isFinite(b.x) && Number.isFinite(b.count) && b.count > 0)
       .sort((a, b) => a.x - b.x);
-    if (!points.length) return result.result_percentiles;
+    if (!points.length) return result.resultPercentiles;
 
     return buildAtLeastPercentiles(points, [50, 70, 90]);
   }, [result]);

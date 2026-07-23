@@ -410,7 +410,7 @@ describe("computeThroughputReliability", () => {
     const reliability = computeThroughputReliability([20, 18, 16, 14, 12, 10, 8, 6]);
 
     expect(reliability?.label).toBe("non fiable");
-    expect(reliability?.slope_norm).toBeLessThanOrEqual(-0.15);
+    expect(reliability?.slopeNorm).toBeLessThanOrEqual(-0.15);
   });
 
   it("returns null for empty or non-finite samples", () => {
@@ -423,10 +423,10 @@ describe("computeThroughputReliability", () => {
 
     expect(reliability).toMatchObject({
       label: "non fiable",
-      samples_count: 5,
+      samplesCount: 5,
       cv: 0,
-      iqr_ratio: 0,
-      slope_norm: 0,
+      iqrRatio: 0,
+      slopeNorm: 0,
     });
   });
 
@@ -442,10 +442,10 @@ describe("computeThroughputReliability", () => {
 
     expect(reliability).toMatchObject({
       label: "incertain",
-      samples_count: 8,
+      samplesCount: 8,
     });
-    expect(Math.abs(reliability?.slope_norm ?? 0)).toBeGreaterThanOrEqual(0.05);
-    expect(Math.abs(reliability?.slope_norm ?? 0)).toBeLessThan(0.1);
+    expect(Math.abs(reliability?.slopeNorm ?? 0)).toBeGreaterThanOrEqual(0.05);
+    expect(Math.abs(reliability?.slopeNorm ?? 0)).toBeLessThan(0.1);
   });
 
   it("downgrades otherwise stable short histories to incertain", () => {
@@ -453,10 +453,10 @@ describe("computeThroughputReliability", () => {
 
     expect(reliability).toMatchObject({
       label: "incertain",
-      samples_count: 7,
+      samplesCount: 7,
       cv: 0,
-      iqr_ratio: 0,
-      slope_norm: 0,
+      iqrRatio: 0,
+      slopeNorm: 0,
     });
   });
 
@@ -465,10 +465,10 @@ describe("computeThroughputReliability", () => {
 
     expect(reliability).toMatchObject({
       label: "non fiable",
-      samples_count: 1,
+      samplesCount: 1,
       cv: 0,
-      iqr_ratio: 0,
-      slope_norm: 0,
+      iqrRatio: 0,
+      slopeNorm: 0,
     });
   });
 
@@ -477,10 +477,10 @@ describe("computeThroughputReliability", () => {
 
     expect(reliability).toMatchObject({
       label: "non fiable",
-      samples_count: 6,
+      samplesCount: 6,
       cv: 0,
-      iqr_ratio: 0,
-      slope_norm: 0,
+      iqrRatio: 0,
+      slopeNorm: 0,
     });
   });
 
@@ -493,10 +493,10 @@ describe("computeThroughputReliability", () => {
   it("returns the expected rounded ratio values for the reference series", () => {
     expect(computeThroughputReliability([10, 20, 30, 40, 50, 60, 70, 80])).toEqual({
       cv: 0.5092,
-      iqr_ratio: 0.7778,
-      slope_norm: 0.2222,
+      iqrRatio: 0.7778,
+      slopeNorm: 0.2222,
       label: "fragile",
-      samples_count: 8,
+      samplesCount: 8,
     });
   });
 });
@@ -511,20 +511,20 @@ describe("getProjectionReliabilityNotice", () => {
     expect(
       getProjectionReliabilityNotice({
         cv: 1,
-        iqr_ratio: 0.2,
-        slope_norm: 0,
+        iqrRatio: 0.2,
+        slopeNorm: 0,
         label: "fragile",
-        samples_count: 8,
+        samplesCount: 8,
       }),
     ).toContain("Historique trop volatil");
 
     expect(
       getProjectionReliabilityNotice({
         cv: 0.2,
-        iqr_ratio: 1,
-        slope_norm: 0,
+        iqrRatio: 1,
+        slopeNorm: 0,
         label: "fragile",
-        samples_count: 8,
+        samplesCount: 8,
       }),
     ).toContain("Historique trop volatil");
   });
@@ -533,10 +533,10 @@ describe("getProjectionReliabilityNotice", () => {
     expect(
       getProjectionReliabilityNotice({
         cv: 0.2,
-        iqr_ratio: 0.3,
-        slope_norm: 0,
+        iqrRatio: 0.3,
+        slopeNorm: 0,
         label: "non fiable",
-        samples_count: 5,
+        samplesCount: 5,
       }),
     ).toContain("Projection non fiable");
   });
@@ -545,10 +545,10 @@ describe("getProjectionReliabilityNotice", () => {
     expect(
       getProjectionReliabilityNotice({
         cv: 0.2,
-        iqr_ratio: 0.3,
-        slope_norm: 0,
+        iqrRatio: 0.3,
+        slopeNorm: 0,
         label: "fiable",
-        samples_count: 12,
+        samplesCount: 12,
       }),
     ).toBeNull();
   });
@@ -653,7 +653,7 @@ describe("simulateMonteCarloLocal", () => {
       nSims: 1000,
     });
 
-    expect(result.result_distribution).toEqual([{ x: 2, count: 1000 }]);
+    expect(result.resultDistribution).toEqual([{ x: 2, count: 1000 }]);
   });
 
   it("returns a backend-compatible structure in backlog mode", () => {
@@ -666,12 +666,12 @@ describe("simulateMonteCarloLocal", () => {
       nSims: 5000,
     });
 
-    expect(result.result_kind).toBe("weeks");
-    expect(result.samples_count).toBe(16);
-    expect(Object.keys(result.result_percentiles)).toEqual(["P50", "P70", "P90"]);
-    expect(result.result_distribution.length).toBeGreaterThan(0);
-    expect(typeof result.risk_score).toBe("number");
-    expect(result.throughput_reliability?.label).toBe("fiable");
+    expect(result.resultKind).toBe("weeks");
+    expect(result.samplesCount).toBe(16);
+    expect(Object.keys(result.resultPercentiles)).toEqual(["P50", "P70", "P90"]);
+    expect(result.resultDistribution.length).toBeGreaterThan(0);
+    expect(typeof result.riskScore).toBe("number");
+    expect(result.throughputReliability?.label).toBe("fiable");
   });
 
   it("returns a backend-compatible structure in target-weeks mode", () => {
@@ -684,12 +684,12 @@ describe("simulateMonteCarloLocal", () => {
       nSims: 5000,
     });
 
-    expect(result.result_kind).toBe("items");
-    expect(result.result_percentiles.P50 ?? 0).toBeGreaterThan(0);
-    expect(result.result_percentiles.P50 ?? 0).toBeGreaterThanOrEqual(result.result_percentiles.P70 ?? 0);
-    expect(result.result_percentiles.P70 ?? 0).toBeGreaterThanOrEqual(result.result_percentiles.P90 ?? 0);
-    expect(result.result_distribution.length).toBeGreaterThan(0);
-    expect(result.throughput_reliability?.label).toBe("fragile");
+    expect(result.resultKind).toBe("items");
+    expect(result.resultPercentiles.P50 ?? 0).toBeGreaterThan(0);
+    expect(result.resultPercentiles.P50 ?? 0).toBeGreaterThanOrEqual(result.resultPercentiles.P70 ?? 0);
+    expect(result.resultPercentiles.P70 ?? 0).toBeGreaterThanOrEqual(result.resultPercentiles.P90 ?? 0);
+    expect(result.resultDistribution.length).toBeGreaterThan(0);
+    expect(result.throughputReliability?.label).toBe("fragile");
   });
 
   it("keeps risk_score consistent with the returned business percentiles in both modes", () => {
@@ -710,11 +710,11 @@ describe("simulateMonteCarloLocal", () => {
       nSims: 2000,
     });
 
-    expect(backlogResult.risk_score).toBe(
-      Number(computeRiskScoreFromPercentiles("backlog_to_weeks", backlogResult.result_percentiles)?.toFixed(4)),
+    expect(backlogResult.riskScore).toBe(
+      Number(computeRiskScoreFromPercentiles("backlog_to_weeks", backlogResult.resultPercentiles)?.toFixed(4)),
     );
-    expect(itemsResult.risk_score).toBe(
-      Number(computeRiskScoreFromPercentiles("weeks_to_items", itemsResult.result_percentiles)?.toFixed(4)),
+    expect(itemsResult.riskScore).toBe(
+      Number(computeRiskScoreFromPercentiles("weeks_to_items", itemsResult.resultPercentiles)?.toFixed(4)),
     );
   });
 
@@ -752,9 +752,9 @@ describe("simulateMonteCarloLocal", () => {
       nSims: 1000,
     });
 
-    expect(result.result_distribution.length).toBeLessThanOrEqual(100);
-    expect(result.result_distribution.every((bucket) => Number.isInteger(bucket.x) && bucket.count > 0)).toBe(true);
-    expect(result.result_distribution.reduce((sum, bucket) => sum + bucket.count, 0)).toBe(1000);
+    expect(result.resultDistribution.length).toBeLessThanOrEqual(100);
+    expect(result.resultDistribution.every((bucket) => Number.isInteger(bucket.x) && bucket.count > 0)).toBe(true);
+    expect(result.resultDistribution.reduce((sum, bucket) => sum + bucket.count, 0)).toBe(1000);
   });
 
   it("reports a fully censored backlog when zero throughput never burns backlog", () => {
@@ -767,17 +767,17 @@ describe("simulateMonteCarloLocal", () => {
       nSims: 1000,
     });
 
-    expect(result.result_kind).toBe("weeks");
-    expect(result.result_percentiles).toEqual({});
-    expect(result.result_distribution).toEqual([]);
-    expect(result.completion_summary).toEqual({
-      completed_count: 0,
-      censored_count: 1000,
-      censored_rate: 1,
-      horizon_weeks: 521,
+    expect(result.resultKind).toBe("weeks");
+    expect(result.resultPercentiles).toEqual({});
+    expect(result.resultDistribution).toEqual([]);
+    expect(result.completionSummary).toEqual({
+      completedCount: 0,
+      censoredCount: 1000,
+      censoredRate: 1,
+      horizonWeeks: 521,
     });
-    expect(result.risk_score).toBeUndefined();
-    expect(result.throughput_reliability?.label).toBe("non fiable");
+    expect(result.riskScore).toBeUndefined();
+    expect(result.throughputReliability?.label).toBe("non fiable");
   });
 
   it("rejects negative or fractional contract inputs instead of correcting them silently", () => {

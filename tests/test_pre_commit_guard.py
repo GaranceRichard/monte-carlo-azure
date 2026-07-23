@@ -25,60 +25,117 @@ def workspace_readme() -> Path:
         shutil.rmtree(base_dir, ignore_errors=True)
 
 
-def test_staged_files_reads_only_added_copied_modified_or_renamed_index_entries(
-    monkeypatch,
+def change(status: str, *paths: str) -> pre_commit_guard.StagedChange:
+    return pre_commit_guard.StagedChange(status=status, paths=paths)
+
+
+def test_staged_changes_reads_added_modified_deleted_and_renamed_index_entries(
 ) -> None:
-    calls: list[list[str]] = []
+    assert list(
+        pre_commit_guard.parse_staged_changes(
+            "M\0backend/api.py\0A\0README.md\0D\0docs/old.md\0"
+            "R100\0README.md\0docs/README.md\0"
+        )
+    ) == [
+        change("M", "backend/api.py"),
+        change("A", "README.md"),
+        change("D", "docs/old.md"),
+        change("R", "README.md", "docs/README.md"),
+    ]
 
-    def fake_run(cmd: list[str]) -> SimpleNamespace:
-        calls.append(cmd)
-        return SimpleNamespace(returncode=0, stdout="backend/api.py\nREADME.md\n\n", stderr="")
 
-    monkeypatch.setattr(pre_commit_guard, "run", fake_run)
-
-    assert pre_commit_guard.staged_files() == ["backend/api.py", "README.md"]
-    assert calls == [["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR"]]
-
-
-def test_staged_files_exits_two_when_the_index_cannot_be_read(
+def test_staged_changes_exits_two_when_the_index_cannot_be_read(
     monkeypatch, capsys
 ) -> None:
     monkeypatch.setattr(
         pre_commit_guard,
-        "run",
-        lambda _cmd: SimpleNamespace(returncode=128, stdout="", stderr="fatal: no index"),
+        "read_staged_changes",
+        lambda _root, **_kwargs: (_ for _ in ()).throw(
+            pre_commit_guard.GitStagingError("fatal: no index")
+        ),
     )
 
     with pytest.raises(SystemExit) as exc:
-        pre_commit_guard.staged_files()
+        pre_commit_guard.staged_changes()
 
     assert exc.value.code == 2
-    assert "ERROR: unable to read staged files." in capsys.readouterr().err
+    assert "ERROR: unable to read staged changes." in capsys.readouterr().err
 
 
-def test_readme_requirement_scope_is_prefix_based() -> None:
-    triggering_paths = [
-        "frontend/src/App.tsx",
-        "backend/api.py",
-        "Scripts/quality_gate.py",
-        ".github/workflows/ci.yml",
-        "requirements.txt",
-        "run_app.py",
-    ]
+@pytest.mark.parametrize(
+    "changes",
+    [
+        [],
+        [change("M", "README.md")],
+        [change("M", "backend/api.py"), change("M", "README.md")],
+        [change("A", "README.md"), change("A", "backend/new_module.py")],
+    ],
+    ids=["empty-index", "readme-only", "code-and-readme", "readme-and-new-files"],
+)
+def test_readme_gate_accepts_only_commits_containing_an_added_or_modified_root_readme(
+    changes: list[pre_commit_guard.StagedChange],
+) -> None:
+    assert pre_commit_guard.check_readme_staged(changes) == 0
 
-    assert all(
-        pre_commit_guard.requires_readme_update([path]) for path in triggering_paths
+
+@pytest.mark.parametrize(
+    "changes",
+    [
+        [change("M", "backend/api.py")],
+        [change("M", "docs/note.md")],
+        [change("M", "docs/backlog.md")],
+        [change("M", "frontend/README.md")],
+        [change("D", "README.md")],
+        [change("R", "README.md", "docs/README.md")],
+    ],
+    ids=["code", "documentation", "backlog", "nested-readme", "deleted", "renamed"],
+)
+def test_readme_gate_rejects_every_staged_change_without_a_modified_root_readme(
+    changes: list[pre_commit_guard.StagedChange],
+    capsys,
+) -> None:
+    assert pre_commit_guard.check_readme_staged(changes) == 1
+    assert capsys.readouterr().err.startswith(
+        "Commit refusé : README.md doit contenir une évolution pertinente et être inclus "
+        "dans les changements stagés."
     )
-    assert not pre_commit_guard.requires_readme_update(
-        ["pyproject.toml", ".github/dependabot.yml", "docker-compose.yml"]
+
+
+def test_readme_gate_reports_when_readme_is_modified_only_in_worktree(capsys) -> None:
+    assert pre_commit_guard.check_readme_staged(
+        [change("M", "backend/api.py")],
+        modified_only_in_worktree=True,
+    ) == 1
+    assert "README.md est modifié mais non stagé." in capsys.readouterr().err
+
+
+def test_worktree_readme_probe_is_read_only_and_fails_closed(monkeypatch, capsys) -> None:
+    calls: list[list[str]] = []
+
+    def changed(cmd: list[str]) -> SimpleNamespace:
+        calls.append(cmd)
+        return SimpleNamespace(returncode=0, stdout="README.md\n", stderr="")
+
+    monkeypatch.setattr(pre_commit_guard, "run", changed)
+    assert pre_commit_guard.readme_modified_in_worktree()
+    assert calls == [["git", "diff", "--name-only", "--", "README.md"]]
+
+    monkeypatch.setattr(
+        pre_commit_guard,
+        "run",
+        lambda _cmd: SimpleNamespace(returncode=2, stdout="", stderr="probe failed"),
     )
+    with pytest.raises(SystemExit) as exc:
+        pre_commit_guard.readme_modified_in_worktree()
+    assert exc.value.code == 2
+    assert "unable to inspect the README.md worktree state" in capsys.readouterr().err
 
 
 def test_guard_plan_locks_order_and_repository_inputs() -> None:
-    plan = pre_commit_guard.guard_plan(["backend/api.py"])
+    plan = pre_commit_guard.guard_plan([change("M", "backend/api.py")])
 
     assert [(check.name, check.input_sources) for check in plan] == [
-        ("README staged with code/config changes", ("git-index",)),
+        ("README staged with every commit", ("git-index",)),
         ("README encoding", ("git-index",)),
         ("README French accents", ("git-index",)),
         ("Secret scan", ("git-index",)),
@@ -91,11 +148,22 @@ def test_main_is_fail_fast_and_leaves_naming_to_the_main_quality_plan(
 ) -> None:
     calls: list[str] = []
 
-    monkeypatch.setattr(pre_commit_guard, "staged_files", lambda: ["backend/api.py"])
+    monkeypatch.setattr(
+        pre_commit_guard,
+        "staged_changes",
+        lambda: [change("M", "backend/api.py")],
+    )
+    monkeypatch.setattr(
+        pre_commit_guard,
+        "readme_modified_in_worktree",
+        lambda: False,
+    )
     monkeypatch.setattr(
         pre_commit_guard,
         "check_readme_staged",
-        lambda paths: calls.append(f"readme-staged:{paths[0]}") or 0,
+        lambda changes, *, modified_only_in_worktree=False: calls.append(
+            f"readme-staged:{changes[0].paths[0]}:{modified_only_in_worktree}"
+        ) or 0,
     )
     monkeypatch.setattr(
         pre_commit_guard,
@@ -119,7 +187,7 @@ def test_main_is_fail_fast_and_leaves_naming_to_the_main_quality_plan(
     )
     assert pre_commit_guard.main() == 9
     assert calls == [
-        "readme-staged:backend/api.py",
+        "readme-staged:backend/api.py:False",
         "readme-encoding",
         "readme-accents",
         "secrets",
@@ -183,11 +251,6 @@ def test_run_executes_in_repository(monkeypatch) -> None:
 def test_readme_staging_encoding_and_missing_file_errors(
     workspace_readme: Path, capsys
 ) -> None:
-    assert pre_commit_guard.check_readme_staged(["backend/api.py"]) == 1
-    assert "backend/api.py" in capsys.readouterr().err
-    assert pre_commit_guard.check_readme_staged(["backend/api.py", "README.md"]) == 0
-    assert pre_commit_guard.check_readme_staged(["docs/note.md"]) == 0
-
     assert pre_commit_guard.check_readme_encoding(workspace_readme) == 1
     assert pre_commit_guard.check_readme_french_accents(workspace_readme) == 1
     workspace_readme.write_text("Plain valid text", encoding="utf-8")
@@ -228,10 +291,12 @@ def test_external_checks_cover_missing_failure_and_success(
 
 
 def test_main_returns_zero_when_all_checks_pass(monkeypatch) -> None:
-    monkeypatch.setattr(pre_commit_guard, "staged_files", lambda: [])
+    monkeypatch.setattr(pre_commit_guard, "staged_changes", lambda: [])
     monkeypatch.setattr(
         pre_commit_guard,
         "guard_plan",
-        lambda _paths: (pre_commit_guard.GuardCheck("ok", (), lambda: 0),),
+        lambda _changes, *, readme_worktree_only=False: (
+            pre_commit_guard.GuardCheck("ok", (), lambda: 0),
+        ),
     )
     assert pre_commit_guard.main() == 0

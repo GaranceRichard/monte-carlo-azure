@@ -27,6 +27,9 @@ restent applicables.
 
 - Le pré-commit exécute `python Scripts/quality_gate.py fast`. La liste et le contenu contrôlés proviennent
   de l’index Git ; les modifications non indexées sont ignorées.
+- Dès que l'index contient au moins un changement, le `README.md` racine doit y apparaître avec le statut
+  ajouté ou modifié. Un README imbriqué, une modification limitée au worktree, ou la suppression/renommage
+  du README racine ne satisfait pas cette condition. Un index vide reste accepté par ce contrôle.
 - Le pré-push lit les références transmises par Git, calcule les commits introduits et valide chaque SHA
   terminal distinct dans un worktree détaché temporaire. Il n’utilise aucun stash et ignore le workspace
   courant.
@@ -160,8 +163,9 @@ Seuls le code trivial et le code purement déclaratif sans logique peuvent reste
 - Le code est lisible, explicite et maintenable.
 - Aucun `TODO` ou `FIXME` critique n’est laissé sans ticket associé.
 - Les impacts, risques et commandes de validation sont explicités dans la PR.
-- `README.md` et les documents spécialisés sont mis à jour lorsqu’une commande, un seuil, un artefact ou un
-  workflow change.
+- Toute évolution destinée à un commit comprend une modification pertinente du `README.md` racine et cette
+  modification est réellement stagée avec les autres changements. La garde vérifie la présence dans l'index ;
+  la pertinence du contenu relève de la DoD et de la revue, sans heuristique lexicale ou volumétrique.
 
 ## Checklist DoD
 
@@ -182,7 +186,8 @@ Seuls le code trivial et le code purement déclaratif sans logique peuvent reste
 - [ ] Artefacts de couverture présents, cohérents, frais et issus de l’exécution attendue.
 - [ ] Aucun secret commité et frontière d’identité respectée.
 - [ ] Ratchet de maintenabilité vert, sans régénération automatique de la baseline.
-- [ ] Documentation normative et README cohérents avec le comportement livré.
+- [ ] Documentation normative et README cohérents avec le comportement livré ; `README.md` contient une
+      évolution pertinente et figure comme fichier ajouté ou modifié dans tout index non vide.
 - [ ] Worktree et branche vérifiés ; remote GitHub présent avant toute déclaration de publiabilité.
 
 <!--

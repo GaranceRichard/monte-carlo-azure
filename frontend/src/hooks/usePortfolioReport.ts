@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { formatDateLocal, parseLocalIsoDate } from "../date";
-import type { CompletionSummary, ForecastMode, ForecastPercentiles, WeeklyThroughputRow } from "../types";
+import type { CompletionSummary, SimulationMode, SimulationPercentiles } from "../domain/simulation";
+import type { WeeklyThroughputRow } from "../types";
 import { formatAdoHttpErrorMessage, type AdoErrorContext } from "../adoErrors";
 import {
   fetchTeamThroughput,
@@ -41,7 +42,7 @@ export type TeamReportError = {
 export type PortfolioReportSection = {
   selectedTeam: string;
   seed: number;
-  simulationMode: ForecastMode;
+  simulationMode: SimulationMode;
   includeZeroWeeks: boolean;
   backlogSize: number;
   targetWeeks: number;
@@ -49,11 +50,10 @@ export type PortfolioReportSection = {
   types: string[];
   doneStates: string[];
   resultKind: "items" | "weeks";
-  riskScore?: number;
-  throughputReliability?: ReturnType<typeof computeThroughputReliability>;
+  riskScore?: number; throughputReliability?: ReturnType<typeof computeThroughputReliability>;
   distribution: { x: number; count: number }[];
   weeklyThroughput: { week: string; throughput: number }[];
-  displayPercentiles: ForecastPercentiles;
+  displayPercentiles: SimulationPercentiles;
   completionSummary?: CompletionSummary;
   decisionDiagnostic?: ReturnType<typeof buildSimulationDecisionLanguage>;
 };
@@ -67,7 +67,7 @@ type UsePortfolioReportParams = {
   startDate: string;
   endDate: string;
   includeZeroWeeks: boolean;
-  simulationMode: ForecastMode;
+  simulationMode: SimulationMode;
   backlogSize: number;
   targetWeeks: number;
   nSims: number;
@@ -135,16 +135,16 @@ function toScenarioResult(
   label: PortfolioScenarioResult["label"],
   hypothesis: string,
   samples: number[],
-  simulationMode: ForecastMode,
+  simulationMode: SimulationMode,
   result: Awaited<ReturnType<typeof simulateForecastFromSamples>>,
   weeklyData: WeeklyThroughputRow[],
 ): PortfolioScenarioResult {
-  const percentiles = result.result_percentiles;
+  const percentiles = result.resultPercentiles;
   const computedRiskScore = computeRiskScoreFromPercentiles(simulationMode, percentiles) ?? undefined;
   const riskScore =
     computedRiskScore ??
-    (result.result_kind === "items" && typeof result.risk_score === "number" && Number.isFinite(result.risk_score)
-      ? result.risk_score
+    (result.resultKind === "items" && typeof result.riskScore === "number" && Number.isFinite(result.riskScore)
+      ? result.riskScore
       : undefined);
   return {
     label,
@@ -155,8 +155,8 @@ function toScenarioResult(
     percentiles,
     riskScore,
     riskLegend: riskScore == null ? undefined : computeRiskLegend(riskScore),
-    distribution: result.result_distribution,
-    completionSummary: result.completion_summary,
+    distribution: result.resultDistribution,
+    completionSummary: result.completionSummary,
   };
 }
 
@@ -309,25 +309,25 @@ export function usePortfolioReport({
                 nSims: Number(nSims),
                 types: [...cfg.types],
                 doneStates: [...cfg.doneStates],
-                resultKind: result.result_kind,
+                resultKind: result.resultKind,
                 riskScore:
-                  result.result_kind === "items"
-                    ? computeRiskScoreFromPercentiles(simulationMode, result.result_percentiles) ?? undefined
-                    : result.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, result.result_percentiles) ?? undefined,
+                  result.resultKind === "items"
+                    ? computeRiskScoreFromPercentiles(simulationMode, result.resultPercentiles) ?? undefined
+                    : result.riskScore ?? computeRiskScoreFromPercentiles(simulationMode, result.resultPercentiles) ?? undefined,
                 throughputReliability: computeThroughputReliability(data.throughputSamples),
-                distribution: result.result_distribution,
+                distribution: result.resultDistribution,
                 weeklyThroughput: data.weeklyThroughput,
-                displayPercentiles: result.result_percentiles,
-                completionSummary: result.completion_summary,
+                displayPercentiles: result.resultPercentiles,
+                completionSummary: result.completionSummary,
                 decisionDiagnostic: buildSimulationDecisionLanguage({
                   hasResult: true,
                   throughputSamples: data.throughputSamples,
                   includeZeroWeeks,
-                  percentiles: result.result_percentiles,
-                  completionSummary: result.completion_summary,
-                  riskScore: result.result_kind === "items"
-                    ? computeRiskScoreFromPercentiles(simulationMode, result.result_percentiles)
-                    : result.risk_score ?? computeRiskScoreFromPercentiles(simulationMode, result.result_percentiles),
+                  percentiles: result.resultPercentiles,
+                  completionSummary: result.completionSummary,
+                  riskScore: result.resultKind === "items"
+                    ? computeRiskScoreFromPercentiles(simulationMode, result.resultPercentiles)
+                    : result.riskScore ?? computeRiskScoreFromPercentiles(simulationMode, result.resultPercentiles),
                   throughputReliability: computeThroughputReliability(data.throughputSamples),
                   selectedOrg,
                   selectedProject,

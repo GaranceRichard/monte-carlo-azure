@@ -7,13 +7,7 @@ from starlette.requests import Request
 
 from backend.api import app
 from backend.api_config import ApiConfig
-from backend.api_models import (
-    SIMULATION_SEED_MAX,
-    CompletionSummary,
-    SimulateRequest,
-    SimulateResponse,
-    ThroughputReliability,
-)
+from backend.api_models import SIMULATION_SEED_MAX
 from backend.api_routes_simulate import (
     _client_key_from_request,
     _persist_simulation,
@@ -28,6 +22,13 @@ from backend.simulation_limits import (
     SIMULATION_N_SIMS_MIN,
     SIMULATION_THROUGHPUT_SAMPLES_MAX,
     SIMULATION_THROUGHPUT_SAMPLES_MIN,
+)
+from backend.simulation_models import (
+    CompletionSummary,
+    HistogramBucket,
+    SimulationCommand,
+    SimulationResult,
+    ThroughputReliability,
 )
 from tests.http_client import ApiTestClient
 
@@ -292,11 +293,11 @@ def test_simulate_returns_503_when_forecast_timeout_is_exceeded(monkeypatch):
         "n_sims": 2000,
     }
 
-    def slow_compute(req, samples, seed):
+    def slow_compute(_command):
         time.sleep(0.05)
-        return [1, 2, 3], "weeks"
+        raise AssertionError("the timed-out result must not be observed")
 
-    monkeypatch.setattr("backend.api_routes_simulate._compute_simulation_result", slow_compute)
+    monkeypatch.setattr("backend.api_routes_simulate.run_simulation", slow_compute)
     monkeypatch.setattr(
         "backend.api_routes_simulate.cfg",
         ApiConfig(
@@ -342,12 +343,12 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
     known_backlog = np.array([3, 4, 6, 8, 10], dtype=int)
     known_items = np.array([18, 22, 24, 25, 27], dtype=int)
 
-    def fake_compute(req, _samples, _seed):
-        if req.mode == "backlog_to_weeks":
+    def fake_compute(command, _samples):
+        if command.mode == "backlog_to_weeks":
             return known_backlog, "weeks"
         return known_items, "items"
 
-    monkeypatch.setattr("backend.api_routes_simulate._compute_simulation_result", fake_compute)
+    monkeypatch.setattr("backend.simulation_service._run_engine", fake_compute)
 
     backlog_response = client.post("/simulate", json=backlog_payload)
     items_response = client.post("/simulate", json=items_payload)
@@ -365,7 +366,7 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
 def test_simulate_backlog_to_weeks_omits_unidentifiable_percentiles_and_risk_score(monkeypatch):
     client = ApiTestClient(app)
 
-    def fake_compute(_req, _samples, _seed):
+    def fake_compute(_command, _samples):
         return (
             FinishWeeksSimulation(
                 weeks_needed=np.array([521, 521, 521], dtype=int),
@@ -375,7 +376,7 @@ def test_simulate_backlog_to_weeks_omits_unidentifiable_percentiles_and_risk_sco
             "weeks",
         )
 
-    monkeypatch.setattr("backend.api_routes_simulate._compute_simulation_result", fake_compute)
+    monkeypatch.setattr("backend.simulation_service._run_engine", fake_compute)
 
     response = client.post(
         "/simulate",
@@ -404,7 +405,7 @@ def test_simulate_backlog_to_weeks_omits_unidentifiable_percentiles_and_risk_sco
 def test_simulate_backlog_to_weeks_keeps_exact_finish_at_horizon_distinct_from_censure(monkeypatch):
     client = ApiTestClient(app)
 
-    def fake_compute(_req, _samples, _seed):
+    def fake_compute(_command, _samples):
         return (
             FinishWeeksSimulation(
                 weeks_needed=np.array([521, 521, 521], dtype=int),
@@ -414,7 +415,7 @@ def test_simulate_backlog_to_weeks_keeps_exact_finish_at_horizon_distinct_from_c
             "weeks",
         )
 
-    monkeypatch.setattr("backend.api_routes_simulate._compute_simulation_result", fake_compute)
+    monkeypatch.setattr("backend.simulation_service._run_engine", fake_compute)
 
     response = client.post(
         "/simulate",
@@ -508,12 +509,12 @@ class _FakeStore:
     def __init__(self, enabled: bool, fail: bool = False):
         self.enabled = enabled
         self.fail = fail
-        self.saved: list[tuple[str, dict, dict]] = []
+        self.saved: list[tuple[str, SimulationCommand, SimulationResult]] = []
 
-    def save_simulation(self, mc_client_id, req, response):
+    def save_simulation(self, mc_client_id, command, result):
         if self.fail:
             raise RuntimeError("mongo down")
-        self.saved.append((mc_client_id, req.model_dump(), response.model_dump()))
+        self.saved.append((mc_client_id, command, result))
 
 
 def _build_request_with_cookie(cookie_name: str, cookie_value: str | None = None) -> Request:
@@ -523,12 +524,24 @@ def _build_request_with_cookie(cookie_name: str, cookie_value: str | None = None
     return Request({"type": "http", "headers": headers})
 
 
-def _build_response_model() -> SimulateResponse:
-    return SimulateResponse(
+def _build_command() -> SimulationCommand:
+    return SimulationCommand(
+        throughput_samples=(1, 2, 3, 4, 5, 6),
+        include_zero_weeks=False,
+        mode="backlog_to_weeks",
+        backlog_size=20,
+        target_weeks=None,
+        n_sims=2000,
+        seed=123,
+    )
+
+
+def _build_result_model() -> SimulationResult:
+    return SimulationResult(
         result_kind="weeks",
         result_percentiles={"P50": 10, "P70": 12, "P90": 15},
         risk_score=0.5,
-        result_distribution=[{"x": 10, "count": 4}],
+        result_distribution=(HistogramBucket(x=10, count=4),),
         completion_summary=CompletionSummary(
             completed_count=4,
             censored_count=0,
@@ -552,21 +565,14 @@ def test_persist_simulation_saves_when_cookie_present_and_store_enabled(monkeypa
 
     fake = _FakeStore(enabled=True)
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
-    req = SimulateRequest(
-        throughput_samples=[1, 2, 3, 4, 5, 6],
-        mode="backlog_to_weeks",
-        backlog_size=20,
-        n_sims=2000,
-    )
-
-    _persist_simulation("client-123", req, _build_response_model())
+    _persist_simulation("client-123", _build_command(), _build_result_model())
 
     assert len(fake.saved) == 1
-    saved_id, saved_req, saved_resp = fake.saved[0]
+    saved_id, saved_command, saved_result = fake.saved[0]
     assert saved_id == "client-123"
-    assert saved_req["backlog_size"] == 20
-    assert saved_resp["result_kind"] == "weeks"
-    assert saved_resp["seed"] == 123
+    assert saved_command.backlog_size == 20
+    assert saved_result.result_kind == "weeks"
+    assert saved_result.seed == 123
 
 
 def test_persist_simulation_skips_when_cookie_missing(monkeypatch):
@@ -574,14 +580,7 @@ def test_persist_simulation_skips_when_cookie_missing(monkeypatch):
 
     fake = _FakeStore(enabled=True)
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
-    req = SimulateRequest(
-        throughput_samples=[1, 2, 3, 4, 5, 6],
-        mode="backlog_to_weeks",
-        backlog_size=20,
-        n_sims=2000,
-    )
-
-    _persist_simulation("", req, _build_response_model())
+    _persist_simulation("", _build_command(), _build_result_model())
 
     assert fake.saved == []
 
@@ -591,14 +590,7 @@ def test_persist_simulation_skips_when_store_disabled(monkeypatch):
 
     fake = _FakeStore(enabled=False)
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
-    req = SimulateRequest(
-        throughput_samples=[1, 2, 3, 4, 5, 6],
-        mode="backlog_to_weeks",
-        backlog_size=20,
-        n_sims=2000,
-    )
-
-    _persist_simulation("client-123", req, _build_response_model())
+    _persist_simulation("client-123", _build_command(), _build_result_model())
 
     assert fake.saved == []
 
@@ -608,15 +600,9 @@ def test_persist_simulation_logs_warning_when_store_fails(monkeypatch, caplog):
 
     fake = _FakeStore(enabled=True, fail=True)
     monkeypatch.setattr(api_routes_simulate, "simulation_store", fake)
-    req = SimulateRequest(
-        throughput_samples=[1, 2, 3, 4, 5, 6],
-        mode="backlog_to_weeks",
-        backlog_size=20,
-        n_sims=2000,
-    )
 
     with caplog.at_level("WARNING"):
-        _persist_simulation("client-123", req, _build_response_model())
+        _persist_simulation("client-123", _build_command(), _build_result_model())
 
     assert fake.saved == []
     assert "Simulation persistence failed" in caplog.text

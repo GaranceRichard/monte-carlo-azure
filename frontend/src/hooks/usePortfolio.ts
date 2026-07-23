@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { getTeamOptionsDirect } from "../adoClient";
 import { nWeeksAgo, today } from "../date";
-import type { ForecastMode, NamedEntity } from "../types";
+import type { SimulationMode } from "../domain/simulation";
+import type { NamedEntity } from "../types";
 import { sortTeams } from "../utils/teamSort";
 import {
   buildQuickFiltersScopeKey,
@@ -60,7 +61,7 @@ export function usePortfolio({ demoMode = false, selectedOrg, selectedProject, t
   const portfolioPrefs = useMemo(() => readStoredPortfolioPrefs(), []);
   const [startDate, setStartDate] = useState<string>(demoMode ? DEMO_CONFIG.startDate : nWeeksAgo(26));
   const [endDate, setEndDate] = useState<string>(demoMode ? DEMO_CONFIG.endDate : today());
-  const [simulationMode, setSimulationMode] = useState<ForecastMode>("backlog_to_weeks");
+  const [simulationMode, setSimulationMode] = useState<SimulationMode>("backlog_to_weeks");
   const [includeZeroWeeks, setIncludeZeroWeeks] = useState<boolean>(true);
   const [backlogSize, setBacklogSize] = useState<number>(120);
   const [targetWeeks, setTargetWeeks] = useState<number>(12);

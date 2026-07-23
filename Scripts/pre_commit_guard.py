@@ -4,7 +4,7 @@
 Pre-commit guard for repository hygiene.
 
 Checks:
-1) README update is staged when code/config changes are staged.
+1) README update is staged whenever at least one change is staged.
 2) README text does not contain common mojibake artifacts.
 3) README French prose is not massively de-accented.
 4) Secret scan via Scripts/check_no_secrets.py.
@@ -13,6 +13,7 @@ Checks:
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
@@ -21,21 +22,20 @@ from pathlib import Path
 from typing import Callable
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+
+from Scripts.git_staging import (  # noqa: E402
+    GitStagingError,
+    StagedChange,
+    read_staged_changes,
+)
+from Scripts.git_staging import (  # noqa: E402
+    parse_staged_changes as parse_staged_changes,
+)
+
 README_PATH = REPO_ROOT / "README.md"
 SECRET_CHECK_PATH = REPO_ROOT / "Scripts" / "check_no_secrets.py"
 DOD_CHECK_PATH = REPO_ROOT / "Scripts" / "check_dod_compliance.py"
-
-# If one of these paths changes in the index, README.md must also be staged.
-README_REQUIRED_PREFIXES = (
-    "frontend/",
-    "backend/",
-    "Scripts/",
-    ".github/workflows/",
-)
-README_REQUIRED_FILES = {
-    "requirements.txt",
-    "run_app.py",
-}
 
 # Typical mojibake fragments seen when UTF-8 is decoded as cp1252/latin1.
 MOJIBAKE_TOKENS = (
@@ -115,40 +115,51 @@ def run(cmd: list[str]) -> subprocess.CompletedProcess[str]:
     )
 
 
-def staged_files() -> list[str]:
-    p = run(["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR"])
+def staged_changes() -> list[StagedChange]:
+    try:
+        return list(
+            read_staged_changes(
+                REPO_ROOT,
+                environment=os.environ,
+            )
+        )
+    except GitStagingError as exc:
+        print("ERROR: unable to read staged changes.", file=sys.stderr)
+        print(str(exc), file=sys.stderr)
+        raise SystemExit(2)
+
+
+def readme_modified_in_worktree() -> bool:
+    p = run(["git", "diff", "--name-only", "--", "README.md"])
     if p.returncode != 0:
-        print("ERROR: unable to read staged files.", file=sys.stderr)
+        print("ERROR: unable to inspect the README.md worktree state.", file=sys.stderr)
         print(p.stderr, file=sys.stderr)
         raise SystemExit(2)
-    return [line.strip() for line in p.stdout.splitlines() if line.strip()]
+    return "README.md" in {line.strip() for line in p.stdout.splitlines()}
 
 
-def requires_readme_update(paths: list[str]) -> bool:
-    for path in paths:
-        if path in README_REQUIRED_FILES:
-            return True
-        if any(path.startswith(prefix) for prefix in README_REQUIRED_PREFIXES):
-            return True
-    return False
+def readme_is_modified_or_added(changes: list[StagedChange]) -> bool:
+    return any(
+        change.status in {"A", "M"} and change.paths == ("README.md",)
+        for change in changes
+    )
 
 
-def check_readme_staged(paths: list[str]) -> int:
-    readme_staged = "README.md" in set(paths)
-    if requires_readme_update(paths) and not readme_staged:
-        print(
-            "ERROR: README.md must be updated and staged when code/config changes are committed.",
-            file=sys.stderr,
-        )
-        print("Staged paths triggering this rule:", file=sys.stderr)
-        for p in paths:
-            if p in README_REQUIRED_FILES or any(
-                p.startswith(prefix) for prefix in README_REQUIRED_PREFIXES
-            ):
-                print(f"  - {p}", file=sys.stderr)
-        print("\nAction: update README.md, then run `git add README.md`.", file=sys.stderr)
-        return 1
-    return 0
+def check_readme_staged(
+    changes: list[StagedChange],
+    *,
+    modified_only_in_worktree: bool = False,
+) -> int:
+    if not changes or readme_is_modified_or_added(changes):
+        return 0
+    print(
+        "Commit refusé : README.md doit contenir une évolution pertinente et être inclus "
+        "dans les changements stagés.",
+        file=sys.stderr,
+    )
+    if modified_only_in_worktree:
+        print("README.md est modifié mais non stagé.", file=sys.stderr)
+    return 1
 
 
 def check_readme_encoding(readme_path: Path | None = None) -> int:
@@ -225,13 +236,20 @@ def check_dod_compliance() -> int:
     return 0
 
 
-def guard_plan(paths: list[str]) -> tuple[GuardCheck, ...]:
+def guard_plan(
+    changes: list[StagedChange],
+    *,
+    readme_worktree_only: bool = False,
+) -> tuple[GuardCheck, ...]:
     """Describe the current ordered checks without executing them."""
     return (
         GuardCheck(
-            "README staged with code/config changes",
+            "README staged with every commit",
             ("git-index",),
-            lambda: check_readme_staged(paths),
+            lambda: check_readme_staged(
+                changes,
+                modified_only_in_worktree=readme_worktree_only,
+            ),
         ),
         GuardCheck("README encoding", ("git-index",), check_readme_encoding),
         GuardCheck("README French accents", ("git-index",), check_readme_french_accents),
@@ -241,8 +259,16 @@ def guard_plan(paths: list[str]) -> tuple[GuardCheck, ...]:
 
 
 def main() -> int:
-    paths = staged_files()
-    for check in guard_plan(paths):
+    changes = staged_changes()
+    readme_worktree_only = (
+        bool(changes)
+        and not readme_is_modified_or_added(changes)
+        and readme_modified_in_worktree()
+    )
+    for check in guard_plan(
+        changes,
+        readme_worktree_only=readme_worktree_only,
+    ):
         code = check.run()
         if code != 0:
             return code

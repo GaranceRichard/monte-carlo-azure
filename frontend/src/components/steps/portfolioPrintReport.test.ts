@@ -94,7 +94,7 @@ function baseArgs(): PortfolioPrintReportArgs {
         riskScore: 0.2,
         riskLegend: "fiable" as const,
         distribution: [{ x: 10, count: 10 }],
-        throughputReliability: { cv: 0.22, iqr_ratio: 0.3, slope_norm: -0.02, label: "fiable" as const, samples_count: 8 },
+        throughputReliability: { cv: 0.22, iqrRatio: 0.3, slopeNorm: -0.02, label: "fiable" as const, samplesCount: 8 },
         decisionDiagnostic: scenarioDiagnostic("caution"),
       },
       {
@@ -110,7 +110,7 @@ function baseArgs(): PortfolioPrintReportArgs {
         riskScore: 0.25,
         riskLegend: "incertain" as const,
         distribution: [{ x: 8, count: 10 }],
-        throughputReliability: { cv: 0.51, iqr_ratio: 0.55, slope_norm: -0.03, label: "incertain" as const, samples_count: 8 },
+        throughputReliability: { cv: 0.51, iqrRatio: 0.55, slopeNorm: -0.03, label: "incertain" as const, samplesCount: 8 },
         decisionDiagnostic: scenarioDiagnostic("arbitration_required"),
       },
       {
@@ -126,7 +126,7 @@ function baseArgs(): PortfolioPrintReportArgs {
         riskScore: 0.28,
         riskLegend: "incertain" as const,
         distribution: [{ x: 7, count: 10 }],
-        throughputReliability: { cv: 1.01, iqr_ratio: 0.7, slope_norm: -0.11, label: "fragile" as const, samples_count: 8 },
+        throughputReliability: { cv: 1.01, iqrRatio: 0.7, slopeNorm: -0.11, label: "fragile" as const, samplesCount: 8 },
         decisionDiagnostic: scenarioDiagnostic("not_recommended"),
       },
       {
@@ -142,7 +142,7 @@ function baseArgs(): PortfolioPrintReportArgs {
         riskScore: 0.3,
         riskLegend: "incertain" as const,
         distribution: [{ x: 6, count: 10 }],
-        throughputReliability: { cv: 1.6, iqr_ratio: 1.2, slope_norm: -0.2, label: "non fiable" as const, samples_count: 5 },
+        throughputReliability: { cv: 1.6, iqrRatio: 1.2, slopeNorm: -0.2, label: "non fiable" as const, samplesCount: 5 },
         decisionDiagnostic: scenarioDiagnostic("supportable"),
       },
     ],
@@ -159,7 +159,7 @@ function baseArgs(): PortfolioPrintReportArgs {
         doneStates: ["Done"],
         resultKind: "weeks" as const,
         riskScore: 0.3,
-        throughputReliability: { cv: 0.62, iqr_ratio: 0.55, slope_norm: -0.07, label: "incertain" as const, samples_count: 10 },
+        throughputReliability: { cv: 0.62, iqrRatio: 0.55, slopeNorm: -0.07, label: "incertain" as const, samplesCount: 10 },
         distribution: [{ x: 10, count: 20 }],
         weeklyThroughput: [{ week: "2026-01-01", throughput: 3 }],
         displayPercentiles: { P50: 10, P70: 12, P90: 15 },
@@ -662,20 +662,20 @@ describe("portfolioPrintReport", () => {
     args.scenarios[0] = {
       ...args.scenarios[0],
       completionSummary: {
-        completed_count: 9,
-        censored_count: 1,
-        censored_rate: 0.1,
-        horizon_weeks: 52,
+        completedCount: 9,
+        censoredCount: 1,
+        censoredRate: 0.1,
+        horizonWeeks: 52,
       },
     };
     args.sections[0] = {
       ...args.sections[0],
       throughputReliability: {
         cv: Number.NaN,
-        iqr_ratio: Number.NaN,
-        slope_norm: Number.NaN,
+        iqrRatio: Number.NaN,
+        slopeNorm: Number.NaN,
         label: "incertain",
-        samples_count: Number.NaN,
+        samplesCount: Number.NaN,
       },
     };
 
@@ -738,10 +738,10 @@ describe("portfolioPrintReport", () => {
       ...args.sections[0],
       displayPercentiles: { P50: 12 },
       completionSummary: {
-        completed_count: 4,
-        censored_count: 6,
-        censored_rate: 0.6,
-        horizon_weeks: 521,
+        completedCount: 4,
+        censoredCount: 6,
+        censoredRate: 0.6,
+        horizonWeeks: 521,
       },
     };
 

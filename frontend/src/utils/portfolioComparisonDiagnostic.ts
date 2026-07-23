@@ -1,4 +1,4 @@
-import type { ThroughputReliability } from "../types";
+import type { ThroughputReliability } from "../domain/simulation";
 
 export type PortfolioHypothesis = "independent" | "aligned" | "friction" | "correlated";
 
@@ -94,21 +94,21 @@ function buildTeamFinding(observation: TeamHistoricalObservation): TeamHistorica
   if (reliability.label === "fragile" || reliability.label === "non fiable") {
     signals.push("fragile_history");
   }
-  if (reliability.slope_norm <= -0.05) signals.push("declining_trend");
+  if (reliability.slopeNorm <= -0.05) signals.push("declining_trend");
 
-  const trendStatement = reliability.slope_norm <= -0.05
+  const trendStatement = reliability.slopeNorm <= -0.05
     ? "tendance observée en baisse"
-    : reliability.slope_norm >= 0.05
+    : reliability.slopeNorm >= 0.05
       ? "tendance observée en hausse"
       : "sans tendance marquée";
 
   return {
     teamName: observation.teamName,
     quality: reliability.label,
-    sampleCount: reliability.samples_count,
-    normalizedTrend: reliability.slope_norm,
+    sampleCount: reliability.samplesCount,
+    normalizedTrend: reliability.slopeNorm,
     signals,
-    statement: `Équipe ${observation.teamName} : ${String(reliability.samples_count)} semaines observées, historique ${reliability.label}, ${trendStatement}.`,
+    statement: `Équipe ${observation.teamName} : ${String(reliability.samplesCount)} semaines observées, historique ${reliability.label}, ${trendStatement}.`,
   };
 }
 

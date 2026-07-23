@@ -57,7 +57,7 @@ Règles bloquées par la CI :
 - `IDENTITY-001`: aucun proxy local `/ado` ou `/vssps`
 - `IDENTITY-002`: aucun endpoint local ou backend recevant un PAT Azure DevOps
 - `IDENTITY-003`: les appels ADO du navigateur utilisent les URL officielles ou une URL on-premise saisie localement
-- `IDENTITY-004`: `ForecastRequestPayload` et `SimulateRequest` ne contiennent aucun contexte Azure DevOps
+- `IDENTITY-004`: `SimulateRequestDto` et `SimulateRequest` ne contiennent aucun contexte Azure DevOps
 - `IDENTITY-005`: `postSimulate` et les modules de construction du payload n'envoient aucun champ Azure DevOps
 - `IDENTITY-006`: `SimulationStore` ne persiste aucun champ Azure DevOps
 - `IDENTITY-007`: `SimulationHistoryItem` et `GET /simulations/history` n'exposent aucun contexte Azure DevOps
@@ -67,9 +67,11 @@ Chemins surveillés par `Scripts/check_identity_boundary.py` :
 
 - `frontend/src/types.ts`
 - `frontend/src/api.ts`
+- `frontend/src/api/simulationDtos.ts`
+- `frontend/src/api/simulationMappers.ts`
 - `frontend/src/hooks/simulationForecastCore.ts`
 - `frontend/src/hooks/simulationForecastService.ts`
-- tout fichier `frontend/src/` qui construit un `ForecastRequestPayload` ou appelle `postSimulate`
+- tout fichier `frontend/src/` qui construit un `SimulateRequestDto` ou appelle `postSimulate`
 - `backend/api_models.py`
 - `backend/api_routes_simulate.py`
 - `backend/simulation_store.py`
@@ -118,8 +120,16 @@ Garde-fous serveur :
 frontend/
   src/
     adoClient.ts        # appels directs Azure DevOps
-    api.ts              # appel backend /simulate uniquement
-    apiHelpers.ts       # normalisation/fallbacks API hors wrapper vital
+    api.ts              # adaptateur HTTP /simulate et historique serveur
+    api/
+      simulationDtos.ts    # contrats JSON HTTP en snake_case
+      simulationMappers.ts # conversions explicites HTTP <-> domaine
+    domain/
+      simulation.ts        # commande et résultat statistiques métier en camelCase
+      simulationHistory.ts # historique interne contenant un SimulationResult
+    storage/
+      simulationHistoryDtos.ts    # schéma localStorage v2 inchangé
+      simulationHistoryMappers.ts # conversions stockage/legacy <-> domaine
     AppFlowContent.tsx  # rendu des étapes onboarding/simulation
     appNavigation.ts    # navigation/backspace et helpers de retour
     appShellSections.tsx # sections shell, mode public et stepper
@@ -150,10 +160,57 @@ frontend/
 
 backend/
   api.py                 # FastAPI + CORS + /simulate + /health
-  api_routes_simulate.py # endpoint /simulate
-  api_models.py          # SimulateRequest / SimulateResponse
+  api_routes_simulate.py # frontière HTTP, timeout, rate limit et persistance
+  api_models.py          # DTO Pydantic HTTP uniquement
+  simulation_mappers.py  # conversions DTO HTTP/persistance <-> domaine
+  simulation_models.py   # modèles statistiques métier sans framework
+  simulation_service.py  # orchestration statistique sans dépendance HTTP
+  simulation_store.py    # frontière Mongo, document existant préservé
   mc_core.py             # cœur Monte Carlo
 ```
+
+## Frontières de simulation
+
+Les contrats externes et les modèles statistiques internes sont séparés par des mappers explicites :
+
+- les DTO HTTP Python restent dans `backend/api_models.py` et les DTO HTTP TypeScript dans
+  `frontend/src/api/simulationDtos.ts` ; leurs propriétés `snake_case` décrivent uniquement le JSON public ;
+- `backend/simulation_models.py` et `frontend/src/domain/simulation.ts` portent les commandes et résultats
+  métier ; le domaine TypeScript emploie exclusivement `camelCase` ;
+- `backend/simulation_service.py` orchestre les fonctions existantes de `mc_core.py` sans importer Pydantic,
+  FastAPI ou la persistance ;
+- `frontend/src/utils/simulation.ts` reçoit et retourne les mêmes modèles métier que le chemin backend, sans
+  importer les DTO HTTP ;
+- `backend/simulation_store.py` convertit commande et résultat en document Mongo à sa frontière, tandis que
+  `frontend/src/storage/simulationHistoryMappers.ts` convertit le modèle interne vers le schéma
+  `localStorage` version 2 inchangé et prend en charge les migrations legacy existantes.
+
+Flux backend :
+
+```text
+SimulationCommand
+  -> mapper vers SimulateRequestDto
+  -> POST /simulate
+  -> SimulateRequest Pydantic
+  -> mapper vers SimulationCommand Python
+  -> simulation_service -> mc_core
+  -> SimulationResult Python
+  -> mapper vers SimulateResponse Pydantic
+  -> SimulateResponseDto
+  -> mapper vers SimulationResult TypeScript
+```
+
+Flux local :
+
+```text
+SimulationCommand TypeScript
+  -> moteur local TypeScript
+  -> SimulationResult TypeScript
+```
+
+Après ces deux flux, les hooks, le portefeuille, l'UI, les graphiques et les exports consomment uniquement
+`SimulationResult`. Les contrôles de maintenabilité bloquent les imports des DTO par le domaine, le moteur
+local ou l'UI, ainsi que toute dépendance du service ou du store Python envers les DTO HTTP.
 
 ## Convention de nommage
 
@@ -429,6 +486,12 @@ des règles automatiques.
 Les sources de changement sont distinctes : index Git pour le pré-commit, commits introduits pour le
 pré-push, checkout de travail pour la CI. Le pré-push valide chaque SHA terminal distinct dans un worktree
 détaché temporaire et n’utilise pas le workspace courant.
+
+Le hook `.githooks/pre-commit` délègue à `Scripts/quality_gate.py fast`, dont le contrôle de dépôt appelle
+`Scripts/pre_commit_guard.py`. Cette garde lit les entrées `A/M/D/R` de l'index réel : tout index non vide doit
+contenir `README.md` racine avec un statut ajouté ou modifié. Un README imbriqué, supprimé, renommé ou modifié
+seulement dans le worktree est refusé. L'index vide reste accepté afin que les validations de conformité sans
+intention de commit puissent s'exécuter.
 
 Pour toute validation isolée, l’environnement de commande commun fixe explicitement
 `MONTECARLO_E2E_PYTHON` sur l’interpréteur Python hôte. Cette règle est appliquée de façon identique à la

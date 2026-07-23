@@ -24,6 +24,15 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCKER_SMOKE_PORT = 18080
 sys.path.insert(0, str(ROOT))
 
+from Scripts.git_staging import (  # noqa: E402
+    GitStagingError,
+    StagedChange,
+    active_index_git_environment,
+    changed_paths,
+    index_git_environment,
+    isolated_git_environment,
+    read_staged_changes,
+)
 from Scripts.quality_gate_change_policy import (  # noqa: E402
     MASSIVE_EXACT_PATHS,
     MASSIVE_SCRIPT_NAMES,
@@ -120,6 +129,7 @@ class ChangeContext:
     revision_ranges: tuple[tuple[str, ...], ...] = ()
     classification: ChangeClassification | None = None
     execution_profile: str | None = None
+    staged_changes: tuple[StagedChange, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -310,6 +320,7 @@ def _git_output(
     result = subprocess.run(
         ["git", *args],
         cwd=repository_root,
+        env=isolated_git_environment(),
         check=False,
         capture_output=True,
         text=True,
@@ -483,23 +494,25 @@ def build_push_validation_plan(
     )
 
 
-def staged_files() -> list[str]:
-    """Return the files currently staged for the pre-commit hook."""
-    result = subprocess.run(
-        ["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR"],
-        cwd=ROOT,
-        check=False,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-    )
-    if result.returncode:
+def staged_changes(repository_root: Path | None = None) -> tuple[StagedChange, ...]:
+    """Return canonical name-status entries from the active commit index."""
+    root = repository_root or ROOT
+    try:
+        environment = (
+            os.environ
+            if repository_root is None
+            else isolated_git_environment()
+        )
+        return read_staged_changes(root, environment=environment)
+    except GitStagingError as exc:
         print("ERROR: unable to list staged files.", file=sys.stderr)
-        if result.stderr:
-            print(result.stderr, file=sys.stderr, end="")
+        print(str(exc), file=sys.stderr)
         raise RuntimeError("git diff --cached failed")
-    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+
+def staged_files() -> list[str]:
+    """Return paths from the canonical staged change context."""
+    return list(changed_paths(staged_changes()))
 
 
 def is_documentation_only(paths: list[str]) -> bool:
@@ -896,6 +909,7 @@ def build_change_context(
     paths: list[str] | tuple[str, ...],
     *,
     execution_profile: str | None = None,
+    staged_change_entries: tuple[StagedChange, ...] | None = None,
 ) -> ChangeContext:
     """Build a pure change context from already-resolved paths."""
     if mode not in {"fast", "push", "ci", "nightly", "release"}:
@@ -914,6 +928,7 @@ def build_change_context(
         documentation_only=mode == "fast" and is_documentation_only(list(changed_paths)),
         classification=classify_changes(changed_paths),
         execution_profile=execution_profile,
+        staged_changes=staged_change_entries,
     )
 
 
@@ -947,8 +962,18 @@ def resolve_change_context(
     execution_profile: str | None = None,
 ) -> ChangeContext:
     """Resolve the current change paths without changing gate selection semantics."""
-    resolved_paths = staged_files() if paths is None and mode == "fast" else (paths or [])
-    return build_change_context(mode, resolved_paths, execution_profile=execution_profile)
+    staged_change_entries = None
+    if paths is None and mode == "fast":
+        staged_change_entries = staged_changes()
+        resolved_paths = list(changed_paths(staged_change_entries))
+    else:
+        resolved_paths = paths or []
+    return build_change_context(
+        mode,
+        resolved_paths,
+        execution_profile=execution_profile,
+        staged_change_entries=staged_change_entries,
+    )
 
 
 def _gate_input_sources(mode: str) -> tuple[InputSource, ...]:
@@ -992,8 +1017,7 @@ def _run_command(
     if command.backend_test:
         env.update(BACKEND_TEST_ENV)
     if _is_direct_pytest_command(command):
-        env.pop("GIT_DIR", None)
-        env.pop("GIT_WORK_TREE", None)
+        env = isolated_git_environment(env)
     resolved_runtime_temp_root = runtime_temp_root or _runtime_temp_root(
         validation_root,
         isolated_validation=isolated_validation,
@@ -1018,11 +1042,21 @@ def _run_command(
     return result.returncode
 
 
-def _checkout_index(snapshot_root: Path, repository_root: Path = ROOT) -> None:
+def _checkout_index(
+    snapshot_root: Path,
+    repository_root: Path | None = None,
+) -> None:
+    root = repository_root or ROOT
+    environment = (
+        active_index_git_environment(root)
+        if repository_root is None
+        else isolated_git_environment()
+    )
     prefix = f"{snapshot_root.resolve().as_posix()}/"
     result = subprocess.run(
         ["git", "checkout-index", "--all", "--force", f"--prefix={prefix}"],
-        cwd=repository_root,
+        cwd=root,
+        env=environment,
         check=False,
         capture_output=True,
         text=True,
@@ -1109,7 +1143,7 @@ def exposed_frontend_dependencies(validation_root: Path) -> Iterator[Path]:
 
 
 @contextmanager
-def staged_index_snapshot(repository_root: Path = ROOT) -> Iterator[Path]:
+def staged_index_snapshot(repository_root: Path | None = None) -> Iterator[Path]:
     """Materialize exactly the current Git index in a temporary directory."""
     with tempfile.TemporaryDirectory(prefix="montecarlo-staged-") as temp_dir:
         snapshot_root = Path(temp_dir) / "repository"
@@ -1126,6 +1160,7 @@ def _run_worktree_command(
     return subprocess.run(
         ["git", "worktree", *args],
         cwd=repository_root,
+        env=isolated_git_environment(),
         check=False,
         capture_output=True,
         text=True,
@@ -1189,10 +1224,10 @@ def detached_commit_worktree(
 
 
 def _index_git_environment(repository_root: Path = ROOT) -> dict[str, str]:
-    return {
-        "GIT_DIR": str((repository_root / ".git").resolve()),
-        "GIT_WORK_TREE": str(repository_root.resolve()),
-    }
+    try:
+        return index_git_environment(repository_root)
+    except GitStagingError as exc:
+        raise RuntimeError(f"Unable to resolve the active Git index: {exc}") from exc
 
 
 def _ensure_frontend_dependencies() -> int:
@@ -1448,6 +1483,12 @@ def _print_plan_selection(plan: GateExecutionPlan) -> None:
     )
     triggers = classification.trigger_paths if classification is not None else ()
     print(f"Change validation level: {level.value}")
+    if plan.context.staged_changes is not None:
+        staged = ", ".join(
+            f"{change.status} {' -> '.join(change.paths)}"
+            for change in plan.context.staged_changes
+        )
+        print(f"Staged changes: {staged or '(none)'}")
     print(f"Trigger paths: {', '.join(triggers) if triggers else '(none)'}")
     if resolution is not None:
         print(f"Selection reason: {resolution.justification}")
