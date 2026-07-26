@@ -47,7 +47,7 @@ La modification du README doit être pertinente et refléter le changement livr�
 
 ## Feature 2 — Garantir la fiabilité du cœur statistique
 
-**Description :** formaliser les règles statistiques communes, supprimer les divergences involontaires entre Python et TypeScript et protéger les invariants du moteur par des contrats et des jeux de référence partagés.
+**Description :** formaliser les règles statistiques communes, supprimer les divergences involontaires entre Python et TypeScript et protéger les invariants du moteur par des contrats, un rejeu déterministe et des références partagées.
 
 **Flux de valeur :** assurer que les projections, diagnostics et décisions reposent sur des calculs cohérents, reproductibles et explicables, quel que soit le chemin d’exécution utilisé.
 
@@ -57,10 +57,156 @@ La modification du README doit être pertinente et refléter le changement livr�
 | 2.2 | Définir le contrat normatif de parité statistique | M | Sol Très élevé | 22/07/2026 |
 | 2.3 | Séparer les DTO des modèles statistiques métier | L | Sol Très élevé | 22/07/2026 |
 | 2.4 | Introduire les Value Objects statistiques prioritaires | L | Sol Très élevé | 26/07/2026 |
-| 2.5 | Injecter l’aléatoire, l’horloge et les identifiants variables | M | Sol Élevé | |
-| 2.6 | Construire les jeux de référence statistiques partagés | M | Sol Élevé | |
-| 2.7 | Aligner les implémentations statistiques | L | Sol Très élevé | |
-| 2.8 | Bloquer les régressions de parité entre les moteurs | L | Sol Très élevé | |
+| 2.5 | Isoler la résolution de seed aux frontières d’exécution | M | Sol Élevé | |
+| 2.6 | Introduire un port de tirage déterministe dans les deux moteurs | M | Sol Très élevé | |
+| 2.7 | Implémenter le PRNG contractuel commun Python et TypeScript | L | Sol Ultra | |
+| 2.8 | Garantir l’ordre logique des tirages et l’indépendance du batching | M | Sol Très élevé | |
+| 2.9 | Versionner le schéma du corpus de référence statistique | M | Sol Élevé | |
+| 2.10 | Construire les cas de référence des entrées, modes, censures et percentiles | M | Sol Très élevé | |
+| 2.11 | Construire les cas de référence du Risk Score, de la fiabilité et des histogrammes | M | Sol Très élevé | |
+| 2.12 | Exécuter le corpus partagé dans les deux moteurs | L | Sol Très élevé | |
+| 2.13 | Aligner la validation normalisée et la forme des résultats | M | Sol Très élevé | |
+| 2.14 | Aligner les censures, percentiles et Risk Score | M | Sol Très élevé | |
+| 2.15 | Aligner les métriques et labels de fiabilité du throughput | M | Sol Très élevé | |
+| 2.16 | Aligner la construction des histogrammes | M | Sol Très élevé | |
+| 2.17 | Établir le rejeu exact interlangage sur le corpus versionné | L | Sol Ultra | |
+| 2.18 | Produire le rapport de parité déterministe et distributionnelle | M | Sol Très élevé | |
+| 2.19 | Intégrer les contrôles de parité au profil `main` | M | Sol Très élevé | |
+| 2.20 | Bloquer les dérives de version et de compatibilité statistique | M | Sol Très élevé | |
+
+### Retour d’expérience du PBI 2.4
+
+Le PBI 2.4 a livré le résultat attendu, mais son périmètre était trop large pour une complexité `L`. Il réunissait plusieurs familles de Value Objects, leur intégration dans deux langages, la migration des frontières et consommateurs, la suppression d’autorités concurrentes et la reprise de la preuve qualité.
+
+Cette réalisation ne doit pas servir de modèle de granularité. Pour la suite de la Feature 2 :
+
+- un PBI porte un seul résultat statistique ou architectural principal ;
+- l’introduction d’une abstraction est séparée de l’alignement des algorithmes ;
+- la construction d’un corpus est séparée de son exécution ;
+- l’alignement d’une famille de règles est séparé des autres familles ;
+- le reporting de parité, son intégration à la gate et la compatibilité versionnée restent trois résultats distincts ;
+- aucun PBI ne combine modèle, algorithmes, corpus, gate et migration.
+
+### Phase A — Déterminisme d’exécution : PBI 2.5 à 2.8
+
+#### Résultat attendu du PBI 2.5
+
+- résoudre la seed aux frontières API, UI et démo avant l’appel du moteur ;
+- conserver exactement une seed uint32 déjà validée ;
+- supprimer les générations ou normalisations silencieuses dans le cœur ;
+- ne pas injecter ici l’horloge ou les identifiants techniques sans effet statistique.
+
+#### Résultat attendu du PBI 2.6
+
+- définir une interface minimale de tirage consommée par les moteurs ;
+- remplacer l’accès direct aux bibliothèques aléatoires dans la logique Monte Carlo ;
+- permettre une source déterministe de test ;
+- ne choisir ni ne déployer encore le PRNG commun.
+
+#### Résultat attendu du PBI 2.7
+
+- implémenter le même PRNG contractuel dans les deux langages ;
+- définir son état, son domaine, sa sortie et ses vecteurs de vérification ;
+- prouver l’égalité des suites de nombres produites ;
+- ne pas aligner dans ce PBI les percentiles, la fiabilité ou les histogrammes.
+
+#### Résultat attendu du PBI 2.8
+
+- figer l’ordre logique de consommation des tirages ;
+- rendre les résultats indépendants du découpage en lots ;
+- couvrir les deux modes, les censures et les changements de taille de batch ;
+- ne pas introduire le corpus complet de parité.
+
+### Phase B — Corpus partagé : PBI 2.9 à 2.12
+
+#### Résultat attendu du PBI 2.9
+
+- définir un format sérialisé strict et versionné ;
+- distinguer entrées normalisées, résultats attendus et niveau de preuve ;
+- porter la version normative `1.0` et la seed ;
+- valider le schéma indépendamment des moteurs.
+
+#### Résultat attendu du PBI 2.10
+
+- couvrir bornes, types invalides, traitement des zéros et paramètres actifs ;
+- couvrir les deux modes, la fin exacte à l’horizon, les censures totale et partielle ;
+- couvrir l’identifiabilité et l’ordre de P50, P70 et P90 ;
+- utiliser des cas lisibles et déterministes, sans dépendre d’un moteur comme oracle.
+
+#### Résultat attendu du PBI 2.11
+
+- couvrir le calcul et l’absence du Risk Score ;
+- couvrir les seuils exacts de fiabilité après arrondi normatif ;
+- couvrir histogrammes exacts et agrégés, masse et représentants ;
+- inclure les cas qui matérialisent les divergences historiques recensées par l’audit.
+
+#### Résultat attendu du PBI 2.12
+
+- fournir un runner Python et un runner TypeScript du même corpus ;
+- produire des sorties canoniques comparables ;
+- distinguer échec de schéma, échec moteur et divergence de résultat ;
+- ne rendre aucun contrôle bloquant dans ce PBI.
+
+### Phase C — Alignement statistique : PBI 2.13 à 2.17
+
+#### Résultat attendu du PBI 2.13
+
+- aligner validations, paramètres actifs, valeurs absentes et forme normative de réponse ;
+- conserver les DTO et persistances comme frontières primitives ;
+- éviter toute coercion ou valeur sentinelle divergente ;
+- ne modifier aucune formule statistique relevant des PBI suivants.
+
+#### Résultat attendu du PBI 2.14
+
+- aligner les règles de censure ;
+- aligner les rangs et quantiles de P50, P70 et P90 ;
+- aligner le Risk Score et son arrondi d’autorité ;
+- préserver les percentiles absents sans reconstruction depuis l’histogramme.
+
+#### Résultat attendu du PBI 2.15
+
+- aligner moyenne, variance de population, quartiles et pente ;
+- appliquer l’arrondi `round half up` avant les seuils ;
+- appliquer exactement l’ordre de catégorisation normatif ;
+- prouver les cas limites, notamment six et sept observations.
+
+#### Résultat attendu du PBI 2.16
+
+- remplacer les constructions historiques divergentes par l’algorithme normatif ;
+- appliquer `right = min(max, left + width - 1)` ;
+- appliquer `x = floor((left + right) / 2)` ;
+- garantir au plus 100 buckets, la masse et les représentants attendus ;
+- invalider ou migrer explicitement toute référence historique devenue incompatible.
+
+#### Résultat attendu du PBI 2.17
+
+- démontrer l’égalité exacte des résultats normatifs à entrée, seed et version identiques ;
+- couvrir les deux modes, censures, percentiles, score, fiabilité et histogrammes ;
+- vérifier plusieurs tailles de batch ;
+- produire une preuve distincte de la seule équivalence distributionnelle.
+
+### Phase D — Gouvernance de la parité : PBI 2.18 à 2.20
+
+#### Résultat attendu du PBI 2.18
+
+- consolider les résultats déterministes, de rejeu et distributionnels ;
+- identifier précisément la fixture, la règle et le moteur en défaut ;
+- séparer échec fonctionnel, incompatibilité de version et erreur d’infrastructure ;
+- publier un rapport JSON canonique et une synthèse Markdown.
+
+#### Résultat attendu du PBI 2.19
+
+- exécuter les contrôles de parité dans le profil `main` ;
+- bloquer toute divergence normative ;
+- conserver un diagnostic local actionnable ;
+- interdire skip, retry, quarantaine ou exemption silencieuse.
+
+#### Résultat attendu du PBI 2.20
+
+- rendre obligatoire la version du contrat pour toute preuve de rejeu ;
+- détecter les changements affectant tirages, censures, percentiles, scores, labels, histogrammes ou réponse ;
+- exiger une décision de compatibilité, une nouvelle version et la mise à jour du corpus ;
+- documenter migration ou invalidation des caches et historiques concernés.
 
 ---
 
@@ -182,6 +328,7 @@ Le protocole doit également vérifier si les utilisateurs distinguent correctem
 | 7.10 | Définir les contrats de communication inter-modules | M | Sol Très élevé | |
 | 7.11 | Introduire le composition root et l’injection explicite des adaptateurs | M | Sol Très élevé | |
 | 7.12 | Prouver les contrats des ports et adaptateurs | L | Sol Très élevé | |
+| 7.13 | Injecter l’horloge et les générateurs d’identifiants techniques | M | Sol Élevé | |
 
 ### Résultat attendu du PBI 7.1
 
@@ -246,6 +393,14 @@ Les contrats des ports et adaptateurs doivent être prouvés par :
 - des tests négatifs sur les données interdites ;
 - des tests d’intégration aux frontières sans duplication des règles métier ;
 - la preuve que le remplacement d’un adaptateur ne modifie pas la sémantique du cas d’usage.
+
+### Résultat attendu du PBI 7.13
+
+- isoler les lectures de l’horloge utilisées pour les timestamps, expirations et métadonnées techniques ;
+- isoler les générateurs d’identifiants sans sémantique statistique ;
+- injecter des implémentations déterministes dans les tests ;
+- conserver la résolution de seed et le PRNG dans la Feature 2 ;
+- ne modifier ni les contrats publics ni le sens des résultats statistiques.
 
 ### Résultat attendu du PBI 7.9
 
@@ -526,17 +681,43 @@ Tout écart avec un concurrent doit être reformulé en :
 
 ---
 
+# Règle de raffinement des PBI
+
+Un PBI doit produire un résultat principal démontrable et rester livrable indépendamment des PBI suivants.
+
+Un raffinement est obligatoire lorsqu’un item combine au moins deux natures de transformation parmi :
+
+- introduction d’un modèle ou d’une abstraction ;
+- migration de ses consommateurs ;
+- modification ou alignement d’un algorithme ;
+- création d’un corpus de preuve ;
+- automatisation d’une gate ;
+- modification d’un contrat externe ;
+- migration ou invalidation de données.
+
+Les signaux suivants imposent une revue de découpage sans constituer des limites mécaniques :
+
+- plusieurs familles d’invariants indépendantes ;
+- modification substantielle simultanée du backend, du frontend, des persistances et des restitutions ;
+- impossibilité de décrire la valeur livrée en une phrase sans plusieurs résultats reliés par « et » ;
+- nécessité de corriger des dettes historiques étrangères au résultat principal ;
+- validation complète exigeant plusieurs dispositifs de preuve qui pourraient être livrés séparément.
+
+Aucun PBI `XL` ne peut être engagé. Un PBI `L` reste autorisé lorsqu’il porte un seul résultat cohérent malgré une réalisation transverse.
+
+---
+
 # Synthèse du backlog
 
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
 | 1 — Preuve qualité gouvernée | 11 | 11 | 0 |
-| 2 — Fiabilité du cœur statistique | 8 | 4 | 4 |
+| 2 — Fiabilité du cœur statistique | 20 | 4 | 16 |
 | 3 — Réutilisabilité du moteur | 5 | 0 | 5 |
 | 4 — Mise en production personnelle | 6 | 0 | 6 |
 | 5 — Valeur d’usage du portefeuille | 4 | 0 | 4 |
 | 6 — Qualité réelle et limites opérationnelles | 8 | 0 | 8 |
-| 7 — Architecture applicative évolutive | 12 | 0 | 12 |
+| 7 — Architecture applicative évolutive | 13 | 0 | 13 |
 | 8 — Données Azure DevOps et sprints | 14 | 0 | 14 |
 | 9 — Calibration et évolution temporelle | 8 | 0 | 8 |
 | 10 — Expérience et restitutions | 10 | 0 | 10 |
@@ -544,7 +725,7 @@ Tout écart avec un concurrent doit être reformulé en :
 | 12 — Pilotage de programme | 7 | 0 | 7 |
 | 13 — Rationalisation de la gouvernance | 9 | 0 | 9 |
 | 14 — Stratégie de diffusion et adoption | 9 | 0 | 9 |
-| **Total** | **119** | **15** | **104** |
+| **Total** | **132** | **15** | **117** |
 
 Aucun PBI n’est classé XL.
 
@@ -570,12 +751,12 @@ Un PBI `L` peut relever de Sol Élevé lorsqu’il est volumineux mais prévisib
 
 Aucun PBI actuel ne relève de **Sol Minimal**, réservé aux corrections mécaniques telles que le formatage, le renommage évident ou la résolution d’une erreur de lint isolée.
 
-## Répartition des 104 PBI non réalisés
+## Répartition des 117 PBI non réalisés
 
 | Modèle Codex | Nombre de PBI |
 | --- | ---: |
 | Sol Medium | 15 |
-| Sol Élevé | 29 |
-| Sol Très élevé | 56 |
-| Sol Ultra | 4 |
-| **Total** | **104** |
+| Sol Élevé | 30 |
+| Sol Très élevé | 66 |
+| Sol Ultra | 6 |
+| **Total** | **117** |
