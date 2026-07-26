@@ -56,7 +56,7 @@ La modification du README doit être pertinente et refléter le changement livr�
 | 2.1 | Auditer les divergences statistiques Python et TypeScript | M | Sol Très élevé | 22/07/2026 |
 | 2.2 | Définir le contrat normatif de parité statistique | M | Sol Très élevé | 22/07/2026 |
 | 2.3 | Séparer les DTO des modèles statistiques métier | L | Sol Très élevé | 22/07/2026 |
-| 2.4 | Introduire les Value Objects statistiques prioritaires | L | Sol Très élevé | |
+| 2.4 | Introduire les Value Objects statistiques prioritaires | L | Sol Très élevé | 26/07/2026 |
 | 2.5 | Injecter l’aléatoire, l’horloge et les identifiants variables | M | Sol Élevé | |
 | 2.6 | Construire les jeux de référence statistiques partagés | M | Sol Élevé | |
 | 2.7 | Aligner les implémentations statistiques | L | Sol Très élevé | |
@@ -531,7 +531,7 @@ Tout écart avec un concurrent doit être reformulé en :
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
 | 1 — Preuve qualité gouvernée | 11 | 11 | 0 |
-| 2 — Fiabilité du cœur statistique | 8 | 3 | 5 |
+| 2 — Fiabilité du cœur statistique | 8 | 4 | 4 |
 | 3 — Réutilisabilité du moteur | 5 | 0 | 5 |
 | 4 — Mise en production personnelle | 6 | 0 | 6 |
 | 5 — Valeur d’usage du portefeuille | 4 | 0 | 4 |
@@ -544,7 +544,7 @@ Tout écart avec un concurrent doit être reformulé en :
 | 12 — Pilotage de programme | 7 | 0 | 7 |
 | 13 — Rationalisation de la gouvernance | 9 | 0 | 9 |
 | 14 — Stratégie de diffusion et adoption | 9 | 0 | 9 |
-| **Total** | **119** | **14** | **105** |
+| **Total** | **119** | **15** | **104** |
 
 Aucun PBI n’est classé XL.
 
@@ -570,12 +570,12 @@ Un PBI `L` peut relever de Sol Élevé lorsqu’il est volumineux mais prévisib
 
 Aucun PBI actuel ne relève de **Sol Minimal**, réservé aux corrections mécaniques telles que le formatage, le renommage évident ou la résolution d’une erreur de lint isolée.
 
-## Répartition des 105 PBI non réalisés
+## Répartition des 104 PBI non réalisés
 
 | Modèle Codex | Nombre de PBI |
 | --- | ---: |
 | Sol Medium | 15 |
 | Sol Élevé | 29 |
-| Sol Très élevé | 57 |
+| Sol Très élevé | 56 |
 | Sol Ultra | 4 |
-| **Total** | **105** |
+| **Total** | **104** |

@@ -78,10 +78,11 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
   const riskScoreValue = useMemo(() => {
     if (!s.result) return null;
     if (typeof s.displayPercentiles?.P50 === "number" && typeof s.displayPercentiles?.P90 === "number") {
-      return computeRiskScoreFromPercentiles(s.simulationMode, s.displayPercentiles ?? {});
+      const resultMode = s.result.resultKind === "items" ? "weeks_to_items" : "backlog_to_weeks";
+      return computeRiskScoreFromPercentiles(resultMode, s.displayPercentiles ?? {});
     }
     return null;
-  }, [s.result, s.displayPercentiles, s.simulationMode]);
+  }, [s.result, s.displayPercentiles]);
 
   const riskLegend = useMemo(() => {
     if (riskScoreValue == null) return "";

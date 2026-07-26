@@ -66,7 +66,7 @@ type PortfolioSectionInput = {
   resultKind: SimulationResultKind;
   riskScore?: number;
   throughputReliability?: ThroughputReliability | null;
-  distribution: Array<{ x: number; count: number }>;
+  distribution: ReadonlyArray<{ x: number; count: number }>;
   weeklyThroughput: Array<{ week: string; throughput: number }>;
   displayPercentiles: SimulationPercentiles;
   completionSummary?: CompletionSummary;
@@ -259,7 +259,7 @@ function buildTeamLikePageHtml({
   types?: string[];
   doneStates?: string[];
   resultKind: SimulationResultKind;
-  distribution: Array<{ x: number; count: number }>;
+  distribution: ReadonlyArray<{ x: number; count: number }>;
   weeklyThroughput: Array<{ week: string; throughput: number }>;
   displayPercentiles: SimulationPercentiles;
   riskScore?: number;

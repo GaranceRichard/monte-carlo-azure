@@ -24,10 +24,15 @@ from backend.simulation_limits import (
     SIMULATION_THROUGHPUT_SAMPLES_MIN,
 )
 from backend.simulation_models import (
-    CompletionSummary,
-    HistogramBucket,
     SimulationCommand,
     SimulationResult,
+)
+from backend.simulation_value_objects import (
+    CompletionSummary,
+    Histogram,
+    SimulationCount,
+    SimulationPercentiles,
+    SimulationSeed,
     ThroughputReliability,
 )
 from tests.http_client import ApiTestClient
@@ -71,7 +76,7 @@ def test_simulate_backlog_to_weeks_success():
         (body["result_percentiles"]["P90"] - body["result_percentiles"]["P50"])
         / body["result_percentiles"]["P50"]
     )
-    assert body["risk_score"] == expected
+    assert body["risk_score"] == round(expected, 4)
     assert isinstance(body["result_distribution"], list)
     assert len(body["result_distribution"]) > 0
     assert (
@@ -115,7 +120,7 @@ def test_simulate_weeks_to_items_success():
         (body["result_percentiles"]["P50"] - body["result_percentiles"]["P90"])
         / body["result_percentiles"]["P50"]
     )
-    assert body["risk_score"] == max(0.0, expected)
+    assert body["risk_score"] == round(max(0.0, expected), 4)
 
 
 def test_simulate_include_zero_weeks_keeps_zero_samples():
@@ -340,12 +345,19 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
         "target_weeks": 5,
         "n_sims": 1000,
     }
-    known_backlog = np.array([3, 4, 6, 8, 10], dtype=int)
-    known_items = np.array([18, 22, 24, 25, 27], dtype=int)
+    known_backlog = np.tile(np.array([3, 4, 6, 8, 10], dtype=int), 200)
+    known_items = np.tile(np.array([18, 22, 24, 25, 27], dtype=int), 200)
 
     def fake_compute(command, _samples):
         if command.mode == "backlog_to_weeks":
-            return known_backlog, "weeks"
+            return (
+                FinishWeeksSimulation(
+                    weeks_needed=known_backlog,
+                    completed_mask=np.ones(1000, dtype=bool),
+                    horizon_weeks=521,
+                ),
+                "weeks",
+            )
         return known_items, "items"
 
     monkeypatch.setattr("backend.simulation_service._run_engine", fake_compute)
@@ -355,7 +367,7 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
 
     assert backlog_response.status_code == 200
     assert backlog_response.json()["result_percentiles"] == {"P50": 6, "P70": 8, "P90": 10}
-    assert backlog_response.json()["risk_score"] == pytest.approx((10 - 6) / 6)
+    assert backlog_response.json()["risk_score"] == 0.6667
     assert isinstance(backlog_response.json()["seed"], int)
     assert items_response.status_code == 200
     assert items_response.json()["result_percentiles"] == {"P50": 24, "P70": 22, "P90": 18}
@@ -369,8 +381,8 @@ def test_simulate_backlog_to_weeks_omits_unidentifiable_percentiles_and_risk_sco
     def fake_compute(_command, _samples):
         return (
             FinishWeeksSimulation(
-                weeks_needed=np.array([521, 521, 521], dtype=int),
-                completed_mask=np.array([False, False, False], dtype=bool),
+                weeks_needed=np.full(2000, 521, dtype=int),
+                completed_mask=np.zeros(2000, dtype=bool),
                 horizon_weeks=521,
             ),
             "weeks",
@@ -396,7 +408,7 @@ def test_simulate_backlog_to_weeks_omits_unidentifiable_percentiles_and_risk_sco
     assert body["result_distribution"] == []
     assert body["completion_summary"] == {
         "completed_count": 0,
-        "censored_count": 3,
+        "censored_count": 2000,
         "censored_rate": 1.0,
         "horizon_weeks": 521,
     }
@@ -408,8 +420,8 @@ def test_simulate_backlog_to_weeks_keeps_exact_finish_at_horizon_distinct_from_c
     def fake_compute(_command, _samples):
         return (
             FinishWeeksSimulation(
-                weeks_needed=np.array([521, 521, 521], dtype=int),
-                completed_mask=np.array([True, False, True], dtype=bool),
+                weeks_needed=np.full(2000, 521, dtype=int),
+                completed_mask=np.array([True] * 1000 + [False] * 1000),
                 horizon_weeks=521,
             ),
             "weeks",
@@ -429,11 +441,11 @@ def test_simulate_backlog_to_weeks_keeps_exact_finish_at_horizon_distinct_from_c
 
     assert response.status_code == 200
     body = response.json()
-    assert body["result_distribution"] == [{"x": 521, "count": 2}]
+    assert body["result_distribution"] == [{"x": 521, "count": 1000}]
     assert body["completion_summary"] == {
-        "completed_count": 2,
-        "censored_count": 1,
-        "censored_rate": 0.3333,
+        "completed_count": 1000,
+        "censored_count": 1000,
+        "censored_rate": 0.5,
         "horizon_weeks": 521,
     }
     assert body["result_percentiles"] == {"P50": 521}
@@ -525,7 +537,7 @@ def _build_request_with_cookie(cookie_name: str, cookie_value: str | None = None
 
 
 def _build_command() -> SimulationCommand:
-    return SimulationCommand(
+    return SimulationCommand.create(
         throughput_samples=(1, 2, 3, 4, 5, 6),
         include_zero_weeks=False,
         mode="backlog_to_weeks",
@@ -539,24 +551,28 @@ def _build_command() -> SimulationCommand:
 def _build_result_model() -> SimulationResult:
     return SimulationResult(
         result_kind="weeks",
-        result_percentiles={"P50": 10, "P70": 12, "P90": 15},
-        risk_score=0.5,
-        result_distribution=(HistogramBucket(x=10, count=4),),
-        completion_summary=CompletionSummary(
-            completed_count=4,
+        result_percentiles=SimulationPercentiles.create(
+            "backlog_to_weeks",
+            {"P50": 10, "P70": 12, "P90": 15},
+        ),
+        result_distribution=Histogram.create(
+            [{"x": 10, "count": 2000}],
+            expected_mass=2000,
+        ),
+        completion_summary=CompletionSummary.create(
+            completed_count=2000,
             censored_count=0,
-            censored_rate=0.0,
-            horizon_weeks=521,
+            n_sims=SimulationCount(2000),
         ),
         samples_count=6,
-        throughput_reliability=ThroughputReliability(
+        throughput_reliability=ThroughputReliability.create(
             cv=0.2,
             iqr_ratio=0.3,
             slope_norm=0.1,
             label="fiable",
             samples_count=6,
         ),
-        seed=123,
+        seed=SimulationSeed(123),
     )
 
 
@@ -570,9 +586,10 @@ def test_persist_simulation_saves_when_cookie_present_and_store_enabled(monkeypa
     assert len(fake.saved) == 1
     saved_id, saved_command, saved_result = fake.saved[0]
     assert saved_id == "client-123"
-    assert saved_command.backlog_size == 20
+    assert saved_command.backlog_size is not None
+    assert saved_command.backlog_size.value == 20
     assert saved_result.result_kind == "weeks"
-    assert saved_result.seed == 123
+    assert saved_result.seed.value == 123
 
 
 def test_persist_simulation_skips_when_cookie_missing(monkeypatch):

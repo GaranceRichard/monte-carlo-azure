@@ -1,5 +1,13 @@
 import type { SimulationResult } from "../domain/simulation";
 import type { SimulationHistoryEntry } from "../domain/simulationHistory";
+import {
+  createCompletionSummary,
+  createHistogram,
+  createSimulationCount,
+  createSimulationPercentiles,
+  createSimulationSeed,
+  createThroughputReliability,
+} from "../domain/simulationValueObjects";
 import type {
   SimulationHistoryEntryDto,
   StoredSimulationResultDto,
@@ -23,10 +31,6 @@ type LegacySimulationHistoryEntry = Record<string, unknown> & {
 function toFiniteNumber(value: unknown, fallback = 0): number {
   const numericValue = Number(value);
   return Number.isFinite(numericValue) ? numericValue : fallback;
-}
-
-function toOptionalSeed(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
 function toStringArray(value: unknown): string[] {
@@ -72,39 +76,52 @@ function normalizeCycleTimeDaysData(value: unknown, schemaVersion?: unknown) {
     .filter((point) => point.week);
 }
 
-function storedResultToModel(value: unknown): SimulationResult {
+function storedResultToModel(
+  value: unknown,
+  nSimsValue: ReturnType<typeof createSimulationCount>,
+): SimulationResult {
   const result = value && typeof value === "object"
     ? value as Partial<StoredSimulationResultDto>
     : {};
-  return {
-    resultKind: result.result_kind === "items" ? "items" : "weeks",
+  const resultKind = result.result_kind === "items" ? "items" : "weeks";
+  const mode = resultKind === "items" ? "weeks_to_items" : "backlog_to_weeks";
+  const completionSummary = result.completion_summary
+    ? createCompletionSummary({
+        completedCount: result.completion_summary.completed_count,
+        censoredCount: result.completion_summary.censored_count,
+        censoredRate: result.completion_summary.censored_rate,
+        horizonWeeks: result.completion_summary.horizon_weeks,
+        nSims: createSimulationCount(nSimsValue),
+      })
+    : undefined;
+  const rawDistribution = Array.isArray(result.result_distribution)
+    ? result.result_distribution
+    : [];
+  const expectedMass = completionSummary?.completedCount
+    ?? nSimsValue;
+  return Object.freeze({
+    resultKind,
     samplesCount: toFiniteNumber(result.samples_count),
-    seed: toFiniteNumber(result.seed),
-    resultPercentiles: result.result_percentiles ?? {},
+    seed: createSimulationSeed(result.seed),
+    resultPercentiles: createSimulationPercentiles(
+      mode,
+      result.result_percentiles ?? {},
+    ),
     ...(typeof result.risk_score === "number" ? { riskScore: result.risk_score } : {}),
-    resultDistribution: Array.isArray(result.result_distribution) ? result.result_distribution : [],
-    ...(result.completion_summary
-      ? {
-          completionSummary: {
-            completedCount: result.completion_summary.completed_count,
-            censoredCount: result.completion_summary.censored_count,
-            censoredRate: result.completion_summary.censored_rate,
-            horizonWeeks: result.completion_summary.horizon_weeks,
-          },
-        }
-      : {}),
+    resultDistribution: createHistogram(rawDistribution, expectedMass),
+    ...(completionSummary === undefined ? {} : { completionSummary }),
     ...(result.throughput_reliability
       ? {
-          throughputReliability: {
+          throughputReliability: createThroughputReliability({
             cv: result.throughput_reliability.cv,
             iqrRatio: result.throughput_reliability.iqr_ratio,
             slopeNorm: result.throughput_reliability.slope_norm,
             label: result.throughput_reliability.label,
             samplesCount: result.throughput_reliability.samples_count,
-          },
+          }),
         }
       : {}),
-  };
+  });
 }
 
 function simulationResultToStorageDto(result: SimulationResult): StoredSimulationResultDto {
@@ -112,9 +129,9 @@ function simulationResultToStorageDto(result: SimulationResult): StoredSimulatio
     result_kind: result.resultKind,
     samples_count: result.samplesCount,
     seed: result.seed,
-    result_percentiles: result.resultPercentiles,
+    result_percentiles: { ...result.resultPercentiles },
     ...(result.riskScore === undefined ? {} : { risk_score: result.riskScore }),
-    result_distribution: result.resultDistribution,
+    result_distribution: result.resultDistribution.map((bucket) => ({ ...bucket })),
     ...(result.completionSummary === undefined
       ? {}
       : {
@@ -142,10 +159,20 @@ function simulationResultToStorageDto(result: SimulationResult): StoredSimulatio
 export function simulationHistoryDtoToModel(value: unknown): SimulationHistoryEntry | null {
   if (!value || typeof value !== "object") return null;
   const entry = value as LegacySimulationHistoryEntry;
+  let nSims: ReturnType<typeof createSimulationCount>;
+  let seed: ReturnType<typeof createSimulationSeed> | null;
+  let result: SimulationResult;
+  try {
+    nSims = createSimulationCount(entry.nSims);
+    seed = entry.seed == null ? null : createSimulationSeed(entry.seed);
+    result = storedResultToModel(entry.result, nSims);
+  } catch {
+    return null;
+  }
   return {
     schemaVersion: CURRENT_SIM_HISTORY_SCHEMA_VERSION,
     id: String(entry.id ?? ""),
-    seed: toOptionalSeed(entry.seed),
+    seed,
     createdAt: String(entry.createdAt ?? ""),
     selectedOrg: String(entry.selectedOrg ?? ""),
     selectedProject: String(entry.selectedProject ?? ""),
@@ -156,7 +183,7 @@ export function simulationHistoryDtoToModel(value: unknown): SimulationHistoryEn
     includeZeroWeeks: Boolean(entry.includeZeroWeeks),
     backlogSize: toFiniteNumber(entry.backlogSize),
     targetWeeks: toFiniteNumber(entry.targetWeeks),
-    nSims: Math.max(1, Math.floor(toFiniteNumber(entry.nSims, 1))),
+    nSims,
     types: toStringArray(entry.types),
     doneStates: toStringArray(entry.doneStates),
     sampleStats: (entry.sampleStats ?? null) as SimulationHistoryEntry["sampleStats"],
@@ -165,7 +192,7 @@ export function simulationHistoryDtoToModel(value: unknown): SimulationHistoryEn
       entry.cycleTimeDaysData ?? entry.cycleTimeData,
       entry.schemaVersion,
     ),
-    result: storedResultToModel(entry.result),
+    result,
     warning: toOptionalWarning(entry.warning),
   };
 }

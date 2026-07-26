@@ -3,9 +3,7 @@ import { fetchTeamThroughput, runSimulationForecast, simulateForecastFromSamples
 import { getTeamDeliveryDataDirect } from "../adoClient";
 import { postSimulate } from "../api";
 import {
-  SIMULATION_BACKLOG_SIZE_MAX,
   SIMULATION_HORIZON_WEEKS_MAX,
-  SIMULATION_N_SIMS_MAX,
   SIMULATION_THROUGHPUT_SAMPLES_MAX,
 } from "../simulationLimits";
 
@@ -31,12 +29,13 @@ const API_RESPONSE_WEEKS = {
   samples_count: 6,
   seed: 111,
   result_percentiles: { P50: 8, P70: 10, P90: 13 },
+  completion_summary: { completed_count: 20000, censored_count: 0, censored_rate: 0, horizon_weeks: 521 },
   throughput_reliability: { cv: 0.22, iqr_ratio: 0.3, slope_norm: -0.02, label: "fiable" as const, samples_count: 6 },
   result_distribution: [
-    { x: 6, count: 400 },
-    { x: 8, count: 3000 },
-    { x: 10, count: 2000 },
-    { x: 13, count: 1000 },
+    { x: 6, count: 4000 },
+    { x: 8, count: 10000 },
+    { x: 10, count: 4000 },
+    { x: 13, count: 2000 },
   ],
 };
 
@@ -44,12 +43,12 @@ const API_RESPONSE_ITEMS = {
   result_kind: "items" as const,
   samples_count: 6,
   seed: 222,
-  result_percentiles: { P50: 30, P70: 35, P90: 40 },
+  result_percentiles: { P50: 40, P70: 35, P90: 30 },
   throughput_reliability: { cv: 0.65, iqr_ratio: 0.7, slope_norm: -0.08, label: "incertain" as const, samples_count: 6 },
   result_distribution: [
-    { x: 25, count: 1000 },
-    { x: 30, count: 5000 },
-    { x: 35, count: 3000 },
+    { x: 25, count: 5000 },
+    { x: 30, count: 10000 },
+    { x: 35, count: 5000 },
   ],
 };
 
@@ -291,7 +290,7 @@ describe("appels réseau", () => {
     );
   });
 
-  it("normalise une distribution absente en tableau vide", async () => {
+  it("rejette une distribution absente qui ne conserve pas la masse", async () => {
     vi.mocked(postSimulate).mockResolvedValue({
       result_kind: "weeks",
       samples_count: 6,
@@ -301,9 +300,7 @@ describe("appels réseau", () => {
       throughput_reliability: { cv: 0.22, iqr_ratio: 0.3, slope_norm: -0.02, label: "fiable", samples_count: 6 },
     } as never);
 
-    const result = await runSimulationForecast(baseParams());
-
-    expect(result.result.resultDistribution).toEqual([]);
+    await expect(runSimulationForecast(baseParams())).rejects.toThrow("masse totale");
   });
 
   it("propage throughput_reliability tel quel", async () => {
@@ -331,7 +328,7 @@ describe("filtrage des throughput samples", () => {
     expect(result.sampleStats.usedWeeks).toBe(6);
     expect(postSimulate).toHaveBeenCalledWith(
       expect.objectContaining({
-        throughput_samples: [5, 7, 4, 6, 8, 5],
+        throughput_samples: [0, 5, 7, 4, 6, 8, 5],
         include_zero_weeks: false,
       }),
     );
@@ -394,33 +391,35 @@ describe("seuil d'historique insuffisant", () => {
     await expect(runSimulationForecast(baseParams())).resolves.toBeDefined();
   });
 
-  it("rejette un contrat hors bornes avant l'appel API", async () => {
+  it("rejette un contrôle vide avant l'appel API", async () => {
     await expect(
       simulateForecastFromSamples({
         throughputSamples: [5, 7, 4, 6, 8, 5],
         simulationMode: "backlog_to_weeks",
-        backlogSize: SIMULATION_BACKLOG_SIZE_MAX + 1,
+        backlogSize: "",
         targetWeeks: 12,
         nSims: 20_000,
       }),
-    ).rejects.toThrow("backlog_size");
+    ).rejects.toThrow("backlog_size requis");
 
     expect(postSimulate).not.toHaveBeenCalled();
   });
 
-  it("accepte les bornes du contrat et les transmet telles quelles", async () => {
+  it("accepte les bornes d'horizon et d'historique et les transmet telles quelles", async () => {
+    vi.mocked(postSimulate).mockResolvedValue(API_RESPONSE_ITEMS);
+
     await simulateForecastFromSamples({
       throughputSamples: Array.from({ length: SIMULATION_THROUGHPUT_SAMPLES_MAX }, () => 1),
       simulationMode: "weeks_to_items",
       backlogSize: 80,
       targetWeeks: SIMULATION_HORIZON_WEEKS_MAX,
-      nSims: SIMULATION_N_SIMS_MAX,
+      nSims: 20_000,
     });
 
     expect(postSimulate).toHaveBeenCalledWith(
       expect.objectContaining({
         target_weeks: SIMULATION_HORIZON_WEEKS_MAX,
-        n_sims: SIMULATION_N_SIMS_MAX,
+        n_sims: 20_000,
       }),
     );
   });

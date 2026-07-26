@@ -11,12 +11,18 @@ from pymongo.errors import AutoReconnect, OperationFailure, PyMongoError
 import backend.simulation_store as simulation_store_module
 from backend.api_config import ApiConfig
 from backend.simulation_models import (
-    HistogramBucket,
     SimulationCommand,
     SimulationResult,
-    ThroughputReliability,
 )
 from backend.simulation_store import SENSITIVE_HISTORY_FIELDS, SimulationStore
+from backend.simulation_value_objects import (
+    CompletionSummary,
+    Histogram,
+    SimulationCount,
+    SimulationPercentiles,
+    SimulationSeed,
+    ThroughputReliability,
+)
 
 
 class _FakeAdmin:
@@ -124,7 +130,7 @@ def _cfg(mongo_url: str) -> ApiConfig:
 
 
 def _req_resp():
-    req = SimulationCommand(
+    req = SimulationCommand.create(
         throughput_samples=(1, 2, 3, 4, 5, 6),
         include_zero_weeks=False,
         mode="backlog_to_weeks",
@@ -135,19 +141,28 @@ def _req_resp():
     )
     resp = SimulationResult(
         result_kind="weeks",
-        result_percentiles={"P50": 10, "P70": 12, "P90": 14},
-        risk_score=0.4,
-        result_distribution=(HistogramBucket(x=8, count=12),),
-        completion_summary=None,
+        result_percentiles=SimulationPercentiles.create(
+            "backlog_to_weeks",
+            {"P50": 10, "P70": 12, "P90": 14},
+        ),
+        result_distribution=Histogram.create(
+            [{"x": 8, "count": 2000}],
+            expected_mass=2000,
+        ),
+        completion_summary=CompletionSummary.create(
+            completed_count=2000,
+            censored_count=0,
+            n_sims=SimulationCount(2000),
+        ),
         samples_count=6,
-        throughput_reliability=ThroughputReliability(
+        throughput_reliability=ThroughputReliability.create(
             cv=0.25,
             iqr_ratio=0.2,
             slope_norm=-0.01,
             label="fiable",
             samples_count=6,
         ),
-        seed=98765,
+        seed=SimulationSeed(98765),
     )
     return req, resp
 
@@ -339,7 +354,7 @@ def test_save_simulation_inserts_and_updates(monkeypatch):
     assert len(fake_coll.inserted) == 1
     assert fake_coll.inserted[0]["mc_client_id"] == "c1"
     assert fake_coll.inserted[0]["seed"] == 98765
-    assert fake_coll.inserted[0]["distribution"] == [{"x": 8, "count": 12}]
+    assert fake_coll.inserted[0]["distribution"] == [{"x": 8, "count": 2000}]
     assert "selected_org" not in fake_coll.inserted[0]
     assert "client_context" not in fake_coll.inserted[0]
     assert len(fake_coll.updated) == 1

@@ -91,7 +91,7 @@ export type PortfolioScenarioResult = {
   percentiles: SimulationPercentiles;
   riskScore?: number;
   riskLegend?: "fiable" | "incertain" | "fragile" | "non fiable";
-  distribution: HistogramBucket[];
+  distribution: readonly HistogramBucket[];
   completionSummary?: CompletionSummary;
   throughputReliability?: ThroughputReliability | null;
   decisionDiagnostic?: DecisionLanguage;

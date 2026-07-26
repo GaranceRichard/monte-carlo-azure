@@ -9,10 +9,14 @@ from backend.mc_core import (
     mc_finish_weeks,
     mc_items_done_for_weeks,
     percentiles,
-    risk_score,
-    throughput_reliability,
+    throughput_reliability_metrics,
 )
 from backend.simulation_limits import SIMULATION_HORIZON_WEEKS_MAX, SIMULATION_N_SIMS_MAX
+from backend.simulation_value_objects import ThroughputReliability
+
+
+def _reliability(samples: np.ndarray) -> ThroughputReliability:
+    return ThroughputReliability.create(**throughput_reliability_metrics(samples))
 
 
 def test_empty_finish_result_and_discrete_quantile_guardrails():
@@ -25,11 +29,11 @@ def test_empty_finish_result_and_discrete_quantile_guardrails():
     with pytest.raises(ValueError, match="arr est vide"):
         _discrete_quantile(np.array([], dtype=int), 0.5, method="higher")
     with pytest.raises(ValueError, match="throughput_samples est vide"):
-        throughput_reliability(np.array([], dtype=int))
+        throughput_reliability_metrics(np.array([], dtype=int))
 
 
 def test_throughput_reliability_marks_moderate_trend_as_incertain():
-    assert throughput_reliability(np.arange(7, 15))["label"] == "incertain"
+    assert _reliability(np.arange(7, 15)).label == "incertain"
 
 
 def test_mc_finish_weeks_shape_and_bounds():
@@ -353,54 +357,41 @@ def test_percentiles_weeks_to_items_use_survival_lower_quantiles():
     assert p["P50"] >= p["P70"] >= p["P90"]
 
 
-def test_risk_score_matches_expected_formulas_and_guardrails():
-    assert risk_score("backlog_to_weeks", 10, 14) == 0.4
-    assert risk_score("weeks_to_items", 24, 18) == 0.25
-    assert risk_score("backlog_to_weeks", 10, 8) == 0.0
-    assert risk_score("weeks_to_items", 10, 6) == 0.4
-    assert risk_score("weeks_to_items", 10, 12) == 0.0
-    assert risk_score("backlog_to_weeks", 0, 5) is None
-    assert risk_score("weeks_to_items", 0, 18) is None
-    assert risk_score("backlog_to_weeks", None, 18) is None
-
-
 def test_throughput_reliability_marks_stable_history_as_fiable():
-    result = throughput_reliability(np.array([9, 10, 10, 11, 9, 10, 11, 10, 9, 10], dtype=int))
+    result = _reliability(np.array([9, 10, 10, 11, 9, 10, 11, 10, 9, 10], dtype=int))
 
-    assert result["label"] == "fiable"
-    assert result["samples_count"] == 10
-    assert float(result["cv"]) < 0.5
-    assert abs(float(result["slope_norm"])) < 0.05
+    assert result.label == "fiable"
+    assert result.samples_count == 10
+    assert result.cv < 0.5
+    assert abs(result.slope_norm) < 0.05
 
 
 def test_throughput_reliability_marks_volatile_history_as_fragile():
-    result = throughput_reliability(np.array([1, 12, 2, 14, 1, 15, 2, 13, 1, 16], dtype=int))
+    result = _reliability(np.array([1, 12, 2, 14, 1, 15, 2, 13, 1, 16], dtype=int))
 
-    assert result["label"] == "fragile"
-    assert float(result["cv"]) >= 1.0 or float(result["iqr_ratio"]) >= 1.0
+    assert result.label == "fragile"
+    assert result.cv >= 1.0 or result.iqr_ratio >= 1.0
 
 
 def test_throughput_reliability_marks_downward_trend_as_non_fiable():
-    result = throughput_reliability(np.array([20, 18, 16, 14, 12, 10, 8, 6], dtype=int))
+    result = _reliability(np.array([20, 18, 16, 14, 12, 10, 8, 6], dtype=int))
 
-    assert result["label"] == "non fiable"
-    assert float(result["slope_norm"]) <= -0.15
+    assert result.label == "non fiable"
+    assert result.slope_norm <= -0.15
 
 
 def test_throughput_reliability_marks_short_history_as_non_fiable():
-    result = throughput_reliability(np.array([8, 8, 8, 8, 8], dtype=int))
+    result = _reliability(np.array([8, 8, 8, 8, 8], dtype=int))
 
-    assert result["label"] == "non fiable"
-    assert result["samples_count"] == 5
+    assert result.label == "non fiable"
+    assert result.samples_count == 5
 
 
 def test_throughput_reliability_returns_expected_ratio_values_for_reference_series():
-    result = throughput_reliability(np.array([10, 20, 30, 40, 50, 60, 70, 80], dtype=int))
+    result = _reliability(np.array([10, 20, 30, 40, 50, 60, 70, 80], dtype=int))
 
-    assert result == {
-        "cv": 0.5092,
-        "iqr_ratio": 0.7778,
-        "slope_norm": 0.2222,
-        "label": "fragile",
-        "samples_count": 8,
-    }
+    assert result.cv == 0.5092
+    assert result.iqr_ratio == 0.7778
+    assert result.slope_norm == 0.2222
+    assert result.label == "fragile"
+    assert result.samples_count == 8

@@ -6,14 +6,11 @@ import {
 } from "../api/simulationMappers";
 import { getDemoCycleTime, getDemoThroughputSamples, getDemoWeeklyThroughput } from "../demoData";
 import type {
-  SimulationCommand,
   SimulationResult,
 } from "../domain/simulation";
+import { createSimulationCommand } from "../domain/simulation";
+import { createThroughputSamples } from "../domain/simulationValueObjects";
 import { toSafeNumber } from "../utils/math";
-import {
-  SIMULATION_THROUGHPUT_SAMPLES_MIN,
-  validateSimulationInputContract,
-} from "../simulationLimits";
 import {
   computeRiskScoreFromPercentiles,
   generateSimulationSeed,
@@ -27,6 +24,36 @@ import type {
   SimulateFromSamplesParams,
 } from "./simulationForecastService";
 import type { SampleStats, SimulationHistoryEntry } from "../domain/simulationHistory";
+
+const INSUFFICIENT_HISTORY_MESSAGE =
+  "Historique insuffisant pour une simulation fiable. Elargissez la periode selectionnee, verifiez les types et etats choisis, ou activez les semaines a 0 incluses.";
+
+function throwTranslatedHistoryError(error: unknown): never {
+  if (
+    error instanceof Error
+    && (
+      error.message.startsWith("Historique insuffisant")
+      || error.message.startsWith("throughput_samples doit contenir entre")
+    )
+  ) {
+    throw new Error(INSUFFICIENT_HISTORY_MESSAGE);
+  }
+  throw error;
+}
+
+function usableThroughputCount(
+  throughputSamples: readonly number[],
+  includeZeroWeeks: boolean,
+): number {
+  try {
+    return createThroughputSamples(
+      throughputSamples,
+      includeZeroWeeks,
+    ).usableValues.length;
+  } catch (error) {
+    throwTranslatedHistoryError(error);
+  }
+}
 
 export async function fetchTeamThroughputCore(
   params: FetchTeamThroughputParams,
@@ -47,7 +74,7 @@ export async function fetchTeamThroughputCore(
 
   if (demoMode) {
     const weekly = getDemoWeeklyThroughput(selectedTeam);
-    const throughputSamples = getDemoThroughputSamples(selectedTeam).filter((n) => (includeZeroWeeks ? n >= 0 : n > 0));
+    const throughputSamples = getDemoThroughputSamples(selectedTeam);
     return {
       weeklyThroughput: weekly,
       cycleTimeDaysData: getDemoCycleTime(selectedTeam),
@@ -55,7 +82,7 @@ export async function fetchTeamThroughputCore(
       sampleStats: {
         totalWeeks: weekly.length,
         zeroWeeks: weekly.filter((row) => row.throughput === 0).length,
-        usedWeeks: throughputSamples.length,
+        usedWeeks: usableThroughputCount(throughputSamples, includeZeroWeeks),
       },
     };
   }
@@ -73,19 +100,13 @@ export async function fetchTeamThroughputCore(
   );
   const weekly = throughputResponse.weeklyThroughput;
   const warning = throughputResponse.warning;
-  const throughputSamples = weekly.map((r) => r.throughput).filter((n) => (includeZeroWeeks ? n >= 0 : n > 0));
+  const throughputSamples = weekly.map((r) => r.throughput);
   const zeroWeeks = weekly.filter((r) => r.throughput === 0).length;
   const sampleStats: SampleStats = {
     totalWeeks: weekly.length,
     zeroWeeks,
-    usedWeeks: throughputSamples.length,
+    usedWeeks: usableThroughputCount(throughputSamples, includeZeroWeeks),
   };
-  if (throughputSamples.length < SIMULATION_THROUGHPUT_SAMPLES_MIN) {
-    throw new Error(
-      "Historique insuffisant pour une simulation fiable. Elargissez la periode selectionnee, verifiez les types et etats choisis, ou activez les semaines a 0 incluses.",
-    );
-  }
-
   return {
     weeklyThroughput: weekly,
     cycleTimeDaysData: throughputResponse.cycleTimeDaysData,
@@ -93,6 +114,15 @@ export async function fetchTeamThroughputCore(
     sampleStats,
     warning,
   };
+}
+
+function simulationControlToNumber(
+  value: number | string,
+  fieldName: string,
+): number {
+  if (typeof value === "number") return value;
+  if (value.trim() === "") throw new Error(`${fieldName} requis.`);
+  return Number(value);
 }
 
 export async function simulateForecastFromSamplesCore(
@@ -109,23 +139,19 @@ export async function simulateForecastFromSamplesCore(
     nSims,
   } = params;
   const simulationSeed = seed ?? generateSimulationSeed();
-  const contract = validateSimulationInputContract({
-    throughputSamples,
-    includeZeroWeeks,
-    mode: simulationMode,
-    backlogSize,
-    targetWeeks,
-    nSims,
-  });
-  const command: SimulationCommand = {
+  const command = createSimulationCommand({
     seed: simulationSeed,
     throughputSamples,
     includeZeroWeeks,
     mode: simulationMode,
-    backlogSize: contract.backlogSize,
-    targetWeeks: contract.targetWeeks,
-    nSims: contract.nSims,
-  };
+    backlogSize: simulationMode === "backlog_to_weeks"
+      ? simulationControlToNumber(backlogSize, "backlog_size")
+      : undefined,
+    targetWeeks: simulationMode === "weeks_to_items"
+      ? simulationControlToNumber(targetWeeks, "target_weeks")
+      : undefined,
+    nSims: simulationControlToNumber(nSims, "n_sims"),
+  });
 
   if (demoMode) {
     return simulateMonteCarloLocal(command);
@@ -133,14 +159,29 @@ export async function simulateForecastFromSamplesCore(
 
   const response = simulateResponseDtoToResult(
     await postSimulate(simulationCommandToDto(command)),
+    command.nSims,
   );
   const resolvedRiskScore = response.riskScore
     ?? computeRiskScoreFromPercentiles(simulationMode, response.resultPercentiles);
   return {
     ...response,
     riskScore: resolvedRiskScore ?? undefined,
-    resultDistribution: response.resultDistribution ?? [],
+    resultDistribution: response.resultDistribution,
   };
+}
+
+async function simulateForecastWithHistoryTranslation(
+  params: RunSimulationForecastParams,
+  throughputSamples: number[],
+): Promise<SimulationResult> {
+  try {
+    return await simulateForecastFromSamplesCore({
+      ...params,
+      throughputSamples,
+    });
+  } catch (error) {
+    throwTranslatedHistoryError(error);
+  }
 }
 
 export async function runSimulationForecastCore(
@@ -148,7 +189,6 @@ export async function runSimulationForecastCore(
 ): Promise<RunSimulationForecastResult> {
   const {
     demoMode = false,
-    seed,
     selectedOrg,
     selectedProject,
     selectedTeam,
@@ -179,16 +219,10 @@ export async function runSimulationForecastCore(
     includeZeroWeeks,
   });
 
-  const adjusted = await simulateForecastFromSamplesCore({
-    demoMode,
-    seed,
-    throughputSamples: throughputData.throughputSamples,
-    includeZeroWeeks,
-    simulationMode,
-    backlogSize,
-    targetWeeks,
-    nSims,
-  });
+  const adjusted = await simulateForecastWithHistoryTranslation(
+    params,
+    throughputData.throughputSamples,
+  );
 
   const historyEntry: SimulationHistoryEntry = {
     schemaVersion: 2,

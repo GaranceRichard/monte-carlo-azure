@@ -150,7 +150,15 @@ describe("simulationPrintReport", () => {
 
   it.each(["backlog_to_weeks", "weeks_to_items"] as const)("renders high historical sensitivity for %s", (simulationMode) => {
     const decisionDiagnostic = buildDecisionDiagnostic("caution", true, simulationMode);
-    const html = buildSimulationPrintReportHtml({ ...buildBaseArgs(), simulationMode, decisionDiagnostic });
+    const displayPercentiles = simulationMode === "weeks_to_items"
+      ? { P50: 24, P70: 22, P90: 18 }
+      : buildBaseArgs().displayPercentiles;
+    const html = buildSimulationPrintReportHtml({
+      ...buildBaseArgs(),
+      simulationMode,
+      displayPercentiles,
+      decisionDiagnostic,
+    });
     const sensitivity = decisionDiagnostic.historicalSensitivity!;
 
     expect(html).toContain(sensitivity.status);
@@ -329,13 +337,13 @@ describe("simulationPrintReport", () => {
       simulationMode: "weeks_to_items",
       includeZeroWeeks: false,
       resultKind: "items",
-      displayPercentiles: { P50: 10, P70: 20, P90: 30 },
+      displayPercentiles: { P50: 30, P70: 20, P90: 10 },
     });
 
     expect(html).toContain("Semaines vers items - cible: 12 semaines");
     expect(html).toContain("Semaines 0 exclues");
-    expect(html).toContain(">10 items<");
-    expect(html).toContain("0,00 (fiable)");
+    expect(html).toContain(">30 items<");
+    expect(html).toContain("0,67 (fragile)");
   });
 
   it("renders elevated risk for backlog-to-weeks mode", () => {

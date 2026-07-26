@@ -33,9 +33,9 @@ function historyEntry(): SimulationHistoryEntry {
       seed: 123,
       resultPercentiles: { P50: 7, P70: 9, P90: 12 },
       riskScore: 0.71,
-      resultDistribution: [{ x: 7, count: 4 }],
+      resultDistribution: [{ x: 7, count: 2000 }],
       completionSummary: {
-        completedCount: 4,
+        completedCount: 2000,
         censoredCount: 0,
         censoredRate: 0,
         horizonWeeks: 521,
@@ -63,9 +63,9 @@ describe("simulation history storage mappers", () => {
       seed: 123,
       result_percentiles: { P50: 7, P70: 9, P90: 12 },
       risk_score: 0.71,
-      result_distribution: [{ x: 7, count: 4 }],
+      result_distribution: [{ x: 7, count: 2000 }],
       completion_summary: {
-        completed_count: 4,
+        completed_count: 2000,
         censored_count: 0,
         censored_rate: 0,
         horizon_weeks: 521,
@@ -94,5 +94,41 @@ describe("simulation history storage mappers", () => {
     expect(parsed[0]?.cycleTimeDaysData).toEqual([
       { week: "2026-01-05", cycleTimeDays: 14, count: 3 },
     ]);
+  });
+
+  it("reads legacy item distributions without completion and rejects invalid buckets", () => {
+    const stored = simulationHistoryModelToDto(historyEntry());
+    const legacyItems = {
+      ...stored,
+      nSims: 1000,
+      simulationMode: "weeks_to_items" as const,
+      result: {
+        ...stored.result,
+        result_kind: "items" as const,
+        result_percentiles: { P50: 5 },
+        result_distribution: [{ x: 5, count: 1000 }],
+        completion_summary: undefined,
+      },
+    };
+
+    expect(simulationHistoryDtoToModel(legacyItems)?.result.resultDistribution).toEqual([
+      { x: 5, count: 1000 },
+    ]);
+    expect(simulationHistoryDtoToModel({
+      ...legacyItems,
+      result: { ...legacyItems.result, result_distribution: [{ x: 5, count: 0 }] },
+    })).toBeNull();
+    expect(simulationHistoryDtoToModel({
+      ...legacyItems,
+      result: { ...legacyItems.result, result_distribution: [{ x: 5, count: 999 }] },
+    })).toBeNull();
+    expect(simulationHistoryDtoToModel({
+      ...legacyItems,
+      nSims: "1000",
+    })).toBeNull();
+    expect(simulationHistoryDtoToModel({
+      ...legacyItems,
+      result: { ...legacyItems.result, seed: "123" },
+    })).toBeNull();
   });
 });

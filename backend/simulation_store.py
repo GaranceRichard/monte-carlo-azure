@@ -164,14 +164,22 @@ class SimulationStore:
                 "created_at": now,
                 "last_seen": now,
                 "mode": command.mode,
-                "backlog_size": command.backlog_size,
-                "target_weeks": command.target_weeks,
-                "n_sims": command.n_sims,
+                "backlog_size": (
+                    command.backlog_size.value
+                    if command.backlog_size is not None
+                    else None
+                ),
+                "target_weeks": (
+                    command.target_weeks.value
+                    if command.target_weeks is not None
+                    else None
+                ),
+                "n_sims": command.n_sims.value,
                 "samples_count": result.samples_count,
-                "percentiles": dict(result.result_percentiles),
+                "percentiles": result.result_percentiles.to_dict(),
                 "distribution": [
                     {"x": bucket.x, "count": bucket.count}
-                    for bucket in result.result_distribution
+                    for bucket in result.result_distribution.buckets
                 ],
                 "completion_summary": (
                     {
@@ -191,7 +199,7 @@ class SimulationStore:
                     "samples_count": result.throughput_reliability.samples_count,
                 },
                 "include_zero_weeks": command.include_zero_weeks,
-                "seed": result.seed,
+                "seed": result.seed.value,
             }
             coll.insert_one(doc)
             coll.update_many({"mc_client_id": mc_client_id}, {"$set": {"last_seen": now}})

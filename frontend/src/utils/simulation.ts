@@ -1,5 +1,4 @@
 import type {
-  CompletionSummary,
   SimulationCommand,
   SimulationMode,
   SimulationPercentiles,
@@ -8,9 +7,13 @@ import type {
 } from "../domain/simulation";
 import type { WeeklyThroughputRow } from "../types";
 import {
+  createCompletionSummary,
+  createHistogram,
+  createSimulationPercentiles,
+  createThroughputReliability,
+  riskScoreFromPercentiles,
   SIMULATION_HORIZON_WEEKS_MAX,
-  validateSimulationInputContract,
-} from "../simulationLimits";
+} from "../domain/simulationValueObjects";
 import { clamp } from "./math";
 
 export type ScenarioSamples = {
@@ -35,7 +38,7 @@ export function computeFrictionRatePercent(teamCount: number, alignmentRate: num
   return Math.round(computeFrictionFactor(teamCount, alignmentRate) * 100);
 }
 
-export const SIMULATION_SEED_MAX = 0xffffffff;
+export { SIMULATION_SEED_MAX } from "../domain/simulationValueObjects";
 
 export function createSeededRandom(seed: number): () => number {
   let state = seed >>> 0;
@@ -71,18 +74,6 @@ function percentile(values: number[], p: number): number {
   const lowerValue = sorted[lower] ?? 0;
   const upperValue = sorted[upper] ?? lowerValue;
   return lowerValue + (upperValue - lowerValue) * weight;
-}
-
-function normalizeSamples(samples: number[], includeZeroWeeks: boolean): number[] {
-  const normalized = samples.filter((value) => Number.isFinite(value) && (includeZeroWeeks ? value >= 0 : value > 0));
-  if (!normalized.length) {
-    throw new Error(
-      includeZeroWeeks
-        ? "throughput_samples ne contient aucune valeur >= 0"
-        : "throughput_samples ne contient aucune valeur > 0",
-    );
-  }
-  return normalized.map((value) => Math.floor(value));
 }
 
 function histogramBuckets(values: number[], maxBuckets = 100): { x: number; count: number }[] {
@@ -125,11 +116,11 @@ function discreteQuantile(values: number[], q: number, mode: "higher" | "lower")
 export function discretePercentiles(
   values: number[],
   simulationMode: SimulationMode,
-  ps: number[],
+  ps: readonly (50 | 70 | 90)[],
   totalCount?: number,
 ) : SimulationPercentiles {
-  if (!values.length) return {};
-  return Object.fromEntries(
+  if (!values.length) return createSimulationPercentiles(simulationMode, {});
+  const percentileValues = Object.fromEntries(
     ps.flatMap((p) => {
       if (simulationMode === "weeks_to_items") {
         return [[`P${p}`, discreteQuantile(values, (100 - p) / 100, "lower")]];
@@ -145,88 +136,87 @@ export function discretePercentiles(
       return [[`P${p}`, discreteQuantile(values, p / 100, "higher")]];
     }),
   );
+  return createSimulationPercentiles(simulationMode, percentileValues);
 }
 
-export function simulateMonteCarloLocal({
-  throughputSamples,
-  includeZeroWeeks = true,
-  mode,
-  backlogSize,
-  targetWeeks,
-  nSims,
-  seed,
-}: SimulationCommand): SimulationResult {
-  const samples = normalizeSamples(throughputSamples, includeZeroWeeks);
-  const contract = validateSimulationInputContract({
-    throughputSamples,
-    includeZeroWeeks,
-    mode,
-    backlogSize,
-    targetWeeks,
-    nSims,
-  });
-  const safeNSims = contract.nSims;
-  const safeBacklog = contract.backlogSize;
-  const safeWeeks = contract.targetWeeks;
-  const random = createSeededRandom(seed);
-  const results = new Array<number>(safeNSims);
-  const completedFlags = new Array<boolean>(safeNSims).fill(true);
-  let completionSummary: CompletionSummary | undefined;
-
-  for (let i = 0; i < safeNSims; i += 1) {
-    if (mode === "backlog_to_weeks") {
-      let remaining = safeBacklog ?? 0;
-      let weeks = 0;
-      while (remaining > 0 && weeks < SIMULATION_HORIZON_WEEKS_MAX) {
-        const nextSample = samples[Math.floor(random() * samples.length)] ?? 0;
-        remaining -= nextSample;
-        weeks += 1;
-      }
-      results[i] = weeks || SIMULATION_HORIZON_WEEKS_MAX;
-      completedFlags[i] = remaining <= 0;
-      continue;
+function simulateBacklogToWeeks(
+  samples: readonly number[],
+  backlogSize: number,
+  nSims: number,
+  random: () => number,
+): { results: number[]; completedFlags: boolean[] } {
+  const results = new Array<number>(nSims);
+  const completedFlags = new Array<boolean>(nSims);
+  for (let index = 0; index < nSims; index += 1) {
+    let remaining = backlogSize;
+    let weeks = 0;
+    while (remaining > 0 && weeks < SIMULATION_HORIZON_WEEKS_MAX) {
+      remaining -= samples[Math.floor(random() * samples.length)] ?? 0;
+      weeks += 1;
     }
+    results[index] = weeks || SIMULATION_HORIZON_WEEKS_MAX;
+    completedFlags[index] = remaining <= 0;
+  }
+  return { results, completedFlags };
+}
 
+function simulateWeeksToItems(
+  samples: readonly number[],
+  targetWeeks: number,
+  nSims: number,
+  random: () => number,
+): number[] {
+  const results = new Array<number>(nSims);
+  for (let index = 0; index < nSims; index += 1) {
     let delivered = 0;
-    for (let week = 0; week < (safeWeeks ?? 0); week += 1) {
+    for (let week = 0; week < targetWeeks; week += 1) {
       delivered += samples[Math.floor(random() * samples.length)] ?? 0;
     }
-    results[i] = delivered;
+    results[index] = delivered;
   }
+  return results;
+}
 
-  let distributionValues = results;
-  let percentileTotalCount: number | undefined;
-  if (mode === "backlog_to_weeks") {
-    const horizonWeeks = SIMULATION_HORIZON_WEEKS_MAX;
-    distributionValues = results.filter((_value, index) => completedFlags[index]);
-    const completedCount = distributionValues.length;
-    const censoredCount = results.length - completedCount;
-    percentileTotalCount = results.length;
-    completionSummary = {
-      completedCount,
-      censoredCount,
-      censoredRate: Number((censoredCount / results.length).toFixed(4)),
-      horizonWeeks,
-    };
-  }
-
+export function simulateMonteCarloLocal(
+  command: SimulationCommand,
+): SimulationResult {
+  const samples = command.throughputSamples.usableValues;
+  const random = createSeededRandom(command.seed);
+  const backlogSimulation = command.mode === "backlog_to_weeks"
+    ? simulateBacklogToWeeks(samples, command.backlogSize ?? 0, command.nSims, random)
+    : undefined;
+  const results = backlogSimulation?.results
+    ?? simulateWeeksToItems(samples, command.targetWeeks ?? 0, command.nSims, random);
+  const distributionValues = backlogSimulation === undefined
+    ? results
+    : results.filter((_value, index) => backlogSimulation.completedFlags[index]);
+  const completionSummary = backlogSimulation === undefined
+    ? undefined
+    : createCompletionSummary({
+        completedCount: distributionValues.length,
+        censoredCount: results.length - distributionValues.length,
+        nSims: command.nSims,
+      });
   const resultPercentiles = discretePercentiles(
-    mode === "backlog_to_weeks" ? distributionValues : results,
-    mode,
+    distributionValues,
+    command.mode,
     [50, 70, 90],
-    percentileTotalCount,
+    backlogSimulation === undefined ? undefined : results.length,
   );
-  const resolvedRiskScore = computeRiskScoreFromPercentiles(mode, resultPercentiles);
-  return {
-    resultKind: mode === "backlog_to_weeks" ? "weeks" : "items",
+  const riskScore = riskScoreFromPercentiles(command.mode, resultPercentiles);
+  return Object.freeze({
+    resultKind: command.mode === "backlog_to_weeks" ? "weeks" : "items",
     samplesCount: samples.length,
-    seed,
+    seed: command.seed,
     resultPercentiles,
-    riskScore: resolvedRiskScore == null ? undefined : Number(resolvedRiskScore.toFixed(4)),
-    resultDistribution: histogramBuckets(mode === "backlog_to_weeks" ? distributionValues : results),
-    completionSummary,
+    ...(riskScore === undefined ? {} : { riskScore }),
+    resultDistribution: createHistogram(
+      histogramBuckets(distributionValues),
+      distributionValues.length,
+    ),
+    ...(completionSummary === undefined ? {} : { completionSummary }),
     throughputReliability: computeThroughputReliability(samples) ?? undefined,
-  };
+  });
 }
 
 export function buildScenarioSamples(teamSamples: number[][], alignmentRate: number, seed: number): ScenarioSamples {
@@ -345,22 +335,21 @@ export function computeRiskLegend(score: number): "fiable" | "incertain" | "frag
 
 export function computeRiskScoreFromPercentiles(
   mode: SimulationMode,
-  percentiles: SimulationPercentiles,
+  percentiles: SimulationPercentiles | null | undefined,
 ): number | null {
-  const p50 = Number(percentiles?.P50 ?? 0);
-  const p90 = Number(percentiles?.P90 ?? 0);
-  if (!Number.isFinite(p50) || !Number.isFinite(p90) || p50 <= 0) return null;
-  if (mode === "weeks_to_items") {
-    return Math.max(0, (p50 - p90) / p50);
+  try {
+    return riskScoreFromPercentiles(mode, percentiles) ?? null;
+  } catch {
+    return null;
   }
-  return Math.max(0, (p90 - p50) / p50);
 }
 
-export function computeThroughputReliability(samples: number[]): ThroughputReliability | null {
+export function computeThroughputReliability(samples: readonly number[]): ThroughputReliability | null {
   if (!samples.length) return null;
-
-  const values = samples.filter((value) => Number.isFinite(value));
-  if (!values.length) return null;
+  if (samples.some((value) => !Number.isInteger(value) || value < 0)) {
+    throw new Error("throughput_samples doit contenir uniquement des entiers finis >= 0.");
+  }
+  const values = [...samples];
 
   const sampleCount = values.length;
   const mean = values.reduce((sum, value) => sum + value, 0) / sampleCount;
@@ -381,28 +370,13 @@ export function computeThroughputReliability(samples: number[]): ThroughputRelia
   }
   const slopeNorm = mean <= 0 ? 0 : slope / mean;
 
-  let label: ThroughputReliability["label"];
-  if (sampleCount < 6 || cv >= 1.5 || slopeNorm <= -0.15 || mean <= 0) {
-    label = "non fiable";
-  } else if (cv >= 1 || iqrRatio >= 1 || Math.abs(slopeNorm) >= 0.1) {
-    label = "fragile";
-  } else if (cv >= 0.5 || iqrRatio >= 0.5 || Math.abs(slopeNorm) >= 0.05) {
-    label = "incertain";
-  } else {
-    label = "fiable";
-  }
-
-  if (sampleCount < 8 && label === "fiable") {
-    label = "incertain";
-  }
-
-  return {
-    cv: Number(cv.toFixed(4)),
-    iqrRatio: Number(iqrRatio.toFixed(4)),
-    slopeNorm: Number(slopeNorm.toFixed(4)),
-    label,
+  return createThroughputReliability({
+    cv,
+    iqrRatio,
+    slopeNorm,
     samplesCount: sampleCount,
-  };
+    mean,
+  });
 }
 
 export function getProjectionReliabilityNotice(reliability?: ThroughputReliability | null): string | null {

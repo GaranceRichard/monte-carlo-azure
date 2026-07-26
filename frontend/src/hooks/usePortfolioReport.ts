@@ -51,7 +51,7 @@ export type PortfolioReportSection = {
   doneStates: string[];
   resultKind: "items" | "weeks";
   riskScore?: number; throughputReliability?: ReturnType<typeof computeThroughputReliability>;
-  distribution: { x: number; count: number }[];
+  distribution: readonly { x: number; count: number }[];
   weeklyThroughput: { week: string; throughput: number }[];
   displayPercentiles: SimulationPercentiles;
   completionSummary?: CompletionSummary;

@@ -39,7 +39,7 @@ function buildLocalEntry(
       seed: 123456,
       resultPercentiles: { P50: 7, P70: 9, P90: 12 },
       riskScore: 0.71,
-      resultDistribution: [],
+      resultDistribution: [{ x: 7, count: 2000 }],
     },
     ...overrides,
   };
@@ -112,7 +112,7 @@ describe("useSimulationHistory", () => {
           includeZeroWeeks: true,
           backlogSize: 12,
           targetWeeks: 6,
-          nSims: "1234.9",
+          nSims: 1234,
           types: ["Bug", 42],
           doneStates: ["Done", null],
           sampleStats: null,
@@ -123,7 +123,13 @@ describe("useSimulationHistory", () => {
             { week: "2026-01-12", cycleTime: 3, count: -4 },
             { week: "", cycleTimeDays: 8, count: 1 },
           ],
-          result: undefined,
+          result: {
+            result_kind: "items",
+            samples_count: 0,
+            seed: 0,
+            result_percentiles: {},
+            result_distribution: [{ x: 0, count: 1234 }],
+          },
           warning: 404,
           schemaVersion: 2,
         },
@@ -158,11 +164,11 @@ describe("useSimulationHistory", () => {
             { week: "2026-01-12", cycleTimeDays: 3, count: 0 },
           ],
           result: {
-            resultKind: "weeks",
+            resultKind: "items",
             samplesCount: 0,
             seed: 0,
             resultPercentiles: {},
-            resultDistribution: [],
+            resultDistribution: [{ x: 0, count: 1234 }],
           },
           warning: undefined,
         },
@@ -170,7 +176,7 @@ describe("useSimulationHistory", () => {
     });
   });
 
-  it("skips non-object rows and preserves string warnings when optional collections are malformed", async () => {
+  it("rejects stored simulations that violate the strict simulation-count contract", async () => {
     vi.mocked(storageGetItem).mockReturnValue(
       JSON.stringify([
         null,
@@ -200,37 +206,7 @@ describe("useSimulationHistory", () => {
     const { result } = renderHook(() => useSimulationHistory());
 
     await waitFor(() => {
-      expect(result.current.simulationHistory).toEqual([
-        {
-          schemaVersion: 2,
-          id: "local-3",
-          seed: null,
-          createdAt: "2026-03-03T10:00:00Z",
-          selectedOrg: "org-demo",
-          selectedProject: "Projet A",
-          selectedTeam: "Equipe Gamma",
-          startDate: "2026-01-01",
-          endDate: "2026-02-01",
-          simulationMode: "weeks_to_items",
-          includeZeroWeeks: false,
-          backlogSize: 5,
-          targetWeeks: 2,
-          nSims: 500,
-          types: [],
-          doneStates: [],
-          sampleStats: null,
-          weeklyThroughput: [],
-          cycleTimeDaysData: [],
-          result: {
-            resultKind: "weeks",
-            samplesCount: 0,
-            seed: 0,
-            resultPercentiles: {},
-            resultDistribution: [],
-          },
-          warning: "warning conserve",
-        },
-      ]);
+      expect(result.current.simulationHistory).toEqual([]);
     });
   });
 

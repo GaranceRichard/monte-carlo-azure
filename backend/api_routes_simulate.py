@@ -22,8 +22,9 @@ from .simulation_mappers import (
     result_to_response,
 )
 from .simulation_models import SimulationCommand, SimulationResult
-from .simulation_service import InsufficientSimulationSamplesError, run_simulation
+from .simulation_service import run_simulation
 from .simulation_store import SimulationStore
+from .simulation_value_objects import StatisticalValueError
 
 router = APIRouter()
 cfg = get_api_config()
@@ -132,7 +133,7 @@ def _persist_simulation(
             extra={
                 "event": "simulation_persistence_failed",
                 "mode": command.mode,
-                "n_sims": command.n_sims,
+                "n_sims": command.n_sims.value,
                 "client_id_prefix": mc_client_id[:8],
             },
             exc_info=exc,
@@ -148,14 +149,14 @@ async def simulate(
 ) -> SimulateResponse:
     started_at = time.perf_counter()
     seed = _resolve_simulation_seed(req.seed)
-    command = request_to_command(req, seed)
 
     try:
+        command = request_to_command(req, seed)
         result = await asyncio.wait_for(
             run_in_threadpool(run_simulation, command),
             timeout=cfg.forecast_timeout_seconds,
         )
-    except InsufficientSimulationSamplesError as exc:
+    except StatisticalValueError as exc:
         raise HTTPException(422, str(exc)) from exc
     except TimeoutError as exc:
         logger.warning(
@@ -165,7 +166,7 @@ async def simulate(
                     "mode": req.mode,
                     "n_sims": req.n_sims,
                     "timeout_seconds": cfg.forecast_timeout_seconds,
-                    "samples_count": len(command.throughput_samples),
+                    "samples_count": len(command.throughput_samples.usable_values),
                     "duration_ms": round((time.perf_counter() - started_at) * 1000, 2),
                 },
                 ensure_ascii=True,

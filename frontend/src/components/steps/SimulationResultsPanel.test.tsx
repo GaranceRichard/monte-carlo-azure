@@ -31,8 +31,8 @@ describe("SimulationResultsPanel history list", () => {
         resultKind: "items" as const,
         samplesCount: 10,
         seed: 123456,
-        resultPercentiles: { P50: 1, P70: 2, P90: 3 },
-        resultDistribution: [],
+        resultPercentiles: { P50: 3, P70: 2, P90: 1 },
+        resultDistribution: [{ x: 1, count: 20000 }],
       },
     };
   }
@@ -219,7 +219,7 @@ describe("SimulationResultsPanel history list", () => {
         includeZeroWeeks: true,
         sampleStats: null,
         result: { resultKind: "items", seed: 2 },
-        displayPercentiles: { P50: 38, P70: 44, P90: 52 },
+        displayPercentiles: { P50: 52, P70: 44, P90: 38 },
         simulationHistory: [],
         applyHistoryEntry: vi.fn(),
         clearSimulationHistory: vi.fn(),
@@ -227,7 +227,7 @@ describe("SimulationResultsPanel history list", () => {
     } as never);
 
     render(<SimulationResultsPanel />);
-    expect(screen.getByText(/38 items/i)).not.toBeNull();
+    expect(screen.getByText(/52 items/i)).not.toBeNull();
   });
 
   it("renders risk score indicator", () => {
@@ -487,7 +487,7 @@ describe("SimulationResultsPanel history list", () => {
           riskScore: 0.1,
           throughputReliability: { cv: 0.1, iqrRatio: 0.1, slopeNorm: 0.01, label: "fiable", samplesCount: 8 },
         },
-        displayPercentiles: { P50: 10, P70: 10.5, P90: 11 },
+        displayPercentiles: { P50: 10, P70: 10, P90: 11 },
         simulationHistory: [],
         applyHistoryEntry: vi.fn(),
         clearSimulationHistory: vi.fn(),
@@ -672,7 +672,7 @@ describe("SimulationResultsPanel history list", () => {
       })),
       result: {
         ...baseEntry("source", "Alpha-Team").result,
-        resultPercentiles: { P50: 10, P70: 11, P90: 12 },
+        resultPercentiles: { P50: 30, P70: 20, P90: 12 },
       },
     };
     vi.mocked(useSimulationContext).mockReturnValue({
@@ -701,7 +701,7 @@ describe("SimulationResultsPanel history list", () => {
           seed: 15,
           throughputReliability: { cv: 0.1, iqrRatio: 0.1, slopeNorm: 0.01, label: "fiable", samplesCount: 9 },
         },
-        displayPercentiles: { P50: 12, P70: 15, P90: 18 },
+        displayPercentiles: { P50: 40, P70: 25, P90: 18 },
         simulationHistory: [longWindow],
         applyHistoryEntry: vi.fn(),
         clearSimulationHistory: vi.fn(),

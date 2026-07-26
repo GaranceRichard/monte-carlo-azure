@@ -24,6 +24,8 @@ Démo GitHub Pages:
 - guide frontend: [`frontend/README.md`](frontend/README.md)
 - standard de classification, de qualité et de pilotage des tests :
   [`docs/standards/STD-TEST-001.md`](docs/standards/STD-TEST-001.md)
+- contrat normatif de parité statistique :
+  [`docs/standards/STD-STAT-001.md`](docs/standards/STD-STAT-001.md)
 - contrat et guide du modèle de classification :
   [`docs/test-classification.md`](docs/test-classification.md),
   [`config/test-classification.json`](config/test-classification.json) et
@@ -53,6 +55,9 @@ Démo GitHub Pages:
 - contrat de simulation borné avant calcul: `n_sims` entre `1_000` et `200_000`,
   `target_weeks` entre `1` et `521`, `throughput_samples` entre `6` et `521` valeurs,
   `backlog_size` entre `1` et `1_000_000`
+- Value Objects statistiques immuables et validés en Python et TypeScript pour la seed, les entrées,
+  les percentiles, la fiabilité du throughput, l’histogramme et la complétion ; les DTO HTTP,
+  MongoDB et `localStorage` conservent leurs formats primitifs et sont convertis explicitement aux frontières
 - démo locale et simulations portefeuille reproductibles à `seed` identique
 - visualisation des percentiles et distributions
 - sémantique métier des percentiles alignée sur le mode de simulation:

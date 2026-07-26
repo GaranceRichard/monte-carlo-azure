@@ -126,6 +126,7 @@ frontend/
       simulationMappers.ts # conversions explicites HTTP <-> domaine
     domain/
       simulation.ts        # commande et résultat statistiques métier en camelCase
+      simulationValueObjects.ts # Value Objects statistiques immuables et validés
       simulationHistory.ts # historique interne contenant un SimulationResult
     storage/
       simulationHistoryDtos.ts    # schéma localStorage v2 inchangé
@@ -164,6 +165,7 @@ backend/
   api_models.py          # DTO Pydantic HTTP uniquement
   simulation_mappers.py  # conversions DTO HTTP/persistance <-> domaine
   simulation_models.py   # modèles statistiques métier sans framework
+  simulation_value_objects.py # Value Objects statistiques immuables et validés
   simulation_service.py  # orchestration statistique sans dépendance HTTP
   simulation_store.py    # frontière Mongo, document existant préservé
   mc_core.py             # cœur Monte Carlo
@@ -177,6 +179,12 @@ Les contrats externes et les modèles statistiques internes sont séparés par d
   `frontend/src/api/simulationDtos.ts` ; leurs propriétés `snake_case` décrivent uniquement le JSON public ;
 - `backend/simulation_models.py` et `frontend/src/domain/simulation.ts` portent les commandes et résultats
   métier ; le domaine TypeScript emploie exclusivement `camelCase` ;
+- `backend/simulation_value_objects.py` et `frontend/src/domain/simulationValueObjects.ts` sont les autorités
+  de création des primitives statistiques prioritaires : seed, nombre de simulations, backlog, horizon,
+  throughput, percentiles, fiabilité, histogramme et complétion ;
+- `SimulationCommand` contient une entrée de throughput résolue et seulement le paramètre actif de son mode ;
+  `SimulationResult` contient des percentiles, une fiabilité et un histogramme validés, ainsi qu’une
+  complétion uniquement en `backlog_to_weeks` ;
 - `backend/simulation_service.py` orchestre les fonctions existantes de `mc_core.py` sans importer Pydantic,
   FastAPI ou la persistance ;
 - `frontend/src/utils/simulation.ts` reçoit et retourne les mêmes modèles métier que le chemin backend, sans
@@ -211,6 +219,13 @@ SimulationCommand TypeScript
 Après ces deux flux, les hooks, le portefeuille, l'UI, les graphiques et les exports consomment uniquement
 `SimulationResult`. Les contrôles de maintenabilité bloquent les imports des DTO par le domaine, le moteur
 local ou l'UI, ainsi que toute dépendance du service ou du store Python envers les DTO HTTP.
+
+Les Value Objects n’importent aucun framework, moteur numérique, hook, API ou stockage. Ils imposent les
+types stricts et les bornes d’entrée avant le traitement des semaines nulles, les clés et l’ordre des
+percentiles selon le mode, la normalisation `round half up` à quatre décimales de la fiabilité, la masse et
+l’ordre des histogrammes, ainsi que la cohérence des comptes de complétion à l’horizon contractuel de
+`521` semaines. Les moteurs reçoivent ensuite uniquement les tableaux et nombres primitifs nécessaires au
+calcul ; les mappers déballent les Value Objects vers les formats JSON, MongoDB et `localStorage` existants.
 
 ## Convention de nommage
 

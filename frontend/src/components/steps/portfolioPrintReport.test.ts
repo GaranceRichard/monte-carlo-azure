@@ -548,7 +548,7 @@ describe("portfolioPrintReport", () => {
 
   it("uses business percentiles in weeks_to_items mode for scenario risk score", () => {
     const args: ReturnType<typeof baseArgs> = baseArgs();
-    args.sections[0].simulationMode = "weeks_to_items";
+    args.sections[0] = { ...args.sections[0], simulationMode: "weeks_to_items", displayPercentiles: { P50: 24, P70: 22, P90: 18 } };
     args.scenarios[0] = {
       ...args.scenarios[0],
       percentiles: { P50: 24, P70: 22, P90: 18 },
@@ -572,7 +572,7 @@ describe("portfolioPrintReport", () => {
 
   it("documents the weeks_to_items risk formula in the synthesis", () => {
     const args = baseArgs();
-    args.sections[0].simulationMode = "weeks_to_items";
+    args.sections[0] = { ...args.sections[0], simulationMode: "weeks_to_items", displayPercentiles: { P50: 24, P70: 22, P90: 18 } };
 
     const html = buildPortfolioPrintReportHtml(args);
 

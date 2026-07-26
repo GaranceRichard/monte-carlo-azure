@@ -268,25 +268,39 @@ export async function setupAppRoutes(page, options = {}) {
 
     const payload = route.request().postDataJSON();
     const isWeeksToItems = payload?.mode === "weeks_to_items";
+    const nSims = payload?.n_sims ?? 20_000;
+    const quarter = Math.floor(nSims / 4);
+    const bucketCounts = [quarter, quarter, quarter, nSims - (quarter * 3)];
     await route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
         result_kind: isWeeksToItems ? "items" : "weeks",
-        result_percentiles: isWeeksToItems ? { P50: 38, P70: 44, P90: 52 } : { P50: 10, P70: 12, P90: 15 },
+        seed: payload?.seed ?? 123,
+        result_percentiles: isWeeksToItems ? { P50: 38, P70: 35, P90: 30 } : { P50: 10, P70: 12, P90: 15 },
         result_distribution: isWeeksToItems
           ? [
-              { x: 35, count: 1 },
-              { x: 38, count: 1 },
-              { x: 44, count: 1 },
-              { x: 52, count: 1 },
+              { x: 35, count: bucketCounts[0] },
+              { x: 38, count: bucketCounts[1] },
+              { x: 44, count: bucketCounts[2] },
+              { x: 52, count: bucketCounts[3] },
             ]
           : [
-              { x: 9, count: 1 },
-              { x: 10, count: 1 },
-              { x: 12, count: 1 },
-              { x: 15, count: 1 },
+              { x: 9, count: bucketCounts[0] },
+              { x: 10, count: bucketCounts[1] },
+              { x: 12, count: bucketCounts[2] },
+              { x: 15, count: bucketCounts[3] },
             ],
+        ...(isWeeksToItems
+          ? {}
+          : {
+              completion_summary: {
+                completed_count: nSims,
+                censored_count: 0,
+                censored_rate: 0,
+                horizon_weeks: 521,
+              },
+            }),
         samples_count: 30,
       }),
     });

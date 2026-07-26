@@ -659,11 +659,14 @@ test.describe("e2e istanbul coverage", () => {
           }
           if (asString.includes("/simulate")) {
             const body = init?.body ? JSON.parse(String(init.body)) : {};
+            const nSims = body.n_sims ?? 2000;
             if (body.mode === "weeks_to_items") {
               return new Response(
                 JSON.stringify({
                   result_kind: "items",
-                  result_percentiles: { P50: 20, P70: 24, P90: 30 },
+                  seed: body.seed ?? 123,
+                  result_percentiles: { P50: 30, P70: 24, P90: 20 },
+                  result_distribution: [{ x: 20, count: nSims }],
                   samples_count: 70,
                 }),
                 { status: 200, headers: { "content-type": "application/json" } },
@@ -672,8 +675,15 @@ test.describe("e2e istanbul coverage", () => {
             return new Response(
               JSON.stringify({
                 result_kind: "weeks",
+                seed: body.seed ?? 123,
                 result_percentiles: { P50: 8, P70: 10, P90: 12 },
-                result_distribution: [{ x: 8, count: 10 }],
+                result_distribution: [{ x: 8, count: nSims }],
+                completion_summary: {
+                  completed_count: nSims,
+                  censored_count: 0,
+                  censored_rate: 0,
+                  horizon_weeks: 521,
+                },
                 samples_count: 70,
               }),
               { status: 200, headers: { "content-type": "application/json" } },
@@ -1462,12 +1472,21 @@ test.describe("e2e istanbul coverage", () => {
           if (portfolioMode === "phase2-fail") {
             return new Response("sim-failure", { status: 503, statusText: "Service Unavailable" });
           }
+          const body = init?.body ? JSON.parse(String(init.body)) : {};
+          const nSims = body.n_sims ?? 20_000;
           return jsonResponse({
             result_kind: "weeks",
+            seed: body.seed ?? 123,
             samples_count: 8,
             risk_score: 0.3,
             result_percentiles: { P50: 10, P70: 12, P90: 15 },
-            result_distribution: [{ x: 10, count: 5 }],
+            result_distribution: [{ x: 10, count: nSims }],
+            completion_summary: {
+              completed_count: nSims,
+              censored_count: 0,
+              censored_rate: 0,
+              horizon_weeks: 521,
+            },
           });
         }
         return originalFetch(input, init);
@@ -2468,20 +2487,29 @@ test.describe("e2e istanbul coverage", () => {
               });
             }
             const body = init?.body ? JSON.parse(String(init.body)) : {};
+            const nSims = body.n_sims ?? 2000;
             if (body.mode === "weeks_to_items") {
               return jsonResponse({
                 result_kind: "items",
-                result_percentiles: { P50: 20, P70: 24, P90: 30 },
+                seed: body.seed ?? 123,
+                result_percentiles: { P50: 30, P70: 24, P90: 20 },
                 samples_count: 6,
-                result_distribution: [{ x: 20, count: 4 }],
+                result_distribution: [{ x: 20, count: nSims }],
               });
             }
             return jsonResponse({
               result_kind: "weeks",
+              seed: body.seed ?? 123,
               result_percentiles: { P50: 8, P70: 10, P90: 12 },
               risk_score: 0.25,
               samples_count: 6,
-              result_distribution: [{ x: 8, count: 4 }],
+              result_distribution: [{ x: 8, count: nSims }],
+              completion_summary: {
+                completed_count: nSims,
+                censored_count: 0,
+                censored_rate: 0,
+                horizon_weeks: 521,
+              },
             });
           }
           if (url.includes("/simulations/history")) {
@@ -2796,11 +2824,16 @@ test.describe("e2e istanbul coverage", () => {
 
     const results = await page.evaluate(async () => {
       const simulationMod = await import("/src/utils/simulation.ts");
+      const simulationDomain = await import("/src/domain/simulation.ts");
+      const runLocalSimulation = (input) => simulationMod.simulateMonteCarloLocal(
+        simulationDomain.createSimulationCommand({ ...input, seed: 123456 }),
+      );
 
       let emptyTeamsError = "";
       let emptyTeamSamplesError = "";
       let invalidIncludeZeroError = "";
       let invalidExcludeZeroError = "";
+      let invalidReliabilityError = "";
 
       try {
         simulationMod.buildScenarioSamples([], 80);
@@ -2839,9 +2872,14 @@ test.describe("e2e istanbul coverage", () => {
         simulationMod.computeRiskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: 12 }),
       ];
 
+      try {
+        simulationMod.computeThroughputReliability([Number.NaN, Number.POSITIVE_INFINITY]);
+      } catch (error) {
+        invalidReliabilityError = String(error?.message || error);
+      }
+
       const reliabilities = [
         simulationMod.computeThroughputReliability([]),
-        simulationMod.computeThroughputReliability([Number.NaN, Number.POSITIVE_INFINITY]),
         simulationMod.computeThroughputReliability([4, 4, 4, 4, 4]),
         simulationMod.computeThroughputReliability([0, 20, 0, 20, 0, 20, 0, 20]),
         simulationMod.computeThroughputReliability([10, 11, 12, 13, 14, 15, 16, 17]),
@@ -2849,7 +2887,7 @@ test.describe("e2e istanbul coverage", () => {
         simulationMod.computeThroughputReliability([12, 12, 13, 12, 12, 13, 12, 12, 13, 12]),
       ].map((entry) => entry?.label ?? null);
 
-      const backlogResult = simulationMod.simulateMonteCarloLocal({
+      const backlogResult = runLocalSimulation({
         throughputSamples: [0, 2, 3, 4, 5, 6, 7],
         includeZeroWeeks: true,
         mode: "backlog_to_weeks",
@@ -2857,7 +2895,7 @@ test.describe("e2e istanbul coverage", () => {
         nSims: 1000,
       });
 
-      const itemsResult = simulationMod.simulateMonteCarloLocal({
+      const itemsResult = runLocalSimulation({
         throughputSamples: [1, 2, 3, 4, 5, 6, 7],
         includeZeroWeeks: false,
         mode: "weeks_to_items",
@@ -2865,7 +2903,7 @@ test.describe("e2e istanbul coverage", () => {
         nSims: 1000,
       });
 
-      const histogramResult = simulationMod.simulateMonteCarloLocal({
+      const histogramResult = runLocalSimulation({
         throughputSamples: Array.from({ length: 250 }, (_value, index) => index),
         includeZeroWeeks: true,
         mode: "weeks_to_items",
@@ -2874,7 +2912,7 @@ test.describe("e2e istanbul coverage", () => {
       });
 
       try {
-        simulationMod.simulateMonteCarloLocal({
+        runLocalSimulation({
           throughputSamples: [Number.NaN, Number.POSITIVE_INFINITY, -1, -2, -3, -4],
           includeZeroWeeks: true,
           mode: "backlog_to_weeks",
@@ -2886,7 +2924,7 @@ test.describe("e2e istanbul coverage", () => {
       }
 
       try {
-        simulationMod.simulateMonteCarloLocal({
+        runLocalSimulation({
           throughputSamples: [0, -1, -2, -3, -4, -5],
           includeZeroWeeks: false,
           mode: "backlog_to_weeks",
@@ -2902,6 +2940,7 @@ test.describe("e2e istanbul coverage", () => {
         emptyTeamSamplesError,
         invalidIncludeZeroError,
         invalidExcludeZeroError,
+        invalidReliabilityError,
         riskLabels,
         riskScores,
         reliabilities,
@@ -2918,10 +2957,11 @@ test.describe("e2e istanbul coverage", () => {
 
     expect(results.emptyTeamsError).toContain("teamSamples");
     expect(results.emptyTeamSamplesError).toContain("chaque equipe");
-    expect(results.invalidIncludeZeroError).toContain(">= 0");
-    expect(results.invalidExcludeZeroError).toContain("> 0");
+    expect(results.invalidIncludeZeroError).toContain("entier strict");
+    expect(results.invalidExcludeZeroError).toContain(">= 0");
+    expect(results.invalidReliabilityError).toContain("entiers finis");
     expect(results.riskLabels).toEqual(["fiable", "incertain", "fragile", "non fiable"]);
-    expect(results.riskScores).toEqual([null, 0.4, 0.4, 0]);
+    expect(results.riskScores).toEqual([null, 0.4, 0.4, null]);
     expect(results.reliabilities).toContain("non fiable");
     expect(results.reliabilities).toContain("fragile");
     expect(results.reliabilities).toContain("incertain");

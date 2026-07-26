@@ -1,9 +1,9 @@
 [
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2701:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2729:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: app demo mode [2701:3]",
+    "selector": "e2e istanbul coverage > coverage: app demo mode [2729:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -18,47 +18,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2755:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2783:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: app editable backspace and team validation [2755:3]",
-    "status": "classified",
-    "executionProfile": "main",
-    "nature": "e2e",
-    "purposes": [
-      "functional",
-      "accessibility",
-      "observability"
-    ],
-    "domains": [
-      "azure_devops",
-      "user_interface",
-      "quality_chain"
-    ]
-  },
-  {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app global org backspace [2686:3]",
-    "framework": "playwright",
-    "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: app global org backspace [2686:3]",
-    "status": "classified",
-    "executionProfile": "main",
-    "nature": "e2e",
-    "purposes": [
-      "functional",
-      "accessibility",
-      "observability"
-    ],
-    "domains": [
-      "user_interface",
-      "quality_chain"
-    ]
-  },
-  {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app project and team backspace [2727:3]",
-    "framework": "playwright",
-    "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: app project and team backspace [2727:3]",
+    "selector": "e2e istanbul coverage > coverage: app editable backspace and team validation [2783:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -74,10 +37,47 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches ado client direct [1043:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app global org backspace [2714:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches ado client direct [1043:3]",
+    "selector": "e2e istanbul coverage > coverage: app global org backspace [2714:3]",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "e2e",
+    "purposes": [
+      "functional",
+      "accessibility",
+      "observability"
+    ],
+    "domains": [
+      "user_interface",
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app project and team backspace [2755:3]",
+    "framework": "playwright",
+    "sourcePath": "frontend/tests/e2e/coverage.spec.js",
+    "selector": "e2e istanbul coverage > coverage: app project and team backspace [2755:3]",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "e2e",
+    "purposes": [
+      "functional",
+      "accessibility",
+      "observability"
+    ],
+    "domains": [
+      "azure_devops",
+      "user_interface",
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches ado client direct [1053:3]",
+    "framework": "playwright",
+    "sourcePath": "frontend/tests/e2e/coverage.spec.js",
+    "selector": "e2e istanbul coverage > coverage: branches ado client direct [1053:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -93,10 +93,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches ado platform [995:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches ado platform [1005:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches ado platform [995:3]",
+    "selector": "e2e istanbul coverage > coverage: branches ado platform [1005:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -113,10 +113,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches print and pdf direct [2338:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches print and pdf direct [2357:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches print and pdf direct [2338:3]",
+    "selector": "e2e istanbul coverage > coverage: branches print and pdf direct [2357:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -131,10 +131,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches team sort et simulation history [769:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches team sort et simulation history [779:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches team sort et simulation history [769:3]",
+    "selector": "e2e istanbul coverage > coverage: branches team sort et simulation history [779:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -152,10 +152,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolio direct [1575:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolio direct [1594:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches usePortfolio direct [1575:3]",
+    "selector": "e2e istanbul coverage > coverage: branches usePortfolio direct [1594:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -171,10 +171,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolioReport direct [1401:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolioReport direct [1411:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches usePortfolioReport direct [1401:3]",
+    "selector": "e2e istanbul coverage > coverage: branches usePortfolioReport direct [1411:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -191,10 +191,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: cycle time utility direct branches [1355:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: cycle time utility direct branches [1365:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: cycle time utility direct branches [1355:3]",
+    "selector": "e2e istanbul coverage > coverage: cycle time utility direct branches [1365:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -209,10 +209,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: entry and portfolio components direct [2024:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: entry and portfolio components direct [2043:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: entry and portfolio components direct [2024:3]",
+    "selector": "e2e istanbul coverage > coverage: entry and portfolio components direct [2043:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -248,10 +248,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: onboarding hook direct [1754:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: onboarding hook direct [1773:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: onboarding hook direct [1754:3]",
+    "selector": "e2e istanbul coverage > coverage: onboarding hook direct [1773:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -266,10 +266,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: org listee + stepper retour [729:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: org listee + stepper retour [739:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: org listee + stepper retour [729:3]",
+    "selector": "e2e istanbul coverage > coverage: org listee + stepper retour [739:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -284,10 +284,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3380:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3420:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3380:3]",
+    "selector": "e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3420:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -320,10 +320,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation context direct [2936:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation context direct [2976:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: simulation context direct [2936:3]",
+    "selector": "e2e istanbul coverage > coverage: simulation context direct [2976:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -338,10 +338,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation prefs direct [3259:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation prefs direct [3299:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: simulation prefs direct [3259:3]",
+    "selector": "e2e istanbul coverage > coverage: simulation prefs direct [3299:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -356,10 +356,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation utils direct [2794:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation utils direct [2822:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: simulation utils direct [2794:3]",
+    "selector": "e2e istanbul coverage > coverage: simulation utils direct [2822:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -374,10 +374,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: sla identite direct [2440:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: sla identite direct [2459:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: sla identite direct [2440:3]",
+    "selector": "e2e istanbul coverage > coverage: sla identite direct [2459:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -392,10 +392,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: useTeamOptions direct [3000:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: useTeamOptions direct [3040:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: useTeamOptions direct [3000:3]",
+    "selector": "e2e istanbul coverage > coverage: useTeamOptions direct [3040:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -3887,29 +3887,6 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "pytest:tests/test_mc_core.py::test_risk_score_matches_expected_formulas_and_guardrails",
-    "framework": "pytest",
-    "sourcePath": "tests/test_mc_core.py",
-    "selector": "test_risk_score_matches_expected_formulas_and_guardrails",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "statistical_engine"
-    ],
-    "risks": [
-      "RISK-003",
-      "RISK-004"
-    ],
-    "criticalPaths": [
-      "CP-003"
-    ],
-    "criticality": "critical"
-  },
-  {
     "logicalCaseId": "pytest:tests/test_mc_core.py::test_simulation_batch_size_must_be_positive",
     "framework": "pytest",
     "sourcePath": "tests/test_mc_core.py",
@@ -6549,6 +6526,37 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_simulation_domain_models.py::test_simulation_result_protects_cross_value_object_invariants",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_domain_models.py",
+    "selector": "test_simulation_result_protects_cross_value_object_invariants",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "accessibility"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_domain_models.py::test_statistical_domain_has_no_framework_or_engine_dependency",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_domain_models.py",
+    "selector": "test_statistical_domain_has_no_framework_or_engine_dependency",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_simulation_mappers.py::test_persistence_row_to_history_item_preserves_legacy_optional_fields",
     "framework": "pytest",
     "sourcePath": "tests/test_simulation_mappers.py",
@@ -7048,6 +7056,331 @@
       "CP-007"
     ],
     "criticality": "high"
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_bounded_integer_value_objects_accept_inclusive_bounds",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_bounded_integer_value_objects_accept_inclusive_bounds",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_bounded_integer_value_objects_reject_out_of_bounds_and_non_integers",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_bounded_integer_value_objects_reject_out_of_bounds_and_non_integers",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_commands_reject_unresolved_domain_inputs",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_commands_reject_unresolved_domain_inputs",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_commands_resolve_only_the_active_mode_parameter",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_commands_resolve_only_the_active_mode_parameter",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_completion_supports_complete_partial_and_fully_censored_counts",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_completion_supports_complete_partial_and_fully_censored_counts",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_completion_uses_round_half_up_and_rejects_inconsistent_counts",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_completion_uses_round_half_up_and_rejects_inconsistent_counts",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_direct_command_construction_requires_value_objects_and_resolved_mode",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_direct_command_construction_requires_value_objects_and_resolved_mode",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_histogram_accepts_exact_and_aggregated_immutable_buckets",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_histogram_accepts_exact_and_aggregated_immutable_buckets",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_histogram_rejects_invalid_buckets_order_and_mass",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_histogram_rejects_invalid_buckets_order_and_mass",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_histogram_rejects_more_than_one_hundred_buckets",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_histogram_rejects_more_than_one_hundred_buckets",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_percentiles_preserve_absences_and_mode_order",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_percentiles_preserve_absences_and_mode_order",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_percentiles_reject_invalid_keys_values_and_order",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_percentiles_reject_invalid_keys_values_and_order",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_reliability_normalizes_before_categorization",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_reliability_normalizes_before_categorization",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_reliability_rejects_invalid_metrics",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_reliability_rejects_invalid_metrics",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability",
+      "data_quality"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_risk_score_uses_round_half_up_and_requires_positive_p50",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_risk_score_uses_round_half_up_and_requires_positive_p50",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_round_half_up_distinguishes_midpoints_and_adjacent_values",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_round_half_up_distinguishes_midpoints_and_adjacent_values",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_seed_and_throughput_value_objects_are_immutable",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_seed_and_throughput_value_objects_are_immutable",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_serialized_reliability_accepts_only_the_closed_label_set",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_serialized_reliability_accepts_only_the_closed_label_set",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_throughput_enforces_raw_and_usable_sample_limits",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_throughput_rejects_invalid_collection_and_zero_week_flag",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_value_objects.py",
+    "selector": "test_throughput_rejects_invalid_values_before_zero_processing",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
   },
   {
     "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_added_test_without_regeneration_is_blocking",
@@ -10339,6 +10672,21 @@
     "domains": [
       "api",
       "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > derives a response mass when needed and rejects completion in the wrong mode [137:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/api/simulationMappers.test.ts",
+    "selector": "simulation HTTP mappers > derives a response mass when needed and rejects completion in the wrong mode [137:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
     ]
   },
   {
@@ -14947,10 +15295,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > adds an explicit decision notice when volatility is too high [310:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > adds an explicit decision notice when volatility is too high [318:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > adds an explicit decision notice when volatility is too high [310:3]",
+    "selector": "simulationPrintReport > adds an explicit decision notice when volatility is too high [318:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -14974,10 +15322,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > alerts and rethrows when direct PDF generation fails [380:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > alerts and rethrows when direct PDF generation fails [388:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > alerts and rethrows when direct PDF generation fails [380:3]",
+    "selector": "simulationPrintReport > alerts and rethrows when direct PDF generation fails [388:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -15002,10 +15350,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > computes fallback reliability wording when API reliability is absent [205:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > computes fallback reliability wording when API reliability is absent [213:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > computes fallback reliability wording when API reliability is absent [205:3]",
+    "selector": "simulationPrintReport > computes fallback reliability wording when API reliability is absent [213:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15032,10 +15380,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > covers diagnostic summary variants and fragile risk legend [262:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > covers diagnostic summary variants and fragile risk legend [270:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > covers diagnostic summary variants and fragile risk legend [262:3]",
+    "selector": "simulationPrintReport > covers diagnostic summary variants and fragile risk legend [270:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15060,10 +15408,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > documents horizon and censures when backlog simulations are incomplete [351:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > documents horizon and censures when backlog simulations are incomplete [359:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > documents horizon and censures when backlog simulations are incomplete [351:3]",
+    "selector": "simulationPrintReport > documents horizon and censures when backlog simulations are incomplete [359:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15088,10 +15436,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > exports directly to PDF from a detached document [370:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > exports directly to PDF from a detached document [378:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > exports directly to PDF from a detached document [370:3]",
+    "selector": "simulationPrintReport > exports directly to PDF from a detached document [378:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -15115,10 +15463,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > falls back to zero when throughput inputs and reliability metrics are nullish [225:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > falls back to zero when throughput inputs and reliability metrics are nullish [233:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > falls back to zero when throughput inputs and reliability metrics are nullish [225:3]",
+    "selector": "simulationPrintReport > falls back to zero when throughput inputs and reliability metrics are nullish [233:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15171,10 +15519,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > logs and rethrows when direct PDF generation fails without alert support [391:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > logs and rethrows when direct PDF generation fails without alert support [399:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > logs and rethrows when direct PDF generation fails without alert support [391:3]",
+    "selector": "simulationPrintReport > logs and rethrows when direct PDF generation fails without alert support [399:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -15199,10 +15547,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > omits unavailable sensitivity and invalid diagnostic content [163:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > omits unavailable sensitivity and invalid diagnostic content [171:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > omits unavailable sensitivity and invalid diagnostic content [163:3]",
+    "selector": "simulationPrintReport > omits unavailable sensitivity and invalid diagnostic content [171:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15227,10 +15575,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > renders elevated risk for backlog-to-weeks mode [341:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > renders elevated risk for backlog-to-weeks mode [349:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > renders elevated risk for backlog-to-weeks mode [341:3]",
+    "selector": "simulationPrintReport > renders elevated risk for backlog-to-weeks mode [349:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15254,10 +15602,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > renders empty-chart placeholders and escapes unsafe values [185:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > renders empty-chart placeholders and escapes unsafe values [193:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > renders empty-chart placeholders and escapes unsafe values [185:3]",
+    "selector": "simulationPrintReport > renders empty-chart placeholders and escapes unsafe values [193:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15308,10 +15656,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > renders items mode and zero-week exclusion labels [326:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > renders items mode and zero-week exclusion labels [334:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > renders items mode and zero-week exclusion labels [326:3]",
+    "selector": "simulationPrintReport > renders items mode and zero-week exclusion labels [334:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15362,10 +15710,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > renders short-history diagnostics and percentile fallbacks [244:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > renders short-history diagnostics and percentile fallbacks [252:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > renders short-history diagnostics and percentile fallbacks [244:3]",
+    "selector": "simulationPrintReport > renders short-history diagnostics and percentile fallbacks [252:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15392,10 +15740,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > renders the short-history warning and the uncertain risk band [293:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > renders the short-history warning and the uncertain risk band [301:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > renders the short-history warning and the uncertain risk band [293:3]",
+    "selector": "simulationPrintReport > renders the short-history warning and the uncertain risk band [301:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15420,10 +15768,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > still exposes the shared filename helper [403:3]",
+    "logicalCaseId": "vitest:frontend/src/components/steps/simulationPrintReport.test.ts::simulationPrintReport > still exposes the shared filename helper [411:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/components/steps/simulationPrintReport.test.ts",
-    "selector": "simulationPrintReport > still exposes the shared filename helper [403:3]",
+    "selector": "simulationPrintReport > still exposes the shared filename helper [411:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15612,10 +15960,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > exposes coherent demo portfolio and app defaults [152:3]",
+    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > exposes coherent demo portfolio and app defaults [153:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/demoData.test.ts",
-    "selector": "demoData > exposes coherent demo portfolio and app defaults [152:3]",
+    "selector": "demoData > exposes coherent demo portfolio and app defaults [153:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15628,10 +15976,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > exposes differentiated and coherent public decision language for the three demo teams [130:3]",
+    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > exposes differentiated and coherent public decision language for the three demo teams [131:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/demoData.test.ts",
-    "selector": "demoData > exposes differentiated and coherent public decision language for the three demo teams [130:3]",
+    "selector": "demoData > exposes differentiated and coherent public decision language for the three demo teams [131:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15644,10 +15992,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > keeps demo dates valid, ordered and aligned across throughput and Cycle Time [105:3]",
+    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > keeps demo dates valid, ordered and aligned across throughput and Cycle Time [106:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/demoData.test.ts",
-    "selector": "demoData > keeps demo dates valid, ordered and aligned across throughput and Cycle Time [105:3]",
+    "selector": "demoData > keeps demo dates valid, ordered and aligned across throughput and Cycle Time [106:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15659,10 +16007,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > produces the expected decision profile for %s through production diagnostics [119:13]",
+    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > produces the expected decision profile for %s through production diagnostics [120:13]",
     "framework": "vitest",
     "sourcePath": "frontend/src/demoData.test.ts",
-    "selector": "demoData > produces the expected decision profile for %s through production diagnostics [119:13]",
+    "selector": "demoData > produces the expected decision profile for %s through production diagnostics [120:13]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15674,10 +16022,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [86:3]",
+    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [87:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/demoData.test.ts",
-    "selector": "demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [86:3]",
+    "selector": "demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [87:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15689,10 +16037,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [75:3]",
+    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [76:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/demoData.test.ts",
-    "selector": "demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [75:3]",
+    "selector": "demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [76:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15706,10 +16054,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo weekly throughput [66:3]",
+    "logicalCaseId": "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo weekly throughput [67:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/demoData.test.ts",
-    "selector": "demoData > returns defensive copies for demo weekly throughput [66:3]",
+    "selector": "demoData > returns defensive copies for demo weekly throughput [67:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15718,6 +16066,368 @@
     ],
     "domains": [
       "data"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > accepts the inclusive bounds [34:4]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "bounded statistical value objects > accepts the inclusive bounds [34:4]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects out-of-bounds and non-integer values [44:4]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "bounded statistical value objects > rejects out-of-bounds and non-integer values [44:4]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects unsafe JavaScript integers at unbounded integer boundaries [70:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "bounded statistical value objects > rejects unsafe JavaScript integers at unbounded integer boundaries [70:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > requires runtime factories for opaque value-object types [59:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "bounded statistical value objects > requires runtime factories for opaque value-object types [59:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [363:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "completion summary > rounds half up and rejects inconsistent counts, rates and horizon [363:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [348:4]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "completion summary > supports complete, partial and fully censored counts [348:4]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [413:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [413:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine",
+      "persistence"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [307:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "histograms > accepts exact and aggregated histograms while freezing every bucket [307:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [329:13]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "histograms > rejects invalid buckets, order and mass [329:13]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [333:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "histograms > rejects more than one hundred buckets [333:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > derives a half-up risk score only when P50 and P90 are usable [207:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "percentiles > derives a half-up risk score only when P50 and P90 are usable [207:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > keeps the public key set closed, preserves absences and enforces mode order [183:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "percentiles > keeps the public key set closed, preserves absences and enforces mode order [183:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rejects invalid keys, values and order [203:13]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "percentiles > rejects invalid keys, values and order [203:13]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [231:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "percentiles > rounds exact decimal midpoints without binary floating-point drift [231:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > keeps only the active mode parameter [138:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "resolved simulation commands > keeps only the active mode parameter [138:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > rejects invalid modes and missing active parameters [159:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "resolved simulation commands > rejects invalid modes and missing active parameters [159:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [284:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "throughput reliability > accepts only the closed serialized label set [284:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [256:13]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "throughput reliability > normalizes before applying category priority [256:13]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [271:4]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "throughput reliability > rejects invalid metrics [271:4]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > enforces raw and usable limits [106:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "throughput samples > enforces raw and usable limits [106:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > rejects invalid values without filtering them [102:4]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "throughput samples > rejects invalid values without filtering them [102:4]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > requires a strict boolean zero-week flag [125:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "throughput samples > requires a strict boolean zero-week flag [125:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > validates raw values before zero processing and freezes both collections [83:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
+    "selector": "throughput samples > validates raw values before zero processing and freezes both collections [83:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
     ]
   },
   {
@@ -15769,10 +16479,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle getTeamDeliveryDataDirect avec les bons parametres [207:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle getTeamDeliveryDataDirect avec les bons parametres [206:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > appelle getTeamDeliveryDataDirect avec les bons parametres [207:3]",
+    "selector": "appels réseau > appelle getTeamDeliveryDataDirect avec les bons parametres [206:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15785,10 +16495,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle postSimulate en mode backlog_to_weeks avec backlog_size [224:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle postSimulate en mode backlog_to_weeks avec backlog_size [223:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > appelle postSimulate en mode backlog_to_weeks avec backlog_size [224:3]",
+    "selector": "appels réseau > appelle postSimulate en mode backlog_to_weeks avec backlog_size [223:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -15801,10 +16511,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle postSimulate en mode weeks_to_items avec target_weeks [242:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle postSimulate en mode weeks_to_items avec target_weeks [241:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > appelle postSimulate en mode weeks_to_items avec target_weeks [242:3]",
+    "selector": "appels réseau > appelle postSimulate en mode weeks_to_items avec target_weeks [241:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -15816,10 +16526,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > couvre directement backlog_size pour simulateForecastFromSamples [256:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > couvre directement backlog_size pour simulateForecastFromSamples [255:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > couvre directement backlog_size pour simulateForecastFromSamples [256:3]",
+    "selector": "appels réseau > couvre directement backlog_size pour simulateForecastFromSamples [255:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15834,10 +16544,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > couvre directement target_weeks pour simulateForecastFromSamples [274:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > couvre directement target_weeks pour simulateForecastFromSamples [273:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > couvre directement target_weeks pour simulateForecastFromSamples [274:3]",
+    "selector": "appels réseau > couvre directement target_weeks pour simulateForecastFromSamples [273:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -15851,25 +16561,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > normalise une distribution absente en tableau vide [294:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > propage throughput_reliability tel quel [306:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > normalise une distribution absente en tableau vide [294:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "component",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "statistical_engine"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > propage throughput_reliability tel quel [309:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > propage throughput_reliability tel quel [309:3]",
+    "selector": "appels réseau > propage throughput_reliability tel quel [306:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15883,10 +16578,25 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > utilise la forme objet weeklyThroughput + warning quand ADO renvoie un warning [193:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > rejette une distribution absente qui ne conserve pas la masse [293:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > utilise la forme objet weeklyThroughput + warning quand ADO renvoie un warning [193:3]",
+    "selector": "appels réseau > rejette une distribution absente qui ne conserve pas la masse [293:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > utilise la forme objet weeklyThroughput + warning quand ADO renvoie un warning [192:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
+    "selector": "appels réseau > utilise la forme objet weeklyThroughput + warning quand ADO renvoie un warning [192:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -15900,10 +16610,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > propage un warning de données partielles [570:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > propage un warning de données partielles [569:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "cohérence du résultat retourné > propage un warning de données partielles [570:3]",
+    "selector": "cohérence du résultat retourné > propage un warning de données partielles [569:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -15915,10 +16625,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > result est identique dans le retour et dans historyEntry [560:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > result est identique dans le retour et dans historyEntry [559:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "cohérence du résultat retourné > result est identique dans le retour et dans historyEntry [560:3]",
+    "selector": "cohérence du résultat retourné > result est identique dans le retour et dans historyEntry [559:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15931,10 +16641,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > sampleStats est identique dans le retour et dans historyEntry [565:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > sampleStats est identique dans le retour et dans historyEntry [564:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "cohérence du résultat retourné > sampleStats est identique dans le retour et dans historyEntry [565:3]",
+    "selector": "cohérence du résultat retourné > sampleStats est identique dans le retour et dans historyEntry [564:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15949,10 +16659,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > weeklyThroughput est identique dans le retour et dans historyEntry [555:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > weeklyThroughput est identique dans le retour et dans historyEntry [554:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "cohérence du résultat retourné > weeklyThroughput est identique dans le retour et dans historyEntry [555:3]",
+    "selector": "cohérence du résultat retourné > weeklyThroughput est identique dans le retour et dans historyEntry [554:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15966,10 +16676,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > calcule risk_score localement si le backend ne le renvoie pas [156:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > calcule risk_score localement si le backend ne le renvoie pas [155:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > calcule risk_score localement si le backend ne le renvoie pas [156:3]",
+    "selector": "demo mode et normalisation > calcule risk_score localement si le backend ne le renvoie pas [155:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -15981,10 +16691,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > filters out zero weeks in demo mode when includeZeroWeeks is false [105:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > filters out zero weeks in demo mode when includeZeroWeeks is false [104:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > filters out zero weeks in demo mode when includeZeroWeeks is false [105:3]",
+    "selector": "demo mode et normalisation > filters out zero weeks in demo mode when includeZeroWeeks is false [104:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -15997,10 +16707,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent [173:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent [172:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent [173:3]",
+    "selector": "demo mode et normalisation > laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent [172:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -16012,10 +16722,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses local simulation in demo backlog mode without API calls [140:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses local simulation in demo backlog mode without API calls [139:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > uses local simulation in demo backlog mode without API calls [140:3]",
+    "selector": "demo mode et normalisation > uses local simulation in demo backlog mode without API calls [139:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -16028,10 +16738,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses local simulation in demo mode without API calls [124:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses local simulation in demo mode without API calls [123:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > uses local simulation in demo mode without API calls [124:3]",
+    "selector": "demo mode et normalisation > uses local simulation in demo mode without API calls [123:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -16043,10 +16753,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses the demo throughput source without network calls [83:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses the demo throughput source without network calls [82:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > uses the demo throughput source without network calls [83:3]",
+    "selector": "demo mode et normalisation > uses the demo throughput source without network calls [82:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -16060,10 +16770,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::filtrage des throughput samples > exclut les semaines à 0 quand includeZeroWeeks = false [317:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::filtrage des throughput samples > exclut les semaines à 0 quand includeZeroWeeks = false [314:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "filtrage des throughput samples > exclut les semaines à 0 quand includeZeroWeeks = false [317:3]",
+    "selector": "filtrage des throughput samples > exclut les semaines à 0 quand includeZeroWeeks = false [314:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -16077,10 +16787,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::filtrage des throughput samples > inclut les semaines à 0 quand includeZeroWeeks = true [340:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::filtrage des throughput samples > inclut les semaines à 0 quand includeZeroWeeks = true [337:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "filtrage des throughput samples > inclut les semaines à 0 quand includeZeroWeeks = true [340:3]",
+    "selector": "filtrage des throughput samples > inclut les semaines à 0 quand includeZeroWeeks = true [337:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -16094,10 +16804,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > applique toSafeNumber sur backlogSize, targetWeeks et nSims [481:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > applique toSafeNumber sur backlogSize, targetWeeks et nSims [480:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "historyEntry > applique toSafeNumber sur backlogSize, targetWeeks et nSims [481:3]",
+    "selector": "historyEntry > applique toSafeNumber sur backlogSize, targetWeeks et nSims [480:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -16111,10 +16821,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > contient les métadonnées de session correctes [451:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > contient les métadonnées de session correctes [450:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "historyEntry > contient les métadonnées de session correctes [451:3]",
+    "selector": "historyEntry > contient les métadonnées de session correctes [450:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -16128,10 +16838,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > copie défensivement les tableaux [519:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > copie défensivement les tableaux [518:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "historyEntry > copie défensivement les tableaux [519:3]",
+    "selector": "historyEntry > copie défensivement les tableaux [518:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -16144,10 +16854,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > génère un id unique et une date ISO valide [473:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > génère un id unique et une date ISO valide [472:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "historyEntry > génère un id unique et une date ISO valide [473:3]",
+    "selector": "historyEntry > génère un id unique et une date ISO valide [472:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -16160,10 +16870,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > retombe sur un id date-seed quand crypto.randomUUID est indisponible [492:5]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > retombe sur un id date-seed quand crypto.randomUUID est indisponible [491:5]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "historyEntry > retombe sur un id date-seed quand crypto.randomUUID est indisponible [492:5]",
+    "selector": "historyEntry > retombe sur un id date-seed quand crypto.randomUUID est indisponible [491:5]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -16176,10 +16886,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage l'erreur si getTeamDeliveryDataDirect echoue [534:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage l'erreur si getTeamDeliveryDataDirect echoue [533:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "propagation des erreurs réseau > propage l'erreur si getTeamDeliveryDataDirect echoue [534:3]",
+    "selector": "propagation des erreurs réseau > propage l'erreur si getTeamDeliveryDataDirect echoue [533:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -16192,10 +16902,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage l'erreur si postSimulate échoue [541:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage l'erreur si postSimulate échoue [540:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "propagation des erreurs réseau > propage l'erreur si postSimulate échoue [541:3]",
+    "selector": "propagation des erreurs réseau > propage l'erreur si postSimulate échoue [540:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -16207,10 +16917,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage une erreur 422 backend [547:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage une erreur 422 backend [546:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "propagation des erreurs réseau > propage une erreur 422 backend [547:3]",
+    "selector": "propagation des erreurs réseau > propage une erreur 422 backend [546:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -16222,10 +16932,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::sampleStats > calcule correctement totalWeeks, zeroWeeks et usedWeeks [430:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::sampleStats > calcule correctement totalWeeks, zeroWeeks et usedWeeks [429:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "sampleStats > calcule correctement totalWeeks, zeroWeeks et usedWeeks [430:3]",
+    "selector": "sampleStats > calcule correctement totalWeeks, zeroWeeks et usedWeeks [429:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -16239,10 +16949,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > accepte exactement 6 semaines valides [393:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > accepte exactement 6 semaines valides [390:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "seuil d'historique insuffisant > accepte exactement 6 semaines valides [393:3]",
+    "selector": "seuil d'historique insuffisant > accepte exactement 6 semaines valides [390:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -16254,25 +16964,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > accepte les bornes du contrat et les transmet telles quelles [411:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > accepte les bornes d'horizon et d'historique et les transmet telles quelles [408:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "seuil d'historique insuffisant > accepte les bornes du contrat et les transmet telles quelles [411:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "statistical_engine"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > lève une erreur si moins de 6 semaines au total [376:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "seuil d'historique insuffisant > lève une erreur si moins de 6 semaines au total [376:3]",
+    "selector": "seuil d'historique insuffisant > accepte les bornes d'horizon et d'historique et les transmet telles quelles [408:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -16284,10 +16979,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > lève une erreur si moins de 6 semaines non nulles [363:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > lève une erreur si moins de 6 semaines au total [373:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "seuil d'historique insuffisant > lève une erreur si moins de 6 semaines non nulles [363:3]",
+    "selector": "seuil d'historique insuffisant > lève une erreur si moins de 6 semaines au total [373:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -16299,10 +16994,25 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > rejette un contrat hors bornes avant l'appel API [397:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > lève une erreur si moins de 6 semaines non nulles [360:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "seuil d'historique insuffisant > rejette un contrat hors bornes avant l'appel API [397:3]",
+    "selector": "seuil d'historique insuffisant > lève une erreur si moins de 6 semaines non nulles [360:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > rejette un contrôle vide avant l'appel API [394:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
+    "selector": "seuil d'historique insuffisant > rejette un contrôle vide avant l'appel API [394:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -16314,10 +17024,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > renvoie un message lisible [387:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > renvoie un message lisible [384:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "seuil d'historique insuffisant > renvoie un message lisible [387:3]",
+    "selector": "seuil d'historique insuffisant > renvoie un message lisible [384:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -18106,10 +18816,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > falls back to empty local state when storage contains invalid JSON [237:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > falls back to empty local state when storage contains invalid JSON [213:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > falls back to empty local state when storage contains invalid JSON [237:3]",
+    "selector": "useSimulationHistory > falls back to empty local state when storage contains invalid JSON [213:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -18123,10 +18833,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > ignores non-array stored values [247:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > ignores non-array stored values [223:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > ignores non-array stored values [247:3]",
+    "selector": "useSimulationHistory > ignores non-array stored values [223:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -18180,10 +18890,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > pushes entries with max history size and clears storage [257:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > pushes entries with max history size and clears storage [233:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > pushes entries with max history size and clears storage [257:3]",
+    "selector": "useSimulationHistory > pushes entries with max history size and clears storage [233:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -18198,21 +18908,20 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > skips non-object rows and preserves string warnings when optional collections are malformed [173:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > rejects stored simulations that violate the strict simulation-count contract [179:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > skips non-object rows and preserves string warnings when optional collections are malformed [173:3]",
+    "selector": "useSimulationHistory > rejects stored simulations that violate the strict simulation-count contract [179:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
     "purposes": [
-      "functional",
-      "resilience",
-      "data_quality"
+      "functional"
     ],
     "domains": [
       "statistical_engine",
       "history",
+      "persistence",
       "user_interface"
     ]
   },
@@ -18234,10 +18943,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > uses a dedicated storage key in demo mode [279:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/useSimulationHistory.test.tsx::useSimulationHistory > uses a dedicated storage key in demo mode [255:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/useSimulationHistory.test.tsx",
-    "selector": "useSimulationHistory > uses a dedicated storage key in demo mode [279:3]",
+    "selector": "useSimulationHistory > uses a dedicated storage key in demo mode [255:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -18796,6 +19505,25 @@
     ],
     "domains": [
       "data",
+      "statistical_engine",
+      "history",
+      "persistence"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > reads legacy item distributions without completion and rejects invalid buckets [99:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/storage/simulationHistoryMappers.test.ts",
+    "selector": "simulation history storage mappers > reads legacy item distributions without completion and rejects invalid buckets [99:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "compatibility",
+      "migration_recovery"
+    ],
+    "domains": [
       "statistical_engine",
       "history",
       "persistence"
@@ -19674,10 +20402,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > applies includeZeroWeeks after aggregating the portfolio total [245:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > applies includeZeroWeeks after aggregating the portfolio total [226:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > applies includeZeroWeeks after aggregating the portfolio total [245:3]",
+    "selector": "buildCorrelatedPortfolioSamples > applies includeZeroWeeks after aggregating the portfolio total [226:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19692,10 +20420,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > is not mathematically forced to match optimistic independent draws [261:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > is not mathematically forced to match optimistic independent draws [242:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > is not mathematically forced to match optimistic independent draws [261:3]",
+    "selector": "buildCorrelatedPortfolioSamples > is not mathematically forced to match optimistic independent draws [242:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19710,10 +20438,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps ISO week timestamps aligned after normalization [370:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps ISO week timestamps aligned after normalization [351:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > keeps ISO week timestamps aligned after normalization [370:3]",
+    "selector": "buildCorrelatedPortfolioSamples > keeps ISO week timestamps aligned after normalization [351:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19728,10 +20456,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps only the intersection of aligned weeks [210:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps only the intersection of aligned weeks [191:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > keeps only the intersection of aligned weeks [210:3]",
+    "selector": "buildCorrelatedPortfolioSamples > keeps only the intersection of aligned weeks [191:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19746,10 +20474,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > returns the same history for a single team [232:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > returns the same history for a single team [213:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > returns the same history for a single team [232:3]",
+    "selector": "buildCorrelatedPortfolioSamples > returns the same history for a single team [213:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19766,10 +20494,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > sums aligned weekly throughput for two teams [185:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > sums aligned weekly throughput for two teams [166:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > sums aligned weekly throughput for two teams [185:3]",
+    "selector": "buildCorrelatedPortfolioSamples > sums aligned weekly throughput for two teams [166:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19785,10 +20513,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws an explicit error when no complete common week exists [289:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws an explicit error when no complete common week exists [270:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > throws an explicit error when no complete common week exists [289:3]",
+    "selector": "buildCorrelatedPortfolioSamples > throws an explicit error when no complete common week exists [270:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19803,10 +20531,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when a weekly row has an invalid week or throughput [317:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when a weekly row has an invalid week or throughput [298:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > throws when a weekly row has an invalid week or throughput [317:3]",
+    "selector": "buildCorrelatedPortfolioSamples > throws when a weekly row has an invalid week or throughput [298:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19821,10 +20549,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when includeZeroWeeks keeps only negative common totals [383:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when includeZeroWeeks keeps only negative common totals [364:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > throws when includeZeroWeeks keeps only negative common totals [383:3]",
+    "selector": "buildCorrelatedPortfolioSamples > throws when includeZeroWeeks keeps only negative common totals [364:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19839,10 +20567,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when one team contains the same week twice [337:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when one team contains the same week twice [318:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > throws when one team contains the same week twice [337:3]",
+    "selector": "buildCorrelatedPortfolioSamples > throws when one team contains the same week twice [318:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19858,10 +20586,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when one team has no usable weekly history [305:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when one team has no usable weekly history [286:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > throws when one team has no usable weekly history [305:3]",
+    "selector": "buildCorrelatedPortfolioSamples > throws when one team has no usable weekly history [286:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19878,10 +20606,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when the correlated portfolio input is empty [301:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when the correlated portfolio input is empty [282:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > throws when the correlated portfolio input is empty [301:3]",
+    "selector": "buildCorrelatedPortfolioSamples > throws when the correlated portfolio input is empty [282:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19896,10 +20624,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when zero-week filtering removes every common weekly total [351:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when zero-week filtering removes every common weekly total [332:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildCorrelatedPortfolioSamples > throws when zero-week filtering removes every common weekly total [351:3]",
+    "selector": "buildCorrelatedPortfolioSamples > throws when zero-week filtering removes every common weekly total [332:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19914,29 +20642,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > applies no friction penalty with one team, then starts at the second team [91:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > applies no friction penalty with one team, then starts at the second team [72:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildScenarioSamples > applies no friction penalty with one team, then starts at the second team [91:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional",
-      "data_quality"
-    ],
-    "domains": [
-      "azure_devops",
-      "data",
-      "statistical_engine",
-      "portfolio"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > builds optimistic, aligned and friction samples for 2 teams [66:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildScenarioSamples > builds optimistic, aligned and friction samples for 2 teams [66:3]",
+    "selector": "buildScenarioSamples > applies no friction penalty with one team, then starts at the second team [72:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19952,46 +20661,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > clamps alignment rate before computing aligned and friction samples [53:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > builds optimistic, aligned and friction samples for 2 teams [47:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildScenarioSamples > clamps alignment rate before computing aligned and friction samples [53:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional",
-      "data_quality"
-    ],
-    "domains": [
-      "data",
-      "statistical_engine",
-      "portfolio"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > keeps the displayed friction percent aligned with the rounded sample factor [108:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildScenarioSamples > keeps the displayed friction percent aligned with the rounded sample factor [108:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional",
-      "data_quality"
-    ],
-    "domains": [
-      "data",
-      "statistical_engine",
-      "portfolio"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > throws explicit error when a team has no samples [130:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildScenarioSamples > throws explicit error when a team has no samples [130:3]",
+    "selector": "buildScenarioSamples > builds optimistic, aligned and friction samples for 2 teams [47:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20007,10 +20680,46 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > throws explicit error when teamSamples is empty [126:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > clamps alignment rate before computing aligned and friction samples [34:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildScenarioSamples > throws explicit error when teamSamples is empty [126:3]",
+    "selector": "buildScenarioSamples > clamps alignment rate before computing aligned and friction samples [34:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine",
+      "portfolio"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > keeps the displayed friction percent aligned with the rounded sample factor [89:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/utils/simulation.test.ts",
+    "selector": "buildScenarioSamples > keeps the displayed friction percent aligned with the rounded sample factor [89:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine",
+      "portfolio"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > throws explicit error when a team has no samples [111:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/utils/simulation.test.ts",
+    "selector": "buildScenarioSamples > throws explicit error when a team has no samples [111:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20026,10 +20735,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > uses same values for all scenarios with 1 team [84:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > throws explicit error when teamSamples is empty [107:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "buildScenarioSamples > uses same values for all scenarios with 1 team [84:3]",
+    "selector": "buildScenarioSamples > throws explicit error when teamSamples is empty [107:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20045,10 +20754,29 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeRiskLegend > covers fiable and incertain ranges [397:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > uses same values for all scenarios with 1 team [65:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeRiskLegend > covers fiable and incertain ranges [397:3]",
+    "selector": "buildScenarioSamples > uses same values for all scenarios with 1 team [65:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "azure_devops",
+      "data",
+      "statistical_engine",
+      "portfolio"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeRiskLegend > covers fiable and incertain ranges [378:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/utils/simulation.test.ts",
+    "selector": "computeRiskLegend > covers fiable and incertain ranges [378:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20068,10 +20796,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeRiskLegend > covers fragile and non fiable ranges [402:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeRiskLegend > covers fragile and non fiable ranges [383:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeRiskLegend > covers fragile and non fiable ranges [402:3]",
+    "selector": "computeRiskLegend > covers fragile and non fiable ranges [383:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20091,103 +20819,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeRiskScoreFromPercentiles > computes normalized spread in backlog_to_weeks mode [34:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > downgrades otherwise stable short histories to incertain [434:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeRiskScoreFromPercentiles > computes normalized spread in backlog_to_weeks mode [34:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional",
-      "observability"
-    ],
-    "domains": [
-      "statistical_engine"
-    ],
-    "risks": [
-      "RISK-003",
-      "RISK-004"
-    ],
-    "criticalPaths": [
-      "CP-003"
-    ],
-    "criticality": "critical"
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeRiskScoreFromPercentiles > computes normalized spread in weeks_to_items mode [39:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeRiskScoreFromPercentiles > computes normalized spread in weeks_to_items mode [39:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "statistical_engine"
-    ],
-    "risks": [
-      "RISK-003",
-      "RISK-004"
-    ],
-    "criticalPaths": [
-      "CP-003"
-    ],
-    "criticality": "critical"
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeRiskScoreFromPercentiles > returns null when P50 is missing or non-positive [28:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeRiskScoreFromPercentiles > returns null when P50 is missing or non-positive [28:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "statistical_engine"
-    ],
-    "risks": [
-      "RISK-003",
-      "RISK-004"
-    ],
-    "criticalPaths": [
-      "CP-003"
-    ],
-    "criticality": "critical"
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeRiskScoreFromPercentiles > returns null when percentiles are incoherent or non-finite [45:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeRiskScoreFromPercentiles > returns null when percentiles are incoherent or non-finite [45:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "statistical_engine"
-    ],
-    "risks": [
-      "RISK-003",
-      "RISK-004"
-    ],
-    "criticalPaths": [
-      "CP-003"
-    ],
-    "criticality": "critical"
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > downgrades otherwise stable short histories to incertain [451:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeThroughputReliability > downgrades otherwise stable short histories to incertain [451:3]",
+    "selector": "computeThroughputReliability > downgrades otherwise stable short histories to incertain [434:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20201,10 +20836,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > handles a single finite sample without slope computation [463:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > handles a single finite sample without slope computation [446:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeThroughputReliability > handles a single finite sample without slope computation [463:3]",
+    "selector": "computeThroughputReliability > handles a single finite sample without slope computation [446:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20218,10 +20853,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > handles zero-only histories with zero mean and quartiles [475:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > handles zero-only histories with zero mean and quartiles [458:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeThroughputReliability > handles zero-only histories with zero mean and quartiles [475:3]",
+    "selector": "computeThroughputReliability > handles zero-only histories with zero mean and quartiles [458:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20235,10 +20870,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks highly volatile histories as fragile [433:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks highly volatile histories as fragile [416:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeThroughputReliability > marks highly volatile histories as fragile [433:3]",
+    "selector": "computeThroughputReliability > marks highly volatile histories as fragile [416:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20252,10 +20887,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks moderate variability as incertain [440:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks moderate variability as incertain [423:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeThroughputReliability > marks moderate variability as incertain [440:3]",
+    "selector": "computeThroughputReliability > marks moderate variability as incertain [423:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20270,10 +20905,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks steep downward trends as non fiable [409:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks steep downward trends as non fiable [390:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeThroughputReliability > marks steep downward trends as non fiable [409:3]",
+    "selector": "computeThroughputReliability > marks steep downward trends as non fiable [390:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20287,10 +20922,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks very short histories as non fiable [421:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks very short histories as non fiable [404:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeThroughputReliability > marks very short histories as non fiable [421:3]",
+    "selector": "computeThroughputReliability > marks very short histories as non fiable [404:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20304,10 +20939,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > matches the expected reliability labels for demo teams [487:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > matches the expected reliability labels for demo teams [470:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeThroughputReliability > matches the expected reliability labels for demo teams [487:3]",
+    "selector": "computeThroughputReliability > matches the expected reliability labels for demo teams [470:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20322,10 +20957,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > returns null for empty or non-finite samples [416:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > returns null for empty samples and rejects non-finite samples [397:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeThroughputReliability > returns null for empty or non-finite samples [416:3]",
+    "selector": "computeThroughputReliability > returns null for empty samples and rejects non-finite samples [397:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20339,10 +20974,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > returns the expected rounded ratio values for the reference series [493:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > returns the expected rounded ratio values for the reference series [476:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "computeThroughputReliability > returns the expected rounded ratio values for the reference series [493:3]",
+    "selector": "computeThroughputReliability > returns the expected rounded ratio values for the reference series [476:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20356,10 +20991,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::generateSimulationSeed > falls back to Date.now when crypto.getRandomValues is unavailable [158:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::generateSimulationSeed > falls back to Date.now when crypto.getRandomValues is unavailable [139:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "generateSimulationSeed > falls back to Date.now when crypto.getRandomValues is unavailable [158:3]",
+    "selector": "generateSimulationSeed > falls back to Date.now when crypto.getRandomValues is unavailable [139:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20380,10 +21015,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::generateSimulationSeed > uses crypto.getRandomValues when available [138:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::generateSimulationSeed > uses crypto.getRandomValues when available [119:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "generateSimulationSeed > uses crypto.getRandomValues when available [138:3]",
+    "selector": "generateSimulationSeed > uses crypto.getRandomValues when available [119:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20403,10 +21038,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null for reliable or uncertain non-volatile histories [544:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null for reliable or uncertain non-volatile histories [527:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "getProjectionReliabilityNotice > returns null for reliable or uncertain non-volatile histories [544:3]",
+    "selector": "getProjectionReliabilityNotice > returns null for reliable or uncertain non-volatile histories [527:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20420,10 +21055,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null when reliability is absent [505:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null when reliability is absent [488:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "getProjectionReliabilityNotice > returns null when reliability is absent [505:3]",
+    "selector": "getProjectionReliabilityNotice > returns null when reliability is absent [488:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20437,10 +21072,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the non fiable notice when the label is non fiable without high volatility [532:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the non fiable notice when the label is non fiable without high volatility [515:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "getProjectionReliabilityNotice > returns the non fiable notice when the label is non fiable without high volatility [532:3]",
+    "selector": "getProjectionReliabilityNotice > returns the non fiable notice when the label is non fiable without high volatility [515:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20454,10 +21089,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the volatility notice when cv or iqr_ratio is high [510:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the volatility notice when cv or iqr_ratio is high [493:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "getProjectionReliabilityNotice > returns the volatility notice when cv or iqr_ratio is high [510:3]",
+    "selector": "getProjectionReliabilityNotice > returns the volatility notice when cv or iqr_ratio is high [493:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20471,10 +21106,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [745:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [716:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [745:3]",
+    "selector": "simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [716:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20494,10 +21129,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [638:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [632:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [638:3]",
+    "selector": "simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [632:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20519,10 +21154,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [646:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [640:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [646:3]",
+    "selector": "simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [640:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20542,10 +21177,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [695:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [690:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [695:3]",
+    "selector": "simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [690:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20565,10 +21200,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [634:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [628:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [634:3]",
+    "selector": "simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [628:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20589,27 +21224,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects empty normalized samples for both zero-week modes [721:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [754:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > rejects empty normalized samples for both zero-week modes [721:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional",
-      "data_quality"
-    ],
-    "domains": [
-      "data",
-      "statistical_engine"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [783:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [783:3]",
+    "selector": "simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [754:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20621,10 +21239,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects shared contract violations with explicit messages [573:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects shared contract violations with explicit messages [567:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > rejects shared contract violations with explicit messages [573:3]",
+    "selector": "simulateMonteCarloLocal > rejects shared contract violations with explicit messages [567:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20636,10 +21254,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [760:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [731:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [760:3]",
+    "selector": "simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [731:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20662,10 +21280,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [659:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [654:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [659:3]",
+    "selector": "simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [654:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20682,10 +21300,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [677:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [672:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [677:3]",
+    "selector": "simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [672:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20701,10 +21319,55 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > validates the shared contract boundaries [558:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > validates the shared contract boundaries [541:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > validates the shared contract boundaries [558:3]",
+    "selector": "simulateMonteCarloLocal > validates the shared contract boundaries [541:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > computes both normalized spreads and preserves missing values [16:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/utils/simulationRiskScore.test.ts",
+    "selector": "computeRiskScoreFromPercentiles > computes both normalized spreads and preserves missing values [16:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > does not let invalid presentation data produce a risk score [32:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/utils/simulationRiskScore.test.ts",
+    "selector": "computeRiskScoreFromPercentiles > does not let invalid presentation data produce a risk score [32:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > rejects invalid domain percentiles [28:13]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/utils/simulationRiskScore.test.ts",
+    "selector": "computeRiskScoreFromPercentiles > rejects invalid domain percentiles [28:13]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",

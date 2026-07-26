@@ -2,6 +2,19 @@
 
 ## Recent
 
+### Value Objects statistiques prioritaires — PBI 2.4
+
+- introduction, en Python et TypeScript, de Value Objects statistiques immuables pour la seed, les entrées de
+  simulation, les percentiles, la fiabilité du throughput, l’histogramme et la complétion, conformément à
+  `STD-STAT-001` version 1.0
+- résolution complète des commandes métier par mode, validation stricte du throughput avant traitement des
+  zéros, normalisation `round half up` de la fiabilité et de la complétion, et protection de l’ordre, de la
+  masse et des clés fermées des résultats
+- conversions explicites aux frontières HTTP, MongoDB et `localStorage`, sans changement de leurs champs ou
+  formats primitifs, ni des PRNG, tirages, formules statistiques, lots ou comportements frontend-only
+- ajout des tests Python et TypeScript de bornes, types invalides, modes, percentiles, seuils de fiabilité,
+  histogrammes, complétion, round-trips et indépendance du domaine envers les frameworks
+
 ### Gate README de commit
 
 - rétablissement de l'obligation d'inclure une évolution pertinente du `README.md` racine dans tout index

@@ -1,88 +1,50 @@
 from typing import Dict, List, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, StrictBool, StrictInt, model_validator
 
-from .simulation_limits import (
-    SIMULATION_BACKLOG_SIZE_MAX,
-    SIMULATION_BACKLOG_SIZE_MIN,
-    SIMULATION_HORIZON_WEEKS_MAX,
-    SIMULATION_N_SIMS_MAX,
-    SIMULATION_N_SIMS_MIN,
-    SIMULATION_TARGET_WEEKS_MIN,
-    SIMULATION_THROUGHPUT_SAMPLES_MAX,
-    SIMULATION_THROUGHPUT_SAMPLES_MIN,
-)
+from .simulation_limits import SIMULATION_SEED_MAX, SIMULATION_SEED_MIN
+from .simulation_models import SimulationCommand
+from .simulation_value_objects import StatisticalValueError
 
-SIMULATION_SEED_MIN = 0
-SIMULATION_SEED_MAX = 4_294_967_295
+__all__ = [
+    "SIMULATION_SEED_MAX",
+    "SIMULATION_SEED_MIN",
+    "CompletionSummary",
+    "DistributionBucket",
+    "SimulateRequest",
+    "SimulateResponse",
+    "SimulationHistoryItem",
+    "ThroughputReliability",
+]
 
 
 class SimulateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    throughput_samples: List[int]
-    include_zero_weeks: bool = False
+    throughput_samples: List[StrictInt]
+    include_zero_weeks: StrictBool = False
     mode: Literal["backlog_to_weeks", "weeks_to_items"]
-    backlog_size: Optional[int] = None
-    target_weeks: Optional[int] = None
-    n_sims: int = 20000
-    seed: Optional[int] = Field(default=None, ge=SIMULATION_SEED_MIN, le=SIMULATION_SEED_MAX)
-
-    @field_validator("throughput_samples")
-    @classmethod
-    def validate_throughput_samples(cls, value: List[int]) -> List[int]:
-        if not (
-            SIMULATION_THROUGHPUT_SAMPLES_MIN
-            <= len(value)
-            <= SIMULATION_THROUGHPUT_SAMPLES_MAX
-        ):
-            raise ValueError(
-                "throughput_samples doit contenir entre "
-                f"{SIMULATION_THROUGHPUT_SAMPLES_MIN} et "
-                f"{SIMULATION_THROUGHPUT_SAMPLES_MAX} valeurs."
-            )
-        return value
-
-    @field_validator("backlog_size")
-    @classmethod
-    def validate_backlog_size(cls, value: Optional[int]) -> Optional[int]:
-        if value is not None and not (
-            SIMULATION_BACKLOG_SIZE_MIN <= value <= SIMULATION_BACKLOG_SIZE_MAX
-        ):
-            raise ValueError(
-                "backlog_size doit etre compris entre "
-                f"{SIMULATION_BACKLOG_SIZE_MIN} et {SIMULATION_BACKLOG_SIZE_MAX}."
-            )
-        return value
-
-    @field_validator("target_weeks")
-    @classmethod
-    def validate_target_weeks(cls, value: Optional[int]) -> Optional[int]:
-        if value is not None and not (
-            SIMULATION_TARGET_WEEKS_MIN <= value <= SIMULATION_HORIZON_WEEKS_MAX
-        ):
-            raise ValueError(
-                "target_weeks doit etre compris entre "
-                f"{SIMULATION_TARGET_WEEKS_MIN} et {SIMULATION_HORIZON_WEEKS_MAX}."
-            )
-        return value
-
-    @field_validator("n_sims")
-    @classmethod
-    def validate_n_sims(cls, value: int) -> int:
-        if not SIMULATION_N_SIMS_MIN <= value <= SIMULATION_N_SIMS_MAX:
-            raise ValueError(
-                f"n_sims doit etre compris entre {SIMULATION_N_SIMS_MIN} et "
-                f"{SIMULATION_N_SIMS_MAX}."
-            )
-        return value
+    backlog_size: Optional[StrictInt] = None
+    target_weeks: Optional[StrictInt] = None
+    n_sims: StrictInt = 20000
+    seed: Optional[StrictInt] = None
 
     @model_validator(mode="after")
-    def validate_mode_requirements(self) -> "SimulateRequest":
-        if self.mode == "backlog_to_weeks" and self.backlog_size is None:
-            raise ValueError("backlog_size requis pour le mode backlog_to_weeks.")
-        if self.mode == "weeks_to_items" and self.target_weeks is None:
-            raise ValueError("target_weeks requis pour le mode weeks_to_items.")
+    def validate_domain_contract(self) -> "SimulateRequest":
+        try:
+            SimulationCommand.create(
+                throughput_samples=self.throughput_samples,
+                include_zero_weeks=self.include_zero_weeks,
+                mode=self.mode,
+                backlog_size=self.backlog_size,
+                target_weeks=self.target_weeks,
+                n_sims=self.n_sims,
+                seed=self.seed if self.seed is not None else SIMULATION_SEED_MIN,
+            )
+        except StatisticalValueError as exc:
+            if str(exc).startswith("Historique insuffisant"):
+                return self
+            raise
         return self
 
 
@@ -114,7 +76,7 @@ class SimulateResponse(BaseModel):
     completion_summary: Optional[CompletionSummary] = None
     samples_count: int
     throughput_reliability: ThroughputReliability
-    seed: int = Field(ge=SIMULATION_SEED_MIN, le=SIMULATION_SEED_MAX)
+    seed: int
 
 
 class SimulationHistoryItem(BaseModel):
@@ -130,4 +92,4 @@ class SimulationHistoryItem(BaseModel):
     completion_summary: Optional[CompletionSummary] = None
     include_zero_weeks: bool = False
     throughput_reliability: Optional[ThroughputReliability] = None
-    seed: Optional[int] = Field(default=None, ge=SIMULATION_SEED_MIN, le=SIMULATION_SEED_MAX)
+    seed: Optional[int] = None

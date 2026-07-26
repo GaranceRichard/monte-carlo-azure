@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import type { SimulationCommand } from "../domain/simulation";
+import { createSimulationCommand } from "../domain/simulation";
 import {
   simulateResponseDtoToResult,
   simulationCommandToDto,
   simulationHistoryItemDtoToModel,
 } from "./simulationMappers";
 
-const command: SimulationCommand = {
+const command = createSimulationCommand({
   throughputSamples: [0, 2, 4, 6, 8, 10],
   includeZeroWeeks: true,
   mode: "backlog_to_weeks",
@@ -14,7 +14,7 @@ const command: SimulationCommand = {
   targetWeeks: undefined,
   nSims: 20000,
   seed: 123456,
-};
+});
 
 describe("simulation HTTP mappers", () => {
   it("maps a business command to the unchanged public request DTO", () => {
@@ -37,11 +37,11 @@ describe("simulation HTTP mappers", () => {
       seed: 123456,
       result_percentiles: { P50: 8, P70: 10, P90: 13 },
       risk_score: 0.625,
-      result_distribution: [{ x: 8, count: 4 }],
+      result_distribution: [{ x: 8, count: 800 }],
       completion_summary: {
-        completed_count: 4,
-        censored_count: 2,
-        censored_rate: 0.3333,
+        completed_count: 800,
+        censored_count: 200,
+        censored_rate: 0.2,
         horizon_weeks: 521,
       },
       throughput_reliability: {
@@ -51,17 +51,17 @@ describe("simulation HTTP mappers", () => {
         label: "fiable",
         samples_count: 6,
       },
-    })).toEqual({
+    }, 1000)).toEqual({
       resultKind: "weeks",
       samplesCount: 6,
       seed: 123456,
       resultPercentiles: { P50: 8, P70: 10, P90: 13 },
       riskScore: 0.625,
-      resultDistribution: [{ x: 8, count: 4 }],
+      resultDistribution: [{ x: 8, count: 800 }],
       completionSummary: {
-        completedCount: 4,
-        censoredCount: 2,
-        censoredRate: 0.3333,
+        completedCount: 800,
+        censoredCount: 200,
+        censoredRate: 0.2,
         horizonWeeks: 521,
       },
       throughputReliability: {
@@ -80,8 +80,8 @@ describe("simulation HTTP mappers", () => {
       samples_count: 6,
       seed: 7,
       result_percentiles: { P50: 30 },
-      result_distribution: [],
-    });
+      result_distribution: [{ x: 30, count: 1000 }],
+    }, 1000);
     const history = simulationHistoryItemDtoToModel({
       created_at: "2026-02-26T10:00:00Z",
       last_seen: "2026-02-26T10:00:00Z",
@@ -89,7 +89,7 @@ describe("simulation HTTP mappers", () => {
       n_sims: 20000,
       samples_count: 6,
       percentiles: { P50: 30 },
-      distribution: [],
+      distribution: [{ x: 30, count: 20000 }],
     });
     const completeHistory = simulationHistoryItemDtoToModel({
       created_at: "2026-02-27T10:00:00Z",
@@ -101,11 +101,11 @@ describe("simulation HTTP mappers", () => {
       n_sims: 20000,
       samples_count: 6,
       percentiles: { P50: 8, P70: 10, P90: 13 },
-      distribution: [{ x: 8, count: 4 }],
+      distribution: [{ x: 8, count: 18000 }],
       completion_summary: {
-        completed_count: 4,
-        censored_count: 2,
-        censored_rate: 0.3333,
+        completed_count: 18000,
+        censored_count: 2000,
+        censored_rate: 0.1,
         horizon_weeks: 521,
       },
       include_zero_weeks: true,
@@ -129,8 +129,49 @@ describe("simulation HTTP mappers", () => {
       backlogSize: 80,
       targetWeeks: null,
       includeZeroWeeks: true,
-      completionSummary: { completedCount: 4, censoredCount: 2 },
+      completionSummary: { completedCount: 18000, censoredCount: 2000 },
       throughputReliability: { iqrRatio: 0.3, samplesCount: 6 },
     });
+  });
+
+  it("derives a response mass when needed and rejects completion in the wrong mode", () => {
+    expect(simulateResponseDtoToResult({
+      result_kind: "items",
+      samples_count: 6,
+      seed: 7,
+      result_percentiles: { P50: 30 },
+      result_distribution: [{ x: 30, count: 1000 }],
+    }).resultDistribution).toEqual([{ x: 30, count: 1000 }]);
+
+    expect(() => simulateResponseDtoToResult({
+      result_kind: "weeks",
+      samples_count: 6,
+      seed: 7,
+      result_percentiles: {},
+      result_distribution: [{ x: 30, count: 1000 }],
+    }, 1000)).toThrow("completion_summary est requis");
+    expect(() => simulateResponseDtoToResult({
+      result_kind: "items",
+      samples_count: 6,
+      seed: 7,
+      result_percentiles: { P50: 30 },
+      result_distribution: [{ x: 30, count: 1000 }],
+      completion_summary: {
+        completed_count: 1000,
+        censored_count: 0,
+        censored_rate: 0,
+        horizon_weeks: 521,
+      },
+    }, 1000)).toThrow("completion_summary est interdit");
+
+    expect(() => simulationHistoryItemDtoToModel({
+      created_at: "2026-02-26T10:00:00Z",
+      last_seen: "2026-02-26T10:00:00Z",
+      mode: "weeks_to_items",
+      n_sims: 1000,
+      samples_count: 6,
+      percentiles: { P50: 30 },
+      distribution: [{ x: 30, count: 999 }],
+    })).toThrow("masse totale");
   });
 });

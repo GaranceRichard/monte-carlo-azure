@@ -5,38 +5,50 @@ from backend.simulation_mappers import (
     result_to_response,
 )
 from backend.simulation_models import (
-    CompletionSummary,
-    HistogramBucket,
     SimulationResult,
+)
+from backend.simulation_value_objects import (
+    CompletionSummary,
+    Histogram,
+    SimulationCount,
+    SimulationPercentiles,
+    SimulationSeed,
     ThroughputReliability,
 )
 
 
 def _result(*, with_optional_values: bool = True) -> SimulationResult:
+    mode = "backlog_to_weeks" if with_optional_values else "weeks_to_items"
+    percentiles = (
+        {"P50": 8, "P70": 10, "P90": 13}
+        if with_optional_values
+        else {"P70": 10}
+    )
     return SimulationResult(
-        result_kind="weeks",
-        result_percentiles={"P50": 8, "P70": 10, "P90": 13},
-        risk_score=0.625 if with_optional_values else None,
-        result_distribution=(HistogramBucket(x=8, count=4),),
+        result_kind="weeks" if with_optional_values else "items",
+        result_percentiles=SimulationPercentiles.create(mode, percentiles),
+        result_distribution=Histogram.create(
+            [{"x": 8, "count": 800 if with_optional_values else 4}],
+            expected_mass=800 if with_optional_values else 4,
+        ),
         completion_summary=(
-            CompletionSummary(
-                completed_count=4,
-                censored_count=2,
-                censored_rate=0.3333,
-                horizon_weeks=521,
+            CompletionSummary.create(
+                completed_count=800,
+                censored_count=200,
+                n_sims=SimulationCount(1000),
             )
             if with_optional_values
             else None
         ),
         samples_count=6,
-        throughput_reliability=ThroughputReliability(
+        throughput_reliability=ThroughputReliability.create(
             cv=0.2,
             iqr_ratio=0.3,
             slope_norm=-0.02,
             label="fiable",
             samples_count=6,
         ),
-        seed=123,
+        seed=SimulationSeed(123),
     )
 
 
@@ -51,11 +63,12 @@ def test_request_to_command_resolves_transport_values_and_seed():
 
     command = request_to_command(request, 98765)
 
-    assert command.throughput_samples == (0, 1, 2, 3, 4, 5)
+    assert command.throughput_samples.raw_values == (0, 1, 2, 3, 4, 5)
     assert command.include_zero_weeks is True
-    assert command.backlog_size == 20
+    assert command.backlog_size is not None
+    assert command.backlog_size.value == 20
     assert command.target_weeks is None
-    assert command.seed == 98765
+    assert command.seed.value == 98765
 
 
 def test_result_to_response_preserves_public_json_and_omits_none_values():
@@ -64,11 +77,11 @@ def test_result_to_response_preserves_public_json_and_omits_none_values():
         "result_kind": "weeks",
         "result_percentiles": {"P50": 8, "P70": 10, "P90": 13},
         "risk_score": 0.625,
-        "result_distribution": [{"x": 8, "count": 4}],
+        "result_distribution": [{"x": 8, "count": 800}],
         "completion_summary": {
-            "completed_count": 4,
-            "censored_count": 2,
-            "censored_rate": 0.3333,
+            "completed_count": 800,
+            "censored_count": 200,
+            "censored_rate": 0.2,
             "horizon_weeks": 521,
         },
         "samples_count": 6,
