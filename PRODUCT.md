@@ -17,6 +17,19 @@ Le produit s'adresse en priorité à :
 
 Le produit ne remplace pas le jugement managérial. Il rend l'incertitude visible, mesurable et actionnable.
 
+Son positionnement distingue trois horizons :
+
+- la **simulation ponctuelle**, capacité actuelle, répond à une question de délai ou de capacité avec les
+  données disponibles au moment du calcul ;
+- l'**audit rétrospectif**, orientation stratégique future, reconstruira plusieurs dates d'observation d'une
+  livraison passée, rejouera chaque prévision avec les seules données alors disponibles et confrontera sa
+  trajectoire de crédibilité au résultat réel ;
+- le **monitoring continu**, la collecte permanente et les alertes en temps réel restent hors cible actuelle.
+
+L'audit rétrospectif devra éviter toute fuite d'information future et diagnostiquer stabilité, volatilité,
+dérive, rupture, délai de détection, faux signaux, robustesse et calibration. Il constitue une orientation
+du backlog et non une capacité actuellement livrée.
+
 Trois dimensions métier restent distinctes :
 
 - la qualité des données qualifie la profondeur historique, la complétude et les collectes Azure DevOps partielles ;
@@ -78,8 +91,9 @@ Fonctionnalités actuellement présentes dans le produit :
 - en `backlog_to_weeks`, les censures à l'horizon sont explicites et lues à part
 - export CSV du throughput hebdomadaire
 - historique local des simulations récentes, contextualisé par équipe dans le navigateur
-- cookie client `IDMontecarlo` pour relier un client anonyme à son historique persisté
-- persistance MongoDB et restitution des 10 dernières simulations statistiques anonymes via `/simulations/history`
+- cookie client `IDMontecarlo` pour relier un identifiant pseudonyme à son historique persisté
+- persistance MongoDB minimisée et restitution des 10 dernières simulations statistiques via
+  `/simulations/history`
 - configuration rapide des filtres types + états, mémorisée localement
 - mode `Portefeuille` multi-équipes
 - rapport PDF portefeuille avec synthèse décisionnelle et pages détaillées
@@ -231,8 +245,8 @@ Principe non négociable :
 
 - le PAT Azure DevOps est utilisé uniquement dans le navigateur
 - aucune donnée d'identification Azure DevOps ne doit transiter par le backend
-- le backend ne reçoit que des données anonymisées de throughput et des paramètres de simulation
-- `mc_client_id` est un identifiant anonyme et non dérivé du contexte Azure DevOps
+- le backend ne reçoit que les données de throughput minimisées nécessaires et les paramètres de simulation
+- `mc_client_id` est un identifiant pseudonyme et non dérivé du contexte Azure DevOps
 
 Cette frontière d'identité est un invariant produit autant qu'un invariant d'architecture.
 Elle est protégée par des contrôles CI dédiés.
@@ -246,6 +260,7 @@ Monte Carlo Azure :
 - ne remplace pas la décision humaine
 - ne promet pas un résultat certain
 - explicite une probabilité plutôt qu'un engagement artificiellement précis
+- n'assure ni monitoring continu, ni collecte permanente, ni alertes en temps réel
 
 ## Indicateurs de pilotage
 
@@ -286,6 +301,8 @@ La trajectoire produit est claire :
 - passer d'un outil équipe à un outil portefeuille robuste
 - mieux soutenir les arbitrages de direction
 - rendre les hypothèses de simulation plus lisibles et plus gouvernables
+- prévoir une livraison puis évaluer rétrospectivement, sans fuite d'information future, comment la
+  crédibilité de cette prévision évoluait
 - conserver une architecture stricte où l'identité Azure DevOps reste côté navigateur
 
 ## Résumé exécutif

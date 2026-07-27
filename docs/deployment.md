@@ -113,7 +113,7 @@ python Scripts/scrub_simulation_identity.py --apply
 
 - le mode par défaut est `dry-run`
 - `--apply` exécute le `$unset`
-- `mc_client_id` reste un identifiant anonyme non dérivé du contexte Azure DevOps
+- `mc_client_id` reste un identifiant pseudonyme non dérivé du contexte Azure DevOps
 
 ### 7) Cron de purge
 

@@ -1,8 +1,8 @@
 # Frontend Monte Carlo Azure
 
 Frontend React + Vite de Monte Carlo Azure.
-Cette application appelle Azure DevOps directement depuis le navigateur, puis envoie uniquement des
-données anonymisées de throughput au backend FastAPI pour la simulation.
+Cette application appelle Azure DevOps directement depuis le navigateur, puis envoie uniquement les
+données de throughput minimisées nécessaires au backend FastAPI pour la simulation.
 
 ## Azure DevOps Cloud et on-prem
 
@@ -149,7 +149,8 @@ Le frontend couvre notamment :
 
 - le `PAT` Azure DevOps reste côté navigateur
 - aucun appel frontend ne doit envoyer de secret Azure DevOps au backend
-- les appels backend concernent uniquement la simulation statistique et l’historique anonyme
+- les appels backend concernent uniquement la simulation statistique et l’historique minimisé relié à un
+  identifiant pseudonyme
 - `POST /simulate` n’envoie jamais `selectedOrg`, `selectedProject`, `selectedTeam`, `startDate`, `endDate`,
   `types`, `doneStates`, `pat` ou `serverUrl`
 

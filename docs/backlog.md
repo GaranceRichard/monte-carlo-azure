@@ -178,28 +178,32 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 | 8.13 | Matérialiser les limites de sprint dans les graphiques et rapports | L | Sol Élevé | |
 | 8.14 | Qualifier les prérequis de stabilité du flux avant prévision | L | Sol Très élevé | |
 
-## Feature 9 — Éprouver les prévisions face au temps et aux résultats réels
+## Feature 9 — Rejouer les prévisions dans le temps et les calibrer
 
-**Description :** comparer les projections aux résultats observés et détecter les changements de comportement qui rendent un historique moins représentatif.
+**Description :** reconstruire les états historiques d’une livraison passée, rejouer les prévisions à
+plusieurs dates d’observation sans fuite d’information future et confronter leur trajectoire de crédibilité
+au résultat réel.
 
-**Flux de valeur :** distinguer une prévision techniquement calculable d’une méthode empiriquement crédible pour soutenir une décision.
+**Flux de valeur :** distinguer une simulation ponctuelle techniquement calculable d’une méthode
+empiriquement calibrée pour soutenir une décision.
 
 **Attendus détaillés :** [`backlog-expectations/feature-09-forecast-calibration.md`](backlog-expectations/feature-09-forecast-calibration.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
-| 9.1 | Définir le protocole de calibration et de backtesting | M | Sol Très élevé | |
-| 9.2 | Construire les couples prévision–résultat observé | L | Sol Très élevé | |
-| 9.3 | Mesurer la couverture empirique des percentiles | L | Sol Très élevé | |
-| 9.4 | Comparer la crédibilité des différentes fenêtres historiques | L | Sol Très élevé | |
-| 9.5 | Détecter les tendances et ruptures de régime | L | Sol Très élevé | |
-| 9.6 | Détecter la saisonnalité et l’obsolescence de l’historique | L | Sol Très élevé | |
-| 9.7 | Restituer les diagnostics de calibration et de non-stationnarité | L | Sol Élevé | |
-| 9.8 | Calibrer, renommer ou retirer le Risk Score | L | Sol Très élevé | |
+| 9.1 | Définir le protocole de backtesting sans fuite d’information future | M | Sol Très élevé | |
+| 9.2 | Reconstruire les états historiques et les points de rejeu | L | Sol Très élevé | |
+| 9.3 | Rejouer les prévisions et construire la trajectoire de crédibilité | L | Sol Très élevé | |
+| 9.4 | Confronter les prévisions aux résultats observés | L | Sol Très élevé | |
+| 9.5 | Diagnostiquer stabilité, volatilité, dérive et rupture | L | Sol Très élevé | |
+| 9.6 | Mesurer délai de détection, faux signaux et robustesse | L | Sol Très élevé | |
+| 9.7 | Calibrer les percentiles et comparer les fenêtres historiques | L | Sol Très élevé | |
+| 9.8 | Formaliser la synthèse métier et décider empiriquement du Risk Score | L | Sol Très élevé | |
 
-## Feature 10 — Fiabiliser l’expérience de simulation et les restitutions
+## Feature 10 — Concevoir l’expérience de simulation et ses restitutions
 
-**Description :** séparer les responsabilités frontend et PDF, fiabiliser l’état des simulations et garantir une présentation cohérente sur tous les supports.
+**Description :** porter la configuration, la progression visible, l’historique, la comparaison et les
+restitutions UI, PDF et export, tout en fiabilisant le cache local et l’état de l’expérience.
 
 **Flux de valeur :** empêcher l’affichage ou l’export de résultats devenus incohérents et permettre au décideur de retrouver la même information dans l’interface et dans les rapports.
 
@@ -207,20 +211,21 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
-| 10.1 | Cartographier et séparer les responsabilités d’état frontend | M | Sol Très élevé | |
-| 10.2 | Extraire l’acquisition et l’orchestration des simulations | L | Sol Très élevé | |
+| 10.1 | Structurer la configuration et l’état de l’expérience | M | Sol Très élevé | |
+| 10.2 | Orchestrer le lancement et la progression visible | L | Sol Très élevé | |
 | 10.3 | Isoler le cache, l’historique local et les migrations | L | Sol Très élevé | |
-| 10.4 | Sécuriser invalidation, rechargement et rejeu par seed | M | Sol Très élevé | |
-| 10.5 | Définir le modèle de données commun des rapports | M | Sol Élevé | |
-| 10.6 | Séparer diagnostics, graphiques et mise en page | L | Sol Élevé | |
-| 10.7 | Séparer pagination, rendu PDF et téléchargement | L | Sol Élevé | |
-| 10.8 | Sécuriser les artefacts et les échecs partiels de génération | M | Sol Très élevé | |
+| 10.4 | Sécuriser invalidation, rechargement, comparaison et rejeu par seed | M | Sol Très élevé | |
+| 10.5 | Définir le modèle commun des restitutions UI, PDF et export | M | Sol Élevé | |
+| 10.6 | Séparer diagnostics, graphiques et mise en page des restitutions | L | Sol Élevé | |
+| 10.7 | Séparer pagination, rendu PDF, export et téléchargement | L | Sol Élevé | |
+| 10.8 | Sécuriser les artefacts et les échecs partiels de restitution | M | Sol Très élevé | |
 | 10.9 | Harmoniser les formulations et conventions visuelles UI/PDF | M | Sol Medium | |
 | 10.10 | Auditer et découper les composants frontend à responsabilités multiples | L | Sol Très élevé | |
 
-## Feature 11 — Faire passer la solution à l’échelle
+## Feature 11 — Exécuter les traitements coûteux à l’échelle
 
-**Description :** définir les objectifs de charge, instrumenter le produit et faire évoluer son exécution pour supporter davantage de concurrence, de volume et de traitements longs.
+**Description :** mesurer la charge des audits et autres traitements longs, décider empiriquement du
+passage interactif ou asynchrone et maîtriser jobs, workers, progression, reprise et ressources.
 
 **Flux de valeur :** soutenir une utilisation croissante avec des SLO, une consommation de ressources, une dégradation et des coûts explicitement maîtrisés.
 
@@ -228,13 +233,13 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
-| 11.1 | Définir les volumes cibles, la concurrence et les SLO | M | Sol Élevé | |
-| 11.2 | Construire le dispositif de tests de charge | L | Sol Très élevé | |
-| 11.3 | Caractériser la montée en charge des workers et de la mémoire | L | Sol Très élevé | |
-| 11.4 | Valider Redis et MongoDB en fonctionnement multi-worker | M | Sol Très élevé | |
-| 11.5 | Concevoir le traitement asynchrone et l’annulation des calculs longs | L | Sol Très élevé | |
-| 11.6 | Mettre en place une exécution distribuable et stateless | L | Sol Ultra | |
-| 11.7 | Ajouter l’observabilité et le suivi des coûts de scalabilité | L | Sol Très élevé | |
+| 11.1 | Modéliser la charge conceptuelle et les enveloppes à mesurer | M | Sol Élevé | |
+| 11.2 | Benchmarker les exécutions interactives et asynchrones | L | Sol Très élevé | |
+| 11.3 | Décider le seuil interactif ou asynchrone à partir des mesures | L | Sol Très élevé | |
+| 11.4 | Persister de façon minimisée les jobs et résultats agrégés | M | Sol Très élevé | |
+| 11.5 | Gérer jobs, progression, annulation et reprise | L | Sol Très élevé | |
+| 11.6 | Mettre en place des workers distribuables et maîtrisés | L | Sol Ultra | |
+| 11.7 | Observer les traitements, ressources et coûts | L | Sol Très élevé | |
 | 11.8 | Valider charge nominale, pointe, endurance et reprise | L | Sol Très élevé | |
 
 ## Feature 12 — Étendre le produit au pilotage de programme
@@ -288,8 +293,8 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 | ---: | --- | :---: | :---: | :---: |
 | 14.1 | Décider de l’ambition, du modèle de diffusion et de la pérennité du produit | S | Sol Medium | |
 | 14.2 | Définir les segments utilisateurs et organisations prioritaires | M | Sol Medium | |
-| 14.3 | Formaliser les différenciateurs et les preuves de valeur | M | Sol Medium | |
-| 14.4 | Recentrer le README et la démo sur la proposition de valeur | M | Sol Élevé | |
+| 14.3 | Formaliser les différenciateurs futurs et les preuves de valeur | M | Sol Medium | |
+| 14.4 | Recentrer le README et la démo sur la proposition de valeur actuelle et future | M | Sol Élevé | |
 | 14.5 | Cartographier les freins du parcours d’adoption réel | M | Sol Medium | |
 | 14.6 | Étudier et décider le modèle d’authentification Azure DevOps | M | Sol Très élevé | |
 | 14.7 | Évaluer et décider une distribution Azure DevOps Marketplace | M | Sol Élevé | |
@@ -307,9 +312,9 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 | 6 — Mesurer la qualité réelle et les limites opérationnelles | 8 | 0 | 8 |
 | 7 — Établir une architecture applicative évolutive | 13 | 0 | 13 |
 | 8 — Fiabiliser les données Azure DevOps et matérialiser les sprints | 14 | 0 | 14 |
-| 9 — Éprouver les prévisions face au temps et aux résultats réels | 8 | 0 | 8 |
-| 10 — Fiabiliser l’expérience de simulation et les restitutions | 10 | 0 | 10 |
-| 11 — Faire passer la solution à l’échelle | 8 | 0 | 8 |
+| 9 — Rejouer les prévisions dans le temps et les calibrer | 8 | 0 | 8 |
+| 10 — Concevoir l’expérience de simulation et ses restitutions | 10 | 0 | 10 |
+| 11 — Exécuter les traitements coûteux à l’échelle | 8 | 0 | 8 |
 | 12 — Étendre le produit au pilotage de programme | 7 | 0 | 7 |
 | 13 — Rationaliser le dispositif de gouvernance technique | 10 | 0 | 10 |
 | 14 — Clarifier la stratégie de diffusion et réduire la friction d’adoption | 9 | 0 | 9 |

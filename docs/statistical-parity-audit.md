@@ -179,7 +179,7 @@ différents lorsque `demoMode` change.
 
 - frontend : collecte ADO, semaines complètes, Cycle Time, scénarios portefeuille, diagnostics, courbes,
   lissage, historique contextualisé, UI et PDF;
-- backend : rate limit, timeout, génération cryptographique serveur de seed, persistance Mongo anonyme et
+- backend : rate limit, timeout, génération cryptographique serveur de seed, persistance Mongo minimisée et
   historique serveur;
 - non comparable : un diagnostic ou une transformation de présentation n'est pas un équivalent du moteur
   NumPy simplement parce qu'il contient une moyenne, une pente ou un percentile.
@@ -292,7 +292,7 @@ pas un travail réalisé pendant l'audit.
 | ST-36 | `single_engine_by_design` | `none` | `CODE/TEST` : probabilité « au moins » décroissante pour items. | Restitution frontend. | Corpus de présentation. | 2.2, 2.6 |
 | ST-37 | `single_engine_by_design` | `moderate` | `CODE` : anciens percentiles ascendants recalculés depuis les buckets. | Histogramme agrégé legacy peut rendre le recalcul approximatif. | Séparer migration DTO et règle métier. | 2.2, 2.3, 2.6 |
 | ST-38 | `equivalent_demonstrated` | `none` | `CODE/TEST` : une valeur réellement `undefined`/`None` est omise sur le wire; summary présent seulement backlog. ST-24 traite séparément le calcul local d'un score `0` quand P90 manque. | Mécanisme d'omission compatible; prérequis de calcul non équivalent. | Conserver l'omission dans le contrat consommateur. | 2.2, 2.3, 2.8 |
-| ST-39 | `single_engine_by_design` | `none` | `CODE/TEST` : Mongo persiste percentiles, distribution, censure, fiabilité, seed; pas le score. | Historique serveur anonymisé distinct du local. | Clarifier DTO de persistance. | 2.3, 2.6 |
+| ST-39 | `single_engine_by_design` | `none` | `CODE/TEST` : Mongo persiste percentiles, distribution, censure, fiabilité, seed; pas le score. | Historique serveur minimisé et relié à un identifiant pseudonyme, distinct du local. | Clarifier DTO de persistance. | 2.3, 2.6 |
 | ST-40 | `single_engine_by_design` | `none` | `CODE/TEST` : historique local garde contexte, résultat et seed, puis rejoue. | Responsabilité navigateur attendue. | Clarifier modèle métier/DTO. | 2.3, 2.5, 2.6 |
 | ST-41 | `single_engine_by_design` | `high` | `CODE/TEST` : semaines lundi-dimanche complètes, zéros matérialisés, dates partielles écartées. | L'échantillon conditionne toute décision mais ne doit pas être porté au backend. | Exclure de la parité moteur, référencer les entrées. | 2.2, 2.6; Feature 8 pour qualité temporelle |
 | ST-42 | `single_engine_by_design` | `high` | `EXP` : équipes constantes 10/5/2 donnent scénario indépendant 17. | Hypothèse de capacité portefeuille. | Formaliser la responsabilité, sans créer d'équivalent Python. | 2.2, 2.4, 2.6 |
@@ -477,7 +477,7 @@ afin de distinguer « responsabilité unique » de « deux implémentations volo
 
 - collecte ADO et construction des semaines complètes, imposées par la frontière d'identité navigateur;
 - génération cryptographique serveur, rate limiting, timeout et persistance Mongo;
-- historique local contextualisé et historique serveur anonyme;
+- historique local contextualisé et historique serveur minimisé, relié à un identifiant pseudonyme;
 - courbes de probabilité, lissage, UI et rapports;
 - préparation des scénarios portefeuille et diagnostic comparatif.
 

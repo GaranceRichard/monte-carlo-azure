@@ -45,7 +45,8 @@ Les contrats de communication inter-modules doivent :
 - interdire le partage direct d’état mutable ;
 - définir les responsabilités transactionnelles ;
 - documenter les règles d’évolution et de compatibilité des contrats internes ;
-- conserver les données Azure DevOps contextualisées dans le navigateur et les données statistiques anonymes à la frontière backend.
+- conserver les données Azure DevOps contextualisées dans le navigateur et limiter la frontière backend aux
+  données statistiques minimisées.
 
 ## Résultat attendu du PBI 7.11
 
@@ -80,7 +81,7 @@ Les contrats des ports et adaptateurs doivent être prouvés par :
 
 ## Résultat attendu du PBI 7.9
 
-- objet-frontière typé limité aux données statistiques anonymes ;
+- objet-frontière typé limité aux données statistiques minimisées ;
 - contrats dédiés aux données autorisées vers le backend ;
 - interdiction architecturale des dépendances entre contexte ADO et moteur backend ;
 - tests négatifs de contrat ;

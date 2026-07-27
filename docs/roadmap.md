@@ -52,14 +52,20 @@ contexte d’itération, tout en conservant des définitions et des sources dist
 *Valeur : replacer les variations observées dans leur contexte opérationnel sans transformer une
 coïncidence temporelle en relation de causalité.*
 
-**Robustesse statistique et crédibilité des hypothèses**
+**Audit rétrospectif des prévisions**
 
-Outiller progressivement la calibration et le backtesting des hypothèses de prévision et d’agrégation
-portefeuille. Ces travaux doivent éprouver les hypothèses face aux observations, sans transformer la
-stabilité d’une distribution en preuve ni sélectionner automatiquement un scénario.
+Préparer une capacité future de backtesting qui, pour une livraison passée, reconstruit plusieurs dates
+d'observation, n'utilise à chacune que les données alors disponibles, rejoue la prévision et confronte sa
+trajectoire de crédibilité au résultat réel. Le protocole devra prévenir toute fuite d'information future
+et mesurer stabilité, volatilité, dérive, rupture, délai de détection, faux signaux, robustesse et
+calibration des percentiles et fenêtres.
 
-*Valeur : distinguer une projection calculable d’une hypothèse suffisamment étayée pour soutenir une
-décision.*
+Cette orientation ne décrit pas une fonctionnalité déjà livrée : le produit actuel reste une simulation
+ponctuelle. Elle doit éprouver les hypothèses face aux observations sans transformer la stabilité d'une
+distribution en preuve ni sélectionner automatiquement un scénario.
+
+*Valeur : prévoir une livraison puis vérifier rétrospectivement si la crédibilité affichée soutenait
+réellement la décision.*
 
 **Socle de maintenabilité vérifiable**
 
@@ -131,3 +137,4 @@ limites des données visibles.*
 - gestion de backlog : l’outil lit Azure DevOps, il ne le remplace pas ;
 - estimation par story points : le modèle repose intentionnellement sur le throughput réel ;
 - garantie de résultat : l’outil structure l’incertitude, il ne l’élimine pas.
+- monitoring continu, collecte permanente et alertes en temps réel.

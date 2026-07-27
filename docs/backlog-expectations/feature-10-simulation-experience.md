@@ -1,10 +1,42 @@
-# Feature 10 — Fiabiliser l’expérience de simulation et les restitutions
+# Feature 10 — Concevoir l’expérience de simulation et ses restitutions
 
-**Description :** séparer les responsabilités frontend et PDF, fiabiliser l’état des simulations et garantir une présentation cohérente sur tous les supports.
+**Description :** porter la configuration, la progression visible, l’historique, la comparaison et les
+restitutions UI, PDF et export, tout en fiabilisant le cache local et l’état de l’expérience.
 
 **Flux de valeur :** empêcher l’affichage ou l’export de résultats devenus incohérents et permettre au décideur de retrouver la même information dans l’interface et dans les rapports.
 
 **Backlog :** [`../backlog.md`](../backlog.md)
+
+## Périmètre
+
+La Feature 10 porte :
+
+- la configuration d'une simulation ponctuelle ou d'un futur audit rétrospectif ;
+- la progression présentée à l'utilisateur, quel que soit le mode d'exécution ;
+- l'historique local, la comparaison des exécutions et le rejeu par seed ;
+- les restitutions UI, PDF et export ;
+- le cache local et ses migrations.
+
+Elle ne porte ni le protocole de backtesting et de calibration de la Feature 9, ni l'infrastructure de jobs,
+workers, annulation et reprise de la Feature 11.
+
+## Cache local
+
+Pour l'audit rétrospectif futur, la clé conceptuelle du cache est :
+
+```text
+empreinte des données + paramètres + seed + version moteur + version contrat statistique
+```
+
+Une entrée n'est réutilisable que si ces cinq dimensions sont identiques. La configuration affichée,
+l'historique et les comparaisons doivent conserver les informations nécessaires pour expliquer une
+invalidation ou une réutilisation.
+
+## Restitution de l'audit futur
+
+L'expérience devra rendre lisibles les points de rejeu, la trajectoire de crédibilité, la confrontation au
+résultat réel, les diagnostics temporels et la calibration sans les présenter comme une surveillance en
+temps réel. Une progression UI n'implique pas à elle seule une exécution asynchrone.
 
 ## Résultat attendu du PBI 10.10
 

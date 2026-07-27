@@ -31,3 +31,14 @@ Les contrôles de sécurité, de contrat, de parité statistique et de protectio
 - définir un processus contrôlé de mise à jour du miroir depuis l’image amont ;
 - distinguer explicitement les échecs de récupération d’image, de démarrage du service et de tests backend ;
 - ne modifier ni le comportement MongoDB attendu, ni les tests produit, ni les seuils de qualité.
+
+## Statut vérifié du PBI 13.10
+
+Le PBI reste **non réalisé** au 27/07/2026 :
+
+- `.github/workflows/ci.yml` référence encore directement `mongo:7` pour le service MongoDB ;
+- le commit `e1d64b6948105359533fec4ef915a4d9c25f0a60` du 26/07/2026 ajoute le PBI au backlog ;
+- le commit `73258201936afa435d0ba62d86371689218b4f15` du 26/07/2026 ajoute uniquement les attendus ci-dessus.
+
+Ces preuves documentent le besoin mais ne démontrent ni miroir GHCR, ni référence par digest immuable, ni
+processus de mise à jour livré.

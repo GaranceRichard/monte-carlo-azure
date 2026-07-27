@@ -2,7 +2,8 @@
 
 [![CI](https://github.com/GaranceRichard/monte-carlo-azure/actions/workflows/ci.yml/badge.svg)](https://github.com/GaranceRichard/monte-carlo-azure/actions/workflows/ci.yml)
 
-Outil de prévision basé sur une simulation Monte Carlo. L'application aide à transformer un historique Azure DevOps en projection probabiliste, sans exposer le PAT Azure DevOps au backend.
+Outil d'aide à la décision basé sur une simulation Monte Carlo. L'application transforme un historique
+Azure DevOps en projection probabiliste ponctuelle, sans exposer le PAT Azure DevOps au backend.
 
 Démo GitHub Pages:
 
@@ -12,7 +13,21 @@ Démo GitHub Pages:
 
 - cible: directeur de projet, PMO, responsables delivery et portefeuille
 - usage: sécuriser une date, arbitrer un périmètre, dimensionner une capacité, expliciter un niveau de risque
-- principe clé: le frontend appelle Azure DevOps directement; le backend ne reçoit que des données anonymisées de throughput
+- principe clé: le frontend appelle Azure DevOps directement; le backend ne reçoit que les données de
+  throughput minimisées nécessaires au calcul
+
+## Positionnement produit
+
+- **Capacité actuelle — simulation ponctuelle :** produire une projection à partir des données disponibles
+  au moment du calcul pour arbitrer délai, capacité et périmètre.
+- **Orientation stratégique future — audit rétrospectif :** pour une livraison passée, reconstruire plusieurs
+  dates d'observation, n'utiliser à chacune que les données alors disponibles, rejouer la prévision et
+  confronter sa trajectoire de crédibilité au résultat réel, sans fuite d'information future.
+- **Hors cible actuelle :** monitoring continu, collecte permanente et alertes en temps réel.
+
+Le différenciateur visé est de pouvoir prévoir une livraison, puis vérifier rétrospectivement comment la
+crédibilité de cette prévision évoluait à mesure que de nouvelles observations devenaient disponibles.
+Cette capacité de backtesting et de calibration est inscrite au backlog ; elle n'est pas encore livrée.
 
 ## Parcours de lecture
 
@@ -118,8 +133,9 @@ Démo GitHub Pages:
 - export CSV du throughput hebdomadaire
 - téléchargement direct du rapport PDF simulation sans fenêtre intermédiaire
 - historique local des dernières simulations, contextualisé par équipe dans le navigateur
-- cookie client `IDMontecarlo` pour relier un client anonyme à ses simulations persistées
-- persistance MongoDB des simulations statistiques anonymes et restitution des 10 dernières via `/simulations/history`
+- cookie client `IDMontecarlo` pour relier un identifiant pseudonyme à ses simulations persistées
+- persistance MongoDB minimisée des simulations statistiques et restitution des 10 dernières via
+  `/simulations/history`
 - configuration rapide des filtres (types + états) mémorisée localement
 - rapport portefeuille PDF direct avec progression et tolérance aux échecs partiels
 - page PDF « Comparaison des hypothèses » placée après la synthèse et avant le détail des scénarios
@@ -293,8 +309,9 @@ Frontière d'identité Azure DevOps :
 
 - le navigateur conserve le `PAT`, l'URL serveur, l'organisation, le projet, l'équipe, la période, les types, les états `Done`, l'historique hebdomadaire brut, le cycle time brut en jours calendaires et l'historique utilisateur contextualisé
 - `POST /simulate` transmet uniquement `throughput_samples`, `include_zero_weeks`, `mode`, `backlog_size`, `target_weeks`, `n_sims` et un `seed` optionnel
-- MongoDB ne persiste que `mc_client_id`, `created_at`, `last_seen`, les paramètres Monte Carlo et les résultats statistiques anonymes
-- `mc_client_id` est un identifiant anonyme non dérivé d'Azure DevOps
+- MongoDB ne persiste que `mc_client_id`, `created_at`, `last_seen`, les paramètres Monte Carlo et les
+  résultats statistiques minimisés
+- `mc_client_id` est un identifiant pseudonyme non dérivé d'Azure DevOps
 - `Scripts/check_identity_boundary.py` bloque en CI toute réintroduction d'un champ Azure DevOps dans le payload de simulation, les modèles backend, la persistance Mongo, l'historique serveur, les proxies locaux ou les appels Azure DevOps côté backend
 - les exécutions Pytest lancées par la couverture VS Code utilisent un temporaire isolé dans le workspace ;
   elles ne dépendent pas du répertoire temporaire global de l’utilisateur

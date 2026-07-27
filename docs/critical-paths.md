@@ -35,7 +35,8 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   `POST /simulate`, persistance MongoDB.
 - **Préconditions** : un PAT et un contexte organisation/projet/équipe sont présents dans le navigateur.
 - **Étapes principales** : le navigateur collecte le throughput directement auprès d'Azure DevOps; le service
-  construit un payload statistique; le backend valide, calcule et persiste uniquement les données anonymes.
+  construit un payload statistique minimisé; le backend valide, calcule et persiste uniquement les données
+  nécessaires.
 - **Résultat attendu** : aucun PAT, URL serveur ou contexte Azure DevOps ne franchit la frontière backend.
 - **Risques associés** : `RISK-001`.
 - **Niveaux actuellement mobilisés** : contrôles statiques de dépôt, tests unitaires des constructeurs de
@@ -49,7 +50,7 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
 
 ### CP-002 — Cookie `IDMontecarlo`
 
-- **Objectif** : conserver un identifiant anonyme pour l'historique backend sans l'envoyer à Azure DevOps.
+- **Objectif** : conserver un identifiant pseudonyme pour l'historique backend sans l'envoyer à Azure DevOps.
 - **Acteurs ou composants** : navigateur, gestion du cookie, client Azure DevOps, backend.
 - **Préconditions** : le navigateur ouvre l'application et peut contacter le backend et Azure DevOps.
 - **Étapes principales** : création/lecture du cookie; appel backend avec credentials same-origin; appels ADO

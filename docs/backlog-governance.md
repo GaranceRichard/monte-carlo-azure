@@ -8,10 +8,17 @@
 
 ## Séquence prioritaire actuelle
 
-1. **1.11 — Rétablir la modification obligatoire du README comme gate de commit**
-2. **Terminer la Feature 2 — Garantir la fiabilité du cœur statistique**
-3. **Rationaliser le dispositif de gouvernance technique — Feature 13**
-4. Réarbitrer les autres Features selon la stratégie de diffusion définie par la Feature 14
+1. **Feature 2 — Garantir la fiabilité du cœur statistique**
+2. **Feature 8 — Fiabiliser les données Azure DevOps et leur cohérence temporelle**
+3. **Feature 9 — Rejouer les prévisions dans le temps et les calibrer**
+4. **Feature 10 — Concevoir l’expérience et les restitutions**
+5. **Feature 11 — Exécuter les traitements coûteux à l’échelle**, seulement lorsque les benchmarks
+   démontrent que l’exécution interactive ne suffit plus
+
+Cette séquence exprime les dépendances `Feature 2 → Feature 8 → Feature 9 → Feature 10 / Feature 11`.
+La Feature 11 n’est pas un préalable intégral à la Feature 10 : les deux peuvent progresser après la logique
+métier de la Feature 9, et seuls les traitements mesurés comme coûteux basculent vers l’asynchrone.
+La Feature 14 porte en parallèle la décision de positionnement et de diffusion.
 
 Aucun PBI ne peut être considéré comme committable si `README.md` n’a pas reçu une évolution pertinente, réellement stagée avec le changement livré.
 
@@ -36,6 +43,10 @@ La colonne `Réalisé le` constitue l’autorité de statut du registre :
 - une cellule vide désigne un PBI non réalisé ;
 - une date au format `JJ/MM/AAAA` désigne un PBI réalisé à cette date ;
 - les totaux de la synthèse et la répartition par modèle sont recalculés à partir des tables de PBI.
+
+Un changement de statut exige une preuve présente dans le dépôt ou son historique. Une description
+d'attendus, un titre de commit documentaire ou l'existence d'un PBI ne constituent pas une preuve de
+livraison. La date retenue doit être démontrable et documentée ; à défaut, le PBI reste ouvert.
 
 ## Complexité des PBI
 

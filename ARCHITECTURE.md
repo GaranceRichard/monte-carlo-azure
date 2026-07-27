@@ -5,7 +5,7 @@
 Monte Carlo Azure suit une architecture à frontière d’identité stricte :
 
 - le frontend appelle Azure DevOps directement depuis le navigateur ;
-- le backend FastAPI ne reçoit que des données anonymisées de throughput pour calculer les simulations ;
+- le backend FastAPI ne reçoit que les données de throughput minimisées nécessaires aux simulations ;
 - le PAT Azure DevOps n’est jamais transmis au backend.
 
 ## Invariants de sécurité
@@ -34,7 +34,7 @@ Le backend ne reçoit que :
 - bornes de contrat avant calcul : `throughput_samples` entre `6` et `521` valeurs,
   `n_sims` entre `1_000` et `200_000`, `target_weeks` entre `1` et `521`,
   `backlog_size` entre `1` et `1_000_000`
-- un cookie anonyme `IDMontecarlo` pour relier un historique statistique non contextualisé.
+- un cookie pseudonyme `IDMontecarlo` pour relier un historique statistique non contextualisé.
 
 Champs explicitement interdits à la frontière backend/payload :
 
@@ -243,6 +243,42 @@ l’ordre des histogrammes, ainsi que la cohérence des comptes de complétion �
 `521` semaines. Les moteurs reçoivent ensuite uniquement les tableaux et nombres primitifs nécessaires au
 calcul ; les mappers déballent les Value Objects vers les formats JSON, MongoDB et `localStorage` existants.
 
+### Orientation future : audit rétrospectif
+
+L'architecture actuelle exécute une simulation ponctuelle. L'audit rétrospectif prévu par la Feature 9
+devra rester une capacité distincte et respecter les frontières suivantes :
+
+- la Feature 8 fournit des états historiques temporellement cohérents ;
+- la Feature 9 définit le protocole sans fuite d'information future, les points de rejeu, la trajectoire de
+  crédibilité, la confrontation au réel, les diagnostics et la calibration ;
+- la Feature 10 porte la configuration, la progression visible, l'historique, la comparaison, l'UI, les
+  PDF, les exports et le cache local ;
+- la Feature 11 ne devient nécessaire que lorsque les mesures de charge justifient une exécution
+  asynchrone ou distribuée.
+
+La charge conceptuelle d'un audit est :
+
+```text
+points de rejeu × scénarios × simulations × fenêtres
+```
+
+Aucun seuil entre exécution interactive et asynchrone ne doit être fixé avant benchmark.
+
+Si des jobs asynchrones deviennent nécessaires, leur persistance MongoDB devra être minimisée et limitée
+aux paramètres normalisés, à la seed, aux versions du moteur et du contrat statistique, à l'empreinte des
+données, à la progression, aux diagnostics, aux métriques et à l'expiration TTL. Elle devra exclure PAT,
+URL Azure DevOps, work items, descriptions, utilisateurs, équipes, identifiants détaillés et historique
+brut. Les identifiants techniques indispensables devront être pseudonymisés.
+
+La clé conceptuelle du cache d'audit sera :
+
+```text
+empreinte des données + paramètres + seed + version moteur + version contrat statistique
+```
+
+Le monitoring continu, la collecte permanente et les alertes en temps réel ne font pas partie de cette
+orientation.
+
 ### Port de tirage d’indices
 
 Les moteurs dépendent d’un seul port métier par langage, sans seed ni générateur concret :
@@ -423,7 +459,7 @@ Le backend persiste aussi la simulation dans MongoDB (collection `simulations`) 
 ### Historique client `GET /simulations/history`
 
 - le cookie `IDMontecarlo` est lu côté backend ;
-- réponse : jusqu’à 10 simulations récentes du client, limitées aux données statistiques anonymes ;
+- réponse : jusqu’à 10 simulations récentes du client, limitée aux données statistiques minimisées ;
 - aucun champ Azure DevOps historique n’est réexposé, y compris pour d’anciens documents Mongo.
 
 ### Historique frontend local
