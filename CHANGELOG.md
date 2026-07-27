@@ -2,6 +2,20 @@
 
 ## Recent
 
+### PRNG contractuel commun — PBI 2.7
+
+- remplacement de l’adaptateur NumPy backend et identification de l’algorithme bitwise frontend historique
+  comme contrat commun `mca-prng-v1`, avec un état uint32 unique et un mapping d’indice exact par
+  `floor(value * sampleCount / 2^32)`, sans modulo
+- ajout de vecteurs canoniques figés dans `contracts/mca-prng-v1-vectors.json`, lus par les tests Python et
+  TypeScript pour prouver l’égalité des sorties uint32 et des indices d’échantillonnage
+- conservation des résultats frontend seed-à-seed ; changement volontaire des tirages backend pour une
+  même seed historique à la suite de l’abandon de `numpy.random.default_rng`
+- résultats déjà persistés laissés inchangés, sans suppression ni migration d’historique et sans changement
+  de DTO, JSON, MongoDB ou `localStorage`
+- égalité complète des simulations et indépendance du batching laissées aux PBI 2.8 à 2.17 ; version externe
+  du contrat et règles de migration laissées au PBI 2.20
+
 ### Port de tirage déterministe — PBI 2.6
 
 - introduction d’un port d’indices d’échantillons dans chaque langage, adapté aux tirages unitaires

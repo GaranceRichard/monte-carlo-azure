@@ -53,6 +53,23 @@ def test_service_and_engine_keep_seed_resolution_outside_the_draw_port_contract(
         parameters = signature(engine).parameters
         assert "seed" not in parameters
         assert parameters["draw_port"].default is Parameter.empty
+    assert tuple(signature(run_simulation).parameters) == ("command",)
+    assert tuple(signature(mc_finish_weeks).parameters) == (
+        "backlog_size",
+        "throughput_samples",
+        "n_sims",
+        "include_zero_weeks",
+        "draw_port",
+        "batch_size",
+    )
+    assert tuple(signature(mc_items_done_for_weeks).parameters) == (
+        "weeks",
+        "throughput_samples",
+        "n_sims",
+        "include_zero_weeks",
+        "draw_port",
+        "batch_size",
+    )
 
 
 def test_mc_core_has_no_concrete_rng_access():
@@ -61,14 +78,22 @@ def test_mc_core_has_no_concrete_rng_access():
 
     for forbidden in ("np.random", "default_rng", "Generator"):
         assert forbidden not in engine_source
+    assert "McaPrngV1SampleIndexDrawPort" not in engine_source
+    assert "mca_prng_v1_sample_index_draw_port" not in engine_source
 
 
 def test_service_runs_both_modes_without_changing_seeded_results():
     weeks = run_simulation(_command())
+    repeated_weeks = run_simulation(_command())
     items = run_simulation(
         _command(mode="weeks_to_items", backlog_size=None, target_weeks=8)
     )
+    repeated_items = run_simulation(
+        _command(mode="weeks_to_items", backlog_size=None, target_weeks=8)
+    )
 
+    assert weeks == repeated_weeks
+    assert items == repeated_items
     assert weeks.result_kind == "weeks"
     assert weeks.seed.value == 123
     assert weeks.result_percentiles
@@ -93,7 +118,7 @@ def test_service_constructs_exactly_one_adapter_per_execution_and_passes_it_to_e
 
     monkeypatch.setattr(
         simulation_service,
-        "NumpySampleIndexDrawPort",
+        "McaPrngV1SampleIndexDrawPort",
         create_port,
     )
 

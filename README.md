@@ -69,7 +69,8 @@ Démo GitHub Pages:
   `crypto.getRandomValues`; l’absence de Web Crypto est une erreur explicite
 - ports de tirage injectés dans les moteurs : `SampleIndexDrawPort` reçoit uniquement le nombre
   d’échantillons et la forme vectorisée côté Python, ou le nombre d’échantillons côté TypeScript ;
-  `NumpySampleIndexDrawPort` et `createSeededSampleIndexDrawPort` encapsulent seuls les PRNG historiques
+  les adaptateurs de production implémentent seuls le contrat commun `mca-prng-v1`, vérifié dans les deux
+  langages à partir de [`contracts/mca-prng-v1-vectors.json`](contracts/mca-prng-v1-vectors.json)
 - démo locale et simulations portefeuille reproductibles à `seed` identique
 - visualisation des percentiles et distributions
 - sémantique métier des percentiles alignée sur le mode de simulation:
@@ -639,23 +640,35 @@ Variable d'environnement simulation:
 Comportement du `seed` de simulation:
 
 - `POST /simulate` accepte un `seed` entier optionnel entre `0` et `4294967295`
-- à payload identique, renvoyer le même `seed` reproduit strictement le même résultat de simulation
+- à payload identique, renvoyer le même `seed` reproduit strictement le même résultat avec la version
+  courante du moteur et du contrat aléatoire
 - si aucun `seed` n'est fourni, le backend en génère un automatiquement et le renvoie dans la réponse
 - la génération backend utilise `secrets` directement dans `0..4294967295` et retourne un
   `SimulationSeed` validé avant la création de la commande
-- côté backend, `run_simulation` construit un seul `NumpySampleIndexDrawPort` depuis la seed de la
-  commande ; cet adaptateur conserve un seul `numpy.random.default_rng(seed)` sur toute l'exécution et
-  traite les simulations par lots sans réensemencement inter-lots
+- côté backend, `run_simulation` construit un seul adaptateur `mca-prng-v1` depuis la seed de la commande ;
+  cet adaptateur conserve un état uint32 unique et traite les matrices en ordre C / row-major, sans
+  réensemencement entre deux demandes
 - l'historique Mongo persiste aussi ce `seed` pour faciliter l'analyse a posteriori d'une simulation
 - côté frontend, une exécution logique ne consomme qu'une seule `seed`; le rejeu d'une entrée
   locale réemploie cette même `seed` tant que ses paramètres restent inchangés
 - côté frontend, une seed absente est générée directement par `crypto.getRandomValues`; aucun repli
   `Date.now() >>> 0`, aucune troncature et aucune normalisation silencieuse ne sont autorisés
-- côté frontend, le chemin démo/local compose un unique adaptateur Mulberry32 par simulation et le
+- côté frontend, le chemin démo/local compose un unique adaptateur `mca-prng-v1` par simulation et le
   bootstrap portefeuille en compose un depuis la seed optimiste déjà résolue ; le chemin HTTP transmet
   uniquement la seed au backend et ne construit aucun générateur local
-- ces adaptateurs préservent les PRNG et l’ordre de tirage actuels ; le PRNG commun relève du PBI 2.7
-  et l’indépendance contractuelle envers le batching du PBI 2.8
+- `mca-prng-v1` part d'une seed et d'un état dans `0..4294967295`, produit une sortie uint32 sans
+  transition flottante, puis calcule l'indice par `floor(value * sampleCount / 2^32)`, sans réduction
+  modulo ; la transition normative complète est décrite dans
+  [`ARCHITECTURE.md`](ARCHITECTURE.md#port-de-tirage-dindices)
+- les vecteurs canoniques figés couvrent les sorties uint32 et les indices d'échantillonnage ; Python et
+  TypeScript lisent exactement le même fichier, distinct du futur corpus statistique
+- le frontend conserve ses résultats seed-à-seed, car son algorithme bitwise historique est inchangé ;
+  le backend abandonne volontairement le générateur NumPy, donc le rejeu backend d'une ancienne seed peut
+  produire de nouveaux tirages
+- les résultats déjà persistés restent inchangés : aucun historique n'est supprimé ou migré, et aucun
+  identifiant de PRNG n'est ajouté aux DTO, au JSON, à MongoDB ou à `localStorage`
+- l'ordre logique commun et l'indépendance du batching au niveau moteur restent réservés au PBI 2.8 ;
+  la version externe du contrat et les règles de migration relèvent du PBI 2.20
 
 Purge planifiée:
 

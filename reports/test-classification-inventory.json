@@ -4173,7 +4173,7 @@
     "selector": "test_numpy_draw_port_matches_default_rng_across_successive_vectorized_draws",
     "status": "classified",
     "executionProfile": "pr",
-    "nature": "unit",
+    "nature": "integration",
     "purposes": [
       "functional"
     ]

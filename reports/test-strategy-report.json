@@ -2,12 +2,12 @@
   "schemaVersion": "1.0.0",
   "schema": "config/test-strategy-report.schema.json",
   "profile": "main",
-  "evidenceBundleId": "867ae0a483c4cbeaaf9d5c9ef459e7a4d18360cde8b3d359235b4edefcb5f3ba",
+  "evidenceBundleId": "00690713a5653759a43b3bf7b6e7652af4be9c519208986976e529ce9366d3c6",
   "evidenceBundleIdentityDisclaimer": "This identifier names the exact evidence bundle; it does not prove that every source came from the same physical execution.",
   "globalReference": {
     "inventory": {
       "path": "reports/test-classification-inventory.json",
-      "sha256": "4322cdbfa1dae05c0ca1a088c9bf05e2bb2846f15fa16d385e436214a1813d69",
+      "sha256": "b479cc408cb50db3d37e2932b23def96d5392d163dc0ff21aa1c8f3c7b1792a2",
       "logicalCases": 1221
     },
     "classification": {
@@ -24,8 +24,8 @@
           "component": 397,
           "contract": 44,
           "e2e": 32,
-          "integration": 198,
-          "unit": 550
+          "integration": 199,
+          "unit": 549
         },
         "purpose": {
           "accessibility": 104,
@@ -99,7 +99,7 @@
     "executionCounts": {
       "path": "reports/test-execution-counts.json",
       "schemaVersion": "1.0.0",
-      "inventorySha256": "4322cdbfa1dae05c0ca1a088c9bf05e2bb2846f15fa16d385e436214a1813d69",
+      "inventorySha256": "b479cc408cb50db3d37e2932b23def96d5392d163dc0ff21aa1c8f3c7b1792a2",
       "totals": {
         "logicalCases": 1221,
         "collectedInstances": 1461,
@@ -1492,7 +1492,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/preflight/result.json",
         "exitCode": 0,
-        "durationSeconds": 8.556,
+        "durationSeconds": 8.36,
         "reasons": []
       },
       {
@@ -1501,7 +1501,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 0.113,
+        "durationSeconds": 0.132,
         "reasons": []
       },
       {
@@ -1510,7 +1510,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 31.586,
+        "durationSeconds": 31.51,
         "reasons": []
       },
       {
@@ -1519,7 +1519,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 83.68,
+        "durationSeconds": 84.821,
         "reasons": []
       },
       {
@@ -1528,7 +1528,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 120.5,
+        "durationSeconds": 113.963,
         "reasons": []
       },
       {
@@ -1537,7 +1537,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/e2e/result.json",
         "exitCode": 0,
-        "durationSeconds": 43.469,
+        "durationSeconds": 45.701,
         "reasons": []
       },
       {
@@ -1546,7 +1546,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/release-or-container-checks/result.json",
         "exitCode": 0,
-        "durationSeconds": 38.947,
+        "durationSeconds": 40.575,
         "reasons": []
       },
       {
@@ -1613,13 +1613,13 @@
         "thresholdSource": ".coveragerc",
         "metrics": {
           "lines": {
-            "total": 6581,
-            "covered": 6581,
+            "total": 6610,
+            "covered": 6610,
             "pct": 100.0
           },
           "branches": {
-            "total": 2312,
-            "covered": 2275,
+            "total": 2314,
+            "covered": 2277,
             "pct": 98.4
           }
         },
@@ -1637,8 +1637,8 @@
         "thresholdSource": "frontend/vitest.config.js",
         "metrics": {
           "statements": {
-            "total": 3907,
-            "covered": 3870,
+            "total": 3908,
+            "covered": 3871,
             "pct": 99.05
           },
           "branches": {
@@ -1652,8 +1652,8 @@
             "pct": 99.89
           },
           "lines": {
-            "total": 3907,
-            "covered": 3870,
+            "total": 3908,
+            "covered": 3871,
             "pct": 99.05
           }
         },
@@ -1673,23 +1673,23 @@
         "thresholdSource": "frontend/e2e-coverage.config.json",
         "metrics": {
           "statements": {
-            "total": 12339,
-            "covered": 11262,
+            "total": 12341,
+            "covered": 11264,
             "pct": 91.27
           },
           "branches": {
-            "total": 2729,
-            "covered": 2261,
-            "pct": 82.85
+            "total": 2727,
+            "covered": 2258,
+            "pct": 82.8
           },
           "functions": {
             "total": 442,
-            "covered": 408,
-            "pct": 92.3
+            "covered": 407,
+            "pct": 92.08
           },
           "lines": {
-            "total": 12233,
-            "covered": 11159,
+            "total": 12235,
+            "covered": 11161,
             "pct": 91.22
           }
         },
@@ -2279,7 +2279,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "4322cdbfa1dae05c0ca1a088c9bf05e2bb2846f15fa16d385e436214a1813d69",
+      "fingerprint": "b479cc408cb50db3d37e2932b23def96d5392d163dc0ff21aa1c8f3c7b1792a2",
       "schemaVersion": null,
       "status": "valid",
       "reasons": []
@@ -2311,7 +2311,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "7693e97b9a42662f0dd9fa2e263071f99ec82ee67fc8a137694105cf44ab3ba3",
+      "fingerprint": "7ae060ba720acc0d1f9c8cf69b42a10ccfdbbefdd0e1f843fb6316cbc0be3105",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2327,7 +2327,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "c360c5f5fb5ee5aebf99c8db2c9ff720316d6f7db99485e172ce8ce606bc4e27",
+      "fingerprint": "e071574047d30d899388e4091317eb12254bbfcd58a52c305142c135a8d0bad6",
       "schemaVersion": 3,
       "status": "valid",
       "reasons": []
@@ -2343,7 +2343,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "a5a080163279f50894e5f2131021858ea5c1639c3ac775b109e9d2964daec76a",
+      "fingerprint": "3b81ea1bbc9e6b5c43852740941de1a4c8b8b699e744fbc6d8af8c5fc4a72bc8",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2359,7 +2359,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "beaa22493926bfe2e8c08efdd1dd660b8058a2b3be51d58ab4e20c5c84b859fd",
+      "fingerprint": "8a84ece11e46f7942d095213f74e4c144deaf75f110c64b9c22d056f3cde62f6",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2375,7 +2375,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "ca1684d6d6117c8cc3c0872bb4e089aadbbee5cfe87a0fe56b225803335db575",
+      "fingerprint": "f5688eb1186f785e57d51f20ceb3bd7ec20e1023e4da7611765e73e6d616bd2b",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2391,7 +2391,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "cee2954ec09e0804b0685b73b9b26373c70cef4814da49717576115bdf91b930",
+      "fingerprint": "45c604f846d2de60ae1856835bfd92da7162bd2735e452f17affea337f012d12",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2439,7 +2439,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "dde29a74b820cb9d8220d0b4c8d18fd8cab286c55eebf1f894500766ecdd10b6",
+      "fingerprint": "d0a5e0c9108e991770abf0291e688f5f6bf749ca03032763affb04304d8bea64",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2455,7 +2455,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "38234add332bfca60f07fdb530bc596335893f3a190c8bc970fc18d8abb3d008",
+      "fingerprint": "08b21ef8ffbebf8a46b2a57475a5bf27baaa447cb29abfc0f8fb8fbdc0b32791",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2471,7 +2471,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "4adb8806edc3b779dd4636543f556a58c00bc1cb874a05e05e55aeee202e665a",
+      "fingerprint": "afe19bc60999d7bc69abf81faac07512649d2d59af377a146aca387ccf7be304",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2487,7 +2487,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "d4da18e2ae07d4579e65950d1d18608b4a9c6dfa663884254d810279e15c27f5",
+      "fingerprint": "7aaebedc301b4cdcb76a232c94acc91b5a7344a0295c48dd83da6bfe29ff4ebd",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2503,7 +2503,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "6ad45be81bd400036d200d4420b3427316dd3e346fbd00a52ce6a1bcb09e5093",
+      "fingerprint": "4d92bdb254ecfebbdd4400c6952f3da93d4ef4265eed3a48e84e5c169d2e9eca",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2519,7 +2519,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "92b16e00215de00743cc47757c0986d1cba4128faedadeaca476bf026f7a6fac",
+      "fingerprint": "76bb1986728fd065b94a96e4707b9aa4d2572612b38818df14b12ba044657735",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2535,7 +2535,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "251d09b3aae88c89e7000b0e6cbd677872c30a411e27186fb9a4cf8b31bdb20e",
+      "fingerprint": "585e966add79946e46ae406497656d6dde2890e8105633f884b9d5bc1fdb84ec",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2567,7 +2567,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "ee895e31933a4f7f8ce9d92d6d17ae5b97724ef7893dd2616f4ebaf7cea636b5",
+      "fingerprint": "90f35e8e87a9e1bcda9134e9523ac90867b98fb94a28266e5c32f4c70a10ff2c",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []

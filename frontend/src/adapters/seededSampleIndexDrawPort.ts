@@ -1,6 +1,8 @@
 import type { SampleIndexDrawPort } from "../domain/sampleIndexDrawPort";
 import type { SimulationSeed } from "../domain/simulationValueObjects";
 
+export const MCA_PRNG_CONTRACT_ID = "mca-prng-v1";
+
 export function createSeededSampleIndexDrawPort(
   seed: SimulationSeed,
 ): SampleIndexDrawPort {

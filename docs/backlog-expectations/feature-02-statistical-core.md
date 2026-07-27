@@ -22,15 +22,14 @@
 - permettre une source déterministe de test ;
 - ne choisir ni ne déployer encore le PRNG commun.
 
-Implémentation retenue :
+Architecture introduite par le PBI 2.6 et conservée :
 
 - le port Python demande des matrices d’indices afin de préserver la vectorisation et les lots existants ;
 - le port TypeScript demande un indice unitaire afin de préserver l’ordre historique des simulations
   locales et du bootstrap portefeuille ;
-- les adaptateurs concrets conservent respectivement `numpy.random.default_rng(seed)` et Mulberry32,
-  tandis que les services et hooks restent les seuls lieux de composition ;
-- le PRNG commun et ses vecteurs relèvent toujours du PBI 2.7 ; l’ordre logique commun et l’indépendance
-  contractuelle du batching relèvent toujours du PBI 2.8.
+- les services et hooks restent les seuls lieux de composition, et les moteurs ne dépendent que du port ;
+- les adaptateurs transitoires NumPy et Mulberry32 livrés par le PBI 2.6 sont remplacés par le contrat
+  commun du PBI 2.7, sans changer les signatures ni la composition.
 
 ### Résultat attendu du PBI 2.7
 
@@ -38,6 +37,22 @@ Implémentation retenue :
 - définir son état, son domaine, sa sortie et ses vecteurs de vérification ;
 - prouver l’égalité des suites de nombres produites ;
 - ne pas aligner dans ce PBI les percentiles, la fiabilité ou les histogrammes.
+
+Implémentation retenue :
+
+- le contrat est identifié par `mca-prng-v1`, avec une seed et un état uint32 dans `0..4294967295`,
+  une sortie primitive uint32 et un `sampleCount` entier strictement positif ;
+- la transition reprend exactement les constantes et opérations bitwise TypeScript historiques, ramène
+  chaque opération sur 32 bits et n’emploie aucune opération flottante pour faire évoluer l’état ;
+- l’indice est calculé par `floor(value * sampleCount / 2^32)`, sans réduction modulo ;
+- `contracts/mca-prng-v1-vectors.json` fige l’unique jeu de vecteurs partagé par les tests Python et
+  TypeScript pour les sorties uint32 et les indices d’échantillonnage ;
+- le frontend conserve ses résultats seed-à-seed, tandis que l’abandon volontaire du générateur NumPy
+  peut modifier le rejeu backend d’une seed antérieure au PBI 2.7 ;
+- les résultats persistés restent inchangés, sans suppression ou migration d’historique et sans ajout aux
+  DTO, au JSON, à MongoDB ou à `localStorage` ;
+- l’ordre logique et l’indépendance du batching restent réservés au PBI 2.8 ; la version externe du
+  contrat et les règles de migration restent réservées au PBI 2.20.
 
 ### Résultat attendu du PBI 2.8
 

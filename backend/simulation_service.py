@@ -10,7 +10,7 @@ from .mc_core import (
     percentiles,
     throughput_reliability_metrics,
 )
-from .numpy_sample_index_draw_port import NumpySampleIndexDrawPort
+from .mca_prng_v1_sample_index_draw_port import McaPrngV1SampleIndexDrawPort
 from .sample_index_draw_port import SampleIndexDrawPort
 from .simulation_models import (
     SimulationCommand,
@@ -61,7 +61,7 @@ def _run_engine(
 
 def run_simulation(command: SimulationCommand) -> SimulationResult:
     samples = _prepare_samples(command)
-    draw_port = NumpySampleIndexDrawPort(command.seed)
+    draw_port = McaPrngV1SampleIndexDrawPort(command.seed)
     engine_result, result_kind = _run_engine(command, samples, draw_port)
     completion_summary = None
     distribution_values = engine_result

@@ -465,8 +465,8 @@
           "natures": {
             "component": 67,
             "contract": 44,
-            "integration": 24,
-            "unit": 210
+            "integration": 25,
+            "unit": 209
           },
           "criticalities": {
             "critical": 71,
@@ -1906,8 +1906,8 @@
           "natures": {
             "component": 67,
             "contract": 44,
-            "integration": 195,
-            "unit": 210
+            "integration": 196,
+            "unit": 209
           },
           "criticalities": {
             "critical": 84,
@@ -3389,8 +3389,8 @@
           "natures": {
             "component": 67,
             "contract": 44,
-            "integration": 195,
-            "unit": 211
+            "integration": 196,
+            "unit": 210
           },
           "criticalities": {
             "critical": 84,
@@ -4873,8 +4873,8 @@
           "natures": {
             "component": 67,
             "contract": 44,
-            "integration": 196,
-            "unit": 211
+            "integration": 197,
+            "unit": 210
           },
           "criticalities": {
             "critical": 84,

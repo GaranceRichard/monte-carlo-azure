@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "classificationInventorySha256": "4322cdbfa1dae05c0ca1a088c9bf05e2bb2846f15fa16d385e436214a1813d69",
+  "classificationInventorySha256": "b479cc408cb50db3d37e2932b23def96d5392d163dc0ff21aa1c8f3c7b1792a2",
   "totals": {
     "logicalCases": 1221,
     "collectedInstances": 1461,
@@ -127,14 +127,14 @@
       }
     },
     "integration": {
-      "logicalCases": 198,
-      "collectedInstances": 223,
-      "executedInstances": 223,
+      "logicalCases": 199,
+      "collectedInstances": 224,
+      "executedInstances": 224,
       "skippedInstances": 0,
-      "attempts": 223,
+      "attempts": 224,
       "retries": 0,
       "results": {
-        "passed": 223,
+        "passed": 224,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -142,14 +142,14 @@
       }
     },
     "unit": {
-      "logicalCases": 550,
-      "collectedInstances": 737,
-      "executedInstances": 737,
+      "logicalCases": 549,
+      "collectedInstances": 736,
+      "executedInstances": 736,
       "skippedInstances": 0,
-      "attempts": 737,
+      "attempts": 736,
       "retries": 0,
       "results": {
-        "passed": 737,
+        "passed": 736,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -4825,7 +4825,7 @@
       "selector": "test_numpy_draw_port_matches_default_rng_across_successive_vectorized_draws",
       "classificationStatus": "classified",
       "executionProfile": "pr",
-      "nature": "unit",
+      "nature": "integration",
       "logicalCases": 1,
       "collectedInstances": 1,
       "executedInstances": 1,

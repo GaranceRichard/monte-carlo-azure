@@ -117,14 +117,20 @@ Garde-fous serveur :
 ## Structure du code
 
 ```text
+contracts/
+  mca-prng-v1-vectors.json # sorties uint32 et indices canoniques partagés
+
 frontend/
   src/
     adoClient.ts        # appels directs Azure DevOps
     api.ts              # adaptateur HTTP /simulate et historique serveur
+    adapters/
+      seededSampleIndexDrawPort.ts # implémentation TypeScript de mca-prng-v1
     api/
       simulationDtos.ts    # contrats JSON HTTP en snake_case
       simulationMappers.ts # conversions explicites HTTP <-> domaine
     domain/
+      sampleIndexDrawPort.ts # port minimal de tirage injecté dans les moteurs
       simulation.ts        # commande et résultat statistiques métier en camelCase
       simulationValueObjects.ts # Value Objects statistiques immuables et validés
       simulationHistory.ts # historique interne contenant un SimulationResult
@@ -168,6 +174,8 @@ backend/
   simulation_models.py   # modèles statistiques métier sans framework
   simulation_value_objects.py # Value Objects statistiques immuables et validés
   simulation_seed.py     # résolution HTTP de la seed en SimulationSeed
+  sample_index_draw_port.py # port matriciel injecté dans le moteur
+  mca_prng_v1_sample_index_draw_port.py # implémentation vectorisée de mca-prng-v1
   simulation_service.py  # orchestration statistique sans dépendance HTTP
   simulation_store.py    # frontière Mongo, document existant préservé
   mc_core.py             # cœur Monte Carlo
@@ -246,22 +254,57 @@ Les moteurs dépendent d’un seul port métier par langage, sans seed ni géné
   `[0, sampleCount)` par appel ; cette granularité conserve l’ordre de consommation historique du
   moteur local et du bootstrap portefeuille.
 
-Les implémentations concrètes sont hors des moteurs. `backend/numpy_sample_index_draw_port.py` construit
-exactement un `numpy.random.default_rng(seed.value)` et délègue à `Generator.integers`.
-`frontend/src/adapters/seededSampleIndexDrawPort.ts` conserve exactement l’algorithme Mulberry32
-historique, opérations bitwise comprises.
+Les implémentations concrètes sont hors des moteurs et portent la constante d’identification
+`mca-prng-v1`. Une instance conserve un seul état uint32, initialisé avec une seed entière dans
+`0..4294967295`. `sampleCount` est un entier strictement positif et la sortie primitive est un uint32.
+
+La transition normative de chaque tirage est :
+
+```text
+state = (state + 0x6D2B79F5) mod 2^32
+t = state
+t = imul32(t xor (t >>> 15), t or 1)
+t = t xor ((t + imul32(t xor (t >>> 7), t or 61)) mod 2^32)
+value = (t xor (t >>> 14)) mod 2^32
+index = floor(value * sampleCount / 2^32)
+```
+
+`>>>` est un décalage logique non signé, `imul32` ne conserve que les 32 bits faibles et chaque
+opération est ramenée explicitement dans le domaine uint32. Aucune opération flottante n’influence la
+transition d’état. Le calcul de l’indice reproduit `floor(random * sampleCount)` et n’utilise jamais une
+réduction `% sampleCount`.
+
+L’adaptateur Python calcule les états successifs à partir de l’état courant avec des opérations NumPy
+vectorisées, remplit chaque matrice en ordre C / row-major et utilise une multiplication suffisamment
+large suivie d’un décalage de 32 bits pour produire les indices. L’adaptateur TypeScript conserve
+strictement les constantes et opérations bitwise historiques. Dans les deux cas, plusieurs demandes
+successives poursuivent la même suite et mettent à jour l’unique état avec le dernier tirage consommé.
+
+[`contracts/mca-prng-v1-vectors.json`](contracts/mca-prng-v1-vectors.json) est l’unique preuve canonique
+figée du contrat. Les tests Python et TypeScript lisent ce même fichier pour vérifier les sorties uint32
+et les indices pour `sampleCount` `1`, `2`, `3`, `6`, `17` et `2^33`; ce dernier cas prouve le calcul
+large sans overflow. Ce fichier reste distinct du futur corpus statistique du PBI 2.9.
 
 La composition appartient aux frontières d’exécution :
 
-- `backend/simulation_service.py` construit un adaptateur NumPy par commande puis transmet la même
+- `backend/simulation_service.py` construit un adaptateur `mca-prng-v1` par commande puis transmet la même
   instance au moteur sélectionné ;
 - `frontend/src/hooks/simulationForecastCore.ts` construit l’adaptateur TypeScript uniquement pour le
   chemin démo/local ; le chemin HTTP transmet la seed au backend sans PRNG local ;
 - `frontend/src/hooks/usePortfolioReport.ts` construit l’adaptateur du bootstrap depuis la seed optimiste
   déjà résolue, sans modifier le nombre ni l’ordre des résolutions de seed.
 
-Ce découplage ne change ni les suites actuelles ni les formules. Le choix d’un PRNG commun est réservé au
-PBI 2.7 ; l’ordre contractuel commun et l’indépendance complète du batching restent réservés au PBI 2.8.
+Les moteurs ne connaissent toujours que `SampleIndexDrawPort` et ne créent aucun PRNG. Le contrat commun
+prouve uniquement l’égalité Python/TypeScript des sorties uint32 et des indices d’échantillonnage. Il ne
+prouve pas encore l’égalité complète des simulations : l’ordre logique commun et l’indépendance complète
+du batching restent réservés au PBI 2.8, puis les autres règles statistiques aux PBI 2.9 à 2.17.
+
+Le frontend conserve ses résultats seed-à-seed, puisque `mca-prng-v1` reprend exactement son algorithme
+bitwise historique. Le backend abandonne volontairement le générateur NumPy : le rejeu backend d’une seed
+utilisée avant ce changement peut donc produire de nouveaux tirages. Les résultats déjà persistés restent
+inchangés et aucun historique n’est supprimé ou migré. Aucun champ n’est ajouté aux DTO, au JSON, à
+MongoDB ou à `localStorage`; la version externe du contrat et les règles de migration restent réservées au
+PBI 2.20.
 
 ## Convention de nommage
 
@@ -346,7 +389,8 @@ ou
 Comportement du `seed` :
 
 - `seed` est optionnel et borné à l’intervalle entier `0..4294967295` ;
-- à payload identique, un même `seed` reproduit strictement la même simulation ;
+- à payload identique, un même `seed` reproduit strictement la même simulation avec la version courante
+  du moteur et de `mca-prng-v1` ;
 - si aucun `seed` n’est fourni, `backend/simulation_seed.py` génère directement avec `secrets` une valeur
   dans `0..4294967295`, la valide en `SimulationSeed`, puis la renvoie pour rendre le tirage rejouable ;
 - le mapper, le service, le moteur et la persistance ne génèrent aucune seed ; la même valeur résolue
@@ -354,7 +398,7 @@ Comportement du `seed` :
 - le frontend résout de la même manière la seed avant la commande : valeur explicite conservée exactement,
   sinon un unique `crypto.getRandomValues` par exécution logique ; Web Crypto absent produit une erreur
   explicite et n'active aucun repli temporel, modulo, troncature ou opération bitwise de normalisation ;
-- côté backend, `simulation_service.py` compose depuis cette seed un unique adaptateur NumPy, ensuite
+- côté backend, `simulation_service.py` compose depuis cette seed un unique adaptateur `mca-prng-v1`, ensuite
   consommé par lots via le port de tirage ; il n’y a ni réensemencement inter-lots, ni allocation complète
   `n_sims x horizon`.
 
