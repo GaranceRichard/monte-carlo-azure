@@ -4,6 +4,7 @@ import { storageGetItem, storageRemoveItem, storageSetItem } from "../storage";
 import type { SimulationHistoryEntry } from "../domain/simulationHistory";
 import { simulationHistoryModelToDto } from "../storage/simulationHistoryMappers";
 import { useSimulationHistory } from "./useSimulationHistory";
+import { createSimulationSeed } from "../domain/simulationValueObjects";
 
 vi.mock("../storage", () => ({
   storageGetItem: vi.fn(),
@@ -36,7 +37,7 @@ function buildLocalEntry(
     result: {
       resultKind: "weeks",
       samplesCount: 24,
-      seed: 123456,
+      seed: createSimulationSeed(123456),
       resultPercentiles: { P50: 7, P70: 9, P90: 12 },
       riskScore: 0.71,
       resultDistribution: [{ x: 7, count: 2000 }],

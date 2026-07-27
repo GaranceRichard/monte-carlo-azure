@@ -2,7 +2,6 @@ import {
   createBacklogSize,
   createSimulationCount,
   createSimulationHorizon,
-  createSimulationSeed,
   createThroughputSamples,
 } from "./simulationValueObjects";
 import type {
@@ -47,7 +46,7 @@ export type SimulationCommandInput = {
   backlogSize?: unknown;
   targetWeeks?: unknown;
   nSims: unknown;
-  seed: unknown;
+  seed: SimulationSeed;
 };
 
 export function createSimulationCommand(input: SimulationCommandInput): SimulationCommand {
@@ -62,7 +61,7 @@ export function createSimulationCommand(input: SimulationCommandInput): Simulati
     throughputSamples,
     mode: input.mode,
     nSims: createSimulationCount(input.nSims),
-    seed: createSimulationSeed(input.seed),
+    seed: input.seed,
   };
   if (input.mode === "backlog_to_weeks") {
     if (input.backlogSize === undefined || input.backlogSize === null) {

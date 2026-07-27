@@ -148,6 +148,7 @@ frontend/
       usePortfolioReport.ts        # génération rapport portefeuille
       simulationForecastService.ts # façade forecast exposée au reste du front
       simulationForecastCore.ts    # logique forecast extraite et testée
+      simulationSeedResolver.ts    # résolution uint32 à la frontière d'orchestration
     utils/
       cycleTime.ts        # calcul et tendances du cycle time en jours calendaires
       portfolioComparisonDiagnostic.ts # diagnostic métier comparatif des scénarios portefeuille
@@ -166,6 +167,7 @@ backend/
   simulation_mappers.py  # conversions DTO HTTP/persistance <-> domaine
   simulation_models.py   # modèles statistiques métier sans framework
   simulation_value_objects.py # Value Objects statistiques immuables et validés
+  simulation_seed.py     # résolution HTTP de la seed en SimulationSeed
   simulation_service.py  # orchestration statistique sans dépendance HTTP
   simulation_store.py    # frontière Mongo, document existant préservé
   mc_core.py             # cœur Monte Carlo
@@ -183,6 +185,7 @@ Les contrats externes et les modèles statistiques internes sont séparés par d
   de création des primitives statistiques prioritaires : seed, nombre de simulations, backlog, horizon,
   throughput, percentiles, fiabilité, histogramme et complétion ;
 - `SimulationCommand` contient une entrée de throughput résolue et seulement le paramètre actif de son mode ;
+  sa `SimulationSeed` est obligatoire et a déjà été validée à la frontière d'exécution ;
   `SimulationResult` contient des percentiles, une fiabilité et un histogramme validés, ainsi qu’une
   complétion uniquement en `backlog_to_weeks` ;
 - `backend/simulation_service.py` orchestre les fonctions existantes de `mc_core.py` sans importer Pydantic,
@@ -196,10 +199,13 @@ Les contrats externes et les modèles statistiques internes sont séparés par d
 Flux backend :
 
 ```text
-SimulationCommand
+seed UI optionnelle
+  -> simulationSeedResolver.ts -> SimulationSeed TypeScript obligatoire
+  -> SimulationCommand TypeScript
   -> mapper vers SimulateRequestDto
   -> POST /simulate
   -> SimulateRequest Pydantic
+  -> backend/simulation_seed.py -> SimulationSeed Python obligatoire
   -> mapper vers SimulationCommand Python
   -> simulation_service -> mc_core
   -> SimulationResult Python
@@ -211,7 +217,9 @@ SimulationCommand
 Flux local :
 
 ```text
-SimulationCommand TypeScript
+seed UI optionnelle
+  -> simulationSeedResolver.ts -> SimulationSeed obligatoire
+  -> SimulationCommand TypeScript
   -> moteur local TypeScript
   -> SimulationResult TypeScript
 ```
@@ -311,7 +319,13 @@ Comportement du `seed` :
 
 - `seed` est optionnel et borné à l’intervalle entier `0..4294967295` ;
 - à payload identique, un même `seed` reproduit strictement la même simulation ;
-- si aucun `seed` n’est fourni, le backend en génère un et le renvoie pour rendre le tirage rejouable ;
+- si aucun `seed` n’est fourni, `backend/simulation_seed.py` génère directement avec `secrets` une valeur
+  dans `0..4294967295`, la valide en `SimulationSeed`, puis la renvoie pour rendre le tirage rejouable ;
+- le mapper, le service, le moteur et la persistance ne génèrent aucune seed ; la même valeur résolue
+  traverse commande, moteur, résultat, réponse et document Mongo ;
+- le frontend résout de la même manière la seed avant la commande : valeur explicite conservée exactement,
+  sinon un unique `crypto.getRandomValues` par exécution logique ; Web Crypto absent produit une erreur
+  explicite et n'active aucun repli temporel, modulo, troncature ou opération bitwise de normalisation ;
 - côté backend, ce même tirage est exécuté par lots avec un unique générateur pseudo-aléatoire ;
   il n’y a ni réensemencement inter-lots, ni allocation complète `n_sims x horizon`.
 

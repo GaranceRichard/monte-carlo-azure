@@ -16,8 +16,8 @@ import {
   computeRiskLegend,
   computeRiskScoreFromPercentiles,
   computeThroughputReliability,
-  generateSimulationSeed,
 } from "../utils/simulation";
+import { resolveSimulationSeed } from "./simulationSeedResolver";
 import { buildSimulationDecisionLanguage } from "../utils/simulationDecisionDiagnostic";
 import {
   buildPortfolioComparisonDiagnostic,
@@ -260,11 +260,11 @@ export function usePortfolioReport({
 
       // Phase 2: run team + portfolio scenario simulations in parallel.
       const seedBySimulation = {
-        teams: successfulTeams.map(() => generateSimulationSeed()),
-        optimistic: generateSimulationSeed(),
-        aligned: generateSimulationSeed(),
-        friction: generateSimulationSeed(),
-        correlated: generateSimulationSeed(),
+        teams: successfulTeams.map(() => resolveSimulationSeed()),
+        optimistic: resolveSimulationSeed(),
+        aligned: resolveSimulationSeed(),
+        friction: resolveSimulationSeed(),
+        correlated: resolveSimulationSeed(),
       };
       const scenarioSamples = buildScenarioSamples(successfulTeams.map((team) => team.data.throughputSamples), alignmentRate, seedBySimulation.optimistic);
       const correlatedWeeklyData = buildCorrelatedPortfolioWeeklyThroughputs(

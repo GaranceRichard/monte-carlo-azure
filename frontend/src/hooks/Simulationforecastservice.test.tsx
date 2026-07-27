@@ -501,8 +501,8 @@ describe("historyEntry", () => {
     });
 
     try {
-      const { historyEntry } = await runSimulationForecast(baseParams());
-      expect(historyEntry.id).toMatch(/^1234567890-111-\d+$/);
+      const { historyEntry } = await runSimulationForecast(baseParams({ seed: 111 }));
+      expect(historyEntry.id).toBe("1234567890-111");
     } finally {
       Object.defineProperty(globalThis, "crypto", {
         configurable: true,

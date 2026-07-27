@@ -71,7 +71,8 @@ def mc_finish_weeks(
     throughput_samples: np.ndarray,
     n_sims: int = 20000,
     include_zero_weeks: bool = False,
-    seed: Optional[int] = None,
+    *,
+    seed: int,
     batch_size: int = SIMULATION_BATCH_SIZE,
 ) -> FinishWeeksSimulation:
     """
@@ -133,7 +134,8 @@ def mc_items_done_for_weeks(
     throughput_samples: np.ndarray,
     n_sims: int = 20000,
     include_zero_weeks: bool = False,
-    seed: Optional[int] = None,
+    *,
+    seed: int,
     batch_size: int = SIMULATION_BATCH_SIZE,
 ) -> np.ndarray:
     """

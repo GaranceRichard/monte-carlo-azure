@@ -137,7 +137,7 @@ def _req_resp():
         backlog_size=20,
         target_weeks=None,
         n_sims=2000,
-        seed=98765,
+        seed=SimulationSeed(98765),
     )
     resp = SimulationResult(
         result_kind="weeks",

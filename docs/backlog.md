@@ -57,7 +57,7 @@ La modification du README doit être pertinente et refléter le changement livr�
 | 2.2 | Définir le contrat normatif de parité statistique | M | Sol Très élevé | 22/07/2026 |
 | 2.3 | Séparer les DTO des modèles statistiques métier | L | Sol Très élevé | 22/07/2026 |
 | 2.4 | Introduire les Value Objects statistiques prioritaires | L | Sol Très élevé | 26/07/2026 |
-| 2.5 | Isoler la résolution de seed aux frontières d’exécution | M | Sol Élevé | |
+| 2.5 | Isoler la résolution de seed aux frontières d’exécution | M | Sol Élevé | 26/07/2026 |
 | 2.6 | Introduire un port de tirage déterministe dans les deux moteurs | M | Sol Très élevé | |
 | 2.7 | Implémenter le PRNG contractuel commun Python et TypeScript | L | Sol Ultra | |
 | 2.8 | Garantir l’ordre logique des tirages et l’indépendance du batching | M | Sol Très élevé | |
@@ -712,7 +712,7 @@ Aucun PBI `XL` ne peut être engagé. Un PBI `L` reste autorisé lorsqu’il por
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
 | 1 — Preuve qualité gouvernée | 11 | 11 | 0 |
-| 2 — Fiabilité du cœur statistique | 20 | 4 | 16 |
+| 2 — Fiabilité du cœur statistique | 20 | 5 | 15 |
 | 3 — Réutilisabilité du moteur | 5 | 0 | 5 |
 | 4 — Mise en production personnelle | 6 | 0 | 6 |
 | 5 — Valeur d’usage du portefeuille | 4 | 0 | 4 |
@@ -725,7 +725,7 @@ Aucun PBI `XL` ne peut être engagé. Un PBI `L` reste autorisé lorsqu’il por
 | 12 — Pilotage de programme | 7 | 0 | 7 |
 | 13 — Rationalisation de la gouvernance | 9 | 0 | 9 |
 | 14 — Stratégie de diffusion et adoption | 9 | 0 | 9 |
-| **Total** | **132** | **15** | **117** |
+| **Total** | **132** | **16** | **116** |
 
 Aucun PBI n’est classé XL.
 
@@ -751,12 +751,12 @@ Un PBI `L` peut relever de Sol Élevé lorsqu’il est volumineux mais prévisib
 
 Aucun PBI actuel ne relève de **Sol Minimal**, réservé aux corrections mécaniques telles que le formatage, le renommage évident ou la résolution d’une erreur de lint isolée.
 
-## Répartition des 117 PBI non réalisés
+## Répartition des 116 PBI non réalisés
 
 | Modèle Codex | Nombre de PBI |
 | --- | ---: |
 | Sol Medium | 15 |
-| Sol Élevé | 30 |
+| Sol Élevé | 29 |
 | Sol Très élevé | 66 |
 | Sol Ultra | 6 |
-| **Total** | **117** |
+| **Total** | **116** |

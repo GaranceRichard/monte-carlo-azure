@@ -83,13 +83,13 @@ def test_mc_finish_weeks_large_backlog_hits_cap():
 
 def test_mc_finish_weeks_invalid_inputs():
     with pytest.raises(ValueError):
-        mc_finish_weeks(backlog_size=0, throughput_samples=np.array([1, 2], dtype=int))
+        mc_finish_weeks(backlog_size=0, throughput_samples=np.array([1, 2], dtype=int), seed=0)
     with pytest.raises(ValueError):
-        mc_finish_weeks(backlog_size=10, throughput_samples=np.array([], dtype=int))
+        mc_finish_weeks(backlog_size=10, throughput_samples=np.array([], dtype=int), seed=0)
     with pytest.raises(ValueError):
-        mc_finish_weeks(backlog_size=10, throughput_samples=None)
+        mc_finish_weeks(backlog_size=10, throughput_samples=None, seed=0)
     with pytest.raises(ValueError):
-        mc_finish_weeks(backlog_size=10, throughput_samples=np.array([0, 0], dtype=int))
+        mc_finish_weeks(backlog_size=10, throughput_samples=np.array([0, 0], dtype=int), seed=0)
 
 
 def test_mc_items_done_for_weeks_shape_and_reproducible():
@@ -109,13 +109,13 @@ def test_mc_items_done_for_weeks_single_sample_value():
 
 def test_mc_items_done_for_weeks_invalid_inputs():
     with pytest.raises(ValueError):
-        mc_items_done_for_weeks(weeks=0, throughput_samples=np.array([1, 2], dtype=int))
+        mc_items_done_for_weeks(weeks=0, throughput_samples=np.array([1, 2], dtype=int), seed=0)
     with pytest.raises(ValueError):
-        mc_items_done_for_weeks(weeks=2, throughput_samples=np.array([], dtype=int))
+        mc_items_done_for_weeks(weeks=2, throughput_samples=np.array([], dtype=int), seed=0)
     with pytest.raises(ValueError):
-        mc_items_done_for_weeks(weeks=2, throughput_samples=None)
+        mc_items_done_for_weeks(weeks=2, throughput_samples=None, seed=0)
     with pytest.raises(ValueError):
-        mc_items_done_for_weeks(weeks=2, throughput_samples=np.array([0, 0], dtype=int))
+        mc_items_done_for_weeks(weeks=2, throughput_samples=np.array([0, 0], dtype=int), seed=0)
 
 
 @pytest.mark.parametrize("batch_size", [1, 4, SIMULATION_BATCH_SIZE])
@@ -231,7 +231,7 @@ def test_simulation_batch_size_must_be_positive(function_name, kwargs):
     function = mc_finish_weeks if function_name == "mc_finish_weeks" else mc_items_done_for_weeks
 
     with pytest.raises(ValueError, match="batch_size"):
-        function(n_sims=5, batch_size=0, **kwargs)
+        function(n_sims=5, seed=0, batch_size=0, **kwargs)
 
 
 def test_mc_finish_weeks_accepts_zero_only_samples_when_enabled():
@@ -253,6 +253,7 @@ def test_mc_finish_weeks_include_zero_rejects_all_negative_samples():
             backlog_size=10,
             throughput_samples=np.array([-5, -1], dtype=int),
             include_zero_weeks=True,
+            seed=0,
         )
 
 
@@ -275,6 +276,7 @@ def test_mc_items_done_for_weeks_include_zero_rejects_all_negative_samples():
             weeks=4,
             throughput_samples=np.array([-4, -1], dtype=int),
             include_zero_weeks=True,
+            seed=0,
         )
 
 

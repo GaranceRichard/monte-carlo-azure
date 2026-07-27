@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { SimulationHistoryEntry } from "../domain/simulationHistory";
+import { createSimulationSeed } from "../domain/simulationValueObjects";
 import {
   parseSimulationHistory,
   simulationHistoryDtoToModel,
@@ -30,7 +31,7 @@ function historyEntry(): SimulationHistoryEntry {
     result: {
       resultKind: "weeks",
       samplesCount: 24,
-      seed: 123,
+      seed: createSimulationSeed(123),
       resultPercentiles: { P50: 7, P70: 9, P90: 12 },
       riskScore: 0.71,
       resultDistribution: [{ x: 7, count: 2000 }],

@@ -11,7 +11,6 @@ from backend.api_models import SIMULATION_SEED_MAX
 from backend.api_routes_simulate import (
     _client_key_from_request,
     _persist_simulation,
-    _resolve_simulation_seed,
     limiter,
 )
 from backend.mc_core import FinishWeeksSimulation
@@ -27,12 +26,14 @@ from backend.simulation_models import (
     SimulationCommand,
     SimulationResult,
 )
+from backend.simulation_seed import resolve_simulation_seed
 from backend.simulation_value_objects import (
     CompletionSummary,
     Histogram,
     SimulationCount,
     SimulationPercentiles,
     SimulationSeed,
+    StatisticalValueError,
     ThroughputReliability,
 )
 from tests.http_client import ApiTestClient
@@ -470,7 +471,12 @@ def test_simulate_returns_same_result_for_same_seed():
     assert first.json() == second.json()
 
 
-def test_simulate_uses_requested_seed():
+@pytest.mark.parametrize("seed", [0, SIMULATION_SEED_MAX])
+def test_simulate_preserves_requested_seed_without_generation(seed, monkeypatch):
+    monkeypatch.setattr(
+        "backend.simulation_seed.secrets.randbelow",
+        lambda _limit: pytest.fail("the generator must not be called"),
+    )
     client = ApiTestClient(app)
     response = client.post(
         "/simulate",
@@ -479,12 +485,50 @@ def test_simulate_uses_requested_seed():
             "mode": "weeks_to_items",
             "target_weeks": 8,
             "n_sims": 2000,
-            "seed": 98765,
+            "seed": seed,
         },
     )
 
     assert response.status_code == 200
-    assert response.json()["seed"] == 98765
+    assert response.json()["seed"] == seed
+
+
+def test_simulate_generates_once_before_service_and_preserves_resolved_seed(
+    monkeypatch,
+):
+    from backend.simulation_service import run_simulation as run_domain_simulation
+
+    generator_calls = []
+    captured_commands = []
+
+    def generate(limit):
+        generator_calls.append(limit)
+        return 424242
+
+    def capture_command(command):
+        captured_commands.append(command)
+        return run_domain_simulation(command)
+
+    monkeypatch.setattr("backend.simulation_seed.secrets.randbelow", generate)
+    monkeypatch.setattr("backend.api_routes_simulate.run_simulation", capture_command)
+    client = ApiTestClient(app)
+
+    response = client.post(
+        "/simulate",
+        json={
+            "throughput_samples": [1, 2, 3, 4, 5, 6],
+            "mode": "weeks_to_items",
+            "target_weeks": 8,
+            "n_sims": 2000,
+        },
+    )
+
+    assert response.status_code == 200
+    assert generator_calls == [SIMULATION_SEED_MAX + 1]
+    assert len(captured_commands) == 1
+    assert isinstance(captured_commands[0].seed, SimulationSeed)
+    assert captured_commands[0].seed.value == 424242
+    assert response.json()["seed"] == 424242
 
 
 @pytest.mark.parametrize(
@@ -507,14 +551,44 @@ def test_simulate_rejects_invalid_seed(seed):
     assert response.status_code == 422
 
 
-def test_resolve_simulation_seed_returns_requested_value():
-    assert _resolve_simulation_seed(321) == 321
+@pytest.mark.parametrize("seed", [0, SIMULATION_SEED_MAX])
+def test_resolve_simulation_seed_preserves_requested_boundaries(seed, monkeypatch):
+    generator = monkeypatch.setattr(
+        "backend.simulation_seed.secrets.randbelow",
+        lambda _limit: pytest.fail("the generator must not be called"),
+    )
+
+    resolved = resolve_simulation_seed(seed)
+
+    assert generator is None
+    assert isinstance(resolved, SimulationSeed)
+    assert resolved.value == seed
 
 
-def test_resolve_simulation_seed_generates_value_in_range(monkeypatch):
-    monkeypatch.setattr("backend.api_routes_simulate.secrets.randbelow", lambda limit: limit - 1)
+def test_resolve_simulation_seed_generates_and_validates_once(monkeypatch):
+    calls = []
 
-    assert _resolve_simulation_seed(None) == SIMULATION_SEED_MAX
+    def generate(limit):
+        calls.append(limit)
+        return limit - 1
+
+    monkeypatch.setattr("backend.simulation_seed.secrets.randbelow", generate)
+
+    resolved = resolve_simulation_seed(None)
+
+    assert calls == [SIMULATION_SEED_MAX + 1]
+    assert isinstance(resolved, SimulationSeed)
+    assert resolved.value == SIMULATION_SEED_MAX
+
+
+def test_resolve_simulation_seed_rejects_an_invalid_generated_value(monkeypatch):
+    monkeypatch.setattr(
+        "backend.simulation_seed.secrets.randbelow",
+        lambda _limit: SIMULATION_SEED_MAX + 1,
+    )
+
+    with pytest.raises(StatisticalValueError, match="seed"):
+        resolve_simulation_seed(None)
 
 
 class _FakeStore:
@@ -544,7 +618,7 @@ def _build_command() -> SimulationCommand:
         backlog_size=20,
         target_weeks=None,
         n_sims=2000,
-        seed=123,
+        seed=SimulationSeed(123),
     )
 
 

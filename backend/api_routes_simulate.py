@@ -1,7 +1,6 @@
 import asyncio
 import json
 import logging
-import secrets
 import time
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
@@ -11,7 +10,6 @@ from starlette.concurrency import run_in_threadpool
 
 from .api_config import get_api_config
 from .api_models import (
-    SIMULATION_SEED_MAX,
     SimulateRequest,
     SimulateResponse,
     SimulationHistoryItem,
@@ -22,6 +20,7 @@ from .simulation_mappers import (
     result_to_response,
 )
 from .simulation_models import SimulationCommand, SimulationResult
+from .simulation_seed import resolve_simulation_seed
 from .simulation_service import run_simulation
 from .simulation_store import SimulationStore
 from .simulation_value_objects import StatisticalValueError
@@ -111,12 +110,6 @@ limiter = ObservableLimiter(
 )
 
 
-def _resolve_simulation_seed(requested_seed: int | None) -> int:
-    if requested_seed is not None:
-        return requested_seed
-    return secrets.randbelow(SIMULATION_SEED_MAX + 1)
-
-
 def _persist_simulation(
     mc_client_id: str,
     command: SimulationCommand,
@@ -148,9 +141,9 @@ async def simulate(
     background_tasks: BackgroundTasks,
 ) -> SimulateResponse:
     started_at = time.perf_counter()
-    seed = _resolve_simulation_seed(req.seed)
 
     try:
+        seed = resolve_simulation_seed(req.seed)
         command = request_to_command(req, seed)
         result = await asyncio.wait_for(
             run_in_threadpool(run_simulation, command),

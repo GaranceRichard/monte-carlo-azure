@@ -4,6 +4,7 @@ import { fetchTeamThroughput, simulateForecastFromSamples } from "./simulationFo
 import { exportPortfolioPrintReport } from "../components/steps/portfolioPrintReport";
 import { getPortfolioErrorMessage, usePortfolioReport } from "./usePortfolioReport";
 import { computeRiskScoreFromPercentiles } from "../utils/simulation";
+import { createSimulationSeed } from "../domain/simulationValueObjects";
 
 vi.mock("./simulationForecastService", () => ({
   fetchTeamThroughput: vi.fn(),
@@ -13,7 +14,6 @@ vi.mock("./simulationForecastService", () => ({
 vi.mock("../components/steps/portfolioPrintReport", () => ({
   exportPortfolioPrintReport: vi.fn(),
 }));
-
 const throughputData = {
   weeklyThroughput: [{ week: "2026-01-05", throughput: 3 }],
   cycleTimeDaysData: [{ week: "2026-01-05", cycleTimeDays: 1.5, count: 3 }],
@@ -24,7 +24,7 @@ const throughputData = {
 const simulationResult = {
   resultKind: "weeks" as const,
   samplesCount: 100,
-  seed: 123456,
+  seed: createSimulationSeed(123456),
   riskScore: 0.3,
   resultPercentiles: { P50: 10, P70: 12, P90: 15 },
   resultDistribution: [{ x: 10, count: 25 }],
@@ -68,9 +68,7 @@ function setupReportHook(overrides: Partial<Parameters<typeof usePortfolioReport
 }
 
 describe("usePortfolioReport", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  beforeEach(() => vi.clearAllMocks());
 
   it("exports report when collect + simulations succeed", async () => {
     vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
@@ -135,7 +133,7 @@ describe("usePortfolioReport", () => {
     vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
     const monteCarloResult = {
       ...simulationResult,
-      seed: 24680,
+      seed: createSimulationSeed(24680),
       riskScore: 0.42,
       resultPercentiles: { P50: 11, P70: 13, P90: 17 },
       resultDistribution: [
@@ -318,7 +316,7 @@ describe("usePortfolioReport", () => {
     vi.mocked(simulateForecastFromSamples).mockResolvedValue({
       resultKind: "items",
       samplesCount: 100,
-      seed: 98765,
+      seed: createSimulationSeed(98765),
       riskScore: 0,
       resultPercentiles: { P50: 24, P70: 22, P90: 18 },
       resultDistribution: [
@@ -493,7 +491,7 @@ describe("usePortfolioReport", () => {
       ...simulationResult,
       riskScore: undefined,
       resultKind: "items",
-      seed: 54321,
+      seed: createSimulationSeed(54321),
       resultPercentiles: { P50: 24, P70: 22, P90: 18 },
       resultDistribution: [
         { x: 10, count: 10 },

@@ -61,7 +61,7 @@ def test_request_to_command_resolves_transport_values_and_seed():
         n_sims=2000,
     )
 
-    command = request_to_command(request, 98765)
+    command = request_to_command(request, SimulationSeed(98765))
 
     assert command.throughput_samples.raw_values == (0, 1, 2, 3, 4, 5)
     assert command.include_zero_weeks is True

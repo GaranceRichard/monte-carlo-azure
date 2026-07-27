@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { usePortfolio } from "./usePortfolio";
+import { createSimulationSeed } from "../domain/simulationValueObjects";
 import { getTeamOptionsDirect } from "../adoClient";
 import { fetchTeamThroughput, simulateForecastFromSamples } from "./simulationForecastService";
 import { exportPortfolioPrintReport } from "../components/steps/portfolioPrintReport";
@@ -29,7 +30,7 @@ const throughputData = {
 const simulationResult = {
   resultKind: "weeks" as const,
   samplesCount: 100,
-  seed: 123456,
+  seed: createSimulationSeed(123456),
   riskScore: 0.3,
   resultPercentiles: { P50: 10, P70: 12, P90: 15 },
   resultDistribution: [{ x: 10, count: 25 }],

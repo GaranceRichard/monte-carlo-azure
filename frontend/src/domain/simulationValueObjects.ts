@@ -19,7 +19,7 @@ declare const backlogSizeBrand: unique symbol;
 declare const simulationHorizonBrand: unique symbol;
 declare const throughputSamplesBrand: unique symbol;
 
-export type SimulationSeed = number & { readonly [simulationSeedBrand]?: never };
+export type SimulationSeed = number & { readonly [simulationSeedBrand]: true };
 export type SimulationCount = number & { readonly [simulationCountBrand]?: never };
 export type BacklogSize = number & { readonly [backlogSizeBrand]?: never };
 export type SimulationHorizon = number & { readonly [simulationHorizonBrand]?: never };

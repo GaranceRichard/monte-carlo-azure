@@ -1,12 +1,17 @@
+from inspect import Parameter, signature
 from pathlib import Path
 
 import numpy as np
 import pytest
 
-from backend.mc_core import FinishWeeksSimulation
+from backend.mc_core import (
+    FinishWeeksSimulation,
+    mc_finish_weeks,
+    mc_items_done_for_weeks,
+)
 from backend.simulation_models import SimulationCommand
 from backend.simulation_service import run_simulation
-from backend.simulation_value_objects import StatisticalValueError
+from backend.simulation_value_objects import SimulationSeed, StatisticalValueError
 
 
 def _command(**overrides) -> SimulationCommand:
@@ -17,7 +22,7 @@ def _command(**overrides) -> SimulationCommand:
         "backlog_size": 20,
         "target_weeks": None,
         "n_sims": 2000,
-        "seed": 123,
+        "seed": SimulationSeed(123),
     }
     values.update(overrides)
     return SimulationCommand.create(**values)
@@ -30,6 +35,20 @@ def test_service_has_no_http_or_pydantic_dependency():
     for forbidden in ("pydantic", "fastapi", "starlette", "api_models"):
         assert forbidden not in service_source.lower()
         assert forbidden not in model_source.lower()
+
+
+def test_service_and_engine_do_not_generate_automatic_seeds():
+    root = Path(__file__).resolve().parents[1]
+    sources = [
+        (root / "backend/simulation_service.py").read_text(encoding="utf-8"),
+        (root / "backend/mc_core.py").read_text(encoding="utf-8"),
+    ]
+
+    for source in sources:
+        assert "secrets" not in source
+        assert "randbelow" not in source
+    for engine in (mc_finish_weeks, mc_items_done_for_weeks):
+        assert signature(engine).parameters["seed"].default is Parameter.empty
 
 
 def test_service_runs_both_modes_without_changing_seeded_results():

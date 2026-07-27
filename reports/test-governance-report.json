@@ -5,7 +5,7 @@
   "profile": "main",
   "runtimeComplete": true,
   "summary": {
-    "logicalCases": 1189,
+    "logicalCases": 1198,
     "governedEntries": 0,
     "detectedMechanisms": 0,
     "skippedCases": 0,
@@ -15,8 +15,8 @@
     "retryCases": 0,
     "expiredEntries": 0,
     "dueWithin30Days": 0,
-    "executedInstances": 1409,
-    "attempts": 1409,
+    "executedInstances": 1422,
+    "attempts": 1422,
     "retries": 0,
     "unstableInstances": 0,
     "instabilityRatePercent": 0.0

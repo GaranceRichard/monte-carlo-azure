@@ -13,9 +13,9 @@ import { createThroughputSamples } from "../domain/simulationValueObjects";
 import { toSafeNumber } from "../utils/math";
 import {
   computeRiskScoreFromPercentiles,
-  generateSimulationSeed,
   simulateMonteCarloLocal,
 } from "../utils/simulation";
+import { resolveSimulationSeed } from "./simulationSeedResolver";
 import type {
   FetchTeamThroughputParams,
   FetchTeamThroughputResult,
@@ -138,7 +138,7 @@ export async function simulateForecastFromSamplesCore(
     targetWeeks,
     nSims,
   } = params;
-  const simulationSeed = seed ?? generateSimulationSeed();
+  const simulationSeed = resolveSimulationSeed(seed);
   const command = createSimulationCommand({
     seed: simulationSeed,
     throughputSamples,
@@ -226,7 +226,7 @@ export async function runSimulationForecastCore(
 
   const historyEntry: SimulationHistoryEntry = {
     schemaVersion: 2,
-    id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${String(adjusted.seed)}-${String(generateSimulationSeed())}`,
+    id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${String(adjusted.seed)}`,
     seed: adjusted.seed,
     createdAt: new Date().toISOString(),
     selectedOrg,

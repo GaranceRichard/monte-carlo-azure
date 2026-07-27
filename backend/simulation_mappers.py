@@ -4,9 +4,13 @@ from typing import Any, Mapping
 
 from .api_models import SimulateRequest, SimulateResponse, SimulationHistoryItem
 from .simulation_models import SimulationCommand, SimulationResult
+from .simulation_value_objects import SimulationSeed
 
 
-def request_to_command(request: SimulateRequest, resolved_seed: int) -> SimulationCommand:
+def request_to_command(
+    request: SimulateRequest,
+    resolved_seed: SimulationSeed,
+) -> SimulationCommand:
     return SimulationCommand.create(
         throughput_samples=request.throughput_samples,
         include_zero_weeks=request.include_zero_weeks,

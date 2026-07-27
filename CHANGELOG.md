@@ -2,6 +2,19 @@
 
 ## Recent
 
+### Résolution de seed aux frontières d’exécution — PBI 2.5
+
+- résolution backend extraite dans `backend/simulation_seed.py` : seed HTTP explicite validée sans
+  altération ou valeur uint32 générée une seule fois avec `secrets`, avant la création de la commande
+- résolution frontend déplacée hors du moteur statistique vers
+  `frontend/src/hooks/simulationSeedResolver.ts`, avec `crypto.getRandomValues` obligatoire lorsque la seed
+  est absente et suppression du repli `Date.now() >>> 0`
+- commandes Python et TypeScript désormais limitées à une `SimulationSeed` déjà résolue ; propagation
+  inchangée vers moteurs, réponses, MongoDB, `localStorage`, démo, portefeuille et rejeu
+- contrats JSON, formats de persistance, PRNG, ordre et nombre des tirages, batching et formules statistiques
+  inchangés ; tests ciblés ajoutés pour les bornes, l'appel unique, l'erreur Web Crypto et l'absence de
+  génération dans les moteurs
+
 ### Value Objects statistiques prioritaires — PBI 2.4
 
 - introduction, en Python et TypeScript, de Value Objects statistiques immuables pour la seed, les entrées de

@@ -14,6 +14,7 @@ import {
   riskScoreFromPercentiles,
   SIMULATION_HORIZON_WEEKS_MAX,
 } from "../domain/simulationValueObjects";
+import type { SimulationSeed } from "../domain/simulationValueObjects";
 import { clamp } from "./math";
 
 export type ScenarioSamples = {
@@ -48,14 +49,6 @@ export function createSeededRandom(seed: number): () => number {
     t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-}
-
-export function generateSimulationSeed(): number {
-  const cryptoApi = globalThis.crypto;
-  if (cryptoApi?.getRandomValues) {
-    return cryptoApi.getRandomValues(new Uint32Array(1))[0] ?? 0;
-  }
-  return Date.now() >>> 0;
 }
 
 function pickBootstrapSample(samples: number[], random: () => number): number {
@@ -219,7 +212,11 @@ export function simulateMonteCarloLocal(
   });
 }
 
-export function buildScenarioSamples(teamSamples: number[][], alignmentRate: number, seed: number): ScenarioSamples {
+export function buildScenarioSamples(
+  teamSamples: number[][],
+  alignmentRate: number,
+  seed: SimulationSeed,
+): ScenarioSamples {
   if (!teamSamples.length) {
     throw new Error("buildScenarioSamples: teamSamples ne peut pas etre vide.");
   }

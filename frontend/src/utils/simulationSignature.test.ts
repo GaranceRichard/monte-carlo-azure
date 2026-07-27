@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { SimulationHistoryEntry } from "../domain/simulationHistory";
+import { createSimulationSeed } from "../domain/simulationValueObjects";
 import {
   buildHistoryEntrySignature,
   buildSimulationExecutionSnapshot,
@@ -31,7 +32,7 @@ function historyEntry(overrides: Partial<SimulationHistoryEntry> = {}): Simulati
     result: {
       resultKind: "items",
       samplesCount: 20_000,
-      seed: 42,
+      seed: createSimulationSeed(42),
       resultPercentiles: { P50: 20, P70: 18, P90: 15 },
       riskScore: 0.25,
       resultDistribution: [{ x: 15, count: 10 }],

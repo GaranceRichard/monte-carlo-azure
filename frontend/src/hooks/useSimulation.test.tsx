@@ -4,6 +4,7 @@ import { runSimulationForecast } from "./simulationForecastService";
 import { useSimulation } from "./useSimulation";
 import type { SimulationViewModel } from "./useSimulation";
 import type { SimulationHistoryEntry } from "../domain/simulationHistory";
+import { createSimulationSeed } from "../domain/simulationValueObjects";
 
 const pushSimulationHistory = vi.fn();
 const clearSimulationHistory = vi.fn();
@@ -46,7 +47,7 @@ const forecast = {
   sampleStats: { totalWeeks: 8, zeroWeeks: 1, usedWeeks: 7 },
   weeklyThroughput: [{ week: "2026-01-05", throughput: 3 }],
   cycleTimeDaysData: [],
-  result: { resultKind: "weeks" as const, samplesCount: 8, seed: 42, resultPercentiles: { P50: 3 }, resultDistribution: [] },
+  result: { resultKind: "weeks" as const, samplesCount: 8, seed: createSimulationSeed(42), resultPercentiles: { P50: 3 }, resultDistribution: [] },
   warning: "partiel",
   historyEntry: { id: "history" },
 };
@@ -78,7 +79,7 @@ function reusableHistoryEntry(
     result: {
       resultKind: simulation.simulationMode === "weeks_to_items" ? "items" : "weeks",
       samplesCount: Number(simulation.nSims),
-      seed: 77,
+      seed: createSimulationSeed(77),
       resultPercentiles: { P50: 10, P70: 12, P90: 15 },
       riskScore: 0.5,
       resultDistribution: [{ x: 10, count: 5 }],

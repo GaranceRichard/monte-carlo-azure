@@ -123,7 +123,7 @@ def test_commands_resolve_only_the_active_mode_parameter():
         backlog_size=10,
         target_weeks="inactive",
         n_sims=1000,
-        seed=0,
+        seed=SimulationSeed(0),
     )
     horizon = SimulationCommand.create(
         throughput_samples=[1] * 6,
@@ -132,7 +132,7 @@ def test_commands_resolve_only_the_active_mode_parameter():
         backlog_size="inactive",
         target_weeks=12,
         n_sims=1000,
-        seed=SIMULATION_SEED_MAX,
+        seed=SimulationSeed(SIMULATION_SEED_MAX),
     )
 
     assert backlog.backlog_size == BacklogSize(10)
@@ -148,6 +148,7 @@ def test_commands_resolve_only_the_active_mode_parameter():
         {"mode": "backlog_to_weeks", "backlog_size": None},
         {"mode": "weeks_to_items", "target_weeks": None},
         {"throughput_samples": "123456"},
+        {"seed": 0},
     ],
 )
 def test_commands_reject_unresolved_domain_inputs(overrides):
@@ -158,7 +159,7 @@ def test_commands_reject_unresolved_domain_inputs(overrides):
         "backlog_size": 10,
         "target_weeks": None,
         "n_sims": 1000,
-        "seed": 0,
+        "seed": SimulationSeed(0),
     }
     values.update(overrides)
 

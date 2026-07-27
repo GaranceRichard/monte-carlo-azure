@@ -132,7 +132,7 @@ describe("resolved simulation commands", () => {
     throughputSamples: [1, 2, 3, 4, 5, 6],
     includeZeroWeeks: false,
     nSims: 1000,
-    seed: 0,
+    seed: createSimulationSeed(0),
   };
 
   it("keeps only the active mode parameter", () => {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createSimulationCommand } from "../domain/simulation";
 import type { SimulationCommandInput } from "../domain/simulation";
+import { createSimulationSeed } from "../domain/simulationValueObjects";
 import {
   buildCorrelatedPortfolioSamples,
   buildCorrelatedPortfolioWeeklyThroughputs,
@@ -12,7 +13,6 @@ import {
   computeRiskScoreFromPercentiles,
   computeThroughputReliability,
   discretePercentiles,
-  generateSimulationSeed,
   getProjectionReliabilityNotice,
   simulateMonteCarloLocal,
 } from "./simulation";
@@ -26,18 +26,23 @@ import {
   validateSimulationInputContract,
 } from "../simulationLimits";
 
-function runLocalSimulation(input: SimulationCommandInput) {
-  return simulateMonteCarloLocal(createSimulationCommand(input));
+function runLocalSimulation(
+  input: Omit<SimulationCommandInput, "seed"> & { seed: number },
+) {
+  return simulateMonteCarloLocal(createSimulationCommand({
+    ...input,
+    seed: createSimulationSeed(input.seed),
+  }));
 }
 
 describe("buildScenarioSamples", () => {
   it("clamps alignment rate before computing aligned and friction samples", () => {
-    expect(buildScenarioSamples([[5], [7]], -25, 123)).toEqual({
+    expect(buildScenarioSamples([[5], [7]], -25, createSimulationSeed(123))).toEqual({
       optimistic: [12],
       aligned: [0],
       friction: [0],
     });
-    expect(buildScenarioSamples([[5], [7]], 140, 123)).toEqual({
+    expect(buildScenarioSamples([[5], [7]], 140, createSimulationSeed(123))).toEqual({
       optimistic: [12],
       aligned: [12],
       friction: [12],
@@ -51,7 +56,7 @@ describe("buildScenarioSamples", () => {
         [100, 200],
       ],
       80,
-      1431655765,
+      createSimulationSeed(1431655765),
     );
 
     expect(scenarios.optimistic).toEqual([130, 120, 110]);
@@ -63,7 +68,7 @@ describe("buildScenarioSamples", () => {
   });
 
   it("uses same values for all scenarios with 1 team", () => {
-    const scenarios = buildScenarioSamples([[5, 8, 13]], 20, 123);
+    const scenarios = buildScenarioSamples([[5, 8, 13]], 20, createSimulationSeed(123));
 
     expect(scenarios.optimistic).toEqual(scenarios.aligned);
     expect(scenarios.aligned).toEqual(scenarios.friction);
@@ -87,10 +92,10 @@ describe("buildScenarioSamples", () => {
   });
 
   it("keeps the displayed friction percent aligned with the rounded sample factor", () => {
-    const oneTeam = buildScenarioSamples([[101]], 80, 123);
-    const twoTeams = buildScenarioSamples([[101], [100]], 80, 123);
-    const threeTeams = buildScenarioSamples([[101], [100], [100]], 80, 123);
-    const fourTeams = buildScenarioSamples([[101], [100], [100], [100]], 80, 123);
+    const oneTeam = buildScenarioSamples([[101]], 80, createSimulationSeed(123));
+    const twoTeams = buildScenarioSamples([[101], [100]], 80, createSimulationSeed(123));
+    const threeTeams = buildScenarioSamples([[101], [100], [100]], 80, createSimulationSeed(123));
+    const fourTeams = buildScenarioSamples([[101], [100], [100], [100]], 80, createSimulationSeed(123));
 
     expect(oneTeam.friction).toEqual([101]);
     expect(twoTeams.friction).toEqual([160]);
@@ -105,60 +110,13 @@ describe("buildScenarioSamples", () => {
   });
 
   it("throws explicit error when teamSamples is empty", () => {
-    expect(() => buildScenarioSamples([], 100, 123)).toThrow("teamSamples ne peut pas etre vide");
+    expect(() => buildScenarioSamples([], 100, createSimulationSeed(123))).toThrow("teamSamples ne peut pas etre vide");
   });
 
   it("throws explicit error when a team has no samples", () => {
-    expect(() => buildScenarioSamples([[1, 2], []], 100, 123)).toThrow(
+    expect(() => buildScenarioSamples([[1, 2], []], 100, createSimulationSeed(123))).toThrow(
       "chaque equipe doit contenir au moins un sample",
     );
-  });
-});
-
-describe("generateSimulationSeed", () => {
-  it("uses crypto.getRandomValues when available", () => {
-    const originalCrypto = globalThis.crypto;
-    Object.defineProperty(globalThis, "crypto", {
-      configurable: true,
-      value: {
-        getRandomValues(target: Uint32Array) {
-          target[0] = 424242;
-          return target;
-        },
-      },
-    });
-
-    expect(generateSimulationSeed()).toBe(424242);
-
-    Object.defineProperty(globalThis, "crypto", {
-      configurable: true,
-      value: originalCrypto,
-    });
-  });
-
-  it("falls back to Date.now when crypto.getRandomValues is unavailable", () => {
-    const originalCrypto = globalThis.crypto;
-    const originalDateNow = Date.now;
-    Object.defineProperty(Date, "now", {
-      configurable: true,
-      value: () => 9876543210,
-    });
-
-    Object.defineProperty(globalThis, "crypto", {
-      configurable: true,
-      value: undefined,
-    });
-
-    expect(generateSimulationSeed()).toBe(1286608618);
-
-    Object.defineProperty(globalThis, "crypto", {
-      configurable: true,
-      value: originalCrypto,
-    });
-    Object.defineProperty(Date, "now", {
-      configurable: true,
-      value: originalDateNow,
-    });
   });
 });
 
@@ -246,7 +204,7 @@ describe("buildCorrelatedPortfolioSamples", () => {
         [50, 60],
       ],
       80,
-      2004318071,
+      createSimulationSeed(2004318071),
     );
     const correlated = buildCorrelatedPortfolioSamples(
       [

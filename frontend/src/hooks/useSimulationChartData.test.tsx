@@ -2,6 +2,7 @@ import { renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as probability from "./probability";
 import { useSimulationChartData } from "./useSimulationChartData";
+import { createSimulationSeed } from "../domain/simulationValueObjects";
 
 describe("useSimulationChartData", () => {
   afterEach(() => {
@@ -50,7 +51,7 @@ describe("useSimulationChartData", () => {
         result: {
           resultKind: "weeks",
           samplesCount: 4,
-          seed: 1,
+          seed: createSimulationSeed(1),
           resultPercentiles: { P50: 10, P70: 12, P90: 15 },
           resultDistribution: [
             { x: 15, count: 1 },
@@ -95,7 +96,7 @@ describe("useSimulationChartData", () => {
         result: {
           resultKind: "items",
           samplesCount: 3,
-          seed: 2,
+          seed: createSimulationSeed(2),
           resultPercentiles: { P50: 1, P70: 2, P90: 3 },
           resultDistribution: [
             { x: Number.NaN, count: 1 },
@@ -124,7 +125,7 @@ describe("useSimulationChartData", () => {
         result: {
           resultKind: "items",
           samplesCount: 5,
-          seed: 3,
+          seed: createSimulationSeed(3),
           resultPercentiles: { P50: 24, P70: 22, P90: 18 },
           resultDistribution: [
             { x: 18, count: 1 },
@@ -152,7 +153,7 @@ describe("useSimulationChartData", () => {
         result: {
           resultKind: "items",
           samplesCount: 5,
-          seed: 4,
+          seed: createSimulationSeed(4),
           resultPercentiles: { P50: 24, P70: 25, P90: 27 },
           resultDistribution: [
             { x: 18, count: 1 },

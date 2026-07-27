@@ -3,8 +3,13 @@ from typing import Dict, List, Literal, Optional
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictInt, model_validator
 
 from .simulation_limits import SIMULATION_SEED_MAX, SIMULATION_SEED_MIN
-from .simulation_models import SimulationCommand
-from .simulation_value_objects import StatisticalValueError
+from .simulation_value_objects import (
+    BacklogSize,
+    SimulationCount,
+    SimulationHorizon,
+    StatisticalValueError,
+    ThroughputSamples,
+)
 
 __all__ = [
     "SIMULATION_SEED_MAX",
@@ -32,15 +37,23 @@ class SimulateRequest(BaseModel):
     @model_validator(mode="after")
     def validate_domain_contract(self) -> "SimulateRequest":
         try:
-            SimulationCommand.create(
-                throughput_samples=self.throughput_samples,
-                include_zero_weeks=self.include_zero_weeks,
-                mode=self.mode,
-                backlog_size=self.backlog_size,
-                target_weeks=self.target_weeks,
-                n_sims=self.n_sims,
-                seed=self.seed if self.seed is not None else SIMULATION_SEED_MIN,
+            ThroughputSamples.create(
+                self.throughput_samples,
+                self.include_zero_weeks,
             )
+            SimulationCount(self.n_sims)
+            if self.mode == "backlog_to_weeks":
+                if self.backlog_size is None:
+                    raise StatisticalValueError(
+                        "backlog_size requis pour le mode backlog_to_weeks."
+                    )
+                BacklogSize(self.backlog_size)
+            else:
+                if self.target_weeks is None:
+                    raise StatisticalValueError(
+                        "target_weeks requis pour le mode weeks_to_items."
+                    )
+                SimulationHorizon(self.target_weeks)
         except StatisticalValueError as exc:
             if str(exc).startswith("Historique insuffisant"):
                 return self

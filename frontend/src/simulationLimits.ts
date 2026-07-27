@@ -1,5 +1,10 @@
-import { createSimulationCommand } from "./domain/simulation";
 import type { SimulationMode } from "./domain/simulation";
+import {
+  createBacklogSize,
+  createSimulationCount,
+  createSimulationHorizon,
+  createThroughputSamples,
+} from "./domain/simulationValueObjects";
 
 export {
   SIMULATION_BACKLOG_SIZE_MAX,
@@ -33,17 +38,28 @@ export function validateSimulationInputContract(input: {
   targetWeeks?: number;
   nSims: number;
 } {
-  const command = createSimulationCommand({
-    ...input,
-    includeZeroWeeks: input.includeZeroWeeks ?? false,
-    backlogSize: input.backlogSize === undefined ? undefined : Number(input.backlogSize),
-    targetWeeks: input.targetWeeks === undefined ? undefined : Number(input.targetWeeks),
-    nSims: Number(input.nSims),
-    seed: 0,
-  });
+  createThroughputSamples(
+    input.throughputSamples,
+    input.includeZeroWeeks ?? false,
+  );
+  const nSims = createSimulationCount(Number(input.nSims));
+  if (input.mode !== "backlog_to_weeks" && input.mode !== "weeks_to_items") {
+    throw new Error("mode de simulation invalide.");
+  }
+  if (input.mode === "backlog_to_weeks") {
+    if (input.backlogSize === undefined) {
+      throw new Error("backlog_size requis pour le mode backlog_to_weeks.");
+    }
+    return {
+      backlogSize: createBacklogSize(Number(input.backlogSize)),
+      nSims,
+    };
+  }
+  if (input.targetWeeks === undefined) {
+    throw new Error("target_weeks requis pour le mode weeks_to_items.");
+  }
   return {
-    ...(command.backlogSize === undefined ? {} : { backlogSize: command.backlogSize }),
-    ...(command.targetWeeks === undefined ? {} : { targetWeeks: command.targetWeeks }),
-    nSims: command.nSims,
+    targetWeeks: createSimulationHorizon(Number(input.targetWeeks)),
+    nSims,
   };
 }

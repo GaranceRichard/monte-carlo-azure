@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createSimulationCommand } from "./domain/simulation";
+import { createSimulationSeed } from "./domain/simulationValueObjects";
 import {
   DEMO_CONFIG,
   DEMO_TEAM_CYCLE_TIME,
@@ -26,7 +27,7 @@ function buildDemoDiagnostic(teamName: string) {
     mode: "backlog_to_weeks",
     backlogSize: 120,
     nSims: 4_000,
-    seed: 12_345,
+    seed: createSimulationSeed(12_345),
   }));
   const dataQuality = diagnoseDataQuality({ throughputSamples, includeZeroWeeks: true });
   const forecastUncertainty = diagnoseForecastUncertainty({

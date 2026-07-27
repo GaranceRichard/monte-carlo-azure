@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createSimulationCommand } from "../domain/simulation";
+import { createSimulationSeed } from "../domain/simulationValueObjects";
 import {
   simulateResponseDtoToResult,
   simulationCommandToDto,
@@ -13,7 +14,7 @@ const command = createSimulationCommand({
   backlogSize: 80,
   targetWeeks: undefined,
   nSims: 20000,
-  seed: 123456,
+  seed: createSimulationSeed(123456),
 });
 
 describe("simulation HTTP mappers", () => {

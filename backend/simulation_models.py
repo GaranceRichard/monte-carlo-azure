@@ -62,8 +62,10 @@ class SimulationCommand:
         backlog_size: object | None,
         target_weeks: object | None,
         n_sims: object,
-        seed: object,
+        seed: SimulationSeed,
     ) -> SimulationCommand:
+        if not isinstance(seed, SimulationSeed):
+            raise StatisticalValueError("seed doit etre un Value Object resolu.")
         if mode not in ("backlog_to_weeks", "weeks_to_items"):
             raise StatisticalValueError("mode de simulation invalide.")
         if not isinstance(throughput_samples, (list, tuple)):
@@ -75,7 +77,6 @@ class SimulationCommand:
             include_zero_weeks,
         )
         simulation_count = SimulationCount(n_sims)
-        simulation_seed = SimulationSeed(seed)
         if mode == "backlog_to_weeks":
             if backlog_size is None:
                 raise StatisticalValueError(
@@ -87,7 +88,7 @@ class SimulationCommand:
                 BacklogSize(backlog_size),
                 None,
                 simulation_count,
-                simulation_seed,
+                seed,
             )
         if target_weeks is None:
             raise StatisticalValueError(
@@ -99,7 +100,7 @@ class SimulationCommand:
             None,
             SimulationHorizon(target_weeks),
             simulation_count,
-            simulation_seed,
+            seed,
         )
 
     @property

@@ -58,6 +58,10 @@ Démo GitHub Pages:
 - Value Objects statistiques immuables et validés en Python et TypeScript pour la seed, les entrées,
   les percentiles, la fiabilité du throughput, l’histogramme et la complétion ; les DTO HTTP,
   MongoDB et `localStorage` conservent leurs formats primitifs et sont convertis explicitement aux frontières
+- résolution de la seed avant toute création de commande : `backend/simulation_seed.py` produit directement
+  un `SimulationSeed` avec `secrets` à la frontière HTTP, tandis que
+  `frontend/src/hooks/simulationSeedResolver.ts` valide la seed explicite ou utilise une seule fois
+  `crypto.getRandomValues`; l’absence de Web Crypto est une erreur explicite
 - démo locale et simulations portefeuille reproductibles à `seed` identique
 - visualisation des percentiles et distributions
 - sémantique métier des percentiles alignée sur le mode de simulation:
@@ -200,7 +204,8 @@ L'historique local des simulations embarque aussi un `schemaVersion`; les ancien
 sans version sont migrées une seule fois au chargement en convertissant leurs anciennes
 valeurs `Cycle Time` stockées en semaines vers des jours calendaires (`* 7`).
 Les nouvelles entrées locales embarquent aussi leur `seed`: une nouvelle simulation frontend
-génère une seule `seed` par exécution logique, la transmet au backend si besoin, l'utilise
+résout une seule `seed` uint32 par exécution logique avant de créer la commande, la transmet au backend si
+besoin, l'utilise
 dans le moteur démo / portefeuille, puis la conserve lors d'un rejeu local. Les historiques
 plus anciens sans `seed` restent lisibles et rejouables, mais sans promesse de reproductibilité
 bit à bit.
@@ -628,11 +633,15 @@ Comportement du `seed` de simulation:
 - `POST /simulate` accepte un `seed` entier optionnel entre `0` et `4294967295`
 - à payload identique, renvoyer le même `seed` reproduit strictement le même résultat de simulation
 - si aucun `seed` n'est fourni, le backend en génère un automatiquement et le renvoie dans la réponse
+- la génération backend utilise `secrets` directement dans `0..4294967295` et retourne un
+  `SimulationSeed` validé avant la création de la commande
 - côté backend, le calcul conserve un seul générateur pseudo-aléatoire sur toute l'exécution et
   traite les simulations par lots sans réensemencement inter-lots
 - l'historique Mongo persiste aussi ce `seed` pour faciliter l'analyse a posteriori d'une simulation
 - côté frontend, une exécution logique ne consomme qu'une seule `seed`; le rejeu d'une entrée
   locale réemploie cette même `seed` tant que ses paramètres restent inchangés
+- côté frontend, une seed absente est générée directement par `crypto.getRandomValues`; aucun repli
+  `Date.now() >>> 0`, aucune troncature et aucune normalisation silencieuse ne sont autorisés
 
 Purge planifiée:
 
