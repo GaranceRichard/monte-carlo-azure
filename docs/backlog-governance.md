@@ -106,7 +106,7 @@ Aucun PBI actuel ne relève de **Sol Minimal**, réservé aux corrections mécan
 | Modèle Codex | Nombre de PBI |
 | --- | ---: |
 | Sol Medium | 15 |
-| Sol Élevé | 31 |
+| Sol Élevé | 32 |
 | Sol Très élevé | 72 |
 | Sol Ultra | 5 |
 | **Total** | **123** |
