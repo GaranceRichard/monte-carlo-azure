@@ -20,3 +20,14 @@ Chaque contrôle doit être évalué selon :
 - la capacité d’un nouveau mainteneur à le comprendre et le réparer.
 
 Les contrôles de sécurité, de contrat, de parité statistique et de protection des parcours critiques restent prioritaires.
+
+
+## Résultat attendu du PBI 13.10
+
+- supprimer la dépendance directe de la CI à Docker Hub pour les images de services critiques ;
+- répliquer l’image MongoDB approuvée dans GitHub Container Registry ;
+- référencer l’image CI par digest immuable ;
+- utiliser des permissions minimales et le `GITHUB_TOKEN` pour l’accès au package ;
+- définir un processus contrôlé de mise à jour du miroir depuis l’image amont ;
+- distinguer explicitement les échecs de récupération d’image, de démarrage du service et de tests backend ;
+- ne modifier ni le comportement MongoDB attendu, ni les tests produit, ni les seuils de qualité.
