@@ -2,7 +2,7 @@
   "schemaVersion": "1.0.0",
   "schema": "config/test-strategy-report.schema.json",
   "profile": "main",
-  "evidenceBundleId": "8650fcea8069d12d4e6e10000b90da56d53d1941a9095120ca2440837898fb2f",
+  "evidenceBundleId": "3f073c18f5b993dacc9c7124866ab9732f13f0eeb95bcd0342d785f5e10d2e81",
   "evidenceBundleIdentityDisclaimer": "This identifier names the exact evidence bundle; it does not prove that every source came from the same physical execution.",
   "globalReference": {
     "inventory": {
@@ -1469,7 +1469,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/preflight/result.json",
         "exitCode": 0,
-        "durationSeconds": 8.685,
+        "durationSeconds": 12.603,
         "reasons": []
       },
       {
@@ -1478,7 +1478,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 0.101,
+        "durationSeconds": 0.8,
         "reasons": []
       },
       {
@@ -1487,7 +1487,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 30.597,
+        "durationSeconds": 35.226,
         "reasons": []
       },
       {
@@ -1496,7 +1496,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 83.393,
+        "durationSeconds": 93.045,
         "reasons": []
       },
       {
@@ -1505,7 +1505,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 93.396,
+        "durationSeconds": 124.37,
         "reasons": []
       },
       {
@@ -1514,7 +1514,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/e2e/result.json",
         "exitCode": 0,
-        "durationSeconds": 42.055,
+        "durationSeconds": 45.681,
         "reasons": []
       },
       {
@@ -1523,7 +1523,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/release-or-container-checks/result.json",
         "exitCode": 0,
-        "durationSeconds": 39.248,
+        "durationSeconds": 60.171,
         "reasons": []
       },
       {
@@ -1655,9 +1655,9 @@
             "pct": 91.28
           },
           "branches": {
-            "total": 2728,
-            "covered": 2260,
-            "pct": 82.84
+            "total": 2726,
+            "covered": 2258,
+            "pct": 82.83
           },
           "functions": {
             "total": 441,
@@ -2288,7 +2288,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "1030d5635e134b171c8b2e0e0bce3528edd23d6fae51142690827fa8d31f7b0d",
+      "fingerprint": "fac7360a1ffcae6a361903ec621cdd1a1e4d5dc23b7c311a4db1fc6e06fad364",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2304,7 +2304,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "49c3faec480bdf42d35603e3a6a940211b56c2055d1998d062206c7ee7f98087",
+      "fingerprint": "d227fb6131a196f2c30c6f6bc4696d51fff86852ea9bb576ed1e36615a55ec44",
       "schemaVersion": 3,
       "status": "valid",
       "reasons": []
@@ -2320,7 +2320,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "40583475ffaada3b58036eedcf1e47ba291baccd383562bb30342ced2249d554",
+      "fingerprint": "3d0c308ef805cd7d45bccad2ac20bb40249a150b77b3f08a95c2a247c9263b2a",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2336,7 +2336,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "550f6efa4fc47ae116b66a2a506b1fff521e74481f4a5330bee39d7284c2c8de",
+      "fingerprint": "708daad337793eced48ba2e568334a3ba545dd396c79369ac2d06448191a599f",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2416,7 +2416,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "aa3ed5b4810da70c9251847a779be8f0f4066293afae562521871608f4ad9980",
+      "fingerprint": "7065c09631bd7a79a0f0fc843e4bca7b5c9cc445fcca90b5b70edd52e0939681",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2432,7 +2432,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "d2032547c9f97ace90fade51da8a1ed49846e7bd8856366a0414d6b28e71ad2c",
+      "fingerprint": "f2959e9a0c59b3be70b0e060524a0f4b0c490c521e9d7904f3711c70d385e139",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2448,7 +2448,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "bcc2b4e74b1e6a84d4bf845b903b16d52d96fab87f5c149bcb3960bd07c3fd21",
+      "fingerprint": "119ff8d93b1cb1582f8f8c989dac8a94ed65f0c3a113178d9ae1614147e83ffe",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2464,7 +2464,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "4fe761cc0aa65e2abbc45099df03581f5238da6054ad4bc1470e260fce26b29c",
+      "fingerprint": "e5721b4639209833fb00f53132b3f7ad19dcd8f732db99010938fc15faa9dd2b",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2480,7 +2480,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "ba80230d9bc098640d671f25511bba2d41d333eec24c0f90e753b85a1858eb4d",
+      "fingerprint": "87753dbfc97f5859bb643b257d87ebaf90008458cb1b0680409e567c7cd1ed04",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2496,7 +2496,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "23668647981b1694a347bfd7af8a0fcd28ead777a20bc6d5ddf07511522d775f",
+      "fingerprint": "7278e2cbd9f5aaa430f1edf6b476da8e7e24681d32975eb1a46a1393c59b2844",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2512,7 +2512,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "98078c317fdc0e4babfc82763f26a0ef988448a69545fb1bb61a30e16e9e8602",
+      "fingerprint": "a2ab1d8d5ac4e247b1fe8da72b99e9a80a4c8312425be9ba0548e9628034f65d",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []

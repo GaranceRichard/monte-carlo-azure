@@ -1,21 +1,14 @@
-# Backlog consolidé et ordonnancé
+# Registre du backlog
 
-## Séquence prioritaire actuelle
-
-1. **1.11 — Rétablir la modification obligatoire du README comme gate de commit**
-2. **Terminer la Feature 2 — Garantir la fiabilité du cœur statistique**
-3. **Rationaliser le dispositif de gouvernance technique — Feature 13**
-4. Réarbitrer les autres Features selon la stratégie de diffusion définie par la Feature 14
-
-Aucun PBI ne peut être considéré comme committable si `README.md` n’a pas reçu une évolution pertinente, réellement stagée avec le changement livré.
-
----
+Ce document constitue le registre de pilotage des Features et PBI. Les règles transverses sont définies dans [`backlog-governance.md`](backlog-governance.md) et les attendus détaillés dans [`backlog-expectations/`](backlog-expectations/README.md).
 
 ## Feature 1 — Disposer d’un système de preuve qualité gouverné
 
 **Description :** mettre en place un dispositif capable de classifier, sélectionner, exécuter, dénombrer et piloter automatiquement les tests selon leur nature réelle, leurs finalités, leurs risques et leurs profils d’exécution.
 
 **Flux de valeur :** rendre mesurable et vérifiable la confiance apportée par la stratégie de test, plutôt que de s’appuyer uniquement sur le volume de tests ou la couverture du code.
+
+**Attendus détaillés :** [`backlog-expectations/feature-01-quality-governance.md`](backlog-expectations/feature-01-quality-governance.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -31,25 +24,13 @@ Aucun PBI ne peut être considéré comme committable si `README.md` n’a pas r
 | 1.10 | Publier un reporting consolidé de la stratégie de test | L | Sol Élevé | 22/07/2026 |
 | 1.11 | Rétablir la modification obligatoire du README comme gate de commit | M | Sol Très élevé | 22/07/2026 |
 
-### Règle portée par le PBI 1.11
-
-La gate de commit doit vérifier le contenu réellement stagé et refuser tout commit lorsque :
-
-- des changements sont destinés au commit ;
-- `README.md` n’est pas modifié et stagé ;
-- `README.md` est modifié dans le worktree mais absent du staging.
-
-La règle s’applique sans exception implicite aux changements de code, tests, documentation, configuration, CI/CD, architecture, backlog et maintenance.
-
-La modification du README doit être pertinente et refléter le changement livré. Une modification artificielle ou purement mécanique ne satisfait pas l’intention de la gate.
-
----
-
 ## Feature 2 — Garantir la fiabilité du cœur statistique
 
 **Description :** formaliser les règles statistiques communes, supprimer les divergences involontaires entre Python et TypeScript et protéger les invariants du moteur par des contrats, un rejeu déterministe et des références partagées.
 
 **Flux de valeur :** assurer que les projections, diagnostics et décisions reposent sur des calculs cohérents, reproductibles et explicables, quel que soit le chemin d’exécution utilisé.
+
+**Attendus détaillés :** [`backlog-expectations/feature-02-statistical-core.md`](backlog-expectations/feature-02-statistical-core.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -74,163 +55,36 @@ La modification du README doit être pertinente et refléter le changement livr�
 | 2.19 | Intégrer les contrôles de parité au profil `main` | M | Sol Très élevé | |
 | 2.20 | Bloquer les dérives de version et de compatibilité statistique | M | Sol Très élevé | |
 
-### Retour d’expérience du PBI 2.4
+## Feature 3 — Distribuer un moteur statistique Python réutilisable
 
-Le PBI 2.4 a livré le résultat attendu, mais son périmètre était trop large pour une complexité `L`. Il réunissait plusieurs familles de Value Objects, leur intégration dans deux langages, la migration des frontières et consommateurs, la suppression d’autorités concurrentes et la reprise de la preuve qualité.
+**Description :** produire un package Python installable, versionné et utilisable par un consommateur externe au travers d’une API publique stable, sans dépendance à Azure DevOps, FastAPI, MongoDB, Redis ou au frontend.
 
-Cette réalisation ne doit pas servir de modèle de granularité. Pour la suite de la Feature 2 :
+**Flux de valeur :** permettre à un intégrateur d’exécuter une prévision conforme au contrat statistique sans dépendre de l’application Monte Carlo Azure ni de ses infrastructures.
 
-- un PBI porte un seul résultat statistique ou architectural principal ;
-- l’introduction d’une abstraction est séparée de l’alignement des algorithmes ;
-- la construction d’un corpus est séparée de son exécution ;
-- l’alignement d’une famille de règles est séparé des autres familles ;
-- le reporting de parité, son intégration à la gate et la compatibilité versionnée restent trois résultats distincts ;
-- aucun PBI ne combine modèle, algorithmes, corpus, gate et migration.
-
-### Phase A — Déterminisme d’exécution : PBI 2.5 à 2.8
-
-#### Résultat attendu du PBI 2.5
-
-- résoudre la seed aux frontières API, UI et démo avant l’appel du moteur ;
-- conserver exactement une seed uint32 déjà validée ;
-- supprimer les générations ou normalisations silencieuses dans le cœur ;
-- ne pas injecter ici l’horloge ou les identifiants techniques sans effet statistique.
-
-#### Résultat attendu du PBI 2.6
-
-- définir une interface minimale de tirage consommée par les moteurs ;
-- remplacer l’accès direct aux bibliothèques aléatoires dans la logique Monte Carlo ;
-- permettre une source déterministe de test ;
-- ne choisir ni ne déployer encore le PRNG commun.
-
-#### Résultat attendu du PBI 2.7
-
-- implémenter le même PRNG contractuel dans les deux langages ;
-- définir son état, son domaine, sa sortie et ses vecteurs de vérification ;
-- prouver l’égalité des suites de nombres produites ;
-- ne pas aligner dans ce PBI les percentiles, la fiabilité ou les histogrammes.
-
-#### Résultat attendu du PBI 2.8
-
-- figer l’ordre logique de consommation des tirages ;
-- rendre les résultats indépendants du découpage en lots ;
-- couvrir les deux modes, les censures et les changements de taille de batch ;
-- ne pas introduire le corpus complet de parité.
-
-### Phase B — Corpus partagé : PBI 2.9 à 2.12
-
-#### Résultat attendu du PBI 2.9
-
-- définir un format sérialisé strict et versionné ;
-- distinguer entrées normalisées, résultats attendus et niveau de preuve ;
-- porter la version normative `1.0` et la seed ;
-- valider le schéma indépendamment des moteurs.
-
-#### Résultat attendu du PBI 2.10
-
-- couvrir bornes, types invalides, traitement des zéros et paramètres actifs ;
-- couvrir les deux modes, la fin exacte à l’horizon, les censures totale et partielle ;
-- couvrir l’identifiabilité et l’ordre de P50, P70 et P90 ;
-- utiliser des cas lisibles et déterministes, sans dépendre d’un moteur comme oracle.
-
-#### Résultat attendu du PBI 2.11
-
-- couvrir le calcul et l’absence du Risk Score ;
-- couvrir les seuils exacts de fiabilité après arrondi normatif ;
-- couvrir histogrammes exacts et agrégés, masse et représentants ;
-- inclure les cas qui matérialisent les divergences historiques recensées par l’audit.
-
-#### Résultat attendu du PBI 2.12
-
-- fournir un runner Python et un runner TypeScript du même corpus ;
-- produire des sorties canoniques comparables ;
-- distinguer échec de schéma, échec moteur et divergence de résultat ;
-- ne rendre aucun contrôle bloquant dans ce PBI.
-
-### Phase C — Alignement statistique : PBI 2.13 à 2.17
-
-#### Résultat attendu du PBI 2.13
-
-- aligner validations, paramètres actifs, valeurs absentes et forme normative de réponse ;
-- conserver les DTO et persistances comme frontières primitives ;
-- éviter toute coercion ou valeur sentinelle divergente ;
-- ne modifier aucune formule statistique relevant des PBI suivants.
-
-#### Résultat attendu du PBI 2.14
-
-- aligner les règles de censure ;
-- aligner les rangs et quantiles de P50, P70 et P90 ;
-- aligner le Risk Score et son arrondi d’autorité ;
-- préserver les percentiles absents sans reconstruction depuis l’histogramme.
-
-#### Résultat attendu du PBI 2.15
-
-- aligner moyenne, variance de population, quartiles et pente ;
-- appliquer l’arrondi `round half up` avant les seuils ;
-- appliquer exactement l’ordre de catégorisation normatif ;
-- prouver les cas limites, notamment six et sept observations.
-
-#### Résultat attendu du PBI 2.16
-
-- remplacer les constructions historiques divergentes par l’algorithme normatif ;
-- appliquer `right = min(max, left + width - 1)` ;
-- appliquer `x = floor((left + right) / 2)` ;
-- garantir au plus 100 buckets, la masse et les représentants attendus ;
-- invalider ou migrer explicitement toute référence historique devenue incompatible.
-
-#### Résultat attendu du PBI 2.17
-
-- démontrer l’égalité exacte des résultats normatifs à entrée, seed et version identiques ;
-- couvrir les deux modes, censures, percentiles, score, fiabilité et histogrammes ;
-- vérifier plusieurs tailles de batch ;
-- produire une preuve distincte de la seule équivalence distributionnelle.
-
-### Phase D — Gouvernance de la parité : PBI 2.18 à 2.20
-
-#### Résultat attendu du PBI 2.18
-
-- consolider les résultats déterministes, de rejeu et distributionnels ;
-- identifier précisément la fixture, la règle et le moteur en défaut ;
-- séparer échec fonctionnel, incompatibilité de version et erreur d’infrastructure ;
-- publier un rapport JSON canonique et une synthèse Markdown.
-
-#### Résultat attendu du PBI 2.19
-
-- exécuter les contrôles de parité dans le profil `main` ;
-- bloquer toute divergence normative ;
-- conserver un diagnostic local actionnable ;
-- interdire skip, retry, quarantaine ou exemption silencieuse.
-
-#### Résultat attendu du PBI 2.20
-
-- rendre obligatoire la version du contrat pour toute preuve de rejeu ;
-- détecter les changements affectant tirages, censures, percentiles, scores, labels, histogrammes ou réponse ;
-- exiger une décision de compatibilité, une nouvelle version et la mise à jour du corpus ;
-- documenter migration ou invalidation des caches et historiques concernés.
-
----
-
-## Feature 3 — Rendre le moteur statistique réutilisable et intégrable
-
-**Description :** extraire le cœur Monte Carlo dans un package Python autonome, documenté, versionné et utilisable sans Azure DevOps, FastAPI, MongoDB ou frontend.
-
-**Flux de valeur :** rendre concrète la promesse Apache 2.0 en permettant à un intégrateur tiers d’utiliser directement le moteur sans devoir comprendre, forker ou nettoyer l’ensemble de l’application.
+**Attendus détaillés :** [`backlog-expectations/feature-03-reusable-engine.md`](backlog-expectations/feature-03-reusable-engine.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
-| 3.1 | Séparer les trajectoires d’usage personnel et de réutilisabilité externe | M | Sol Medium | |
-| 3.2 | Définir le périmètre et l’API publique du package | M | Sol Élevé | |
-| 3.3 | Extraire le moteur et ses validations dans un package autonome | L | Sol Ultra | |
-| 3.4 | Versionner, construire et tester le package isolément | L | Sol Très élevé | |
-| 3.5 | Écrire un guide minimal d’intégration du moteur | M | Sol Medium | |
-
----
+| 3.1 | Définir les cas d’intégration et le niveau de support du package | M | Sol Medium | |
+| 3.2 | Définir la frontière, le nom et les dépendances du package | M | Sol Élevé | |
+| 3.3 | Définir l’API publique, les erreurs et la politique de compatibilité | M | Sol Très élevé | |
+| 3.4 | Créer le squelette installable et les métadonnées du package | M | Sol Élevé | |
+| 3.5 | Extraire les contrats métier et Value Objects dans le package | L | Sol Très élevé | |
+| 3.6 | Extraire le moteur statistique interne dans le package | L | Sol Très élevé | |
+| 3.7 | Exposer le cas d’usage public et migrer le backend vers le package | L | Sol Très élevé | |
+| 3.8 | Bloquer les dépendances interdites et les contournements de l’API publique | M | Sol Très élevé | |
+| 3.9 | Construire les distributions `wheel` et `sdist` reproductibles | M | Sol Élevé | |
+| 3.10 | Prouver l’installation isolée et l’usage par un consommateur externe | M | Sol Très élevé | |
+| 3.11 | Produire les artefacts versionnés du package dans la CI | M | Sol Très élevé | |
+| 3.12 | Écrire un guide exécutable d’intégration du package | M | Sol Medium | |
 
 ## Feature 4 — Sécuriser la mise en production personnelle
 
 **Description :** corriger les risques immédiats de persistance, de conteneurisation et d’identification des clients avant toute exposition réelle de l’application.
 
 **Flux de valeur :** permettre un déploiement personnel exploitable sans croissance silencieuse du stockage, privilèges excessifs dans le conteneur ou contournement du rate limiting.
+
+**Attendus détaillés :** [`backlog-expectations/feature-04-personal-production.md`](backlog-expectations/feature-04-personal-production.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -241,13 +95,13 @@ Cette réalisation ne doit pas servir de modèle de granularité. Pour la suite 
 | 4.5 | Définir le modèle de confiance des adresses clientes | S | Sol Très élevé | |
 | 4.6 | Appliquer et tester la politique de proxy de confiance | L | Sol Très élevé | |
 
----
-
 ## Feature 5 — Valider la valeur d’usage du mode portefeuille
 
 **Description :** observer l’utilisation réelle du portefeuille avant d’ajouter de nouveaux scénarios, diagnostics ou niveaux de complexité à l’interface.
 
 **Flux de valeur :** vérifier que les quatre hypothèses et les trois dimensions de diagnostic facilitent réellement la décision en comité plutôt que d’augmenter la charge cognitive et le besoin d’explication.
+
+**Attendus détaillés :** [`backlog-expectations/feature-05-portfolio-value.md`](backlog-expectations/feature-05-portfolio-value.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -256,34 +110,13 @@ Cette réalisation ne doit pas servir de modèle de granularité. Pour la suite 
 | 5.3 | Observer l’utilisation réelle du portefeuille | M | Sol Medium | |
 | 5.4 | Décider de conserver, simplifier ou divulguer progressivement la complexité | M | Sol Medium | |
 
-### Mesures attendues
-
-L’instrumentation doit pouvoir mesurer sans collecter d’identité Azure DevOps :
-
-- ouverture du mode portefeuille ;
-- nombre d’équipes sélectionnées ;
-- lancement des scénarios ;
-- temps de calcul ;
-- génération du PDF ;
-- choix éventuel d’une référence de pilotage ;
-- échecs partiels ;
-- abandon du parcours.
-
-Le protocole doit également vérifier si les utilisateurs distinguent correctement :
-
-- les données observées ;
-- l’incertitude statistique ;
-- l’hypothèse de scénario ;
-- la recommandation ;
-- le refus de trancher faute de preuves.
-
----
-
 ## Feature 6 — Mesurer la qualité réelle et les limites opérationnelles
 
 **Description :** compléter la couverture structurelle par une mesure de la capacité de détection des tests, des risques non fonctionnels et des performances observables du produit.
 
 **Flux de valeur :** disposer d’une base factuelle permettant de distinguer une suite de tests volumineuse d’une suite réellement efficace, et mesurer le produit avant toute optimisation ou montée en charge.
+
+**Attendus détaillés :** [`backlog-expectations/feature-06-operational-quality.md`](backlog-expectations/feature-06-operational-quality.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -296,23 +129,13 @@ Le protocole doit également vérifier si les utilisateurs distinguent correctem
 | 6.7 | Renforcer les tests d’observabilité et de qualité des données | L | Sol Élevé | |
 | 6.8 | Établir une baseline de performance reproductible | L | Sol Très élevé | |
 
-### Bornes à intégrer dans la baseline
-
-- `n_sims = 200 000` ;
-- historique de 521 semaines ;
-- horizon de 521 semaines ;
-- simulations portefeuille multi-équipes ;
-- calcul simultané de plusieurs scénarios ;
-- génération PDF ;
-- exécutions concurrentes.
-
----
-
 ## Feature 7 — Établir une architecture applicative évolutive
 
 **Description :** formaliser une architecture hexagonale modulaire, supprimer les cycles et isoler les cas d’usage des technologies d’accès aux données, de calcul, de persistance et de restitution.
 
 **Flux de valeur :** permettre l’évolution du produit sans accroître le couplage, les responsabilités concentrées, les régressions ou le coût de chaque modification, grâce à des modules cohésifs communiquant par des contrats explicites.
+
+**Attendus détaillés :** [`backlog-expectations/feature-07-evolvable-architecture.md`](backlog-expectations/feature-07-evolvable-architecture.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -330,94 +153,13 @@ Le protocole doit également vérifier si les utilisateurs distinguent correctem
 | 7.12 | Prouver les contrats des ports et adaptateurs | L | Sol Très élevé | |
 | 7.13 | Injecter l’horloge et les générateurs d’identifiants techniques | M | Sol Élevé | |
 
-### Résultat attendu du PBI 7.1
-
-Le modèle cible doit formaliser une architecture hexagonale modulaire et préciser pour chaque module :
-
-- sa responsabilité métier ;
-- son API publique ;
-- les commandes, requêtes, résultats et événements qu’il expose ;
-- les données et états dont il est propriétaire ;
-- les dépendances autorisées et interdites ;
-- les ports entrants et sortants ;
-- les adaptateurs techniques associés ;
-- les éléments réellement partagés, limités à des contrats ou Value Objects stables.
-
-Le modèle doit empêcher qu’un simple découpage de répertoires masque des dépendances transverses ou un état mutable partagé.
-
-### Résultat attendu du PBI 7.2
-
-Le contrôle automatisé doit notamment bloquer :
-
-- les dépendances du domaine vers React, FastAPI, MongoDB, Azure DevOps ou toute autre technologie périphérique ;
-- les imports profonds dans les fichiers internes d’un autre module ;
-- les contournements des API publiques de modules ;
-- les dépendances directes entre adaptateurs ;
-- les cycles entre modules ;
-- l’utilisation des DTO de transport hors des adaptateurs et mappers autorisés ;
-- la constitution d’un répertoire `shared` sans responsabilité ni contrat explicite.
-
-Les règles doivent être exécutées par la gate normative et produire un diagnostic actionnable sans exemption silencieuse.
-
-### Résultat attendu du PBI 7.10
-
-Les contrats de communication inter-modules doivent :
-
-- distinguer commandes, requêtes, résultats et événements ;
-- définir les entrées, sorties et erreurs métier de chaque module ;
-- préciser les communications synchrones et asynchrones ;
-- interdire le partage direct d’état mutable ;
-- définir les responsabilités transactionnelles ;
-- documenter les règles d’évolution et de compatibilité des contrats internes ;
-- conserver les données Azure DevOps contextualisées dans le navigateur et les données statistiques anonymes à la frontière backend.
-
-### Résultat attendu du PBI 7.11
-
-Le composition root doit :
-
-- centraliser l’assemblage des cas d’usage, ports et adaptateurs ;
-- injecter les implémentations concrètes depuis la périphérie ;
-- supprimer les instanciations techniques dispersées dans le domaine et les cas d’usage ;
-- permettre de remplacer les adaptateurs Azure DevOps, moteur de prévision, persistance et reporting ;
-- fournir des implémentations en mémoire pour les tests ;
-- rendre la configuration d’exécution explicite et testable.
-
-### Résultat attendu du PBI 7.12
-
-Les contrats des ports et adaptateurs doivent être prouvés par :
-
-- une suite de conformité commune par port ;
-- les mêmes invariants appliqués à chaque adaptateur d’un port ;
-- des tests de contrat pour les moteurs Python et TypeScript ;
-- des tests de contrat pour MongoDB, `localStorage` et les adaptateurs mémoire ;
-- des tests négatifs sur les données interdites ;
-- des tests d’intégration aux frontières sans duplication des règles métier ;
-- la preuve que le remplacement d’un adaptateur ne modifie pas la sémantique du cas d’usage.
-
-### Résultat attendu du PBI 7.13
-
-- isoler les lectures de l’horloge utilisées pour les timestamps, expirations et métadonnées techniques ;
-- isoler les générateurs d’identifiants sans sémantique statistique ;
-- injecter des implémentations déterministes dans les tests ;
-- conserver la résolution de seed et le PRNG dans la Feature 2 ;
-- ne modifier ni les contrats publics ni le sens des résultats statistiques.
-
-### Résultat attendu du PBI 7.9
-
-- objet-frontière typé limité aux données statistiques anonymes ;
-- contrats dédiés aux données autorisées vers le backend ;
-- interdiction architecturale des dépendances entre contexte ADO et moteur backend ;
-- tests négatifs de contrat ;
-- contrôle du graphe d’imports ;
-- conservation du contrôle lexical comme défense complémentaire, non comme garantie unique.
-
----
-
 ## Feature 8 — Fiabiliser les données Azure DevOps et matérialiser les sprints
 
 **Description :** restructurer le client Azure DevOps, qualifier explicitement les limites des données et intégrer le contexte réel des itérations Cloud et Server/TFS.
 
 **Flux de valeur :** fournir aux prévisions un historique fiable, temporellement cohérent et replacé dans son contexte de sprint avant que le décideur n’interprète les résultats.
+
+**Attendus détaillés :** [`backlog-expectations/feature-08-azure-devops-data.md`](backlog-expectations/feature-08-azure-devops-data.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -436,21 +178,13 @@ Les contrats des ports et adaptateurs doivent être prouvés par :
 | 8.13 | Matérialiser les limites de sprint dans les graphiques et rapports | L | Sol Élevé | |
 | 8.14 | Qualifier les prérequis de stabilité du flux avant prévision | L | Sol Très élevé | |
 
-### Résultat attendu du PBI 8.14
-
-- détecter les ruptures, dérives et périodes non représentatives ;
-- signaler les historiques dont la stabilité est insuffisante ;
-- distinguer absence de preuve et preuve d’instabilité ;
-- dégrader ou bloquer la recommandation lorsque la prévision ne peut pas être défendue ;
-- ne pas transformer l’absence d’une politique WIP connue en preuve automatique d’imprévisibilité.
-
----
-
 ## Feature 9 — Éprouver les prévisions face au temps et aux résultats réels
 
 **Description :** comparer les projections aux résultats observés et détecter les changements de comportement qui rendent un historique moins représentatif.
 
 **Flux de valeur :** distinguer une prévision techniquement calculable d’une méthode empiriquement crédible pour soutenir une décision.
+
+**Attendus détaillés :** [`backlog-expectations/feature-09-forecast-calibration.md`](backlog-expectations/feature-09-forecast-calibration.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -463,22 +197,13 @@ Les contrats des ports et adaptateurs doivent être prouvés par :
 | 9.7 | Restituer les diagnostics de calibration et de non-stationnarité | L | Sol Élevé | |
 | 9.8 | Calibrer, renommer ou retirer le Risk Score | L | Sol Très élevé | |
 
-### Décision attendue sur le Risk Score
-
-- tester sa relation avec les écarts réellement observés ;
-- mesurer sa stabilité selon le mode, `n_sims` et la fenêtre historique ;
-- vérifier sa valeur supplémentaire par rapport à P50, P90 et aux diagnostics ;
-- calibrer les seuils de lecture ;
-- le renommer en « Indice de dispersion » si aucune interprétation empirique du risque n’est démontrée ;
-- le retirer s’il n’améliore pas la décision.
-
----
-
 ## Feature 10 — Fiabiliser l’expérience de simulation et les restitutions
 
 **Description :** séparer les responsabilités frontend et PDF, fiabiliser l’état des simulations et garantir une présentation cohérente sur tous les supports.
 
 **Flux de valeur :** empêcher l’affichage ou l’export de résultats devenus incohérents et permettre au décideur de retrouver la même information dans l’interface et dans les rapports.
+
+**Attendus détaillés :** [`backlog-expectations/feature-10-simulation-experience.md`](backlog-expectations/feature-10-simulation-experience.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -493,29 +218,13 @@ Les contrats des ports et adaptateurs doivent être prouvés par :
 | 10.9 | Harmoniser les formulations et conventions visuelles UI/PDF | M | Sol Medium | |
 | 10.10 | Auditer et découper les composants frontend à responsabilités multiples | L | Sol Très élevé | |
 
-### Résultat attendu du PBI 10.10
-
-L’audit et le découpage frontend doivent :
-
-- inventorier les composants, hooks et services cumulant plusieurs responsabilités ;
-- mesurer leur complexité, leurs dépendances et leurs motifs de modification ;
-- découper le frontend par capacité métier et responsabilité cohésive ;
-- distinguer conteneurs, sections métier et composants de présentation ;
-- attribuer explicitement la propriété de l’état ;
-- exposer une API publique par Feature frontend ;
-- interdire les imports de fichiers internes entre Features ;
-- préserver les comportements, l’accessibilité, les contrats UI/PDF et la couverture de tests ;
-- éviter toute limite arbitraire de lignes ou tout micro-découpage sans valeur démontrée.
-
-Un éventuel socle UI partagé ne doit être engagé qu’après preuve de duplication significative et ne doit contenir aucune règle métier.
-
----
-
 ## Feature 11 — Faire passer la solution à l’échelle
 
 **Description :** définir les objectifs de charge, instrumenter le produit et faire évoluer son exécution pour supporter davantage de concurrence, de volume et de traitements longs.
 
 **Flux de valeur :** soutenir une utilisation croissante avec des SLO, une consommation de ressources, une dégradation et des coûts explicitement maîtrisés.
+
+**Attendus détaillés :** [`backlog-expectations/feature-11-scalability.md`](backlog-expectations/feature-11-scalability.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -528,13 +237,13 @@ Un éventuel socle UI partagé ne doit être engagé qu’après preuve de dupli
 | 11.7 | Ajouter l’observabilité et le suivi des coûts de scalabilité | L | Sol Très élevé | |
 | 11.8 | Valider charge nominale, pointe, endurance et reprise | L | Sol Très élevé | |
 
----
-
 ## Feature 12 — Étendre le produit au pilotage de programme
 
 **Description :** enrichir le modèle portefeuille avec des relations opérationnelles explicites et consolider plusieurs projets dans une vue adaptée aux arbitrages de direction.
 
 **Flux de valeur :** transformer une comparaison statistique multiéquipes en capacité de pilotage de programme, sans confondre hypothèses, dépendances réelles, risques et décisions humaines.
+
+**Attendus détaillés :** [`backlog-expectations/feature-12-program-management.md`](backlog-expectations/feature-12-program-management.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -546,13 +255,13 @@ Un éventuel socle UI partagé ne doit être engagé qu’après preuve de dupli
 | 12.6 | Construire la vue de direction de programme | L | Sol Élevé | |
 | 12.7 | Produire les exports structurés de reporting programme | L | Sol Élevé | |
 
----
-
 ## Feature 13 — Rationaliser le dispositif de gouvernance technique
 
 **Description :** mesurer la valeur, le coût et les recouvrements des contrôles du dépôt, puis simplifier le dispositif sans affaiblir les protections critiques.
 
 **Flux de valeur :** conserver une forte confiance dans le produit tout en réduisant le temps de changement, la charge de maintenance et la complexité de reprise par un autre contributeur.
+
+**Attendus détaillés :** [`backlog-expectations/feature-13-technical-governance.md`](backlog-expectations/feature-13-technical-governance.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -566,28 +275,13 @@ Un éventuel socle UI partagé ne doit être engagé qu’après preuve de dupli
 | 13.8 | Mesurer l’évolution du coût de changement après rationalisation | M | Sol Medium | |
 | 13.9 | Tester la reprise du produit par un nouveau contributeur | M | Sol Medium | |
 
-### Principe de rationalisation
-
-La Feature ne poursuit aucun objectif arbitraire de réduction du nombre de lignes ou de scripts.
-
-Chaque contrôle doit être évalué selon :
-
-- le risque protégé ;
-- les défauts effectivement détectés ;
-- le coût d’exécution ;
-- le coût de maintenance ;
-- les recouvrements avec d’autres contrôles ;
-- la capacité d’un nouveau mainteneur à le comprendre et le réparer.
-
-Les contrôles de sécurité, de contrat, de parité statistique et de protection des parcours critiques restent prioritaires.
-
----
-
 ## Feature 14 — Clarifier la stratégie de diffusion et réduire la friction d’adoption
 
 **Description :** expliciter l’ambition du produit, son modèle de pérennité, son marché cible, ses modes de distribution et le parcours permettant à une organisation Azure DevOps de l’adopter réellement.
 
 **Flux de valeur :** transformer un dépôt techniquement crédible en proposition lisible, testable et adoptable par ses utilisateurs et intégrateurs cibles.
+
+**Attendus détaillés :** [`backlog-expectations/feature-14-distribution-strategy.md`](backlog-expectations/feature-14-distribution-strategy.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
@@ -601,162 +295,25 @@ Les contrôles de sécurité, de contrat, de parité statistique et de protectio
 | 14.8 | Décider du périmètre linguistique et de l’internationalisation | S | Sol Medium | |
 | 14.9 | Mesurer l’activation et la réussite du premier usage | M | Sol Très élevé | |
 
-### Décisions possibles
-
-La Feature doit permettre d’assumer explicitement une trajectoire parmi plusieurs options :
-
-- projet portfolio et démonstrateur ;
-- brique open source institutionnelle ;
-- solution auto-hébergée ;
-- offre de service ;
-- SaaS ;
-- extension Azure DevOps ;
-- combinaison open source et services.
-
-Elle doit également décider, sans automatisme :
-
-- du maintien d’un positionnement francophone ;
-- d’une éventuelle interface bilingue ;
-- du maintien d’Azure DevOps comme spécialisation ;
-- de l’intérêt réel d’OAuth ;
-- de la pertinence d’un listing Marketplace.
-
----
-
-# Sujets conditionnels à arbitrer ultérieurement
-
-Les sujets suivants sont identifiés, mais ne sont pas comptabilisés comme PBI engagés tant que les Features 9 et 14 n’ont pas produit les décisions nécessaires.
-
-## API HTTP publique et intégrations tierces
-
-À envisager après stabilisation du moteur, du package et du modèle de diffusion :
-
-- API HTTP versionnée ;
-- OpenAPI public et exemples ;
-- politique de compatibilité ;
-- authentification et quotas ;
-- intégrations Power BI, Grafana ou outils de reporting.
-
-## Support Jira et autres sources de delivery
-
-À envisager après :
-
-- définition du port d’accès aux données ;
-- isolation complète d’Azure DevOps ;
-- validation d’un besoin de marché réel.
-
-## Prévision d’un item individuel par Cycle Time et SLE
-
-À envisager après fiabilisation des données et backtesting :
-
-- scatterplot de Cycle Time ;
-- percentiles par population comparable ;
-- Service Level Expectation ;
-- classes de service ;
-- calibration empirique.
-
-## Recalcul planifié des prévisions
-
-À envisager uniquement après décision sur :
-
-- OAuth ;
-- Marketplace ;
-- agent local ;
-- gestion sécurisée d’identifiants persistants.
-
-## Pondération optionnelle par récence
-
-À ne considérer qu’après avoir démontré par backtesting que le tirage uniforme simple dégrade réellement les résultats dans certains contextes.
-
-## Comparaison avec les fonctionnalités concurrentes
-
-Tout écart avec un concurrent doit être reformulé en :
-
-- problème utilisateur ;
-- résultat attendu ;
-- preuve de valeur ;
-- coût et risques.
-
-« Rattraper le marché » ne constitue pas à lui seul un PBI.
-
----
-
-# Règle de raffinement des PBI
-
-Un PBI doit produire un résultat principal démontrable et rester livrable indépendamment des PBI suivants.
-
-Un raffinement est obligatoire lorsqu’un item combine au moins deux natures de transformation parmi :
-
-- introduction d’un modèle ou d’une abstraction ;
-- migration de ses consommateurs ;
-- modification ou alignement d’un algorithme ;
-- création d’un corpus de preuve ;
-- automatisation d’une gate ;
-- modification d’un contrat externe ;
-- migration ou invalidation de données.
-
-Les signaux suivants imposent une revue de découpage sans constituer des limites mécaniques :
-
-- plusieurs familles d’invariants indépendantes ;
-- modification substantielle simultanée du backend, du frontend, des persistances et des restitutions ;
-- impossibilité de décrire la valeur livrée en une phrase sans plusieurs résultats reliés par « et » ;
-- nécessité de corriger des dettes historiques étrangères au résultat principal ;
-- validation complète exigeant plusieurs dispositifs de preuve qui pourraient être livrés séparément.
-
-Aucun PBI `XL` ne peut être engagé. Un PBI `L` reste autorisé lorsqu’il porte un seul résultat cohérent malgré une réalisation transverse.
-
----
-
 # Synthèse du backlog
-
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
-| 1 — Preuve qualité gouvernée | 11 | 11 | 0 |
-| 2 — Fiabilité du cœur statistique | 20 | 5 | 15 |
-| 3 — Réutilisabilité du moteur | 5 | 0 | 5 |
-| 4 — Mise en production personnelle | 6 | 0 | 6 |
-| 5 — Valeur d’usage du portefeuille | 4 | 0 | 4 |
-| 6 — Qualité réelle et limites opérationnelles | 8 | 0 | 8 |
-| 7 — Architecture applicative évolutive | 13 | 0 | 13 |
-| 8 — Données Azure DevOps et sprints | 14 | 0 | 14 |
-| 9 — Calibration et évolution temporelle | 8 | 0 | 8 |
-| 10 — Expérience et restitutions | 10 | 0 | 10 |
-| 11 — Scalabilité | 8 | 0 | 8 |
-| 12 — Pilotage de programme | 7 | 0 | 7 |
-| 13 — Rationalisation de la gouvernance | 9 | 0 | 9 |
-| 14 — Stratégie de diffusion et adoption | 9 | 0 | 9 |
-| **Total** | **132** | **16** | **116** |
+| 1 — Disposer d’un système de preuve qualité gouverné | 11 | 11 | 0 |
+| 2 — Garantir la fiabilité du cœur statistique | 20 | 5 | 15 |
+| 3 — Distribuer un moteur statistique Python réutilisable | 12 | 0 | 12 |
+| 4 — Sécuriser la mise en production personnelle | 6 | 0 | 6 |
+| 5 — Valider la valeur d’usage du mode portefeuille | 4 | 0 | 4 |
+| 6 — Mesurer la qualité réelle et les limites opérationnelles | 8 | 0 | 8 |
+| 7 — Établir une architecture applicative évolutive | 13 | 0 | 13 |
+| 8 — Fiabiliser les données Azure DevOps et matérialiser les sprints | 14 | 0 | 14 |
+| 9 — Éprouver les prévisions face au temps et aux résultats réels | 8 | 0 | 8 |
+| 10 — Fiabiliser l’expérience de simulation et les restitutions | 10 | 0 | 10 |
+| 11 — Faire passer la solution à l’échelle | 8 | 0 | 8 |
+| 12 — Étendre le produit au pilotage de programme | 7 | 0 | 7 |
+| 13 — Rationaliser le dispositif de gouvernance technique | 9 | 0 | 9 |
+| 14 — Clarifier la stratégie de diffusion et réduire la friction d’adoption | 9 | 0 | 9 |
+| **Total** | **139** | **16** | **123** |
 
 Aucun PBI n’est classé XL.
 
 Les sujets conditionnels non numérotés ne sont pas inclus dans le total.
-
----
-
-# Attribution des modèles Codex
-
-Les modèles Codex sont attribués selon le niveau minimal capable de réaliser le PBI avec une fiabilité suffisante.
-
-- **Sol Medium** : cadrage, documentation, protocole, observation, analyse ou décision ; modifications techniques locales et très prévisibles.
-- **Sol Élevé** : réalisation technique bornée, généralement multi-fichiers, dont les frontières et le résultat attendu sont déjà connus.
-- **Sol Très élevé** : statistiques, sécurité, concurrence, CI/CD, contrats transverses, compatibilité, migrations ou refactors dont plusieurs choix restent à arbitrer.
-- **Sol Ultra** : transformation structurelle massive nécessitant l’exploration et la modification coordonnées de plusieurs sous-systèmes fortement couplés.
-
-La complexité du PBI et le modèle Codex sont deux informations distinctes :
-
-- la **complexité** évalue l’ampleur du travail ;
-- le **modèle** évalue la profondeur de raisonnement et l’incertitude nécessaires.
-
-Un PBI `L` peut relever de Sol Élevé lorsqu’il est volumineux mais prévisible, tandis qu’un PBI `S` peut relever de Sol Très élevé lorsqu’il porte une décision de sécurité délicate.
-
-Aucun PBI actuel ne relève de **Sol Minimal**, réservé aux corrections mécaniques telles que le formatage, le renommage évident ou la résolution d’une erreur de lint isolée.
-
-## Répartition des 116 PBI non réalisés
-
-| Modèle Codex | Nombre de PBI |
-| --- | ---: |
-| Sol Medium | 15 |
-| Sol Élevé | 29 |
-| Sol Très élevé | 66 |
-| Sol Ultra | 6 |
-| **Total** | **116** |

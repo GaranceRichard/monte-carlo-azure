@@ -18,6 +18,11 @@ Démo GitHub Pages:
 
 - vision produit et valeur: [`PRODUCT.md`](PRODUCT.md)
 - trajectoire produit: [`docs/roadmap.md`](docs/roadmap.md)
+- registre de pilotage des Features et PBI: [`docs/backlog.md`](docs/backlog.md)
+- règles transverses de gouvernance du backlog:
+  [`docs/backlog-governance.md`](docs/backlog-governance.md)
+- attendus détaillés des Features, PBI et sujets conditionnels:
+  [`docs/backlog-expectations/`](docs/backlog-expectations/README.md)
 - architecture, sécurité, API, CI: [`ARCHITECTURE.md`](ARCHITECTURE.md)
   - inclut la convention de nommage: identifiants de code en anglais, textes utilisateur en français
 - historique des évolutions: [`CHANGELOG.md`](CHANGELOG.md)
