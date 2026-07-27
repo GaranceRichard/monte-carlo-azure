@@ -274,6 +274,7 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 | 13.7 | Documenter la maintenance et le diagnostic du système de qualité | M | Sol Medium | |
 | 13.8 | Mesurer l’évolution du coût de changement après rationalisation | M | Sol Medium | |
 | 13.9 | Tester la reprise du produit par un nouveau contributeur | M | Sol Medium | |
+| 13.10 | Sécuriser l’approvisionnement des images de services CI | M | Sol Élevé | |
 
 ## Feature 14 — Clarifier la stratégie de diffusion et réduire la friction d’adoption
 
@@ -310,9 +311,9 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 | 10 — Fiabiliser l’expérience de simulation et les restitutions | 10 | 0 | 10 |
 | 11 — Faire passer la solution à l’échelle | 8 | 0 | 8 |
 | 12 — Étendre le produit au pilotage de programme | 7 | 0 | 7 |
-| 13 — Rationaliser le dispositif de gouvernance technique | 9 | 0 | 9 |
+| 13 — Rationaliser le dispositif de gouvernance technique | 10 | 0 | 9 |
 | 14 — Clarifier la stratégie de diffusion et réduire la friction d’adoption | 9 | 0 | 9 |
-| **Total** | **139** | **16** | **123** |
+| **Total** | **140** | **16** | **124** |
 
 Aucun PBI n’est classé XL.
 
