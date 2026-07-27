@@ -107,6 +107,6 @@ Aucun PBI actuel ne relève de **Sol Minimal**, réservé aux corrections mécan
 | --- | ---: |
 | Sol Medium | 15 |
 | Sol Élevé | 32 |
-| Sol Très élevé | 72 |
+| Sol Très élevé | 71 |
 | Sol Ultra | 5 |
 | **Total** | **123** |

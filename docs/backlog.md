@@ -39,7 +39,7 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 | 2.3 | Séparer les DTO des modèles statistiques métier | L | Sol Très élevé | 22/07/2026 |
 | 2.4 | Introduire les Value Objects statistiques prioritaires | L | Sol Très élevé | 26/07/2026 |
 | 2.5 | Isoler la résolution de seed aux frontières d’exécution | M | Sol Élevé | 26/07/2026 |
-| 2.6 | Introduire un port de tirage déterministe dans les deux moteurs | M | Sol Très élevé | |
+| 2.6 | Introduire un port de tirage déterministe dans les deux moteurs | M | Sol Très élevé | 26/07/2026 |
 | 2.7 | Implémenter le PRNG contractuel commun Python et TypeScript | L | Sol Ultra | |
 | 2.8 | Garantir l’ordre logique des tirages et l’indépendance du batching | M | Sol Très élevé | |
 | 2.9 | Versionner le schéma du corpus de référence statistique | M | Sol Élevé | |
@@ -300,7 +300,7 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
 | 1 — Disposer d’un système de preuve qualité gouverné | 11 | 11 | 0 |
-| 2 — Garantir la fiabilité du cœur statistique | 20 | 5 | 15 |
+| 2 — Garantir la fiabilité du cœur statistique | 20 | 6 | 14 |
 | 3 — Distribuer un moteur statistique Python réutilisable | 12 | 0 | 12 |
 | 4 — Sécuriser la mise en production personnelle | 6 | 0 | 6 |
 | 5 — Valider la valeur d’usage du mode portefeuille | 4 | 0 | 4 |
@@ -311,9 +311,9 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 | 10 — Fiabiliser l’expérience de simulation et les restitutions | 10 | 0 | 10 |
 | 11 — Faire passer la solution à l’échelle | 8 | 0 | 8 |
 | 12 — Étendre le produit au pilotage de programme | 7 | 0 | 7 |
-| 13 — Rationaliser le dispositif de gouvernance technique | 10 | 0 | 9 |
+| 13 — Rationaliser le dispositif de gouvernance technique | 10 | 0 | 10 |
 | 14 — Clarifier la stratégie de diffusion et réduire la friction d’adoption | 9 | 0 | 9 |
-| **Total** | **140** | **16** | **124** |
+| **Total** | **140** | **17** | **123** |
 
 Aucun PBI n’est classé XL.
 

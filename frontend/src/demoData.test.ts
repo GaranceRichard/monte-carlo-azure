@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createSeededSampleIndexDrawPort } from "./adapters/seededSampleIndexDrawPort";
 import { createSimulationCommand } from "./domain/simulation";
 import { createSimulationSeed } from "./domain/simulationValueObjects";
 import {
@@ -21,14 +22,18 @@ import { buildSimulationDecisionLanguage } from "./utils/simulationDecisionDiagn
 function buildDemoDiagnostic(teamName: string) {
   const throughputSamples = getDemoThroughputSamples(teamName);
   const weeklyThroughput = getDemoWeeklyThroughput(teamName);
-  const result = simulateMonteCarloLocal(createSimulationCommand({
-    throughputSamples,
-    includeZeroWeeks: true,
-    mode: "backlog_to_weeks",
-    backlogSize: 120,
-    nSims: 4_000,
-    seed: createSimulationSeed(12_345),
-  }));
+  const seed = createSimulationSeed(12_345);
+  const result = simulateMonteCarloLocal(
+    createSimulationCommand({
+      throughputSamples,
+      includeZeroWeeks: true,
+      mode: "backlog_to_weeks",
+      backlogSize: 120,
+      nSims: 4_000,
+      seed,
+    }),
+    createSeededSampleIndexDrawPort(seed),
+  );
   const dataQuality = diagnoseDataQuality({ throughputSamples, includeZeroWeeks: true });
   const forecastUncertainty = diagnoseForecastUncertainty({
     percentiles: result.resultPercentiles,

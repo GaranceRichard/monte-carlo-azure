@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+import backend.simulation_service as simulation_service
 from backend.mc_core import (
     FinishWeeksSimulation,
     mc_finish_weeks,
@@ -12,6 +13,7 @@ from backend.mc_core import (
 from backend.simulation_models import SimulationCommand
 from backend.simulation_service import run_simulation
 from backend.simulation_value_objects import SimulationSeed, StatisticalValueError
+from tests.deterministic_sample_index_draw_port import RecordingSampleIndexDrawPort
 
 
 def _command(**overrides) -> SimulationCommand:
@@ -37,7 +39,7 @@ def test_service_has_no_http_or_pydantic_dependency():
         assert forbidden not in model_source.lower()
 
 
-def test_service_and_engine_do_not_generate_automatic_seeds():
+def test_service_and_engine_keep_seed_resolution_outside_the_draw_port_contract():
     root = Path(__file__).resolve().parents[1]
     sources = [
         (root / "backend/simulation_service.py").read_text(encoding="utf-8"),
@@ -48,7 +50,17 @@ def test_service_and_engine_do_not_generate_automatic_seeds():
         assert "secrets" not in source
         assert "randbelow" not in source
     for engine in (mc_finish_weeks, mc_items_done_for_weeks):
-        assert signature(engine).parameters["seed"].default is Parameter.empty
+        parameters = signature(engine).parameters
+        assert "seed" not in parameters
+        assert parameters["draw_port"].default is Parameter.empty
+
+
+def test_mc_core_has_no_concrete_rng_access():
+    root = Path(__file__).resolve().parents[1]
+    engine_source = (root / "backend/mc_core.py").read_text(encoding="utf-8")
+
+    for forbidden in ("np.random", "default_rng", "Generator"):
+        assert forbidden not in engine_source
 
 
 def test_service_runs_both_modes_without_changing_seeded_results():
@@ -65,6 +77,40 @@ def test_service_runs_both_modes_without_changing_seeded_results():
     assert items.seed.value == 123
     assert items.result_percentiles
     assert items.completion_summary is None
+
+
+def test_service_constructs_exactly_one_adapter_per_execution_and_passes_it_to_engine(
+    monkeypatch,
+):
+    created_seeds: list[SimulationSeed] = []
+    created_ports: list[RecordingSampleIndexDrawPort] = []
+
+    def create_port(seed):
+        draw_port = RecordingSampleIndexDrawPort()
+        created_seeds.append(seed)
+        created_ports.append(draw_port)
+        return draw_port
+
+    monkeypatch.setattr(
+        simulation_service,
+        "NumpySampleIndexDrawPort",
+        create_port,
+    )
+
+    run_simulation(_command(n_sims=1000))
+    run_simulation(
+        _command(
+            mode="weeks_to_items",
+            backlog_size=None,
+            target_weeks=3,
+            n_sims=1000,
+        )
+    )
+
+    assert created_seeds == [SimulationSeed(123), SimulationSeed(123)]
+    assert len(created_ports) == 2
+    assert created_ports[0].requests == [(6, (1000, 521))]
+    assert created_ports[1].requests == [(6, (1000, 3))]
 
 
 @pytest.mark.parametrize(
@@ -85,7 +131,7 @@ def test_service_preserves_total_and_partial_censure(
     )
     monkeypatch.setattr(
         "backend.simulation_service._run_engine",
-        lambda _command, _samples: (simulation, "weeks"),
+        lambda _command, _samples, _draw_port: (simulation, "weeks"),
     )
 
     result = run_simulation(_command())
@@ -108,7 +154,7 @@ def test_service_preserves_histogram_reliability_and_risk_score(monkeypatch):
     )
     monkeypatch.setattr(
         "backend.simulation_service._run_engine",
-        lambda _command, _samples: (simulation, "weeks"),
+        lambda _command, _samples, _draw_port: (simulation, "weeks"),
     )
 
     result = run_simulation(_command())

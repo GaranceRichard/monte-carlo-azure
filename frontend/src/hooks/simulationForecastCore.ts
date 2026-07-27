@@ -1,4 +1,5 @@
 import { getTeamDeliveryDataDirect } from "../adoClient";
+import { createSeededSampleIndexDrawPort } from "../adapters/seededSampleIndexDrawPort";
 import { postSimulate } from "../api";
 import {
   simulateResponseDtoToResult,
@@ -154,7 +155,10 @@ export async function simulateForecastFromSamplesCore(
   });
 
   if (demoMode) {
-    return simulateMonteCarloLocal(command);
+    return simulateMonteCarloLocal(
+      command,
+      createSeededSampleIndexDrawPort(command.seed),
+    );
   }
 
   const response = simulateResponseDtoToResult(

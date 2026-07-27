@@ -2,6 +2,19 @@
 
 ## Recent
 
+### Port de tirage déterministe — PBI 2.6
+
+- introduction d’un port d’indices d’échantillons dans chaque langage, adapté aux tirages unitaires
+  TypeScript et aux matrices vectorisées/batchées Python, sans seed ni bibliothèque aléatoire exposée aux
+  moteurs
+- composition d’un unique adaptateur NumPy depuis `command.seed` dans le service backend et d’un adaptateur
+  conservant strictement l’ancien algorithme bitwise TypeScript dans les seuls chemins locaux qui tirent des
+  échantillons ; le chemin HTTP continue de transmettre uniquement la seed
+- injection du même port dans les deux modes Monte Carlo et dans les scénarios portefeuille, avec doubles de
+  test contrôlant séquences, bornes, cardinalité et forme des tirages
+- sorties déterministes, batching, censures, percentiles, histogrammes, Risk Score, DTO, JSON et persistences
+  conservés ; le PRNG commun et l’indépendance de l’ordre des tirages restent réservés aux PBI 2.7 et 2.8
+
 ### Résolution de seed aux frontières d’exécution — PBI 2.5
 
 - résolution backend extraite dans `backend/simulation_seed.py` : seed HTTP explicite validée sans

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createSimulationCommand } from "../domain/simulation";
 import type { SimulationCommandInput } from "../domain/simulation";
 import { createSimulationSeed } from "../domain/simulationValueObjects";
+import { createSeededSampleIndexDrawPort } from "../adapters/seededSampleIndexDrawPort";
 import {
   buildCorrelatedPortfolioSamples,
   buildCorrelatedPortfolioWeeklyThroughputs,
@@ -29,20 +30,28 @@ import {
 function runLocalSimulation(
   input: Omit<SimulationCommandInput, "seed"> & { seed: number },
 ) {
-  return simulateMonteCarloLocal(createSimulationCommand({
-    ...input,
-    seed: createSimulationSeed(input.seed),
-  }));
+  const seed = createSimulationSeed(input.seed);
+  return simulateMonteCarloLocal(
+    createSimulationCommand({
+      ...input,
+      seed,
+    }),
+    createSeededSampleIndexDrawPort(seed),
+  );
+}
+
+function seededDrawPort(seed: number) {
+  return createSeededSampleIndexDrawPort(createSimulationSeed(seed));
 }
 
 describe("buildScenarioSamples", () => {
   it("clamps alignment rate before computing aligned and friction samples", () => {
-    expect(buildScenarioSamples([[5], [7]], -25, createSimulationSeed(123))).toEqual({
+    expect(buildScenarioSamples([[5], [7]], -25, seededDrawPort(123))).toEqual({
       optimistic: [12],
       aligned: [0],
       friction: [0],
     });
-    expect(buildScenarioSamples([[5], [7]], 140, createSimulationSeed(123))).toEqual({
+    expect(buildScenarioSamples([[5], [7]], 140, seededDrawPort(123))).toEqual({
       optimistic: [12],
       aligned: [12],
       friction: [12],
@@ -56,7 +65,7 @@ describe("buildScenarioSamples", () => {
         [100, 200],
       ],
       80,
-      createSimulationSeed(1431655765),
+      seededDrawPort(1431655765),
     );
 
     expect(scenarios.optimistic).toEqual([130, 120, 110]);
@@ -68,7 +77,7 @@ describe("buildScenarioSamples", () => {
   });
 
   it("uses same values for all scenarios with 1 team", () => {
-    const scenarios = buildScenarioSamples([[5, 8, 13]], 20, createSimulationSeed(123));
+    const scenarios = buildScenarioSamples([[5, 8, 13]], 20, seededDrawPort(123));
 
     expect(scenarios.optimistic).toEqual(scenarios.aligned);
     expect(scenarios.aligned).toEqual(scenarios.friction);
@@ -92,10 +101,10 @@ describe("buildScenarioSamples", () => {
   });
 
   it("keeps the displayed friction percent aligned with the rounded sample factor", () => {
-    const oneTeam = buildScenarioSamples([[101]], 80, createSimulationSeed(123));
-    const twoTeams = buildScenarioSamples([[101], [100]], 80, createSimulationSeed(123));
-    const threeTeams = buildScenarioSamples([[101], [100], [100]], 80, createSimulationSeed(123));
-    const fourTeams = buildScenarioSamples([[101], [100], [100], [100]], 80, createSimulationSeed(123));
+    const oneTeam = buildScenarioSamples([[101]], 80, seededDrawPort(123));
+    const twoTeams = buildScenarioSamples([[101], [100]], 80, seededDrawPort(123));
+    const threeTeams = buildScenarioSamples([[101], [100], [100]], 80, seededDrawPort(123));
+    const fourTeams = buildScenarioSamples([[101], [100], [100], [100]], 80, seededDrawPort(123));
 
     expect(oneTeam.friction).toEqual([101]);
     expect(twoTeams.friction).toEqual([160]);
@@ -110,11 +119,11 @@ describe("buildScenarioSamples", () => {
   });
 
   it("throws explicit error when teamSamples is empty", () => {
-    expect(() => buildScenarioSamples([], 100, createSimulationSeed(123))).toThrow("teamSamples ne peut pas etre vide");
+    expect(() => buildScenarioSamples([], 100, seededDrawPort(123))).toThrow("teamSamples ne peut pas etre vide");
   });
 
   it("throws explicit error when a team has no samples", () => {
-    expect(() => buildScenarioSamples([[1, 2], []], 100, createSimulationSeed(123))).toThrow(
+    expect(() => buildScenarioSamples([[1, 2], []], 100, seededDrawPort(123))).toThrow(
       "chaque equipe doit contenir au moins un sample",
     );
   });
@@ -204,7 +213,7 @@ describe("buildCorrelatedPortfolioSamples", () => {
         [50, 60],
       ],
       80,
-      createSimulationSeed(2004318071),
+      seededDrawPort(2004318071),
     );
     const correlated = buildCorrelatedPortfolioSamples(
       [

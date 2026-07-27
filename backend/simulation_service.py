@@ -10,6 +10,8 @@ from .mc_core import (
     percentiles,
     throughput_reliability_metrics,
 )
+from .numpy_sample_index_draw_port import NumpySampleIndexDrawPort
+from .sample_index_draw_port import SampleIndexDrawPort
 from .simulation_models import (
     SimulationCommand,
     SimulationResult,
@@ -27,7 +29,9 @@ def _prepare_samples(command: SimulationCommand) -> np.ndarray:
 
 
 def _run_engine(
-    command: SimulationCommand, samples: np.ndarray
+    command: SimulationCommand,
+    samples: np.ndarray,
+    draw_port: SampleIndexDrawPort,
 ) -> tuple[np.ndarray | FinishWeeksSimulation, str]:
     if command.mode == "backlog_to_weeks":
         assert command.backlog_size is not None
@@ -37,7 +41,7 @@ def _run_engine(
                 samples,
                 command.n_sims.value,
                 include_zero_weeks=True,
-                seed=command.seed.value,
+                draw_port=draw_port,
             ),
             "weeks",
         )
@@ -49,7 +53,7 @@ def _run_engine(
             samples,
             command.n_sims.value,
             include_zero_weeks=True,
-            seed=command.seed.value,
+            draw_port=draw_port,
         ),
         "items",
     )
@@ -57,7 +61,8 @@ def _run_engine(
 
 def run_simulation(command: SimulationCommand) -> SimulationResult:
     samples = _prepare_samples(command)
-    engine_result, result_kind = _run_engine(command, samples)
+    draw_port = NumpySampleIndexDrawPort(command.seed)
+    engine_result, result_kind = _run_engine(command, samples, draw_port)
     completion_summary = None
     distribution_values = engine_result
     percentile_values = engine_result

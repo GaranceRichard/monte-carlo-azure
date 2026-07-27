@@ -349,7 +349,7 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
     known_backlog = np.tile(np.array([3, 4, 6, 8, 10], dtype=int), 200)
     known_items = np.tile(np.array([18, 22, 24, 25, 27], dtype=int), 200)
 
-    def fake_compute(command, _samples):
+    def fake_compute(command, _samples, _draw_port):
         if command.mode == "backlog_to_weeks":
             return (
                 FinishWeeksSimulation(
@@ -379,7 +379,7 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
 def test_simulate_backlog_to_weeks_omits_unidentifiable_percentiles_and_risk_score(monkeypatch):
     client = ApiTestClient(app)
 
-    def fake_compute(_command, _samples):
+    def fake_compute(_command, _samples, _draw_port):
         return (
             FinishWeeksSimulation(
                 weeks_needed=np.full(2000, 521, dtype=int),
@@ -418,7 +418,7 @@ def test_simulate_backlog_to_weeks_omits_unidentifiable_percentiles_and_risk_sco
 def test_simulate_backlog_to_weeks_keeps_exact_finish_at_horizon_distinct_from_censure(monkeypatch):
     client = ApiTestClient(app)
 
-    def fake_compute(_command, _samples):
+    def fake_compute(_command, _samples, _draw_port):
         return (
             FinishWeeksSimulation(
                 weeks_needed=np.full(2000, 521, dtype=int),

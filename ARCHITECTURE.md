@@ -235,6 +235,34 @@ l’ordre des histogrammes, ainsi que la cohérence des comptes de complétion �
 `521` semaines. Les moteurs reçoivent ensuite uniquement les tableaux et nombres primitifs nécessaires au
 calcul ; les mappers déballent les Value Objects vers les formats JSON, MongoDB et `localStorage` existants.
 
+### Port de tirage d’indices
+
+Les moteurs dépendent d’un seul port métier par langage, sans seed ni générateur concret :
+
+- `backend/sample_index_draw_port.py` demande une matrice d’indices dans
+  `[0, sample_count)` ; la forme `(batch_size, weeks)` conserve les appels vectorisés et la mémoire
+  bornée du backend ;
+- `frontend/src/domain/sampleIndexDrawPort.ts` demande un indice dans
+  `[0, sampleCount)` par appel ; cette granularité conserve l’ordre de consommation historique du
+  moteur local et du bootstrap portefeuille.
+
+Les implémentations concrètes sont hors des moteurs. `backend/numpy_sample_index_draw_port.py` construit
+exactement un `numpy.random.default_rng(seed.value)` et délègue à `Generator.integers`.
+`frontend/src/adapters/seededSampleIndexDrawPort.ts` conserve exactement l’algorithme Mulberry32
+historique, opérations bitwise comprises.
+
+La composition appartient aux frontières d’exécution :
+
+- `backend/simulation_service.py` construit un adaptateur NumPy par commande puis transmet la même
+  instance au moteur sélectionné ;
+- `frontend/src/hooks/simulationForecastCore.ts` construit l’adaptateur TypeScript uniquement pour le
+  chemin démo/local ; le chemin HTTP transmet la seed au backend sans PRNG local ;
+- `frontend/src/hooks/usePortfolioReport.ts` construit l’adaptateur du bootstrap depuis la seed optimiste
+  déjà résolue, sans modifier le nombre ni l’ordre des résolutions de seed.
+
+Ce découplage ne change ni les suites actuelles ni les formules. Le choix d’un PRNG commun est réservé au
+PBI 2.7 ; l’ordre contractuel commun et l’indépendance complète du batching restent réservés au PBI 2.8.
+
 ## Convention de nommage
 
 Règle du dépôt :
@@ -326,8 +354,9 @@ Comportement du `seed` :
 - le frontend résout de la même manière la seed avant la commande : valeur explicite conservée exactement,
   sinon un unique `crypto.getRandomValues` par exécution logique ; Web Crypto absent produit une erreur
   explicite et n'active aucun repli temporel, modulo, troncature ou opération bitwise de normalisation ;
-- côté backend, ce même tirage est exécuté par lots avec un unique générateur pseudo-aléatoire ;
-  il n’y a ni réensemencement inter-lots, ni allocation complète `n_sims x horizon`.
+- côté backend, `simulation_service.py` compose depuis cette seed un unique adaptateur NumPy, ensuite
+  consommé par lots via le port de tirage ; il n’y a ni réensemencement inter-lots, ni allocation complète
+  `n_sims x horizon`.
 
 Le backend persiste aussi la simulation dans MongoDB (collection `simulations`) quand le cookie
 `IDMontecarlo` est présent. Les champs autorisés en base sont :

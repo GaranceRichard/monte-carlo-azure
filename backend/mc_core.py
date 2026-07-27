@@ -5,6 +5,7 @@ from typing import Dict, Literal, Optional, Tuple
 
 import numpy as np
 
+from .sample_index_draw_port import SampleIndexDrawPort
 from .simulation_limits import SIMULATION_HORIZON_WEEKS_MAX
 
 SIMULATION_BATCH_SIZE = 2048
@@ -72,7 +73,7 @@ def mc_finish_weeks(
     n_sims: int = 20000,
     include_zero_weeks: bool = False,
     *,
-    seed: int,
+    draw_port: SampleIndexDrawPort,
     batch_size: int = SIMULATION_BATCH_SIZE,
 ) -> FinishWeeksSimulation:
     """
@@ -81,7 +82,7 @@ def mc_finish_weeks(
     - backlog_size: nombre d'items à livrer
     - throughput_samples: array des throughputs (items/semaine) observés historiquement
     - n_sims: nombre de simulations
-    - seed: graine RNG pour reproductibilité
+    - draw_port: source injectee d'indices d'echantillons deterministes
 
     Retour: array des semaines nécessaires (taille = n_sims)
     """
@@ -101,7 +102,6 @@ def mc_finish_weeks(
             raise ValueError("throughput_samples ne contient aucune valeur > 0")
 
     resolved_batch_size = _resolve_batch_size(batch_size)
-    rng = np.random.default_rng(seed)
 
     # Garde-fou historique: la version boucle stoppait au plus tard a 521 semaines.
     max_weeks = SIMULATION_HORIZON_WEEKS_MAX
@@ -111,7 +111,12 @@ def mc_finish_weeks(
     for start in range(0, n_sims, resolved_batch_size):
         stop = min(start + resolved_batch_size, n_sims)
         current_batch_size = stop - start
-        draws = _draw_samples_batch(rng, samples, current_batch_size, max_weeks)
+        draws = _draw_samples_batch(
+            draw_port,
+            samples,
+            current_batch_size,
+            max_weeks,
+        )
         cumulative = np.cumsum(draws, axis=1)
         reached = cumulative >= backlog_size
 
@@ -135,7 +140,7 @@ def mc_items_done_for_weeks(
     n_sims: int = 20000,
     include_zero_weeks: bool = False,
     *,
-    seed: int,
+    draw_port: SampleIndexDrawPort,
     batch_size: int = SIMULATION_BATCH_SIZE,
 ) -> np.ndarray:
     """
@@ -144,7 +149,7 @@ def mc_items_done_for_weeks(
     - weeks: horizon de simulation en semaines
     - throughput_samples: array des throughputs (items/semaine) observés historiquement
     - n_sims: nombre de simulations
-    - seed: graine RNG pour reproductibilité
+    - draw_port: source injectee d'indices d'echantillons deterministes
 
     Retour: array du nombre d'items terminés sur N semaines (taille = n_sims)
     """
@@ -164,13 +169,17 @@ def mc_items_done_for_weeks(
             raise ValueError("throughput_samples ne contient aucune valeur > 0")
 
     resolved_batch_size = _resolve_batch_size(batch_size)
-    rng = np.random.default_rng(seed)
     items_done = np.empty(n_sims, dtype=int)
 
     for start in range(0, n_sims, resolved_batch_size):
         stop = min(start + resolved_batch_size, n_sims)
         current_batch_size = stop - start
-        draws = _draw_samples_batch(rng, samples, current_batch_size, weeks)
+        draws = _draw_samples_batch(
+            draw_port,
+            samples,
+            current_batch_size,
+            weeks,
+        )
         items_done[start:stop] = draws.sum(axis=1, dtype=int)
 
     return items_done
@@ -183,12 +192,15 @@ def _resolve_batch_size(batch_size: int) -> int:
 
 
 def _draw_samples_batch(
-    rng: np.random.Generator,
+    draw_port: SampleIndexDrawPort,
     samples: np.ndarray,
     batch_size: int,
     weeks: int,
 ) -> np.ndarray:
-    sample_indexes = rng.integers(0, len(samples), size=(batch_size, weeks))
+    sample_indexes = draw_port.draw_sample_indices(
+        len(samples),
+        (batch_size, weeks),
+    )
     return samples[sample_indexes]
 
 

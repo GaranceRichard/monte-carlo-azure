@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { createSeededSampleIndexDrawPort } from "../adapters/seededSampleIndexDrawPort";
 import { formatDateLocal, parseLocalIsoDate } from "../date";
 import type { CompletionSummary, SimulationMode, SimulationPercentiles } from "../domain/simulation";
 import type { WeeklyThroughputRow } from "../types";
@@ -9,8 +10,7 @@ import {
 } from "./simulationForecastService";
 import type { PortfolioScenarioResult } from "./simulationTypes";
 import {
-  buildCorrelatedPortfolioSamples,
-  buildCorrelatedPortfolioWeeklyThroughputs,
+  buildCorrelatedPortfolioSamples, buildCorrelatedPortfolioWeeklyThroughputs,
   buildScenarioSamples,
   computeFrictionRatePercent,
   computeRiskLegend,
@@ -266,7 +266,7 @@ export function usePortfolioReport({
         friction: resolveSimulationSeed(),
         correlated: resolveSimulationSeed(),
       };
-      const scenarioSamples = buildScenarioSamples(successfulTeams.map((team) => team.data.throughputSamples), alignmentRate, seedBySimulation.optimistic);
+      const scenarioSamples = buildScenarioSamples(successfulTeams.map((team) => team.data.throughputSamples), alignmentRate, createSeededSampleIndexDrawPort(seedBySimulation.optimistic));
       const correlatedWeeklyData = buildCorrelatedPortfolioWeeklyThroughputs(
         successfulTeams.map((team) => team.data.weeklyThroughput),
         includeZeroWeeks,
@@ -568,4 +568,3 @@ export function usePortfolioReport({
     clearReportErr,
   };
 }
-

@@ -67,6 +67,9 @@ Démo GitHub Pages:
   un `SimulationSeed` avec `secrets` à la frontière HTTP, tandis que
   `frontend/src/hooks/simulationSeedResolver.ts` valide la seed explicite ou utilise une seule fois
   `crypto.getRandomValues`; l’absence de Web Crypto est une erreur explicite
+- ports de tirage injectés dans les moteurs : `SampleIndexDrawPort` reçoit uniquement le nombre
+  d’échantillons et la forme vectorisée côté Python, ou le nombre d’échantillons côté TypeScript ;
+  `NumpySampleIndexDrawPort` et `createSeededSampleIndexDrawPort` encapsulent seuls les PRNG historiques
 - démo locale et simulations portefeuille reproductibles à `seed` identique
 - visualisation des percentiles et distributions
 - sémantique métier des percentiles alignée sur le mode de simulation:
@@ -640,13 +643,19 @@ Comportement du `seed` de simulation:
 - si aucun `seed` n'est fourni, le backend en génère un automatiquement et le renvoie dans la réponse
 - la génération backend utilise `secrets` directement dans `0..4294967295` et retourne un
   `SimulationSeed` validé avant la création de la commande
-- côté backend, le calcul conserve un seul générateur pseudo-aléatoire sur toute l'exécution et
+- côté backend, `run_simulation` construit un seul `NumpySampleIndexDrawPort` depuis la seed de la
+  commande ; cet adaptateur conserve un seul `numpy.random.default_rng(seed)` sur toute l'exécution et
   traite les simulations par lots sans réensemencement inter-lots
 - l'historique Mongo persiste aussi ce `seed` pour faciliter l'analyse a posteriori d'une simulation
 - côté frontend, une exécution logique ne consomme qu'une seule `seed`; le rejeu d'une entrée
   locale réemploie cette même `seed` tant que ses paramètres restent inchangés
 - côté frontend, une seed absente est générée directement par `crypto.getRandomValues`; aucun repli
   `Date.now() >>> 0`, aucune troncature et aucune normalisation silencieuse ne sont autorisés
+- côté frontend, le chemin démo/local compose un unique adaptateur Mulberry32 par simulation et le
+  bootstrap portefeuille en compose un depuis la seed optimiste déjà résolue ; le chemin HTTP transmet
+  uniquement la seed au backend et ne construit aucun générateur local
+- ces adaptateurs préservent les PRNG et l’ordre de tirage actuels ; le PRNG commun relève du PBI 2.7
+  et l’indépendance contractuelle envers le batching du PBI 2.8
 
 Purge planifiée:
 

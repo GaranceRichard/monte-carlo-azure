@@ -442,8 +442,17 @@ test.describe("e2e istanbul coverage", () => {
       dateMod.nWeeksAgo(4);
 
       const simulationMod = await import("/src/utils/simulation.ts");
-      simulationMod.buildScenarioSamples([[5, 8, 13], [2, 3, 5]], 85);
-      simulationMod.buildScenarioSamples([[5, 8, 13]], 20);
+      const drawAdapter = await import("/src/adapters/seededSampleIndexDrawPort.ts");
+      simulationMod.buildScenarioSamples(
+        [[5, 8, 13], [2, 3, 5]],
+        85,
+        drawAdapter.createSeededSampleIndexDrawPort(123),
+      );
+      simulationMod.buildScenarioSamples(
+        [[5, 8, 13]],
+        20,
+        drawAdapter.createSeededSampleIndexDrawPort(123),
+      );
       simulationMod.computeRiskLegend(0.15);
       simulationMod.computeRiskLegend(0.35);
       simulationMod.computeRiskLegend(0.7);
@@ -2825,9 +2834,13 @@ test.describe("e2e istanbul coverage", () => {
     const results = await page.evaluate(async () => {
       const simulationMod = await import("/src/utils/simulation.ts");
       const simulationDomain = await import("/src/domain/simulation.ts");
-      const runLocalSimulation = (input) => simulationMod.simulateMonteCarloLocal(
-        simulationDomain.createSimulationCommand({ ...input, seed: 123456 }),
-      );
+      const drawAdapter = await import("/src/adapters/seededSampleIndexDrawPort.ts");
+      const seededDrawPort = () => drawAdapter.createSeededSampleIndexDrawPort(123456);
+      const runLocalSimulation = (input) =>
+        simulationMod.simulateMonteCarloLocal(
+          simulationDomain.createSimulationCommand({ ...input, seed: 123456 }),
+          seededDrawPort(),
+        );
 
       let emptyTeamsError = "";
       let emptyTeamSamplesError = "";
@@ -2836,18 +2849,22 @@ test.describe("e2e istanbul coverage", () => {
       let invalidReliabilityError = "";
 
       try {
-        simulationMod.buildScenarioSamples([], 80);
+        simulationMod.buildScenarioSamples([], 80, seededDrawPort());
       } catch (error) {
         emptyTeamsError = String(error?.message || error);
       }
 
       try {
-        simulationMod.buildScenarioSamples([[1, 2], []], 80);
+        simulationMod.buildScenarioSamples([[1, 2], []], 80, seededDrawPort());
       } catch (error) {
         emptyTeamSamplesError = String(error?.message || error);
       }
 
-      const singleTeam = simulationMod.buildScenarioSamples([[5, 8, 13]], 20);
+      const singleTeam = simulationMod.buildScenarioSamples(
+        [[5, 8, 13]],
+        20,
+        seededDrawPort(),
+      );
       const _multiTeam = simulationMod.buildScenarioSamples(
         [
           [10],
@@ -2856,6 +2873,7 @@ test.describe("e2e istanbul coverage", () => {
           [80],
         ],
         80,
+        seededDrawPort(),
       );
 
       const riskLabels = [

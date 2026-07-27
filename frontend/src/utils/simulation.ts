@@ -5,6 +5,7 @@ import type {
   SimulationResult,
   ThroughputReliability,
 } from "../domain/simulation";
+import type { SampleIndexDrawPort } from "../domain/sampleIndexDrawPort";
 import type { WeeklyThroughputRow } from "../types";
 import {
   createCompletionSummary,
@@ -14,7 +15,6 @@ import {
   riskScoreFromPercentiles,
   SIMULATION_HORIZON_WEEKS_MAX,
 } from "../domain/simulationValueObjects";
-import type { SimulationSeed } from "../domain/simulationValueObjects";
 import { clamp } from "./math";
 
 export type ScenarioSamples = {
@@ -41,19 +41,11 @@ export function computeFrictionRatePercent(teamCount: number, alignmentRate: num
 
 export { SIMULATION_SEED_MAX } from "../domain/simulationValueObjects";
 
-export function createSeededRandom(seed: number): () => number {
-  let state = seed >>> 0;
-  return () => {
-    state = (state + 0x6d2b79f5) | 0;
-    let t = Math.imul(state ^ (state >>> 15), 1 | state);
-    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function pickBootstrapSample(samples: number[], random: () => number): number {
-  const randomIndex = Math.floor(random() * samples.length);
-  return samples[randomIndex] ?? 0;
+function pickBootstrapSample(
+  samples: number[],
+  drawPort: SampleIndexDrawPort,
+): number {
+  return samples[drawPort.drawSampleIndex(samples.length)] ?? 0;
 }
 
 function percentile(values: number[], p: number): number {
@@ -132,11 +124,11 @@ export function discretePercentiles(
   return createSimulationPercentiles(simulationMode, percentileValues);
 }
 
-function simulateBacklogToWeeks(
+export function simulateBacklogToWeeks(
   samples: readonly number[],
   backlogSize: number,
   nSims: number,
-  random: () => number,
+  drawPort: SampleIndexDrawPort,
 ): { results: number[]; completedFlags: boolean[] } {
   const results = new Array<number>(nSims);
   const completedFlags = new Array<boolean>(nSims);
@@ -144,7 +136,7 @@ function simulateBacklogToWeeks(
     let remaining = backlogSize;
     let weeks = 0;
     while (remaining > 0 && weeks < SIMULATION_HORIZON_WEEKS_MAX) {
-      remaining -= samples[Math.floor(random() * samples.length)] ?? 0;
+      remaining -= samples[drawPort.drawSampleIndex(samples.length)] ?? 0;
       weeks += 1;
     }
     results[index] = weeks || SIMULATION_HORIZON_WEEKS_MAX;
@@ -153,17 +145,17 @@ function simulateBacklogToWeeks(
   return { results, completedFlags };
 }
 
-function simulateWeeksToItems(
+export function simulateWeeksToItems(
   samples: readonly number[],
   targetWeeks: number,
   nSims: number,
-  random: () => number,
+  drawPort: SampleIndexDrawPort,
 ): number[] {
   const results = new Array<number>(nSims);
   for (let index = 0; index < nSims; index += 1) {
     let delivered = 0;
     for (let week = 0; week < targetWeeks; week += 1) {
-      delivered += samples[Math.floor(random() * samples.length)] ?? 0;
+      delivered += samples[drawPort.drawSampleIndex(samples.length)] ?? 0;
     }
     results[index] = delivered;
   }
@@ -172,14 +164,14 @@ function simulateWeeksToItems(
 
 export function simulateMonteCarloLocal(
   command: SimulationCommand,
+  drawPort: SampleIndexDrawPort,
 ): SimulationResult {
   const samples = command.throughputSamples.usableValues;
-  const random = createSeededRandom(command.seed);
   const backlogSimulation = command.mode === "backlog_to_weeks"
-    ? simulateBacklogToWeeks(samples, command.backlogSize ?? 0, command.nSims, random)
+    ? simulateBacklogToWeeks(samples, command.backlogSize ?? 0, command.nSims, drawPort)
     : undefined;
   const results = backlogSimulation?.results
-    ?? simulateWeeksToItems(samples, command.targetWeeks ?? 0, command.nSims, random);
+    ?? simulateWeeksToItems(samples, command.targetWeeks ?? 0, command.nSims, drawPort);
   const distributionValues = backlogSimulation === undefined
     ? results
     : results.filter((_value, index) => backlogSimulation.completedFlags[index]);
@@ -215,7 +207,7 @@ export function simulateMonteCarloLocal(
 export function buildScenarioSamples(
   teamSamples: number[][],
   alignmentRate: number,
-  seed: SimulationSeed,
+  drawPort: SampleIndexDrawPort,
 ): ScenarioSamples {
   if (!teamSamples.length) {
     throw new Error("buildScenarioSamples: teamSamples ne peut pas etre vide.");
@@ -228,13 +220,12 @@ export function buildScenarioSamples(
   const teamCount = teamSamples.length;
   const safeRate = normalizeAlignmentRate(alignmentRate);
   const frictionFactor = computeFrictionFactor(teamCount, alignmentRate);
-  const random = createSeededRandom(seed);
   const optimistic: number[] = [];
   const aligned: number[] = [];
   const friction: number[] = [];
 
   for (let index = 0; index < maxLength; index += 1) {
-    const draws = teamSamples.map((samples) => pickBootstrapSample(samples, random));
+    const draws = teamSamples.map((samples) => pickBootstrapSample(samples, drawPort));
     const optimisticValue = draws.reduce((sum, value) => sum + value, 0);
     const alignedValue = teamCount === 1 ? optimisticValue : Math.floor(optimisticValue * safeRate);
     const frictionValue = Math.floor(optimisticValue * frictionFactor);
@@ -386,4 +377,3 @@ export function getProjectionReliabilityNotice(reliability?: ThroughputReliabili
   }
   return null;
 }
-

@@ -22,6 +22,16 @@
 - permettre une source déterministe de test ;
 - ne choisir ni ne déployer encore le PRNG commun.
 
+Implémentation retenue :
+
+- le port Python demande des matrices d’indices afin de préserver la vectorisation et les lots existants ;
+- le port TypeScript demande un indice unitaire afin de préserver l’ordre historique des simulations
+  locales et du bootstrap portefeuille ;
+- les adaptateurs concrets conservent respectivement `numpy.random.default_rng(seed)` et Mulberry32,
+  tandis que les services et hooks restent les seuls lieux de composition ;
+- le PRNG commun et ses vecteurs relèvent toujours du PBI 2.7 ; l’ordre logique commun et l’indépendance
+  contractuelle du batching relèvent toujours du PBI 2.8.
+
 ### Résultat attendu du PBI 2.7
 
 - implémenter le même PRNG contractuel dans les deux langages ;
