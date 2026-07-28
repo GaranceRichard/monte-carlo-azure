@@ -1,8 +1,9 @@
 # Contrat du corpus de référence statistique
 
 Le PBI 2.9 établit le format sérialisé commun. Le PBI 2.10 matérialise dans ce format les cas normatifs
-d’entrées, de modes, de zéros, d’horizon, de censures et de percentiles. Aucun cas n’est encore exécuté
-dans un moteur : les runners Python et TypeScript restent réservés au PBI 2.12.
+d’entrées, de modes, de zéros, d’horizon, de censures et de percentiles. Le PBI 2.11 l’enrichit avec les
+cas du Risk Score, des seuils de fiabilité et des histogrammes exacts ou agrégés. Aucun cas n’est encore
+exécuté dans un moteur : les runners Python et TypeScript restent réservés au PBI 2.12.
 
 ## Autorité et fichiers
 
@@ -11,7 +12,7 @@ Le contrat normatif initial est la version `1.0`, exprimée en JSON Schema draft
 - [`contracts/statistical-reference-corpus-v1.0.schema.json`](../contracts/statistical-reference-corpus-v1.0.schema.json)
   est l’autorité machine, indépendante de Python et TypeScript ;
 - [`contracts/statistical-reference-corpus-v1.0.json`](../contracts/statistical-reference-corpus-v1.0.json)
-  est le corpus normatif `1.0`, enrichi par les cinq cas du PBI 2.10 ;
+  est le corpus normatif `1.0`, formé des cinq cas du PBI 2.10 et des dix cas du PBI 2.11 ;
 - [`contracts/examples/statistical-reference-corpus-v1.0.minimal.json`](../contracts/examples/statistical-reference-corpus-v1.0.minimal.json)
   reste une preuve de structure avec un seul cas trivial ;
 - [`contracts/examples/statistical-reference-corpus-v1.0.invalid.json`](../contracts/examples/statistical-reference-corpus-v1.0.invalid.json)
@@ -80,9 +81,11 @@ de l’indice tiré.
 | `weeks-total-censorship` | throughput fixé à 1, backlog 522 | 0 fin, 1 000 censures ; tous les percentiles absents |
 
 Les champs `risk_score`, `throughput_reliability` et `result_distribution` restent présents lorsque le
-schéma et `STD-STAT-001` l’exigent pour former un résultat normatif complet. Le PBI 2.10 ne leur ajoute
-aucun scénario limite, aucun calcul spécialisé et aucune revendication de couverture : leurs cas de
-référence dédiés restent au PBI 2.11.
+schéma et `STD-STAT-001` l’exigent pour former un résultat normatif complet. Le PBI 2.10 ne leur a ajouté
+aucun scénario limite ni aucune revendication de couverture. Le PBI 2.11 réutilise sans modifier deux
+preuves 2.10 lorsqu’elles sont déjà minimales et discriminantes : le score `0.6667` et l’histogramme exact
+de `items-zero-weeks-excluded`, puis l’absence de score avec P90 non identifiable dans
+`weeks-partial-censorship`.
 
 ## Dérivation explicite des résultats attendus
 
@@ -159,6 +162,110 @@ Il reste `1000 - 748 = 252` censures, donc `censored_rate = 252 / 1000 = 0,2520`
 Le rang 500 se trouve en semaine 518 et le rang 700 en semaine 521. Le rang 900 dépasse les 748 fins :
 `P50 = 518`, `P70 = 521` et P90 est omis, sans `null`, zéro ni sentinelle.
 
+## Cas normatifs du PBI 2.11
+
+Les dix nouveaux cas utilisent `n_sims = 1000`, `target_weeks = 1` et la seed `0`. Ce choix rend chaque
+tirage égal à un sample utilisable et garde les distributions lisibles. La récurrence indépendante employée
+pour le PBI 2.10 est réutilisée sans importer un moteur ; ses indices sont de nouveau contrôlés contre le
+vecteur canonique avant de calculer les comptes.
+
+| Cas | Frontière isolée | Attendu discriminant |
+| --- | --- | --- |
+| `risk-p50-zero-absent` | garde `P50 > 0`, moyenne nulle | P50/P70/P90 = 0, score absent, `non fiable` |
+| `reliability-slope-005-rounded` | `slope_norm = 0.0500` | `incertain` |
+| `reliability-slope-010-rounded` | `slope_norm = 0.1000` | `fragile` |
+| `reliability-slope-minus-015-rounded` | `slope_norm = -0.1500` | `non fiable` par priorité |
+| `reliability-cv-050-rounded` | `cv = 0.5000` seul | `incertain` |
+| `reliability-cv-100-rounded` | `cv = 1.0000` seul | `fragile` |
+| `reliability-cv-150-rounded` | `cv = 1.5000` seul | `non fiable` |
+| `reliability-iqr-050-rounded` | `iqr_ratio = 0.5000` seul | `incertain` |
+| `histogram-aggregated-contiguous-101` | 101 valeurs continues, `iqr_ratio = 1.0000` | 51 buckets de largeur 2, `fragile` |
+| `histogram-aggregated-discontinuous` | `0..99` puis `10000` | représentants 50 et 9999 |
+
+Les cas ne dupliquent aucune paire entrée normalisée/seed du corpus. Le contrôle autonome refuse désormais
+aussi deux identifiants différents qui décriraient le même scénario.
+
+### Risk Score calculé et absent
+
+Trois gardes complémentaires sont protégées :
+
+- dans le cas 2.10 `items-zero-weeks-excluded`, `P50 = 3` et `P90 = 1`, donc
+  `roundHalfUp((3 - 1) / 3, 4) = 0.6667` en mode capacité ; cette valeur matérialise aussi l’écart historique
+  ST-25 entre flottant natif et valeur normative arrondie ;
+- dans `weeks-partial-censorship`, P50 existe mais P90 n’est pas identifiable : `risk_score` est omis. Cette
+  absence matérialise ST-24 et D-02, où l’ancien chemin TypeScript pouvait transformer P90 absent en zéro ;
+- dans `risk-p50-zero-absent`, P50 et P90 valent zéro : la garde `P50 > 0` échoue et le score reste absent,
+  sans être transformé en score nul.
+
+Le validateur recalcule la formule depuis les percentiles attendus, applique `round half up` à quatre
+décimales et vérifie à la fois la valeur et la présence conditionnelle du champ.
+
+### Seuils de fiabilité après arrondi normatif
+
+Toutes les métriques sont dérivées des samples d’entrée, jamais de la sortie d’un helper moteur. Le
+validateur recalcule moyenne, variance de population, quantiles linéaires, pente des moindres carrés et
+normalisation avec une précision décimale suffisante, normalise à quatre décimales, puis classe dans l’ordre
+de `STAT-PAR-033`.
+
+Les trois suites arithmétiques ont une moyenne de `20`. Leurs pentes sont respectivement `1`, `2` et `-3`,
+donc les pentes normalisées exactes sont `0.05`, `0.10` et `-0.15`. Les deux premières matérialisent D-03 :
+les moteurs historiques exposaient la même valeur arrondie mais choisissaient des labels différents en
+comparant auparavant leurs flottants bruts. La référence impose `incertain`, puis `fragile`. La troisième
+impose `non fiable` avant toute catégorie de priorité inférieure.
+
+Les cas de coefficient de variation placent huit valeurs `a` et deux valeurs hautes symétriques, ce qui
+annule la pente et garde l’IQR nul :
+
+| Samples | Moyenne | Écart-type population | CV | Label |
+| --- | ---: | ---: | ---: | --- |
+| huit `3`, deux `8` | 4 | 2 | 0.5000 | `incertain` |
+| huit `1`, deux `6` | 2 | 2 | 1.0000 | `fragile` |
+| huit `1`, deux `16` | 4 | 6 | 1.5000 | `non fiable` |
+
+Pour `reliability-iqr-050-rounded`, les trois occurrences de `3`, `4` et `5` donnent `Q25 = 3`,
+médiane `4`, `Q75 = 5` et `(5 - 3) / 4 = 0.5000`; le CV `0.2041` et la pente normalisée `0.0083`
+restent sous leurs seuils. Pour `0..100`, `Q25 = 25`, médiane `50`, `Q75 = 75`, donc
+`iqr_ratio = 1.0000` et le label est `fragile`. Les cas 2.10 préservés complètent les quatre labels :
+l’historique constant de six valeurs est dégradé en `incertain`, tandis que la censure partielle conserve
+un résultat `fiable`.
+
+### Histogrammes exacts, agrégés, masse et représentants
+
+L’histogramme exact préservé de `items-zero-weeks-excluded` contient les six valeurs `1..6`, dans l’ordre,
+avec les comptes `157, 168, 186, 164, 160, 165`. Il conserve une masse de `1000` et reste sous la frontière
+de 100 valeurs distinctes de `STAT-PAR-037`.
+
+Pour `histogram-aggregated-contiguous-101`, les valeurs possibles sont `0..100` :
+
+```text
+width = ceil((100 - 0 + 1) / 100) = 2
+```
+
+Les buckets occupés ont pour représentants `0, 2, 4, ..., 98, 100`. Le premier utilise les bornes réelles
+`[0,1]` et `floor((0+1)/2) = 0`; le dernier est le bucket tronqué `[100,100]` et garde le représentant
+`100`. Les 51 comptes, dans cet ordre, sont :
+
+```text
+19,20,14,17,26,14,18,19,23,22,18,24,20,15,19,19,22,23,19,17,22,21,21,24,29,14,
+27,22,19,21,16,17,25,17,13,19,19,16,13,32,15,23,17,24,26,17,18,24,20,15,6
+```
+
+Leur somme vaut exactement `1000`. Cette référence matérialise ST-33 : l’audit observait 100 buckets côté
+Python et 51 centres impairs pouvant atteindre 101 côté TypeScript ; le contrat retient 51 représentants
+compris dans leurs bornes réelles.
+
+Pour `histogram-aggregated-discontinuous`, les 101 valeurs distinctes sont `0..99` et `10000` :
+
+```text
+width = ceil((10000 - 0 + 1) / 100) = 101
+0..99  -> index 0,  bornes [0,100],       x = 50,   compte = 994
+10000  -> index 99, bornes [9999,10000],  x = 9999, compte = 6
+```
+
+La masse vaut encore `1000`, les deux comptes sont strictement positifs et les représentants sont dans les
+bornes réelles. L’audit recensait les centres historiques `50/9951` côté Python et `51/10050` côté
+TypeScript ; la référence normative choisit explicitement `50/9999` sans aligner ici aucun moteur.
+
 ## Probes de validation des entrées
 
 Un cas invalide ne peut pas appartenir à `cases` sans rendre le corpus contraire au schéma 2.9. Le contrôle
@@ -190,11 +297,13 @@ Le point d’entrée délègue les invariants interchamps et de périmètre à
 `Scripts/statistical_reference_corpus_invariants.py` afin de conserver des contrôles courts et auditables ;
 ce module ne dépend lui non plus d’aucun moteur.
 
-Il valide le métaschème et le corpus, vérifie la complétude du périmètre 2.10, exécute les 24 probes
-d’entrées, contrôle les invariants interchamps structurels, accepte l’exemple positif et exige le rejet du
-contre-exemple. Ce rejet doit désigner `/cases/0/input` avec le mot-clé `additionalProperties`. Des corpus
-candidats peuvent être fournis en arguments. Chaque erreur contient le fichier, un JSON Pointer d’instance,
-le mot-clé en défaut, un message et le JSON Pointer du schéma, par exemple :
+Il valide le métaschème et le corpus, vérifie la complétude des périmètres 2.10 et 2.11, exécute les
+24 probes d’entrées, contrôle les invariants interchamps structurels, la formule et les gardes du Risk Score,
+les métriques et labels de fiabilité normalisés, les représentants de buckets à une semaine et l’identité
+des résultats spécialisés. Il accepte l’exemple positif et exige le rejet du contre-exemple. Ce rejet doit
+désigner `/cases/0/input` avec le mot-clé `additionalProperties`. Des corpus candidats peuvent être fournis
+en arguments. Chaque erreur contient le fichier, un JSON Pointer d’instance, le mot-clé en défaut, un message
+et le JSON Pointer du schéma, par exemple :
 
 ```text
 candidate.json:/cases/0/seed: [maximum] 4294967296 is greater than the maximum of 4294967295

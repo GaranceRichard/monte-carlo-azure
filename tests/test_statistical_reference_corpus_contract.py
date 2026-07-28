@@ -44,7 +44,7 @@ def test_bundled_control_accepts_minimal_contract_and_rejects_negative_example(
     assert corpus_validation.main([]) == 0
     output = capsys.readouterr()
     assert "corpus 1.0 and its schema are valid" in output.out
-    assert "PBI 2.10 scope is complete" in output.out
+    assert "PBI 2.10 and PBI 2.11 scopes are complete" in output.out
     assert "input rejection probes pass" in output.out
     assert output.err == ""
 
@@ -81,8 +81,10 @@ def test_pbi_210_reference_cases_are_exact_readable_and_scope_complete() -> None
     }
 
     cases = {case["id"]: case for case in corpus["cases"]}
-    assert set(cases) == corpus_validation.PBI_210_CASE_IDS
-    assert len(cases) == len(corpus["cases"]) == 5
+    assert set(cases) == (
+        corpus_validation.PBI_210_CASE_IDS | corpus_validation.PBI_211_CASE_IDS
+    )
+    assert len(cases) == len(corpus["cases"]) == 15
     assert all(case["description"] for case in cases.values())
 
     items = cases["items-zero-weeks-excluded"]
@@ -161,6 +163,128 @@ def test_pbi_210_reference_cases_are_exact_readable_and_scope_complete() -> None
         "censored_rate": 1,
         "horizon_weeks": 521,
     }
+
+
+def test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms() -> None:
+    schema, corpus = _reference_corpus()
+    assert corpus_validation.validate_contract(corpus, schema) == []
+    assert corpus_validation.validate_pbi_211_scope(corpus) == []
+    cases = {case["id"]: case for case in corpus["cases"]}
+    assert len(corpus_validation.PBI_211_CASE_IDS) == 10
+    assert corpus_validation.PBI_210_CASE_IDS.isdisjoint(corpus_validation.PBI_211_CASE_IDS)
+
+    risk_present = cases["items-zero-weeks-excluded"]["expected_result"]
+    assert risk_present["risk_score"] == 0.6667
+    assert sum(bucket["count"] for bucket in risk_present["result_distribution"]) == 1000
+
+    censored_risk = cases["weeks-partial-censorship"]["expected_result"]
+    assert "P90" not in censored_risk["result_percentiles"]
+    assert "risk_score" not in censored_risk
+
+    zero_risk = cases["risk-p50-zero-absent"]
+    assert zero_risk["proof_level"] == "deterministic"
+    assert zero_risk["expected_result"]["result_percentiles"] == {
+        "P50": 0,
+        "P70": 0,
+        "P90": 0,
+    }
+    assert "risk_score" not in zero_risk["expected_result"]
+    assert zero_risk["expected_result"]["throughput_reliability"]["label"] == "non fiable"
+
+    reliability_expectations = {
+        "reliability-slope-005-rounded": (0.1291, 0.2, 0.05, "incertain"),
+        "reliability-slope-010-rounded": (0.2582, 0.4, 0.1, "fragile"),
+        "reliability-slope-minus-015-rounded": (0.3873, 0.6, -0.15, "non fiable"),
+        "reliability-cv-050-rounded": (0.5, 0, 0, "incertain"),
+        "reliability-cv-100-rounded": (1, 0, 0, "fragile"),
+        "reliability-cv-150-rounded": (1.5, 0, 0, "non fiable"),
+        "reliability-iqr-050-rounded": (0.2041, 0.5, 0.0083, "incertain"),
+        "histogram-aggregated-contiguous-101": (0.5831, 1, 0.02, "fragile"),
+    }
+    for case_id, (cv, iqr, slope, label) in reliability_expectations.items():
+        reliability = cases[case_id]["expected_result"]["throughput_reliability"]
+        assert (
+            reliability["cv"],
+            reliability["iqr_ratio"],
+            reliability["slope_norm"],
+            reliability["label"],
+        ) == (cv, iqr, slope, label)
+
+    exact = risk_present["result_distribution"]
+    assert exact == [
+        {"x": 1, "count": 157},
+        {"x": 2, "count": 168},
+        {"x": 3, "count": 186},
+        {"x": 4, "count": 164},
+        {"x": 5, "count": 160},
+        {"x": 6, "count": 165},
+    ]
+
+    contiguous = cases["histogram-aggregated-contiguous-101"]["expected_result"][
+        "result_distribution"
+    ]
+    assert [bucket["x"] for bucket in contiguous] == list(range(0, 101, 2))
+    assert [bucket["count"] for bucket in contiguous] == [
+        19,
+        20,
+        14,
+        17,
+        26,
+        14,
+        18,
+        19,
+        23,
+        22,
+        18,
+        24,
+        20,
+        15,
+        19,
+        19,
+        22,
+        23,
+        19,
+        17,
+        22,
+        21,
+        21,
+        24,
+        29,
+        14,
+        27,
+        22,
+        19,
+        21,
+        16,
+        17,
+        25,
+        17,
+        13,
+        19,
+        19,
+        16,
+        13,
+        32,
+        15,
+        23,
+        17,
+        24,
+        26,
+        17,
+        18,
+        24,
+        20,
+        15,
+        6,
+    ]
+    assert len(contiguous) == 51
+    assert sum(bucket["count"] for bucket in contiguous) == 1000
+
+    discontinuous = cases["histogram-aggregated-discontinuous"]["expected_result"][
+        "result_distribution"
+    ]
+    assert discontinuous == [{"x": 50, "count": 994}, {"x": 9999, "count": 6}]
+    assert sum(bucket["count"] for bucket in discontinuous) == 1000
 
 
 def test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes() -> None:
@@ -294,11 +418,68 @@ def test_cross_field_invariants_reject_structural_result_regressions(
     assert any(issue.instance_path == path and issue.keyword == keyword for issue in issues)
 
 
+@pytest.mark.parametrize(
+    ("case_id", "update", "path", "keyword"),
+    [
+        (
+            "items-zero-weeks-excluded",
+            lambda result: result.__setitem__("risk_score", 0.6666),
+            "/cases/0/expected_result/risk_score",
+            "riskScoreFormula",
+        ),
+        (
+            "items-zero-weeks-excluded",
+            lambda result: result.pop("risk_score"),
+            "/cases/0/expected_result/risk_score",
+            "riskScorePresence",
+        ),
+        (
+            "risk-p50-zero-absent",
+            lambda result: result.__setitem__("risk_score", 0),
+            "/cases/0/expected_result/risk_score",
+            "riskScorePresence",
+        ),
+        (
+            "reliability-slope-005-rounded",
+            lambda result: result["throughput_reliability"].__setitem__("slope_norm", 0.0499),
+            "/cases/0/expected_result/throughput_reliability/slope_norm",
+            "reliabilityMetric",
+        ),
+        (
+            "reliability-slope-010-rounded",
+            lambda result: result["throughput_reliability"].__setitem__("label", "incertain"),
+            "/cases/0/expected_result/throughput_reliability/label",
+            "reliabilityLabel",
+        ),
+        (
+            "histogram-aggregated-contiguous-101",
+            lambda result: result["result_distribution"][0].__setitem__("x", 1),
+            "/cases/0/expected_result/result_distribution",
+            "histogramRepresentative",
+        ),
+    ],
+)
+def test_normative_result_invariants_reject_score_reliability_and_bucket_drift(
+    case_id: str,
+    update: Callable[[dict[str, Any]], None],
+    path: str,
+    keyword: str,
+) -> None:
+    schema, corpus = _reference_corpus()
+    case = deepcopy(next(case for case in corpus["cases"] if case["id"] == case_id))
+    update(case["expected_result"])
+    candidate = deepcopy(corpus)
+    candidate["cases"] = [case]
+    issues = corpus_validation.validate_contract(candidate, schema)
+    assert any(issue.instance_path == path and issue.keyword == keyword for issue in issues)
+
+
 def test_scope_and_probe_controls_report_actionable_regressions(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     schema, corpus = _reference_corpus()
     assert corpus_validation.validate_pbi_210_scope([])[0].instance_path == "/"
+    assert corpus_validation.validate_pbi_211_scope([])[0].instance_path == "/"
 
     missing = deepcopy(corpus)
     missing["cases"] = missing["cases"][1:]
@@ -337,6 +518,64 @@ def test_scope_and_probe_controls_report_actionable_regressions(
             for issue in corpus_validation.validate_pbi_210_scope(candidate)
         )
 
+    missing_211 = deepcopy(corpus)
+    missing_211["cases"] = [
+        case for case in missing_211["cases"] if case["id"] != "risk-p50-zero-absent"
+    ]
+    assert "risk-p50-zero-absent" in corpus_validation.validate_pbi_211_scope(
+        missing_211
+    )[0].message
+
+    pbi_211_regressions = [
+        (
+            "reliability-cv-050-rounded",
+            ("expected_result", "result_percentiles"),
+            {},
+        ),
+        (
+            "histogram-aggregated-contiguous-101",
+            ("expected_result", "result_distribution"),
+            [],
+        ),
+        (
+            "histogram-aggregated-discontinuous",
+            ("input", "throughput_samples"),
+            list(range(101)),
+        ),
+    ]
+    for case_id, path, value in pbi_211_regressions:
+        candidate = deepcopy(corpus)
+        case = next(case for case in candidate["cases"] if case["id"] == case_id)
+        case[path[0]][path[1]] = value
+        assert any(
+            issue.keyword == "pbi211Scope"
+            for issue in corpus_validation.validate_pbi_211_scope(candidate)
+        )
+
+    exact_regression = deepcopy(corpus)
+    exact_case = next(
+        case
+        for case in exact_regression["cases"]
+        if case["id"] == "items-zero-weeks-excluded"
+    )
+    exact_case["expected_result"]["risk_score"] = 0.6666
+    assert any(
+        issue.keyword == "pbi211Scope"
+        for issue in corpus_validation.validate_pbi_211_scope(exact_regression)
+    )
+
+    absent_regression = deepcopy(corpus)
+    absent_case = next(
+        case
+        for case in absent_regression["cases"]
+        if case["id"] == "weeks-partial-censorship"
+    )
+    absent_case["expected_result"]["risk_score"] = 0
+    assert any(
+        issue.keyword == "pbi211Scope"
+        for issue in corpus_validation.validate_pbi_211_scope(absent_regression)
+    )
+
     bad_probe = corpus_validation.InputRejectionProbe(
         "diagnostic-regression",
         "items-zero-weeks-excluded",
@@ -368,6 +607,35 @@ def test_scope_and_probe_controls_report_actionable_regressions(
     }
     assert corpus_validation._validate_case_semantics(guarded_case, 0) == []
 
+    invalid_reliability_shape = deepcopy(corpus["cases"][0])
+    invalid_reliability_shape["expected_result"]["throughput_reliability"] = []
+    assert not any(
+        issue.keyword in {"reliabilityMetric", "reliabilityLabel"}
+        for issue in corpus_validation._validate_case_semantics(
+            invalid_reliability_shape,
+            0,
+        )
+    )
+
+    invalid_zero_policy = deepcopy(corpus["cases"][0])
+    invalid_zero_policy["input"]["include_zero_weeks"] = "false"
+    assert not any(
+        issue.keyword == "histogramRepresentative"
+        for issue in corpus_validation._validate_case_semantics(invalid_zero_policy, 0)
+    )
+
+    invalid_result_shape = deepcopy(corpus)
+    pbi_211_case = next(
+        case
+        for case in invalid_result_shape["cases"]
+        if case["id"] == "risk-p50-zero-absent"
+    )
+    pbi_211_case["expected_result"] = []
+    assert any(
+        issue.keyword == "pbi211Scope"
+        for issue in corpus_validation.validate_pbi_211_scope(invalid_result_shape)
+    )
+
     invalid_completion_types = deepcopy(corpus["cases"][1])
     invalid_completion_types["expected_result"]["completion_summary"]["completed_count"] = "1000"
     assert not any(
@@ -380,16 +648,20 @@ def test_scope_and_probe_controls_report_actionable_regressions(
     assert corpus_validation._validate_case_semantics(backlog_without_completion, 0) == []
 
 
-def test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope() -> None:
+def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope() -> None:
     root = corpus_validation.ROOT
     corpus_doc = (root / "docs/statistical-reference-corpus.md").read_text(encoding="utf-8")
     for case_id in corpus_validation.PBI_210_CASE_IDS:
+        assert f"`{case_id}`" in corpus_doc
+    for case_id in corpus_validation.PBI_211_CASE_IDS:
         assert f"`{case_id}`" in corpus_doc
     assert "sans appeler\nle moteur Python ni le moteur TypeScript" in corpus_doc
     assert "floor(0,5 × 999) = 499" in corpus_doc
     assert "Le rang 500 se trouve en semaine 518" in corpus_doc
     assert "24 mutations négatives minimales" in corpus_doc
-    assert "PBI 2.11" in corpus_doc
+    assert "`slope_norm = 0.0500`" in corpus_doc
+    assert "la référence normative choisit explicitement `50/9999`" in corpus_doc
+    assert "aucun moteur" in corpus_doc
     assert "PBI 2.12" in corpus_doc
 
     documentation_expectations = {
@@ -397,25 +669,34 @@ def test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope() -> 
             "contracts/statistical-reference-corpus-v1.0.json",
             "censure partielle avec 748 fins et 252 censures",
             "aucun moteur Python ou TypeScript n’a servi d’oracle",
+            "anciens centres `50/9951` et `51/10050`",
+            "Les PBI 2.10 et 2.11 ne créent aucun runner moteur",
         ],
         "ARCHITECTURE.md": [
             "statistical-reference-corpus-v1.0.json",
             "24 probes négatives",
+            "sa complétude 2.10/2.11",
+            "Le PBI 2.11 ne modifie donc aucun moteur ni aucune formule",
         ],
         "CHANGELOG.md": [
-            "Cas d’entrées, modes, censures et percentiles — PBI 2.10",
+            "Risk Score, fiabilité et histogrammes de référence — PBI 2.11",
             "aucun runner du PBI 2.12",
+            "Cas d’entrées, modes, censures et percentiles — PBI 2.10",
         ],
         "docs/backlog-expectations/feature-02-statistical-core.md": [
             "Implémentation retenue",
             "P50 = 518 et P70 = 521",
+            "les représentants `50` et `9999`",
+            "aucun runner Python ou TypeScript du PBI 2.12",
         ],
         "docs/standards/STD-STAT-001.md": [
             "Le PBI 2.10 instancie cette frontière",
             "constituent donc pas encore une preuve de parité interlangage",
+            "Le PBI 2.11 ajoute dix cas discriminants",
+            "aucun runner moteur du PBI 2.12",
         ],
         "docs/risk-control-matrix.md": [
-            "Les cas 2.10 existent sans runner moteur; les cas 2.11",
+            "Les cas 2.10 et 2.11 existent sans runner moteur",
             "24 probes autonomes des entrées 2.10",
         ],
     }
@@ -426,6 +707,8 @@ def test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope() -> 
     backlog = (root / "docs/backlog.md").read_text(encoding="utf-8")
     pbi_line = next(line for line in backlog.splitlines() if line.startswith("| 2.10 |"))
     assert pbi_line.endswith("| 28/07/2026 |")
+    pbi_211_line = next(line for line in backlog.splitlines() if line.startswith("| 2.11 |"))
+    assert pbi_211_line.endswith("| 28/07/2026 |")
 
 
 @pytest.mark.parametrize(
@@ -539,6 +822,21 @@ def test_contract_control_rejects_duplicate_case_identifiers() -> None:
     )
     assert corpus_validation.validate_contract([], schema)
     assert corpus_validation.validate_contract({"cases": [None]}, schema)
+
+
+def test_contract_control_rejects_duplicate_normalized_scenarios() -> None:
+    schema, instance = _contract()
+    duplicate = deepcopy(instance["cases"][0])
+    duplicate["id"] = "different-id-same-scenario"
+    duplicate["description"] = "A renamed case must not duplicate an existing input and seed."
+    instance["cases"].append(duplicate)
+    issues = corpus_validation.validate_contract(instance, schema)
+    assert any(
+        issue.instance_path == "/cases/1"
+        and issue.keyword == "uniqueScenario"
+        and "/cases/0" in issue.message
+        for issue in issues
+    )
 
 
 def test_cli_reports_invalid_custom_instance_and_parse_failures(

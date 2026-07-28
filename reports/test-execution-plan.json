@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1025,
+      "logicalCases": 1028,
       "nodes": [
         {
           "id": "preflight",
@@ -397,10 +397,13 @@
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_normalized_scenarios",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
-            "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_scope_and_probe_controls_report_actionable_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_script_entrypoint_runs_the_autonomous_control",
@@ -470,18 +473,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 355
+            "pytest": 358
           },
           "natures": {
             "component": 69,
             "contract": 44,
             "integration": 26,
-            "unit": 216
+            "unit": 219
           },
           "criticalities": {
             "critical": 71,
             "high": 16,
-            "unassigned": 268
+            "unassigned": 271
           }
         },
         {
@@ -1289,7 +1292,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1230,
+      "logicalCases": 1233,
       "nodes": [
         {
           "id": "preflight",
@@ -1776,11 +1779,14 @@
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_normalized_scenarios",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
-            "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_scope_and_probe_controls_report_actionable_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_script_entrypoint_runs_the_autonomous_control",
@@ -1923,18 +1929,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 528
+            "pytest": 531
           },
           "natures": {
             "component": 69,
             "contract": 44,
             "integration": 199,
-            "unit": 216
+            "unit": 219
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 424
+            "unassigned": 427
           }
         },
         {
@@ -2783,7 +2789,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1231,
+      "logicalCases": 1234,
       "nodes": [
         {
           "id": "preflight",
@@ -3270,11 +3276,14 @@
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_normalized_scenarios",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
-            "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_scope_and_probe_controls_report_actionable_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_script_entrypoint_runs_the_autonomous_control",
@@ -3418,18 +3427,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 529
+            "pytest": 532
           },
           "natures": {
             "component": 69,
             "contract": 44,
             "integration": 199,
-            "unit": 217
+            "unit": 220
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 425
+            "unassigned": 428
           }
         },
         {
@@ -4278,7 +4287,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1232,
+      "logicalCases": 1235,
       "nodes": [
         {
           "id": "preflight",
@@ -4766,11 +4775,14 @@
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_normalized_scenarios",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
-            "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_scope_and_probe_controls_report_actionable_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_script_entrypoint_runs_the_autonomous_control",
@@ -4914,18 +4926,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 530
+            "pytest": 533
           },
           "natures": {
             "component": 69,
             "contract": 44,
             "integration": 200,
-            "unit": 217
+            "unit": 220
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 426
+            "unassigned": 429
           }
         },
         {

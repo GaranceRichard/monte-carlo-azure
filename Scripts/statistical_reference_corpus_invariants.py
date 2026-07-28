@@ -1,37 +1,26 @@
-"""Cross-field and PBI 2.10 invariants for the statistical reference corpus."""
+"""Cross-field and PBI 2.10/2.11 invariants for the statistical reference corpus."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
-from pathlib import Path
 from typing import Any, Callable
 
-
-@dataclass(frozen=True, slots=True)
-class ValidationIssue:
-    instance_path: str
-    keyword: str
-    message: str
-    schema_path: str
-
-    def render(self, source: Path) -> str:
-        return (
-            f"{source.as_posix()}:{self.instance_path}: [{self.keyword}] {self.message} "
-            f"(schema {self.schema_path})"
-        )
-
-
-@dataclass(frozen=True, slots=True)
-class InputRejectionProbe:
-    probe_id: str
-    source_case_id: str
-    operation: str
-    path: tuple[str | int, ...]
-    value: Any
-    expected_instance_path: str
-    expected_keyword: str
-
+from Scripts.statistical_reference_corpus_models import (
+    InputRejectionProbe,
+    ValidationIssue,
+    semantic_issue,
+)
+from Scripts.statistical_reference_corpus_normative import (
+    histogram_representative_issues,
+    reliability_issues,
+    risk_score_issues,
+)
+from Scripts.statistical_reference_corpus_pbi_211 import (
+    PBI_211_CASE_IDS as PBI_211_CASE_IDS,
+)
+from Scripts.statistical_reference_corpus_pbi_211 import (
+    validate_pbi_211_scope as validate_pbi_211_scope,
+)
 
 PBI_210_CASE_IDS = frozenset(
     {
@@ -42,15 +31,6 @@ PBI_210_CASE_IDS = frozenset(
         "weeks-total-censorship",
     }
 )
-
-
-def semantic_issue(instance_path: str, keyword: str, message: str) -> ValidationIssue:
-    return ValidationIssue(
-        instance_path=instance_path,
-        keyword=keyword,
-        message=message,
-        schema_path="/$defs/expectedResult/$comment",
-    )
 
 
 def _seed_and_sample_issues(
@@ -208,9 +188,12 @@ def validate_case_semantics(case: dict[str, Any], index: int) -> list[Validation
     case_path = f"/cases/{index}"
     issues = _seed_and_sample_issues(case_path, case, input_value, result)
     issues.extend(_percentile_issues(case_path, input_value, result))
+    issues.extend(risk_score_issues(case_path, input_value, result))
+    issues.extend(reliability_issues(case_path, input_value, result))
     distribution_issues, distribution_mass = _distribution_state(case_path, result)
     completion_issues, expected_mass = _completion_state(case_path, input_value, result)
     issues.extend(distribution_issues)
+    issues.extend(histogram_representative_issues(case_path, input_value, result))
     issues.extend(completion_issues)
     if (
         distribution_mass is not None

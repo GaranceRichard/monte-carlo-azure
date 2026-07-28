@@ -340,6 +340,14 @@ censures et percentiles. Les résultats attendus sont dérivés du présent stan
 utiliser un moteur comme oracle. Ils restent des références à exécuter par les runners du PBI 2.12 et ne
 constituent donc pas encore une preuve de parité interlangage.
 
+Le PBI 2.11 ajoute dix cas discriminants pour `STAT-PAR-026` à `STAT-PAR-039`. Ils figent le calcul et les
+gardes d’absence du Risk Score, tous les seuils de `cv`, `iqr_ratio` et `slope_norm` après arrondi normatif,
+les quatre labels dans leur ordre de priorité, ainsi que les histogrammes exacts et agrégés avec masse,
+largeur, bornes et représentants. Les cas `0..100` et `0..99 + 10000` matérialisent explicitement les
+géométries historiquement divergentes recensées par l’audit. Leurs résultats sont eux aussi dérivés du
+présent standard, du contrat sérialisé et de calculs indépendants ; aucun runner moteur du PBI 2.12 ni
+alignement des formules des PBI suivants n’est introduit.
+
 ### STAT-PAR-047 — Version de rejeu
 
 Le contrat normatif **DOIT** porter la version `1.0`. Toute preuve ou donnée destinée au rejeu **DOIT**

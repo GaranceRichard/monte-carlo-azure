@@ -120,7 +120,7 @@ Garde-fous serveur :
 contracts/
   mca-prng-v1-vectors.json # sorties uint32 et indices canoniques partagés
   statistical-reference-corpus-v1.0.schema.json # contrat JSON Schema normatif du corpus
-  statistical-reference-corpus-v1.0.json # cas normatifs d’entrées, modes, censures et percentiles
+  statistical-reference-corpus-v1.0.json # cas normatifs 2.10/2.11, scores, fiabilité et histogrammes
   examples/
     statistical-reference-corpus-v1.0.minimal.json # preuve structurelle minimale
     statistical-reference-corpus-v1.0.invalid.json # contre-exemple de fermeture
@@ -352,9 +352,9 @@ La composition appartient aux frontières d’exécution :
   déjà résolue, sans modifier le nombre ni l’ordre des résolutions de seed.
 
 Les moteurs ne connaissent toujours que `SampleIndexDrawPort` et ne créent aucun PRNG. Le contrat commun,
-l’ordre logique et les tests de lots prouvent la stabilité de l’affectation des tirages. Le PBI 2.10
-matérialise désormais les premiers cas normatifs ; leur exécution commune et l’égalité complète des
-résultats relèvent encore des PBI 2.12 à 2.17.
+l’ordre logique et les tests de lots prouvent la stabilité de l’affectation des tirages. Les PBI 2.10 et
+2.11 matérialisent désormais les cas normatifs jusqu’aux scores, labels et buckets ; leur exécution commune
+et l’égalité complète des résultats relèvent encore des PBI 2.12 à 2.17.
 
 ### Contrat du corpus statistique
 
@@ -364,10 +364,12 @@ est la frontière sérialisée interlangage du corpus. Le document racine porte 
 le résultat attendu et l’un des quatre niveaux de preuve normatifs.
 
 [`contracts/statistical-reference-corpus-v1.0.json`](contracts/statistical-reference-corpus-v1.0.json)
-porte les cinq cas du PBI 2.10. Ils couvrent zéros inclus et exclus, paramètres actifs des deux modes,
-censure absente, partielle ou totale, fin exacte en semaine 521 et rangs de P50, P70 et P90. Les résultats
-de rejeu sont dérivés de la récurrence contractuelle et de l’ordre simulation-major, indépendamment des
-deux moteurs ; les cas constants rendent explicites les deux côtés de la frontière de l’horizon.
+porte les cinq cas du PBI 2.10 et les dix cas du PBI 2.11. Les premiers couvrent zéros inclus et exclus,
+paramètres actifs des deux modes, censure absente, partielle ou totale, fin exacte en semaine 521 et rangs
+de P50, P70 et P90. Les seconds couvrent les gardes et l’arrondi du Risk Score, les seuils exacts de CV,
+IQR relatif et pente normalisée, les quatre labels, l’histogramme exact et les agrégations continues ou
+discontinues avec masse, largeur, bornes et représentants. Les résultats de rejeu sont dérivés de la
+récurrence contractuelle et de l’ordre simulation-major, indépendamment des deux moteurs.
 
 Le JSON Schema draft 2020-12 ferme tous les objets, discrimine `backlog_to_weeks` et `weeks_to_items`,
 interdit leur paramètre inactif et décrit types, bornes, cardinalités et champs obligatoires. Les invariants
@@ -376,12 +378,13 @@ normative `$comment` et détaillés dans
 [`docs/statistical-reference-corpus.md`](docs/statistical-reference-corpus.md), sans `$data` ni dépendance à
 un langage. `Scripts/validate_statistical_reference_corpus.py`, appuyé par le module court
 `Scripts/statistical_reference_corpus_invariants.py`, contrôle le métaschème, le corpus, ses invariants
-structurels, sa complétude 2.10, 24 probes négatives et les exemples positif et négatif sans importer les
-moteurs.
+structurels, sa complétude 2.10/2.11, les formules et gardes du score, les métriques et labels normalisés,
+les représentants de buckets, l’unicité des scénarios, 24 probes négatives et les exemples positif et
+négatif sans importer les moteurs.
 
 Cette frontière ne constitue pas une nouvelle API applicative : aucun mapper, DTO, document MongoDB ou
-objet `localStorage` ne la consomme. Les cas spécialisés du Risk Score, de la fiabilité et des histogrammes,
-les runners moteur et la gate de parité restent respectivement réservés aux PBI 2.11, 2.12 et 2.19.
+objet `localStorage` ne la consomme. Le PBI 2.11 ne modifie donc aucun moteur ni aucune formule ; les runners
+moteur et la gate de parité restent respectivement réservés aux PBI 2.12 et 2.19.
 
 Le PBI 2.7 a conservé les résultats frontend seed-à-seed en reprenant son algorithme bitwise historique,
 mais le PBI 2.8 change volontairement l’affectation locale des tirages `backlog_to_weeks` après une fin

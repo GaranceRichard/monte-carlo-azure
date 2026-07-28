@@ -126,6 +126,26 @@ Implémentation retenue :
 - couvrir histogrammes exacts et agrégés, masse et représentants ;
 - inclure les cas qui matérialisent les divergences historiques recensées par l’audit.
 
+Implémentation retenue :
+
+- dix cas discriminants enrichissent le corpus `1.0`; les preuves 2.10 du score `0.6667`, de l’histogramme
+  exact à six valeurs et du score absent lorsque P90 manque restent inchangées et sont réutilisées sans
+  créer de doublon ;
+- les gardes couvrent P90 absent et P50 nul ; les seuils isolés après `round half up` sont `cv = 0.5`,
+  `1` et `1.5`, `iqr_ratio = 0.5` et `1`, puis `slope_norm = 0.05`, `0.10` et `-0.15`, avec les quatre
+  labels et l’ordre de priorité normatifs ;
+- le cas continu `0..100` produit 51 buckets de largeur 2, de représentants `0,2,..,100`; le cas
+  discontinu `0..99 + 10000` produit les représentants `50` et `9999`; chaque histogramme conserve une
+  masse de `1000` et aucun bucket vide ;
+- ST-24/D-02, ST-25, ST-30/D-03, ST-32 à ST-34 sont matérialisés sans modifier les formules actuelles des
+  moteurs : la référence normative documente notamment les anciens centres divergents `50/9951` et
+  `51/10050`, puis fixe `50/9999` ;
+- le validateur recalcule indépendamment les gardes/formules du score et toutes les métriques/labels de
+  fiabilité, protège les représentants et résultats attendus, et refuse aussi deux scénarios identiques sous
+  des identifiants différents ;
+- aucun runner Python ou TypeScript du PBI 2.12, aucun alignement des PBI 2.13 à 2.16 et aucune modification
+  de DTO, API, MongoDB ou `localStorage` n’est introduit.
+
 ### Résultat attendu du PBI 2.12
 
 - fournir un runner Python et un runner TypeScript du même corpus ;

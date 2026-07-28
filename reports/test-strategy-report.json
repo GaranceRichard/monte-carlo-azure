@@ -2,22 +2,22 @@
   "schemaVersion": "1.0.0",
   "schema": "config/test-strategy-report.schema.json",
   "profile": "main",
-  "evidenceBundleId": "a80c84965646565a6aeb79999b64314c5bc81c79e8911914573957141ac1b864",
+  "evidenceBundleId": "fcda7fa522f3134c627e2a0f6c9dbf44410530c1cfd3c6762315a4d3d6c7c828",
   "evidenceBundleIdentityDisclaimer": "This identifier names the exact evidence bundle; it does not prove that every source came from the same physical execution.",
   "globalReference": {
     "inventory": {
       "path": "reports/test-classification-inventory.json",
-      "sha256": "3d9ac79d7712d6c307491c0fa127eed0e11a062669fe5bc65dedd7d99e62a351",
-      "logicalCases": 1233
+      "sha256": "3ee31bd4f8ae3a346c01d63341749e5a97204c111134364bd68bfc0f3f0e533c",
+      "logicalCases": 1236
     },
     "classification": {
       "breakdowns": {
         "status": {
-          "classified": 1233
+          "classified": 1236
         },
         "framework": {
           "playwright": 32,
-          "pytest": 531,
+          "pytest": 534,
           "vitest": 670
         },
         "nature": {
@@ -25,13 +25,13 @@
           "contract": 44,
           "e2e": 32,
           "integration": 202,
-          "unit": 556
+          "unit": 559
         },
         "purpose": {
-          "accessibility": 105,
+          "accessibility": 106,
           "compatibility": 104,
-          "data_quality": 130,
-          "functional": 1233,
+          "data_quality": 131,
+          "functional": 1236,
           "migration_recovery": 20,
           "observability": 234,
           "performance": 11,
@@ -41,7 +41,7 @@
         "primaryProfile": {
           "main": 205,
           "nightly": 1,
-          "pr": 1025,
+          "pr": 1028,
           "release": 2
         },
         "domain": {
@@ -52,16 +52,16 @@
           "history": 104,
           "identity": 92,
           "persistence": 81,
-          "portfolio": 144,
+          "portfolio": 145,
           "quality_chain": 238,
           "reporting": 218,
-          "statistical_engine": 486,
+          "statistical_engine": 487,
           "user_interface": 313
         },
         "criticality": {
           "critical": 202,
           "high": 20,
-          "unassigned": 1011
+          "unassigned": 1014
         }
       },
       "riskAssociations": {
@@ -99,16 +99,16 @@
     "executionCounts": {
       "path": "reports/test-execution-counts.json",
       "schemaVersion": "1.0.0",
-      "inventorySha256": "3d9ac79d7712d6c307491c0fa127eed0e11a062669fe5bc65dedd7d99e62a351",
+      "inventorySha256": "3ee31bd4f8ae3a346c01d63341749e5a97204c111134364bd68bfc0f3f0e533c",
       "totals": {
-        "logicalCases": 1233,
-        "collectedInstances": 1488,
-        "executedInstances": 1488,
+        "logicalCases": 1236,
+        "collectedInstances": 1496,
+        "executedInstances": 1496,
         "skippedInstances": 0,
-        "attempts": 1488,
+        "attempts": 1496,
         "retries": 0,
         "results": {
-          "passed": 1488,
+          "passed": 1496,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -122,15 +122,15 @@
         "includedProfiles": [
           "pr"
         ],
-        "logicalCases": 1025,
+        "logicalCases": 1028,
         "frameworks": {
-          "pytest": 355,
+          "pytest": 358,
           "vitest": 670
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 355,
+          "backend-tests": 358,
           "e2e": 0,
           "frontend-static": 0,
           "frontend-tests": 670,
@@ -144,16 +144,16 @@
           "pr",
           "main"
         ],
-        "logicalCases": 1230,
+        "logicalCases": 1233,
         "frameworks": {
           "playwright": 32,
-          "pytest": 528,
+          "pytest": 531,
           "vitest": 670
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 528,
+          "backend-tests": 531,
           "e2e": 32,
           "frontend-static": 0,
           "frontend-tests": 670,
@@ -168,16 +168,16 @@
           "main",
           "nightly"
         ],
-        "logicalCases": 1231,
+        "logicalCases": 1234,
         "frameworks": {
           "playwright": 32,
-          "pytest": 529,
+          "pytest": 532,
           "vitest": 670
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 529,
+          "backend-tests": 532,
           "e2e": 32,
           "frontend-static": 0,
           "frontend-tests": 670,
@@ -192,16 +192,16 @@
           "main",
           "release"
         ],
-        "logicalCases": 1232,
+        "logicalCases": 1235,
         "frameworks": {
           "playwright": 32,
-          "pytest": 530,
+          "pytest": 533,
           "vitest": 670
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 530,
+          "backend-tests": 533,
           "e2e": 32,
           "frontend-static": 0,
           "frontend-tests": 670,
@@ -217,7 +217,7 @@
       "pr",
       "main"
     ],
-    "selectedLogicalCases": 1230,
+    "selectedLogicalCases": 1233,
     "logicalCaseIds": [
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2738:3]",
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2792:3]",
@@ -634,11 +634,14 @@
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
+      "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_normalized_scenarios",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
+      "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
-      "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope",
+      "pytest:tests/test_statistical_reference_corpus_contract.py::test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
+      "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_scope_and_probe_controls_report_actionable_regressions",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_script_entrypoint_runs_the_autonomous_control",
@@ -1467,14 +1470,14 @@
         }
       },
       "pytest": {
-        "logicalCases": 528,
-        "collectedInstances": 704,
-        "executedInstances": 704,
+        "logicalCases": 531,
+        "collectedInstances": 712,
+        "executedInstances": 712,
         "skippedInstances": 0,
-        "attempts": 704,
+        "attempts": 712,
         "retries": 0,
         "results": {
-          "passed": 704,
+          "passed": 712,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -1504,7 +1507,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/preflight/result.json",
         "exitCode": 0,
-        "durationSeconds": 9.152,
+        "durationSeconds": 9.021,
         "reasons": []
       },
       {
@@ -1513,7 +1516,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 0.106,
+        "durationSeconds": 0.123,
         "reasons": []
       },
       {
@@ -1522,7 +1525,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 34.344,
+        "durationSeconds": 33.526,
         "reasons": []
       },
       {
@@ -1531,7 +1534,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 94.074,
+        "durationSeconds": 92.159,
         "reasons": []
       },
       {
@@ -1540,7 +1543,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 122.212,
+        "durationSeconds": 121.848,
         "reasons": []
       },
       {
@@ -1549,7 +1552,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/e2e/result.json",
         "exitCode": 0,
-        "durationSeconds": 45.348,
+        "durationSeconds": 43.503,
         "reasons": []
       },
       {
@@ -1558,7 +1561,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/release-or-container-checks/result.json",
         "exitCode": 0,
-        "durationSeconds": 57.397,
+        "durationSeconds": 39.675,
         "reasons": []
       },
       {
@@ -1571,20 +1574,20 @@
         "reasons": []
       }
     ],
-    "collectedInstances": 1485,
-    "executedInstances": 1485,
+    "collectedInstances": 1493,
+    "executedInstances": 1493,
     "skippedInstances": 0,
-    "attempts": 1485,
+    "attempts": 1493,
     "retries": 0,
     "initialResults": {
-      "passed": 1485,
+      "passed": 1493,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
       "infrastructureError": 0
     },
     "finalResults": {
-      "passed": 1485,
+      "passed": 1493,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -1602,14 +1605,14 @@
       "instabilities": 0,
       "instabilityRatePercent": 0.0,
       "initialResults": {
-        "passed": 1485,
+        "passed": 1493,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
         "infrastructureError": 0
       },
       "finalResults": {
-        "passed": 1485,
+        "passed": 1493,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -1625,14 +1628,14 @@
         "thresholdSource": ".coveragerc",
         "metrics": {
           "lines": {
-            "total": 6835,
-            "covered": 6835,
+            "total": 7017,
+            "covered": 7017,
             "pct": 100.0
           },
           "branches": {
-            "total": 2382,
-            "covered": 2345,
-            "pct": 98.45
+            "total": 2434,
+            "covered": 2396,
+            "pct": 98.44
           }
         },
         "thresholds": {
@@ -1690,9 +1693,9 @@
             "pct": 91.26
           },
           "branches": {
-            "total": 2727,
-            "covered": 2258,
-            "pct": 82.8
+            "total": 2730,
+            "covered": 2261,
+            "pct": 82.82
           },
           "functions": {
             "total": 443,
@@ -2291,7 +2294,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "3d9ac79d7712d6c307491c0fa127eed0e11a062669fe5bc65dedd7d99e62a351",
+      "fingerprint": "3ee31bd4f8ae3a346c01d63341749e5a97204c111134364bd68bfc0f3f0e533c",
       "schemaVersion": null,
       "status": "valid",
       "reasons": []
@@ -2323,7 +2326,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "c23d768b7e6653ab1ad57d596d8d40db1732e2e133e3b1984d2083161b78a5a2",
+      "fingerprint": "8a3ee305c9ab296853b49762bec9f27ac4f645abe7f5ef5d68d504fbc82eeb61",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2339,7 +2342,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "649f7af4e43cdedb1a91b173a687345f5a26a454eca3ba808fbe7602e02cdd30",
+      "fingerprint": "e31da689f03fe1b5272bb42d004f1d431f4951d9370cd168ed1a445e9297d3f3",
       "schemaVersion": 3,
       "status": "valid",
       "reasons": []
@@ -2355,7 +2358,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "ae20ce8578e284cd6feb87019c6c850f03100e0b8b01916db9a4ad420ceb3364",
+      "fingerprint": "d22e9a1777f69562f977a74fa6833fc0027a339afe00ccdcf7589af9a9cdb56f",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2371,7 +2374,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "33934ba18edbac05a1b93f50f49de69d3ec6752b8d47c27c0a39c4b806bd23f9",
+      "fingerprint": "742cd2fdc688b2936b8db22e976dae93e4c7dacd38b117234c2747689f1da9c8",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2387,7 +2390,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "b668b6fb268e77e91c01e66022a09e9296165ee6c0cda64544e07171ec8cbb4f",
+      "fingerprint": "60fdb0420b1c9cbcfad1cbc75af7ba5e6ef3d3612b2eaf22a66badd85672f6c3",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2403,7 +2406,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "3e64f96b542caff0fa683765e54ee0b536dc2c9a1917731a3a1de98fc6e2452e",
+      "fingerprint": "0e8e2d4721eb68b9e8bf71f29a2d36d59ba376777166493488bf90ec402a264d",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2435,7 +2438,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "6222bc61c9f0be490d88cb0fe2bd4e6eed893fae6363f88169c1da9d13c03bc9",
+      "fingerprint": "ea9134b12ed573278d82655b4e4788dcb3a2488891c23281bdde6484da3a3662",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2451,7 +2454,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "3ca1cdb421bfab3fb60a470f43cf6fd7b95eb1c272c81fc899bc4664be7a0895",
+      "fingerprint": "4d7676258bfc0721d5f614373df888dda62532be9bb023e3f0e64481de89740d",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2467,7 +2470,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "7b5f264a4367c5e72a907e44b54c5fefeae29f0b273a34162cb27ab5d55f224a",
+      "fingerprint": "1d8e984fbd966cbcb2a86512a47bb7abd86c408b2cd2fd238759d5d81992aad0",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2483,7 +2486,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "9cd5820d97adeffeff085a3f88050a1f3dd6d6b3af80472baad9ccea752f1dbc",
+      "fingerprint": "67826c8ebc86140fea4c0dae1865676fc1da976ab978abe88081838c7ba4c5be",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2499,7 +2502,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "789fbff376afd429c4f2cab66182c21cf3e33c98c3533842fea825768ce1a738",
+      "fingerprint": "9f373c8534fa26ffe2dff298f585fbbfd95c2f14cd8e6e1cbfee1663028c101e",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2515,7 +2518,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "b7c1889bd3575b88856643d5cb3b2d7044673018f18f4716ddfffe0e647aa795",
+      "fingerprint": "f87e48eaa4479d4954866228e5afa6db51a289d842b71c0c8f56523b74e78e2b",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2531,7 +2534,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "a40109e84b52ef9baf68642fa95e8f087b643449b96d9fdaaee4f96517899bbe",
+      "fingerprint": "66a2589c8b9108f81d511ac4f0404a4e604089172f5cbcf38f55b800002dd184",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2547,7 +2550,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "dae089fb7cac54e897f56f550b5f6050c541dbb3cdf16f42c95bbd47c9d1ba6d",
+      "fingerprint": "acfc724ad4dbacc857994a538defd33b96a4db3d8a38adde2a0e9e034a6c86e5",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2579,7 +2582,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "50c32247b8927bd90885c9099828f6526c1ded3d86df373a70fd3a54bef11009",
+      "fingerprint": "bb89afadaae7115eebbf1650b66eb125a6915b99afc1a5c61368300b4e909e03",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []

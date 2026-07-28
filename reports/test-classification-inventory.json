@@ -7623,6 +7623,21 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_normalized_scenarios",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_contract_control_rejects_duplicate_normalized_scenarios",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "portfolio"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
     "framework": "pytest",
     "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
@@ -7652,6 +7667,18 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
     "framework": "pytest",
     "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
@@ -7664,15 +7691,17 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope",
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
     "framework": "pytest",
     "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
-    "selector": "test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope",
+    "selector": "test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
     "status": "classified",
     "executionProfile": "pr",
-    "nature": "integration",
+    "nature": "unit",
     "purposes": [
-      "functional"
+      "functional",
+      "accessibility",
+      "data_quality"
     ]
   },
   {
@@ -7685,6 +7714,21 @@
     "nature": "unit",
     "purposes": [
       "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
     ]
   },
   {

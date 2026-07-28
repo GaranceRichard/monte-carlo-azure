@@ -1,15 +1,15 @@
 {
   "schemaVersion": "1.0.0",
-  "classificationInventorySha256": "3d9ac79d7712d6c307491c0fa127eed0e11a062669fe5bc65dedd7d99e62a351",
+  "classificationInventorySha256": "3ee31bd4f8ae3a346c01d63341749e5a97204c111134364bd68bfc0f3f0e533c",
   "totals": {
-    "logicalCases": 1233,
-    "collectedInstances": 1488,
-    "executedInstances": 1488,
+    "logicalCases": 1236,
+    "collectedInstances": 1496,
+    "executedInstances": 1496,
     "skippedInstances": 0,
-    "attempts": 1488,
+    "attempts": 1496,
     "retries": 0,
     "results": {
-      "passed": 1488,
+      "passed": 1496,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -33,14 +33,14 @@
       }
     },
     "pytest": {
-      "logicalCases": 531,
-      "collectedInstances": 707,
-      "executedInstances": 707,
+      "logicalCases": 534,
+      "collectedInstances": 715,
+      "executedInstances": 715,
       "skippedInstances": 0,
-      "attempts": 707,
+      "attempts": 715,
       "retries": 0,
       "results": {
-        "passed": 707,
+        "passed": 715,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -65,14 +65,14 @@
   },
   "classificationStatuses": {
     "classified": {
-      "logicalCases": 1233,
-      "collectedInstances": 1488,
-      "executedInstances": 1488,
+      "logicalCases": 1236,
+      "collectedInstances": 1496,
+      "executedInstances": 1496,
       "skippedInstances": 0,
-      "attempts": 1488,
+      "attempts": 1496,
       "retries": 0,
       "results": {
-        "passed": 1488,
+        "passed": 1496,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -142,14 +142,14 @@
       }
     },
     "unit": {
-      "logicalCases": 556,
-      "collectedInstances": 758,
-      "executedInstances": 758,
+      "logicalCases": 559,
+      "collectedInstances": 766,
+      "executedInstances": 766,
       "skippedInstances": 0,
-      "attempts": 758,
+      "attempts": 766,
       "retries": 0,
       "results": {
-        "passed": 758,
+        "passed": 766,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -159,14 +159,14 @@
   },
   "executionProfiles": {
     "pr": {
-      "logicalCases": 1025,
-      "collectedInstances": 1255,
-      "executedInstances": 1255,
+      "logicalCases": 1028,
+      "collectedInstances": 1263,
+      "executedInstances": 1263,
       "skippedInstances": 0,
-      "attempts": 1255,
+      "attempts": 1263,
       "retries": 0,
       "results": {
-        "passed": 1255,
+        "passed": 1263,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -9373,6 +9373,28 @@
       }
     },
     {
+      "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_normalized_scenarios",
+      "framework": "pytest",
+      "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+      "selector": "test_contract_control_rejects_duplicate_normalized_scenarios",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
       "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
       "framework": "pytest",
       "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
@@ -9417,6 +9439,28 @@
       }
     },
     {
+      "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
+      "framework": "pytest",
+      "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+      "selector": "test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "integration",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
       "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
       "framework": "pytest",
       "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
@@ -9439,13 +9483,35 @@
       }
     },
     {
-      "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope",
+      "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
       "framework": "pytest",
       "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
-      "selector": "test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope",
+      "selector": "test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
       "classificationStatus": "classified",
       "executionProfile": "pr",
-      "nature": "integration",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 6,
+      "executedInstances": 6,
+      "skippedInstances": 0,
+      "attempts": 6,
+      "retries": 0,
+      "results": {
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
+      "framework": "pytest",
+      "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+      "selector": "test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
       "logicalCases": 1,
       "collectedInstances": 1,
       "executedInstances": 1,
@@ -9461,10 +9527,10 @@
       }
     },
     {
-      "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
+      "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms",
       "framework": "pytest",
       "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
-      "selector": "test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
+      "selector": "test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",

@@ -2,6 +2,21 @@
 
 ## Recent
 
+### Risk Score, fiabilité et histogrammes de référence — PBI 2.11
+
+- enrichissement du corpus normatif `1.0` avec dix cas discriminants, sans modifier les cinq cas 2.10 ni
+  le contrat `mca-prng-v1`
+- matérialisation du score `0.6667`, de son absence avec P90 manquant ou P50 nul, et des seuils exacts
+  après arrondi normatif : CV `0.5/1/1.5`, IQR relatif `0.5/1`, pente `0.05/0.10/-0.15`
+- ajout d’un histogramme continu agrégé en 51 buckets de représentants `0,2,..,100` et d’un cas discontinu
+  aux représentants `50/9999`, avec comptes, masse, bornes et absence de buckets vides protégés
+- matérialisation des divergences historiques ST-24/D-02, ST-25, ST-30/D-03 et ST-33, sans utiliser les
+  moteurs comme oracle ni aligner leurs formules
+- renforcement du validateur autonome : présence/formule du Risk Score, métriques et labels de fiabilité,
+  représentants normatifs, résultats spécialisés et refus des scénarios dupliqués
+- aucun runner du PBI 2.12, aucun alignement des PBI 2.13 à 2.16, aucun changement de DTO, API, MongoDB,
+  `localStorage`, formule moteur ou contrôle qualité
+
 ### Cas d’entrées, modes, censures et percentiles — PBI 2.10
 
 - ajout du corpus normatif `contracts/statistical-reference-corpus-v1.0.json` avec cinq cas minimaux

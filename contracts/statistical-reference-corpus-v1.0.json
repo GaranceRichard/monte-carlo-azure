@@ -376,6 +376,979 @@
         },
         "seed": 0
       }
+    },
+    {
+      "id": "risk-p50-zero-absent",
+      "description": "Six retained zero weeks make every capacity result and percentile zero; P50 is not positive, so the Risk Score is absent and reliability is non fiable.",
+      "proof_level": "deterministic",
+      "input": {
+        "throughput_samples": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "include_zero_weeks": true,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 0,
+          "P70": 0,
+          "P90": 0
+        },
+        "result_distribution": [
+          {
+            "x": 0,
+            "count": 1000
+          }
+        ],
+        "samples_count": 6,
+        "throughput_reliability": {
+          "cv": 0,
+          "iqr_ratio": 0,
+          "slope_norm": 0,
+          "label": "non fiable",
+          "samples_count": 6
+        },
+        "seed": 0
+      }
+    },
+    {
+      "id": "reliability-slope-005-rounded",
+      "description": "The arithmetic history 16..24 has normalized slope exactly 0.0500 after normative rounding, so the inclusive incertain threshold applies.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "include_zero_weeks": false,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 20,
+          "P70": 18,
+          "P90": 16
+        },
+        "risk_score": 0.2,
+        "result_distribution": [
+          {
+            "x": 16,
+            "count": 107
+          },
+          {
+            "x": 17,
+            "count": 109
+          },
+          {
+            "x": 18,
+            "count": 109
+          },
+          {
+            "x": 19,
+            "count": 115
+          },
+          {
+            "x": 20,
+            "count": 130
+          },
+          {
+            "x": 21,
+            "count": 105
+          },
+          {
+            "x": 22,
+            "count": 95
+          },
+          {
+            "x": 23,
+            "count": 126
+          },
+          {
+            "x": 24,
+            "count": 104
+          }
+        ],
+        "samples_count": 9,
+        "throughput_reliability": {
+          "cv": 0.1291,
+          "iqr_ratio": 0.2,
+          "slope_norm": 0.05,
+          "label": "incertain",
+          "samples_count": 9
+        },
+        "seed": 0
+      }
+    },
+    {
+      "id": "reliability-slope-010-rounded",
+      "description": "The arithmetic history 12,14,..,28 has normalized slope exactly 0.1000 after normative rounding, so the inclusive fragile threshold applies.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          12,
+          14,
+          16,
+          18,
+          20,
+          22,
+          24,
+          26,
+          28
+        ],
+        "include_zero_weeks": false,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 20,
+          "P70": 16,
+          "P90": 12
+        },
+        "risk_score": 0.4,
+        "result_distribution": [
+          {
+            "x": 12,
+            "count": 107
+          },
+          {
+            "x": 14,
+            "count": 109
+          },
+          {
+            "x": 16,
+            "count": 109
+          },
+          {
+            "x": 18,
+            "count": 115
+          },
+          {
+            "x": 20,
+            "count": 130
+          },
+          {
+            "x": 22,
+            "count": 105
+          },
+          {
+            "x": 24,
+            "count": 95
+          },
+          {
+            "x": 26,
+            "count": 126
+          },
+          {
+            "x": 28,
+            "count": 104
+          }
+        ],
+        "samples_count": 9,
+        "throughput_reliability": {
+          "cv": 0.2582,
+          "iqr_ratio": 0.4,
+          "slope_norm": 0.1,
+          "label": "fragile",
+          "samples_count": 9
+        },
+        "seed": 0
+      }
+    },
+    {
+      "id": "reliability-slope-minus-015-rounded",
+      "description": "The arithmetic history 32,29,..,8 has normalized slope exactly -0.1500 after normative rounding, so the highest-priority non fiable threshold applies.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          32,
+          29,
+          26,
+          23,
+          20,
+          17,
+          14,
+          11,
+          8
+        ],
+        "include_zero_weeks": false,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 20,
+          "P70": 14,
+          "P90": 8
+        },
+        "risk_score": 0.6,
+        "result_distribution": [
+          {
+            "x": 8,
+            "count": 104
+          },
+          {
+            "x": 11,
+            "count": 126
+          },
+          {
+            "x": 14,
+            "count": 95
+          },
+          {
+            "x": 17,
+            "count": 105
+          },
+          {
+            "x": 20,
+            "count": 130
+          },
+          {
+            "x": 23,
+            "count": 115
+          },
+          {
+            "x": 26,
+            "count": 109
+          },
+          {
+            "x": 29,
+            "count": 109
+          },
+          {
+            "x": 32,
+            "count": 107
+          }
+        ],
+        "samples_count": 9,
+        "throughput_reliability": {
+          "cv": 0.3873,
+          "iqr_ratio": 0.6,
+          "slope_norm": -0.15,
+          "label": "non fiable",
+          "samples_count": 9
+        },
+        "seed": 0
+      }
+    },
+    {
+      "id": "reliability-cv-050-rounded",
+      "description": "Eight threes and two symmetric eights produce cv exactly 0.5000, zero IQR ratio and zero slope, isolating the incertain cv threshold.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          8,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          8
+        ],
+        "include_zero_weeks": false,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 3,
+          "P70": 3,
+          "P90": 3
+        },
+        "risk_score": 0,
+        "result_distribution": [
+          {
+            "x": 3,
+            "count": 806
+          },
+          {
+            "x": 8,
+            "count": 194
+          }
+        ],
+        "samples_count": 10,
+        "throughput_reliability": {
+          "cv": 0.5,
+          "iqr_ratio": 0,
+          "slope_norm": 0,
+          "label": "incertain",
+          "samples_count": 10
+        },
+        "seed": 0
+      }
+    },
+    {
+      "id": "reliability-cv-100-rounded",
+      "description": "Eight ones and two symmetric sixes produce cv exactly 1.0000, zero IQR ratio and zero slope, isolating the fragile cv threshold.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          6,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          6
+        ],
+        "include_zero_weeks": false,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 1,
+          "P70": 1,
+          "P90": 1
+        },
+        "risk_score": 0,
+        "result_distribution": [
+          {
+            "x": 1,
+            "count": 806
+          },
+          {
+            "x": 6,
+            "count": 194
+          }
+        ],
+        "samples_count": 10,
+        "throughput_reliability": {
+          "cv": 1,
+          "iqr_ratio": 0,
+          "slope_norm": 0,
+          "label": "fragile",
+          "samples_count": 10
+        },
+        "seed": 0
+      }
+    },
+    {
+      "id": "reliability-cv-150-rounded",
+      "description": "Eight ones and two symmetric sixteens produce cv exactly 1.5000, zero IQR ratio and zero slope, isolating the non fiable cv threshold.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          16,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          16
+        ],
+        "include_zero_weeks": false,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 1,
+          "P70": 1,
+          "P90": 1
+        },
+        "risk_score": 0,
+        "result_distribution": [
+          {
+            "x": 1,
+            "count": 806
+          },
+          {
+            "x": 16,
+            "count": 194
+          }
+        ],
+        "samples_count": 10,
+        "throughput_reliability": {
+          "cv": 1.5,
+          "iqr_ratio": 0,
+          "slope_norm": 0,
+          "label": "non fiable",
+          "samples_count": 10
+        },
+        "seed": 0
+      }
+    },
+    {
+      "id": "reliability-iqr-050-rounded",
+      "description": "Three values at each of 3, 4 and 5 give Q25=3, median=4 and Q75=5; iqr_ratio is exactly 0.5000 and selects incertain.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          3,
+          4,
+          5,
+          5,
+          4,
+          3,
+          3,
+          4,
+          5
+        ],
+        "include_zero_weeks": false,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 4,
+          "P70": 3,
+          "P90": 3
+        },
+        "risk_score": 0.25,
+        "result_distribution": [
+          {
+            "x": 3,
+            "count": 307
+          },
+          {
+            "x": 4,
+            "count": 365
+          },
+          {
+            "x": 5,
+            "count": 328
+          }
+        ],
+        "samples_count": 9,
+        "throughput_reliability": {
+          "cv": 0.2041,
+          "iqr_ratio": 0.5,
+          "slope_norm": 0.0083,
+          "label": "incertain",
+          "samples_count": 9
+        },
+        "seed": 0
+      }
+    },
+    {
+      "id": "histogram-aggregated-contiguous-101",
+      "description": "The 101 values 0..100 force width 2 and 51 non-empty normative buckets; each representative uses the real inclusive bounds, including 0 and 100.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99,
+          100
+        ],
+        "include_zero_weeks": true,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 49,
+          "P70": 31,
+          "P90": 10
+        },
+        "risk_score": 0.7959,
+        "result_distribution": [
+          {
+            "x": 0,
+            "count": 19
+          },
+          {
+            "x": 2,
+            "count": 20
+          },
+          {
+            "x": 4,
+            "count": 14
+          },
+          {
+            "x": 6,
+            "count": 17
+          },
+          {
+            "x": 8,
+            "count": 26
+          },
+          {
+            "x": 10,
+            "count": 14
+          },
+          {
+            "x": 12,
+            "count": 18
+          },
+          {
+            "x": 14,
+            "count": 19
+          },
+          {
+            "x": 16,
+            "count": 23
+          },
+          {
+            "x": 18,
+            "count": 22
+          },
+          {
+            "x": 20,
+            "count": 18
+          },
+          {
+            "x": 22,
+            "count": 24
+          },
+          {
+            "x": 24,
+            "count": 20
+          },
+          {
+            "x": 26,
+            "count": 15
+          },
+          {
+            "x": 28,
+            "count": 19
+          },
+          {
+            "x": 30,
+            "count": 19
+          },
+          {
+            "x": 32,
+            "count": 22
+          },
+          {
+            "x": 34,
+            "count": 23
+          },
+          {
+            "x": 36,
+            "count": 19
+          },
+          {
+            "x": 38,
+            "count": 17
+          },
+          {
+            "x": 40,
+            "count": 22
+          },
+          {
+            "x": 42,
+            "count": 21
+          },
+          {
+            "x": 44,
+            "count": 21
+          },
+          {
+            "x": 46,
+            "count": 24
+          },
+          {
+            "x": 48,
+            "count": 29
+          },
+          {
+            "x": 50,
+            "count": 14
+          },
+          {
+            "x": 52,
+            "count": 27
+          },
+          {
+            "x": 54,
+            "count": 22
+          },
+          {
+            "x": 56,
+            "count": 19
+          },
+          {
+            "x": 58,
+            "count": 21
+          },
+          {
+            "x": 60,
+            "count": 16
+          },
+          {
+            "x": 62,
+            "count": 17
+          },
+          {
+            "x": 64,
+            "count": 25
+          },
+          {
+            "x": 66,
+            "count": 17
+          },
+          {
+            "x": 68,
+            "count": 13
+          },
+          {
+            "x": 70,
+            "count": 19
+          },
+          {
+            "x": 72,
+            "count": 19
+          },
+          {
+            "x": 74,
+            "count": 16
+          },
+          {
+            "x": 76,
+            "count": 13
+          },
+          {
+            "x": 78,
+            "count": 32
+          },
+          {
+            "x": 80,
+            "count": 15
+          },
+          {
+            "x": 82,
+            "count": 23
+          },
+          {
+            "x": 84,
+            "count": 17
+          },
+          {
+            "x": 86,
+            "count": 24
+          },
+          {
+            "x": 88,
+            "count": 26
+          },
+          {
+            "x": 90,
+            "count": 17
+          },
+          {
+            "x": 92,
+            "count": 18
+          },
+          {
+            "x": 94,
+            "count": 24
+          },
+          {
+            "x": 96,
+            "count": 20
+          },
+          {
+            "x": 98,
+            "count": 15
+          },
+          {
+            "x": 100,
+            "count": 6
+          }
+        ],
+        "samples_count": 101,
+        "throughput_reliability": {
+          "cv": 0.5831,
+          "iqr_ratio": 1,
+          "slope_norm": 0.02,
+          "label": "fragile",
+          "samples_count": 101
+        },
+        "seed": 0
+      }
+    },
+    {
+      "id": "histogram-aggregated-discontinuous",
+      "description": "The 101 values 0..99 plus 10000 force width 101; occupied bucket representatives are 50 and 9999, materializing both historical center divergences.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99,
+          10000
+        ],
+        "include_zero_weeks": true,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 49,
+          "P70": 31,
+          "P90": 10
+        },
+        "risk_score": 0.7959,
+        "result_distribution": [
+          {
+            "x": 50,
+            "count": 994
+          },
+          {
+            "x": 9999,
+            "count": 6
+          }
+        ],
+        "samples_count": 101,
+        "throughput_reliability": {
+          "cv": 6.6587,
+          "iqr_ratio": 1,
+          "slope_norm": 0.0457,
+          "label": "non fiable",
+          "samples_count": 101
+        },
+        "seed": 0
+      }
     }
   ]
 }

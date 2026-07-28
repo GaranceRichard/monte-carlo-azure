@@ -20,9 +20,13 @@ from Scripts.statistical_reference_corpus_invariants import (  # noqa: E402
     PBI_210_CASE_IDS as _PBI_210_CASE_IDS,
 )
 from Scripts.statistical_reference_corpus_invariants import (  # noqa: E402
+    PBI_211_CASE_IDS as _PBI_211_CASE_IDS,
+)
+from Scripts.statistical_reference_corpus_invariants import (  # noqa: E402
     InputRejectionProbe,
     ValidationIssue,
     validate_pbi_210_scope,
+    validate_pbi_211_scope,
 )
 from Scripts.statistical_reference_corpus_invariants import (  # noqa: E402
     apply_probe as _apply_probe,
@@ -35,6 +39,7 @@ from Scripts.statistical_reference_corpus_invariants import (  # noqa: E402
 )
 
 PBI_210_CASE_IDS = _PBI_210_CASE_IDS
+PBI_211_CASE_IDS = _PBI_211_CASE_IDS
 
 SCHEMA_PATH = ROOT / "contracts/statistical-reference-corpus-v1.0.schema.json"
 CORPUS_PATH = ROOT / "contracts/statistical-reference-corpus-v1.0.json"
@@ -314,6 +319,7 @@ def validate_contract(instance: Any, schema: dict[str, Any]) -> list[ValidationI
     if not isinstance(instance, dict) or not isinstance(instance.get("cases"), list):
         return issues
     first_index_by_id: dict[str, int] = {}
+    first_index_by_scenario: dict[str, int] = {}
     for index, case in enumerate(instance["cases"]):
         if not isinstance(case, dict) or not isinstance(case.get("id"), str):
             continue
@@ -329,6 +335,26 @@ def validate_contract(instance: Any, schema: dict[str, Any]) -> list[ValidationI
             )
         else:
             first_index_by_id[case_id] = index
+        if isinstance(case.get("input"), dict) and type(case.get("seed")) is int:
+            scenario = json.dumps(
+                {"input": case["input"], "seed": case["seed"]},
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            if scenario in first_index_by_scenario:
+                issues.append(
+                    ValidationIssue(
+                        instance_path=f"/cases/{index}",
+                        keyword="uniqueScenario",
+                        message=(
+                            "normalized input and seed duplicate "
+                            f"/cases/{first_index_by_scenario[scenario]}"
+                        ),
+                        schema_path="/$comment",
+                    )
+                )
+            else:
+                first_index_by_scenario[scenario] = index
         issues.extend(_validate_case_semantics(case, index))
     return sorted(
         issues,
@@ -378,6 +404,7 @@ def run_control(instance_paths: list[Path] | None = None) -> list[str]:
         errors.extend(issue.render(path) for issue in validate_contract(load_json(path), schema))
 
     errors.extend(issue.render(CORPUS_PATH) for issue in validate_pbi_210_scope(corpus))
+    errors.extend(issue.render(CORPUS_PATH) for issue in validate_pbi_211_scope(corpus))
     errors.extend(
         f"{CORPUS_PATH.as_posix()}:/cases: [inputRejectionProbe] {error}"
         for error in validate_input_rejection_probes(corpus, schema)
@@ -420,7 +447,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     print(
         "Statistical reference corpus 1.0 and its schema are valid; "
-        "PBI 2.10 scope is complete, input rejection probes pass, "
+        "PBI 2.10 and PBI 2.11 scopes are complete, input rejection probes pass, "
         "positive example is accepted and negative example is rejected."
     )
     return 0

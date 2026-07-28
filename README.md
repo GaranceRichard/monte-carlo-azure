@@ -723,22 +723,35 @@ contient les cinq cas minimaux du PBI 2.10 :
 
 Les résultats sont dérivés explicitement de `STD-STAT-001`, des vecteurs `mca-prng-v1` et de l’ordre
 simulation-major. Les tables de tirages, cumuls et rangs sont publiées dans la documentation du corpus ;
-aucun moteur Python ou TypeScript n’a servi d’oracle. Les champs de Risk Score, fiabilité et distribution
-restent uniquement l’enveloppe normative imposée par le schéma : leurs cas limites et preuves dédiées
-appartiennent au PBI 2.11.
+aucun moteur Python ou TypeScript n’a servi d’oracle.
 
-Le contrôle autonome valide le métaschème, le corpus, ses invariants interchamps et sa complétude 2.10.
-Il applique aussi 24 probes minimaux prouvant le rejet des types et bornes invalides, des zéros laissant
-moins de six observations utiles, des paramètres absents ou inactifs et des champs hors contrat. L’exemple
-positif trivial et le contre-exemple fermé restent des preuves structurelles séparées. Les diagnostics sont
-localisés par JSON Pointer :
+Le PBI 2.11 ajoute dix cas sans modifier les cinq précédents :
+
+- Risk Score calculé et arrondi à `0.6667`, absent avec P90 manquant, puis absent avec P50 nul ;
+- seuils exacts après `round half up` : CV `0.5/1/1.5`, IQR relatif `0.5/1` et pente normalisée
+  `0.05/0.10/-0.15`, avec les quatre labels et leur priorité ;
+- histogramme exact à six valeurs, histogramme continu `0..100` agrégé en 51 représentants pairs de
+  `0` à `100`, puis plage `0..99 + 10000` représentée par `50` et `9999` ;
+- masse totale `1000`, buckets non vides, ordre strict, bornes réelles et comptes exacts.
+
+Ces cas matérialisent les divergences ST-24/D-02, ST-25, ST-30/D-03 et ST-33 de l’audit, notamment les
+anciens centres `50/9951` et `51/10050`, sans aligner les moteurs.
+
+Le contrôle autonome valide le métaschème, le corpus, ses invariants interchamps et sa complétude 2.10/2.11.
+Il recalcule indépendamment les gardes/formules du score, les métriques et labels normalisés, protège les
+résultats spécialisés et les représentants de buckets, et refuse les scénarios dupliqués. Il applique aussi
+24 probes minimaux prouvant le rejet des types et bornes invalides, des zéros laissant moins de six
+observations utiles, des paramètres absents ou inactifs et des champs hors contrat. L’exemple positif trivial
+et le contre-exemple fermé restent des preuves structurelles séparées. Les diagnostics sont localisés par
+JSON Pointer :
 
 ```bash
 .venv\Scripts\python.exe Scripts/validate_statistical_reference_corpus.py
 ```
 
-Le PBI 2.10 ne crée aucun runner moteur, ne change aucune formule ou sortie courante et ne migre aucun DTO,
-payload API, document MongoDB ou objet `localStorage`. L’exécution partagée reste réservée au PBI 2.12.
+Les PBI 2.10 et 2.11 ne créent aucun runner moteur, ne changent aucune formule ou sortie courante et ne
+migrent aucun DTO, payload API, document MongoDB ou objet `localStorage`. L’exécution partagée reste
+réservée au PBI 2.12.
 
 Purge planifiée:
 
