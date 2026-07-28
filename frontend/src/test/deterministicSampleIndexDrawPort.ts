@@ -2,6 +2,7 @@ import type { SampleIndexDrawPort } from "../domain/sampleIndexDrawPort";
 
 export class DeterministicSampleIndexDrawPort implements SampleIndexDrawPort {
   readonly requests: number[] = [];
+  readonly skippedDrawCounts: number[] = [];
   private position = 0;
 
   constructor(private readonly sampleIndices: readonly number[]) {}
@@ -25,6 +26,17 @@ export class DeterministicSampleIndexDrawPort implements SampleIndexDrawPort {
     this.requests.push(sampleCount);
     this.position += 1;
     return sampleIndex;
+  }
+
+  skipSampleIndices(drawCount: number): void {
+    if (!Number.isSafeInteger(drawCount) || drawCount <= 0) {
+      throw new Error("drawCount de test doit etre un entier > 0.");
+    }
+    if (this.position + drawCount > this.sampleIndices.length) {
+      throw new Error("consommation excessive d'indices.");
+    }
+    this.skippedDrawCounts.push(drawCount);
+    this.position += drawCount;
   }
 
   assertExhausted(): void {

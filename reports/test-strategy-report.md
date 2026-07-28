@@ -11,9 +11,9 @@ Known logical cases: 1221
 ## Profile execution
 
 Selected logical cases: 1218
-Collected instances: 1458
-Executed instances: 1458
-Attempts: 1458
+Collected instances: 1460
+Executed instances: 1460
+Attempts: 1460
 Retries: 0
 
 ## Evidence manifest

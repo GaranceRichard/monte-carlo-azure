@@ -287,8 +287,7 @@ Les moteurs dépendent d’un seul port métier par langage, sans seed ni géné
   `[0, sample_count)` ; la forme `(batch_size, weeks)` conserve les appels vectorisés et la mémoire
   bornée du backend ;
 - `frontend/src/domain/sampleIndexDrawPort.ts` demande un indice dans
-  `[0, sampleCount)` par appel ; cette granularité conserve l’ordre de consommation historique du
-  moteur local et du bootstrap portefeuille.
+  `[0, sampleCount)` par appel et permet d’avancer sur des positions réservées sans calculer leurs indices.
 
 Les implémentations concrètes sont hors des moteurs et portent la constante d’identification
 `mca-prng-v1`. Une instance conserve un seul état uint32, initialisé avec une seed entière dans
@@ -316,6 +315,23 @@ large suivie d’un décalage de 32 bits pour produire les indices. L’adaptate
 strictement les constantes et opérations bitwise historiques. Dans les deux cas, plusieurs demandes
 successives poursuivent la même suite et mettent à jour l’unique état avec le dernier tirage consommé.
 
+L’ordre logique canonique est simulation-major, puis semaine-major à l’intérieur de chaque simulation :
+
+```text
+logicalOffset = simulationIndex * drawSlotsPerSimulation + weekIndex
+```
+
+`drawSlotsPerSimulation` vaut `SIMULATION_HORIZON_WEEKS_MAX` (`521`) en `backlog_to_weeks` et
+`target_weeks` en `weeks_to_items`. En mode backlog, seuls les slots allant jusqu’à la première fin
+influencent le résultat ; les slots suivants de la ligne restent réservés afin que la simulation suivante
+commence toujours au même offset. Le backend les obtient dans sa matrice vectorisée. Le frontend avance
+l’état par `state + drawCount * 0x6D2B79F5 mod 2^32`, opération strictement équivalente à la consommation
+des transitions écartées et vérifiée contre une consommation unitaire.
+
+Chaque lot backend contient ainsi une plage contiguë de lignes complètes. Une taille de lot divisible,
+un dernier lot incomplet ou un lot plus grand que la population concatènent exactement la même suite de
+slots logiques ; le batching ne peut donc modifier ni trajectoire ni censure.
+
 [`contracts/mca-prng-v1-vectors.json`](contracts/mca-prng-v1-vectors.json) est l’unique preuve canonique
 figée du contrat. Les tests Python et TypeScript lisent ce même fichier pour vérifier les sorties uint32
 et les indices pour `sampleCount` `1`, `2`, `3`, `6`, `17` et `2^33`; ce dernier cas prouve le calcul
@@ -330,17 +346,17 @@ La composition appartient aux frontières d’exécution :
 - `frontend/src/hooks/usePortfolioReport.ts` construit l’adaptateur du bootstrap depuis la seed optimiste
   déjà résolue, sans modifier le nombre ni l’ordre des résolutions de seed.
 
-Les moteurs ne connaissent toujours que `SampleIndexDrawPort` et ne créent aucun PRNG. Le contrat commun
-prouve uniquement l’égalité Python/TypeScript des sorties uint32 et des indices d’échantillonnage. Il ne
-prouve pas encore l’égalité complète des simulations : l’ordre logique commun et l’indépendance complète
-du batching restent réservés au PBI 2.8, puis les autres règles statistiques aux PBI 2.9 à 2.17.
+Les moteurs ne connaissent toujours que `SampleIndexDrawPort` et ne créent aucun PRNG. Le contrat commun,
+l’ordre logique et les tests de lots prouvent la stabilité de l’affectation des tirages. Ils ne constituent
+pas encore le corpus statistique partagé : les autres règles et l’égalité complète des résultats relèvent
+des PBI 2.9 à 2.17.
 
-Le frontend conserve ses résultats seed-à-seed, puisque `mca-prng-v1` reprend exactement son algorithme
-bitwise historique. Le backend abandonne volontairement le générateur NumPy : le rejeu backend d’une seed
-utilisée avant ce changement peut donc produire de nouveaux tirages. Les résultats déjà persistés restent
-inchangés et aucun historique n’est supprimé ou migré. Aucun champ n’est ajouté aux DTO, au JSON, à
-MongoDB ou à `localStorage`; la version externe du contrat et les règles de migration restent réservées au
-PBI 2.20.
+Le PBI 2.7 a conservé les résultats frontend seed-à-seed en reprenant son algorithme bitwise historique,
+mais le PBI 2.8 change volontairement l’affectation locale des tirages `backlog_to_weeks` après une fin
+anticipée. Le backend, déjà organisé en lignes complètes, et le mode local `weeks_to_items` conservent leur
+ordre. Les résultats déjà persistés restent inchangés et aucun historique n’est supprimé ou migré. Aucun
+champ n’est ajouté aux DTO, au JSON, à MongoDB ou à `localStorage`; la version externe du contrat et les
+règles de migration restent réservées au PBI 2.20.
 
 ## Convention de nommage
 

@@ -41,7 +41,7 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 | 2.5 | Isoler la résolution de seed aux frontières d’exécution | M | Sol Élevé | 26/07/2026 |
 | 2.6 | Introduire un port de tirage déterministe dans les deux moteurs | M | Sol Très élevé | 26/07/2026 |
 | 2.7 | Implémenter le PRNG contractuel commun Python et TypeScript | L | Sol Ultra | 26/07/2026 |
-| 2.8 | Garantir l’ordre logique des tirages et l’indépendance du batching | M | Sol Très élevé | |
+| 2.8 | Garantir l’ordre logique des tirages et l’indépendance du batching | M | Sol Très élevé | 28/07/2026 |
 | 2.9 | Versionner le schéma du corpus de référence statistique | M | Sol Élevé | |
 | 2.10 | Construire les cas de référence des entrées, modes, censures et percentiles | M | Sol Très élevé | |
 | 2.11 | Construire les cas de référence du Risk Score, de la fiabilité et des histogrammes | M | Sol Très élevé | |
@@ -305,7 +305,7 @@ passage interactif ou asynchrone et maîtriser jobs, workers, progression, repri
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
 | 1 — Disposer d’un système de preuve qualité gouverné | 11 | 11 | 0 |
-| 2 — Garantir la fiabilité du cœur statistique | 20 | 7 | 13 |
+| 2 — Garantir la fiabilité du cœur statistique | 20 | 8 | 12 |
 | 3 — Distribuer un moteur statistique Python réutilisable | 12 | 0 | 12 |
 | 4 — Sécuriser la mise en production personnelle | 6 | 0 | 6 |
 | 5 — Valider la valeur d’usage du mode portefeuille | 4 | 0 | 4 |
@@ -318,7 +318,7 @@ passage interactif ou asynchrone et maîtriser jobs, workers, progression, repri
 | 12 — Étendre le produit au pilotage de programme | 7 | 0 | 7 |
 | 13 — Rationaliser le dispositif de gouvernance technique | 10 | 0 | 10 |
 | 14 — Clarifier la stratégie de diffusion et réduire la friction d’adoption | 9 | 0 | 9 |
-| **Total** | **140** | **18** | **122** |
+| **Total** | **140** | **19** | **121** |
 
 Aucun PBI n’est classé XL.
 

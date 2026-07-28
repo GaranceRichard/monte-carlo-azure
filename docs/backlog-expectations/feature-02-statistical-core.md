@@ -61,6 +61,19 @@ Implémentation retenue :
 - couvrir les deux modes, les censures et les changements de taille de batch ;
 - ne pas introduire le corpus complet de parité.
 
+Implémentation retenue :
+
+- l’ordre canonique est simulation-major, puis semaine-major dans chaque simulation ;
+- chaque simulation réserve une ligne de `521` slots en `backlog_to_weeks` ou de `target_weeks` slots en
+  `weeks_to_items` ;
+- une fin anticipée utilise seulement le préfixe nécessaire au résultat, puis réserve les slots restants
+  avant la simulation suivante ; le frontend avance l’état en temps constant et le backend conserve ses
+  lignes vectorisées en ordre C ;
+- les lots backend ne sont que des plages contiguës de lignes complètes : leur taille et leur dernier lot
+  incomplet ne changent ni les trajectoires ni les censures ;
+- les preuves ciblées couvrent les deux modes, les censures absente, partielle et totale et des tailles de
+  lots divisibles et non divisibles, sans fixture sérialisée de résultats statistiques.
+
 ## Phase B — Corpus partagé : PBI 2.9 à 2.12
 
 ### Résultat attendu du PBI 2.9

@@ -2,6 +2,18 @@
 
 ## Recent
 
+### Ordre logique des tirages et batching — PBI 2.8
+
+- adoption d’une grille canonique simulation-major : chaque simulation reçoit un segment contigu de la
+  suite `mca-prng-v1`, ordonné par semaine, de largeur `521` en `backlog_to_weeks` et `target_weeks` en
+  `weeks_to_items`
+- alignement du moteur local TypeScript sur les lignes row-major déjà produites par le backend ; après une
+  fin anticipée du backlog, l’adaptateur avance en temps constant sur les slots réservés inutilisés
+- résultats backend prouvés identiques pour des lots divisibles et non divisibles, dans les deux modes et
+  avec censure absente, partielle ou totale
+- vecteurs `mca-prng-v1`, formules de percentiles, Risk Score, fiabilité et histogrammes inchangés ; aucun
+  corpus de parité du PBI 2.9 introduit
+
 ### PRNG contractuel commun — PBI 2.7
 
 - remplacement de l’adaptateur NumPy backend et identification de l’algorithme bitwise frontend historique

@@ -2,12 +2,12 @@
   "schemaVersion": "1.0.0",
   "schema": "config/test-strategy-report.schema.json",
   "profile": "main",
-  "evidenceBundleId": "00690713a5653759a43b3bf7b6e7652af4be9c519208986976e529ce9366d3c6",
+  "evidenceBundleId": "547678bee53d4701c95ca66726ff3993ecf00dc39bb5f95ab5be96f8497b1edf",
   "evidenceBundleIdentityDisclaimer": "This identifier names the exact evidence bundle; it does not prove that every source came from the same physical execution.",
   "globalReference": {
     "inventory": {
       "path": "reports/test-classification-inventory.json",
-      "sha256": "b479cc408cb50db3d37e2932b23def96d5392d163dc0ff21aa1c8f3c7b1792a2",
+      "sha256": "6fbafc074c59a529e544666fb0b141d65a63ba8d2b374456d39b979dd8a6d664",
       "logicalCases": 1221
     },
     "classification": {
@@ -67,8 +67,8 @@
       "riskAssociations": {
         "RISK-001": 17,
         "RISK-002": 9,
-        "RISK-003": 19,
-        "RISK-004": 19,
+        "RISK-003": 20,
+        "RISK-004": 20,
         "RISK-005": 10,
         "RISK-006": 6,
         "RISK-007": 6,
@@ -99,16 +99,16 @@
     "executionCounts": {
       "path": "reports/test-execution-counts.json",
       "schemaVersion": "1.0.0",
-      "inventorySha256": "b479cc408cb50db3d37e2932b23def96d5392d163dc0ff21aa1c8f3c7b1792a2",
+      "inventorySha256": "6fbafc074c59a529e544666fb0b141d65a63ba8d2b374456d39b979dd8a6d664",
       "totals": {
         "logicalCases": 1221,
-        "collectedInstances": 1461,
-        "executedInstances": 1461,
+        "collectedInstances": 1463,
+        "executedInstances": 1463,
         "skippedInstances": 0,
-        "attempts": 1461,
+        "attempts": 1463,
         "retries": 0,
         "results": {
-          "passed": 1461,
+          "passed": 1463,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -397,10 +397,10 @@
       "pytest:tests/test_mc_core.py::test_mc_finish_weeks_consumes_imposed_indices_for_known_censored_result",
       "pytest:tests/test_mc_core.py::test_mc_finish_weeks_include_zero_rejects_all_negative_samples",
       "pytest:tests/test_mc_core.py::test_mc_finish_weeks_invalid_inputs",
+      "pytest:tests/test_mc_core.py::test_mc_finish_weeks_is_batch_independent_for_every_censoring_state",
       "pytest:tests/test_mc_core.py::test_mc_finish_weeks_keeps_batched_draw_shapes_at_max_contract",
       "pytest:tests/test_mc_core.py::test_mc_finish_weeks_large_backlog_hits_cap",
       "pytest:tests/test_mc_core.py::test_mc_finish_weeks_processes_incomplete_last_batch",
-      "pytest:tests/test_mc_core.py::test_mc_finish_weeks_reproducible_across_batch_sizes",
       "pytest:tests/test_mc_core.py::test_mc_finish_weeks_reproducible_for_seed",
       "pytest:tests/test_mc_core.py::test_mc_finish_weeks_shape_and_bounds",
       "pytest:tests/test_mc_core.py::test_mc_finish_weeks_single_value_samples",
@@ -408,8 +408,8 @@
       "pytest:tests/test_mc_core.py::test_mc_items_done_for_weeks_consumes_imposed_indices_for_known_result",
       "pytest:tests/test_mc_core.py::test_mc_items_done_for_weeks_include_zero_rejects_all_negative_samples",
       "pytest:tests/test_mc_core.py::test_mc_items_done_for_weeks_invalid_inputs",
+      "pytest:tests/test_mc_core.py::test_mc_items_done_for_weeks_is_batch_independent",
       "pytest:tests/test_mc_core.py::test_mc_items_done_for_weeks_processes_incomplete_last_batch",
-      "pytest:tests/test_mc_core.py::test_mc_items_done_for_weeks_reproducible_across_batch_sizes",
       "pytest:tests/test_mc_core.py::test_mc_items_done_for_weeks_shape_and_reproducible",
       "pytest:tests/test_mc_core.py::test_mc_items_done_for_weeks_single_sample_value",
       "pytest:tests/test_mc_core.py::test_numpy_adapter_preserves_captured_reference_outputs",
@@ -1419,15 +1419,15 @@
       "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [621:3]",
       "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [639:3]",
       "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > validates the shared contract boundaries [508:3]",
-      "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [261:3]",
-      "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [126:3]",
-      "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [174:3]",
-      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > detects excessive, insufficient and out-of-bound test consumption [101:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [262:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [128:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [175:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > detects excessive, insufficient and out-of-bound test consumption [103:3]",
       "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives backlog mode with an exact sequence, including censure [31:3]",
-      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives weeks-to-items mode with an exact sequence [48:3]",
-      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [116:3]",
-      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes buildScenarioSamples deterministic and verifies every bound [80:3]",
-      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [60:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives weeks-to-items mode with an exact sequence [50:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [118:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes buildScenarioSamples deterministic and verifies every bound [82:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [62:3]",
       "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > computes both normalized spreads and preserves missing values [16:3]",
       "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > does not let invalid presentation data produce a risk score [32:3]",
       "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > rejects invalid domain percentiles [28:13]",
@@ -1456,13 +1456,13 @@
       },
       "pytest": {
         "logicalCases": 516,
-        "collectedInstances": 677,
-        "executedInstances": 677,
+        "collectedInstances": 679,
+        "executedInstances": 679,
         "skippedInstances": 0,
-        "attempts": 677,
+        "attempts": 679,
         "retries": 0,
         "results": {
-          "passed": 677,
+          "passed": 679,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -1492,7 +1492,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/preflight/result.json",
         "exitCode": 0,
-        "durationSeconds": 8.36,
+        "durationSeconds": 8.688,
         "reasons": []
       },
       {
@@ -1501,7 +1501,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 0.132,
+        "durationSeconds": 0.119,
         "reasons": []
       },
       {
@@ -1510,7 +1510,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 31.51,
+        "durationSeconds": 35.107,
         "reasons": []
       },
       {
@@ -1519,7 +1519,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 84.821,
+        "durationSeconds": 93.293,
         "reasons": []
       },
       {
@@ -1528,7 +1528,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 113.963,
+        "durationSeconds": 125.24,
         "reasons": []
       },
       {
@@ -1537,7 +1537,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/e2e/result.json",
         "exitCode": 0,
-        "durationSeconds": 45.701,
+        "durationSeconds": 47.217,
         "reasons": []
       },
       {
@@ -1546,7 +1546,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/release-or-container-checks/result.json",
         "exitCode": 0,
-        "durationSeconds": 40.575,
+        "durationSeconds": 39.889,
         "reasons": []
       },
       {
@@ -1559,20 +1559,20 @@
         "reasons": []
       }
     ],
-    "collectedInstances": 1458,
-    "executedInstances": 1458,
+    "collectedInstances": 1460,
+    "executedInstances": 1460,
     "skippedInstances": 0,
-    "attempts": 1458,
+    "attempts": 1460,
     "retries": 0,
     "initialResults": {
-      "passed": 1458,
+      "passed": 1460,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
       "infrastructureError": 0
     },
     "finalResults": {
-      "passed": 1458,
+      "passed": 1460,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -1590,14 +1590,14 @@
       "instabilities": 0,
       "instabilityRatePercent": 0.0,
       "initialResults": {
-        "passed": 1458,
+        "passed": 1460,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
         "infrastructureError": 0
       },
       "finalResults": {
-        "passed": 1458,
+        "passed": 1460,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -1637,24 +1637,24 @@
         "thresholdSource": "frontend/vitest.config.js",
         "metrics": {
           "statements": {
-            "total": 3908,
-            "covered": 3871,
-            "pct": 99.05
+            "total": 3922,
+            "covered": 3883,
+            "pct": 99.01
           },
           "branches": {
-            "total": 3060,
-            "covered": 2838,
-            "pct": 92.75
+            "total": 3072,
+            "covered": 2848,
+            "pct": 92.71
           },
           "functions": {
-            "total": 911,
-            "covered": 910,
+            "total": 913,
+            "covered": 912,
             "pct": 99.89
           },
           "lines": {
-            "total": 3908,
-            "covered": 3871,
-            "pct": 99.05
+            "total": 3922,
+            "covered": 3883,
+            "pct": 99.01
           }
         },
         "thresholds": {
@@ -1673,24 +1673,24 @@
         "thresholdSource": "frontend/e2e-coverage.config.json",
         "metrics": {
           "statements": {
-            "total": 12341,
-            "covered": 11264,
-            "pct": 91.27
+            "total": 12353,
+            "covered": 11274,
+            "pct": 91.26
           },
           "branches": {
-            "total": 2727,
-            "covered": 2258,
-            "pct": 82.8
+            "total": 2730,
+            "covered": 2261,
+            "pct": 82.82
           },
           "functions": {
-            "total": 442,
-            "covered": 407,
-            "pct": 92.08
+            "total": 443,
+            "covered": 409,
+            "pct": 92.32
           },
           "lines": {
-            "total": 12235,
-            "covered": 11161,
-            "pct": 91.22
+            "total": 12247,
+            "covered": 11171,
+            "pct": 91.21
           }
         },
         "thresholds": {
@@ -2279,7 +2279,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "b479cc408cb50db3d37e2932b23def96d5392d163dc0ff21aa1c8f3c7b1792a2",
+      "fingerprint": "6fbafc074c59a529e544666fb0b141d65a63ba8d2b374456d39b979dd8a6d664",
       "schemaVersion": null,
       "status": "valid",
       "reasons": []
@@ -2311,7 +2311,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "7ae060ba720acc0d1f9c8cf69b42a10ccfdbbefdd0e1f843fb6316cbc0be3105",
+      "fingerprint": "57f9213e81b72eb4ec9302d530f948a9e4313f3032fdb032a9e6c83bbf1c582d",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2327,7 +2327,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "e071574047d30d899388e4091317eb12254bbfcd58a52c305142c135a8d0bad6",
+      "fingerprint": "d2f88c881e7f85471cbad1fe20942613e93094dee29e919e6b4fc8469df8da1c",
       "schemaVersion": 3,
       "status": "valid",
       "reasons": []
@@ -2343,7 +2343,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "3b81ea1bbc9e6b5c43852740941de1a4c8b8b699e744fbc6d8af8c5fc4a72bc8",
+      "fingerprint": "c8ab3647e252d1df372b015c79f4f988bd21e74621446148001478035695b83a",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2359,7 +2359,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "8a84ece11e46f7942d095213f74e4c144deaf75f110c64b9c22d056f3cde62f6",
+      "fingerprint": "1c11f306166090eb286f996b8ce00328d5a10a61582c7dc2c949b34fe494f695",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2375,7 +2375,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "f5688eb1186f785e57d51f20ceb3bd7ec20e1023e4da7611765e73e6d616bd2b",
+      "fingerprint": "72201635671c458be390f192a408ca130de51007a5a330d806dbe8cb6767779a",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2391,7 +2391,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "45c604f846d2de60ae1856835bfd92da7162bd2735e452f17affea337f012d12",
+      "fingerprint": "8d6e9a1639b87bd0a494329039acb385628f35b4a4c05c4482c6c7ef7966e574",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2423,7 +2423,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "583a26bb13390a8c0dc3982fd912c5ac1365d57ff5f2f8f4e6e72feb3a37ab25",
+      "fingerprint": "9cb1e6b8453d5ee1e34e6ff11bc472dd3b9d1c63baaed7a330c652dd9e72bda3",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2439,7 +2439,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "d0a5e0c9108e991770abf0291e688f5f6bf749ca03032763affb04304d8bea64",
+      "fingerprint": "edde553c84f310943650449ad365d711043f3c7c0a1f5f0b7f918e6a1a7078f1",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2455,7 +2455,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "08b21ef8ffbebf8a46b2a57475a5bf27baaa447cb29abfc0f8fb8fbdc0b32791",
+      "fingerprint": "3058193b5a1b5c7ba7e1e84a059e5ade98f6d274dd9d0e59e416765daa58a1b2",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2471,7 +2471,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "afe19bc60999d7bc69abf81faac07512649d2d59af377a146aca387ccf7be304",
+      "fingerprint": "0a11dd3d4d8e07fdc35ac89d362491fce35f034e90eef906f26b106c2e251a8a",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2487,7 +2487,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "7aaebedc301b4cdcb76a232c94acc91b5a7344a0295c48dd83da6bfe29ff4ebd",
+      "fingerprint": "5f536b638c77e2973cfff197a3dbbc62adef330b946e9d248569c1ba1b0c7d4c",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2503,7 +2503,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "4d92bdb254ecfebbdd4400c6952f3da93d4ef4265eed3a48e84e5c169d2e9eca",
+      "fingerprint": "2c2709193e36cb9be10c1a5d4c733d4058d91bcc99526f3dfbfdebd50af17a96",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2519,7 +2519,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "76bb1986728fd065b94a96e4707b9aa4d2572612b38818df14b12ba044657735",
+      "fingerprint": "29d1e047be6d11f265389432e672d0f61e1f480f50e28f27e35625011bfeb98f",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2535,7 +2535,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "585e966add79946e46ae406497656d6dde2890e8105633f884b9d5bc1fdb84ec",
+      "fingerprint": "930238ecaaa5b2e54ef3fe9cc0280dabe08733c4446d868af788940f141f7361",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2567,7 +2567,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "90f35e8e87a9e1bcda9134e9523ac90867b98fb94a28266e5c32f4c70a10ff2c",
+      "fingerprint": "696fae2e249914a710d1e2af472b5251c800bf7f11e215ee82479bc5d25ca3b9",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2583,7 +2583,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "894d85ed5cec6e0c6fc4681d123bac425677de0b17da2e5face52c2b54a8204a",
+      "fingerprint": "bf94d4c6c0df533e62dc726209fa0fd76b8a0c0b47249934fbbd5dbef2b5fc79",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []

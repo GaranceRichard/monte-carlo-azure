@@ -194,12 +194,14 @@ def _resolve_batch_size(batch_size: int) -> int:
 def _draw_samples_batch(
     draw_port: SampleIndexDrawPort,
     samples: np.ndarray,
-    batch_size: int,
-    weeks: int,
+    simulation_count: int,
+    draw_slots_per_simulation: int,
 ) -> np.ndarray:
+    """Draw a simulation-major matrix whose rows are contiguous logical slots."""
+
     sample_indexes = draw_port.draw_sample_indices(
         len(samples),
-        (batch_size, weeks),
+        (simulation_count, draw_slots_per_simulation),
     )
     return samples[sample_indexes]
 

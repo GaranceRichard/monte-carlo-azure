@@ -15,8 +15,8 @@
     "retryCases": 0,
     "expiredEntries": 0,
     "dueWithin30Days": 0,
-    "executedInstances": 1458,
-    "attempts": 1458,
+    "executedInstances": 1460,
+    "attempts": 1460,
     "retries": 0,
     "unstableInstances": 0,
     "instabilityRatePercent": 0.0

@@ -3563,6 +3563,31 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_mc_core.py::test_mc_finish_weeks_is_batch_independent_for_every_censoring_state",
+    "framework": "pytest",
+    "sourcePath": "tests/test_mc_core.py",
+    "selector": "test_mc_finish_weeks_is_batch_independent_for_every_censoring_state",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "performance"
+    ],
+    "domains": [
+      "statistical_engine"
+    ],
+    "risks": [
+      "RISK-003",
+      "RISK-004",
+      "RISK-016"
+    ],
+    "criticalPaths": [
+      "CP-003"
+    ],
+    "criticality": "critical"
+  },
+  {
     "logicalCaseId": "pytest:tests/test_mc_core.py::test_mc_finish_weeks_keeps_batched_draw_shapes_at_max_contract",
     "framework": "pytest",
     "sourcePath": "tests/test_mc_core.py",
@@ -3620,29 +3645,6 @@
       "functional",
       "performance",
       "data_quality"
-    ],
-    "domains": [
-      "statistical_engine"
-    ],
-    "risks": [
-      "RISK-016"
-    ],
-    "criticalPaths": [
-      "CP-003"
-    ],
-    "criticality": "critical"
-  },
-  {
-    "logicalCaseId": "pytest:tests/test_mc_core.py::test_mc_finish_weeks_reproducible_across_batch_sizes",
-    "framework": "pytest",
-    "sourcePath": "tests/test_mc_core.py",
-    "selector": "test_mc_finish_weeks_reproducible_across_batch_sizes",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional",
-      "performance"
     ],
     "domains": [
       "statistical_engine"
@@ -3775,17 +3777,16 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_mc_core.py::test_mc_items_done_for_weeks_processes_incomplete_last_batch",
+    "logicalCaseId": "pytest:tests/test_mc_core.py::test_mc_items_done_for_weeks_is_batch_independent",
     "framework": "pytest",
     "sourcePath": "tests/test_mc_core.py",
-    "selector": "test_mc_items_done_for_weeks_processes_incomplete_last_batch",
+    "selector": "test_mc_items_done_for_weeks_is_batch_independent",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
     "purposes": [
       "functional",
-      "performance",
-      "data_quality"
+      "performance"
     ],
     "domains": [
       "statistical_engine"
@@ -3799,16 +3800,17 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "pytest:tests/test_mc_core.py::test_mc_items_done_for_weeks_reproducible_across_batch_sizes",
+    "logicalCaseId": "pytest:tests/test_mc_core.py::test_mc_items_done_for_weeks_processes_incomplete_last_batch",
     "framework": "pytest",
     "sourcePath": "tests/test_mc_core.py",
-    "selector": "test_mc_items_done_for_weeks_reproducible_across_batch_sizes",
+    "selector": "test_mc_items_done_for_weeks_processes_incomplete_last_batch",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
     "purposes": [
       "functional",
-      "performance"
+      "performance",
+      "data_quality"
     ],
     "domains": [
       "statistical_engine"
@@ -21678,10 +21680,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [261:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [262:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-    "selector": "captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [261:3]",
+    "selector": "captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [262:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21696,10 +21698,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [126:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [128:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-    "selector": "captured TypeScript non-regression references > preserves the complete backlog result [126:3]",
+    "selector": "captured TypeScript non-regression references > preserves the complete backlog result [128:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21712,10 +21714,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [174:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [175:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-    "selector": "captured TypeScript non-regression references > preserves the complete weeks-to-items result [174:3]",
+    "selector": "captured TypeScript non-regression references > preserves the complete weeks-to-items result [175:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21727,10 +21729,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > detects excessive, insufficient and out-of-bound test consumption [101:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > detects excessive, insufficient and out-of-bound test consumption [103:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-    "selector": "sample index draw port in local engines > detects excessive, insufficient and out-of-bound test consumption [101:3]",
+    "selector": "sample index draw port in local engines > detects excessive, insufficient and out-of-bound test consumption [103:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21762,10 +21764,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives weeks-to-items mode with an exact sequence [48:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives weeks-to-items mode with an exact sequence [50:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-    "selector": "sample index draw port in local engines > drives weeks-to-items mode with an exact sequence [48:3]",
+    "selector": "sample index draw port in local engines > drives weeks-to-items mode with an exact sequence [50:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21779,10 +21781,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [116:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [118:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-    "selector": "sample index draw port in local engines > keeps concrete generator construction outside engine logic [116:3]",
+    "selector": "sample index draw port in local engines > keeps concrete generator construction outside engine logic [118:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21797,10 +21799,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes buildScenarioSamples deterministic and verifies every bound [80:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes buildScenarioSamples deterministic and verifies every bound [82:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-    "selector": "sample index draw port in local engines > makes buildScenarioSamples deterministic and verifies every bound [80:3]",
+    "selector": "sample index draw port in local engines > makes buildScenarioSamples deterministic and verifies every bound [82:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21815,10 +21817,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [60:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [62:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-    "selector": "sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [60:3]",
+    "selector": "sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [62:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",

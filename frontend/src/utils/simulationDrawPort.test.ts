@@ -32,6 +32,7 @@ describe("sample index draw port in local engines", () => {
     const drawPort = new DeterministicSampleIndexDrawPort([
       1,
       1,
+      ...Array.from({ length: 519 }, () => 0),
       ...Array.from({ length: 521 }, () => 0),
     ]);
 
@@ -42,6 +43,7 @@ describe("sample index draw port in local engines", () => {
       completedFlags: [true, false],
     });
     expect(drawPort.requests).toEqual(Array.from({ length: 523 }, () => 2));
+    expect(drawPort.skippedDrawCounts).toEqual([519]);
     drawPort.assertExhausted();
   });
 
@@ -68,7 +70,7 @@ describe("sample index draw port in local engines", () => {
       seed,
     });
     const drawPort = new DeterministicSampleIndexDrawPort(
-      Array.from({ length: 2000 }, () => 0),
+      Array.from({ length: 1000 * 521 }, () => 0),
     );
 
     const result = simulateMonteCarloLocal(command, drawPort);
@@ -137,28 +139,27 @@ describe("captured TypeScript non-regression references", () => {
       seed: 246_813_579,
       resultPercentiles: {},
       resultDistribution: [
-        { x: 497, count: 1 },
-        { x: 501, count: 1 },
-        { x: 502, count: 1 },
-        { x: 503, count: 1 },
-        { x: 508, count: 1 },
-        { x: 509, count: 2 },
-        { x: 510, count: 1 },
-        { x: 512, count: 3 },
-        { x: 513, count: 1 },
+        { x: 500, count: 1 },
+        { x: 502, count: 2 },
+        { x: 507, count: 2 },
+        { x: 509, count: 1 },
+        { x: 510, count: 2 },
+        { x: 511, count: 2 },
+        { x: 512, count: 1 },
+        { x: 513, count: 2 },
         { x: 514, count: 3 },
         { x: 515, count: 1 },
-        { x: 516, count: 1 },
-        { x: 517, count: 6 },
-        { x: 518, count: 3 },
-        { x: 519, count: 3 },
-        { x: 520, count: 3 },
-        { x: 521, count: 6 },
+        { x: 516, count: 2 },
+        { x: 517, count: 2 },
+        { x: 518, count: 7 },
+        { x: 519, count: 1 },
+        { x: 520, count: 1 },
+        { x: 521, count: 3 },
       ],
       completionSummary: {
-        completedCount: 38,
-        censoredCount: 962,
-        censoredRate: 0.962,
+        completedCount: 33,
+        censoredCount: 967,
+        censoredRate: 0.967,
         horizonWeeks: 521,
       },
       throughputReliability: {

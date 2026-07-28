@@ -168,7 +168,7 @@ function verifyCapturedContract(): void {
     "seededSampleIndexDrawPort.ts",
   );
   expect(implementationSources[0]?.[1].split(incrementToken)).toHaveLength(2);
-  expect(implementationSources[0]?.[1].split(multiplicationToken)).toHaveLength(3);
+  expect(implementationSources[0]?.[1].split(multiplicationToken)).toHaveLength(4);
 }
 
 function verifyBoundsAndContinuity(): void {
@@ -196,4 +196,16 @@ function verifyBoundsAndContinuity(): void {
     contract.vectors.find(({ seed: vectorSeed }) => vectorSeed === seed)
       ?.sampleIndices["17"],
   );
+
+  const sequentialPort = createSeededSampleIndexDrawPort(seed);
+  const skippingPort = createSeededSampleIndexDrawPort(seed);
+  const sequential = drawMany(sequentialPort, 17, contract.drawsPerSeed);
+  skippingPort.skipSampleIndices(5);
+  expect(drawMany(skippingPort, 17, 11)).toEqual(sequential.slice(5));
+
+  for (const invalidDrawCount of [0, -1, 1.5, Number.NaN]) {
+    expect(() => skippingPort.skipSampleIndices(invalidDrawCount)).toThrow(
+      "drawCount doit etre un entier > 0",
+    );
+  }
 }

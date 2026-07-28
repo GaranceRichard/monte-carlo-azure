@@ -2,7 +2,6 @@ import numpy as np
 import pytest
 
 from backend.mc_core import (
-    SIMULATION_BATCH_SIZE,
     FinishWeeksSimulation,
     _discrete_quantile,
     histogram_buckets,
@@ -303,40 +302,66 @@ def test_numpy_adapter_preserves_captured_reference_outputs(batch_size):
     assert np.array_equal(items, repeated_items)
 
 
-@pytest.mark.parametrize("batch_size", [1, 4, SIMULATION_BATCH_SIZE])
-def test_mc_finish_weeks_reproducible_across_batch_sizes(batch_size):
-    samples = np.array([1, 2, 3, 4, 5, 6], dtype=int)
+@pytest.mark.parametrize("batch_size", [3, 4])
+@pytest.mark.parametrize(
+    ("censoring_state", "backlog_size", "completed_count", "censored_count"),
+    [
+        ("absent", 1, 15, 0),
+        ("partial", 1625, 7, 8),
+        ("total", 4169, 0, 15),
+    ],
+)
+def test_mc_finish_weeks_is_batch_independent_for_every_censoring_state(
+    batch_size,
+    censoring_state,
+    backlog_size,
+    completed_count,
+    censored_count,
+):
+    samples = np.array([0, 1, 2, 3, 5, 8], dtype=int)
     expected = mc_finish_weeks(
-        backlog_size=40,
+        backlog_size=backlog_size,
         throughput_samples=samples,
-        n_sims=37,
+        n_sims=15,
+        include_zero_weeks=True,
         draw_port=_prng_draw_port(99),
     )
     actual = mc_finish_weeks(
-        backlog_size=40,
+        backlog_size=backlog_size,
         throughput_samples=samples,
-        n_sims=37,
+        n_sims=15,
+        include_zero_weeks=True,
         draw_port=_prng_draw_port(99),
         batch_size=batch_size,
     )
 
+    actual_censoring_state = (
+        "absent"
+        if expected.censored_count == 0
+        else "total"
+        if expected.completed_count == 0
+        else "partial"
+    )
+    assert actual_censoring_state == censoring_state
+    assert expected.completed_count == completed_count
+    assert expected.censored_count == censored_count
     assert np.array_equal(actual.weeks_needed, expected.weeks_needed)
     assert np.array_equal(actual.completed_mask, expected.completed_mask)
 
 
-@pytest.mark.parametrize("batch_size", [1, 4, SIMULATION_BATCH_SIZE])
-def test_mc_items_done_for_weeks_reproducible_across_batch_sizes(batch_size):
+@pytest.mark.parametrize("batch_size", [3, 4])
+def test_mc_items_done_for_weeks_is_batch_independent(batch_size):
     samples = np.array([1, 2, 3, 4, 5, 6], dtype=int)
     expected = mc_items_done_for_weeks(
         weeks=9,
         throughput_samples=samples,
-        n_sims=37,
+        n_sims=15,
         draw_port=_prng_draw_port(99),
     )
     actual = mc_items_done_for_weeks(
         weeks=9,
         throughput_samples=samples,
-        n_sims=37,
+        n_sims=15,
         draw_port=_prng_draw_port(99),
         batch_size=batch_size,
     )

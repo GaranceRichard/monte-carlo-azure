@@ -86,6 +86,8 @@ Cette capacité de backtesting et de calibration est inscrite au backlog ; elle 
   d’échantillons et la forme vectorisée côté Python, ou le nombre d’échantillons côté TypeScript ;
   les adaptateurs de production implémentent seuls le contrat commun `mca-prng-v1`, vérifié dans les deux
   langages à partir de [`contracts/mca-prng-v1-vectors.json`](contracts/mca-prng-v1-vectors.json)
+- ordre logique simulation-major commun : les slots hebdomadaires d’une simulation sont contigus et leur
+  affectation reste identique quelle que soit la taille des lots backend
 - démo locale et simulations portefeuille reproductibles à `seed` identique
 - visualisation des percentiles et distributions
 - sémantique métier des percentiles alignée sur le mode de simulation:
@@ -679,13 +681,20 @@ Comportement du `seed` de simulation:
   [`ARCHITECTURE.md`](ARCHITECTURE.md#port-de-tirage-dindices)
 - les vecteurs canoniques figés couvrent les sorties uint32 et les indices d'échantillonnage ; Python et
   TypeScript lisent exactement le même fichier, distinct du futur corpus statistique
-- le frontend conserve ses résultats seed-à-seed, car son algorithme bitwise historique est inchangé ;
-  le backend abandonne volontairement le générateur NumPy, donc le rejeu backend d'une ancienne seed peut
-  produire de nouveaux tirages
+- l’ordre canonique parcourt d’abord les simulations, puis les semaines : le slot logique
+  `(simulationIndex, weekIndex)` correspond à l’offset
+  `simulationIndex * drawSlotsPerSimulation + weekIndex` dans la suite `mca-prng-v1`
+- `drawSlotsPerSimulation` vaut `521` en `backlog_to_weeks` et `target_weeks` en `weeks_to_items` ; une fin
+  anticipée ignore les slots restants pour le résultat mais les réserve avant la simulation suivante
+- le backend peut découper les lignes contiguës en lots divisibles ou non divisibles sans changer cette
+  affectation ; le frontend avance directement l’état sur les slots inutilisés, sans calculer leurs indices
+- le changement d’ordre du PBI 2.8 peut modifier le rejeu local `backlog_to_weeks` d’une seed antérieure ;
+  les tirages backend adoptés au PBI 2.7 et le mode `weeks_to_items` conservent leur ordre
 - les résultats déjà persistés restent inchangés : aucun historique n'est supprimé ou migré, et aucun
   identifiant de PRNG n'est ajouté aux DTO, au JSON, à MongoDB ou à `localStorage`
-- l'ordre logique commun et l'indépendance du batching au niveau moteur restent réservés au PBI 2.8 ;
-  la version externe du contrat et les règles de migration relèvent du PBI 2.20
+- les formules de percentiles, Risk Score, fiabilité et histogrammes ne sont pas modifiées par cette règle ;
+  le corpus statistique partagé commence au PBI 2.9
+- la version externe du contrat et les règles de migration relèvent du PBI 2.20
 
 Purge planifiée:
 

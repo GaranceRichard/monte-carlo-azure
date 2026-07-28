@@ -8,6 +8,11 @@ Périmètre : PBI **2.1 — Auditer les divergences statistiques Python et TypeS
 > versionnées dans [`STD-STAT-001` — Standard de parité et de reproductibilité statistiques](standards/STD-STAT-001.md),
 > version 1.0. Ce standard fait désormais autorité pour les travaux 2.3 à 2.8. Les constats, expériences,
 > statuts et conclusions ci-dessous restent le relevé historique factuel du PBI 2.1 et ne sont pas réécrits.
+>
+> **Mise en œuvre postérieure — PBI 2.7 et 2.8.** `mca-prng-v1` remplace les PRNG divergents observés ici,
+> puis une grille simulation-major de largeur fixe aligne l’ordre logique et rend le résultat indépendant
+> des lots. Les observations historiques ST-12 à ST-18 restent inchangées ; les travaux de corpus et
+> d’alignement statistique commencent au PBI 2.9.
 
 ## 1. Objet et périmètre
 

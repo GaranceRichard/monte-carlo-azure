@@ -139,6 +139,10 @@ export function simulateBacklogToWeeks(
       remaining -= samples[drawPort.drawSampleIndex(samples.length)] ?? 0;
       weeks += 1;
     }
+    const unusedDrawSlots = SIMULATION_HORIZON_WEEKS_MAX - weeks;
+    if (unusedDrawSlots > 0) {
+      drawPort.skipSampleIndices(unusedDrawSlots);
+    }
     results[index] = weeks || SIMULATION_HORIZON_WEEKS_MAX;
     completedFlags[index] = remaining <= 0;
   }
