@@ -103,6 +103,22 @@ Implémentation retenue :
 - couvrir l’identifiabilité et l’ordre de P50, P70 et P90 ;
 - utiliser des cas lisibles et déterministes, sans dépendre d’un moteur comme oracle.
 
+Implémentation retenue :
+
+- `contracts/statistical-reference-corpus-v1.0.json` contient cinq cas minimaux : capacité avec zéro exclu,
+  délai avec zéro inclus sans censure, fin exacte à 521, censure partielle et censure totale ;
+- les résultats des cas de rejeu sont dérivés de la récurrence uint32 `mca-prng-v1`, vérifiée d’abord contre
+  son vecteur canonique, puis des règles de cumul et de rang de `STD-STAT-001`, sans moteur Python ou
+  TypeScript comme oracle ;
+- le cas partiel produit 748 fins et 252 censures : les rangs 500 et 700 donnent P50 = 518 et P70 = 521,
+  tandis que P90 reste absent car le rang 900 n’est pas identifiable ;
+- 24 probes autonomes couvrent longueurs, types, bornes, zéros utilisables, paramètres manquants ou
+  inactifs, mode et seed ; des probes positives protègent aussi les maxima inclusifs ;
+- le contrôle vérifie seed, nombre de samples utilisés, ordre des percentiles, masse et ordre structurels,
+  comptes et taux de censure, identité des cinq cas et documentation de leur dérivation ;
+- aucun runner moteur, changement de formule, cas dédié au Risk Score, à la fiabilité ou aux histogrammes,
+  ni migration de DTO, API, MongoDB ou `localStorage` n’est introduit.
+
 ### Résultat attendu du PBI 2.11
 
 - couvrir le calcul et l’absence du Risk Score ;

@@ -1,0 +1,381 @@
+{
+  "schema_version": "1.0",
+  "corpus_id": "mca-statistical-reference-corpus",
+  "normative_contract": {
+    "id": "STD-STAT-001",
+    "version": "1.0"
+  },
+  "prng_contract": {
+    "id": "mca-prng-v1",
+    "vectors": "contracts/mca-prng-v1-vectors.json"
+  },
+  "cases": [
+    {
+      "id": "items-zero-weeks-excluded",
+      "description": "Excluding the single zero leaves six usable samples; one draw per simulation proves weeks_to_items survival percentiles and the absence of backlog_size.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "include_zero_weeks": false,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 3,
+          "P70": 2,
+          "P90": 1
+        },
+        "risk_score": 0.6667,
+        "result_distribution": [
+          {
+            "x": 1,
+            "count": 157
+          },
+          {
+            "x": 2,
+            "count": 168
+          },
+          {
+            "x": 3,
+            "count": 186
+          },
+          {
+            "x": 4,
+            "count": 164
+          },
+          {
+            "x": 5,
+            "count": 160
+          },
+          {
+            "x": 6,
+            "count": 165
+          }
+        ],
+        "samples_count": 6,
+        "throughput_reliability": {
+          "cv": 0.488,
+          "iqr_ratio": 0.7143,
+          "slope_norm": 0.2857,
+          "label": "fragile",
+          "samples_count": 6
+        },
+        "seed": 0
+      }
+    },
+    {
+      "id": "weeks-zero-weeks-included-no-censorship",
+      "description": "Keeping the zero in six samples and targeting five items proves backlog_to_weeks completion without censorship and increasing duration percentiles.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "include_zero_weeks": true,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 5,
+        "n_sims": 1000
+      },
+      "seed": 1,
+      "expected_result": {
+        "result_kind": "weeks",
+        "result_percentiles": {
+          "P50": 2,
+          "P70": 3,
+          "P90": 4
+        },
+        "risk_score": 1,
+        "result_distribution": [
+          {
+            "x": 1,
+            "count": 165
+          },
+          {
+            "x": 2,
+            "count": 413
+          },
+          {
+            "x": 3,
+            "count": 265
+          },
+          {
+            "x": 4,
+            "count": 110
+          },
+          {
+            "x": 5,
+            "count": 35
+          },
+          {
+            "x": 6,
+            "count": 9
+          },
+          {
+            "x": 7,
+            "count": 1
+          },
+          {
+            "x": 8,
+            "count": 2
+          }
+        ],
+        "completion_summary": {
+          "completed_count": 1000,
+          "censored_count": 0,
+          "censored_rate": 0,
+          "horizon_weeks": 521
+        },
+        "samples_count": 6,
+        "throughput_reliability": {
+          "cv": 0.6831,
+          "iqr_ratio": 1,
+          "slope_norm": 0.4,
+          "label": "fragile",
+          "samples_count": 6
+        },
+        "seed": 1
+      }
+    },
+    {
+      "id": "weeks-exact-horizon-completion",
+      "description": "A throughput fixed at one reaches a backlog of 521 exactly during week 521, so every simulation is completed rather than censored.",
+      "proof_level": "deterministic",
+      "input": {
+        "throughput_samples": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 521,
+        "n_sims": 1000
+      },
+      "seed": 4294967295,
+      "expected_result": {
+        "result_kind": "weeks",
+        "result_percentiles": {
+          "P50": 521,
+          "P70": 521,
+          "P90": 521
+        },
+        "risk_score": 0,
+        "result_distribution": [
+          {
+            "x": 521,
+            "count": 1000
+          }
+        ],
+        "completion_summary": {
+          "completed_count": 1000,
+          "censored_count": 0,
+          "censored_rate": 0,
+          "horizon_weeks": 521
+        },
+        "samples_count": 6,
+        "throughput_reliability": {
+          "cv": 0,
+          "iqr_ratio": 0,
+          "slope_norm": 0,
+          "label": "incertain",
+          "samples_count": 6
+        },
+        "seed": 4294967295
+      }
+    },
+    {
+      "id": "weeks-partial-censorship",
+      "description": "With one zero and nineteen ones, a backlog of 492 yields 748 completions: ranks 500 and 700 identify P50 and P70, while rank 900 leaves P90 absent.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "include_zero_weeks": true,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 492,
+        "n_sims": 1000
+      },
+      "seed": 246813579,
+      "expected_result": {
+        "result_kind": "weeks",
+        "result_percentiles": {
+          "P50": 518,
+          "P70": 521
+        },
+        "result_distribution": [
+          {
+            "x": 503,
+            "count": 1
+          },
+          {
+            "x": 504,
+            "count": 1
+          },
+          {
+            "x": 505,
+            "count": 1
+          },
+          {
+            "x": 506,
+            "count": 3
+          },
+          {
+            "x": 507,
+            "count": 12
+          },
+          {
+            "x": 508,
+            "count": 15
+          },
+          {
+            "x": 509,
+            "count": 17
+          },
+          {
+            "x": 510,
+            "count": 18
+          },
+          {
+            "x": 511,
+            "count": 32
+          },
+          {
+            "x": 512,
+            "count": 46
+          },
+          {
+            "x": 513,
+            "count": 58
+          },
+          {
+            "x": 514,
+            "count": 54
+          },
+          {
+            "x": 515,
+            "count": 68
+          },
+          {
+            "x": 516,
+            "count": 66
+          },
+          {
+            "x": 517,
+            "count": 60
+          },
+          {
+            "x": 518,
+            "count": 82
+          },
+          {
+            "x": 519,
+            "count": 74
+          },
+          {
+            "x": 520,
+            "count": 82
+          },
+          {
+            "x": 521,
+            "count": 58
+          }
+        ],
+        "completion_summary": {
+          "completed_count": 748,
+          "censored_count": 252,
+          "censored_rate": 0.252,
+          "horizon_weeks": 521
+        },
+        "samples_count": 20,
+        "throughput_reliability": {
+          "cv": 0.2294,
+          "iqr_ratio": 0,
+          "slope_norm": 0.0150,
+          "label": "fiable",
+          "samples_count": 20
+        },
+        "seed": 246813579
+      }
+    },
+    {
+      "id": "weeks-total-censorship",
+      "description": "A throughput fixed at one cannot reach a backlog of 522 by week 521, so all simulations are censored and every percentile is absent.",
+      "proof_level": "deterministic",
+      "input": {
+        "throughput_samples": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 522,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "weeks",
+        "result_percentiles": {},
+        "result_distribution": [],
+        "completion_summary": {
+          "completed_count": 0,
+          "censored_count": 1000,
+          "censored_rate": 1,
+          "horizon_weeks": 521
+        },
+        "samples_count": 6,
+        "throughput_reliability": {
+          "cv": 0,
+          "iqr_ratio": 0,
+          "slope_norm": 0,
+          "label": "incertain",
+          "samples_count": 6
+        },
+        "seed": 0
+      }
+    }
+  ]
+}

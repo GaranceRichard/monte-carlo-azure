@@ -21,6 +21,14 @@ def _contract() -> tuple[dict[str, object], dict[str, object]]:
     return schema, instance
 
 
+def _reference_corpus() -> tuple[dict[str, Any], dict[str, Any]]:
+    schema = corpus_validation.load_json(corpus_validation.SCHEMA_PATH)
+    corpus = corpus_validation.load_json(corpus_validation.CORPUS_PATH)
+    assert isinstance(schema, dict)
+    assert isinstance(corpus, dict)
+    return schema, corpus
+
+
 def _issues_for(
     update: Callable[[dict[str, Any]], None],
 ) -> list[corpus_validation.ValidationIssue]:
@@ -35,7 +43,9 @@ def test_bundled_control_accepts_minimal_contract_and_rejects_negative_example(
 ) -> None:
     assert corpus_validation.main([]) == 0
     output = capsys.readouterr()
-    assert "schema 1.0 is valid" in output.out
+    assert "corpus 1.0 and its schema are valid" in output.out
+    assert "PBI 2.10 scope is complete" in output.out
+    assert "input rejection probes pass" in output.out
     assert output.err == ""
 
     schema, instance = _contract()
@@ -52,14 +62,370 @@ def test_script_entrypoint_runs_the_autonomous_control(
     monkeypatch.setattr(sys, "argv", [str(corpus_validation.SCHEMA_PATH)])
     with pytest.raises(SystemExit) as stopped:
         runpy.run_path(
-            str(
-                corpus_validation.ROOT
-                / "Scripts/validate_statistical_reference_corpus.py"
-            ),
+            str(corpus_validation.ROOT / "Scripts/validate_statistical_reference_corpus.py"),
             run_name="__main__",
         )
     assert stopped.value.code == 0
-    assert "positive example accepted" in capsys.readouterr().out
+    assert "positive example is accepted" in capsys.readouterr().out
+
+
+def test_pbi_210_reference_cases_are_exact_readable_and_scope_complete() -> None:
+    schema, corpus = _reference_corpus()
+    assert corpus_validation.validate_contract(corpus, schema) == []
+    assert corpus_validation.validate_pbi_210_scope(corpus) == []
+    assert corpus_validation.validate_input_rejection_probes(corpus, schema) == []
+    assert corpus["schema_version"] == "1.0"
+    assert corpus["prng_contract"] == {
+        "id": "mca-prng-v1",
+        "vectors": "contracts/mca-prng-v1-vectors.json",
+    }
+
+    cases = {case["id"]: case for case in corpus["cases"]}
+    assert set(cases) == corpus_validation.PBI_210_CASE_IDS
+    assert len(cases) == len(corpus["cases"]) == 5
+    assert all(case["description"] for case in cases.values())
+
+    items = cases["items-zero-weeks-excluded"]
+    assert items["proof_level"] == "replay"
+    assert items["input"] == {
+        "throughput_samples": [0, 1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": False,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000,
+    }
+    assert "backlog_size" not in items["input"]
+    assert items["expected_result"]["samples_count"] == 6
+    assert items["expected_result"]["result_percentiles"] == {
+        "P50": 3,
+        "P70": 2,
+        "P90": 1,
+    }
+    assert items["expected_result"]["result_distribution"] == [
+        {"x": 1, "count": 157},
+        {"x": 2, "count": 168},
+        {"x": 3, "count": 186},
+        {"x": 4, "count": 164},
+        {"x": 5, "count": 160},
+        {"x": 6, "count": 165},
+    ]
+    assert "completion_summary" not in items["expected_result"]
+
+    no_censor = cases["weeks-zero-weeks-included-no-censorship"]
+    assert no_censor["input"]["include_zero_weeks"] is True
+    assert no_censor["input"]["throughput_samples"] == [0, 1, 2, 3, 4, 5]
+    assert "target_weeks" not in no_censor["input"]
+    assert no_censor["expected_result"]["result_percentiles"] == {
+        "P50": 2,
+        "P70": 3,
+        "P90": 4,
+    }
+    assert no_censor["expected_result"]["completion_summary"] == {
+        "completed_count": 1000,
+        "censored_count": 0,
+        "censored_rate": 0,
+        "horizon_weeks": 521,
+    }
+
+    exact_horizon = cases["weeks-exact-horizon-completion"]
+    assert exact_horizon["proof_level"] == "deterministic"
+    assert exact_horizon["seed"] == 4294967295
+    assert exact_horizon["input"]["backlog_size"] == 521
+    assert exact_horizon["expected_result"]["result_distribution"] == [{"x": 521, "count": 1000}]
+    assert exact_horizon["expected_result"]["completion_summary"]["censored_count"] == 0
+
+    partial = cases["weeks-partial-censorship"]
+    assert partial["expected_result"]["completion_summary"] == {
+        "completed_count": 748,
+        "censored_count": 252,
+        "censored_rate": 0.252,
+        "horizon_weeks": 521,
+    }
+    assert partial["expected_result"]["result_percentiles"] == {
+        "P50": 518,
+        "P70": 521,
+    }
+    assert "P90" not in partial["expected_result"]["result_percentiles"]
+    assert (
+        sum(bucket["count"] for bucket in partial["expected_result"]["result_distribution"]) == 748
+    )
+
+    total = cases["weeks-total-censorship"]
+    assert total["proof_level"] == "deterministic"
+    assert total["input"]["backlog_size"] == 522
+    assert total["expected_result"]["result_percentiles"] == {}
+    assert total["expected_result"]["result_distribution"] == []
+    assert total["expected_result"]["completion_summary"] == {
+        "completed_count": 0,
+        "censored_count": 1000,
+        "censored_rate": 1,
+        "horizon_weeks": 521,
+    }
+
+
+def test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes() -> None:
+    schema, corpus = _reference_corpus()
+    probes = corpus_validation.INPUT_REJECTION_PROBES
+    probe_ids = {probe.probe_id for probe in probes}
+    assert len(probe_ids) == len(probes) == 24
+    assert {
+        "throughput-below-minimum-length",
+        "throughput-above-maximum-length",
+        "throughput-string-item",
+        "throughput-decimal-item",
+        "throughput-negative-item",
+        "too-few-usable-samples-after-zero-exclusion",
+        "include-zero-weeks-wrong-type",
+        "mode-outside-contract",
+        "simulation-count-below-minimum",
+        "simulation-count-above-maximum",
+        "simulation-count-wrong-type",
+        "target-weeks-below-minimum",
+        "target-weeks-above-maximum",
+        "target-weeks-wrong-type",
+        "target-weeks-missing",
+        "inactive-backlog-present",
+        "backlog-below-minimum",
+        "backlog-above-maximum",
+        "backlog-wrong-type",
+        "backlog-missing",
+        "inactive-target-present",
+        "seed-below-minimum",
+        "seed-above-maximum",
+        "seed-wrong-type",
+    } == probe_ids
+    assert corpus_validation.validate_input_rejection_probes(corpus, schema) == []
+
+    extrema = deepcopy(corpus)
+    extrema_case = extrema["cases"][0]
+    extrema_case["input"] = {
+        "throughput_samples": [0] * 521,
+        "include_zero_weeks": True,
+        "mode": "weeks_to_items",
+        "target_weeks": 521,
+        "n_sims": 200000,
+    }
+    extrema_case["seed"] = 4294967295
+    extrema_case["expected_result"]["seed"] = 4294967295
+    extrema["cases"] = [extrema_case]
+    assert corpus_validation.validate_instance(extrema, schema) == []
+
+    backlog_maximum = deepcopy(corpus)
+    backlog_case = backlog_maximum["cases"][1]
+    backlog_case["input"]["backlog_size"] = 1000000
+    backlog_case["input"]["n_sims"] = 200000
+    backlog_maximum["cases"] = [backlog_case]
+    assert corpus_validation.validate_instance(backlog_maximum, schema) == []
+
+
+@pytest.mark.parametrize(
+    ("update", "path", "keyword"),
+    [
+        (
+            lambda case: case["expected_result"].__setitem__("seed", 7),
+            "/cases/0/expected_result/seed",
+            "caseSeedEquality",
+        ),
+        (
+            lambda case: case["expected_result"].__setitem__("samples_count", 7),
+            "/cases/0/expected_result/samples_count",
+            "usableSamplesCount",
+        ),
+        (
+            lambda case: case["expected_result"]["throughput_reliability"].__setitem__(
+                "samples_count", 7
+            ),
+            "/cases/0/expected_result/throughput_reliability/samples_count",
+            "resultSamplesCountEquality",
+        ),
+        (
+            lambda case: case["expected_result"].__setitem__(
+                "result_percentiles", {"P50": 1, "P70": 2, "P90": 3}
+            ),
+            "/cases/0/expected_result/result_percentiles",
+            "percentileOrder",
+        ),
+        (
+            lambda case: case["expected_result"].__setitem__(
+                "result_distribution",
+                [{"x": 2, "count": 500}, {"x": 1, "count": 500}],
+            ),
+            "/cases/0/expected_result/result_distribution",
+            "histogramOrder",
+        ),
+        (
+            lambda case: case["expected_result"].__setitem__(
+                "result_distribution", [{"x": 1, "count": 999}]
+            ),
+            "/cases/0/expected_result/result_distribution",
+            "histogramMass",
+        ),
+        (
+            lambda case: case["expected_result"]["completion_summary"].__setitem__(
+                "completed_count", 999
+            ),
+            "/cases/0/expected_result/completion_summary",
+            "completionMass",
+        ),
+        (
+            lambda case: case["expected_result"]["completion_summary"].__setitem__(
+                "censored_rate", 0.0001
+            ),
+            "/cases/0/expected_result/completion_summary/censored_rate",
+            "censoredRate",
+        ),
+    ],
+)
+def test_cross_field_invariants_reject_structural_result_regressions(
+    update: Callable[[dict[str, Any]], None],
+    path: str,
+    keyword: str,
+) -> None:
+    schema, corpus = _reference_corpus()
+    candidate = deepcopy(corpus)
+    case = (
+        candidate["cases"][1]
+        if keyword in {"completionMass", "censoredRate"}
+        else candidate["cases"][0]
+    )
+    candidate["cases"] = [case]
+    update(case)
+    issues = corpus_validation.validate_contract(candidate, schema)
+    assert any(issue.instance_path == path and issue.keyword == keyword for issue in issues)
+
+
+def test_scope_and_probe_controls_report_actionable_regressions(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    schema, corpus = _reference_corpus()
+    assert corpus_validation.validate_pbi_210_scope([])[0].instance_path == "/"
+
+    missing = deepcopy(corpus)
+    missing["cases"] = missing["cases"][1:]
+    missing_issues = corpus_validation.validate_pbi_210_scope(missing)
+    assert "items-zero-weeks-excluded" in missing_issues[0].message
+
+    regressions = [
+        ("items-zero-weeks-excluded", ("expected_result", "samples_count"), 7),
+        (
+            "weeks-zero-weeks-included-no-censorship",
+            ("expected_result", "result_percentiles"),
+            {},
+        ),
+        (
+            "weeks-exact-horizon-completion",
+            ("expected_result", "result_distribution"),
+            [],
+        ),
+        (
+            "weeks-partial-censorship",
+            ("expected_result", "result_percentiles"),
+            {},
+        ),
+        (
+            "weeks-total-censorship",
+            ("expected_result", "result_percentiles"),
+            {"P50": 521},
+        ),
+    ]
+    for case_id, path, value in regressions:
+        candidate = deepcopy(corpus)
+        case = next(case for case in candidate["cases"] if case["id"] == case_id)
+        case[path[0]][path[1]] = value
+        assert any(
+            issue.keyword == "pbi210Scope"
+            for issue in corpus_validation.validate_pbi_210_scope(candidate)
+        )
+
+    bad_probe = corpus_validation.InputRejectionProbe(
+        "diagnostic-regression",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("seed",),
+        -1,
+        "/seed",
+        "maximum",
+    )
+    monkeypatch.setattr(corpus_validation, "INPUT_REJECTION_PROBES", (bad_probe,))
+    errors = corpus_validation.validate_input_rejection_probes(corpus, schema)
+    assert len(errors) == 1
+    assert "diagnostic-regression" in errors[0]
+    assert "expected [maximum] at /cases/0/seed" in errors[0]
+
+    assert corpus_validation._validate_case_semantics({}, 0) == []
+    guarded_case = {
+        "input": {
+            "throughput_samples": "invalid",
+            "include_zero_weeks": False,
+            "mode": "invalid",
+            "n_sims": "invalid",
+        },
+        "expected_result": {
+            "result_percentiles": [],
+            "result_distribution": {},
+            "throughput_reliability": [],
+        },
+    }
+    assert corpus_validation._validate_case_semantics(guarded_case, 0) == []
+
+    invalid_completion_types = deepcopy(corpus["cases"][1])
+    invalid_completion_types["expected_result"]["completion_summary"]["completed_count"] = "1000"
+    assert not any(
+        issue.keyword in {"completionMass", "censoredRate"}
+        for issue in corpus_validation._validate_case_semantics(invalid_completion_types, 0)
+    )
+
+    backlog_without_completion = deepcopy(corpus["cases"][1])
+    del backlog_without_completion["expected_result"]["completion_summary"]
+    assert corpus_validation._validate_case_semantics(backlog_without_completion, 0) == []
+
+
+def test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope() -> None:
+    root = corpus_validation.ROOT
+    corpus_doc = (root / "docs/statistical-reference-corpus.md").read_text(encoding="utf-8")
+    for case_id in corpus_validation.PBI_210_CASE_IDS:
+        assert f"`{case_id}`" in corpus_doc
+    assert "sans appeler\nle moteur Python ni le moteur TypeScript" in corpus_doc
+    assert "floor(0,5 × 999) = 499" in corpus_doc
+    assert "Le rang 500 se trouve en semaine 518" in corpus_doc
+    assert "24 mutations négatives minimales" in corpus_doc
+    assert "PBI 2.11" in corpus_doc
+    assert "PBI 2.12" in corpus_doc
+
+    documentation_expectations = {
+        "README.md": [
+            "contracts/statistical-reference-corpus-v1.0.json",
+            "censure partielle avec 748 fins et 252 censures",
+            "aucun moteur Python ou TypeScript n’a servi d’oracle",
+        ],
+        "ARCHITECTURE.md": [
+            "statistical-reference-corpus-v1.0.json",
+            "24 probes négatives",
+        ],
+        "CHANGELOG.md": [
+            "Cas d’entrées, modes, censures et percentiles — PBI 2.10",
+            "aucun runner du PBI 2.12",
+        ],
+        "docs/backlog-expectations/feature-02-statistical-core.md": [
+            "Implémentation retenue",
+            "P50 = 518 et P70 = 521",
+        ],
+        "docs/standards/STD-STAT-001.md": [
+            "Le PBI 2.10 instancie cette frontière",
+            "constituent donc pas encore une preuve de parité interlangage",
+        ],
+        "docs/risk-control-matrix.md": [
+            "Les cas 2.10 existent sans runner moteur; les cas 2.11",
+            "24 probes autonomes des entrées 2.10",
+        ],
+    }
+    for relative_path, expected_fragments in documentation_expectations.items():
+        content = (root / relative_path).read_text(encoding="utf-8")
+        assert all(fragment in content for fragment in expected_fragments)
+
+    backlog = (root / "docs/backlog.md").read_text(encoding="utf-8")
+    pbi_line = next(line for line in backlog.splitlines() if line.startswith("| 2.10 |"))
+    assert pbi_line.endswith("| 28/07/2026 |")
 
 
 @pytest.mark.parametrize(
@@ -88,9 +454,7 @@ def test_script_entrypoint_runs_the_autonomous_control(
             "minContains",
         ),
         (
-            lambda value: value["cases"][0]["input"].__setitem__(
-                "backlog_size", 1
-            ),
+            lambda value: value["cases"][0]["input"].__setitem__("backlog_size", 1),
             "/cases/0/input",
             "not",
         ),
@@ -108,9 +472,7 @@ def test_script_entrypoint_runs_the_autonomous_control(
             "not",
         ),
         (
-            lambda value: value["cases"][0]["expected_result"].__setitem__(
-                "unexpected", True
-            ),
+            lambda value: value["cases"][0]["expected_result"].__setitem__("unexpected", True),
             "/cases/0/expected_result",
             "additionalProperties",
         ),
@@ -122,12 +484,8 @@ def test_schema_rejects_contract_drift_with_localized_actionable_diagnostics(
     keyword: str,
 ) -> None:
     issues = _issues_for(update)
-    assert any(
-        issue.instance_path == path and issue.keyword == keyword for issue in issues
-    )
-    rendered = "\n".join(
-        issue.render(Path("candidate.json")) for issue in issues
-    )
+    assert any(issue.instance_path == path and issue.keyword == keyword for issue in issues)
+    rendered = "\n".join(issue.render(Path("candidate.json")) for issue in issues)
     assert f"candidate.json:{path}" in rendered
     assert f"[{keyword}]" in rendered
     assert "(schema /" in rendered
@@ -228,13 +586,24 @@ def test_control_reports_invalid_schema_and_negative_probe_regressions(
         f"{non_object_schema.as_posix()}:/: schema must be a JSON object"
     ]
 
+    non_object_corpus = tmp_path / "non-object-corpus.json"
+    non_object_corpus.write_text("[]", encoding="utf-8")
+    monkeypatch.setattr(corpus_validation, "SCHEMA_PATH", original_schema_path)
+    monkeypatch.setattr(corpus_validation, "CORPUS_PATH", non_object_corpus)
+    assert corpus_validation.run_control() == [
+        f"{non_object_corpus.as_posix()}:/: corpus must be a JSON object"
+    ]
+
     valid_negative = tmp_path / "valid-negative.json"
     valid_negative.write_text(json.dumps(instance), encoding="utf-8")
-    monkeypatch.setattr(corpus_validation, "SCHEMA_PATH", original_schema_path)
+    monkeypatch.setattr(
+        corpus_validation,
+        "CORPUS_PATH",
+        corpus_validation.ROOT / "contracts/statistical-reference-corpus-v1.0.json",
+    )
     monkeypatch.setattr(corpus_validation, "INVALID_EXAMPLE_PATH", valid_negative)
     assert any(
-        "negative example was unexpectedly accepted"
-        in error
+        "negative example was unexpectedly accepted" in error
         for error in corpus_validation.run_control()
     )
 
@@ -244,8 +613,7 @@ def test_control_reports_invalid_schema_and_negative_probe_regressions(
     wrong_negative_path.write_text(json.dumps(wrong_negative), encoding="utf-8")
     monkeypatch.setattr(corpus_validation, "INVALID_EXAMPLE_PATH", wrong_negative_path)
     assert any(
-        "did not produce the expected actionable diagnostic"
-        in error
+        "did not produce the expected actionable diagnostic" in error
         for error in corpus_validation.run_control()
     )
 

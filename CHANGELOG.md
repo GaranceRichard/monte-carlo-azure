@@ -2,6 +2,19 @@
 
 ## Recent
 
+### Cas d’entrées, modes, censures et percentiles — PBI 2.10
+
+- ajout du corpus normatif `contracts/statistical-reference-corpus-v1.0.json` avec cinq cas minimaux
+  couvrant les deux politiques de zéros, les deux modes, la fin exacte à l’horizon et les censures absente,
+  partielle et totale
+- établissement explicite des résultats depuis `STD-STAT-001`, l’ordre simulation-major et
+  `mca-prng-v1`, avec tables de décomptes et de rangs prouvant l’ordre et l’identifiabilité de P50, P70 et
+  P90 sans utiliser les moteurs Python ou TypeScript comme oracle
+- ajout de 24 probes de rejet pour les bornes, types, samples utilisables et paramètres de mode, plus des
+  contrôles des invariants interchamps et de la complétude documentaire et structurelle du périmètre 2.10
+- aucun runner du PBI 2.12, changement de formule ou cas spécialisé du Risk Score, de la fiabilité ou des
+  histogrammes du PBI 2.11 ; aucun changement de DTO, API, MongoDB ou `localStorage`
+
 ### Schéma du corpus de référence statistique — PBI 2.9
 
 - ajout du contrat JSON Schema draft 2020-12 normatif `1.0`, fermé aux propriétés inconnues et lié à

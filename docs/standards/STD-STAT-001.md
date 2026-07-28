@@ -333,6 +333,13 @@ Ce JSON Schema draft 2020-12 associe explicitement chaque entrée normalisée à
 `mca-prng-v1`, à son résultat normatif attendu et à l’un des quatre niveaux de parité de `STAT-PAR-001`.
 Le schéma est fermé, indépendant des DTO et des moteurs, et ne vaut pas encore preuve d’exécution du corpus.
 
+Le PBI 2.10 instancie cette frontière dans
+[`contracts/statistical-reference-corpus-v1.0.json`](../../contracts/statistical-reference-corpus-v1.0.json).
+Ses cinq cas matérialisent `STAT-PAR-012` à `STAT-PAR-025` pour les entrées, zéros, modes, horizon,
+censures et percentiles. Les résultats attendus sont dérivés du présent standard et de `mca-prng-v1` sans
+utiliser un moteur comme oracle. Ils restent des références à exécuter par les runners du PBI 2.12 et ne
+constituent donc pas encore une preuve de parité interlangage.
+
 ### STAT-PAR-047 — Version de rejeu
 
 Le contrat normatif **DOIT** porter la version `1.0`. Toute preuve ou donnée destinée au rejeu **DOIT**

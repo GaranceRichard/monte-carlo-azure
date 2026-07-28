@@ -711,16 +711,34 @@ extension propre à Python, TypeScript ou un validateur particulier. Le détail 
 versionnement est dans
 [`docs/statistical-reference-corpus.md`](docs/statistical-reference-corpus.md).
 
-Un exemple positif trivial et un contre-exemple fermé aux propriétés inconnues prouvent uniquement la
-structure, sans anticiper les cas statistiques des PBI 2.10 et 2.11. Le contrôle autonome valide le
-métaschème et les deux chemins avec des diagnostics JSON Pointer actionnables :
+Le corpus normatif
+[`contracts/statistical-reference-corpus-v1.0.json`](contracts/statistical-reference-corpus-v1.0.json)
+contient les cinq cas minimaux du PBI 2.10 :
+
+- `weeks_to_items` avec exclusion d’un zéro et percentiles de survie `P50 = 3`, `P70 = 2`, `P90 = 1` ;
+- `backlog_to_weeks` avec zéro conservé, aucune censure et percentiles croissants `2`, `3`, `4` ;
+- une fin certaine exactement en semaine `521`, distincte d’une censure ;
+- une censure partielle avec 748 fins et 252 censures : P50 et P70 sont identifiables, P90 est absent ;
+- une censure totale sans durée terminée ni percentile fabriqué.
+
+Les résultats sont dérivés explicitement de `STD-STAT-001`, des vecteurs `mca-prng-v1` et de l’ordre
+simulation-major. Les tables de tirages, cumuls et rangs sont publiées dans la documentation du corpus ;
+aucun moteur Python ou TypeScript n’a servi d’oracle. Les champs de Risk Score, fiabilité et distribution
+restent uniquement l’enveloppe normative imposée par le schéma : leurs cas limites et preuves dédiées
+appartiennent au PBI 2.11.
+
+Le contrôle autonome valide le métaschème, le corpus, ses invariants interchamps et sa complétude 2.10.
+Il applique aussi 24 probes minimaux prouvant le rejet des types et bornes invalides, des zéros laissant
+moins de six observations utiles, des paramètres absents ou inactifs et des champs hors contrat. L’exemple
+positif trivial et le contre-exemple fermé restent des preuves structurelles séparées. Les diagnostics sont
+localisés par JSON Pointer :
 
 ```bash
 .venv\Scripts\python.exe Scripts/validate_statistical_reference_corpus.py
 ```
 
-Ce PBI n’exécute aucun cas dans les moteurs, ne change aucune formule ou sortie courante et ne migre aucun
-DTO, payload API, document MongoDB ou objet `localStorage`.
+Le PBI 2.10 ne crée aucun runner moteur, ne change aucune formule ou sortie courante et ne migre aucun DTO,
+payload API, document MongoDB ou objet `localStorage`. L’exécution partagée reste réservée au PBI 2.12.
 
 Purge planifiée:
 

@@ -7639,6 +7639,55 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_cross_field_invariants_reject_structural_result_regressions",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "accessibility"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_pbi_210_documentation_traces_cases_derivations_and_reserved_scope",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
     "framework": "pytest",
     "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
@@ -7651,6 +7700,22 @@
     ],
     "domains": [
       "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_scope_and_probe_controls_report_actionable_regressions",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_scope_and_probe_controls_report_actionable_regressions",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
     ]
   },
   {

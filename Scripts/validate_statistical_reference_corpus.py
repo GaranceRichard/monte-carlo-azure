@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from dataclasses import dataclass
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -14,27 +14,251 @@ from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from Scripts.statistical_reference_corpus_invariants import (  # noqa: E402
+    PBI_210_CASE_IDS as _PBI_210_CASE_IDS,
+)
+from Scripts.statistical_reference_corpus_invariants import (  # noqa: E402
+    InputRejectionProbe,
+    ValidationIssue,
+    validate_pbi_210_scope,
+)
+from Scripts.statistical_reference_corpus_invariants import (  # noqa: E402
+    apply_probe as _apply_probe,
+)
+from Scripts.statistical_reference_corpus_invariants import (  # noqa: E402
+    cases_by_id as _cases_by_id,
+)
+from Scripts.statistical_reference_corpus_invariants import (  # noqa: E402
+    validate_case_semantics as _validate_case_semantics,
+)
+
+PBI_210_CASE_IDS = _PBI_210_CASE_IDS
+
 SCHEMA_PATH = ROOT / "contracts/statistical-reference-corpus-v1.0.schema.json"
-VALID_EXAMPLE_PATH = (
-    ROOT / "contracts/examples/statistical-reference-corpus-v1.0.minimal.json"
+CORPUS_PATH = ROOT / "contracts/statistical-reference-corpus-v1.0.json"
+VALID_EXAMPLE_PATH = ROOT / "contracts/examples/statistical-reference-corpus-v1.0.minimal.json"
+INVALID_EXAMPLE_PATH = ROOT / "contracts/examples/statistical-reference-corpus-v1.0.invalid.json"
+
+INPUT_REJECTION_PROBES = (
+    InputRejectionProbe(
+        "throughput-below-minimum-length",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "throughput_samples"),
+        [1, 1, 1, 1, 1],
+        "/input/throughput_samples",
+        "minItems",
+    ),
+    InputRejectionProbe(
+        "throughput-above-maximum-length",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "throughput_samples"),
+        [1] * 522,
+        "/input/throughput_samples",
+        "maxItems",
+    ),
+    InputRejectionProbe(
+        "throughput-string-item",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "throughput_samples"),
+        [1, 1, 1, 1, 1, "1"],
+        "/input/throughput_samples/5",
+        "type",
+    ),
+    InputRejectionProbe(
+        "throughput-decimal-item",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "throughput_samples"),
+        [1, 1, 1, 1, 1, 1.5],
+        "/input/throughput_samples/5",
+        "type",
+    ),
+    InputRejectionProbe(
+        "throughput-negative-item",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "throughput_samples"),
+        [1, 1, 1, 1, 1, -1],
+        "/input/throughput_samples/5",
+        "minimum",
+    ),
+    InputRejectionProbe(
+        "too-few-usable-samples-after-zero-exclusion",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "throughput_samples"),
+        [0, 1, 1, 1, 1, 1],
+        "/input/throughput_samples",
+        "minContains",
+    ),
+    InputRejectionProbe(
+        "include-zero-weeks-wrong-type",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "include_zero_weeks"),
+        "false",
+        "/input/include_zero_weeks",
+        "type",
+    ),
+    InputRejectionProbe(
+        "mode-outside-contract",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "mode"),
+        "invalid",
+        "/input/mode",
+        "enum",
+    ),
+    InputRejectionProbe(
+        "simulation-count-below-minimum",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "n_sims"),
+        999,
+        "/input/n_sims",
+        "minimum",
+    ),
+    InputRejectionProbe(
+        "simulation-count-above-maximum",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "n_sims"),
+        200001,
+        "/input/n_sims",
+        "maximum",
+    ),
+    InputRejectionProbe(
+        "simulation-count-wrong-type",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "n_sims"),
+        "1000",
+        "/input/n_sims",
+        "type",
+    ),
+    InputRejectionProbe(
+        "target-weeks-below-minimum",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "target_weeks"),
+        0,
+        "/input/target_weeks",
+        "minimum",
+    ),
+    InputRejectionProbe(
+        "target-weeks-above-maximum",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "target_weeks"),
+        522,
+        "/input/target_weeks",
+        "maximum",
+    ),
+    InputRejectionProbe(
+        "target-weeks-wrong-type",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("input", "target_weeks"),
+        "1",
+        "/input/target_weeks",
+        "type",
+    ),
+    InputRejectionProbe(
+        "target-weeks-missing",
+        "items-zero-weeks-excluded",
+        "remove",
+        ("input", "target_weeks"),
+        None,
+        "/input",
+        "required",
+    ),
+    InputRejectionProbe(
+        "inactive-backlog-present",
+        "items-zero-weeks-excluded",
+        "add",
+        ("input", "backlog_size"),
+        1,
+        "/input",
+        "not",
+    ),
+    InputRejectionProbe(
+        "backlog-below-minimum",
+        "weeks-zero-weeks-included-no-censorship",
+        "replace",
+        ("input", "backlog_size"),
+        0,
+        "/input/backlog_size",
+        "minimum",
+    ),
+    InputRejectionProbe(
+        "backlog-above-maximum",
+        "weeks-zero-weeks-included-no-censorship",
+        "replace",
+        ("input", "backlog_size"),
+        1000001,
+        "/input/backlog_size",
+        "maximum",
+    ),
+    InputRejectionProbe(
+        "backlog-wrong-type",
+        "weeks-zero-weeks-included-no-censorship",
+        "replace",
+        ("input", "backlog_size"),
+        "5",
+        "/input/backlog_size",
+        "type",
+    ),
+    InputRejectionProbe(
+        "backlog-missing",
+        "weeks-zero-weeks-included-no-censorship",
+        "remove",
+        ("input", "backlog_size"),
+        None,
+        "/input",
+        "required",
+    ),
+    InputRejectionProbe(
+        "inactive-target-present",
+        "weeks-zero-weeks-included-no-censorship",
+        "add",
+        ("input", "target_weeks"),
+        1,
+        "/input",
+        "not",
+    ),
+    InputRejectionProbe(
+        "seed-below-minimum",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("seed",),
+        -1,
+        "/seed",
+        "minimum",
+    ),
+    InputRejectionProbe(
+        "seed-above-maximum",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("seed",),
+        4294967296,
+        "/seed",
+        "maximum",
+    ),
+    InputRejectionProbe(
+        "seed-wrong-type",
+        "items-zero-weeks-excluded",
+        "replace",
+        ("seed",),
+        "0",
+        "/seed",
+        "type",
+    ),
 )
-INVALID_EXAMPLE_PATH = (
-    ROOT / "contracts/examples/statistical-reference-corpus-v1.0.invalid.json"
-)
-
-
-@dataclass(frozen=True, slots=True)
-class ValidationIssue:
-    instance_path: str
-    keyword: str
-    message: str
-    schema_path: str
-
-    def render(self, source: Path) -> str:
-        return (
-            f"{source.as_posix()}:{self.instance_path}: [{self.keyword}] {self.message} "
-            f"(schema {self.schema_path})"
-        )
 
 
 def _json_pointer(parts: Any) -> str:
@@ -99,15 +323,13 @@ def validate_contract(instance: Any, schema: dict[str, Any]) -> list[ValidationI
                 ValidationIssue(
                     instance_path=f"/cases/{index}/id",
                     keyword="uniqueCaseId",
-                    message=(
-                        f"{case_id!r} duplicates /cases/"
-                        f"{first_index_by_id[case_id]}/id"
-                    ),
+                    message=(f"{case_id!r} duplicates /cases/{first_index_by_id[case_id]}/id"),
                     schema_path="/$comment",
                 )
             )
         else:
             first_index_by_id[case_id] = index
+        issues.extend(_validate_case_semantics(case, index))
     return sorted(
         issues,
         key=lambda issue: (
@@ -119,15 +341,47 @@ def validate_contract(instance: Any, schema: dict[str, Any]) -> list[ValidationI
     )
 
 
+def validate_input_rejection_probes(corpus: dict[str, Any], schema: dict[str, Any]) -> list[str]:
+    cases = _cases_by_id(corpus)
+    errors: list[str] = []
+    for probe in INPUT_REJECTION_PROBES:
+        candidate_case = deepcopy(cases[probe.source_case_id])
+        _apply_probe(candidate_case, probe)
+        candidate = deepcopy(corpus)
+        candidate["cases"] = [candidate_case]
+        issues = validate_instance(candidate, schema)
+        expected_path = f"/cases/0{probe.expected_instance_path}"
+        if not any(
+            issue.instance_path == expected_path and issue.keyword == probe.expected_keyword
+            for issue in issues
+        ):
+            errors.append(
+                f"{probe.probe_id}: expected [{probe.expected_keyword}] at "
+                f"{expected_path}, got "
+                f"{[(issue.instance_path, issue.keyword) for issue in issues]}"
+            )
+    return errors
+
+
 def run_control(instance_paths: list[Path] | None = None) -> list[str]:
     schema = load_json(SCHEMA_PATH)
     if not isinstance(schema, dict):
         return [f"{SCHEMA_PATH.as_posix()}:/: schema must be a JSON object"]
     Draft202012Validator.check_schema(schema)
 
+    corpus = load_json(CORPUS_PATH)
+    if not isinstance(corpus, dict):
+        return [f"{CORPUS_PATH.as_posix()}:/: corpus must be a JSON object"]
+
     errors: list[str] = []
-    for path in instance_paths or [VALID_EXAMPLE_PATH]:
+    for path in instance_paths or [CORPUS_PATH, VALID_EXAMPLE_PATH]:
         errors.extend(issue.render(path) for issue in validate_contract(load_json(path), schema))
+
+    errors.extend(issue.render(CORPUS_PATH) for issue in validate_pbi_210_scope(corpus))
+    errors.extend(
+        f"{CORPUS_PATH.as_posix()}:/cases: [inputRejectionProbe] {error}"
+        for error in validate_input_rejection_probes(corpus, schema)
+    )
 
     negative_issues = validate_contract(load_json(INVALID_EXAMPLE_PATH), schema)
     if not negative_issues:
@@ -135,8 +389,7 @@ def run_control(instance_paths: list[Path] | None = None) -> list[str]:
             f"{INVALID_EXAMPLE_PATH.as_posix()}:/: negative example was unexpectedly accepted"
         )
     elif not any(
-        issue.instance_path == "/cases/0/input"
-        and issue.keyword == "additionalProperties"
+        issue.instance_path == "/cases/0/input" and issue.keyword == "additionalProperties"
         for issue in negative_issues
     ):
         errors.append(
@@ -166,8 +419,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  - {error}", file=sys.stderr)
         return 1
     print(
-        "Statistical reference corpus schema 1.0 is valid; "
-        "positive example accepted and negative example rejected."
+        "Statistical reference corpus 1.0 and its schema are valid; "
+        "PBI 2.10 scope is complete, input rejection probes pass, "
+        "positive example is accepted and negative example is rejected."
     )
     return 0
 
