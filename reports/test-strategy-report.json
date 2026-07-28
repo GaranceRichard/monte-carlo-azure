@@ -2,66 +2,66 @@
   "schemaVersion": "1.0.0",
   "schema": "config/test-strategy-report.schema.json",
   "profile": "main",
-  "evidenceBundleId": "547678bee53d4701c95ca66726ff3993ecf00dc39bb5f95ab5be96f8497b1edf",
+  "evidenceBundleId": "f8d95a14e844587815dc310f5977ace92cbcd831bd546b1fa0bd42435e58ae1d",
   "evidenceBundleIdentityDisclaimer": "This identifier names the exact evidence bundle; it does not prove that every source came from the same physical execution.",
   "globalReference": {
     "inventory": {
       "path": "reports/test-classification-inventory.json",
-      "sha256": "6fbafc074c59a529e544666fb0b141d65a63ba8d2b374456d39b979dd8a6d664",
-      "logicalCases": 1221
+      "sha256": "a8e2aad1fbb89d3ec13f6389fafefb3c228ec182cbc589756e7d1a51ab4da8eb",
+      "logicalCases": 1228
     },
     "classification": {
       "breakdowns": {
         "status": {
-          "classified": 1221
+          "classified": 1228
         },
         "framework": {
           "playwright": 32,
-          "pytest": 519,
+          "pytest": 526,
           "vitest": 670
         },
         "nature": {
-          "component": 397,
+          "component": 398,
           "contract": 44,
           "e2e": 32,
-          "integration": 199,
-          "unit": 549
+          "integration": 201,
+          "unit": 553
         },
         "purpose": {
           "accessibility": 104,
           "compatibility": 104,
           "data_quality": 130,
-          "functional": 1221,
+          "functional": 1228,
           "migration_recovery": 20,
-          "observability": 230,
+          "observability": 233,
           "performance": 11,
-          "resilience": 125,
+          "resilience": 126,
           "security": 124
         },
         "primaryProfile": {
-          "main": 203,
+          "main": 205,
           "nightly": 1,
-          "pr": 1015,
+          "pr": 1020,
           "release": 2
         },
         "domain": {
           "api": 125,
           "azure_devops": 263,
           "data": 127,
-          "deployment": 41,
+          "deployment": 42,
           "history": 104,
           "identity": 92,
           "persistence": 81,
           "portfolio": 144,
           "quality_chain": 238,
-          "reporting": 215,
+          "reporting": 217,
           "statistical_engine": 486,
-          "user_interface": 312
+          "user_interface": 313
         },
         "criticality": {
           "critical": 202,
           "high": 20,
-          "unassigned": 999
+          "unassigned": 1006
         }
       },
       "riskAssociations": {
@@ -99,16 +99,16 @@
     "executionCounts": {
       "path": "reports/test-execution-counts.json",
       "schemaVersion": "1.0.0",
-      "inventorySha256": "6fbafc074c59a529e544666fb0b141d65a63ba8d2b374456d39b979dd8a6d664",
+      "inventorySha256": "a8e2aad1fbb89d3ec13f6389fafefb3c228ec182cbc589756e7d1a51ab4da8eb",
       "totals": {
-        "logicalCases": 1221,
-        "collectedInstances": 1463,
-        "executedInstances": 1463,
+        "logicalCases": 1228,
+        "collectedInstances": 1476,
+        "executedInstances": 1476,
         "skippedInstances": 0,
-        "attempts": 1463,
+        "attempts": 1476,
         "retries": 0,
         "results": {
-          "passed": 1463,
+          "passed": 1476,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -122,15 +122,15 @@
         "includedProfiles": [
           "pr"
         ],
-        "logicalCases": 1015,
+        "logicalCases": 1020,
         "frameworks": {
-          "pytest": 345,
+          "pytest": 350,
           "vitest": 670
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 345,
+          "backend-tests": 350,
           "e2e": 0,
           "frontend-static": 0,
           "frontend-tests": 670,
@@ -144,16 +144,16 @@
           "pr",
           "main"
         ],
-        "logicalCases": 1218,
+        "logicalCases": 1225,
         "frameworks": {
           "playwright": 32,
-          "pytest": 516,
+          "pytest": 523,
           "vitest": 670
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 516,
+          "backend-tests": 523,
           "e2e": 32,
           "frontend-static": 0,
           "frontend-tests": 670,
@@ -168,16 +168,16 @@
           "main",
           "nightly"
         ],
-        "logicalCases": 1219,
+        "logicalCases": 1226,
         "frameworks": {
           "playwright": 32,
-          "pytest": 517,
+          "pytest": 524,
           "vitest": 670
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 517,
+          "backend-tests": 524,
           "e2e": 32,
           "frontend-static": 0,
           "frontend-tests": 670,
@@ -192,16 +192,16 @@
           "main",
           "release"
         ],
-        "logicalCases": 1220,
+        "logicalCases": 1227,
         "frameworks": {
           "playwright": 32,
-          "pytest": 518,
+          "pytest": 525,
           "vitest": 670
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 518,
+          "backend-tests": 525,
           "e2e": 32,
           "frontend-static": 0,
           "frontend-tests": 670,
@@ -217,7 +217,7 @@
       "pr",
       "main"
     ],
-    "selectedLogicalCases": 1218,
+    "selectedLogicalCases": 1225,
     "logicalCaseIds": [
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2738:3]",
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2792:3]",
@@ -630,6 +630,13 @@
       "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
       "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
       "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+      "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
+      "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
+      "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
+      "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
+      "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
+      "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
+      "pytest:tests/test_statistical_reference_corpus_contract.py::test_script_entrypoint_runs_the_autonomous_control",
       "pytest:tests/test_test_classification_compliance.py::test_added_test_without_regeneration_is_blocking",
       "pytest:tests/test_test_classification_compliance.py::test_catalog_schema_and_rule_contract_defects_are_blocking",
       "pytest:tests/test_test_classification_compliance.py::test_classification_files_are_massive_changes",
@@ -1455,14 +1462,14 @@
         }
       },
       "pytest": {
-        "logicalCases": 516,
-        "collectedInstances": 679,
-        "executedInstances": 679,
+        "logicalCases": 523,
+        "collectedInstances": 692,
+        "executedInstances": 692,
         "skippedInstances": 0,
-        "attempts": 679,
+        "attempts": 692,
         "retries": 0,
         "results": {
-          "passed": 679,
+          "passed": 692,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -1492,7 +1499,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/preflight/result.json",
         "exitCode": 0,
-        "durationSeconds": 8.688,
+        "durationSeconds": 8.492,
         "reasons": []
       },
       {
@@ -1501,7 +1508,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 0.119,
+        "durationSeconds": 0.1,
         "reasons": []
       },
       {
@@ -1510,7 +1517,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 35.107,
+        "durationSeconds": 34.153,
         "reasons": []
       },
       {
@@ -1519,7 +1526,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 93.293,
+        "durationSeconds": 93.072,
         "reasons": []
       },
       {
@@ -1528,7 +1535,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 125.24,
+        "durationSeconds": 124.003,
         "reasons": []
       },
       {
@@ -1537,7 +1544,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/e2e/result.json",
         "exitCode": 0,
-        "durationSeconds": 47.217,
+        "durationSeconds": 45.122,
         "reasons": []
       },
       {
@@ -1546,7 +1553,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/release-or-container-checks/result.json",
         "exitCode": 0,
-        "durationSeconds": 39.889,
+        "durationSeconds": 64.353,
         "reasons": []
       },
       {
@@ -1559,20 +1566,20 @@
         "reasons": []
       }
     ],
-    "collectedInstances": 1460,
-    "executedInstances": 1460,
+    "collectedInstances": 1473,
+    "executedInstances": 1473,
     "skippedInstances": 0,
-    "attempts": 1460,
+    "attempts": 1473,
     "retries": 0,
     "initialResults": {
-      "passed": 1460,
+      "passed": 1473,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
       "infrastructureError": 0
     },
     "finalResults": {
-      "passed": 1460,
+      "passed": 1473,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -1590,14 +1597,14 @@
       "instabilities": 0,
       "instabilityRatePercent": 0.0,
       "initialResults": {
-        "passed": 1460,
+        "passed": 1473,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
         "infrastructureError": 0
       },
       "finalResults": {
-        "passed": 1460,
+        "passed": 1473,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -1613,14 +1620,14 @@
         "thresholdSource": ".coveragerc",
         "metrics": {
           "lines": {
-            "total": 6610,
-            "covered": 6610,
+            "total": 6695,
+            "covered": 6695,
             "pct": 100.0
           },
           "branches": {
-            "total": 2314,
-            "covered": 2277,
-            "pct": 98.4
+            "total": 2340,
+            "covered": 2303,
+            "pct": 98.42
           }
         },
         "thresholds": {
@@ -1678,9 +1685,9 @@
             "pct": 91.26
           },
           "branches": {
-            "total": 2730,
-            "covered": 2261,
-            "pct": 82.82
+            "total": 2728,
+            "covered": 2259,
+            "pct": 82.8
           },
           "functions": {
             "total": 443,
@@ -2279,7 +2286,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "6fbafc074c59a529e544666fb0b141d65a63ba8d2b374456d39b979dd8a6d664",
+      "fingerprint": "a8e2aad1fbb89d3ec13f6389fafefb3c228ec182cbc589756e7d1a51ab4da8eb",
       "schemaVersion": null,
       "status": "valid",
       "reasons": []
@@ -2311,7 +2318,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "57f9213e81b72eb4ec9302d530f948a9e4313f3032fdb032a9e6c83bbf1c582d",
+      "fingerprint": "6806a5cf16835fa7672eada2f2374c8fc9eed279fae0904bbb9df63a096544ce",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2327,7 +2334,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "d2f88c881e7f85471cbad1fe20942613e93094dee29e919e6b4fc8469df8da1c",
+      "fingerprint": "4ee69ddf277abf98efcde6b9f0b954ce48addaed2deb0d298a9bdbea6b2170e7",
       "schemaVersion": 3,
       "status": "valid",
       "reasons": []
@@ -2343,7 +2350,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "c8ab3647e252d1df372b015c79f4f988bd21e74621446148001478035695b83a",
+      "fingerprint": "5d56923a0e46d682e39381486ef22c5df619b55bd80925d6b0a7c9b9ccb9d4b4",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2359,7 +2366,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "1c11f306166090eb286f996b8ce00328d5a10a61582c7dc2c949b34fe494f695",
+      "fingerprint": "9acda9b4fb0d5f7fc79ad4eaa065f4d87ce0fc5a370503c6d6350976e559f23f",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2375,7 +2382,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "72201635671c458be390f192a408ca130de51007a5a330d806dbe8cb6767779a",
+      "fingerprint": "ee392bbc4341fb87ef5f1ebdf1c308dc4457dffa027f71b6755b1c0719f08f9f",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2391,7 +2398,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "8d6e9a1639b87bd0a494329039acb385628f35b4a4c05c4482c6c7ef7966e574",
+      "fingerprint": "1fa12c7db783c07bdea24670fb3575cd91aca41eee587c1ab9a7bac65903511f",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2423,7 +2430,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "9cb1e6b8453d5ee1e34e6ff11bc472dd3b9d1c63baaed7a330c652dd9e72bda3",
+      "fingerprint": "7d84436d01ff00c34bdfeecadfa469a89b55fae68f940a23731c96d2f4816ba2",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2439,7 +2446,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "edde553c84f310943650449ad365d711043f3c7c0a1f5f0b7f918e6a1a7078f1",
+      "fingerprint": "539635501c534cc1d14180bc189a747b31366df9a480b22c03b6fe91f45331eb",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2455,7 +2462,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "3058193b5a1b5c7ba7e1e84a059e5ade98f6d274dd9d0e59e416765daa58a1b2",
+      "fingerprint": "003d770dfec31c4be731df4c9a52af094bfca3cc13537e7bb5fad59f257a8a5f",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2471,7 +2478,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "0a11dd3d4d8e07fdc35ac89d362491fce35f034e90eef906f26b106c2e251a8a",
+      "fingerprint": "1014ac880d285a262747cc37b2491a497a24f004e825e6160900a915ad18ee58",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2487,7 +2494,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "5f536b638c77e2973cfff197a3dbbc62adef330b946e9d248569c1ba1b0c7d4c",
+      "fingerprint": "58f4beb09fd8c87dcdf3f6cb299a2dafae1b957eb6c315b42868b496bdf67440",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2503,7 +2510,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "2c2709193e36cb9be10c1a5d4c733d4058d91bcc99526f3dfbfdebd50af17a96",
+      "fingerprint": "757ee7a4e2bd3f15b95258a58a23d947f387c1647c0daf3c35403ce87bcf1fcb",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2519,7 +2526,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "29d1e047be6d11f265389432e672d0f61e1f480f50e28f27e35625011bfeb98f",
+      "fingerprint": "fa1ce95a1a1182431d8fc0154fc5df2041cbeea73f1c9e32d7560cf4db5cc7fc",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2535,7 +2542,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "930238ecaaa5b2e54ef3fe9cc0280dabe08733c4446d868af788940f141f7361",
+      "fingerprint": "584c50d8798f74597ab214ce5099805af4924438f85cefdc9338aaf6081a834e",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2567,7 +2574,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "696fae2e249914a710d1e2af472b5251c800bf7f11e215ee82479bc5d25ca3b9",
+      "fingerprint": "1eb408f8e2b49904436b39e6bc73ab01558ceff7c62b7fced4d6eea61c7e1655",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []

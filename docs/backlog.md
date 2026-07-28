@@ -42,7 +42,7 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 | 2.6 | Introduire un port de tirage déterministe dans les deux moteurs | M | Sol Très élevé | 26/07/2026 |
 | 2.7 | Implémenter le PRNG contractuel commun Python et TypeScript | L | Sol Ultra | 26/07/2026 |
 | 2.8 | Garantir l’ordre logique des tirages et l’indépendance du batching | M | Sol Très élevé | 28/07/2026 |
-| 2.9 | Versionner le schéma du corpus de référence statistique | M | Sol Élevé | |
+| 2.9 | Versionner le schéma du corpus de référence statistique | M | Sol Élevé | 28/07/2026 |
 | 2.10 | Construire les cas de référence des entrées, modes, censures et percentiles | M | Sol Très élevé | |
 | 2.11 | Construire les cas de référence du Risk Score, de la fiabilité et des histogrammes | M | Sol Très élevé | |
 | 2.12 | Exécuter le corpus partagé dans les deux moteurs | L | Sol Très élevé | |

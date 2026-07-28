@@ -1,0 +1,468 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/statistical-reference-corpus/1.0",
+  "x-schemaVersion": "1.0",
+  "title": "Monte Carlo statistical reference corpus",
+  "description": "Normative, language-neutral contract for statistical reference cases. Version 1.0 is tied to STD-STAT-001 1.0 and mca-prng-v1.",
+  "$comment": "Case identifiers must be unique within a corpus version. The autonomous validator and future corpus runner must reject duplicate identifiers even when the remaining case content differs.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "corpus_id",
+    "normative_contract",
+    "prng_contract",
+    "cases"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Normative corpus schema version. A behavior-affecting incompatible change requires a new version.",
+      "const": "1.0"
+    },
+    "corpus_id": {
+      "description": "Stable identity of the shared statistical corpus.",
+      "const": "mca-statistical-reference-corpus"
+    },
+    "normative_contract": {
+      "$ref": "#/$defs/normativeContract"
+    },
+    "prng_contract": {
+      "$ref": "#/$defs/prngContract"
+    },
+    "cases": {
+      "description": "Reference cases. PBI 2.9 provides only a minimal structural example; normative statistical cases belong to PBI 2.10 and PBI 2.11.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/referenceCase"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "normativeContract": {
+      "description": "Normative statistical contract governing inputs and expected results.",
+      "type": "object",
+      "required": [
+        "id",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "const": "STD-STAT-001"
+        },
+        "version": {
+          "const": "1.0"
+        }
+      },
+      "additionalProperties": false
+    },
+    "prngContract": {
+      "description": "Pseudo-random contract and its canonical vector source.",
+      "type": "object",
+      "required": [
+        "id",
+        "vectors"
+      ],
+      "properties": {
+        "id": {
+          "const": "mca-prng-v1"
+        },
+        "vectors": {
+          "const": "contracts/mca-prng-v1-vectors.json"
+        }
+      },
+      "additionalProperties": false
+    },
+    "referenceCase": {
+      "description": "One normalized simulation input, contractual seed, expected normative result and proof level.",
+      "type": "object",
+      "required": [
+        "id",
+        "description",
+        "proof_level",
+        "input",
+        "seed",
+        "expected_result"
+      ],
+      "properties": {
+        "id": {
+          "description": "Stable, reviewable case identifier.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "minLength": 3,
+          "maxLength": 80
+        },
+        "description": {
+          "description": "Human-readable intent; it must explain the rule proved without relying on an engine as oracle.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "proof_level": {
+          "description": "Parity level from STAT-PAR-001. Distributional proof complements and never replaces replay proof.",
+          "enum": [
+            "algorithmic",
+            "deterministic",
+            "replay",
+            "distributional"
+          ]
+        },
+        "input": {
+          "$ref": "#/$defs/normalizedInput"
+        },
+        "seed": {
+          "description": "Resolved mca-prng-v1 seed, preserved exactly without truncation or modulo normalization.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "expected_result": {
+          "$ref": "#/$defs/expectedResult"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "input": {
+                "required": [
+                  "mode"
+                ],
+                "properties": {
+                  "mode": {
+                    "const": "backlog_to_weeks"
+                  }
+                }
+              }
+            },
+            "required": [
+              "input"
+            ]
+          },
+          "then": {
+            "properties": {
+              "expected_result": {
+                "required": [
+                  "completion_summary"
+                ],
+                "properties": {
+                  "result_kind": {
+                    "const": "weeks"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "input": {
+                "required": [
+                  "mode"
+                ],
+                "properties": {
+                  "mode": {
+                    "const": "weeks_to_items"
+                  }
+                }
+              }
+            },
+            "required": [
+              "input"
+            ]
+          },
+          "then": {
+            "properties": {
+              "expected_result": {
+                "not": {
+                  "required": [
+                    "completion_summary"
+                  ]
+                },
+                "properties": {
+                  "result_kind": {
+                    "const": "items"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "normalizedInput": {
+      "description": "Fully resolved statistical command. Exactly one mode-specific parameter is present; transport defaults and inactive parameters are forbidden.",
+      "type": "object",
+      "required": [
+        "throughput_samples",
+        "include_zero_weeks",
+        "mode",
+        "n_sims"
+      ],
+      "properties": {
+        "throughput_samples": {
+          "$ref": "#/$defs/throughputSamples"
+        },
+        "include_zero_weeks": {
+          "type": "boolean"
+        },
+        "mode": {
+          "enum": [
+            "backlog_to_weeks",
+            "weeks_to_items"
+          ]
+        },
+        "backlog_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "target_weeks": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 521
+        },
+        "n_sims": {
+          "$ref": "#/$defs/simulationCount"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/nonZeroSampleInvariant"
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "backlog_to_weeks"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "backlog_size"
+            ],
+            "not": {
+              "required": [
+                "target_weeks"
+              ]
+            }
+          },
+          "else": {
+            "required": [
+              "target_weeks"
+            ],
+            "not": {
+              "required": [
+                "backlog_size"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "throughputSamples": {
+      "description": "Raw complete-week throughput values before the explicit include_zero_weeks policy is applied.",
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 521,
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "nonZeroSampleInvariant": {
+      "description": "When zero weeks are excluded, at least six strictly positive samples must remain usable.",
+      "if": {
+        "properties": {
+          "include_zero_weeks": {
+            "const": false
+          }
+        },
+        "required": [
+          "include_zero_weeks"
+        ]
+      },
+      "then": {
+        "properties": {
+          "throughput_samples": {
+            "contains": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "minContains": 6
+          }
+        }
+      }
+    },
+    "simulationCount": {
+      "type": "integer",
+      "minimum": 1000,
+      "maximum": 200000
+    },
+    "expectedResult": {
+      "description": "Exact normative statistical response before presentation, persistence or diagnostic transformations.",
+      "$comment": "Cross-field invariants: expected_result.seed equals case.seed; expected_result.samples_count equals throughput_reliability.samples_count; result_percentiles are ordered P50<=P70<=P90 for weeks and P50>=P70>=P90 for items; histogram x values are strictly increasing and counts preserve completed_count for weeks or n_sims for items; completion counts sum to n_sims and censored_rate is censored_count/n_sims rounded half up to four decimals; risk_score is omitted unless P50 and P90 exist and P50>0, otherwise it uses STD-STAT-001.",
+      "type": "object",
+      "required": [
+        "result_kind",
+        "result_percentiles",
+        "result_distribution",
+        "samples_count",
+        "throughput_reliability",
+        "seed"
+      ],
+      "properties": {
+        "result_kind": {
+          "enum": [
+            "weeks",
+            "items"
+          ]
+        },
+        "result_percentiles": {
+          "$ref": "#/$defs/resultPercentiles"
+        },
+        "risk_score": {
+          "type": "number",
+          "minimum": 0
+        },
+        "result_distribution": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/histogramBucket"
+          }
+        },
+        "completion_summary": {
+          "$ref": "#/$defs/completionSummary"
+        },
+        "samples_count": {
+          "type": "integer",
+          "minimum": 6,
+          "maximum": 521
+        },
+        "throughput_reliability": {
+          "$ref": "#/$defs/throughputReliability"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        }
+      },
+      "additionalProperties": false
+    },
+    "resultPercentiles": {
+      "description": "Only identifiable normative percentiles are serialized; absent values are omitted rather than set to null or a sentinel.",
+      "type": "object",
+      "properties": {
+        "P50": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "P70": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "P90": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "histogramBucket": {
+      "type": "object",
+      "required": [
+        "x",
+        "count"
+      ],
+      "properties": {
+        "x": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200000
+        }
+      },
+      "additionalProperties": false
+    },
+    "completionSummary": {
+      "type": "object",
+      "required": [
+        "completed_count",
+        "censored_count",
+        "censored_rate",
+        "horizon_weeks"
+      ],
+      "properties": {
+        "completed_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 200000
+        },
+        "censored_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 200000
+        },
+        "censored_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "horizon_weeks": {
+          "const": 521
+        }
+      },
+      "additionalProperties": false
+    },
+    "throughputReliability": {
+      "type": "object",
+      "required": [
+        "cv",
+        "iqr_ratio",
+        "slope_norm",
+        "label",
+        "samples_count"
+      ],
+      "properties": {
+        "cv": {
+          "type": "number",
+          "minimum": 0
+        },
+        "iqr_ratio": {
+          "type": "number",
+          "minimum": 0
+        },
+        "slope_norm": {
+          "type": "number"
+        },
+        "label": {
+          "enum": [
+            "fiable",
+            "incertain",
+            "fragile",
+            "non fiable"
+          ]
+        },
+        "samples_count": {
+          "type": "integer",
+          "minimum": 6,
+          "maximum": 521
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

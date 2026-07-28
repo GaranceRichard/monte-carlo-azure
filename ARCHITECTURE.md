@@ -119,6 +119,10 @@ Garde-fous serveur :
 ```text
 contracts/
   mca-prng-v1-vectors.json # sorties uint32 et indices canoniques partagés
+  statistical-reference-corpus-v1.0.schema.json # contrat JSON Schema normatif du corpus
+  examples/
+    statistical-reference-corpus-v1.0.minimal.json # preuve structurelle minimale
+    statistical-reference-corpus-v1.0.invalid.json # contre-exemple de fermeture
 
 frontend/
   src/
@@ -349,7 +353,26 @@ La composition appartient aux frontières d’exécution :
 Les moteurs ne connaissent toujours que `SampleIndexDrawPort` et ne créent aucun PRNG. Le contrat commun,
 l’ordre logique et les tests de lots prouvent la stabilité de l’affectation des tirages. Ils ne constituent
 pas encore le corpus statistique partagé : les autres règles et l’égalité complète des résultats relèvent
-des PBI 2.9 à 2.17.
+des PBI 2.10 à 2.17.
+
+### Contrat du corpus statistique
+
+[`contracts/statistical-reference-corpus-v1.0.schema.json`](contracts/statistical-reference-corpus-v1.0.schema.json)
+est la frontière sérialisée interlangage du corpus. Le document racine porte la version normative `1.0`,
+`STD-STAT-001` version `1.0` et `mca-prng-v1`; chaque cas contient séparément l’entrée normalisée, la seed,
+le résultat attendu et l’un des quatre niveaux de preuve normatifs.
+
+Le JSON Schema draft 2020-12 ferme tous les objets, discrimine `backlog_to_weeks` et `weeks_to_items`,
+interdit leur paramètre inactif et décrit types, bornes, cardinalités et champs obligatoires. Les invariants
+arithmétiques interchamps que le standard JSON Schema ne sait pas exprimer sont conservés dans l’annotation
+normative `$comment` et détaillés dans
+[`docs/statistical-reference-corpus.md`](docs/statistical-reference-corpus.md), sans `$data` ni dépendance à
+un langage. `Scripts/validate_statistical_reference_corpus.py` contrôle le métaschème et les exemples positif
+et négatif sans importer les moteurs.
+
+Cette frontière ne constitue pas une nouvelle API applicative : aucun mapper, DTO, document MongoDB ou
+objet `localStorage` ne la consomme. Les cas complets, les runners moteur et la gate de parité restent
+respectivement réservés aux PBI 2.10–2.11, 2.12 et 2.19.
 
 Le PBI 2.7 a conservé les résultats frontend seed-à-seed en reprenant son algorithme bitwise historique,
 mais le PBI 2.8 change volontairement l’affectation locale des tirages `backlog_to_weeks` après une fin

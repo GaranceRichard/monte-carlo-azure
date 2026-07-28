@@ -7569,6 +7569,106 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_backlog_mode_requires_only_backlog_input_and_completion_result",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_cli_reports_invalid_custom_instance_and_parse_failures",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_contract_control_rejects_duplicate_case_identifiers",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_control_reports_invalid_schema_and_negative_probe_regressions",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_script_entrypoint_runs_the_autonomous_control",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_script_entrypoint_runs_the_autonomous_control",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "deployment"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_test_classification_compliance.py::test_added_test_without_regeneration_is_blocking",
     "framework": "pytest",
     "sourcePath": "tests/test_test_classification_compliance.py",

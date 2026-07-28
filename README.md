@@ -696,6 +696,32 @@ Comportement du `seed` de simulation:
   le corpus statistique partagé commence au PBI 2.9
 - la version externe du contrat et les règles de migration relèvent du PBI 2.20
 
+## Corpus de référence statistique `1.0`
+
+Le format partagé est défini par
+[`contracts/statistical-reference-corpus-v1.0.schema.json`](contracts/statistical-reference-corpus-v1.0.schema.json),
+un JSON Schema draft 2020-12 fermé à toute propriété inconnue. Chaque cas relie une entrée statistique
+normalisée, une seed uint32 consommée par `mca-prng-v1`, un résultat normatif attendu et un niveau de preuve
+`algorithmic`, `deterministic`, `replay` ou `distributional` issu de `STD-STAT-001`.
+
+Le schéma discrimine les deux modes et impose leurs paramètres actifs, les bornes existantes, la forme des
+percentiles, histogrammes, métriques de fiabilité et résumés de complétion. Les relations arithmétiques
+interchamps non exprimables en JSON Schema standard sont consignées comme invariants normatifs, sans
+extension propre à Python, TypeScript ou un validateur particulier. Le détail du contrat et de son
+versionnement est dans
+[`docs/statistical-reference-corpus.md`](docs/statistical-reference-corpus.md).
+
+Un exemple positif trivial et un contre-exemple fermé aux propriétés inconnues prouvent uniquement la
+structure, sans anticiper les cas statistiques des PBI 2.10 et 2.11. Le contrôle autonome valide le
+métaschème et les deux chemins avec des diagnostics JSON Pointer actionnables :
+
+```bash
+.venv\Scripts\python.exe Scripts/validate_statistical_reference_corpus.py
+```
+
+Ce PBI n’exécute aucun cas dans les moteurs, ne change aucune formule ou sortie courante et ne migre aucun
+DTO, payload API, document MongoDB ou objet `localStorage`.
+
 Purge planifiée:
 
 ```bash

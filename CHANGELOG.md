@@ -2,6 +2,17 @@
 
 ## Recent
 
+### Schéma du corpus de référence statistique — PBI 2.9
+
+- ajout du contrat JSON Schema draft 2020-12 normatif `1.0`, fermé aux propriétés inconnues et lié à
+  `STD-STAT-001` version `1.0`, `mca-prng-v1` et ses vecteurs canoniques
+- séparation explicite, pour chaque futur cas, des entrées normalisées, de la seed uint32, des résultats
+  attendus et des niveaux de preuve algorithmique, déterministe, de rejeu ou distributionnel
+- ajout d’un contrôle autonome du métaschème et d’exemples positif/négatif minimaux, avec diagnostics
+  localisés par JSON Pointer, mot-clé et chemin de schéma
+- aucun corpus statistique des PBI 2.10–2.11, aucun runner moteur, changement de formule, migration de DTO,
+  API, MongoDB ou `localStorage`
+
 ### Ordre logique des tirages et batching — PBI 2.8
 
 - adoption d’une grille canonique simulation-major : chaque simulation reçoit un segment contigu de la

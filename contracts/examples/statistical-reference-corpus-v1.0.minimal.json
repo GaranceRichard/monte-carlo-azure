@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "corpus_id": "mca-statistical-reference-corpus",
+  "normative_contract": {
+    "id": "STD-STAT-001",
+    "version": "1.0"
+  },
+  "prng_contract": {
+    "id": "mca-prng-v1",
+    "vectors": "contracts/mca-prng-v1-vectors.json"
+  },
+  "cases": [
+    {
+      "id": "minimal-items-structure",
+      "description": "Minimal structural example; it is not the statistical corpus planned by PBI 2.10 and PBI 2.11.",
+      "proof_level": "algorithmic",
+      "input": {
+        "throughput_samples": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "include_zero_weeks": false,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 1,
+          "P70": 1,
+          "P90": 1
+        },
+        "risk_score": 0,
+        "result_distribution": [
+          {
+            "x": 1,
+            "count": 1000
+          }
+        ],
+        "samples_count": 6,
+        "throughput_reliability": {
+          "cv": 0,
+          "iqr_ratio": 0,
+          "slope_norm": 0,
+          "label": "incertain",
+          "samples_count": 6
+        },
+        "seed": 0
+      }
+    }
+  ]
+}

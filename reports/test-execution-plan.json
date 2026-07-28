@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1015,
+      "logicalCases": 1020,
       "nodes": [
         {
           "id": "preflight",
@@ -394,6 +394,11 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_script_entrypoint_runs_the_autonomous_control",
             "pytest:tests/test_test_classification_compliance.py::test_classification_files_are_massive_changes",
             "pytest:tests/test_test_classification_compliance.py::test_control_is_in_main_profile_validation_once",
             "pytest:tests/test_test_classification_compliance.py::test_control_is_present_once_with_the_correct_input_in_each_gate_plan",
@@ -460,18 +465,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 345
+            "pytest": 350
           },
           "natures": {
-            "component": 67,
+            "component": 68,
             "contract": 44,
             "integration": 25,
-            "unit": 209
+            "unit": 213
           },
           "criticalities": {
             "critical": 71,
             "high": 16,
-            "unassigned": 258
+            "unassigned": 263
           }
         },
         {
@@ -1279,7 +1284,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1218,
+      "logicalCases": 1225,
       "nodes": [
         {
           "id": "preflight",
@@ -1762,6 +1767,13 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_script_entrypoint_runs_the_autonomous_control",
             "pytest:tests/test_test_classification_compliance.py::test_added_test_without_regeneration_is_blocking",
             "pytest:tests/test_test_classification_compliance.py::test_catalog_schema_and_rule_contract_defects_are_blocking",
             "pytest:tests/test_test_classification_compliance.py::test_classification_files_are_massive_changes",
@@ -1901,18 +1913,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 516
+            "pytest": 523
           },
           "natures": {
-            "component": 67,
+            "component": 68,
             "contract": 44,
-            "integration": 196,
-            "unit": 209
+            "integration": 198,
+            "unit": 213
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 412
+            "unassigned": 419
           }
         },
         {
@@ -2761,7 +2773,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1219,
+      "logicalCases": 1226,
       "nodes": [
         {
           "id": "preflight",
@@ -3244,6 +3256,13 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_script_entrypoint_runs_the_autonomous_control",
             "pytest:tests/test_test_classification_compliance.py::test_added_test_without_regeneration_is_blocking",
             "pytest:tests/test_test_classification_compliance.py::test_catalog_schema_and_rule_contract_defects_are_blocking",
             "pytest:tests/test_test_classification_compliance.py::test_classification_files_are_massive_changes",
@@ -3384,18 +3403,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 517
+            "pytest": 524
           },
           "natures": {
-            "component": 67,
+            "component": 68,
             "contract": 44,
-            "integration": 196,
-            "unit": 210
+            "integration": 198,
+            "unit": 214
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 413
+            "unassigned": 420
           }
         },
         {
@@ -4244,7 +4263,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1220,
+      "logicalCases": 1227,
       "nodes": [
         {
           "id": "preflight",
@@ -4728,6 +4747,13 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_script_entrypoint_runs_the_autonomous_control",
             "pytest:tests/test_test_classification_compliance.py::test_added_test_without_regeneration_is_blocking",
             "pytest:tests/test_test_classification_compliance.py::test_catalog_schema_and_rule_contract_defects_are_blocking",
             "pytest:tests/test_test_classification_compliance.py::test_classification_files_are_massive_changes",
@@ -4868,18 +4894,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 518
+            "pytest": 525
           },
           "natures": {
-            "component": 67,
+            "component": 68,
             "contract": 44,
-            "integration": 197,
-            "unit": 210
+            "integration": 199,
+            "unit": 214
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 414
+            "unassigned": 421
           }
         },
         {

@@ -325,6 +325,14 @@ Time **DOIT** rester explicitement hors du contrat de parité Monte Carlo.
 
 ## 12. Versionnement et compatibilité
 
+### Matérialisation du corpus version `1.0`
+
+Le PBI 2.9 matérialise la frontière sérialisée de rejeu dans
+[`contracts/statistical-reference-corpus-v1.0.schema.json`](../../contracts/statistical-reference-corpus-v1.0.schema.json).
+Ce JSON Schema draft 2020-12 associe explicitement chaque entrée normalisée à sa seed uint32, au contrat
+`mca-prng-v1`, à son résultat normatif attendu et à l’un des quatre niveaux de parité de `STAT-PAR-001`.
+Le schéma est fermé, indépendant des DTO et des moteurs, et ne vaut pas encore preuve d’exécution du corpus.
+
 ### STAT-PAR-047 — Version de rejeu
 
 Le contrat normatif **DOIT** porter la version `1.0`. Toute preuve ou donnée destinée au rejeu **DOIT**

@@ -83,6 +83,19 @@ Implémentation retenue :
 - porter la version normative `1.0` et la seed ;
 - valider le schéma indépendamment des moteurs.
 
+Implémentation retenue :
+
+- `contracts/statistical-reference-corpus-v1.0.schema.json` est l’autorité JSON Schema draft 2020-12,
+  fermée à toute propriété inconnue et liée à `STD-STAT-001` version `1.0` et `mca-prng-v1` ;
+- chaque cas sépare identifiant, description, niveau de preuve normatif, entrée normalisée, seed uint32 et
+  résultat attendu ; les deux modes imposent uniquement leur paramètre actif et leur forme de résultat ;
+- types, bornes, cardinalités et invariants structurels sont portés par le schéma ; les relations
+  arithmétiques interchamps sont documentées dans son `$comment` normatif sans extension propriétaire ;
+- `Scripts/validate_statistical_reference_corpus.py` valide le métaschème, un exemple positif minimal et un
+  contre-exemple minimal, avec fichier, JSON Pointer, mot-clé et chemin de schéma dans chaque diagnostic ;
+- aucun cas statistique complet, runner moteur, changement de formule, migration de DTO, API, MongoDB ou
+  `localStorage` n’est introduit.
+
 ### Résultat attendu du PBI 2.10
 
 - couvrir bornes, types invalides, traitement des zéros et paramètres actifs ;
