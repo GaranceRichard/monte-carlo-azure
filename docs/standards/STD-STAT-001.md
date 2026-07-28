@@ -331,22 +331,26 @@ Le PBI 2.9 matérialise la frontière sérialisée de rejeu dans
 [`contracts/statistical-reference-corpus-v1.0.schema.json`](../../contracts/statistical-reference-corpus-v1.0.schema.json).
 Ce JSON Schema draft 2020-12 associe explicitement chaque entrée normalisée à sa seed uint32, au contrat
 `mca-prng-v1`, à son résultat normatif attendu et à l’un des quatre niveaux de parité de `STAT-PAR-001`.
-Le schéma est fermé, indépendant des DTO et des moteurs, et ne vaut pas encore preuve d’exécution du corpus.
+Le schéma est fermé et indépendant des DTO et des moteurs.
 
 Le PBI 2.10 instancie cette frontière dans
 [`contracts/statistical-reference-corpus-v1.0.json`](../../contracts/statistical-reference-corpus-v1.0.json).
 Ses cinq cas matérialisent `STAT-PAR-012` à `STAT-PAR-025` pour les entrées, zéros, modes, horizon,
 censures et percentiles. Les résultats attendus sont dérivés du présent standard et de `mca-prng-v1` sans
-utiliser un moteur comme oracle. Ils restent des références à exécuter par les runners du PBI 2.12 et ne
-constituent donc pas encore une preuve de parité interlangage.
+utiliser un moteur comme oracle.
 
 Le PBI 2.11 ajoute dix cas discriminants pour `STAT-PAR-026` à `STAT-PAR-039`. Ils figent le calcul et les
 gardes d’absence du Risk Score, tous les seuils de `cv`, `iqr_ratio` et `slope_norm` après arrondi normatif,
 les quatre labels dans leur ordre de priorité, ainsi que les histogrammes exacts et agrégés avec masse,
 largeur, bornes et représentants. Les cas `0..100` et `0..99 + 10000` matérialisent explicitement les
 géométries historiquement divergentes recensées par l’audit. Leurs résultats sont eux aussi dérivés du
-présent standard, du contrat sérialisé et de calculs indépendants ; aucun runner moteur du PBI 2.12 ni
-alignement des formules des PBI suivants n’est introduit.
+présent standard, du contrat sérialisé et de calculs indépendants.
+
+Le PBI 2.12 exécute les quinze références dans les deux moteurs avec leurs seeds et `mca-prng-v1`, après
+validation du schéma et du corpus. Les sorties sont comparées exactement dans la forme sérialisée commune,
+sans tolérance, tri ou valeur absente reconstruite. Treize cas concordent avec la norme et entre moteurs ;
+les deux cas d’histogrammes agrégés conservent des divergences explicites orientées vers le PBI 2.16.
+Le rapport reste informatif jusqu’au contrôle bloquant prévu par le PBI 2.19.
 
 ### STAT-PAR-047 — Version de rejeu
 

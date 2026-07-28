@@ -2,6 +2,21 @@
 
 ## Recent
 
+### Exécution interlangage du corpus partagé — PBI 2.12
+
+- ajout de runners Python et TypeScript consommant les quinze mêmes cas `1.0`, leurs entrées, seeds et
+  l’adaptateur `mca-prng-v1`, après validation du schéma et des invariants du corpus
+- sérialisation canonique dans la forme `expected_result`, sans tolérance numérique, tri des histogrammes,
+  reconstruction des champs absents ni duplication des règles statistiques
+- comparaison séparée norme/Python, norme/TypeScript et Python/TypeScript, avec diagnostics distincts pour
+  schéma ou corpus invalide, erreur moteur, divergence normative et divergence inter-moteurs
+- rapports JSON et Markdown déterministes, contrôle informatif non intégré au profil `main`
+- observation reproductible de 13 cas conformes et de deux divergences d’histogrammes : 100 buckets Python
+  contre 51 centres impairs TypeScript sur `0..100`, puis représentants `50/9951` et `51/10050` contre la
+  norme `50/9999` sur la plage discontinue
+- aucun alignement des PBI 2.13 à 2.17, aucune modification de formule, résultat attendu, contrat moteur,
+  DTO, API, MongoDB, `localStorage` ou contrôle qualité
+
 ### Risk Score, fiabilité et histogrammes de référence — PBI 2.11
 
 - enrichissement du corpus normatif `1.0` avec dix cas discriminants, sans modifier les cinq cas 2.10 ni

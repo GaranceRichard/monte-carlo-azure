@@ -153,6 +153,27 @@ Implémentation retenue :
 - distinguer échec de schéma, échec moteur et divergence de résultat ;
 - ne rendre aucun contrôle bloquant dans ce PBI.
 
+Implémentation retenue :
+
+- `Scripts/run_statistical_reference_corpus.py` valide le métaschème, le corpus et les invariants 2.10/2.11
+  avant toute exécution, puis orchestre les deux runners sur le même fichier `1.0` ;
+- `Scripts/statistical_corpus_runner.py` compose les Value Objects et le service Python existants ;
+  `frontend/src/statisticalCorpusRunner.ts` compose le moteur local et l’adaptateur `mca-prng-v1`
+  existants, chargé par un pont Node après une seconde validation autonome ;
+- les sorties conservent exactement la présence des champs, les valeurs et l’ordre des distributions dans
+  la forme snake_case de `expected_result`; aucun arrondi, tolérance, tri ou calcul statistique n’est ajouté
+  par les runners ;
+- `Scripts/statistical_parity_report.py` qualifie séparément `schema_invalid`/`corpus_invalid`,
+  `engine_error`, `normative_divergence` et `engine_divergence`, avec JSON Pointer, valeurs exactes et
+  résultats canoniques complets dans le rapport JSON ;
+- les rapports déterministes `reports/statistical-parity-report.json` et `.md` sont informatifs et ne sont
+  pas inclus dans le profil `main`; leur promotion en gate relève toujours du PBI 2.19 ;
+- treize cas sont conformes dans les deux moteurs. Les deux cas d’histogramme agrégé exposent les écarts
+  historiques attendus : Python `100` buckets contre TypeScript `51` centres impairs sur `0..100`, puis
+  `50/9951` contre `51/10050` sur la plage discontinue, la norme demandant `50/9999` ;
+- aucune divergence n’est corrigée, aucun moteur ou contrat externe n’est modifié et les alignements restent
+  affectés aux PBI 2.13 à 2.17.
+
 ## Phase C — Alignement statistique : PBI 2.13 à 2.17
 
 ### Résultat attendu du PBI 2.13

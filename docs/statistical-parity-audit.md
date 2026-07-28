@@ -13,6 +13,12 @@ Périmètre : PBI **2.1 — Auditer les divergences statistiques Python et TypeS
 > puis une grille simulation-major de largeur fixe aligne l’ordre logique et rend le résultat indépendant
 > des lots. Les observations historiques ST-12 à ST-18 restent inchangées ; les travaux de corpus et
 > d’alignement statistique commencent au PBI 2.9.
+>
+> **Preuve d’exécution postérieure — PBI 2.12.** Les quinze cas `1.0` sont maintenant exécutés dans les
+> deux moteurs et comparés exactement. Treize cas concordent avec la norme ; les deux cas d’histogrammes
+> agrégés reproduisent ST-33 : `100` buckets Python contre `51` centres impairs TypeScript sur `0..100`,
+> puis `50/9951` contre `51/10050` sur la plage discontinue, alors que la norme fixe `50/9999`. Le rapport
+> reste informatif et aucune observation historique n’est corrigée dans ce PBI.
 
 ## 1. Objet et périmètre
 

@@ -2,8 +2,9 @@
 
 Le PBI 2.9 établit le format sérialisé commun. Le PBI 2.10 matérialise dans ce format les cas normatifs
 d’entrées, de modes, de zéros, d’horizon, de censures et de percentiles. Le PBI 2.11 l’enrichit avec les
-cas du Risk Score, des seuils de fiabilité et des histogrammes exacts ou agrégés. Aucun cas n’est encore
-exécuté dans un moteur : les runners Python et TypeScript restent réservés au PBI 2.12.
+cas du Risk Score, des seuils de fiabilité et des histogrammes exacts ou agrégés. Le PBI 2.12 exécute les
+quinze cas dans les moteurs Python et TypeScript et compare leurs sorties à cette référence et entre elles,
+sans corriger les divergences observées.
 
 ## Autorité et fichiers
 
@@ -62,8 +63,8 @@ dans le `$comment` normatif de `expectedResult` et restent gouvernées par `STD-
 
 Ces relations arithmétiques ne sont pas remplacées par une extension propriétaire comme `$data` : le
 contrat reste lisible par tout validateur standard draft 2020-12. Le contrôle autonome vérifie désormais
-les relations structurelles nécessaires au corpus, mais leur exécution dans Python et TypeScript appartient
-toujours aux runners du PBI 2.12.
+les relations structurelles nécessaires au corpus avant que le coordinateur 2.12 autorise l’un ou l’autre
+moteur à exécuter un cas.
 
 ## Cas normatifs du PBI 2.10
 
@@ -311,6 +312,59 @@ candidate.json:/cases/0/seed: [maximum] 4294967296 is greater than the maximum o
 
 Le chargeur refuse aussi les propriétés JSON dupliquées avant la validation, car un parseur JSON ordinaire
 les écraserait avant que JSON Schema puisse les observer.
+
+## Exécution partagée et rapport du PBI 2.12
+
+La commande commune est :
+
+```bash
+.venv\Scripts\python.exe Scripts/run_statistical_reference_corpus.py
+```
+
+Le flux est ordonné et fermé :
+
+1. `Scripts/run_statistical_reference_corpus.py` charge et vérifie le JSON Schema draft 2020-12 ;
+2. il valide le corpus, ses invariants interchamps et les périmètres figés 2.10/2.11 ;
+3. seulement si cette étape est verte, `Scripts/statistical_corpus_runner.py` construit chaque
+   `SimulationCommand` Python avec la seed du cas et appelle `backend.simulation_service.run_simulation` ;
+4. le pont Node valide à nouveau le même fichier avant de charger
+   `frontend/src/statisticalCorpusRunner.ts`, qui construit la commande TypeScript, l’adaptateur
+   `mca-prng-v1` et appelle `simulateMonteCarloLocal` ;
+5. le comparateur confronte `expected_result`, Python et TypeScript sans tolérance ni transformation
+   statistique.
+
+Les deux runners convertissent seulement les représentations de langage vers les noms canoniques :
+`resultKind` devient `result_kind`, les champs de fiabilité et de complétion deviennent snake_case et les
+Value Objects Python deviennent des primitives JSON. Ils ne trient pas les buckets, ne recalculent pas un
+score, ne reconstruisent pas une valeur absente et ne normalisent aucun flottant supplémentaire.
+
+Le rapport JSON contient, pour chaque cas, le résultat attendu, les deux résultats canoniques, puis chaque
+différence exacte avec son JSON Pointer et son type (`missing_actual`, `unexpected_actual`,
+`array_length`, `type_mismatch` ou `value_mismatch`). Les états de niveau supérieur restent distincts :
+
+- `schema_invalid` ou `corpus_invalid` : aucun moteur n’a été appelé ;
+- `engine_error` : un moteur ou un cas n’a pas produit de résultat ;
+- `normative_divergence` : la sortie d’un moteur diffère de `expected_result` ;
+- `engine_divergence` : les deux sorties moteur diffèrent entre elles.
+
+Les artefacts sont
+[`reports/statistical-parity-report.json`](../reports/statistical-parity-report.json) et
+[`reports/statistical-parity-report.md`](../reports/statistical-parity-report.md). Ils ne portent aucun
+horodatage et leur ordre suit celui du corpus, ce qui rend deux exécutions identiques byte-à-byte.
+`enforcement = informational` : les divergences laissent la commande à zéro et le contrôle n’est pas dans
+le profil `main`. Un schéma/corpus invalide ou une erreur moteur reste une incapacité d’exécution et renvoie
+un code non nul.
+
+L’exécution 2.12 observe treize cas intégralement conformes dans les deux moteurs. Les deux autres confirment
+les divergences d’histogrammes déjà isolées par 2.11 :
+
+| Cas | Norme | Python | TypeScript |
+| --- | --- | --- | --- |
+| `histogram-aggregated-contiguous-101` | 51 représentants pairs `0..100` | 100 buckets, premier centre `1` | 51 représentants impairs `1..101` |
+| `histogram-aggregated-discontinuous` | `50`, `9999` | `50`, `9951` | `51`, `10050` |
+
+Les seeds, tirages, distributions brutes, percentiles, scores et métriques de fiabilité ne sont pas modifiés
+par le runner. L’alignement de ces sorties reste explicitement hors du PBI 2.12.
 
 ## Évolution
 

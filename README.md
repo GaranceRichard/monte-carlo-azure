@@ -749,9 +749,30 @@ JSON Pointer :
 .venv\Scripts\python.exe Scripts/validate_statistical_reference_corpus.py
 ```
 
-Les PBI 2.10 et 2.11 ne créent aucun runner moteur, ne changent aucune formule ou sortie courante et ne
-migrent aucun DTO, payload API, document MongoDB ou objet `localStorage`. L’exécution partagée reste
-réservée au PBI 2.12.
+Le PBI 2.12 exécute désormais ces quinze cas dans les moteurs Python et TypeScript, après validation
+complète du schéma et du corpus :
+
+```bash
+.venv\Scripts\python.exe Scripts/run_statistical_reference_corpus.py
+```
+
+Le runner Python appelle le service statistique métier ; le runner TypeScript appelle le moteur local via
+son port `mca-prng-v1`. Chacun convertit uniquement les noms et Value Objects dans la forme canonique
+`expected_result` : aucune valeur absente n’est fabriquée, aucun histogramme n’est trié et aucune tolérance
+ou nouvel arrondi n’est appliqué. Le comparateur produit
+[`reports/statistical-parity-report.json`](reports/statistical-parity-report.json), exploitable en CI, et
+[`reports/statistical-parity-report.md`](reports/statistical-parity-report.md), lisible en revue.
+
+Les statuts distinguent `schema_invalid` ou `corpus_invalid`, `engine_error`,
+`normative_divergence` et `engine_divergence`. Une divergence statistique laisse la commande verte parce
+que le contrôle reste informatif dans 2.12 ; un corpus inexécutable ou une erreur moteur rend la commande
+en échec. Le profil `main` ne lance pas ce contrôle avant le PBI 2.19.
+
+L’exécution courante trouve 13 cas entièrement conformes et deux divergences d’histogrammes déjà attendues
+par l’audit : Python produit 100 buckets et TypeScript 51 centres impairs pour `0..100`; sur
+`0..99 + 10000`, les représentants sont `50/9951` en Python et `51/10050` en TypeScript, contre
+`50/9999` dans la norme. Le PBI 2.12 ne corrige aucun de ces écarts et ne modifie ni formule, DTO, payload
+API, document MongoDB ni objet `localStorage`.
 
 Purge planifiée:
 

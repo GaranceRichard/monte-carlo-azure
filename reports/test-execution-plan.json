@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1028,
+      "logicalCases": 1037,
       "nodes": [
         {
           "id": "preflight",
@@ -394,6 +394,11 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
+            "pytest:tests/test_statistical_corpus_runner.py::test_exact_comparator_preserves_absence_order_types_lengths_and_values",
+            "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_distinguishes_normative_engine_and_execution_divergences",
+            "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_executes_all_cases_with_exact_canonical_results",
+            "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_reports_case_errors_without_stopping_following_cases",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
@@ -473,18 +478,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 358
+            "pytest": 363
           },
           "natures": {
-            "component": 69,
+            "component": 70,
             "contract": 44,
             "integration": 26,
-            "unit": 219
+            "unit": 223
           },
           "criticalities": {
             "critical": 71,
             "high": 16,
-            "unassigned": 271
+            "unassigned": 276
           }
         },
         {
@@ -1042,6 +1047,10 @@
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode on pages builds without query flags [51:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > executes the same 1.0 corpus with mca-prng-v1 and canonical output [23:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [109:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [63:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [80:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -1180,16 +1189,16 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 670
+            "vitest": 674
           },
           "natures": {
             "component": 330,
             "integration": 2,
-            "unit": 338
+            "unit": 342
           },
           "criticalities": {
             "critical": 110,
-            "unassigned": 560
+            "unassigned": 564
           }
         },
         {
@@ -1292,7 +1301,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1233,
+      "logicalCases": 1246,
       "nodes": [
         {
           "id": "preflight",
@@ -1775,6 +1784,15 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_fatal_engine_errors_and_cli_statuses",
+            "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
+            "pytest:tests/test_statistical_corpus_runner.py::test_exact_comparator_preserves_absence_order_types_lengths_and_values",
+            "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_distinguishes_normative_engine_and_execution_divergences",
+            "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_executes_all_cases_with_exact_canonical_results",
+            "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_reports_case_errors_without_stopping_following_cases",
+            "pytest:tests/test_statistical_corpus_runner.py::test_report_rendering_is_deterministic_readable_and_writable",
+            "pytest:tests/test_statistical_corpus_runner.py::test_typescript_bridge_parses_report_and_classifies_failures",
+            "pytest:tests/test_statistical_corpus_runner.py::test_validation_rejects_invalid_schema_and_corpus_before_engines",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
@@ -1929,18 +1947,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 531
+            "pytest": 540
           },
           "natures": {
-            "component": 69,
+            "component": 70,
             "contract": 44,
-            "integration": 199,
-            "unit": 219
+            "integration": 203,
+            "unit": 223
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 427
+            "unassigned": 436
           }
         },
         {
@@ -2498,6 +2516,10 @@
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode on pages builds without query flags [51:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > executes the same 1.0 corpus with mca-prng-v1 and canonical output [23:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [109:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [63:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [80:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -2636,16 +2658,16 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 670
+            "vitest": 674
           },
           "natures": {
             "component": 330,
             "integration": 2,
-            "unit": 338
+            "unit": 342
           },
           "criticalities": {
             "critical": 110,
-            "unassigned": 560
+            "unassigned": 564
           }
         },
         {
@@ -2789,7 +2811,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1234,
+      "logicalCases": 1247,
       "nodes": [
         {
           "id": "preflight",
@@ -3272,6 +3294,15 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_fatal_engine_errors_and_cli_statuses",
+            "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
+            "pytest:tests/test_statistical_corpus_runner.py::test_exact_comparator_preserves_absence_order_types_lengths_and_values",
+            "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_distinguishes_normative_engine_and_execution_divergences",
+            "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_executes_all_cases_with_exact_canonical_results",
+            "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_reports_case_errors_without_stopping_following_cases",
+            "pytest:tests/test_statistical_corpus_runner.py::test_report_rendering_is_deterministic_readable_and_writable",
+            "pytest:tests/test_statistical_corpus_runner.py::test_typescript_bridge_parses_report_and_classifies_failures",
+            "pytest:tests/test_statistical_corpus_runner.py::test_validation_rejects_invalid_schema_and_corpus_before_engines",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
@@ -3427,18 +3458,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 532
+            "pytest": 541
           },
           "natures": {
-            "component": 69,
+            "component": 70,
             "contract": 44,
-            "integration": 199,
-            "unit": 220
+            "integration": 203,
+            "unit": 224
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 428
+            "unassigned": 437
           }
         },
         {
@@ -3996,6 +4027,10 @@
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode on pages builds without query flags [51:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > executes the same 1.0 corpus with mca-prng-v1 and canonical output [23:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [109:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [63:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [80:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -4134,16 +4169,16 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 670
+            "vitest": 674
           },
           "natures": {
             "component": 330,
             "integration": 2,
-            "unit": 338
+            "unit": 342
           },
           "criticalities": {
             "critical": 110,
-            "unassigned": 560
+            "unassigned": 564
           }
         },
         {
@@ -4287,7 +4322,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1235,
+      "logicalCases": 1248,
       "nodes": [
         {
           "id": "preflight",
@@ -4771,6 +4806,15 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_fatal_engine_errors_and_cli_statuses",
+            "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
+            "pytest:tests/test_statistical_corpus_runner.py::test_exact_comparator_preserves_absence_order_types_lengths_and_values",
+            "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_distinguishes_normative_engine_and_execution_divergences",
+            "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_executes_all_cases_with_exact_canonical_results",
+            "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_reports_case_errors_without_stopping_following_cases",
+            "pytest:tests/test_statistical_corpus_runner.py::test_report_rendering_is_deterministic_readable_and_writable",
+            "pytest:tests/test_statistical_corpus_runner.py::test_typescript_bridge_parses_report_and_classifies_failures",
+            "pytest:tests/test_statistical_corpus_runner.py::test_validation_rejects_invalid_schema_and_corpus_before_engines",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
@@ -4926,18 +4970,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 533
+            "pytest": 542
           },
           "natures": {
-            "component": 69,
+            "component": 70,
             "contract": 44,
-            "integration": 200,
-            "unit": 220
+            "integration": 204,
+            "unit": 224
           },
           "criticalities": {
             "critical": 84,
             "high": 20,
-            "unassigned": 429
+            "unassigned": 438
           }
         },
         {
@@ -5495,6 +5539,10 @@
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode on pages builds without query flags [51:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > executes the same 1.0 corpus with mca-prng-v1 and canonical output [23:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [109:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [63:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [80:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -5633,16 +5681,16 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 670
+            "vitest": 674
           },
           "natures": {
             "component": 330,
             "integration": 2,
-            "unit": 338
+            "unit": 342
           },
           "criticalities": {
             "critical": 110,
-            "unassigned": 560
+            "unassigned": 564
           }
         },
         {

@@ -670,13 +670,13 @@ def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope
             "censure partielle avec 748 fins et 252 censures",
             "aucun moteur Python ou TypeScript n’a servi d’oracle",
             "anciens centres `50/9951` et `51/10050`",
-            "Les PBI 2.10 et 2.11 ne créent aucun runner moteur",
+            "Le PBI 2.12 exécute désormais ces quinze cas",
         ],
         "ARCHITECTURE.md": [
             "statistical-reference-corpus-v1.0.json",
             "24 probes négatives",
             "sa complétude 2.10/2.11",
-            "Le PBI 2.11 ne modifie donc aucun moteur ni aucune formule",
+            "Le PBI 2.12 ne modifie aucun moteur ni aucune formule",
         ],
         "CHANGELOG.md": [
             "Risk Score, fiabilité et histogrammes de référence — PBI 2.11",
@@ -691,13 +691,12 @@ def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope
         ],
         "docs/standards/STD-STAT-001.md": [
             "Le PBI 2.10 instancie cette frontière",
-            "constituent donc pas encore une preuve de parité interlangage",
             "Le PBI 2.11 ajoute dix cas discriminants",
-            "aucun runner moteur du PBI 2.12",
+            "Le PBI 2.12 exécute les quinze références",
         ],
         "docs/risk-control-matrix.md": [
-            "Les cas 2.10 et 2.11 existent sans runner moteur",
-            "24 probes autonomes des entrées 2.10",
+            "Treize cas concordent",
+            "refus du corpus avant toute exécution moteur",
         ],
     }
     for relative_path, expected_fragments in documentation_expectations.items():

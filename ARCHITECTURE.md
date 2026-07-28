@@ -353,8 +353,8 @@ La composition appartient aux frontières d’exécution :
 
 Les moteurs ne connaissent toujours que `SampleIndexDrawPort` et ne créent aucun PRNG. Le contrat commun,
 l’ordre logique et les tests de lots prouvent la stabilité de l’affectation des tirages. Les PBI 2.10 et
-2.11 matérialisent désormais les cas normatifs jusqu’aux scores, labels et buckets ; leur exécution commune
-et l’égalité complète des résultats relèvent encore des PBI 2.12 à 2.17.
+2.11 matérialisent les cas normatifs jusqu’aux scores, labels et buckets. Le PBI 2.12 les exécute désormais
+dans les deux moteurs ; l’égalité complète des résultats relève encore des PBI 2.13 à 2.17.
 
 ### Contrat du corpus statistique
 
@@ -382,9 +382,22 @@ structurels, sa complétude 2.10/2.11, les formules et gardes du score, les mét
 les représentants de buckets, l’unicité des scénarios, 24 probes négatives et les exemples positif et
 négatif sans importer les moteurs.
 
+`Scripts/statistical_corpus_runner.py` adapte le corpus au service Python et lance le pont Node
+`frontend/scripts/run-statistical-reference-corpus.mjs`. Celui-ci valide d’abord le même fichier avec le
+validateur d’autorité, puis charge `frontend/src/statisticalCorpusRunner.ts`, qui compose le moteur local
+et son adaptateur `mca-prng-v1`. Les deux runners sérialisent le résultat métier dans les noms snake_case
+du contrat, sans recalcul statistique, tolérance, tri ou valeur par défaut.
+
+`Scripts/statistical_parity_report.py` compare récursivement champs, types structurels, longueurs, ordre et
+valeurs. Le rapport sépare la conformité de chaque moteur à `expected_result` de leur égalité mutuelle ;
+les absences de champ restent distinctes de `null` ou de zéro. Le coordinateur
+`Scripts/run_statistical_reference_corpus.py` refuse tout corpus invalide avant d’appeler un moteur,
+isole les erreurs par cas et publie les rapports JSON et Markdown déterministes sous `reports/`.
+L’enforcement reste `informational` et n’appartient pas au DAG `main` avant le PBI 2.19.
+
 Cette frontière ne constitue pas une nouvelle API applicative : aucun mapper, DTO, document MongoDB ou
-objet `localStorage` ne la consomme. Le PBI 2.11 ne modifie donc aucun moteur ni aucune formule ; les runners
-moteur et la gate de parité restent respectivement réservés aux PBI 2.12 et 2.19.
+objet `localStorage` ne la consomme. Le PBI 2.12 ne modifie aucun moteur ni aucune formule ; il expose les
+divergences existantes, dont les deux géométries d’histogrammes agrégés réservées au PBI 2.16.
 
 Le PBI 2.7 a conservé les résultats frontend seed-à-seed en reprenant son algorithme bitwise historique,
 mais le PBI 2.8 change volontairement l’affectation locale des tirages `backlog_to_weeks` après une fin

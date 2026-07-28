@@ -7569,6 +7569,139 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_fatal_engine_errors_and_cli_statuses",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_corpus_runner.py",
+    "selector": "test_control_reports_fatal_engine_errors_and_cli_statuses",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_corpus_runner.py",
+    "selector": "test_control_script_entrypoint",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_corpus_runner.py::test_exact_comparator_preserves_absence_order_types_lengths_and_values",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_corpus_runner.py",
+    "selector": "test_exact_comparator_preserves_absence_order_types_lengths_and_values",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_distinguishes_normative_engine_and_execution_divergences",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_corpus_runner.py",
+    "selector": "test_parity_report_distinguishes_normative_engine_and_execution_divergences",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_executes_all_cases_with_exact_canonical_results",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_corpus_runner.py",
+    "selector": "test_python_runner_executes_all_cases_with_exact_canonical_results",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_reports_case_errors_without_stopping_following_cases",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_corpus_runner.py",
+    "selector": "test_python_runner_reports_case_errors_without_stopping_following_cases",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_corpus_runner.py::test_report_rendering_is_deterministic_readable_and_writable",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_corpus_runner.py",
+    "selector": "test_report_rendering_is_deterministic_readable_and_writable",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting",
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_corpus_runner.py::test_typescript_bridge_parses_report_and_classifies_failures",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_corpus_runner.py",
+    "selector": "test_typescript_bridge_parses_report_and_classifies_failures",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_corpus_runner.py::test_validation_rejects_invalid_schema_and_corpus_before_engines",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_corpus_runner.py",
+    "selector": "test_validation_rejects_invalid_schema_and_corpus_before_engines",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
     "framework": "pytest",
     "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
@@ -19909,6 +20042,63 @@
     "nature": "unit",
     "purposes": [
       "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > executes the same 1.0 corpus with mca-prng-v1 and canonical output [23:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
+    "selector": "shared statistical corpus TypeScript runner > executes the same 1.0 corpus with mca-prng-v1 and canonical output [23:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [109:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
+    "selector": "shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [109:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [63:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
+    "selector": "shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [63:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [80:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
+    "selector": "shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [80:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "resilience",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
     ]
   },
   {
