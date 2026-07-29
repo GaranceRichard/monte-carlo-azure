@@ -379,8 +379,9 @@ interdit leur paramètre inactif et décrit types, bornes, cardinalités et cham
 arithmétiques interchamps que le standard JSON Schema ne sait pas exprimer sont conservés dans l’annotation
 normative `$comment` et détaillés dans
 [`docs/statistical-reference-corpus.md`](docs/statistical-reference-corpus.md), sans `$data` ni dépendance à
-un langage. `Scripts/validate_statistical_reference_corpus.py`, appuyé par le module court
-`Scripts/statistical_reference_corpus_invariants.py`, contrôle le métaschème, le corpus, ses invariants
+un langage. `Scripts/validate_statistical_reference_corpus.py` s’appuie sur
+`Scripts/statistical_reference_corpus_validation.py`, qui compose les invariants partagés et les modules de
+périmètre 2.14/2.15, pour contrôler le métaschème, le corpus candidat, ses invariants
 structurels, la complétude des familles de preuve, les formules et gardes du score, les métriques et labels
 normalisés,
 les représentants de buckets, l’unicité des scénarios, 24 probes négatives et les exemples positif et

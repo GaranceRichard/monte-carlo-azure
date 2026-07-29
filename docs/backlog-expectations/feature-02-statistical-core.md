@@ -242,6 +242,12 @@ Implémentation retenue :
 - le corpus conserve les preuves à six observations et ajoute `reliability-seven-observations-degraded`,
   dérivé indépendamment de `STD-STAT-001` et `mca-prng-v1`; les deux runners concordent exactement sur les
   métriques, le label, les percentiles et les comptes `275/441/284` ;
+- le validateur commun applique les invariants 2.10 à 2.15 au corpus candidat avant les deux runners ; les
+  statistiques brutes à six et sept observations et tous les seuils sont vérifiés depuis des résultats
+  littéraux dérivés du standard, sans prendre un moteur comme oracle ;
+- les tests métier de la frontière HTTP refusent un Risk Score négatif et ceux de la commande résolue
+  couvrent sa fermeture et sa construction commune ; les anciennes lignes rouges correspondantes ne
+  subsistent plus dans le rapport de couverture ;
 - les seize cas donnent quatorze conformités. Les deux seules divergences restent les histogrammes agrégés
   du PBI 2.16 ; le rejeu exact du PBI 2.17 et l’enforcement informatif avant 2.19 sont inchangés.
 

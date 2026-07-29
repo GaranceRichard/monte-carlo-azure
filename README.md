@@ -86,6 +86,9 @@ une connexion Azure DevOps réelle.
   autre sens.
 - **Diagnostics séparés.** Le `Risk Score` exprime une dispersion entre percentiles. Il n’est ni une mesure
   de qualité des données, ni une recommandation automatique.
+- **Fiabilité explicable.** La dispersion, les quartiles et la tendance du throughput suivent les mêmes
+  formules dans les deux moteurs ; les seuils utilisent les métriques arrondies avant d’attribuer les labels
+  `non fiable`, `fragile`, `incertain` ou `fiable`.
 - **Rejeu explicite.** Une seed résolue accompagne l’exécution et peut être réutilisée. La portée exacte de
   cette reproductibilité dépend de la version du moteur et du contrat aléatoire.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au

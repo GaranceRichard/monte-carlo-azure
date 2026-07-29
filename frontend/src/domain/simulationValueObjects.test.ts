@@ -316,7 +316,6 @@ describe("percentiles", () => {
     expect(roundHalfUp(0.00005)).toBe(0.0001);
     expect(roundHalfUp(-0.00005)).toBe(-0.0001);
   });
-
   it("rounds exact decimal midpoints without binary floating-point drift", () => {
     expect(roundHalfUp(1.005, 2)).toBe(1.01);
     expect(roundHalfUp(-1.005, 2)).toBe(-1.01);
@@ -328,7 +327,6 @@ describe("percentiles", () => {
     expect(() => roundHalfUp(1, -1)).toThrow("decimalPlaces");
   });
 });
-
 describe("throughput reliability", () => {
   it.each([
     [{ cv: 1.49994, iqrRatio: 0, slopeNorm: 0, samplesCount: 8, mean: 1 }, "fragile"],
@@ -347,7 +345,6 @@ describe("throughput reliability", () => {
     expect(reliability.label).toBe(expected);
     expect(Object.isFrozen(reliability)).toBe(true);
   });
-
   it.each([
     { cv: Number.NaN },
     { iqrRatio: Number.POSITIVE_INFINITY },

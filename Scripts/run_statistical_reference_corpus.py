@@ -28,13 +28,14 @@ from Scripts.statistical_parity_report import (  # noqa: E402
     invalid_corpus_report,
     write_reports,
 )
+from Scripts.statistical_reference_corpus_validation import (  # noqa: E402
+    validate_reference_corpus,
+)
 from Scripts.validate_statistical_reference_corpus import (  # noqa: E402
     CORPUS_PATH,
     SCHEMA_PATH,
     load_json,
     validate_contract,
-    validate_pbi_210_scope,
-    validate_pbi_211_scope,
 )
 
 DEFAULT_JSON_REPORT = ROOT / "reports/statistical-parity-report.json"
@@ -70,9 +71,7 @@ def validate_for_execution(
     if not isinstance(corpus, dict):
         return None, "corpus_invalid", [f"{corpus_path.as_posix()}:/: corpus must be a JSON object"]
 
-    issues = validate_contract(corpus, schema)
-    issues.extend(validate_pbi_210_scope(corpus))
-    issues.extend(validate_pbi_211_scope(corpus))
+    issues = validate_reference_corpus(corpus, schema, validate_contract)
     diagnostics = [issue.render(corpus_path) for issue in issues]
     if diagnostics:
         return None, "corpus_invalid", sorted(set(diagnostics))

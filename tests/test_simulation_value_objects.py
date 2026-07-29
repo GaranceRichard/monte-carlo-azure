@@ -438,6 +438,18 @@ def test_round_half_up_distinguishes_midpoints_and_adjacent_values(
             {"cv": 0, "iqr_ratio": 0, "slope_norm": 0.04995, "samples_count": 8, "mean": 1},
             "incertain",
         ),
+        (
+            {"cv": 1, "iqr_ratio": 1, "slope_norm": -0.15, "samples_count": 8, "mean": 1},
+            "non fiable",
+        ),
+        (
+            {"cv": 1, "iqr_ratio": 0.5, "slope_norm": 0.05, "samples_count": 6, "mean": 1},
+            "fragile",
+        ),
+        (
+            {"cv": 0.5, "iqr_ratio": 0.5, "slope_norm": 0.05, "samples_count": 8, "mean": 1},
+            "incertain",
+        ),
         ({"cv": 0, "iqr_ratio": 0, "slope_norm": 0, "samples_count": 7, "mean": 1}, "incertain"),
         ({"cv": 0, "iqr_ratio": 0, "slope_norm": 0, "samples_count": 8, "mean": 1}, "fiable"),
         ({"cv": 0, "iqr_ratio": 0, "slope_norm": 0, "samples_count": 8, "mean": 0}, "non fiable"),

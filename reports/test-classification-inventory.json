@@ -7894,6 +7894,19 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_statistical_corpus_runner.py::test_execution_rejects_incomplete_pbi_215_scope_before_engines",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_corpus_runner.py",
+    "selector": "test_execution_rejects_incomplete_pbi_215_scope_before_engines",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_distinguishes_normative_engine_and_execution_divergences",
     "framework": "pytest",
     "sourcePath": "tests/test_statistical_corpus_runner.py",
@@ -8133,6 +8146,20 @@
     "nature": "integration",
     "purposes": [
       "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_reliability_derivation_proves_six_and_seven_observations",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_independent_reliability_derivation_proves_six_and_seven_observations",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "accessibility",
+      "data_quality"
     ]
   },
   {
@@ -17177,10 +17204,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [452:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [449:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
-    "selector": "completion summary > rounds half up and rejects inconsistent counts, rates and horizon [452:3]",
+    "selector": "completion summary > rounds half up and rejects inconsistent counts, rates and horizon [449:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -17192,10 +17219,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [437:4]",
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [434:4]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
-    "selector": "completion summary > supports complete, partial and fully censored counts [437:4]",
+    "selector": "completion summary > supports complete, partial and fully censored counts [434:4]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -17208,10 +17235,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [502:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [499:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
-    "selector": "domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [502:3]",
+    "selector": "domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [499:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -17224,10 +17251,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [396:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [393:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
-    "selector": "histograms > accepts exact and aggregated histograms while freezing every bucket [396:3]",
+    "selector": "histograms > accepts exact and aggregated histograms while freezing every bucket [393:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -17239,10 +17266,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [418:13]",
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [415:13]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
-    "selector": "histograms > rejects invalid buckets, order and mass [418:13]",
+    "selector": "histograms > rejects invalid buckets, order and mass [415:13]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -17254,10 +17281,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [422:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [419:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
-    "selector": "histograms > rejects more than one hundred buckets [422:3]",
+    "selector": "histograms > rejects more than one hundred buckets [419:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -17314,10 +17341,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [320:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [319:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
-    "selector": "percentiles > rounds exact decimal midpoints without binary floating-point drift [320:3]",
+    "selector": "percentiles > rounds exact decimal midpoints without binary floating-point drift [319:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -17389,10 +17416,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [373:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [370:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
-    "selector": "throughput reliability > accepts only the closed serialized label set [373:3]",
+    "selector": "throughput reliability > accepts only the closed serialized label set [370:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -17406,10 +17433,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [345:13]",
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [343:13]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
-    "selector": "throughput reliability > normalizes before applying category priority [345:13]",
+    "selector": "throughput reliability > normalizes before applying category priority [343:13]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -17423,10 +17450,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [360:4]",
+    "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [357:4]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
-    "selector": "throughput reliability > rejects invalid metrics [360:4]",
+    "selector": "throughput reliability > rejects invalid metrics [357:4]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -17509,10 +17536,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > rejects invalid sample histories at the calculation boundary [33:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > applies the normative category priority to overlapping thresholds [117:13]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/throughputReliability.test.ts",
-    "selector": "throughput reliability calculation > rejects invalid sample histories at the calculation boundary [33:3]",
+    "selector": "throughput reliability calculation > applies the normative category priority to overlapping thresholds [117:13]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -17525,10 +17552,26 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [26:13]",
+    "logicalCaseId": "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > rejects invalid sample histories at the calculation boundary [104:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/throughputReliability.test.ts",
-    "selector": "throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [26:13]",
+    "selector": "throughput reliability calculation > rejects invalid sample histories at the calculation boundary [104:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [97:13]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/throughputReliability.test.ts",
+    "selector": "throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [97:13]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",

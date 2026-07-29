@@ -24,14 +24,11 @@ from Scripts.statistical_reference_corpus_invariants import (  # noqa: E402, I00
     apply_probe as _apply_probe,
     cases_by_id as _cases_by_id,
     validate_case_semantics as _validate_case_semantics,
-    validate_pbi_210_scope,
-    validate_pbi_211_scope,
 )
-from Scripts.statistical_reference_corpus_pbi_214 import (  # noqa: E402, I001
+from Scripts.statistical_reference_corpus_pbi_214 import (  # noqa: E402
     PBI_214_CASE_IDS as _PBI_214_CASE_IDS,
-    validate_pbi_214_scope,
 )
-from Scripts.statistical_reference_corpus_pbi_215 import validate_pbi_215_scope  # noqa: E402
+from Scripts.statistical_reference_corpus_validation import validate_reference_corpus  # noqa: E402
 
 PBI_210_CASE_IDS = _PBI_210_CASE_IDS
 PBI_211_CASE_IDS = _PBI_211_CASE_IDS
@@ -396,13 +393,15 @@ def run_control(instance_paths: list[Path] | None = None) -> list[str]:
         return [f"{CORPUS_PATH.as_posix()}:/: corpus must be a JSON object"]
 
     errors: list[str] = []
-    for path in instance_paths or [CORPUS_PATH, VALID_EXAMPLE_PATH]:
-        errors.extend(issue.render(path) for issue in validate_contract(load_json(path), schema))
-
-    errors.extend(issue.render(CORPUS_PATH) for issue in validate_pbi_210_scope(corpus))
-    errors.extend(issue.render(CORPUS_PATH) for issue in validate_pbi_211_scope(corpus))
-    errors.extend(issue.render(CORPUS_PATH) for issue in validate_pbi_214_scope(corpus))
-    errors.extend(issue.render(CORPUS_PATH) for issue in validate_pbi_215_scope(corpus))
+    for path in instance_paths or [CORPUS_PATH]:
+        candidate = corpus if path == CORPUS_PATH else load_json(path)
+        issues = validate_reference_corpus(candidate, schema, validate_contract)
+        errors.extend(issue.render(path) for issue in issues)
+    if not instance_paths:
+        errors.extend(
+            issue.render(VALID_EXAMPLE_PATH)
+            for issue in validate_contract(load_json(VALID_EXAMPLE_PATH), schema)
+        )
     errors.extend(
         f"{CORPUS_PATH.as_posix()}:/cases: [inputRejectionProbe] {error}"
         for error in validate_input_rejection_probes(corpus, schema)

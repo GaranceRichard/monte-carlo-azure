@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1069,
+      "logicalCases": 1071,
       "nodes": [
         {
           "id": "preflight",
@@ -422,6 +422,7 @@
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_normalized_scenarios",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_reliability_derivation_proves_six_and_seven_observations",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
@@ -500,18 +501,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 385
+            "pytest": 386
           },
           "natures": {
             "component": 71,
             "contract": 46,
             "integration": 29,
-            "unit": 239
+            "unit": 240
           },
           "criticalities": {
             "critical": 73,
             "high": 16,
-            "unassigned": 296
+            "unassigned": 297
           }
         },
         {
@@ -876,29 +877,30 @@
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects out-of-bounds and non-integer values [47:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects unsafe JavaScript integers at unbounded integer boundaries [73:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > requires runtime factories for opaque value-object types [62:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [452:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [437:4]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [502:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [396:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [418:13]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [422:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [449:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [434:4]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [499:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [393:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [415:13]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [419:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > derives a half-up risk score only when P50 and P90 are usable [296:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > keeps the public key set closed, preserves absences and enforces mode order [272:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rejects invalid keys, values and order [292:13]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [320:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [319:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > consumes the closed fully resolved corpus 1.0 input shape [204:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > rejects invalid modes and missing active parameters [174:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > rejects open, unresolved or invalid normalized inputs [266:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > requires only the active mode parameter [142:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [373:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [345:13]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [360:4]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [370:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [343:13]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [357:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > enforces raw and usable limits [109:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > rejects invalid values without filtering them [105:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > requires a strict boolean zero-week flag [128:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > validates raw values before zero processing and freezes both collections [86:3]",
-            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > rejects invalid sample histories at the calculation boundary [33:3]",
-            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [26:13]",
+            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > applies the normative category priority to overlapping thresholds [117:13]",
+            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > rejects invalid sample histories at the calculation boundary [104:3]",
+            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [97:13]",
             "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > renders children inside SimulationProvider [31:3]",
             "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > returns provider value when used inside SimulationProvider [13:3]",
             "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > throws when hook is used outside provider [7:3]",
@@ -1221,15 +1223,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 684
+            "vitest": 685
           },
           "natures": {
             "component": 331,
-            "unit": 353
+            "unit": 354
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 576
+            "unassigned": 577
           }
         },
         {
@@ -1332,7 +1334,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1282,
+      "logicalCases": 1285,
       "nodes": [
         {
           "id": "preflight",
@@ -1836,6 +1838,7 @@
             "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_invalid_validation_probe_document",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
             "pytest:tests/test_statistical_corpus_runner.py::test_exact_comparator_preserves_absence_order_types_lengths_and_values",
+            "pytest:tests/test_statistical_corpus_runner.py::test_execution_rejects_incomplete_pbi_215_scope_before_engines",
             "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_distinguishes_normative_engine_and_execution_divergences",
             "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_includes_validation_alignment_without_blocking_it",
             "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_executes_all_cases_with_exact_canonical_results",
@@ -1853,6 +1856,7 @@
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_reliability_derivation_proves_six_and_seven_observations",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
@@ -2004,18 +2008,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 566
+            "pytest": 568
           },
           "natures": {
             "component": 71,
             "contract": 46,
-            "integration": 210,
-            "unit": 239
+            "integration": 211,
+            "unit": 240
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 460
+            "unassigned": 462
           }
         },
         {
@@ -2380,29 +2384,30 @@
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects out-of-bounds and non-integer values [47:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects unsafe JavaScript integers at unbounded integer boundaries [73:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > requires runtime factories for opaque value-object types [62:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [452:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [437:4]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [502:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [396:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [418:13]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [422:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [449:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [434:4]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [499:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [393:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [415:13]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [419:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > derives a half-up risk score only when P50 and P90 are usable [296:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > keeps the public key set closed, preserves absences and enforces mode order [272:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rejects invalid keys, values and order [292:13]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [320:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [319:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > consumes the closed fully resolved corpus 1.0 input shape [204:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > rejects invalid modes and missing active parameters [174:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > rejects open, unresolved or invalid normalized inputs [266:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > requires only the active mode parameter [142:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [373:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [345:13]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [360:4]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [370:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [343:13]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [357:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > enforces raw and usable limits [109:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > rejects invalid values without filtering them [105:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > requires a strict boolean zero-week flag [128:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > validates raw values before zero processing and freezes both collections [86:3]",
-            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > rejects invalid sample histories at the calculation boundary [33:3]",
-            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [26:13]",
+            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > applies the normative category priority to overlapping thresholds [117:13]",
+            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > rejects invalid sample histories at the calculation boundary [104:3]",
+            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [97:13]",
             "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > renders children inside SimulationProvider [31:3]",
             "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > returns provider value when used inside SimulationProvider [13:3]",
             "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > throws when hook is used outside provider [7:3]",
@@ -2725,15 +2730,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 684
+            "vitest": 685
           },
           "natures": {
             "component": 331,
-            "unit": 353
+            "unit": 354
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 576
+            "unassigned": 577
           }
         },
         {
@@ -2877,7 +2882,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1283,
+      "logicalCases": 1286,
       "nodes": [
         {
           "id": "preflight",
@@ -3381,6 +3386,7 @@
             "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_invalid_validation_probe_document",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
             "pytest:tests/test_statistical_corpus_runner.py::test_exact_comparator_preserves_absence_order_types_lengths_and_values",
+            "pytest:tests/test_statistical_corpus_runner.py::test_execution_rejects_incomplete_pbi_215_scope_before_engines",
             "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_distinguishes_normative_engine_and_execution_divergences",
             "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_includes_validation_alignment_without_blocking_it",
             "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_executes_all_cases_with_exact_canonical_results",
@@ -3398,6 +3404,7 @@
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_reliability_derivation_proves_six_and_seven_observations",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
@@ -3550,18 +3557,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 567
+            "pytest": 569
           },
           "natures": {
             "component": 71,
             "contract": 46,
-            "integration": 210,
-            "unit": 240
+            "integration": 211,
+            "unit": 241
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 461
+            "unassigned": 463
           }
         },
         {
@@ -3926,29 +3933,30 @@
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects out-of-bounds and non-integer values [47:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects unsafe JavaScript integers at unbounded integer boundaries [73:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > requires runtime factories for opaque value-object types [62:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [452:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [437:4]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [502:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [396:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [418:13]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [422:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [449:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [434:4]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [499:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [393:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [415:13]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [419:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > derives a half-up risk score only when P50 and P90 are usable [296:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > keeps the public key set closed, preserves absences and enforces mode order [272:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rejects invalid keys, values and order [292:13]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [320:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [319:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > consumes the closed fully resolved corpus 1.0 input shape [204:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > rejects invalid modes and missing active parameters [174:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > rejects open, unresolved or invalid normalized inputs [266:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > requires only the active mode parameter [142:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [373:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [345:13]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [360:4]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [370:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [343:13]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [357:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > enforces raw and usable limits [109:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > rejects invalid values without filtering them [105:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > requires a strict boolean zero-week flag [128:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > validates raw values before zero processing and freezes both collections [86:3]",
-            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > rejects invalid sample histories at the calculation boundary [33:3]",
-            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [26:13]",
+            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > applies the normative category priority to overlapping thresholds [117:13]",
+            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > rejects invalid sample histories at the calculation boundary [104:3]",
+            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [97:13]",
             "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > renders children inside SimulationProvider [31:3]",
             "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > returns provider value when used inside SimulationProvider [13:3]",
             "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > throws when hook is used outside provider [7:3]",
@@ -4271,15 +4279,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 684
+            "vitest": 685
           },
           "natures": {
             "component": 331,
-            "unit": 353
+            "unit": 354
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 576
+            "unassigned": 577
           }
         },
         {
@@ -4423,7 +4431,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1284,
+      "logicalCases": 1287,
       "nodes": [
         {
           "id": "preflight",
@@ -4928,6 +4936,7 @@
             "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_invalid_validation_probe_document",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
             "pytest:tests/test_statistical_corpus_runner.py::test_exact_comparator_preserves_absence_order_types_lengths_and_values",
+            "pytest:tests/test_statistical_corpus_runner.py::test_execution_rejects_incomplete_pbi_215_scope_before_engines",
             "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_distinguishes_normative_engine_and_execution_divergences",
             "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_includes_validation_alignment_without_blocking_it",
             "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_executes_all_cases_with_exact_canonical_results",
@@ -4945,6 +4954,7 @@
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_reliability_derivation_proves_six_and_seven_observations",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_normative_result_invariants_reject_score_reliability_and_bucket_drift",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
@@ -5097,18 +5107,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 568
+            "pytest": 570
           },
           "natures": {
             "component": 71,
             "contract": 46,
-            "integration": 211,
-            "unit": 240
+            "integration": 212,
+            "unit": 241
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 462
+            "unassigned": 464
           }
         },
         {
@@ -5473,29 +5483,30 @@
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects out-of-bounds and non-integer values [47:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects unsafe JavaScript integers at unbounded integer boundaries [73:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > requires runtime factories for opaque value-object types [62:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [452:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [437:4]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [502:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [396:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [418:13]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [422:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [449:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [434:4]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [499:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [393:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [415:13]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [419:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > derives a half-up risk score only when P50 and P90 are usable [296:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > keeps the public key set closed, preserves absences and enforces mode order [272:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rejects invalid keys, values and order [292:13]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [320:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [319:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > consumes the closed fully resolved corpus 1.0 input shape [204:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > rejects invalid modes and missing active parameters [174:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > rejects open, unresolved or invalid normalized inputs [266:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > requires only the active mode parameter [142:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [373:3]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [345:13]",
-            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [360:4]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [370:3]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [343:13]",
+            "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [357:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > enforces raw and usable limits [109:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > rejects invalid values without filtering them [105:4]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > requires a strict boolean zero-week flag [128:3]",
             "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > validates raw values before zero processing and freezes both collections [86:3]",
-            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > rejects invalid sample histories at the calculation boundary [33:3]",
-            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [26:13]",
+            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > applies the normative category priority to overlapping thresholds [117:13]",
+            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > rejects invalid sample histories at the calculation boundary [104:3]",
+            "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [97:13]",
             "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > renders children inside SimulationProvider [31:3]",
             "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > returns provider value when used inside SimulationProvider [13:3]",
             "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > throws when hook is used outside provider [7:3]",
@@ -5818,15 +5829,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 684
+            "vitest": 685
           },
           "natures": {
             "component": 331,
-            "unit": 353
+            "unit": 354
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 576
+            "unassigned": 577
           }
         },
         {

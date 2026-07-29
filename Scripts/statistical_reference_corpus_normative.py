@@ -2,10 +2,24 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from typing import Any
 
 from Scripts.statistical_reference_corpus_models import ValidationIssue, semantic_issue
+
+
+@dataclass(frozen=True, slots=True)
+class ReliabilityStatistics:
+    mean: Decimal
+    population_variance: Decimal
+    q25: Decimal
+    median: Decimal
+    q75: Decimal
+    slope: Decimal
+    cv: Decimal
+    iqr_ratio: Decimal
+    slope_norm: Decimal
 
 
 def round_half_up(value: Decimal) -> Decimal:
@@ -22,34 +36,44 @@ def _linear_quantile(sorted_values: list[Decimal], level: Decimal) -> Decimal:
     )
 
 
-def _normalized_reliability_metrics(
-    samples: list[int],
-) -> tuple[Decimal, Decimal, Decimal, Decimal]:
-    values = [Decimal(sample) for sample in samples]
-    count = len(values)
-    mean = sum(values) / Decimal(count)
-    variance = sum((value - mean) ** 2 for value in values) / Decimal(count)
-    cv = variance.sqrt() / mean if mean > 0 else Decimal(0)
+def reliability_statistics(samples: list[int]) -> ReliabilityStatistics:
+    """Derive statistics from a corpus-valid history containing at least two samples."""
 
-    sorted_values = sorted(values)
-    q25 = _linear_quantile(sorted_values, Decimal("0.25"))
-    median = _linear_quantile(sorted_values, Decimal("0.5"))
-    q75 = _linear_quantile(sorted_values, Decimal("0.75"))
-    iqr_ratio = (q75 - q25) / median if median > 0 else Decimal(0)
+    with localcontext() as context:
+        context.prec = 50
+        values = [Decimal(sample) for sample in samples]
+        count = len(values)
+        mean = sum(values) / Decimal(count)
+        population_variance = (
+            sum((value - mean) ** 2 for value in values) / Decimal(count)
+        )
+        cv = population_variance.sqrt() / mean if mean > 0 else Decimal(0)
 
-    mean_x = Decimal(count - 1) / Decimal(2)
-    denominator = sum((Decimal(index) - mean_x) ** 2 for index in range(count))
-    numerator = sum(
-        (Decimal(index) - mean_x) * (value - mean)
-        for index, value in enumerate(values)
-    )
-    slope_norm = numerator / denominator / mean if mean > 0 else Decimal(0)
-    return (
-        mean,
-        round_half_up(cv),
-        round_half_up(iqr_ratio),
-        round_half_up(slope_norm),
-    )
+        sorted_values = sorted(values)
+        q25 = _linear_quantile(sorted_values, Decimal("0.25"))
+        median = _linear_quantile(sorted_values, Decimal("0.5"))
+        q75 = _linear_quantile(sorted_values, Decimal("0.75"))
+        iqr_ratio = (q75 - q25) / median if median > 0 else Decimal(0)
+
+        mean_x = Decimal(count - 1) / Decimal(2)
+        denominator = sum((Decimal(index) - mean_x) ** 2 for index in range(count))
+        numerator = sum(
+            (Decimal(index) - mean_x) * (value - mean)
+            for index, value in enumerate(values)
+        )
+        slope = numerator / denominator
+        slope_norm = slope / mean if mean > 0 else Decimal(0)
+        return ReliabilityStatistics(
+            mean=mean,
+            population_variance=population_variance,
+            q25=q25,
+            median=median,
+            q75=q75,
+            slope=slope,
+            cv=cv,
+            iqr_ratio=iqr_ratio,
+            slope_norm=slope_norm,
+        )
 
 
 def _reliability_label(
@@ -85,14 +109,21 @@ def _reliability_label(
 
 
 def expected_reliability(samples: list[int]) -> dict[str, Decimal | str | int]:
-    with localcontext() as context:
-        context.prec = 50
-        mean, cv, iqr_ratio, slope_norm = _normalized_reliability_metrics(samples)
+    statistics = reliability_statistics(samples)
+    cv = round_half_up(statistics.cv)
+    iqr_ratio = round_half_up(statistics.iqr_ratio)
+    slope_norm = round_half_up(statistics.slope_norm)
     return {
         "cv": cv,
         "iqr_ratio": iqr_ratio,
         "slope_norm": slope_norm,
-        "label": _reliability_label(len(samples), mean, cv, iqr_ratio, slope_norm),
+        "label": _reliability_label(
+            len(samples),
+            statistics.mean,
+            cv,
+            iqr_ratio,
+            slope_norm,
+        ),
         "samples_count": len(samples),
     }
 

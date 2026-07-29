@@ -231,6 +231,13 @@ quatre labels :
 l’historique constant de six valeurs est dégradé en `incertain`, tandis que la censure partielle conserve
 un résultat `fiable`.
 
+La preuve `items-zero-weeks-excluded` isole aussi les conventions sur six observations avec `1..6`.
+La moyenne vaut `7/2`, la variance de population `35/12`, et les positions `1,25/2,5/3,75` donnent
+`Q25 = 9/4`, médiane `7/2` et `Q75 = 19/4`. Avec `x = 0..5`, la pente des moindres carrés vaut `1`.
+On obtient donc `cv = 0.4880`, `iqr_ratio = 5/7 = 0.7143` et
+`slope_norm = 2/7 = 0.2857`; le label `fragile` reste prioritaire sur la dégradation réservée à un
+résultat autrement `fiable`.
+
 Le cas complémentaire `reliability-seven-observations-degraded` utilise les samples
 `9,9,10,10,10,11,11`, la moyenne vaut `10` et la variance de population vaut `4/7`; le CV est donc
 `sqrt(4/7) / 10 = 0.075592...`, normalisé à `0.0756`. Les positions de quartile `1.5/3/4.5` donnent
@@ -309,9 +316,12 @@ Le contrôle ne charge ni moteur, ni DTO, ni API :
 .venv\Scripts\python.exe Scripts/validate_statistical_reference_corpus.py
 ```
 
-Le point d’entrée délègue les invariants interchamps et de périmètre à
-`Scripts/statistical_reference_corpus_invariants.py` afin de conserver des contrôles courts et auditables ;
-ce module ne dépend lui non plus d’aucun moteur.
+Le point d’entrée délègue la composition complète à
+`Scripts/statistical_reference_corpus_validation.py`, qui appelle les modules
+`Scripts/statistical_reference_corpus_invariants.py`,
+`Scripts/statistical_reference_corpus_pbi_214.py` et
+`Scripts/statistical_reference_corpus_pbi_215.py` afin de conserver des contrôles courts et auditables ;
+aucun de ces modules ne dépend d’un moteur.
 
 Il valide le métaschème et le corpus, vérifie la complétude des familles de preuve, exécute les
 24 probes d’entrées, contrôle les invariants interchamps structurels, la formule et les gardes du Risk Score,
@@ -339,7 +349,8 @@ La commande commune est :
 Le flux est ordonné et fermé :
 
 1. `Scripts/run_statistical_reference_corpus.py` charge et vérifie le JSON Schema draft 2020-12 ;
-2. il valide le corpus, ses invariants interchamps et les familles de preuve figées ;
+2. il valide le corpus candidat, ses invariants interchamps et toutes les familles de preuve figées, y
+   compris les seuils et les cas à six et sept observations, avant toute exécution moteur ;
 3. seulement si cette étape est verte, `Scripts/statistical_corpus_runner.py` construit chaque
    `SimulationCommand` Python avec la seed du cas et appelle `backend.simulation_service.run_simulation` ;
 4. le pont Node valide à nouveau le même fichier avant de charger

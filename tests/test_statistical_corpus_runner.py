@@ -444,6 +444,48 @@ def test_validation_rejects_invalid_schema_and_corpus_before_engines(
     assert executed == []
 
 
+def test_execution_rejects_incomplete_pbi_215_scope_before_engines(
+    tmp_path: Path,
+) -> None:
+    schema_path = tmp_path / "schema.json"
+    corpus_path = tmp_path / "corpus.json"
+    schema_path.write_text(
+        corpus_validation.SCHEMA_PATH.read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    corpus = _corpus()
+    corpus["cases"] = [
+        case
+        for case in corpus["cases"]
+        if case["id"] != "reliability-seven-observations-degraded"
+    ]
+    corpus_path.write_text(json.dumps(corpus), encoding="utf-8")
+
+    validated, invalidity, diagnostics = corpus_control.validate_for_execution(
+        schema_path,
+        corpus_path,
+    )
+    assert validated is None
+    assert invalidity == "corpus_invalid"
+    assert any(
+        "missing required PBI 2.15 case: reliability-seven-observations-degraded"
+        in diagnostic
+        for diagnostic in diagnostics
+    )
+
+    executed: list[str] = []
+    report = corpus_control.run_control(
+        schema_path=schema_path,
+        corpus_path=corpus_path,
+        json_report_path=tmp_path / "invalid.json",
+        markdown_report_path=tmp_path / "invalid.md",
+        python_runner=lambda _corpus: executed.append("python") or {},
+        typescript_runner=lambda _path: executed.append("typescript") or {},
+    )
+    assert report["status"] == "invalid_corpus"
+    assert executed == []
+
+
 def test_control_reports_invalid_validation_probe_document(tmp_path: Path) -> None:
     invalid_probes = tmp_path / "validation-probes.json"
     invalid_probes.write_text("[]", encoding="utf-8")
