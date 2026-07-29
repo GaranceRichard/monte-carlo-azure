@@ -369,6 +369,20 @@ def test_risk_score_uses_round_half_up_and_requires_positive_p50():
         ).risk_score
         is None
     )
+    assert (
+        SimulationPercentiles.create(
+            "backlog_to_weeks",
+            {"P50": 32, "P90": 33},
+        ).risk_score
+        == 0.0313
+    )
+    assert (
+        SimulationPercentiles.create(
+            "weeks_to_items",
+            {"P50": 32, "P90": 31},
+        ).risk_score
+        == 0.0313
+    )
     assert round_half_up(0.00005) == 0.0001
     assert round_half_up(-0.00005) == -0.0001
 

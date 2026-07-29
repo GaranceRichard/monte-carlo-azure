@@ -28,7 +28,7 @@ const API_RESPONSE_WEEKS = {
   result_kind: "weeks" as const,
   samples_count: 6,
   seed: 111,
-  result_percentiles: { P50: 8, P70: 10, P90: 13 },
+  result_percentiles: { P50: 8, P70: 10, P90: 13 }, risk_score: 0.625,
   completion_summary: { completed_count: 20000, censored_count: 0, censored_rate: 0, horizon_weeks: 521 },
   throughput_reliability: { cv: 0.22, iqr_ratio: 0.3, slope_norm: -0.02, label: "fiable" as const, samples_count: 6 },
   result_distribution: [
@@ -43,7 +43,7 @@ const API_RESPONSE_ITEMS = {
   result_kind: "items" as const,
   samples_count: 6,
   seed: 222,
-  result_percentiles: { P50: 40, P70: 35, P90: 30 },
+  result_percentiles: { P50: 40, P70: 35, P90: 30 }, risk_score: 0.25,
   throughput_reliability: { cv: 0.65, iqr_ratio: 0.7, slope_norm: -0.08, label: "incertain" as const, samples_count: 6 },
   result_distribution: [
     { x: 25, count: 5000 },
@@ -159,23 +159,21 @@ describe("demo mode et normalisation", () => {
     expect(vi.mocked(postSimulate)).not.toHaveBeenCalled();
   });
 
-  it("ne reconstruit pas risk_score si le backend l'omet", async () => {
-    vi.mocked(postSimulate).mockResolvedValue(API_RESPONSE_WEEKS);
+  it("rejette une reponse calculable dont le backend omet risk_score", async () => {
+    const { risk_score: _riskScore, ...responseWithoutRiskScore } = API_RESPONSE_WEEKS;
+    vi.mocked(postSimulate).mockResolvedValue(responseWithoutRiskScore);
 
-    const result = await simulateForecastFromSamples(SAMPLE_PARAMS);
-
-    expect(result).not.toHaveProperty("riskScore");
+    await expect(simulateForecastFromSamples(SAMPLE_PARAMS)).rejects.toThrow("risk_score calculable est requis");
   });
 
   it("laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent", async () => {
+    const { risk_score: _riskScore, ...responseWithoutRiskScore } = API_RESPONSE_WEEKS;
     vi.mocked(postSimulate).mockResolvedValue({
-      ...API_RESPONSE_WEEKS,
+      ...responseWithoutRiskScore,
       result_percentiles: { P70: 10 },
     } as never);
 
-    const result = await simulateForecastFromSamples(SAMPLE_PARAMS);
-
-    expect(result.riskScore).toBeUndefined();
+    expect((await simulateForecastFromSamples(SAMPLE_PARAMS)).riskScore).toBeUndefined();
   });
 
   it("resout les memes valeurs par defaut que la frontiere Python", async () => {

@@ -356,7 +356,8 @@ Les moteurs ne connaissent toujours que `SampleIndexDrawPort` et ne créent aucu
 l’ordre logique et les tests de lots prouvent la stabilité de l’affectation des tirages. Les PBI 2.10 et
 2.11 matérialisent les cas normatifs jusqu’aux scores, labels et buckets. Le PBI 2.12 les exécute désormais
 dans les deux moteurs. Le PBI 2.13 aligne leur validation normalisée et leur forme de résultat ; les
-formules statistiques et l’égalité complète des résultats relèvent encore des PBI 2.14 à 2.17.
+formules de censure, de percentiles et de Risk Score sont alignées par le PBI 2.14. La fiabilité,
+les histogrammes et l’égalité complète des résultats relèvent encore des PBI 2.15 à 2.17.
 
 ### Contrat du corpus statistique
 
@@ -380,7 +381,7 @@ normative `$comment` et détaillés dans
 [`docs/statistical-reference-corpus.md`](docs/statistical-reference-corpus.md), sans `$data` ni dépendance à
 un langage. `Scripts/validate_statistical_reference_corpus.py`, appuyé par le module court
 `Scripts/statistical_reference_corpus_invariants.py`, contrôle le métaschème, le corpus, ses invariants
-structurels, sa complétude 2.10/2.11, les formules et gardes du score, les métriques et labels normalisés,
+structurels, sa complétude 2.10/2.11/2.14, les formules et gardes du score, les métriques et labels normalisés,
 les représentants de buckets, l’unicité des scénarios, 24 probes négatives et les exemples positif et
 négatif sans importer les moteurs.
 
@@ -407,8 +408,23 @@ et décomposés avant écriture.
 
 Le PBI 2.12 ne modifie aucun moteur ni aucune formule ; cette limite historique reste la base du rapport
 informatif. Le PBI 2.13 ne modifie à son tour aucune formule de censure, percentile, Risk Score, fiabilité
-ou histogramme. Les deux géométries d’histogrammes agrégés restent donc explicitement divergentes et
-réservées au PBI 2.16.
+ou histogramme.
+
+Le PBI 2.14 supprime ensuite toute durée sentinelle pour les censures dans les deux moteurs : le résultat
+interne `backlog_to_weeks` conserve uniquement les semaines terminées, la population totale et l’horizon.
+Les rangs P50/P70/P90 sont calculés dans `n_sims` et omis lorsqu’ils ne sont pas atteignables ; le mode
+`weeks_to_items` applique les quantiles de survie discrets sur la population complète. Les percentiles
+absents traversent les hooks, historiques et rapports sans reconstruction depuis l’histogramme.
+
+`SimulationPercentiles` porte l’unique autorité de calcul du Risk Score dans chaque langage, avec arithmétique
+rationnelle et arrondi `round half up` à quatre décimales. La réponse HTTP exige cette valeur lorsqu’elle
+est calculable et la refuse autrement. MongoDB et l’historique HTTP peuvent désormais porter la primitive
+optionnelle `risk_score`; une ligne legacy sans ce champ reste valide et son absence est préservée. Les
+consommateurs UI, portefeuille et PDF utilisent exclusivement la valeur reçue.
+
+Les métriques et labels de fiabilité ne sont pas modifiés. Les deux géométries d’histogrammes agrégés
+restent explicitement divergentes et réservées au PBI 2.16 ; le rapport de parité reste informatif jusqu’au
+PBI 2.19.
 
 Le PBI 2.7 a conservé les résultats frontend seed-à-seed en reprenant son algorithme bitwise historique,
 mais le PBI 2.8 change volontairement l’affectation locale des tirages `backlog_to_weeks` après une fin

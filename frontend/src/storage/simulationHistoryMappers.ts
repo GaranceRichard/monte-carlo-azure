@@ -7,6 +7,7 @@ import {
   createSimulationPercentiles,
   createSimulationSeed,
   createThroughputReliability,
+  riskScoreFromPercentiles,
 } from "../domain/simulationValueObjects";
 import type {
   SimulationHistoryEntryDto,
@@ -76,6 +77,24 @@ function normalizeCycleTimeDaysData(value: unknown, schemaVersion?: unknown) {
     .filter((point) => point.week);
 }
 
+function storedRiskScore(
+  result: Partial<StoredSimulationResultDto>,
+  mode: "backlog_to_weeks" | "weeks_to_items",
+  percentiles: ReturnType<typeof createSimulationPercentiles>,
+): number | undefined {
+  if (!Object.prototype.hasOwnProperty.call(result, "risk_score")) return undefined;
+  const score = result.risk_score;
+  if (
+    typeof score !== "number"
+    || !Number.isFinite(score)
+    || score < 0
+    || score !== riskScoreFromPercentiles(mode, percentiles)
+  ) {
+    throw new Error("risk_score persiste doit conserver la valeur d'autorite.");
+  }
+  return score;
+}
+
 function storedResultToModel(
   value: unknown,
   nSimsValue: ReturnType<typeof createSimulationCount>,
@@ -99,15 +118,17 @@ function storedResultToModel(
     : [];
   const expectedMass = completionSummary?.completedCount
     ?? nSimsValue;
+  const resultPercentiles = createSimulationPercentiles(
+    mode,
+    result.result_percentiles ?? {},
+  );
+  const riskScore = storedRiskScore(result, mode, resultPercentiles);
   return Object.freeze({
     resultKind,
     samplesCount: toFiniteNumber(result.samples_count),
     seed: createSimulationSeed(result.seed),
-    resultPercentiles: createSimulationPercentiles(
-      mode,
-      result.result_percentiles ?? {},
-    ),
-    ...(typeof result.risk_score === "number" ? { riskScore: result.risk_score } : {}),
+    resultPercentiles,
+    ...(riskScore === undefined ? {} : { riskScore }),
     resultDistribution: createHistogram(rawDistribution, expectedMass),
     ...(completionSummary === undefined ? {} : { completionSummary }),
     ...(result.throughput_reliability

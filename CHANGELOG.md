@@ -2,6 +2,24 @@
 
 ## Recent
 
+### Censures, percentiles et Risk Score — PBI 2.14
+
+- suppression des durées sentinelles de censure dans les deux moteurs : seules les simulations terminées
+  conservent une semaine, avec population totale et horizon explicites ; une fin exacte en semaine `521`
+  reste une fin
+- alignement de P50/P70/P90 sur les rangs `ceil(p × n_sims / 100)` en `backlog_to_weeks` et sur les
+  quantiles de survie discrets en `weeks_to_items`, sans percentile supplémentaire ni fallback implicite
+- autorité unique du Risk Score dans `SimulationPercentiles`, formule par mode et arrondi rationnel
+  `round half up` à quatre décimales identiques en Python et TypeScript
+- validation de la présence et de la valeur du score aux frontières ; API, MongoDB, historique, interface,
+  portefeuille et PDF propagent désormais l’autorité sans recalcul
+- suppression de la reconstruction des percentiles absents depuis l’histogramme, y compris pour les
+  historiques legacy ; une absence de percentile ou de score reste strictement absente
+- ajout du périmètre de preuve 2.14 au validateur du corpus et de tests discriminants dans les deux langages ;
+  le rapport reste à 13 cas conformes et deux divergences d’histogrammes connues
+- aucune modification des métriques ou labels de fiabilité du PBI 2.15, de la construction des histogrammes
+  du PBI 2.16 ni de l’enforcement informatif avant le PBI 2.19
+
 ### Validation normalisée et forme des résultats — PBI 2.13
 
 - alignement Python/TypeScript des types stricts, bornes, entiers, valeurs finies, négatifs, traitement des

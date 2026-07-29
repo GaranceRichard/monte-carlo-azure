@@ -736,7 +736,24 @@ persistance Mongo, rate-limit partagé, smoke et cleanup ont réussi.
 & .\.venv\Scripts\python.exe Scripts/quality_gate.py ci --profile main
 ```
 
-## 17. Conclusion
+## 17. Suivi du PBI 2.14
+
+Le PBI 2.14 traite les constats ST-24, ST-25 et ST-37 sans réécrire les observations historiques de cet
+audit :
+
+- les censures ne sont plus représentées par une durée `521` interne ; les rangs P50/P70/P90 sont évalués
+  dans la population totale et une fin exacte à l’horizon reste distincte ;
+- les quantiles de survie `weeks_to_items` et les rangs `backlog_to_weeks` suivent désormais exactement
+  `STD-STAT-001` dans les deux moteurs ;
+- `SimulationPercentiles` est l’autorité unique de formule et d’arrondi `round half up` à quatre décimales
+  du Risk Score ; API, historique, interface et rapports ne le recalculent plus ;
+- aucun percentile absent n’est reconstruit depuis un histogramme legacy.
+
+Le corpus partagé démontre ces invariants dans les deux langages. Les deux divergences restantes du rapport
+concernent uniquement les histogrammes agrégés réservés au PBI 2.16. Les métriques et labels de fiabilité
+restent réservés au PBI 2.15 et le contrôle demeure informatif jusqu’au PBI 2.19.
+
+## 18. Conclusion
 
 `CODE/EXP` : les deux moteurs partagent les règles déterministes essentielles, mais ne partagent ni PRNG ni
 contrat normatif complet. L'analyse multi-seeds ne démontre pas de biais interlangage sur le cas censuré;

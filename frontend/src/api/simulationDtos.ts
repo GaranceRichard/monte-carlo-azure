@@ -74,6 +74,7 @@ export type SimulationHistoryItemDto = {
   n_sims: number;
   samples_count: number;
   percentiles: SimulationPercentilesDto;
+  risk_score?: number;
   distribution: HistogramBucketDto[];
   completion_summary?: CompletionSummaryDto;
   include_zero_weeks?: boolean;

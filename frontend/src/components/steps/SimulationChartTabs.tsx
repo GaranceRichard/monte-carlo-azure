@@ -15,7 +15,7 @@ import {
 import { useState, type ReactNode } from "react";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "../ui/tabs";
 import { useSimulationContext } from "../../hooks/SimulationContext";
-import { computeRiskScoreFromPercentiles, computeThroughputReliability } from "../../utils/simulation";
+import { computeThroughputReliability } from "../../utils/simulation";
 import { buildSimulationDecisionLanguage } from "../../utils/simulationDecisionDiagnostic";
 import {
   chartLegendVisualByDataKey,
@@ -56,8 +56,7 @@ export function getCycleTimeYAxisMax(dataMax: number): number {
 }
 
 export default function SimulationChartTabs() {
-  const { selectedTeam, simulation } = useSimulationContext();
-  const s = simulation;
+  const { selectedTeam, simulation: s } = useSimulationContext();
   const [loadingReport, setLoadingReport] = useState(false);
 
   const throughputWithMovingAverage = useMemo(() => {
@@ -85,7 +84,7 @@ export default function SimulationChartTabs() {
     adoDataWarning: s.warning,
     percentiles: s.displayPercentiles,
     completionSummary: s.result?.completionSummary,
-    riskScore: computeRiskScoreFromPercentiles(s.simulationMode, s.displayPercentiles),
+    riskScore: s.result?.riskScore,
     throughputReliability: reliability,
     selectedOrg: s.selectedOrg,
     selectedProject: s.selectedProject,
@@ -245,6 +244,7 @@ export default function SimulationChartTabs() {
         nSims: s.nSims,
         resultKind: s.result.resultKind,
         displayPercentiles: s.displayPercentiles,
+        riskScore: s.result.riskScore,
         completionSummary: s.result.completionSummary,
         throughputReliability: reliability,
         cycleTimePoints: s.cycleTimeDaysData,

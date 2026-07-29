@@ -77,7 +77,7 @@ def run_simulation(command: SimulationCommand) -> SimulationResult:
         )
         distribution_values = engine_result.completed_weeks
         percentile_values = engine_result.completed_weeks
-        percentile_total_count = int(engine_result.weeks_needed.size)
+        percentile_total_count = engine_result.simulation_count
 
     result_percentiles = SimulationPercentiles.create(
         command.mode,

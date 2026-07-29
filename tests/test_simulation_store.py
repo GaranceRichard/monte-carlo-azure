@@ -355,6 +355,7 @@ def test_save_simulation_inserts_and_updates(monkeypatch):
     assert fake_coll.inserted[0]["mc_client_id"] == "c1"
     assert fake_coll.inserted[0]["seed"] == 98765
     assert fake_coll.inserted[0]["distribution"] == [{"x": 8, "count": 2000}]
+    assert fake_coll.inserted[0]["risk_score"] == 0.4
     assert fake_coll.inserted[0]["backlog_size"] == 20
     assert "target_weeks" not in fake_coll.inserted[0]
     assert "completion_summary" in fake_coll.inserted[0]
@@ -409,6 +410,7 @@ def test_save_items_omits_unavailable_mode_and_completion_fields(monkeypatch):
     assert document["target_weeks"] == 12
     assert "backlog_size" not in document
     assert "completion_summary" not in document
+    assert document["risk_score"] == 0.4444
 
 
 def test_list_recent_returns_empty_when_disabled_or_empty_client():

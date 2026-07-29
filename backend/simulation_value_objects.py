@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Literal, TypeAlias, overload
 
+from .risk_score import round_positive_ratio_half_up
 from .simulation_limits import (
     SIMULATION_BACKLOG_SIZE_MAX,
     SIMULATION_BACKLOG_SIZE_MIN,
@@ -25,7 +26,6 @@ ThroughputReliabilityLabel: TypeAlias = Literal["fiable", "incertain", "fragile"
 
 _PERCENTILE_KEYS: tuple[PercentileKey, ...] = ("P50", "P70", "P90")
 _RELIABILITY_LABELS: frozenset[str] = frozenset({"fiable", "incertain", "fragile", "non fiable"})
-_FOUR_DECIMALS = Decimal("0.0001")
 
 
 class StatisticalValueError(ValueError):
@@ -261,7 +261,7 @@ class SimulationPercentiles(Mapping[PercentileKey, int]):
         if p50 is None or p90 is None or p50 <= 0:
             return None
         numerator = p50 - p90 if self.mode == "weeks_to_items" else p90 - p50
-        return round_half_up(max(0.0, numerator / p50))
+        return round_positive_ratio_half_up(max(0, numerator), p50)
 
 
 def _categorize_reliability(

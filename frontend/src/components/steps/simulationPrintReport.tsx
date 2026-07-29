@@ -12,7 +12,6 @@ import {
 import { buildSimulationPdfFileName, downloadSimulationPdf } from "./simulationPdfDownload";
 import { buildProbabilityCurve } from "../../hooks/probability";
 import {
-  computeRiskScoreFromPercentiles,
   computeThroughputReliability,
   getProjectionReliabilityNotice,
 } from "../../utils/simulation";
@@ -74,6 +73,7 @@ export function buildSimulationPrintReportHtml({
   nSims,
   resultKind,
   displayPercentiles,
+  riskScore,
   completionSummary,
   throughputReliability,
   cycleTimePoints,
@@ -95,6 +95,7 @@ export function buildSimulationPrintReportHtml({
   nSims: number | string;
   resultKind: "items" | "weeks";
   displayPercentiles: SimulationPercentiles;
+  riskScore?: number;
   completionSummary?: CompletionSummary;
   throughputReliability?: ThroughputReliability;
   cycleTimePoints: CycleTimeExportPoint[];
@@ -115,7 +116,10 @@ export function buildSimulationPrintReportHtml({
   const stateSummary = doneStates.length ? doneStates.join(", ") : "Aucun";
   const modeZeroLabel = includeZeroWeeks ? "Semaines 0 incluses" : "Semaines 0 exclues";
   const resultLabel = resultKind === "items" ? "items" : "semaines (au plus)";
-  const effectiveRiskScore = computeRiskScoreFromPercentiles(simulationMode, displayPercentiles);
+  const effectiveRiskScore =
+    typeof riskScore === "number" && Number.isFinite(riskScore) && riskScore >= 0
+      ? riskScore
+      : null;
   const effectiveReliability =
     throughputReliability ??
     computeThroughputReliability(throughputPoints.map((point) => Number(point.throughput ?? 0))) ??

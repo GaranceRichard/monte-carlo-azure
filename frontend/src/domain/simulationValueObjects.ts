@@ -1,3 +1,5 @@
+import { roundPositiveRatioHalfUp } from "./riskScore";
+
 export const SIMULATION_N_SIMS_MIN = 1_000;
 export const SIMULATION_N_SIMS_MAX = 200_000;
 export const SIMULATION_TARGET_WEEKS_MIN = 1;
@@ -56,12 +58,7 @@ export type ThroughputReliability = Readonly<{
 }>;
 
 const PERCENTILE_KEYS: readonly PercentileKey[] = ["P50", "P70", "P90"];
-const RELIABILITY_LABELS: readonly ThroughputReliabilityLabel[] = [
-  "fiable",
-  "incertain",
-  "fragile",
-  "non fiable",
-];
+const RELIABILITY_LABELS: readonly ThroughputReliabilityLabel[] = ["fiable", "incertain", "fragile", "non fiable"];
 
 function strictInteger(
   value: unknown,
@@ -254,7 +251,7 @@ export function riskScoreFromPercentiles(
   const p90 = validated.P90;
   if (p50 === undefined || p90 === undefined || p50 <= 0) return undefined;
   const numerator = mode === "weeks_to_items" ? p50 - p90 : p90 - p50;
-  return roundHalfUp(Math.max(0, numerator / p50));
+  return roundPositiveRatioHalfUp(Math.max(0, numerator), p50);
 }
 
 function categorizeReliability(

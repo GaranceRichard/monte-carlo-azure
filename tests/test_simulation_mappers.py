@@ -183,3 +183,25 @@ def test_persistence_row_to_history_item_preserves_legacy_optional_fields():
     assert item.seed is None
     assert item.throughput_reliability is None
     assert item.model_dump()["distribution"] == [{"x": 8, "count": 120}]
+
+
+def test_persistence_history_preserves_absent_risk_and_rejects_stale_authority():
+    row = {
+        "created_at": "2026-02-26T10:00:00Z",
+        "last_seen": "2026-02-26T10:00:00Z",
+        "mode": "backlog_to_weeks",
+        "n_sims": 20000,
+        "samples_count": 24,
+        "percentiles": {"P50": 10, "P70": 12, "P90": 14},
+        "distribution": [{"x": 8, "count": 120}],
+    }
+
+    legacy = persistence_row_to_history_item(row)
+    assert legacy.risk_score is None
+    assert persistence_row_to_history_item({**row, "risk_score": 0.4}).risk_score == 0.4
+    with pytest.raises(ValidationError, match="valeur d'autorite"):
+        persistence_row_to_history_item({**row, "risk_score": 0.3999})
+    with pytest.raises(ValidationError, match="P50, P70 et P90"):
+        persistence_row_to_history_item(
+            {**row, "percentiles": {"P50": 10, "P80": 14}}
+        )

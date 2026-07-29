@@ -392,8 +392,8 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
         if command.mode == "backlog_to_weeks":
             return (
                 FinishWeeksSimulation(
-                    weeks_needed=known_backlog,
-                    completed_mask=np.ones(1000, dtype=bool),
+                    completed_weeks=known_backlog,
+                    simulation_count=1000,
                     horizon_weeks=521,
                 ),
                 "weeks",
@@ -421,8 +421,8 @@ def test_simulate_backlog_to_weeks_omits_unidentifiable_percentiles_and_risk_sco
     def fake_compute(_command, _samples, _draw_port):
         return (
             FinishWeeksSimulation(
-                weeks_needed=np.full(2000, 521, dtype=int),
-                completed_mask=np.zeros(2000, dtype=bool),
+                completed_weeks=np.array([], dtype=int),
+                simulation_count=2000,
                 horizon_weeks=521,
             ),
             "weeks",
@@ -460,8 +460,8 @@ def test_simulate_backlog_to_weeks_keeps_exact_finish_at_horizon_distinct_from_c
     def fake_compute(_command, _samples, _draw_port):
         return (
             FinishWeeksSimulation(
-                weeks_needed=np.full(2000, 521, dtype=int),
-                completed_mask=np.array([True] * 1000 + [False] * 1000),
+                completed_weeks=np.full(1000, 521, dtype=int),
+                simulation_count=2000,
                 horizon_weeks=521,
             ),
             "weeks",

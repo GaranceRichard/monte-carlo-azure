@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { SimulationPercentiles, SimulationResult } from "../domain/simulation";
 import type { CycleTimePoint, WeeklyThroughputRow } from "../types";
-import { buildAtLeastPercentiles, buildProbabilityCurve } from "./probability";
+import { buildProbabilityCurve } from "./probability";
 import type { ChartPoint, ProbabilityPoint, ThroughputPoint } from "./simulationTypes";
 import { buildCycleTimeTrendData, summarizeCycleTime } from "../utils/cycleTime";
 
@@ -21,13 +21,6 @@ function smoothHistogramCounts(points: Array<{ x: number; count: number }>): num
     }
     return weightTotal > 0 ? weightedSum / weightTotal : points[i].count;
   });
-}
-
-function isLegacyItemsPercentiles(percentiles: SimulationPercentiles): boolean {
-  const p50 = Number(percentiles.P50);
-  const p70 = Number(percentiles.P70);
-  const p90 = Number(percentiles.P90);
-  return Number.isFinite(p50) && Number.isFinite(p70) && Number.isFinite(p90) && p50 <= p70 && p70 <= p90;
 }
 
 export function useSimulationChartData({
@@ -87,17 +80,7 @@ export function useSimulationChartData({
   }, [result]);
 
   const displayPercentiles = useMemo((): SimulationPercentiles => {
-    if (!result) return {};
-    if (result.resultKind !== "items") return result.resultPercentiles;
-    if (!isLegacyItemsPercentiles(result.resultPercentiles)) return result.resultPercentiles;
-
-    const points = result.resultDistribution
-      .map((b) => ({ x: Number(b.x), count: Number(b.count) }))
-      .filter((b) => Number.isFinite(b.x) && Number.isFinite(b.count) && b.count > 0)
-      .sort((a, b) => a.x - b.x);
-    if (!points.length) return result.resultPercentiles;
-
-    return buildAtLeastPercentiles(points, [50, 70, 90]);
+    return result?.resultPercentiles ?? {};
   }, [result]);
 
   return {

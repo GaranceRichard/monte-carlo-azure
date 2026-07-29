@@ -38,7 +38,7 @@ Cette capacité de backtesting et de calibration est inscrite au backlog ; elle 
   [`docs/backlog-governance.md`](docs/backlog-governance.md)
 - attendus détaillés des Features, PBI et sujets conditionnels:
   [`docs/backlog-expectations/`](docs/backlog-expectations/README.md)
-- état courant : Feature 2 en cours, PBI 2.13 réalisé et PBI 2.14 non commencé comme prochain item
+- état courant : Feature 2 en cours, PBI 2.14 réalisé et PBI 2.15 non commencé comme prochain item
 - architecture, sécurité, API, CI: [`ARCHITECTURE.md`](ARCHITECTURE.md)
   - inclut la convention de nommage: identifiants de code en anglais, textes utilisateur en français
 - historique des évolutions: [`CHANGELOG.md`](CHANGELOG.md)
@@ -112,7 +112,9 @@ Cette capacité de backtesting et de calibration est inscrite au backlog ; elle 
 - affichage d'un `Risk Score` avec code couleur
   - `backlog_to_weeks`: `(P90 - P50) / P50`
   - `weeks_to_items`: `(P50 - P90) / P50`
-  - absent si `P50` ou `P90` n'est pas identifiable
+  - arrondi normatif `round half up` à quatre décimales par le Value Object de percentiles
+  - absent si `P50` ou `P90` n'est pas identifiable ou si `P50 <= 0`
+  - consommé tel quel par l’API, l’interface et les rapports, sans recalcul de présentation
 - trois dimensions métier distinctes et indépendantes:
   - `dataQuality` qualifie la profondeur historique, les données Azure DevOps partielles
     et les problèmes de complétude
@@ -207,11 +209,13 @@ La route `POST /simulate` isole aussi la persistance Mongo du calcul principal:
 la réponse utilisateur est retournée dès que la simulation est prête, puis l'écriture
 de l'historique part en arrière-plan. Si Mongo est indisponible, l'incident reste limité
 à l'historique et ne bloque plus le résultat de simulation.
-Pour `weeks_to_items`, le frontend consomme directement les `result_percentiles`
-renvoyés par l'API et ne recalcule depuis l'histogramme que pour d'anciens historiques
-détectés par un ordre legacy `P50 <= P70 <= P90`.
-Le `Risk Score`, lui, est maintenant calculé partout à partir des percentiles métier
-effectivement exposés par l'API et affichés à l'écran, y compris dans les exports PDF.
+Pour les deux modes, le frontend consomme directement les `result_percentiles` renvoyés par le moteur ou
+l’API. Un percentile absent reste absent, y compris dans un historique ancien : aucune reconstruction depuis
+l’histogramme n’est autorisée.
+Le `Risk Score` est calculé une seule fois par l’autorité de domaine à partir de ces percentiles, arrondi
+`round half up` à quatre décimales, puis propagé tel quel vers l’API, l’historique, l’interface et les exports
+PDF. Une réponse calculable qui omet ce score ou en fournit une autre valeur est rejetée ; une absence
+historique reste néanmoins lisible sans être comblée.
 L'interface de résultats affiche aussi un diagnostic décisionnel distinct du Risk Score :
 une synthèse de recommandation et un accès à son détail dans une modale.
 La modale organise cette lecture en deux colonnes décisionnelle et complémentaire sur écran large,
@@ -742,7 +746,8 @@ Le PBI 2.11 ajoute dix cas sans modifier les cinq précédents :
 Ces cas matérialisent les divergences ST-24/D-02, ST-25, ST-30/D-03 et ST-33 de l’audit, notamment les
 anciens centres `50/9951` et `51/10050`, sans aligner les moteurs.
 
-Le contrôle autonome valide le métaschème, le corpus, ses invariants interchamps et sa complétude 2.10/2.11.
+Le contrôle autonome valide le métaschème, le corpus, ses invariants interchamps et sa complétude
+2.10/2.11/2.14.
 Il recalcule indépendamment les gardes/formules du score, les métriques et labels normalisés, protège les
 résultats spécialisés et les représentants de buckets, et refuse les scénarios dupliqués. Il applique aussi
 24 probes minimaux prouvant le rejet des types et bornes invalides, des zéros laissant moins de six
@@ -793,9 +798,23 @@ métier ne les franchit.
 Le fichier partagé
 [`contracts/statistical-validation-probes-v1.0.json`](contracts/statistical-validation-probes-v1.0.json)
 porte 22 sondes positives et négatives, toutes concordantes entre Python et TypeScript dans le rapport de
-parité. Cet alignement ne modifie aucune formule de censure, percentile, Risk Score, fiabilité ou
-histogramme : les deux divergences d’histogrammes restent visibles et le contrôle reste informatif jusqu’au
-PBI 2.19.
+parité. Ces sondes de validation ne modifient aucune formule statistique.
+
+Le PBI 2.14 réutilise six cas normatifs discriminants du corpus et aligne les deux moteurs sur les censures,
+les rangs `ceil(p × n_sims / 100)` de `backlog_to_weeks`, les quantiles de survie discrets de
+`weeks_to_items` et P50/P70/P90 uniquement. Les non-terminaisons ne sont plus codées comme une durée
+`521` interne : seules les durées terminées sont conservées avec la taille totale de population. Une fin
+exacte en semaine `521` reste une fin.
+
+Le Value Object `SimulationPercentiles` est l’autorité unique du Risk Score dans les deux langages. Il
+applique la formule du mode et un arrondi rationnel `round half up` à quatre décimales ; les frontières
+vérifient cette valeur et les consommateurs la propagent sans recalcul. P90 censuré, P50 manquant ou
+`P50 <= 0` conservent l’absence du score. Aucun percentile absent n’est reconstruit depuis une distribution,
+même pour un historique ancien.
+
+Le rapport reste à 13 cas intégralement conformes et deux divergences limitées aux histogrammes agrégés,
+réservés au PBI 2.16. Les métriques et labels de fiabilité restent réservés au PBI 2.15 et le contrôle de
+parité demeure informatif jusqu’au PBI 2.19.
 
 Purge planifiée:
 

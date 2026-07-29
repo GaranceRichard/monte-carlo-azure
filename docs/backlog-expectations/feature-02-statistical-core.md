@@ -206,6 +206,23 @@ Implémentation retenue :
 - aligner le Risk Score et son arrondi d’autorité ;
 - préserver les percentiles absents sans reconstruction depuis l’histogramme.
 
+Implémentation retenue :
+
+- les deux moteurs conservent uniquement les durées terminées avec la population totale ; une fin exacte à
+  l’horizon `521` reste distincte d’une censure et aucune non-terminaison n’est encodée comme durée ;
+- `backlog_to_weeks` utilise les rangs `ceil(p × n_sims / 100)` et omet tout rang non atteignable ;
+  `weeks_to_items` utilise les quantiles de survie discrets pour P50, P70 et P90 uniquement ;
+- `SimulationPercentiles` est l’autorité unique de la formule et de l’arrondi rationnel `round half up` à
+  quatre décimales du Risk Score dans les deux langages ; API, historique, interface et rapports conservent
+  sa valeur sans recalcul ;
+- P50 ou P90 manquant, ainsi que `P50 <= 0`, produisent une absence stricte du score ; les historiques
+  legacy sans score restent lisibles sans reconstruction ;
+- les percentiles absents ne sont jamais reconstruits depuis l’histogramme, y compris dans les hooks de
+  présentation et les rapports ;
+- six cas existants du corpus forment le périmètre 2.14 et les deux runners les démontrent. Les métriques et
+  labels de fiabilité, les géométries d’histogrammes et l’enforcement de parité restent respectivement dans
+  les PBI 2.15, 2.16 et 2.19.
+
 ### Résultat attendu du PBI 2.15
 
 - aligner moyenne, variance de population, quartiles et pente ;

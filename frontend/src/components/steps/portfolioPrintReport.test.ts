@@ -1,5 +1,4 @@
 ﻿import { afterEach, describe, expect, it, vi } from "vitest";
-import { computeRiskScoreFromPercentiles } from "../../utils/simulation";
 
 const pdfModuleMocks = vi.hoisted(() => ({
   downloadPortfolioPdf: vi.fn(async () => undefined),
@@ -546,11 +545,12 @@ describe("portfolioPrintReport", () => {
     expect(html).not.toContain("Observed common slowdowns remained visible in the shared history.");
   });
 
-  it("uses business percentiles in weeks_to_items mode for scenario risk score", () => {
+  it("uses the authoritative weeks_to_items scenario risk score", () => {
     const args: ReturnType<typeof baseArgs> = baseArgs();
     args.sections[0] = { ...args.sections[0], simulationMode: "weeks_to_items", displayPercentiles: { P50: 24, P70: 22, P90: 18 } };
     args.scenarios[0] = {
       ...args.scenarios[0],
+      riskScore: 0.91,
       percentiles: { P50: 24, P70: 22, P90: 18 },
       distribution: [
         { x: 10, count: 10 },
@@ -560,14 +560,12 @@ describe("portfolioPrintReport", () => {
     };
 
     const html = buildPortfolioPrintReportHtml(args);
-    const expectedRisk = computeRiskScoreFromPercentiles("weeks_to_items", args.scenarios[0].percentiles);
-
     expect(html).toMatch(
       new RegExp(
         `Indépendant[\\s\\S]*?<td>${Number(args.scenarios[0].percentiles.P50 ?? 0).toFixed(0)}</td>\\s*<td>${Number(args.scenarios[0].percentiles.P70 ?? 0).toFixed(0)}</td>\\s*<td>${Number(args.scenarios[0].percentiles.P90 ?? 0).toFixed(0)}</td>`,
       ),
     );
-    expect(html).toContain(expectedRisk?.toFixed(2).replace(".", ",") ?? "");
+    expect(html).toContain("0,91");
   });
 
   it("documents the weeks_to_items risk formula in the synthesis", () => {
@@ -579,8 +577,9 @@ describe("portfolioPrintReport", () => {
     expect(html).toContain("(P50 - P90) / P50.");
   });
 
-  it("falls back to computed risk score when a team page has no finite risk score", () => {
+  it("does not reconstruct a team risk score from percentiles", () => {
     const args = baseArgs();
+    args.scenarios = [];
     args.sections[0] = {
       ...args.sections[0],
       riskScore: Number.NaN,
@@ -588,9 +587,7 @@ describe("portfolioPrintReport", () => {
     };
 
     const html = buildPortfolioPrintReportHtml(args);
-    const expectedRisk = computeRiskScoreFromPercentiles("backlog_to_weeks", args.sections[0].displayPercentiles);
-
-    expect(html).toContain(expectedRisk?.toFixed(2).replace(".", ",") ?? "");
+    expect(html).not.toContain('<span class="kpi-label">Risk Score</span>');
   });
 
   it("builds a minimal report when sections and scenarios are empty", () => {

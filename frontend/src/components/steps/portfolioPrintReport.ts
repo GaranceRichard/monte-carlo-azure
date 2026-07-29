@@ -4,7 +4,6 @@ import { buildProbabilityCurve } from "../../hooks/probability";
 import {
   computeFrictionRatePercent,
   computeRiskLegend,
-  computeRiskScoreFromPercentiles,
 } from "../../utils/simulation";
 import {
   renderDistributionChart,
@@ -112,27 +111,12 @@ function riskColor(label: string): string {
   }[label] ?? "#111827";
 }
 
-function formatRiskScore(
-  mode: "backlog_to_weeks" | "weeks_to_items",
-  percentiles: SimulationPercentiles,
-): { score: number; label: string; valueLabel: string } | null {
-  const score = computeRiskScoreFromPercentiles(mode, percentiles);
-  if (score == null) return null;
+function formatRiskScoreFromValue(score: number): { score: number; label: string; valueLabel: string } {
   const label = computeRiskLegend(score);
   return {
     score,
     label,
     valueLabel: score.toFixed(2).replace(".", ","),
-  };
-}
-
-function formatRiskScoreFromValue(score: number): { score: number; label: string; valueLabel: string } {
-  const safe = Number.isFinite(score) ? Math.max(0, score) : 0;
-  const label = computeRiskLegend(safe);
-  return {
-    score: safe,
-    label,
-    valueLabel: safe.toFixed(2).replace(".", ","),
   };
 }
 
@@ -206,18 +190,14 @@ function renderHypothesisBlock(block: HypothesisBlock): string {
 }
 
 function resolveRiskScore({
-  simulationMode,
-  displayPercentiles,
   riskScore,
 }: {
-  simulationMode: "backlog_to_weeks" | "weeks_to_items";
-  displayPercentiles: SimulationPercentiles;
   riskScore?: number;
 }): { score: number; label: string; valueLabel: string } | null {
-  if (typeof riskScore === "number" && Number.isFinite(riskScore)) {
+  if (typeof riskScore === "number" && Number.isFinite(riskScore) && riskScore >= 0) {
     return formatRiskScoreFromValue(riskScore);
   }
-  return formatRiskScore(simulationMode, displayPercentiles);
+  return null;
 }
 
 function buildTeamLikePageHtml({
@@ -312,8 +292,6 @@ function buildTeamLikePageHtml({
   const resultLabel = resultKind === "items" ? "items (au moins)" : "semaines (au plus)";
   const modeZeroLabel = includeZeroWeeks ? "Semaines 0 incluses" : "Semaines 0 exclues";
   const risk = resolveRiskScore({
-    simulationMode,
-    displayPercentiles: effectivePercentiles,
     riskScore,
   });
   const reliabilitySummary = showSourceDiagnostic ? buildReliabilitySummary(throughputReliability) : "";
@@ -420,13 +398,12 @@ function buildSummaryPage({
   const rows = orderedScenarios
     .map((scenario) => {
       const effectivePercentiles = scenario.percentiles;
-      const computedRisk = computeRiskScoreFromPercentiles(simulationMode, effectivePercentiles);
       const risk =
-        typeof scenario.riskScore === "number" && Number.isFinite(scenario.riskScore)
+        typeof scenario.riskScore === "number"
+        && Number.isFinite(scenario.riskScore)
+        && scenario.riskScore >= 0
           ? formatRiskScoreFromValue(scenario.riskScore)
-          : computedRisk == null
-            ? null
-            : formatRiskScoreFromValue(computedRisk);
+          : null;
       return `
         <tr>
           <td>${escapeHtml(formatScenarioDisplayLabel(scenario.label))}</td>

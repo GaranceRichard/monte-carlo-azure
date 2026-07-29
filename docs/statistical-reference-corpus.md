@@ -4,7 +4,9 @@ Le PBI 2.9 établit le format sérialisé commun. Le PBI 2.10 matérialise dans 
 d’entrées, de modes, de zéros, d’horizon, de censures et de percentiles. Le PBI 2.11 l’enrichit avec les
 cas du Risk Score, des seuils de fiabilité et des histogrammes exacts ou agrégés. Le PBI 2.12 exécute les
 quinze cas dans les moteurs Python et TypeScript et compare leurs sorties à cette référence et entre elles,
-sans corriger les divergences observées.
+sans corriger les divergences observées. Le PBI 2.13 aligne les frontières normalisées ; le PBI 2.14
+réutilise six cas discriminants pour aligner censures, percentiles et Risk Score sans changer le corpus
+versionné.
 
 ## Autorité et fichiers
 
@@ -298,7 +300,7 @@ Le point d’entrée délègue les invariants interchamps et de périmètre à
 `Scripts/statistical_reference_corpus_invariants.py` afin de conserver des contrôles courts et auditables ;
 ce module ne dépend lui non plus d’aucun moteur.
 
-Il valide le métaschème et le corpus, vérifie la complétude des périmètres 2.10 et 2.11, exécute les
+Il valide le métaschème et le corpus, vérifie la complétude des périmètres 2.10, 2.11 et 2.14, exécute les
 24 probes d’entrées, contrôle les invariants interchamps structurels, la formule et les gardes du Risk Score,
 les métriques et labels de fiabilité normalisés, les représentants de buckets à une semaine et l’identité
 des résultats spécialisés. Il accepte l’exemple positif et exige le rejet du contre-exemple. Ce rejet doit
@@ -391,8 +393,38 @@ une autre sentinelle. La complétion n’est autorisée que pour `backlog_to_wee
 
 Le rapport expose `validation_alignment`: les 22 sondes concordent entre Python et TypeScript, sans
 divergence ni erreur. Les quinze cas statistiques restent à 13 conformités et deux divergences
-d’histogrammes. Aucune formule réservée aux PBI 2.14 à 2.16 n’a été modifiée et `enforcement` demeure
+d’histogrammes. Ces sondes ne modifient aucune formule statistique et `enforcement` demeure
 `informational` jusqu’au PBI 2.19.
+
+## Alignement des censures, percentiles et Risk Score du PBI 2.14
+
+Le corpus `1.0` reste immuable : les six cas nécessaires existaient déjà et sont maintenant regroupés par
+`PBI_214_CASE_IDS`, avec un contrôle de périmètre dédié :
+
+- `items-zero-weeks-excluded` démontre les quantiles de survie P50/P70/P90 `3/2/1` et le score `0.6667` ;
+- `weeks-zero-weeks-included-no-censorship` démontre les rangs backlog `2/3/4` dans la population totale ;
+- `weeks-exact-horizon-completion` distingue trois percentiles `521` d’une censure ;
+- `weeks-partial-censorship` conserve seulement P50 `518` et P70 `521`, sans P90 ni score ;
+- `weeks-total-censorship` ne contient ni durée terminée, ni percentile, ni score ;
+- `risk-p50-zero-absent` conserve les trois percentiles nuls mais omet le score car `P50 <= 0`.
+
+Dans les deux moteurs, `backlog_to_weeks` ne matérialise plus les censures par une durée sentinelle.
+La structure interne conserve seulement les semaines des simulations terminées et la taille de population
+`n_sims`. Pour chaque `p` dans `50, 70, 90`, le rang est `ceil(p × n_sims / 100)` ; si le nombre de fins
+est inférieur à ce rang, le percentile est omis. `weeks_to_items` trie la population complète et lit
+l’indice `floor((100 - p) × (n_sims - 1) / 100)`.
+
+Les Value Objects `SimulationPercentiles` Python et TypeScript portent l’autorité unique du Risk Score.
+Ils appliquent la formule du mode avec des entiers, puis l’arrondi rationnel `round half up` à quatre
+décimales. Le backend produit cette valeur ; les mappers exigent son égalité exacte lorsqu’elle est
+calculable ; l’interface et les rapports la consomment sans recalcul. Les historiques existants peuvent
+omettre le champ, mais cette absence est conservée.
+
+Les hooks et mappers n’utilisent plus l’histogramme comme source secondaire de percentiles. Une distribution
+riche ne peut donc pas recréer P50, P70 ou P90 absent. Le rapport de parité confirme les six cas 2.14 dans
+les deux langages. Son état global reste `divergence` uniquement à cause des deux constructions
+d’histogrammes agrégés réservées au PBI 2.16 ; les métriques et labels de fiabilité restent réservés au PBI
+2.15 et l’enforcement reste informatif jusqu’au PBI 2.19.
 
 ## Évolution
 

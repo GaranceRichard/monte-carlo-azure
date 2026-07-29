@@ -254,13 +254,13 @@ describe("SimulationResultsPanel history list", () => {
 
     render(<SimulationResultsPanel />);
     expect(screen.getByText(/^Risque \/ Fiabilite$/i)).not.toBeNull();
-    expect(screen.getByText(/^0,42 \/ 0,42$/i)).not.toBeNull();
-    expect(screen.getByText(/^R : incertain$/i)).not.toBeNull();
+    expect(screen.getByText(/^0,01 \/ 0,42$/i)).not.toBeNull();
+    expect(screen.getByText(/^R : fiable$/i)).not.toBeNull();
     expect(screen.getByText(/^F : incertain$/i)).not.toBeNull();
     expect(screen.queryByRole("tooltip")).toBeNull();
   });
 
-  it("hides the risk indicator when display percentiles are incomplete", () => {
+  it("hides the risk indicator when the authoritative score is absent", () => {
     vi.mocked(useSimulationContext).mockReturnValue({
       selectedTeam: "Alpha-Team",
       simulation: {
@@ -269,7 +269,7 @@ describe("SimulationResultsPanel history list", () => {
         includeZeroWeeks: true,
         sampleStats: null,
         throughputData: [],
-        result: { resultKind: "weeks", seed: 4, riskScore: 0.42 },
+        result: { resultKind: "weeks", seed: 4 },
         displayPercentiles: { P70: 10 },
         simulationHistory: [],
         applyHistoryEntry: vi.fn(),
@@ -281,7 +281,7 @@ describe("SimulationResultsPanel history list", () => {
     expect(screen.queryByText(/^Risque \/ Fiabilite$/i)).toBeNull();
   });
 
-  it("recomputes a non-zero weeks_to_items risk score from display percentiles when API score is stale", () => {
+  it("uses the authoritative weeks_to_items risk score without recalculation", () => {
     vi.mocked(useSimulationContext).mockReturnValue({
       selectedTeam: "Alpha-Team",
       simulation: {
@@ -305,7 +305,7 @@ describe("SimulationResultsPanel history list", () => {
     } as never);
 
     render(<SimulationResultsPanel />);
-    expect(screen.getByText(/^0,25 \/ 0,42$/i)).not.toBeNull();
+    expect(screen.getByText(/^0,00 \/ 0,42$/i)).not.toBeNull();
   });
 
   it("falls back to computed risk score when percentiles are incomplete and API score is missing", () => {
@@ -357,8 +357,8 @@ describe("SimulationResultsPanel history list", () => {
 
     render(<SimulationResultsPanel />);
     expect(screen.getByText(/^Risque \/ Fiabilite$/i)).not.toBeNull();
-    expect(screen.getByText(/^0,40 \/ 0,06$/i)).not.toBeNull();
-    expect(screen.getByText(/^R : incertain$/i)).not.toBeNull();
+    expect(screen.getByText(/^0,20 \/ 0,06$/i)).not.toBeNull();
+    expect(screen.getByText(/^R : fiable$/i)).not.toBeNull();
     expect(screen.getByText(/^F : fiable$/i)).not.toBeNull();
   });
 

@@ -1,23 +1,27 @@
 import { describe, expect, it } from "vitest";
-import { createSimulationPercentiles } from "../domain/simulationValueObjects";
-import { computeRiskScoreFromPercentiles } from "./simulation";
+import {
+  createSimulationPercentiles,
+  riskScoreFromPercentiles,
+} from "../domain/simulationValueObjects";
 
 function score(
   mode: "backlog_to_weeks" | "weeks_to_items",
   values: Readonly<Record<string, unknown>>,
 ) {
-  return computeRiskScoreFromPercentiles(
+  return riskScoreFromPercentiles(
     mode,
     createSimulationPercentiles(mode, values),
   );
 }
 
-describe("computeRiskScoreFromPercentiles", () => {
+describe("riskScoreFromPercentiles authority", () => {
   it("computes both normalized spreads and preserves missing values", () => {
-    expect(score("backlog_to_weeks", { P90: 14 })).toBeNull();
-    expect(score("backlog_to_weeks", { P50: 0, P90: 14 })).toBeNull();
+    expect(score("backlog_to_weeks", { P90: 14 })).toBeUndefined();
+    expect(score("backlog_to_weeks", { P50: 0, P90: 14 })).toBeUndefined();
     expect(score("backlog_to_weeks", { P50: 10, P90: 14 })).toBe(0.4);
     expect(score("weeks_to_items", { P50: 24, P90: 18 })).toBe(0.25);
+    expect(score("backlog_to_weeks", { P50: 32, P90: 33 })).toBe(0.0313);
+    expect(score("weeks_to_items", { P50: 32, P90: 31 })).toBe(0.0313);
   });
 
   it.each([
@@ -27,14 +31,5 @@ describe("computeRiskScoreFromPercentiles", () => {
     ["weeks_to_items", { P50: 10, P90: Number.NaN }, "entier strict"],
   ] as const)("rejects invalid domain percentiles", (mode, values, message) => {
     expect(() => score(mode, values)).toThrow(message);
-  });
-
-  it("does not let invalid presentation data produce a risk score", () => {
-    expect(
-      computeRiskScoreFromPercentiles(
-        "backlog_to_weeks",
-        { P50: 10, P70: Number.NaN } as never,
-      ),
-    ).toBeNull();
   });
 });

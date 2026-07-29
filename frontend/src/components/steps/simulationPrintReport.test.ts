@@ -75,7 +75,7 @@ function buildBaseArgs() {
     targetWeeks: 12,
     nSims: 20000,
     resultKind: "weeks" as const,
-    displayPercentiles: { P50: 8, P70: 10, P90: 13 },
+    displayPercentiles: { P50: 8, P70: 10, P90: 13 }, riskScore: 0.625,
     throughputReliability: { cv: 0.62, iqrRatio: 0.55, slopeNorm: -0.07, label: "incertain" as const, samplesCount: 10 },
     cycleTimePoints: [
       { week: "2025-01-06", cycleTimeDays: 1.4, count: 2 },
@@ -252,7 +252,7 @@ describe("simulationPrintReport", () => {
   it("renders short-history diagnostics and percentile fallbacks", () => {
     const html = buildSimulationPrintReportHtml({
       ...buildBaseArgs(),
-      displayPercentiles: undefined as unknown as Record<string, number>,
+      displayPercentiles: undefined as unknown as Record<string, number>, riskScore: undefined,
       throughputReliability: {
         cv: 0.2,
         iqrRatio: 0.2,
@@ -291,7 +291,7 @@ describe("simulationPrintReport", () => {
       const html = buildSimulationPrintReportHtml({
         ...buildBaseArgs(),
         throughputReliability: variant.throughputReliability,
-        displayPercentiles: { P50: 10, P70: 12, P90: 16 },
+        displayPercentiles: { P50: 10, P70: 12, P90: 16 }, riskScore: 0.6,
       });
       expect(html).toContain(variant.expected);
       expect(html).toContain("0,60 (fragile)");
@@ -301,7 +301,7 @@ describe("simulationPrintReport", () => {
   it("renders the short-history warning and the uncertain risk band", () => {
     const html = buildSimulationPrintReportHtml({
       ...buildBaseArgs(),
-      displayPercentiles: { P50: 10, P70: 12, P90: 14 },
+      displayPercentiles: { P50: 10, P70: 12, P90: 14 }, riskScore: 0.4,
       throughputReliability: {
         cv: 0.2,
         iqrRatio: 0.2,
@@ -337,7 +337,7 @@ describe("simulationPrintReport", () => {
       simulationMode: "weeks_to_items",
       includeZeroWeeks: false,
       resultKind: "items",
-      displayPercentiles: { P50: 30, P70: 20, P90: 10 },
+      displayPercentiles: { P50: 30, P70: 20, P90: 10 }, riskScore: 0.6667,
     });
 
     expect(html).toContain("Semaines vers items - cible: 12 semaines");
@@ -350,7 +350,7 @@ describe("simulationPrintReport", () => {
     const html = buildSimulationPrintReportHtml({
       ...buildBaseArgs(),
       simulationMode: "backlog_to_weeks",
-      displayPercentiles: { P50: 10, P70: 20, P90: 30 },
+      displayPercentiles: { P50: 10, P70: 20, P90: 30 }, riskScore: 2,
     });
 
     expect(html).toContain("2,00 (eleve)");
@@ -359,7 +359,7 @@ describe("simulationPrintReport", () => {
   it("documents horizon and censures when backlog simulations are incomplete", () => {
     const html = buildSimulationPrintReportHtml({
       ...buildBaseArgs(),
-      displayPercentiles: { P50: 12 },
+      displayPercentiles: { P50: 12 }, riskScore: undefined,
       completionSummary: {
         completedCount: 4,
         censoredCount: 6,

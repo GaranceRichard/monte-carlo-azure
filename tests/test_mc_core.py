@@ -3,7 +3,6 @@ import pytest
 
 from backend.mc_core import (
     FinishWeeksSimulation,
-    _discrete_quantile,
     histogram_buckets,
     mc_finish_weeks,
     mc_items_done_for_weeks,
@@ -27,15 +26,31 @@ def _reliability(samples: np.ndarray) -> ThroughputReliability:
     return ThroughputReliability.create(**throughput_reliability_metrics(samples))
 
 
-def test_empty_finish_result_and_discrete_quantile_guardrails():
+def test_empty_finish_result_guardrails():
     result = FinishWeeksSimulation(
-        weeks_needed=np.array([], dtype=int),
-        completed_mask=np.array([], dtype=bool),
+        completed_weeks=np.array([], dtype=int),
+        simulation_count=0,
         horizon_weeks=10,
     )
     assert result.censored_rate == 0.0
-    with pytest.raises(ValueError, match="arr est vide"):
-        _discrete_quantile(np.array([], dtype=int), 0.5, method="higher")
+    with pytest.raises(ValueError, match="simulations terminees"):
+        FinishWeeksSimulation(
+            completed_weeks=np.array([1], dtype=int),
+            simulation_count=0,
+            horizon_weeks=10,
+        )
+    with pytest.raises(ValueError, match="unidimensionnel"):
+        FinishWeeksSimulation(
+            completed_weeks=np.array([[1]], dtype=int),
+            simulation_count=1,
+            horizon_weeks=10,
+        )
+    with pytest.raises(ValueError, match="horizon"):
+        FinishWeeksSimulation(
+            completed_weeks=np.array([0], dtype=int),
+            simulation_count=1,
+            horizon_weeks=10,
+        )
     with pytest.raises(ValueError, match="throughput_samples est vide"):
         throughput_reliability_metrics(np.array([], dtype=int))
 
@@ -53,10 +68,11 @@ def test_mc_finish_weeks_shape_and_bounds():
         draw_port=_prng_draw_port(123),
     )
 
-    assert out.weeks_needed.shape == (5000,)
-    assert np.issubdtype(out.weeks_needed.dtype, np.integer)
-    assert int(out.weeks_needed.min()) >= 1
-    assert int(out.weeks_needed.max()) <= SIMULATION_HORIZON_WEEKS_MAX
+    assert out.completed_weeks.shape == (5000,)
+    assert np.issubdtype(out.completed_weeks.dtype, np.integer)
+    assert int(out.completed_weeks.min()) >= 1
+    assert int(out.completed_weeks.max()) <= SIMULATION_HORIZON_WEEKS_MAX
+    assert out.simulation_count == 5000
     assert out.horizon_weeks == SIMULATION_HORIZON_WEEKS_MAX
 
 
@@ -75,8 +91,8 @@ def test_mc_finish_weeks_reproducible_for_seed():
         draw_port=_prng_draw_port(42),
     )
 
-    assert np.array_equal(a.weeks_needed, b.weeks_needed)
-    assert np.array_equal(a.completed_mask, b.completed_mask)
+    assert np.array_equal(a.completed_weeks, b.completed_weeks)
+    assert a.simulation_count == b.simulation_count
 
 
 def test_mc_finish_weeks_backlog_size_one():
@@ -87,9 +103,9 @@ def test_mc_finish_weeks_backlog_size_one():
         n_sims=200,
         draw_port=_prng_draw_port(1),
     )
-    assert out.weeks_needed.shape == (200,)
-    assert np.all(out.weeks_needed == 1)
-    assert np.all(out.completed_mask)
+    assert out.completed_weeks.shape == (200,)
+    assert np.all(out.completed_weeks == 1)
+    assert out.censored_count == 0
 
 
 def test_mc_finish_weeks_single_value_samples():
@@ -100,8 +116,8 @@ def test_mc_finish_weeks_single_value_samples():
         n_sims=100,
         draw_port=_prng_draw_port(1),
     )
-    assert np.all(out.weeks_needed == 6)
-    assert np.all(out.completed_mask)
+    assert np.all(out.completed_weeks == 6)
+    assert out.censored_count == 0
 
 
 def test_mc_finish_weeks_large_backlog_hits_cap():
@@ -112,8 +128,7 @@ def test_mc_finish_weeks_large_backlog_hits_cap():
         n_sims=50,
         draw_port=_prng_draw_port(1),
     )
-    assert np.all(out.weeks_needed == SIMULATION_HORIZON_WEEKS_MAX)
-    assert not np.any(out.completed_mask)
+    assert out.completed_weeks.size == 0
     assert out.completed_count == 0
     assert out.censored_count == 50
     assert out.censored_rate == 1.0
@@ -219,8 +234,9 @@ def test_mc_finish_weeks_consumes_imposed_indices_for_known_censored_result():
         batch_size=2,
     )
 
-    assert result.weeks_needed.tolist() == [2, SIMULATION_HORIZON_WEEKS_MAX]
-    assert result.completed_mask.tolist() == [True, False]
+    assert result.completed_weeks.tolist() == [2]
+    assert result.simulation_count == 2
+    assert result.censored_count == 1
     assert draw_port.requests == [
         (2, (2, SIMULATION_HORIZON_WEEKS_MAX)),
     ]
@@ -297,8 +313,8 @@ def test_numpy_adapter_preserves_captured_reference_outputs(batch_size):
         batch_size=batch_size,
     )
 
-    assert np.array_equal(finish.weeks_needed, repeated_finish.weeks_needed)
-    assert np.array_equal(finish.completed_mask, repeated_finish.completed_mask)
+    assert np.array_equal(finish.completed_weeks, repeated_finish.completed_weeks)
+    assert finish.simulation_count == repeated_finish.simulation_count
     assert np.array_equal(items, repeated_items)
 
 
@@ -345,8 +361,8 @@ def test_mc_finish_weeks_is_batch_independent_for_every_censoring_state(
     assert actual_censoring_state == censoring_state
     assert expected.completed_count == completed_count
     assert expected.censored_count == censored_count
-    assert np.array_equal(actual.weeks_needed, expected.weeks_needed)
-    assert np.array_equal(actual.completed_mask, expected.completed_mask)
+    assert np.array_equal(actual.completed_weeks, expected.completed_weeks)
+    assert actual.simulation_count == expected.simulation_count
 
 
 @pytest.mark.parametrize("batch_size", [3, 4])
@@ -385,8 +401,8 @@ def test_mc_finish_weeks_processes_incomplete_last_batch():
         (1, (4, SIMULATION_HORIZON_WEEKS_MAX)),
         (1, (2, SIMULATION_HORIZON_WEEKS_MAX)),
     ]
-    assert np.all(out.weeks_needed == 1)
-    assert np.all(out.completed_mask)
+    assert np.all(out.completed_weeks == 1)
+    assert out.censored_count == 0
 
 
 def test_mc_finish_weeks_keeps_batched_draw_shapes_at_max_contract():
@@ -453,8 +469,8 @@ def test_mc_finish_weeks_accepts_zero_only_samples_when_enabled():
         include_zero_weeks=True,
         draw_port=_prng_draw_port(1),
     )
-    assert np.all(out.weeks_needed == 521)
-    assert not np.any(out.completed_mask)
+    assert out.completed_weeks.size == 0
+    assert out.censored_count == 10
 
 
 def test_mc_finish_weeks_include_zero_rejects_all_negative_samples():
@@ -516,24 +532,39 @@ def test_histogram_buckets_aggregated_skips_zero_count_bins():
     assert sum(b["count"] for b in buckets) == len(data)
 
 
-def test_percentiles_default_and_custom():
+def test_percentiles_default_public_keys_and_small_population_ranks():
     arr = np.array([1, 2, 3, 4, 5], dtype=int)
-    p = percentiles(arr, "backlog_to_weeks")
-    assert set(p.keys()) == {"P50", "P80", "P90"}
+    p = percentiles(arr, "backlog_to_weeks", total_count=5)
+    assert set(p.keys()) == {"P50", "P70", "P90"}
     assert p["P50"] == 3
 
-    p2 = percentiles(arr, "backlog_to_weeks", ps=(25, 75))
-    assert set(p2.keys()) == {"P25", "P75"}
+    assert percentiles(
+        np.array([1, 9], dtype=int),
+        "backlog_to_weeks",
+        total_count=2,
+    ) == {"P50": 1, "P70": 9, "P90": 9}
+    with pytest.raises(ValueError, match="uniquement"):
+        percentiles(arr, "backlog_to_weeks", ps=(50, 80), total_count=5)
+    with pytest.raises(ValueError, match="mode"):
+        percentiles(arr, "invalid", total_count=5)
 
 
 def test_percentiles_return_empty_mapping_when_no_completed_simulation_exists():
-    assert percentiles(np.array([], dtype=int), "backlog_to_weeks", ps=(50, 70, 90)) == {}
+    assert (
+        percentiles(
+            np.array([], dtype=int),
+            "backlog_to_weeks",
+            ps=(50, 70, 90),
+            total_count=1000,
+        )
+        == {}
+    )
 
 
-def test_percentiles_backlog_to_weeks_use_conservative_higher_quantiles():
+def test_percentiles_backlog_to_weeks_use_total_population_ranks():
     arr = np.array([3, 4, 6, 8, 10], dtype=int)
 
-    p = percentiles(arr, "backlog_to_weeks", ps=(50, 70, 90))
+    p = percentiles(arr, "backlog_to_weeks", ps=(50, 70, 90), total_count=5)
 
     assert p == {"P50": 6, "P70": 8, "P90": 10}
     assert p["P50"] <= p["P70"] <= p["P90"]
@@ -544,9 +575,9 @@ def test_percentiles_backlog_to_weeks_use_conservative_higher_quantiles():
     [
         (0, set()),
         (10, {"P50"}),
-        (17, {"P50", "P70", "P85"}),
-        (18, {"P50", "P70", "P85", "P90"}),
-        (20, {"P50", "P70", "P85", "P90", "P100"}),
+        (14, {"P50", "P70"}),
+        (18, {"P50", "P70", "P90"}),
+        (20, {"P50", "P70", "P90"}),
     ],
 )
 def test_percentiles_backlog_to_weeks_require_completion_rank_in_total_population(
@@ -555,9 +586,19 @@ def test_percentiles_backlog_to_weeks_require_completion_rank_in_total_populatio
 ):
     arr = np.arange(1, completed_count + 1, dtype=int)
 
-    p = percentiles(arr, "backlog_to_weeks", ps=(50, 70, 85, 90, 100), total_count=20)
+    p = percentiles(arr, "backlog_to_weeks", ps=(50, 70, 90), total_count=20)
 
     assert set(p.keys()) == expected
+
+
+@pytest.mark.parametrize("total_count", [None, 0, 4, 5.0])
+def test_percentiles_backlog_to_weeks_require_explicit_total_population(total_count):
+    with pytest.raises(ValueError, match="population totale"):
+        percentiles(
+            np.array([1, 2, 3, 4, 5], dtype=int),
+            "backlog_to_weeks",
+            total_count=total_count,
+        )
 
 
 def test_percentiles_weeks_to_items_use_survival_lower_quantiles():
@@ -567,6 +608,9 @@ def test_percentiles_weeks_to_items_use_survival_lower_quantiles():
 
     assert p == {"P50": 24, "P70": 22, "P90": 18}
     assert p["P50"] >= p["P70"] >= p["P90"]
+    assert percentiles(np.array([], dtype=int), "weeks_to_items") == {}
+    with pytest.raises(ValueError, match="interdit"):
+        percentiles(arr, "weeks_to_items", total_count=5)
 
 
 def test_throughput_reliability_marks_stable_history_as_fiable():

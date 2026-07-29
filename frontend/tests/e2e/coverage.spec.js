@@ -433,8 +433,6 @@ test.describe("e2e istanbul coverage", () => {
       const mod = await import("/src/hooks/probability.ts");
       mod.buildProbabilityCurve([], "weeks");
       mod.buildProbabilityCurve([{ x: 1, count: 0 }], "items");
-      mod.buildAtLeastPercentiles([], [50, 70, 90]);
-      mod.buildAtLeastPercentiles([{ x: 1, count: 0 }], [50, 70, 90]);
 
       const dateMod = await import("/src/date.ts");
       dateMod.formatDateLocal(new Date("2026-02-26T12:00:00.000Z"));
@@ -442,6 +440,7 @@ test.describe("e2e istanbul coverage", () => {
       dateMod.nWeeksAgo(4);
 
       const simulationMod = await import("/src/utils/simulation.ts");
+      const valueObjectsMod = await import("/src/domain/simulationValueObjects.ts");
       const drawAdapter = await import("/src/adapters/seededSampleIndexDrawPort.ts");
       simulationMod.buildScenarioSamples(
         [[5, 8, 13], [2, 3, 5]],
@@ -457,13 +456,13 @@ test.describe("e2e istanbul coverage", () => {
       simulationMod.computeRiskLegend(0.35);
       simulationMod.computeRiskLegend(0.7);
       simulationMod.computeRiskLegend(0.95);
-      simulationMod.computeRiskScoreFromPercentiles("backlog_to_weeks", { P50: 0, P90: 4 });
-      simulationMod.computeRiskScoreFromPercentiles("backlog_to_weeks", { P50: 10, P90: 14 });
-      simulationMod.computeRiskScoreFromPercentiles("weeks_to_items", { P50: 12, P90: 9 });
+      valueObjectsMod.riskScoreFromPercentiles("backlog_to_weeks", { P50: 0, P90: 4 });
+      valueObjectsMod.riskScoreFromPercentiles("backlog_to_weeks", { P50: 10, P90: 14 });
+      valueObjectsMod.riskScoreFromPercentiles("weeks_to_items", { P50: 12, P90: 9 });
       const baseResponse = {
         result_kind: "weeks",
         result_percentiles: { P50: 8, P70: 10, P90: 14 },
-        risk_score: 0.2,
+        risk_score: 0.75,
         result_distribution: [{ x: 8, count: 10 }],
         samples_count: 6,
       };
@@ -675,6 +674,7 @@ test.describe("e2e istanbul coverage", () => {
                   result_kind: "items",
                   seed: body.seed ?? 123,
                   result_percentiles: { P50: 30, P70: 24, P90: 20 },
+                  risk_score: 0.3333,
                   result_distribution: [{ x: 20, count: nSims }],
                   samples_count: 70,
                   throughput_reliability: {
@@ -693,6 +693,7 @@ test.describe("e2e istanbul coverage", () => {
                 result_kind: "weeks",
                 seed: body.seed ?? 123,
                 result_percentiles: { P50: 8, P70: 10, P90: 12 },
+                risk_score: 0.5,
                 result_distribution: [{ x: 8, count: nSims }],
                 completion_summary: {
                   completed_count: nSims,
@@ -853,7 +854,7 @@ test.describe("e2e istanbul coverage", () => {
           result_kind: "weeks",
           samples_count: 24,
           result_percentiles: { P50: 7, P70: 9, P90: 12 },
-          risk_score: 0.71,
+          risk_score: 0.7143,
           result_distribution: [],
         },
       };
@@ -1501,7 +1502,7 @@ test.describe("e2e istanbul coverage", () => {
             result_kind: "weeks",
             seed: body.seed ?? 123,
             samples_count: 8,
-            risk_score: 0.3,
+            risk_score: 0.5,
             result_percentiles: { P50: 10, P70: 12, P90: 15 },
             result_distribution: [{ x: 10, count: nSims }],
             completion_summary: {
@@ -2523,6 +2524,7 @@ test.describe("e2e istanbul coverage", () => {
                 result_kind: "items",
                 seed: body.seed ?? 123,
                 result_percentiles: { P50: 30, P70: 24, P90: 20 },
+                risk_score: 0.3333,
                 samples_count: 6,
                 result_distribution: [{ x: 20, count: nSims }],
                 throughput_reliability: {
@@ -2538,7 +2540,7 @@ test.describe("e2e istanbul coverage", () => {
               result_kind: "weeks",
               seed: body.seed ?? 123,
               result_percentiles: { P50: 8, P70: 10, P90: 12 },
-              risk_score: 0.25,
+              risk_score: 0.5,
               samples_count: 6,
               result_distribution: [{ x: 8, count: nSims }],
               completion_summary: {
@@ -2869,6 +2871,7 @@ test.describe("e2e istanbul coverage", () => {
     const results = await page.evaluate(async () => {
       const simulationMod = await import("/src/utils/simulation.ts");
       const simulationDomain = await import("/src/domain/simulation.ts");
+      const valueObjectsMod = await import("/src/domain/simulationValueObjects.ts");
       const drawAdapter = await import("/src/adapters/seededSampleIndexDrawPort.ts");
       const seededDrawPort = () => drawAdapter.createSeededSampleIndexDrawPort(123456);
       const runLocalSimulation = (input) =>
@@ -2882,6 +2885,7 @@ test.describe("e2e istanbul coverage", () => {
       let invalidIncludeZeroError = "";
       let invalidExcludeZeroError = "";
       let invalidReliabilityError = "";
+      let invalidRiskScoreError = "";
 
       try {
         simulationMod.buildScenarioSamples([], 80, seededDrawPort());
@@ -2919,11 +2923,15 @@ test.describe("e2e istanbul coverage", () => {
       ];
 
       const riskScores = [
-        simulationMod.computeRiskScoreFromPercentiles("backlog_to_weeks", { P50: 0, P90: 12 }),
-        simulationMod.computeRiskScoreFromPercentiles("backlog_to_weeks", { P50: 10, P90: 14 }),
-        simulationMod.computeRiskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: 6 }),
-        simulationMod.computeRiskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: 12 }),
+        valueObjectsMod.riskScoreFromPercentiles("backlog_to_weeks", { P50: 0, P90: 12 }),
+        valueObjectsMod.riskScoreFromPercentiles("backlog_to_weeks", { P50: 10, P90: 14 }),
+        valueObjectsMod.riskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: 6 }),
       ];
+      try {
+        valueObjectsMod.riskScoreFromPercentiles("weeks_to_items", { P50: 10, P90: 12 });
+      } catch (error) {
+        invalidRiskScoreError = String(error?.message || error);
+      }
 
       try {
         simulationMod.computeThroughputReliability([Number.NaN, Number.POSITIVE_INFINITY]);
@@ -2994,6 +3002,7 @@ test.describe("e2e istanbul coverage", () => {
         invalidIncludeZeroError,
         invalidExcludeZeroError,
         invalidReliabilityError,
+        invalidRiskScoreError,
         riskLabels,
         riskScores,
         reliabilities,
@@ -3013,8 +3022,9 @@ test.describe("e2e istanbul coverage", () => {
     expect(results.invalidIncludeZeroError).toContain("entier strict");
     expect(results.invalidExcludeZeroError).toContain(">= 0");
     expect(results.invalidReliabilityError).toContain("entiers finis");
+    expect(results.invalidRiskScoreError).toContain("ordre decroissant");
     expect(results.riskLabels).toEqual(["fiable", "incertain", "fragile", "non fiable"]);
-    expect(results.riskScores).toEqual([null, 0.4, 0.4, null]);
+    expect(results.riskScores).toEqual([undefined, 0.4, 0.4]);
     expect(results.reliabilities).toContain("non fiable");
     expect(results.reliabilities).toContain("fragile");
     expect(results.reliabilities).toContain("incertain");

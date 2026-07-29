@@ -139,19 +139,20 @@ def test_service_constructs_exactly_one_adapter_per_execution_and_passes_it_to_e
 
 
 @pytest.mark.parametrize(
-    ("completed_mask", "expected_percentiles", "expected_risk"),
+    ("completion_pattern", "expected_percentiles", "expected_risk"),
     [
         ([False, False, False], {}, None),
         ([True, False, True], {"P50": 521}, None),
     ],
 )
 def test_service_preserves_total_and_partial_censure(
-    monkeypatch, completed_mask, expected_percentiles, expected_risk
+    monkeypatch, completion_pattern, expected_percentiles, expected_risk
 ):
-    repeated_mask = np.resize(np.array(completed_mask, dtype=bool), 2000)
+    repeated_mask = np.resize(np.array(completion_pattern, dtype=bool), 2000)
+    completed_weeks = np.full(int(np.count_nonzero(repeated_mask)), 521, dtype=int)
     simulation = FinishWeeksSimulation(
-        weeks_needed=np.full(2000, 521, dtype=int),
-        completed_mask=repeated_mask,
+        completed_weeks=completed_weeks,
+        simulation_count=2000,
         horizon_weeks=521,
     )
     monkeypatch.setattr(
@@ -173,8 +174,8 @@ def test_service_preserves_total_and_partial_censure(
 def test_service_preserves_histogram_reliability_and_risk_score(monkeypatch):
     outcomes = np.tile(np.array([3, 4, 6, 8, 10]), 400)
     simulation = FinishWeeksSimulation(
-        weeks_needed=outcomes,
-        completed_mask=np.ones(2000, dtype=bool),
+        completed_weeks=outcomes,
+        simulation_count=2000,
         horizon_weeks=521,
     )
     monkeypatch.setattr(

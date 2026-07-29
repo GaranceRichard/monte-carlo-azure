@@ -44,7 +44,7 @@ def test_bundled_control_accepts_minimal_contract_and_rejects_negative_example(
     assert corpus_validation.main([]) == 0
     output = capsys.readouterr()
     assert "corpus 1.0 and its schema are valid" in output.out
-    assert "PBI 2.10 and PBI 2.11 scopes are complete" in output.out
+    assert "PBI 2.10, PBI 2.11 and PBI 2.14 scopes are complete" in output.out
     assert "input rejection probes pass" in output.out
     assert output.err == ""
 
@@ -287,6 +287,29 @@ def test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms() -> N
     assert sum(bucket["count"] for bucket in discontinuous) == 1000
 
 
+def test_pbi_214_reference_cases_protect_censorship_percentiles_and_risk_score() -> None:
+    schema, corpus = _reference_corpus()
+    assert corpus_validation.validate_contract(corpus, schema) == []
+    assert corpus_validation.validate_pbi_214_scope(corpus) == []
+    assert corpus_validation.PBI_214_CASE_IDS == {
+        "items-zero-weeks-excluded",
+        "weeks-zero-weeks-included-no-censorship",
+        "weeks-exact-horizon-completion",
+        "weeks-partial-censorship",
+        "weeks-total-censorship",
+        "risk-p50-zero-absent",
+    }
+
+    cases = {case["id"]: case for case in corpus["cases"]}
+    assert cases["weeks-partial-censorship"]["expected_result"]["result_percentiles"] == {
+        "P50": 518,
+        "P70": 521,
+    }
+    assert "risk_score" not in cases["weeks-partial-censorship"]["expected_result"]
+    assert cases["items-zero-weeks-excluded"]["expected_result"]["risk_score"] == 0.6667
+    assert "risk_score" not in cases["risk-p50-zero-absent"]["expected_result"]
+
+
 def test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes() -> None:
     schema, corpus = _reference_corpus()
     probes = corpus_validation.INPUT_REJECTION_PROBES
@@ -480,11 +503,24 @@ def test_scope_and_probe_controls_report_actionable_regressions(
     schema, corpus = _reference_corpus()
     assert corpus_validation.validate_pbi_210_scope([])[0].instance_path == "/"
     assert corpus_validation.validate_pbi_211_scope([])[0].instance_path == "/"
+    assert corpus_validation.validate_pbi_214_scope([])[0].instance_path == "/"
 
     missing = deepcopy(corpus)
     missing["cases"] = missing["cases"][1:]
     missing_issues = corpus_validation.validate_pbi_210_scope(missing)
     assert "items-zero-weeks-excluded" in missing_issues[0].message
+    assert "items-zero-weeks-excluded" in corpus_validation.validate_pbi_214_scope(
+        missing
+    )[0].message
+
+    malformed_pbi_214 = deepcopy(corpus)
+    zero_case = next(
+        case
+        for case in malformed_pbi_214["cases"]
+        if case["id"] == "risk-p50-zero-absent"
+    )
+    zero_case["expected_result"] = None
+    assert len(corpus_validation.validate_pbi_214_scope(malformed_pbi_214)) == 2
 
     regressions = [
         ("items-zero-weeks-excluded", ("expected_result", "samples_count"), 7),
@@ -525,6 +561,19 @@ def test_scope_and_probe_controls_report_actionable_regressions(
     assert "risk-p50-zero-absent" in corpus_validation.validate_pbi_211_scope(
         missing_211
     )[0].message
+
+    reconstructed_percentile = deepcopy(corpus)
+    partial_case = next(
+        case
+        for case in reconstructed_percentile["cases"]
+        if case["id"] == "weeks-partial-censorship"
+    )
+    partial_case["expected_result"]["result_percentiles"]["P90"] = 521
+    partial_case["expected_result"]["risk_score"] = 0.0058
+    assert any(
+        issue.keyword == "pbi214Scope"
+        for issue in corpus_validation.validate_pbi_214_scope(reconstructed_percentile)
+    )
 
     pbi_211_regressions = [
         (

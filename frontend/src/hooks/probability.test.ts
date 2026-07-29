@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildAtLeastPercentiles, buildProbabilityCurve } from "./probability";
+import { buildProbabilityCurve } from "./probability";
 
 describe("buildProbabilityCurve", () => {
   it("returns empty array for empty points", () => {
@@ -81,47 +81,5 @@ describe("buildProbabilityCurve", () => {
     }
 
     expect(curve.at(-1)?.probability).toBeCloseTo(expectedMax, 5);
-  });
-});
-
-describe("buildAtLeastPercentiles", () => {
-  it("returns empty object for empty points", () => {
-    expect(buildAtLeastPercentiles([], [50, 70, 90])).toEqual({});
-  });
-
-  it("returns empty object when total count is not positive", () => {
-    const points = [
-      { x: 49, count: 0 },
-      { x: 56, count: 0 },
-    ];
-    expect(buildAtLeastPercentiles(points, [50, 70, 90])).toEqual({});
-  });
-
-  it("computes at-least percentiles from histogram buckets", () => {
-    const points = [
-      { x: 49, count: 2 },
-      { x: 56, count: 1 },
-      { x: 66, count: 1 },
-    ];
-
-    const p = buildAtLeastPercentiles(points, [50, 70, 90]);
-
-    expect(p.P50).toBe(56);
-    expect(p.P70).toBe(49);
-    expect(p.P90).toBe(49);
-  });
-
-  it("matches the conservative survival percentiles for a known discrete distribution", () => {
-    const points = [
-      { x: 18, count: 1 },
-      { x: 22, count: 1 },
-      { x: 24, count: 1 },
-      { x: 25, count: 1 },
-      { x: 27, count: 1 },
-    ];
-
-    const p = buildAtLeastPercentiles(points, [50, 70, 90]);
-
-    expect(p).toEqual({ P50: 24, P70: 22, P90: 18 });
   });
 });

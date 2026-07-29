@@ -29,6 +29,7 @@ const API_RESPONSE_WEEKS = {
   samples_count: 6,
   seed: 424242,
   result_percentiles: { P50: 8, P70: 10, P90: 13 },
+  risk_score: 0.625,
   completion_summary: {
     completed_count: 20000,
     censored_count: 0,
@@ -55,6 +56,7 @@ const API_RESPONSE_ITEMS = {
   samples_count: 6,
   seed: SIMULATION_SEED_MAX,
   result_percentiles: { P50: 40, P70: 35, P90: 30 },
+  risk_score: 0.25,
   throughput_reliability: {
     cv: 0.65,
     iqr_ratio: 0.7,

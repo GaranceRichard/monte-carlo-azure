@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createSimulationCommand } from "../domain/simulation";
 import type { SimulationCommandInput } from "../domain/simulation";
-import { createSimulationSeed } from "../domain/simulationValueObjects";
+import { createSimulationSeed, riskScoreFromPercentiles } from "../domain/simulationValueObjects";
 import { createSeededSampleIndexDrawPort } from "../adapters/seededSampleIndexDrawPort";
 import {
   buildCorrelatedPortfolioSamples,
@@ -11,7 +11,6 @@ import {
   computeFrictionFactor,
   computeFrictionRatePercent,
   computeRiskLegend,
-  computeRiskScoreFromPercentiles,
   computeThroughputReliability,
   discretePercentiles,
   getProjectionReliabilityNotice,
@@ -612,11 +611,12 @@ describe("simulateMonteCarloLocal", () => {
     expect(discretePercentiles([521, 521], "backlog_to_weeks", [50, 70, 90], 3)).toEqual({ P50: 521 });
   });
 
-  it("falls back to conservative backlog quantiles when the total simulation count is unavailable", () => {
-    expect(discretePercentiles([3, 4, 6, 8, 10], "backlog_to_weeks", [50, 70, 90])).toEqual({
-      P50: 6,
-      P70: 8,
-      P90: 10,
+  it("requires the total backlog population and uses exact small-population ranks", () => {
+    expect(() => discretePercentiles([3, 4, 6, 8, 10], "backlog_to_weeks", [50, 70, 90])).toThrow("population totale");
+    expect(discretePercentiles([1, 9], "backlog_to_weeks", [50, 70, 90], 2)).toEqual({
+      P50: 1,
+      P70: 9,
+      P90: 9,
     });
   });
 
@@ -689,10 +689,10 @@ describe("simulateMonteCarloLocal", () => {
     });
 
     expect(backlogResult.riskScore).toBe(
-      Number(computeRiskScoreFromPercentiles("backlog_to_weeks", backlogResult.resultPercentiles)?.toFixed(4)),
+      riskScoreFromPercentiles("backlog_to_weeks", backlogResult.resultPercentiles),
     );
     expect(itemsResult.riskScore).toBe(
-      Number(computeRiskScoreFromPercentiles("weeks_to_items", itemsResult.resultPercentiles)?.toFixed(4)),
+      riskScoreFromPercentiles("weeks_to_items", itemsResult.resultPercentiles),
     );
   });
 

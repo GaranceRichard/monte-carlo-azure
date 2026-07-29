@@ -39,7 +39,7 @@ function buildLocalEntry(
       samplesCount: 24,
       seed: createSimulationSeed(123456),
       resultPercentiles: { P50: 7, P70: 9, P90: 12 },
-      riskScore: 0.71,
+      riskScore: 0.7143,
       resultDistribution: [{ x: 7, count: 2000 }],
     },
     ...overrides,

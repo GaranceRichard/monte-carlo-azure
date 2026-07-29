@@ -86,7 +86,6 @@ describe("useSimulationChartData", () => {
 
   it("drops invalid buckets and falls back cleanly when no valid points remain", () => {
     const probabilitySpy = vi.spyOn(probability, "buildProbabilityCurve");
-    const percentileSpy = vi.spyOn(probability, "buildAtLeastPercentiles");
 
     const { result } = renderHook(() =>
       useSimulationChartData({
@@ -111,12 +110,9 @@ describe("useSimulationChartData", () => {
     expect(result.current.probabilityCurveData).toEqual([]);
     expect(result.current.displayPercentiles).toEqual({ P50: 1, P70: 2, P90: 3 });
     expect(probabilitySpy).not.toHaveBeenCalled();
-    expect(percentileSpy).not.toHaveBeenCalled();
   });
 
-  it("uses backend result_percentiles directly for new weeks_to_items responses", () => {
-    const spy = vi.spyOn(probability, "buildAtLeastPercentiles");
-
+  it("uses normative result_percentiles directly for weeks_to_items responses", () => {
     const { result } = renderHook(() =>
       useSimulationChartData({
         weeklyThroughput: [],
@@ -139,12 +135,9 @@ describe("useSimulationChartData", () => {
     );
 
     expect(result.current.displayPercentiles).toEqual({ P50: 24, P70: 22, P90: 18 });
-    expect(spy).not.toHaveBeenCalled();
   });
 
-  it("recomputes only legacy weeks_to_items percentiles detected as ascending", () => {
-    const spy = vi.spyOn(probability, "buildAtLeastPercentiles");
-
+  it("never reconstructs missing or legacy percentiles from histogram buckets", () => {
     const { result } = renderHook(() =>
       useSimulationChartData({
         weeklyThroughput: [],
@@ -154,7 +147,7 @@ describe("useSimulationChartData", () => {
           resultKind: "items",
           samplesCount: 5,
           seed: createSimulationSeed(4),
-          resultPercentiles: { P50: 24, P70: 25, P90: 27 },
+          resultPercentiles: { P50: 24 },
           resultDistribution: [
             { x: 18, count: 1 },
             { x: 22, count: 1 },
@@ -166,7 +159,8 @@ describe("useSimulationChartData", () => {
       }),
     );
 
-    expect(result.current.displayPercentiles).toEqual({ P50: 24, P70: 22, P90: 18 });
-    expect(spy).toHaveBeenCalledOnce();
+    expect(result.current.displayPercentiles).toEqual({ P50: 24 });
+    expect(result.current.displayPercentiles).not.toHaveProperty("P70");
+    expect(result.current.displayPercentiles).not.toHaveProperty("P90");
   });
 });

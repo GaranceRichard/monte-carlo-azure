@@ -14,7 +14,6 @@ import {
   buildScenarioSamples,
   computeFrictionRatePercent,
   computeRiskLegend,
-  computeRiskScoreFromPercentiles,
   computeThroughputReliability,
 } from "../utils/simulation";
 import { resolveSimulationSeed } from "./simulationSeedResolver";
@@ -135,17 +134,16 @@ function toScenarioResult(
   label: PortfolioScenarioResult["label"],
   hypothesis: string,
   samples: number[],
-  simulationMode: SimulationMode,
   result: Awaited<ReturnType<typeof simulateForecastFromSamples>>,
   weeklyData: WeeklyThroughputRow[],
 ): PortfolioScenarioResult {
   const percentiles = result.resultPercentiles;
-  const computedRiskScore = computeRiskScoreFromPercentiles(simulationMode, percentiles) ?? undefined;
   const riskScore =
-    computedRiskScore ??
-    (result.resultKind === "items" && typeof result.riskScore === "number" && Number.isFinite(result.riskScore)
+    typeof result.riskScore === "number"
+    && Number.isFinite(result.riskScore)
+    && result.riskScore >= 0
       ? result.riskScore
-      : undefined);
+      : undefined;
   return {
     label,
     hypothesis,
@@ -310,10 +308,7 @@ export function usePortfolioReport({
                 types: [...cfg.types],
                 doneStates: [...cfg.doneStates],
                 resultKind: result.resultKind,
-                riskScore:
-                  result.resultKind === "items"
-                    ? computeRiskScoreFromPercentiles(simulationMode, result.resultPercentiles) ?? undefined
-                    : result.riskScore ?? computeRiskScoreFromPercentiles(simulationMode, result.resultPercentiles) ?? undefined,
+                riskScore: result.riskScore,
                 throughputReliability: computeThroughputReliability(data.throughputSamples),
                 distribution: result.resultDistribution,
                 weeklyThroughput: data.weeklyThroughput,
@@ -325,9 +320,7 @@ export function usePortfolioReport({
                   includeZeroWeeks,
                   percentiles: result.resultPercentiles,
                   completionSummary: result.completionSummary,
-                  riskScore: result.resultKind === "items"
-                    ? computeRiskScoreFromPercentiles(simulationMode, result.resultPercentiles)
-                    : result.riskScore ?? computeRiskScoreFromPercentiles(simulationMode, result.resultPercentiles),
+                  riskScore: result.riskScore ?? null,
                   throughputReliability: computeThroughputReliability(data.throughputSamples),
                   selectedOrg,
                   selectedProject,
@@ -367,7 +360,6 @@ export function usePortfolioReport({
                 "Optimiste",
                 SCENARIO_HYPOTHESIS_TEXT.optimistic,
                 scenarioSamples.optimistic,
-                simulationMode,
                 result,
                 buildSyntheticWeeklyData(scenarioSamples.optimistic, startDate),
               ),
@@ -397,7 +389,6 @@ export function usePortfolioReport({
                 `Arrime (${Number(alignmentRate)}%)`,
                 SCENARIO_HYPOTHESIS_TEXT.aligned.replace("N%", `${String(alignmentRate)}%`),
                 scenarioSamples.aligned,
-                simulationMode,
                 result,
                 buildSyntheticWeeklyData(scenarioSamples.aligned, startDate),
               ),
@@ -427,7 +418,6 @@ export function usePortfolioReport({
                 `Friction (${effectiveFrictionRate}%)`,
                 SCENARIO_HYPOTHESIS_TEXT.friction.replace("X%", `${String(effectiveFrictionRate)}%`),
                 scenarioSamples.friction,
-                simulationMode,
                 result,
                 buildSyntheticWeeklyData(scenarioSamples.friction, startDate),
               ),
@@ -457,7 +447,6 @@ export function usePortfolioReport({
                 "Historique corr\u00E9l\u00E9",
                 SCENARIO_HYPOTHESIS_TEXT.correlated,
                 correlatedSamples,
-                simulationMode,
                 result,
                 correlatedWeeklyData,
               ),

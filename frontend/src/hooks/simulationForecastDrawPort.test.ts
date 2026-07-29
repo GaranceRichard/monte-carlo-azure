@@ -37,6 +37,7 @@ describe("simulation forecast draw-port composition", () => {
       samples_count: 6,
       seed: 123,
       result_percentiles: { P50: 30, P70: 28, P90: 24 },
+      risk_score: 0.2,
       result_distribution: [{ x: 30, count: 1000 }],
       throughput_reliability: {
         cv: 0.1,

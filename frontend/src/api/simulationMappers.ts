@@ -12,6 +12,7 @@ import {
   createSimulationPercentiles,
   createSimulationSeed,
   createThroughputReliability,
+  riskScoreFromPercentiles,
   SIMULATION_THROUGHPUT_SAMPLES_MAX,
   SIMULATION_THROUGHPUT_SAMPLES_MIN,
 } from "../domain/simulationValueObjects";
@@ -55,6 +56,37 @@ function canonicalRiskScore(value: unknown): number {
     throw new Error("risk_score doit etre un nombre fini >= 0.");
   }
   return value;
+}
+
+function optionalRiskScore(riskScore: number | undefined) {
+  return riskScore === undefined ? {} : { riskScore };
+}
+
+function authoritativeRiskScore(
+  mode: "backlog_to_weeks" | "weeks_to_items",
+  percentiles: ReturnType<typeof createSimulationPercentiles>,
+  source: Record<string, unknown>,
+  requiredWhenCalculable: boolean,
+): number | undefined {
+  const expected = riskScoreFromPercentiles(mode, percentiles);
+  const isPresent = Object.prototype.hasOwnProperty.call(source, "risk_score");
+  if (expected === undefined) {
+    if (isPresent) {
+      throw new Error("risk_score indisponible doit etre omis.");
+    }
+    return undefined;
+  }
+  if (!isPresent) {
+    if (requiredWhenCalculable) {
+      throw new Error("risk_score calculable est requis.");
+    }
+    return undefined;
+  }
+  const received = canonicalRiskScore(source.risk_score);
+  if (received !== expected) {
+    throw new Error("risk_score doit conserver la valeur d'autorite.");
+  }
+  return received;
 }
 
 function toCompletionSummary(
@@ -198,15 +230,13 @@ export function simulateResponseDtoToResult(
     dto.throughput_reliability,
     samplesCount,
   );
-  const riskScore = "risk_score" in dto
-    ? canonicalRiskScore(dto.risk_score)
-    : undefined;
+  const riskScore = authoritativeRiskScore(mode, resultPercentiles, dto, true);
   return Object.freeze({
     resultKind: dto.result_kind,
     samplesCount,
     seed: createSimulationSeed(dto.seed),
     resultPercentiles,
-    ...(riskScore === undefined ? {} : { riskScore }),
+    ...optionalRiskScore(riskScore),
     resultDistribution,
     ...(completionSummary === undefined ? {} : { completionSummary }),
     throughputReliability,
@@ -218,6 +248,13 @@ export function simulationHistoryItemDtoToModel(
 ): ServerSimulationHistoryItem {
   const mode = dto.mode;
   const nSims = createSimulationCount(dto.n_sims);
+  const percentiles = createSimulationPercentiles(mode, dto.percentiles);
+  const riskScore = authoritativeRiskScore(
+    mode,
+    percentiles,
+    dto as unknown as Record<string, unknown>,
+    false,
+  );
   const completionSummary = dto.completion_summary === undefined
     ? undefined
     : toCompletionSummary(dto.completion_summary, nSims);
@@ -238,7 +275,8 @@ export function simulationHistoryItemDtoToModel(
       : { targetWeeks: createSimulationHorizon(dto.target_weeks) }),
     nSims,
     samplesCount: dto.samples_count,
-    percentiles: createSimulationPercentiles(mode, dto.percentiles),
+    percentiles,
+    ...optionalRiskScore(riskScore),
     distribution: createHistogram(dto.distribution, expectedMass),
     ...(completionSummary === undefined ? {} : { completionSummary }),
     ...(dto.include_zero_weeks === undefined

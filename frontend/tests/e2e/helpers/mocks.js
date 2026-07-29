@@ -278,6 +278,7 @@ export async function setupAppRoutes(page, options = {}) {
         result_kind: isWeeksToItems ? "items" : "weeks",
         seed: payload?.seed ?? 123,
         result_percentiles: isWeeksToItems ? { P50: 38, P70: 35, P90: 30 } : { P50: 10, P70: 12, P90: 15 },
+        risk_score: isWeeksToItems ? 0.2105 : 0.5,
         result_distribution: isWeeksToItems
           ? [
               { x: 35, count: bucketCounts[0] },

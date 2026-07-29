@@ -3,7 +3,6 @@ import ProgressBar from "../ui/progress";
 import { useSimulationContext } from "../../hooks/SimulationContext";
 import { keepSelectDropdownAtTop } from "../../utils/selectTopStart";
 import {
-  computeRiskScoreFromPercentiles,
   computeThroughputReliability,
   getProjectionReliabilityNotice,
 } from "../../utils/simulation";
@@ -76,13 +75,11 @@ export default function SimulationResultsPanel({ hideHistory = false }: Simulati
   };
 
   const riskScoreValue = useMemo(() => {
-    if (!s.result) return null;
-    if (typeof s.displayPercentiles?.P50 === "number" && typeof s.displayPercentiles?.P90 === "number") {
-      const resultMode = s.result.resultKind === "items" ? "weeks_to_items" : "backlog_to_weeks";
-      return computeRiskScoreFromPercentiles(resultMode, s.displayPercentiles ?? {});
-    }
-    return null;
-  }, [s.result, s.displayPercentiles]);
+    const value = s.result?.riskScore;
+    return typeof value === "number" && Number.isFinite(value) && value >= 0
+      ? value
+      : null;
+  }, [s.result?.riskScore]);
 
   const riskLegend = useMemo(() => {
     if (riskScoreValue == null) return "";

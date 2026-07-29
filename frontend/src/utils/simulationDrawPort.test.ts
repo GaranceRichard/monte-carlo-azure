@@ -39,8 +39,8 @@ describe("sample index draw port in local engines", () => {
     const result = simulateBacklogToWeeks([0, 2], 3, 2, drawPort);
 
     expect(result).toEqual({
-      results: [2, 521],
-      completedFlags: [true, false],
+      completedWeeks: [2],
+      simulationCount: 2,
     });
     expect(drawPort.requests).toEqual(Array.from({ length: 523 }, () => 2));
     expect(drawPort.skippedDrawCounts).toEqual([519]);

@@ -31,8 +31,6 @@ PBI_210_CASE_IDS = frozenset(
         "weeks-total-censorship",
     }
 )
-
-
 def _seed_and_sample_issues(
     case_path: str,
     case: dict[str, Any],

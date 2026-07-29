@@ -82,6 +82,29 @@ describe("simulation HTTP mappers", () => {
     });
   });
 
+  it("requires the exact authoritative risk score on calculable responses", () => {
+    const base = {
+      result_kind: "items" as const,
+      samples_count: 6,
+      seed: 7,
+      result_percentiles: { P50: 24, P70: 22, P90: 18 },
+      result_distribution: [{ x: 24, count: 1000 }],
+      throughput_reliability: reliabilityDto,
+    };
+
+    expect(() => simulateResponseDtoToResult(base, 1000)).toThrow(
+      "risk_score calculable est requis",
+    );
+    expect(() => simulateResponseDtoToResult({
+      ...base,
+      risk_score: 0.2499,
+    }, 1000)).toThrow("valeur d'autorite");
+    expect(simulateResponseDtoToResult({
+      ...base,
+      risk_score: 0.25,
+    }, 1000).riskScore).toBe(0.25);
+  });
+
   it("keeps absent optional response and history values absent", () => {
     const result = simulateResponseDtoToResult({
       result_kind: "items",

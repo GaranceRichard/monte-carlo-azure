@@ -196,6 +196,7 @@ export type ServerSimulationHistoryItem = {
   nSims: SimulationCount;
   samplesCount: number;
   percentiles: SimulationPercentiles;
+  riskScore?: number;
   distribution: SimulationHistogram;
   completionSummary?: CompletionSummary;
   includeZeroWeeks?: boolean;

@@ -33,7 +33,7 @@ function historyEntry(): SimulationHistoryEntry {
       samplesCount: 24,
       seed: createSimulationSeed(123),
       resultPercentiles: { P50: 7, P70: 9, P90: 12 },
-      riskScore: 0.71,
+      riskScore: 0.7143,
       resultDistribution: [{ x: 7, count: 2000 }],
       completionSummary: {
         completedCount: 2000,
@@ -63,7 +63,7 @@ describe("simulation history storage mappers", () => {
       samples_count: 24,
       seed: 123,
       result_percentiles: { P50: 7, P70: 9, P90: 12 },
-      risk_score: 0.71,
+      risk_score: 0.7143,
       result_distribution: [{ x: 7, count: 2000 }],
       completion_summary: {
         completed_count: 2000,
@@ -99,12 +99,13 @@ describe("simulation history storage mappers", () => {
 
   it("reads legacy item distributions without completion and rejects invalid buckets", () => {
     const stored = simulationHistoryModelToDto(historyEntry());
+    const { risk_score: _riskScore, ...storedResultWithoutRiskScore } = stored.result;
     const legacyItems = {
       ...stored,
       nSims: 1000,
       simulationMode: "weeks_to_items" as const,
       result: {
-        ...stored.result,
+        ...storedResultWithoutRiskScore,
         result_kind: "items" as const,
         result_percentiles: { P50: 5 },
         result_distribution: [{ x: 5, count: 1000 }],
@@ -131,5 +132,21 @@ describe("simulation history storage mappers", () => {
       ...legacyItems,
       result: { ...legacyItems.result, seed: "123" },
     })).toBeNull();
+  });
+
+  it("rejects a stale persisted risk score and preserves a legacy absence", () => {
+    const stored = simulationHistoryModelToDto(historyEntry());
+    const { risk_score: _riskScore, ...resultWithoutRiskScore } = stored.result;
+
+    expect(simulationHistoryDtoToModel({
+      ...stored,
+      result: { ...stored.result, risk_score: 0.7 },
+    })).toBeNull();
+    const legacy = simulationHistoryDtoToModel({
+      ...stored,
+      result: resultWithoutRiskScore,
+    });
+    expect(legacy).not.toBeNull();
+    expect(legacy?.result.riskScore).toBeUndefined();
   });
 });

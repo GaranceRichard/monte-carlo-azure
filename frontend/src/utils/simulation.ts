@@ -90,35 +90,39 @@ function histogramBuckets(values: number[], maxBuckets = 100): { x: number; coun
     .map(([x, count]) => ({ x, count }));
 }
 
-function discreteQuantile(values: number[], q: number, mode: "higher" | "lower"): number {
-  if (!values.length) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const rawIndex = q * (sorted.length - 1);
-  const index = mode === "higher" ? Math.ceil(rawIndex) : Math.floor(rawIndex);
-  return sorted[Math.max(0, Math.min(sorted.length - 1, index))] ?? 0;
-}
-
 export function discretePercentiles(
   values: number[],
   simulationMode: SimulationMode,
   ps: readonly (50 | 70 | 90)[],
   totalCount?: number,
 ) : SimulationPercentiles {
-  if (!values.length) return createSimulationPercentiles(simulationMode, {});
+  if (simulationMode !== "backlog_to_weeks" && simulationMode !== "weeks_to_items") {
+    throw new Error("mode de simulation invalide.");
+  }
+  const sorted = [...values].sort((a, b) => a - b);
+  if (simulationMode === "backlog_to_weeks") {
+    if (
+      !Number.isSafeInteger(totalCount)
+      || (totalCount ?? 0) <= 0
+      || (totalCount ?? 0) < values.length
+    ) {
+      throw new Error("totalCount doit etre un entier couvrant la population totale.");
+    }
+  } else if (totalCount !== undefined) {
+    throw new Error("totalCount est interdit pour weeks_to_items.");
+  }
   const percentileValues = Object.fromEntries(
     ps.flatMap((p) => {
       if (simulationMode === "weeks_to_items") {
-        return [[`P${p}`, discreteQuantile(values, (100 - p) / 100, "lower")]];
+        if (!sorted.length) return [];
+        const index = Math.floor(((100 - p) * (sorted.length - 1)) / 100);
+        return [[`P${p}`, sorted[index]]];
       }
-      if (typeof totalCount === "number" && Number.isFinite(totalCount) && totalCount > 0) {
-        const rank = Math.ceil((p / 100) * totalCount);
-        if (rank <= 0 || values.length < rank) {
-          return [];
-        }
-        const sorted = [...values].sort((a, b) => a - b);
-        return [[`P${p}`, sorted[rank - 1] ?? 0]];
+      const rank = Math.ceil((p * (totalCount ?? 0)) / 100);
+      if (sorted.length < rank) {
+        return [];
       }
-      return [[`P${p}`, discreteQuantile(values, p / 100, "higher")]];
+      return [[`P${p}`, sorted[rank - 1]]];
     }),
   );
   return createSimulationPercentiles(simulationMode, percentileValues);
@@ -129,9 +133,8 @@ export function simulateBacklogToWeeks(
   backlogSize: number,
   nSims: number,
   drawPort: SampleIndexDrawPort,
-): { results: number[]; completedFlags: boolean[] } {
-  const results = new Array<number>(nSims);
-  const completedFlags = new Array<boolean>(nSims);
+): { completedWeeks: number[]; simulationCount: number } {
+  const completedWeeks: number[] = [];
   for (let index = 0; index < nSims; index += 1) {
     let remaining = backlogSize;
     let weeks = 0;
@@ -143,10 +146,11 @@ export function simulateBacklogToWeeks(
     if (unusedDrawSlots > 0) {
       drawPort.skipSampleIndices(unusedDrawSlots);
     }
-    results[index] = weeks || SIMULATION_HORIZON_WEEKS_MAX;
-    completedFlags[index] = remaining <= 0;
+    if (remaining <= 0) {
+      completedWeeks.push(weeks);
+    }
   }
-  return { results, completedFlags };
+  return { completedWeeks, simulationCount: nSims };
 }
 
 export function simulateWeeksToItems(
@@ -175,23 +179,21 @@ export function simulateMonteCarloLocal(
     ? simulateBacklogToWeeks(samples, command.backlogSize, command.nSims, drawPort)
     : undefined;
   const results = command.mode === "backlog_to_weeks"
-    ? backlogSimulation!.results
+    ? backlogSimulation!.completedWeeks
     : simulateWeeksToItems(samples, command.targetWeeks, command.nSims, drawPort);
-  const distributionValues = backlogSimulation === undefined
-    ? results
-    : results.filter((_value, index) => backlogSimulation.completedFlags[index]);
+  const distributionValues = results;
   const completionSummary = backlogSimulation === undefined
     ? undefined
     : createCompletionSummary({
         completedCount: distributionValues.length,
-        censoredCount: results.length - distributionValues.length,
+        censoredCount: backlogSimulation.simulationCount - distributionValues.length,
         nSims: command.nSims,
       });
   const resultPercentiles = discretePercentiles(
     distributionValues,
     command.mode,
     [50, 70, 90],
-    backlogSimulation === undefined ? undefined : results.length,
+    backlogSimulation?.simulationCount,
   );
   const riskScore = riskScoreFromPercentiles(command.mode, resultPercentiles);
   const throughputReliability = computeThroughputReliability(samples)!;
@@ -325,17 +327,6 @@ export function computeRiskLegend(score: number): "fiable" | "incertain" | "frag
   if (score <= 0.5) return "incertain";
   if (score <= 0.8) return "fragile";
   return "non fiable";
-}
-
-export function computeRiskScoreFromPercentiles(
-  mode: SimulationMode,
-  percentiles: SimulationPercentiles | null | undefined,
-): number | null {
-  try {
-    return riskScoreFromPercentiles(mode, percentiles) ?? null;
-  } catch {
-    return null;
-  }
 }
 
 export function computeThroughputReliability(samples: readonly number[]): ThroughputReliability | null {

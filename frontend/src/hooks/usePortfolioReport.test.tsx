@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchTeamThroughput, simulateForecastFromSamples } from "./simulationForecastService";
 import { exportPortfolioPrintReport } from "../components/steps/portfolioPrintReport";
 import { getPortfolioErrorMessage, usePortfolioReport } from "./usePortfolioReport";
-import { computeRiskScoreFromPercentiles } from "../utils/simulation";
 import { createSimulationSeed } from "../domain/simulationValueObjects";
 
 vi.mock("./simulationForecastService", () => ({
@@ -154,10 +153,7 @@ describe("usePortfolioReport", () => {
       expect(scenario.seed).toBe(monteCarloResult.seed);
       expect(scenario.percentiles).toEqual(monteCarloResult.resultPercentiles);
       expect(scenario.distribution).toEqual(monteCarloResult.resultDistribution);
-      expect(scenario.riskScore).toBe(computeRiskScoreFromPercentiles(
-        "backlog_to_weeks",
-        monteCarloResult.resultPercentiles,
-      ));
+      expect(scenario.riskScore).toBe(monteCarloResult.riskScore);
     }
     expect(result.current.portfolioComparisonDiagnostic).not.toBeNull();
   });
@@ -311,7 +307,7 @@ describe("usePortfolioReport", () => {
     expect(result.current.reportErr).toBe("export-failure");
   });
 
-  it("computes section riskScore from business percentiles when result_kind is items", async () => {
+  it("preserves the authoritative section riskScore when result_kind is items", async () => {
     vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
     vi.mocked(simulateForecastFromSamples).mockResolvedValue({
       resultKind: "items",
@@ -337,10 +333,8 @@ describe("usePortfolioReport", () => {
 
     expect(vi.mocked(exportPortfolioPrintReport)).toHaveBeenCalledTimes(1);
     const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
-    const expectedRisk = computeRiskScoreFromPercentiles("weeks_to_items", { P50: 24, P70: 22, P90: 18 });
-
     expect(exportArgs.sections[0].resultKind).toBe("items");
-    expect(exportArgs.sections[0].riskScore).toBe(expectedRisk);
+    expect(exportArgs.sections[0].riskScore).toBe(0);
   });
 
   it("uses the wrapped throughput rejection payload when the original error is undefined", async () => {
@@ -485,7 +479,7 @@ describe("usePortfolioReport", () => {
     expect(result.current.generationProgress).toEqual({ done: 0, total: 0 });
   });
 
-  it("falls back to effective scenario risk_score when scenario result omits it", async () => {
+  it("preserves an absent scenario risk_score without reconstruction", async () => {
     vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
     vi.mocked(simulateForecastFromSamples).mockResolvedValue({
       ...simulationResult,
@@ -507,9 +501,7 @@ describe("usePortfolioReport", () => {
     });
 
     const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
-    expect(exportArgs.scenarios[0].riskScore).toBe(
-      computeRiskScoreFromPercentiles("weeks_to_items", { P50: 24, P70: 22, P90: 18 }),
-    );
+    expect(exportArgs.scenarios[0].riskScore).toBeUndefined();
   });
 
   it("reports an explicit correlated-history error when teams share no complete week", async () => {
@@ -583,4 +575,3 @@ describe("getPortfolioErrorMessage", () => {
     expect(message).toBe('Erreur inattendue pendant "fallback-op".');
   });
 });
-

@@ -435,8 +435,8 @@ def render_markdown(report: dict[str, Any]) -> str:
                 "",
                 "Ces probes couvrent la forme fermée, les valeurs par défaut résolues, "
                 "le paramètre de mode exclusif, les entiers stricts, les zéros, "
-                "les bornes et la seed uint32. Ils n’exécutent ni ne modifient "
-                "les formules réservées aux PBI 2.14 à 2.16.",
+                "les bornes et la seed uint32. Ils ne modifient aucune formule statistique ; "
+                "le corpus démontre le PBI 2.14. Les PBI 2.15 et 2.16 restent inchangés.",
             ]
         )
     return "\n".join(lines) + "\n"

@@ -30,6 +30,50 @@ def _to_iso_z(value: datetime) -> str:
     return value.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def _simulation_document(
+    mc_client_id: str,
+    command: SimulationCommand,
+    result: SimulationResult,
+    now: datetime,
+) -> dict[str, Any]:
+    doc: dict[str, Any] = {
+        "mc_client_id": mc_client_id,
+        "created_at": now,
+        "last_seen": now,
+        "mode": command.mode,
+        "n_sims": command.n_sims.value,
+        "samples_count": result.samples_count,
+        "percentiles": result.result_percentiles.to_dict(),
+        "distribution": [
+            {"x": bucket.x, "count": bucket.count}
+            for bucket in result.result_distribution.buckets
+        ],
+        "throughput_reliability": {
+            "cv": result.throughput_reliability.cv,
+            "iqr_ratio": result.throughput_reliability.iqr_ratio,
+            "slope_norm": result.throughput_reliability.slope_norm,
+            "label": result.throughput_reliability.label,
+            "samples_count": result.throughput_reliability.samples_count,
+        },
+        "include_zero_weeks": command.include_zero_weeks,
+        "seed": result.seed.value,
+    }
+    if command.backlog_size is not None:
+        doc["backlog_size"] = command.backlog_size.value
+    if command.target_weeks is not None:
+        doc["target_weeks"] = command.target_weeks.value
+    if result.completion_summary is not None:
+        doc["completion_summary"] = {
+            "completed_count": result.completion_summary.completed_count,
+            "censored_count": result.completion_summary.censored_count,
+            "censored_rate": result.completion_summary.censored_rate,
+            "horizon_weeks": result.completion_summary.horizon_weeks,
+        }
+    if result.risk_score is not None:
+        doc["risk_score"] = result.risk_score
+    return doc
+
+
 class SimulationStore:
     _LAST_SEEN_INDEX_NAME = "last_seen_1"
     _LAST_SEEN_TTL_SECONDS = 30 * 24 * 3600
@@ -158,40 +202,7 @@ class SimulationStore:
         def _op() -> None:
             coll = self._ensure_collection()
             now = datetime.now(timezone.utc)
-
-            doc: dict[str, Any] = {
-                "mc_client_id": mc_client_id,
-                "created_at": now,
-                "last_seen": now,
-                "mode": command.mode,
-                "n_sims": command.n_sims.value,
-                "samples_count": result.samples_count,
-                "percentiles": result.result_percentiles.to_dict(),
-                "distribution": [
-                    {"x": bucket.x, "count": bucket.count}
-                    for bucket in result.result_distribution.buckets
-                ],
-                "throughput_reliability": {
-                    "cv": result.throughput_reliability.cv,
-                    "iqr_ratio": result.throughput_reliability.iqr_ratio,
-                    "slope_norm": result.throughput_reliability.slope_norm,
-                    "label": result.throughput_reliability.label,
-                    "samples_count": result.throughput_reliability.samples_count,
-                },
-                "include_zero_weeks": command.include_zero_weeks,
-                "seed": result.seed.value,
-            }
-            if command.backlog_size is not None:
-                doc["backlog_size"] = command.backlog_size.value
-            if command.target_weeks is not None:
-                doc["target_weeks"] = command.target_weeks.value
-            if result.completion_summary is not None:
-                doc["completion_summary"] = {
-                    "completed_count": result.completion_summary.completed_count,
-                    "censored_count": result.completion_summary.censored_count,
-                    "censored_rate": result.completion_summary.censored_rate,
-                    "horizon_weeks": result.completion_summary.horizon_weeks,
-                }
+            doc = _simulation_document(mc_client_id, command, result, now)
             coll.insert_one(doc)
             coll.update_many({"mc_client_id": mc_client_id}, {"$set": {"last_seen": now}})
 

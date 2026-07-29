@@ -19,6 +19,9 @@ from .simulation_value_objects import (
     StatisticalValueError,
     ThroughputSamples,
 )
+from .simulation_value_objects import (
+    SimulationPercentiles as DomainSimulationPercentiles,
+)
 
 __all__ = [
     "SIMULATION_SEED_MAX",
@@ -150,6 +153,19 @@ class SimulateResponse(BaseModel):
             raise ValueError(
                 "samples_count doit correspondre a throughput_reliability."
             )
+        mode = (
+            "backlog_to_weeks"
+            if self.result_kind == "weeks"
+            else "weeks_to_items"
+        )
+        expected_risk_score = DomainSimulationPercentiles.create(
+            mode,
+            self.result_percentiles.model_dump(exclude_none=True),
+        ).risk_score
+        if self.risk_score != expected_risk_score:
+            raise ValueError(
+                "risk_score doit etre la valeur d'autorite derivee des percentiles."
+            )
         return self
 
 
@@ -162,8 +178,35 @@ class SimulationHistoryItem(BaseModel):
     n_sims: int
     samples_count: int
     percentiles: Dict[str, int]
+    risk_score: Optional[FiniteFloat] = Field(default=None, ge=0)
     distribution: List[DistributionBucket]
     completion_summary: Optional[CompletionSummary] = None
     include_zero_weeks: bool = False
     throughput_reliability: Optional[ThroughputReliability] = None
     seed: Optional[int] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def reject_null_risk_score(cls, value):
+        if (
+            isinstance(value, Mapping)
+            and "risk_score" in value
+            and value["risk_score"] is None
+        ):
+            raise ValueError("risk_score absent doit etre omis.")
+        return value
+
+    @model_validator(mode="after")
+    def validate_persisted_risk_score(self) -> "SimulationHistoryItem":
+        percentiles = DomainSimulationPercentiles.create(
+            self.mode,
+            self.percentiles,
+        )
+        if self.risk_score is None:
+            return self
+        expected = percentiles.risk_score
+        if expected is None or self.risk_score != expected:
+            raise ValueError(
+                "risk_score persiste doit conserver la valeur d'autorite."
+            )
+        return self

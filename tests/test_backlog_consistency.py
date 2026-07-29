@@ -43,11 +43,11 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     features = check_backlog_consistency.parse_registry(backlog)
 
     assert sum(len(feature.pbis) for feature in features) == 140
-    assert sum(feature.completed_count for feature in features) == 24
+    assert sum(feature.completed_count for feature in features) == 25
     feature_two = next(feature for feature in features if feature.number == 2)
-    assert feature_two.completed_count == 13
+    assert feature_two.completed_count == 14
     assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == [
-        "2.14",
+        # PBI 2.14 completed on 28/07/2026.
         "2.15",
         "2.16",
         "2.17",

@@ -13,28 +13,35 @@ SIMULATION_BATCH_SIZE = 2048
 
 @dataclass(frozen=True)
 class FinishWeeksSimulation:
-    weeks_needed: np.ndarray
-    completed_mask: np.ndarray
+    completed_weeks: np.ndarray
+    simulation_count: int
     horizon_weeks: int
 
-    @property
-    def completed_weeks(self) -> np.ndarray:
-        return self.weeks_needed[self.completed_mask]
+    def __post_init__(self) -> None:
+        values = np.asarray(self.completed_weeks, dtype=int)
+        if values.ndim != 1:
+            raise ValueError("completed_weeks doit etre un tableau unidimensionnel")
+        if type(self.simulation_count) is not int or self.simulation_count < values.size:
+            raise ValueError("simulation_count doit couvrir toutes les simulations terminees")
+        if values.size and (
+            np.any(values < 1) or np.any(values > self.horizon_weeks)
+        ):
+            raise ValueError("completed_weeks doit rester dans l'horizon de simulation")
+        object.__setattr__(self, "completed_weeks", values)
 
     @property
     def completed_count(self) -> int:
-        return int(np.count_nonzero(self.completed_mask))
+        return int(self.completed_weeks.size)
 
     @property
     def censored_count(self) -> int:
-        return int(self.weeks_needed.size - self.completed_count)
+        return self.simulation_count - self.completed_count
 
     @property
     def censored_rate(self) -> float:
-        total = int(self.weeks_needed.size)
-        if total <= 0:
+        if self.simulation_count <= 0:
             return 0.0
-        return self.censored_count / total
+        return self.censored_count / self.simulation_count
 
 
 def histogram_buckets(arr: np.ndarray, max_buckets: int = 100) -> list[Dict[str, int]]:
@@ -105,8 +112,7 @@ def mc_finish_weeks(
 
     # Garde-fou historique: la version boucle stoppait au plus tard a 521 semaines.
     max_weeks = SIMULATION_HORIZON_WEEKS_MAX
-    weeks_needed = np.full(n_sims, max_weeks, dtype=int)
-    completed_mask = np.zeros(n_sims, dtype=bool)
+    completed_batches: list[np.ndarray] = []
 
     for start in range(0, n_sims, resolved_batch_size):
         stop = min(start + resolved_batch_size, n_sims)
@@ -123,13 +129,11 @@ def mc_finish_weeks(
         first_hit_idx = reached.argmax(axis=1)  # 0-based
         has_hit = reached.any(axis=1)
 
-        batch_weeks_needed = weeks_needed[start:stop]
-        batch_weeks_needed[has_hit] = first_hit_idx[has_hit] + 1  # 1-based
-        completed_mask[start:stop] = has_hit
+        completed_batches.append(first_hit_idx[has_hit].astype(int) + 1)
 
     return FinishWeeksSimulation(
-        weeks_needed=weeks_needed,
-        completed_mask=completed_mask,
+        completed_weeks=np.concatenate(completed_batches),
+        simulation_count=n_sims,
         horizon_weeks=max_weeks,
     )
 
@@ -206,21 +210,10 @@ def _draw_samples_batch(
     return samples[sample_indexes]
 
 
-def _discrete_quantile(
-    arr: np.ndarray,
-    q: float,
-    method: Literal["higher", "lower"],
-) -> int:
-    values = np.asarray(arr, dtype=int)
-    if values.size == 0:
-        raise ValueError("arr est vide")
-    return int(np.quantile(values, q, method=method))
-
-
 def percentiles(
     arr: np.ndarray,
     mode: Literal["backlog_to_weeks", "weeks_to_items"],
-    ps: Tuple[int, ...] = (50, 80, 90),
+    ps: Tuple[Literal[50, 70, 90], ...] = (50, 70, 90),
     total_count: Optional[int] = None,
 ) -> Dict[str, int]:
     """
@@ -231,25 +224,36 @@ def percentiles(
     - weeks_to_items: quantile de survie discret "lower" pour lire
       "X% des simulations livrent au moins PXX items".
     """
-    values = np.asarray(arr, dtype=int)
-    if values.size == 0:
-        return {}
+    if mode not in ("backlog_to_weeks", "weeks_to_items"):
+        raise ValueError("mode de simulation invalide")
+    if any(p not in (50, 70, 90) for p in ps):
+        raise ValueError("ps accepte uniquement P50, P70 et P90")
 
+    values = np.asarray(arr, dtype=int)
+    sorted_values = np.sort(values)
     out: Dict[str, int] = {}
-    for p in ps:
-        if mode == "weeks_to_items":
-            q = max(0.0, min(1.0, (100 - p) / 100))
-            out[f"P{p}"] = _discrete_quantile(values, q, method="lower")
-        else:
-            if total_count is not None and total_count > 0:
-                rank = int(np.ceil((p / 100) * total_count))
-                if rank <= 0 or values.size < rank:
-                    continue
-                sorted_values = np.sort(values)
+    if mode == "backlog_to_weeks":
+        if (
+            type(total_count) is not int
+            or total_count <= 0
+            or total_count < values.size
+        ):
+            raise ValueError(
+                "total_count doit etre un entier couvrant la population totale"
+            )
+        for p in ps:
+            rank = (p * total_count + 99) // 100
+            if values.size >= rank:
                 out[f"P{p}"] = int(sorted_values[rank - 1])
-                continue
-            q = max(0.0, min(1.0, p / 100))
-            out[f"P{p}"] = _discrete_quantile(values, q, method="higher")
+        return out
+
+    if total_count is not None:
+        raise ValueError("total_count est interdit pour weeks_to_items")
+    if values.size == 0:
+        return out
+    for p in ps:
+        index = ((100 - p) * (values.size - 1)) // 100
+        out[f"P{p}"] = int(sorted_values[index])
     return out
 
 
