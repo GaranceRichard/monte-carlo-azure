@@ -44,6 +44,10 @@ La colonne `Réalisé le` constitue l’autorité de statut du registre :
 - une date au format `JJ/MM/AAAA` désigne un PBI réalisé à cette date ;
 - les totaux de la synthèse et la répartition par modèle sont recalculés à partir des tables de PBI.
 
+`python Scripts/check_backlog_consistency.py --write` régénère ces deux sections depuis cette autorité.
+Sans `--write`, le même script est bloquant dans la garde du dépôt et refuse toute divergence de compteurs,
+pourcentages, Feature en cours, prochain PBI ou liste de reliquats.
+
 Un changement de statut exige une preuve présente dans le dépôt ou son historique. Une description
 d'attendus, un titre de commit documentaire ou l'existence d'un PBI ne constituent pas une preuve de
 livraison. La date retenue doit être démontrable et documentée ; à défaut, le PBI reste ouvert.
@@ -112,12 +116,12 @@ Un PBI `L` peut relever de Sol Élevé lorsqu’il est volumineux mais prévisib
 
 Aucun PBI actuel ne relève de **Sol Minimal**, réservé aux corrections mécaniques telles que le formatage, le renommage évident ou la résolution d’une erreur de lint isolée.
 
-## Répartition actuelle des 122 PBI non réalisés
+## Répartition actuelle des 116 PBI non réalisés
 
 | Modèle Codex | Nombre de PBI |
 | --- | ---: |
 | Sol Medium | 15 |
-| Sol Élevé | 32 |
-| Sol Très élevé | 71 |
+| Sol Élevé | 30 |
+| Sol Très élevé | 67 |
 | Sol Ultra | 4 |
-| **Total** | **122** |
+| **Total** | **116** |

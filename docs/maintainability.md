@@ -4,8 +4,8 @@
 
 Le contrôle `Scripts/check_maintainability.py` analyse les sources Python, JavaScript et TypeScript
 déclarées dans `config/maintainability.json`. Il mesure les lignes non vides et la complexité cyclomatique
-des fichiers et des fonctions. Les plafonds courants sont respectivement de 500 et 80 pour les fichiers,
-et de 80 et 15 pour les fonctions.
+des fichiers et des fonctions. Les plafonds courants sont de 350 lignes non vides et 50 points de
+complexité par fichier, puis de 50 lignes non vides et 15 points de complexité par fonction.
 
 Le graphe des imports détecte les nouvelles composantes cycliques. Deux règles de direction seulement sont
 appliquées, car elles découlent de la séparation frontend/backend décrite dans `ARCHITECTURE.md` : une
@@ -44,8 +44,9 @@ constitue donc ni une cible d’architecture ni une autorisation d’aggraver le
 
 ## Mise à jour explicite de la baseline
 
-La gate n’écrit jamais la baseline. Après une amélioration validée, ou après une décision explicite et
-revue d’accepter une dette nouvelle, exécuter depuis la racine :
+La gate n’écrit jamais la baseline. Une régénération est réservée à une évolution explicite des plafonds
+ou à une amélioration validée ; elle ne doit jamais accepter une dette créée par le correctif en cours.
+Exécuter depuis la racine :
 
 ```bash
 python Scripts/check_maintainability.py --write-baseline
@@ -54,7 +55,7 @@ git diff -- config/maintainability-baseline.json
 ```
 
 Le diff doit être relu : origine de chaque ajout, baisse conservée pour chaque amélioration, stabilité des
-plafonds et absence de suppression accidentelle. Une dérogation ponctuelle se déclare plutôt dans
-`config/maintainability-exceptions.json` avec sa justification. La baseline et les exceptions sont ensuite
-soumises aux mêmes tests et à la même revue que le moteur ; elles ne sont jamais régénérées automatiquement
-par la gate pour obtenir un résultat vert.
+plafonds et absence de suppression accidentelle. Lors d’un abaissement, une nouvelle entrée n’est légitime
+que si sa mesure dépassait déjà le nouveau plafond avant le correctif ; toute dette touchée doit conserver
+ou abaisser sa valeur antérieure. La baseline et les exceptions sont soumises aux mêmes tests et à la même
+revue que le moteur ; aucune exception ni régénération automatique ne peut servir à obtenir un résultat vert.

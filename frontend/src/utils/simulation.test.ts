@@ -535,11 +535,27 @@ describe("simulateMonteCarloLocal", () => {
     expect(() =>
       validateSimulationInputContract({
         throughputSamples: [1, 2, 3, 4, 5, 6],
+        mode: "unsupported" as never,
+        nSims: SIMULATION_N_SIMS_MIN,
+      }),
+    ).toThrow("mode de simulation invalide");
+
+    expect(() =>
+      validateSimulationInputContract({
+        throughputSamples: [1, 2, 3, 4, 5, 6],
         includeZeroWeeks: false,
         mode: "backlog_to_weeks",
         nSims: SIMULATION_N_SIMS_MIN,
       }),
     ).toThrow("backlog_size requis");
+
+    expect(() =>
+      validateSimulationInputContract({
+        throughputSamples: [1, 2, 3, 4, 5, 6],
+        mode: "weeks_to_items",
+        nSims: SIMULATION_N_SIMS_MIN,
+      }),
+    ).toThrow("target_weeks requis");
 
     expect(() =>
       validateSimulationInputContract({

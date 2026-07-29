@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1050,
+      "logicalCases": 1061,
       "nodes": [
         {
           "id": "preflight",
@@ -175,6 +175,10 @@
             "pytest:tests/test_api_simulate.py::test_simulate_weeks_to_items_success",
             "pytest:tests/test_api_static.py::test_mount_frontend_leaves_root_unmounted_when_dist_is_missing",
             "pytest:tests/test_api_static.py::test_mount_frontend_serves_index_when_dist_exists",
+            "pytest:tests/test_backlog_consistency.py::test_generation_rejects_missing_governance_marker",
+            "pytest:tests/test_backlog_consistency.py::test_generation_requires_one_feature_in_progress",
+            "pytest:tests/test_backlog_consistency.py::test_registry_rejects_invalid_sources",
+            "pytest:tests/test_backlog_consistency.py::test_repository_backlog_status_and_generated_sections_are_exact",
             "pytest:tests/test_check_no_secrets.py::test_ado_scanner_ignores_comments_and_placeholders",
             "pytest:tests/test_check_no_secrets.py::test_allows_fake_ado_values_in_ci_workflow",
             "pytest:tests/test_check_no_secrets.py::test_blocks_real_ado_values_in_ci_workflow",
@@ -212,10 +216,12 @@
             "pytest:tests/test_maintainability.py::test_identical_baseline_passes",
             "pytest:tests/test_maintainability.py::test_improvement_passes_while_debt_remains_above_the_limit",
             "pytest:tests/test_maintainability.py::test_justified_declarative_exception_passes",
+            "pytest:tests/test_maintainability.py::test_lower_ratchet_limits_block_the_first_new_violation",
             "pytest:tests/test_maintainability.py::test_metric_debt_records_file_and_function_values",
             "pytest:tests/test_maintainability.py::test_new_violation_fails",
             "pytest:tests/test_maintainability.py::test_python_and_javascript_metrics_cover_supported_constructs",
             "pytest:tests/test_maintainability.py::test_ratchet_existing_cycle_direction_and_mojibake_debt_stays_stable",
+            "pytest:tests/test_maintainability.py::test_repository_ratchet_limits_and_baseline_are_locked",
             "pytest:tests/test_maintainability.py::test_windows_and_linux_paths_share_one_normalized_form",
             "pytest:tests/test_mc_core.py::test_deterministic_draw_port_detects_invalid_consumption_and_bounds",
             "pytest:tests/test_mc_core.py::test_empty_finish_result_and_discrete_quantile_guardrails",
@@ -486,18 +492,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 371
+            "pytest": 377
           },
           "natures": {
             "component": 71,
             "contract": 46,
-            "integration": 26,
-            "unit": 228
+            "integration": 29,
+            "unit": 231
           },
           "criticalities": {
             "critical": 72,
             "high": 16,
-            "unassigned": 283
+            "unassigned": 289
           }
         },
         {
@@ -600,6 +606,9 @@
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > keeps absent optional response and history values absent [85:3]",
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a business command to the unchanged public request DTO [28:3]",
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a complete response DTO to the camelCase business result [41:3]",
+            "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a non-canonical samples_count value: %s [225:4]",
+            "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a reliability computed from a different sample history [236:3]",
+            "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a response result kind outside the closed HTTP contract [247:3]",
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects absent sentinels and open canonical response shapes [204:4]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [9:3]",
@@ -1171,26 +1180,28 @@
             "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null when reliability is absent [455:3]",
             "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the non fiable notice when the label is non fiable without high volatility [482:3]",
             "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the volatility notice when cv or iqr_ratio is high [460:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [683:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [599:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [607:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [657:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [595:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [721:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [699:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [615:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [623:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [673:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [611:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [737:3]",
             "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects shared contract violations with explicit messages [534:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [698:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [621:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [639:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [714:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [637:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [655:3]",
             "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > validates the shared contract boundaries [508:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [262:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [128:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [175:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [281:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [147:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [194:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > detects excessive, insufficient and out-of-bound test consumption [103:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives backlog mode with an exact sequence, including censure [31:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives weeks-to-items mode with an exact sequence [50:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [118:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [137:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes buildScenarioSamples deterministic and verifies every bound [82:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [62:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an excessive deterministic skip without advancing the sequence [129:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an invalid deterministic skip count without consuming a draw: %s [118:48]",
             "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > computes both normalized spreads and preserves missing values [16:3]",
             "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > does not let invalid presentation data produce a risk score [32:3]",
             "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > rejects invalid domain percentiles [28:13]",
@@ -1202,16 +1213,16 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 679
+            "vitest": 684
           },
           "natures": {
             "component": 331,
             "integration": 2,
-            "unit": 346
+            "unit": 351
           },
           "criticalities": {
             "critical": 110,
-            "unassigned": 569
+            "unassigned": 574
           }
         },
         {
@@ -1314,7 +1325,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1261,
+      "logicalCases": 1274,
       "nodes": [
         {
           "id": "preflight",
@@ -1482,6 +1493,12 @@
             "pytest:tests/test_api_simulate.py::test_simulate_weeks_to_items_success",
             "pytest:tests/test_api_static.py::test_mount_frontend_leaves_root_unmounted_when_dist_is_missing",
             "pytest:tests/test_api_static.py::test_mount_frontend_serves_index_when_dist_exists",
+            "pytest:tests/test_backlog_consistency.py::test_cli_detects_drift_regenerates_both_sections_and_then_passes",
+            "pytest:tests/test_backlog_consistency.py::test_cli_reports_unreadable_input",
+            "pytest:tests/test_backlog_consistency.py::test_generation_rejects_missing_governance_marker",
+            "pytest:tests/test_backlog_consistency.py::test_generation_requires_one_feature_in_progress",
+            "pytest:tests/test_backlog_consistency.py::test_registry_rejects_invalid_sources",
+            "pytest:tests/test_backlog_consistency.py::test_repository_backlog_status_and_generated_sections_are_exact",
             "pytest:tests/test_check_no_secrets.py::test_ado_scanner_ignores_comments_and_placeholders",
             "pytest:tests/test_check_no_secrets.py::test_allows_fake_ado_values_in_ci_workflow",
             "pytest:tests/test_check_no_secrets.py::test_blocks_real_ado_values_in_ci_workflow",
@@ -1545,6 +1562,7 @@
             "pytest:tests/test_maintainability.py::test_identical_baseline_passes",
             "pytest:tests/test_maintainability.py::test_improvement_passes_while_debt_remains_above_the_limit",
             "pytest:tests/test_maintainability.py::test_justified_declarative_exception_passes",
+            "pytest:tests/test_maintainability.py::test_lower_ratchet_limits_block_the_first_new_violation",
             "pytest:tests/test_maintainability.py::test_metric_debt_records_file_and_function_values",
             "pytest:tests/test_maintainability.py::test_mojibake_scanner_handles_binary_invalid_utf8_empty_and_control_data",
             "pytest:tests/test_maintainability.py::test_new_dependency_cycle_is_detected",
@@ -1553,6 +1571,7 @@
             "pytest:tests/test_maintainability.py::test_new_violation_fails",
             "pytest:tests/test_maintainability.py::test_python_and_javascript_metrics_cover_supported_constructs",
             "pytest:tests/test_maintainability.py::test_ratchet_existing_cycle_direction_and_mojibake_debt_stays_stable",
+            "pytest:tests/test_maintainability.py::test_repository_ratchet_limits_and_baseline_are_locked",
             "pytest:tests/test_maintainability.py::test_tracked_path_failure_and_success",
             "pytest:tests/test_maintainability.py::test_windows_and_linux_paths_share_one_normalized_form",
             "pytest:tests/test_mc_core.py::test_deterministic_draw_port_detects_invalid_consumption_and_bounds",
@@ -1970,18 +1989,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 550
+            "pytest": 558
           },
           "natures": {
             "component": 71,
             "contract": 46,
-            "integration": 205,
-            "unit": 228
+            "integration": 210,
+            "unit": 231
           },
           "criticalities": {
             "critical": 85,
             "high": 20,
-            "unassigned": 445
+            "unassigned": 453
           }
         },
         {
@@ -2084,6 +2103,9 @@
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > keeps absent optional response and history values absent [85:3]",
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a business command to the unchanged public request DTO [28:3]",
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a complete response DTO to the camelCase business result [41:3]",
+            "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a non-canonical samples_count value: %s [225:4]",
+            "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a reliability computed from a different sample history [236:3]",
+            "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a response result kind outside the closed HTTP contract [247:3]",
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects absent sentinels and open canonical response shapes [204:4]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [9:3]",
@@ -2655,26 +2677,28 @@
             "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null when reliability is absent [455:3]",
             "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the non fiable notice when the label is non fiable without high volatility [482:3]",
             "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the volatility notice when cv or iqr_ratio is high [460:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [683:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [599:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [607:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [657:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [595:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [721:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [699:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [615:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [623:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [673:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [611:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [737:3]",
             "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects shared contract violations with explicit messages [534:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [698:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [621:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [639:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [714:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [637:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [655:3]",
             "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > validates the shared contract boundaries [508:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [262:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [128:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [175:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [281:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [147:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [194:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > detects excessive, insufficient and out-of-bound test consumption [103:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives backlog mode with an exact sequence, including censure [31:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives weeks-to-items mode with an exact sequence [50:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [118:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [137:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes buildScenarioSamples deterministic and verifies every bound [82:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [62:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an excessive deterministic skip without advancing the sequence [129:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an invalid deterministic skip count without consuming a draw: %s [118:48]",
             "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > computes both normalized spreads and preserves missing values [16:3]",
             "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > does not let invalid presentation data produce a risk score [32:3]",
             "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > rejects invalid domain percentiles [28:13]",
@@ -2686,16 +2710,16 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 679
+            "vitest": 684
           },
           "natures": {
             "component": 331,
             "integration": 2,
-            "unit": 346
+            "unit": 351
           },
           "criticalities": {
             "critical": 110,
-            "unassigned": 569
+            "unassigned": 574
           }
         },
         {
@@ -2839,7 +2863,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1262,
+      "logicalCases": 1275,
       "nodes": [
         {
           "id": "preflight",
@@ -3007,6 +3031,12 @@
             "pytest:tests/test_api_simulate.py::test_simulate_weeks_to_items_success",
             "pytest:tests/test_api_static.py::test_mount_frontend_leaves_root_unmounted_when_dist_is_missing",
             "pytest:tests/test_api_static.py::test_mount_frontend_serves_index_when_dist_exists",
+            "pytest:tests/test_backlog_consistency.py::test_cli_detects_drift_regenerates_both_sections_and_then_passes",
+            "pytest:tests/test_backlog_consistency.py::test_cli_reports_unreadable_input",
+            "pytest:tests/test_backlog_consistency.py::test_generation_rejects_missing_governance_marker",
+            "pytest:tests/test_backlog_consistency.py::test_generation_requires_one_feature_in_progress",
+            "pytest:tests/test_backlog_consistency.py::test_registry_rejects_invalid_sources",
+            "pytest:tests/test_backlog_consistency.py::test_repository_backlog_status_and_generated_sections_are_exact",
             "pytest:tests/test_check_no_secrets.py::test_ado_scanner_ignores_comments_and_placeholders",
             "pytest:tests/test_check_no_secrets.py::test_allows_fake_ado_values_in_ci_workflow",
             "pytest:tests/test_check_no_secrets.py::test_blocks_real_ado_values_in_ci_workflow",
@@ -3070,6 +3100,7 @@
             "pytest:tests/test_maintainability.py::test_identical_baseline_passes",
             "pytest:tests/test_maintainability.py::test_improvement_passes_while_debt_remains_above_the_limit",
             "pytest:tests/test_maintainability.py::test_justified_declarative_exception_passes",
+            "pytest:tests/test_maintainability.py::test_lower_ratchet_limits_block_the_first_new_violation",
             "pytest:tests/test_maintainability.py::test_metric_debt_records_file_and_function_values",
             "pytest:tests/test_maintainability.py::test_mojibake_scanner_handles_binary_invalid_utf8_empty_and_control_data",
             "pytest:tests/test_maintainability.py::test_new_dependency_cycle_is_detected",
@@ -3078,6 +3109,7 @@
             "pytest:tests/test_maintainability.py::test_new_violation_fails",
             "pytest:tests/test_maintainability.py::test_python_and_javascript_metrics_cover_supported_constructs",
             "pytest:tests/test_maintainability.py::test_ratchet_existing_cycle_direction_and_mojibake_debt_stays_stable",
+            "pytest:tests/test_maintainability.py::test_repository_ratchet_limits_and_baseline_are_locked",
             "pytest:tests/test_maintainability.py::test_tracked_path_failure_and_success",
             "pytest:tests/test_maintainability.py::test_windows_and_linux_paths_share_one_normalized_form",
             "pytest:tests/test_mc_core.py::test_deterministic_draw_port_detects_invalid_consumption_and_bounds",
@@ -3496,18 +3528,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 551
+            "pytest": 559
           },
           "natures": {
             "component": 71,
             "contract": 46,
-            "integration": 205,
-            "unit": 229
+            "integration": 210,
+            "unit": 232
           },
           "criticalities": {
             "critical": 85,
             "high": 20,
-            "unassigned": 446
+            "unassigned": 454
           }
         },
         {
@@ -3610,6 +3642,9 @@
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > keeps absent optional response and history values absent [85:3]",
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a business command to the unchanged public request DTO [28:3]",
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a complete response DTO to the camelCase business result [41:3]",
+            "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a non-canonical samples_count value: %s [225:4]",
+            "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a reliability computed from a different sample history [236:3]",
+            "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a response result kind outside the closed HTTP contract [247:3]",
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects absent sentinels and open canonical response shapes [204:4]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [9:3]",
@@ -4181,26 +4216,28 @@
             "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null when reliability is absent [455:3]",
             "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the non fiable notice when the label is non fiable without high volatility [482:3]",
             "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the volatility notice when cv or iqr_ratio is high [460:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [683:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [599:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [607:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [657:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [595:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [721:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [699:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [615:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [623:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [673:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [611:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [737:3]",
             "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects shared contract violations with explicit messages [534:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [698:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [621:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [639:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [714:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [637:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [655:3]",
             "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > validates the shared contract boundaries [508:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [262:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [128:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [175:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [281:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [147:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [194:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > detects excessive, insufficient and out-of-bound test consumption [103:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives backlog mode with an exact sequence, including censure [31:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives weeks-to-items mode with an exact sequence [50:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [118:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [137:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes buildScenarioSamples deterministic and verifies every bound [82:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [62:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an excessive deterministic skip without advancing the sequence [129:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an invalid deterministic skip count without consuming a draw: %s [118:48]",
             "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > computes both normalized spreads and preserves missing values [16:3]",
             "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > does not let invalid presentation data produce a risk score [32:3]",
             "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > rejects invalid domain percentiles [28:13]",
@@ -4212,16 +4249,16 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 679
+            "vitest": 684
           },
           "natures": {
             "component": 331,
             "integration": 2,
-            "unit": 346
+            "unit": 351
           },
           "criticalities": {
             "critical": 110,
-            "unassigned": 569
+            "unassigned": 574
           }
         },
         {
@@ -4365,7 +4402,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1263,
+      "logicalCases": 1276,
       "nodes": [
         {
           "id": "preflight",
@@ -4533,6 +4570,12 @@
             "pytest:tests/test_api_simulate.py::test_simulate_weeks_to_items_success",
             "pytest:tests/test_api_static.py::test_mount_frontend_leaves_root_unmounted_when_dist_is_missing",
             "pytest:tests/test_api_static.py::test_mount_frontend_serves_index_when_dist_exists",
+            "pytest:tests/test_backlog_consistency.py::test_cli_detects_drift_regenerates_both_sections_and_then_passes",
+            "pytest:tests/test_backlog_consistency.py::test_cli_reports_unreadable_input",
+            "pytest:tests/test_backlog_consistency.py::test_generation_rejects_missing_governance_marker",
+            "pytest:tests/test_backlog_consistency.py::test_generation_requires_one_feature_in_progress",
+            "pytest:tests/test_backlog_consistency.py::test_registry_rejects_invalid_sources",
+            "pytest:tests/test_backlog_consistency.py::test_repository_backlog_status_and_generated_sections_are_exact",
             "pytest:tests/test_check_no_secrets.py::test_ado_scanner_ignores_comments_and_placeholders",
             "pytest:tests/test_check_no_secrets.py::test_allows_fake_ado_values_in_ci_workflow",
             "pytest:tests/test_check_no_secrets.py::test_blocks_real_ado_values_in_ci_workflow",
@@ -4596,6 +4639,7 @@
             "pytest:tests/test_maintainability.py::test_identical_baseline_passes",
             "pytest:tests/test_maintainability.py::test_improvement_passes_while_debt_remains_above_the_limit",
             "pytest:tests/test_maintainability.py::test_justified_declarative_exception_passes",
+            "pytest:tests/test_maintainability.py::test_lower_ratchet_limits_block_the_first_new_violation",
             "pytest:tests/test_maintainability.py::test_metric_debt_records_file_and_function_values",
             "pytest:tests/test_maintainability.py::test_mojibake_scanner_handles_binary_invalid_utf8_empty_and_control_data",
             "pytest:tests/test_maintainability.py::test_new_dependency_cycle_is_detected",
@@ -4604,6 +4648,7 @@
             "pytest:tests/test_maintainability.py::test_new_violation_fails",
             "pytest:tests/test_maintainability.py::test_python_and_javascript_metrics_cover_supported_constructs",
             "pytest:tests/test_maintainability.py::test_ratchet_existing_cycle_direction_and_mojibake_debt_stays_stable",
+            "pytest:tests/test_maintainability.py::test_repository_ratchet_limits_and_baseline_are_locked",
             "pytest:tests/test_maintainability.py::test_tracked_path_failure_and_success",
             "pytest:tests/test_maintainability.py::test_windows_and_linux_paths_share_one_normalized_form",
             "pytest:tests/test_mc_core.py::test_deterministic_draw_port_detects_invalid_consumption_and_bounds",
@@ -5023,18 +5068,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 552
+            "pytest": 560
           },
           "natures": {
             "component": 71,
             "contract": 46,
-            "integration": 206,
-            "unit": 229
+            "integration": 211,
+            "unit": 232
           },
           "criticalities": {
             "critical": 85,
             "high": 20,
-            "unassigned": 447
+            "unassigned": 455
           }
         },
         {
@@ -5137,6 +5182,9 @@
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > keeps absent optional response and history values absent [85:3]",
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a business command to the unchanged public request DTO [28:3]",
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a complete response DTO to the camelCase business result [41:3]",
+            "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a non-canonical samples_count value: %s [225:4]",
+            "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a reliability computed from a different sample history [236:3]",
+            "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a response result kind outside the closed HTTP contract [247:3]",
             "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects absent sentinels and open canonical response shapes [204:4]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [9:3]",
@@ -5708,26 +5756,28 @@
             "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null when reliability is absent [455:3]",
             "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the non fiable notice when the label is non fiable without high volatility [482:3]",
             "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the volatility notice when cv or iqr_ratio is high [460:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [683:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [599:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [607:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [657:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [595:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [721:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [699:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [615:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [623:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [673:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [611:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [737:3]",
             "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects shared contract violations with explicit messages [534:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [698:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [621:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [639:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [714:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [637:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [655:3]",
             "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > validates the shared contract boundaries [508:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [262:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [128:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [175:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [281:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [147:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [194:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > detects excessive, insufficient and out-of-bound test consumption [103:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives backlog mode with an exact sequence, including censure [31:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives weeks-to-items mode with an exact sequence [50:3]",
-            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [118:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [137:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes buildScenarioSamples deterministic and verifies every bound [82:3]",
             "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [62:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an excessive deterministic skip without advancing the sequence [129:3]",
+            "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an invalid deterministic skip count without consuming a draw: %s [118:48]",
             "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > computes both normalized spreads and preserves missing values [16:3]",
             "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > does not let invalid presentation data produce a risk score [32:3]",
             "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > rejects invalid domain percentiles [28:13]",
@@ -5739,16 +5789,16 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 679
+            "vitest": 684
           },
           "natures": {
             "component": 331,
             "integration": 2,
-            "unit": 346
+            "unit": 351
           },
           "criticalities": {
             "critical": 110,
-            "unassigned": 569
+            "unassigned": 574
           }
         },
         {

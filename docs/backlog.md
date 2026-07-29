@@ -302,10 +302,16 @@ passage interactif ou asynchrone et maîtriser jobs, workers, progression, repri
 | 14.9 | Mesurer l’activation et la réussite du premier usage | M | Sol Très élevé | |
 
 # Synthèse du backlog
+
+**Feature en cours :** Feature 2 — Garantir la fiabilité du cœur statistique — 13/20 PBI réalisés (65 %).
+**Prochain PBI :** `2.14` — Aligner les censures, percentiles et Risk Score — non commencé.
+**Reliquats de la Feature 2 :** `2.14`, `2.15`, `2.16`, `2.17`, `2.18`, `2.19`, `2.20`.
+**Progression globale :** 24/140 PBI réalisés (17,14 %) ; 116 restants.
+
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
 | 1 — Disposer d’un système de preuve qualité gouverné | 11 | 11 | 0 |
-| 2 — Garantir la fiabilité du cœur statistique | 20 | 8 | 12 |
+| 2 — Garantir la fiabilité du cœur statistique | 20 | 13 | 7 |
 | 3 — Distribuer un moteur statistique Python réutilisable | 12 | 0 | 12 |
 | 4 — Sécuriser la mise en production personnelle | 6 | 0 | 6 |
 | 5 — Valider la valeur d’usage du mode portefeuille | 4 | 0 | 4 |
@@ -318,7 +324,7 @@ passage interactif ou asynchrone et maîtriser jobs, workers, progression, repri
 | 12 — Étendre le produit au pilotage de programme | 7 | 0 | 7 |
 | 13 — Rationaliser le dispositif de gouvernance technique | 10 | 0 | 10 |
 | 14 — Clarifier la stratégie de diffusion et réduire la friction d’adoption | 9 | 0 | 9 |
-| **Total** | **140** | **19** | **121** |
+| **Total** | **140** | **24** | **116** |
 
 Aucun PBI n’est classé XL.
 

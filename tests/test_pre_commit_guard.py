@@ -140,6 +140,7 @@ def test_guard_plan_locks_order_and_repository_inputs() -> None:
         ("README French accents", ("git-index",)),
         ("Secret scan", ("git-index",)),
         ("DoD compliance", ("git-index",)),
+        ("Backlog consistency", ("git-index",)),
     ]
 
 
@@ -264,13 +265,16 @@ def test_external_checks_cover_missing_failure_and_success(
     missing = tmp_path / "missing.py"
     monkeypatch.setattr(pre_commit_guard, "SECRET_CHECK_PATH", missing)
     monkeypatch.setattr(pre_commit_guard, "DOD_CHECK_PATH", missing)
+    monkeypatch.setattr(pre_commit_guard, "BACKLOG_CHECK_PATH", missing)
     assert pre_commit_guard.check_no_secrets() == 1
     assert pre_commit_guard.check_dod_compliance() == 1
+    assert pre_commit_guard.check_backlog_consistency() == 1
 
     script = tmp_path / "check.py"
     script.write_text("", encoding="utf-8")
     monkeypatch.setattr(pre_commit_guard, "SECRET_CHECK_PATH", script)
     monkeypatch.setattr(pre_commit_guard, "DOD_CHECK_PATH", script)
+    monkeypatch.setattr(pre_commit_guard, "BACKLOG_CHECK_PATH", script)
     monkeypatch.setattr(
         pre_commit_guard,
         "run",
@@ -278,6 +282,7 @@ def test_external_checks_cover_missing_failure_and_success(
     )
     assert pre_commit_guard.check_no_secrets() == 4
     assert pre_commit_guard.check_dod_compliance() == 4
+    assert pre_commit_guard.check_backlog_consistency() == 4
     output = capsys.readouterr().err
     assert "out" in output and "err" in output
 
@@ -288,6 +293,7 @@ def test_external_checks_cover_missing_failure_and_success(
     )
     assert pre_commit_guard.check_no_secrets() == 0
     assert pre_commit_guard.check_dod_compliance() == 0
+    assert pre_commit_guard.check_backlog_consistency() == 0
 
 
 def test_main_returns_zero_when_all_checks_pass(monkeypatch) -> None:

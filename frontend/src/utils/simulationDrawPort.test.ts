@@ -115,6 +115,25 @@ describe("sample index draw port in local engines", () => {
     expect(() => outOfBounds.drawSampleIndex(1)).toThrow("hors bornes");
   });
 
+  it.each([0, 1.5, Number.MAX_SAFE_INTEGER + 1])(
+    "rejects an invalid deterministic skip count without consuming a draw: %s",
+    (drawCount) => {
+      const drawPort = new DeterministicSampleIndexDrawPort([0]);
+
+      expect(() => drawPort.skipSampleIndices(drawCount)).toThrow("entier > 0");
+      expect(drawPort.drawSampleIndex(1)).toBe(0);
+      drawPort.assertExhausted();
+    },
+  );
+
+  it("rejects an excessive deterministic skip without advancing the sequence", () => {
+    const drawPort = new DeterministicSampleIndexDrawPort([0]);
+
+    expect(() => drawPort.skipSampleIndices(2)).toThrow("consommation excessive");
+    expect(drawPort.drawSampleIndex(1)).toBe(0);
+    drawPort.assertExhausted();
+  });
+
   it("keeps concrete generator construction outside engine logic", () => {
     expect(engineSource).not.toContain("createSeededRandom");
     expect(engineSource).not.toContain("createSeededSampleIndexDrawPort");

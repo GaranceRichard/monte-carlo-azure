@@ -157,13 +157,7 @@ export function simulationCommandToDto(command: SimulationCommand): SimulateRequ
     seed: command.seed,
   };
   if (command.mode === "backlog_to_weeks") {
-    if (command.backlogSize === undefined) {
-      throw new Error("backlog_size requis pour le mode backlog_to_weeks.");
-    }
     return { ...common, mode: command.mode, backlog_size: command.backlogSize };
-  }
-  if (command.targetWeeks === undefined) {
-    throw new Error("target_weeks requis pour le mode weeks_to_items.");
   }
   return { ...common, mode: command.mode, target_weeks: command.targetWeeks };
 }

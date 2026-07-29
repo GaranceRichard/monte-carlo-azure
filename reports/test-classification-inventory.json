@@ -2081,6 +2081,86 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_cli_detects_drift_regenerates_both_sections_and_then_passes",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_consistency.py",
+    "selector": "test_cli_detects_drift_regenerates_both_sections_and_then_passes",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_cli_reports_unreadable_input",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_consistency.py",
+    "selector": "test_cli_reports_unreadable_input",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_generation_rejects_missing_governance_marker",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_consistency.py",
+    "selector": "test_generation_rejects_missing_governance_marker",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_generation_requires_one_feature_in_progress",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_consistency.py",
+    "selector": "test_generation_requires_one_feature_in_progress",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_registry_rejects_invalid_sources",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_consistency.py",
+    "selector": "test_registry_rejects_invalid_sources",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_repository_backlog_status_and_generated_sections_are_exact",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_consistency.py",
+    "selector": "test_repository_backlog_status_and_generated_sections_are_exact",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_check_no_secrets.py::test_ado_scanner_ignores_comments_and_placeholders",
     "framework": "pytest",
     "sourcePath": "tests/test_check_no_secrets.py",
@@ -3238,6 +3318,21 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_maintainability.py::test_lower_ratchet_limits_block_the_first_new_violation",
+    "framework": "pytest",
+    "sourcePath": "tests/test_maintainability.py",
+    "selector": "test_lower_ratchet_limits_block_the_first_new_violation",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_maintainability.py::test_metric_debt_records_file_and_function_values",
     "framework": "pytest",
     "sourcePath": "tests/test_maintainability.py",
@@ -3353,6 +3448,21 @@
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_maintainability.py::test_repository_ratchet_limits_and_baseline_are_locked",
+    "framework": "pytest",
+    "sourcePath": "tests/test_maintainability.py",
+    "selector": "test_repository_ratchet_limits_and_baseline_are_locked",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
     "purposes": [
       "functional"
     ],
@@ -11458,6 +11568,56 @@
     "framework": "vitest",
     "sourcePath": "frontend/src/api/simulationMappers.test.ts",
     "selector": "simulation HTTP mappers > maps a complete response DTO to the camelCase business result [41:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a non-canonical samples_count value: %s [225:4]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/api/simulationMappers.test.ts",
+    "selector": "simulation HTTP mappers > rejects a non-canonical samples_count value: %s [225:4]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a reliability computed from a different sample history [236:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/api/simulationMappers.test.ts",
+    "selector": "simulation HTTP mappers > rejects a reliability computed from a different sample history [236:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine",
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a response result kind outside the closed HTTP contract [247:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/api/simulationMappers.test.ts",
+    "selector": "simulation HTTP mappers > rejects a response result kind outside the closed HTTP contract [247:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22080,10 +22240,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [683:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [699:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [683:3]",
+    "selector": "simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [699:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22103,10 +22263,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [599:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [615:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [599:3]",
+    "selector": "simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [615:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22128,10 +22288,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [607:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [623:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [607:3]",
+    "selector": "simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [623:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22151,10 +22311,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [657:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [673:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [657:3]",
+    "selector": "simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [673:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22174,10 +22334,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [595:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [611:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [595:3]",
+    "selector": "simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [611:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22198,10 +22358,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [721:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [737:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [721:3]",
+    "selector": "simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [737:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22228,10 +22388,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [698:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [714:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [698:3]",
+    "selector": "simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [714:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22254,10 +22414,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [621:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [637:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [621:3]",
+    "selector": "simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [637:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22274,10 +22434,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [639:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [655:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulation.test.ts",
-    "selector": "simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [639:3]",
+    "selector": "simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [655:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22308,10 +22468,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [262:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [281:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-    "selector": "captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [262:3]",
+    "selector": "captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [281:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22326,10 +22486,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [128:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [147:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-    "selector": "captured TypeScript non-regression references > preserves the complete backlog result [128:3]",
+    "selector": "captured TypeScript non-regression references > preserves the complete backlog result [147:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22342,10 +22502,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [175:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [194:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-    "selector": "captured TypeScript non-regression references > preserves the complete weeks-to-items result [175:3]",
+    "selector": "captured TypeScript non-regression references > preserves the complete weeks-to-items result [194:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22409,10 +22569,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [118:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [137:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-    "selector": "sample index draw port in local engines > keeps concrete generator construction outside engine logic [118:3]",
+    "selector": "sample index draw port in local engines > keeps concrete generator construction outside engine logic [137:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22449,6 +22609,40 @@
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
     "selector": "sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [62:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an excessive deterministic skip without advancing the sequence [129:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
+    "selector": "sample index draw port in local engines > rejects an excessive deterministic skip without advancing the sequence [129:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data",
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an invalid deterministic skip count without consuming a draw: %s [118:48]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
+    "selector": "sample index draw port in local engines > rejects an invalid deterministic skip count without consuming a draw: %s [118:48]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",

@@ -38,6 +38,7 @@ Cette capacité de backtesting et de calibration est inscrite au backlog ; elle 
   [`docs/backlog-governance.md`](docs/backlog-governance.md)
 - attendus détaillés des Features, PBI et sujets conditionnels:
   [`docs/backlog-expectations/`](docs/backlog-expectations/README.md)
+- état courant : Feature 2 en cours, PBI 2.13 réalisé et PBI 2.14 non commencé comme prochain item
 - architecture, sécurité, API, CI: [`ARCHITECTURE.md`](ARCHITECTURE.md)
   - inclut la convention de nommage: identifiants de code en anglais, textes utilisateur en français
 - historique des évolutions: [`CHANGELOG.md`](CHANGELOG.md)
@@ -630,6 +631,10 @@ Le ratchet de maintenabilité bloque uniquement une dette nouvelle ou aggravée 
 les cycles, les directions de dépendance démontrables et le mojibake. Ses règles, sa baseline versionnée et
 sa procédure explicite de mise à jour sont décrites dans
 [`docs/maintainability.md`](docs/maintainability.md).
+Les plafonds bloquants sont de 350 lignes non vides et 50 points de complexité par fichier, puis de
+50 lignes non vides et 15 points de complexité par fonction. La synthèse de
+[`docs/backlog.md`](docs/backlog.md) et la répartition des reliquats de gouvernance sont générées depuis les
+tables de PBI ; `python Scripts/check_backlog_consistency.py` bloque toute nouvelle divergence.
 
 ### Variables d'environnement Mongo / purge
 

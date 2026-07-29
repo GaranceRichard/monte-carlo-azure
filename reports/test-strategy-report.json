@@ -2,66 +2,66 @@
   "schemaVersion": "1.0.0",
   "schema": "config/test-strategy-report.schema.json",
   "profile": "main",
-  "evidenceBundleId": "fde353d070cbcff7a736e811633bd1b37046af4128c00c7965ee91dfd1f3590b",
+  "evidenceBundleId": "0b355ac0c4f0b08b6dc11b5101cc9498fd8b2fa490014502db567ea99358944d",
   "evidenceBundleIdentityDisclaimer": "This identifier names the exact evidence bundle; it does not prove that every source came from the same physical execution.",
   "globalReference": {
     "inventory": {
       "path": "reports/test-classification-inventory.json",
-      "sha256": "1d7b5fc69785e1303ef9b32bbdcef0e010272fca9ef07431bd5c3c8809a822cf",
-      "logicalCases": 1264
+      "sha256": "193f19f55ffd8f20e2cc83b264a4430b671726496eda542a81b404a02e366877",
+      "logicalCases": 1277
     },
     "classification": {
       "breakdowns": {
         "status": {
-          "classified": 1264
+          "classified": 1277
         },
         "framework": {
           "playwright": 32,
-          "pytest": 553,
-          "vitest": 679
+          "pytest": 561,
+          "vitest": 684
         },
         "nature": {
           "component": 402,
           "contract": 46,
           "e2e": 32,
-          "integration": 208,
-          "unit": 576
+          "integration": 213,
+          "unit": 584
         },
         "purpose": {
           "accessibility": 106,
           "compatibility": 104,
-          "data_quality": 131,
-          "functional": 1264,
+          "data_quality": 135,
+          "functional": 1277,
           "migration_recovery": 20,
-          "observability": 243,
+          "observability": 245,
           "performance": 11,
           "resilience": 130,
           "security": 124
         },
         "primaryProfile": {
-          "main": 211,
+          "main": 213,
           "nightly": 1,
-          "pr": 1050,
+          "pr": 1061,
           "release": 2
         },
         "domain": {
           "api": 126,
           "azure_devops": 263,
-          "data": 127,
+          "data": 131,
           "deployment": 43,
-          "history": 104,
+          "history": 105,
           "identity": 92,
           "persistence": 82,
           "portfolio": 145,
-          "quality_chain": 238,
-          "reporting": 227,
-          "statistical_engine": 496,
-          "user_interface": 315
+          "quality_chain": 240,
+          "reporting": 228,
+          "statistical_engine": 501,
+          "user_interface": 316
         },
         "criticality": {
           "critical": 203,
           "high": 20,
-          "unassigned": 1041
+          "unassigned": 1054
         }
       },
       "riskAssociations": {
@@ -99,16 +99,16 @@
     "executionCounts": {
       "path": "reports/test-execution-counts.json",
       "schemaVersion": "1.0.0",
-      "inventorySha256": "1d7b5fc69785e1303ef9b32bbdcef0e010272fca9ef07431bd5c3c8809a822cf",
+      "inventorySha256": "193f19f55ffd8f20e2cc83b264a4430b671726496eda542a81b404a02e366877",
       "totals": {
-        "logicalCases": 1264,
-        "collectedInstances": 1551,
-        "executedInstances": 1551,
+        "logicalCases": 1277,
+        "collectedInstances": 1579,
+        "executedInstances": 1579,
         "skippedInstances": 0,
-        "attempts": 1551,
+        "attempts": 1579,
         "retries": 0,
         "results": {
-          "passed": 1551,
+          "passed": 1579,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -122,18 +122,18 @@
         "includedProfiles": [
           "pr"
         ],
-        "logicalCases": 1050,
+        "logicalCases": 1061,
         "frameworks": {
-          "pytest": 371,
-          "vitest": 679
+          "pytest": 377,
+          "vitest": 684
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 371,
+          "backend-tests": 377,
           "e2e": 0,
           "frontend-static": 0,
-          "frontend-tests": 679,
+          "frontend-tests": 684,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -144,19 +144,19 @@
           "pr",
           "main"
         ],
-        "logicalCases": 1261,
+        "logicalCases": 1274,
         "frameworks": {
           "playwright": 32,
-          "pytest": 550,
-          "vitest": 679
+          "pytest": 558,
+          "vitest": 684
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 550,
+          "backend-tests": 558,
           "e2e": 32,
           "frontend-static": 0,
-          "frontend-tests": 679,
+          "frontend-tests": 684,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -168,19 +168,19 @@
           "main",
           "nightly"
         ],
-        "logicalCases": 1262,
+        "logicalCases": 1275,
         "frameworks": {
           "playwright": 32,
-          "pytest": 551,
-          "vitest": 679
+          "pytest": 559,
+          "vitest": 684
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 551,
+          "backend-tests": 559,
           "e2e": 32,
           "frontend-static": 0,
-          "frontend-tests": 679,
+          "frontend-tests": 684,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -192,19 +192,19 @@
           "main",
           "release"
         ],
-        "logicalCases": 1263,
+        "logicalCases": 1276,
         "frameworks": {
           "playwright": 32,
-          "pytest": 552,
-          "vitest": 679
+          "pytest": 560,
+          "vitest": 684
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 552,
+          "backend-tests": 560,
           "e2e": 32,
           "frontend-static": 0,
-          "frontend-tests": 679,
+          "frontend-tests": 684,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -217,7 +217,7 @@
       "pr",
       "main"
     ],
-    "selectedLogicalCases": 1261,
+    "selectedLogicalCases": 1274,
     "logicalCaseIds": [
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2773:3]",
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2827:3]",
@@ -315,6 +315,12 @@
       "pytest:tests/test_api_simulate.py::test_simulate_weeks_to_items_success",
       "pytest:tests/test_api_static.py::test_mount_frontend_leaves_root_unmounted_when_dist_is_missing",
       "pytest:tests/test_api_static.py::test_mount_frontend_serves_index_when_dist_exists",
+      "pytest:tests/test_backlog_consistency.py::test_cli_detects_drift_regenerates_both_sections_and_then_passes",
+      "pytest:tests/test_backlog_consistency.py::test_cli_reports_unreadable_input",
+      "pytest:tests/test_backlog_consistency.py::test_generation_rejects_missing_governance_marker",
+      "pytest:tests/test_backlog_consistency.py::test_generation_requires_one_feature_in_progress",
+      "pytest:tests/test_backlog_consistency.py::test_registry_rejects_invalid_sources",
+      "pytest:tests/test_backlog_consistency.py::test_repository_backlog_status_and_generated_sections_are_exact",
       "pytest:tests/test_check_no_secrets.py::test_ado_scanner_ignores_comments_and_placeholders",
       "pytest:tests/test_check_no_secrets.py::test_allows_fake_ado_values_in_ci_workflow",
       "pytest:tests/test_check_no_secrets.py::test_blocks_real_ado_values_in_ci_workflow",
@@ -378,6 +384,7 @@
       "pytest:tests/test_maintainability.py::test_identical_baseline_passes",
       "pytest:tests/test_maintainability.py::test_improvement_passes_while_debt_remains_above_the_limit",
       "pytest:tests/test_maintainability.py::test_justified_declarative_exception_passes",
+      "pytest:tests/test_maintainability.py::test_lower_ratchet_limits_block_the_first_new_violation",
       "pytest:tests/test_maintainability.py::test_metric_debt_records_file_and_function_values",
       "pytest:tests/test_maintainability.py::test_mojibake_scanner_handles_binary_invalid_utf8_empty_and_control_data",
       "pytest:tests/test_maintainability.py::test_new_dependency_cycle_is_detected",
@@ -386,6 +393,7 @@
       "pytest:tests/test_maintainability.py::test_new_violation_fails",
       "pytest:tests/test_maintainability.py::test_python_and_javascript_metrics_cover_supported_constructs",
       "pytest:tests/test_maintainability.py::test_ratchet_existing_cycle_direction_and_mojibake_debt_stays_stable",
+      "pytest:tests/test_maintainability.py::test_repository_ratchet_limits_and_baseline_are_locked",
       "pytest:tests/test_maintainability.py::test_tracked_path_failure_and_success",
       "pytest:tests/test_maintainability.py::test_windows_and_linux_paths_share_one_normalized_form",
       "pytest:tests/test_mc_core.py::test_deterministic_draw_port_detects_invalid_consumption_and_bounds",
@@ -880,6 +888,9 @@
       "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > keeps absent optional response and history values absent [85:3]",
       "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a business command to the unchanged public request DTO [28:3]",
       "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a complete response DTO to the camelCase business result [41:3]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a non-canonical samples_count value: %s [225:4]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a reliability computed from a different sample history [236:3]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a response result kind outside the closed HTTP contract [247:3]",
       "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects absent sentinels and open canonical response shapes [204:4]",
       "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
       "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [9:3]",
@@ -1451,26 +1462,28 @@
       "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null when reliability is absent [455:3]",
       "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the non fiable notice when the label is non fiable without high volatility [482:3]",
       "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the volatility notice when cv or iqr_ratio is high [460:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [683:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [599:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [607:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [657:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [595:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [721:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [699:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [615:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [623:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [673:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [611:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [737:3]",
       "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects shared contract violations with explicit messages [534:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [698:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [621:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [639:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [714:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [637:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [655:3]",
       "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > validates the shared contract boundaries [508:3]",
-      "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [262:3]",
-      "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [128:3]",
-      "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [175:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [281:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [147:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [194:3]",
       "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > detects excessive, insufficient and out-of-bound test consumption [103:3]",
       "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives backlog mode with an exact sequence, including censure [31:3]",
       "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > drives weeks-to-items mode with an exact sequence [50:3]",
-      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [118:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [137:3]",
       "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes buildScenarioSamples deterministic and verifies every bound [82:3]",
       "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [62:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an excessive deterministic skip without advancing the sequence [129:3]",
+      "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an invalid deterministic skip count without consuming a draw: %s [118:48]",
       "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > computes both normalized spreads and preserves missing values [16:3]",
       "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > does not let invalid presentation data produce a risk score [32:3]",
       "vitest:frontend/src/utils/simulationRiskScore.test.ts::computeRiskScoreFromPercentiles > rejects invalid domain percentiles [28:13]",
@@ -1498,14 +1511,14 @@
         }
       },
       "pytest": {
-        "logicalCases": 550,
-        "collectedInstances": 750,
-        "executedInstances": 750,
+        "logicalCases": 558,
+        "collectedInstances": 764,
+        "executedInstances": 764,
         "skippedInstances": 0,
-        "attempts": 750,
+        "attempts": 764,
         "retries": 0,
         "results": {
-          "passed": 750,
+          "passed": 764,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -1513,14 +1526,14 @@
         }
       },
       "vitest": {
-        "logicalCases": 679,
-        "collectedInstances": 770,
-        "executedInstances": 770,
+        "logicalCases": 684,
+        "collectedInstances": 780,
+        "executedInstances": 780,
         "skippedInstances": 0,
-        "attempts": 770,
+        "attempts": 780,
         "retries": 0,
         "results": {
-          "passed": 770,
+          "passed": 780,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -1535,7 +1548,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/preflight/result.json",
         "exitCode": 0,
-        "durationSeconds": 9.368,
+        "durationSeconds": 9.782,
         "reasons": []
       },
       {
@@ -1544,7 +1557,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 0.11,
+        "durationSeconds": 0.103,
         "reasons": []
       },
       {
@@ -1553,7 +1566,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 33.614,
+        "durationSeconds": 36.939,
         "reasons": []
       },
       {
@@ -1562,7 +1575,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 96.309,
+        "durationSeconds": 103.857,
         "reasons": []
       },
       {
@@ -1571,7 +1584,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 101.684,
+        "durationSeconds": 131.962,
         "reasons": []
       },
       {
@@ -1580,7 +1593,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/e2e/result.json",
         "exitCode": 0,
-        "durationSeconds": 42.823,
+        "durationSeconds": 50.255,
         "reasons": []
       },
       {
@@ -1589,7 +1602,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/release-or-container-checks/result.json",
         "exitCode": 0,
-        "durationSeconds": 40.565,
+        "durationSeconds": 60.554,
         "reasons": []
       },
       {
@@ -1602,20 +1615,20 @@
         "reasons": []
       }
     ],
-    "collectedInstances": 1552,
-    "executedInstances": 1552,
+    "collectedInstances": 1576,
+    "executedInstances": 1576,
     "skippedInstances": 0,
-    "attempts": 1552,
+    "attempts": 1576,
     "retries": 0,
     "initialResults": {
-      "passed": 1552,
+      "passed": 1576,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
       "infrastructureError": 0
     },
     "finalResults": {
-      "passed": 1552,
+      "passed": 1576,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -1633,14 +1646,14 @@
       "instabilities": 0,
       "instabilityRatePercent": 0.0,
       "initialResults": {
-        "passed": 1552,
+        "passed": 1576,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
         "infrastructureError": 0
       },
       "finalResults": {
-        "passed": 1552,
+        "passed": 1576,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -1656,14 +1669,14 @@
         "thresholdSource": ".coveragerc",
         "metrics": {
           "lines": {
-            "total": 7418,
-            "covered": 7418,
+            "total": 7572,
+            "covered": 7572,
             "pct": 100.0
           },
           "branches": {
-            "total": 2558,
-            "covered": 2519,
-            "pct": 98.48
+            "total": 2600,
+            "covered": 2559,
+            "pct": 98.42
           }
         },
         "thresholds": {
@@ -1680,14 +1693,14 @@
         "thresholdSource": "frontend/vitest.config.js",
         "metrics": {
           "statements": {
-            "total": 4029,
-            "covered": 3982,
-            "pct": 98.83
+            "total": 4019,
+            "covered": 3984,
+            "pct": 99.13
           },
           "branches": {
-            "total": 3147,
-            "covered": 2918,
-            "pct": 92.72
+            "total": 3133,
+            "covered": 2916,
+            "pct": 93.07
           },
           "functions": {
             "total": 934,
@@ -1695,9 +1708,9 @@
             "pct": 99.89
           },
           "lines": {
-            "total": 4029,
-            "covered": 3982,
-            "pct": 98.83
+            "total": 4019,
+            "covered": 3984,
+            "pct": 99.13
           }
         },
         "thresholds": {
@@ -1716,14 +1729,14 @@
         "thresholdSource": "frontend/e2e-coverage.config.json",
         "metrics": {
           "statements": {
-            "total": 12567,
-            "covered": 11460,
-            "pct": 91.19
+            "total": 12563,
+            "covered": 11454,
+            "pct": 91.17
           },
           "branches": {
-            "total": 2760,
-            "covered": 2283,
-            "pct": 82.71
+            "total": 2750,
+            "covered": 2278,
+            "pct": 82.83
           },
           "functions": {
             "total": 452,
@@ -1731,9 +1744,9 @@
             "pct": 92.47
           },
           "lines": {
-            "total": 12378,
-            "covered": 11298,
-            "pct": 91.27
+            "total": 12363,
+            "covered": 11289,
+            "pct": 91.31
           }
         },
         "thresholds": {
@@ -2322,7 +2335,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "1d7b5fc69785e1303ef9b32bbdcef0e010272fca9ef07431bd5c3c8809a822cf",
+      "fingerprint": "193f19f55ffd8f20e2cc83b264a4430b671726496eda542a81b404a02e366877",
       "schemaVersion": null,
       "status": "valid",
       "reasons": []
@@ -2354,7 +2367,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "cc440c395134cf524ac3aacc5ca9ebc831881121be78c99240d7fa23bedfcf02",
+      "fingerprint": "d8e2ba5f4352ad74e68e50abf4311fe2fc61d4ac758b1665348717c81fb2b33e",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2370,7 +2383,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "d5f3eb4229f92d18a51a5b4b10e10f1725ca4427077d74144b7056e95ee67020",
+      "fingerprint": "4afd2f635e209e332f42a3fc20ff462f78b8a0cd859fb3d420af9bb4be8ebea4",
       "schemaVersion": 3,
       "status": "valid",
       "reasons": []
@@ -2386,7 +2399,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "8f88051f1787999db4d88455b4589332a34c1f15468dc7f7262a05d226c112e0",
+      "fingerprint": "ec06033c0076d7ddd24f20bad350233e884a66298022d1c6a66f6618f446c61c",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2402,7 +2415,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "4dc3187b21c84ce237dfe2e21b7124c9229b2e78ea0a547923c05491bc7c0561",
+      "fingerprint": "40e0a51707b9acce32b6bc7c411fe522bbdb320ae657756dea7af12a43bae36d",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2418,7 +2431,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "6f07668c6265aba182eb554c4ab829839562670d0a07478f1546cda2cc3d53b6",
+      "fingerprint": "4eb7a32338f67a371ec66e6152d7000cdec5abec1ab62349a9d793e2f6832f87",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2434,7 +2447,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "c6c91c19e58141d03c70fcc351e98d99840be6ddd6623ece534adf7dad44adab",
+      "fingerprint": "77a542381212eb0b6c4ce45bbbd423ec1650bd252a1d2bb8f5d50459f0898473",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2466,7 +2479,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "7301e0b948060d8e62e9d2cab3f1267b9b255cea16a2948bd9f2bb5fc7d2cb46",
+      "fingerprint": "b68e7053264607f73d6bea903012739bd10e47e76c0178ef7177856c2447d8b6",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2482,7 +2495,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "db92dbb6c7866a6e0bdbf0603ce65c87277e539141f8838a9723e60928a903dc",
+      "fingerprint": "722a9ab227042cc9a4a17a31bcb43e9a61a96b5f97f2179610dc592a35d606a0",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2498,7 +2511,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "7d9b49af9455473ba770bd25898f8042c1ed58e5aa8b495c3ec086b41b2970c1",
+      "fingerprint": "f6e9bd9aaee8577406c52c43879e5378e35dd71b17303dc3e8b5cf6ca1dd0ffc",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2514,7 +2527,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "df53384bb4f18c15c75e91c8560c41b6c7467a7f7c73d8885e2f0293b4516eb8",
+      "fingerprint": "b87d53bcabd6dd513e464fde67e2863dc6b0c3252eb4f51a508060c84561084c",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2530,7 +2543,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "ff05fe0f2068a696ad0289a6b32446f441a787590b6a53e66dec80e75aed8ffa",
+      "fingerprint": "81c80cdd30b5a4f7651bf459b13e9c6fff47f343c3659eec602009ff6b2835df",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2546,7 +2559,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "58344afc0c0138ddbc3fa42a43989997febd1984bdc2eda26abfff21588f4f3c",
+      "fingerprint": "5d8fbfa20427c37ddbda103f3721ff1c4f87096a39396323d455cb3bb8d07990",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2562,7 +2575,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "09181ee60be76c4b90e3f4819caae3c498ab330e7bcf1ab668db4db3c537d50a",
+      "fingerprint": "17046f750378b466c81eac4f27f0b20beea53dec09bc325918ee71081cd0a56a",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2578,7 +2591,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "905868ac8a08d57869bf35178fa603f268601fcc39b0955afbd218d4da23da40",
+      "fingerprint": "6550858a47236a5cebbca1426cde28265e747d5f86c9565c2de3d76e22d0363e",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2610,7 +2623,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "ec6d2ed513866aa3ebf95838f56eb652e95b799c7918b6c44bf061231967f22a",
+      "fingerprint": "788a92cf9e2e037d78738b2689d6a0e0d6407a5eda957177a314eacc1789c0e1",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2626,7 +2639,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "46339dfd722a206a9f14fb5918b6ae3e2c41e4ca46d372699a10e764ac936289",
+      "fingerprint": "6e0566a9e8cbb5acca80e414ab387da76383c3ab9446338040b5cb562ff168e3",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []

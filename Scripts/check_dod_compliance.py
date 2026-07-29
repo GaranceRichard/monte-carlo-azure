@@ -136,22 +136,23 @@ def pages_workflow_run_errors(pages: str, ci_workflow_name: str = "CI") -> list[
 
 def _append_maintainability_errors(root: Path, errors: list[str]) -> None:
     required = (
-        "Scripts/check_maintainability.py",
-        "Scripts/check_python_coverage.py",
-        "Scripts/maintainability_common.py",
-        "Scripts/maintainability_config.py",
-        "Scripts/maintainability_dependencies.py",
-        "Scripts/maintainability_metrics.py",
-        "Scripts/maintainability_ratchet.py",
-        "Scripts/quality_gate_plan.py",
-        "config/maintainability.json",
-        "config/maintainability-baseline.json",
-        "config/maintainability-exceptions.json",
-        "docs/maintainability.md",
-        ".coveragerc",
+        "Scripts/check_maintainability.py", "Scripts/check_python_coverage.py",
+        "Scripts/maintainability_common.py", "Scripts/maintainability_config.py",
+        "Scripts/maintainability_dependencies.py", "Scripts/maintainability_metrics.py",
+        "Scripts/maintainability_ratchet.py", "Scripts/quality_gate_plan.py",
+        "config/maintainability.json", "config/maintainability-baseline.json",
+        "config/maintainability-exceptions.json", "docs/maintainability.md", ".coveragerc",
     )
     for relpath in required:
         _ok((root / relpath).exists(), f"Missing maintainability control file: {relpath}", errors)
+    config = json.loads(_read("config/maintainability.json", root))
+    expected_limits = {
+        "file.lines": 350,
+        "file.complexity": 50,
+        "function.lines": 50,
+        "function.complexity": 15,
+    }
+    _ok(config.get("limits") == expected_limits, "Maintainability limit drift", errors)
     _ok(
         "docs/maintainability.md" in _read("README.md", root),
         "README must link docs/maintainability.md",
@@ -160,11 +161,7 @@ def _append_maintainability_errors(root: Path, errors: list[str]) -> None:
     gate_paths = (root / "Scripts" / "quality_gate.py", root / "Scripts" / "quality_gate_plan.py")
     if all(path.exists() for path in gate_paths):
         gate = "\n".join(path.read_text(encoding="utf-8") for path in gate_paths)
-        _ok(
-            "Scripts/check_maintainability.py" in gate,
-            "Shared quality gate must run the maintainability ratchet",
-            errors,
-        )
+        _ok("Scripts/check_maintainability.py" in gate, "Maintainability gate missing", errors)
 
 
 def _append_python_coverage_errors(root: Path, errors: list[str]) -> None:

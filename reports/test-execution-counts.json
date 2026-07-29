@@ -1,15 +1,15 @@
 {
   "schemaVersion": "1.0.0",
-  "classificationInventorySha256": "1d7b5fc69785e1303ef9b32bbdcef0e010272fca9ef07431bd5c3c8809a822cf",
+  "classificationInventorySha256": "193f19f55ffd8f20e2cc83b264a4430b671726496eda542a81b404a02e366877",
   "totals": {
-    "logicalCases": 1264,
-    "collectedInstances": 1551,
-    "executedInstances": 1551,
+    "logicalCases": 1277,
+    "collectedInstances": 1579,
+    "executedInstances": 1579,
     "skippedInstances": 0,
-    "attempts": 1551,
+    "attempts": 1579,
     "retries": 0,
     "results": {
-      "passed": 1551,
+      "passed": 1579,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -33,14 +33,14 @@
       }
     },
     "pytest": {
-      "logicalCases": 553,
-      "collectedInstances": 749,
-      "executedInstances": 749,
+      "logicalCases": 561,
+      "collectedInstances": 767,
+      "executedInstances": 767,
       "skippedInstances": 0,
-      "attempts": 749,
+      "attempts": 767,
       "retries": 0,
       "results": {
-        "passed": 749,
+        "passed": 767,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -48,14 +48,14 @@
       }
     },
     "vitest": {
-      "logicalCases": 679,
-      "collectedInstances": 770,
-      "executedInstances": 770,
+      "logicalCases": 684,
+      "collectedInstances": 780,
+      "executedInstances": 780,
       "skippedInstances": 0,
-      "attempts": 770,
+      "attempts": 780,
       "retries": 0,
       "results": {
-        "passed": 770,
+        "passed": 780,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -65,14 +65,14 @@
   },
   "classificationStatuses": {
     "classified": {
-      "logicalCases": 1264,
-      "collectedInstances": 1551,
-      "executedInstances": 1551,
+      "logicalCases": 1277,
+      "collectedInstances": 1579,
+      "executedInstances": 1579,
       "skippedInstances": 0,
-      "attempts": 1551,
+      "attempts": 1579,
       "retries": 0,
       "results": {
-        "passed": 1551,
+        "passed": 1579,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -83,13 +83,13 @@
   "natures": {
     "component": {
       "logicalCases": 402,
-      "collectedInstances": 421,
-      "executedInstances": 421,
+      "collectedInstances": 422,
+      "executedInstances": 422,
       "skippedInstances": 0,
-      "attempts": 421,
+      "attempts": 422,
       "retries": 0,
       "results": {
-        "passed": 421,
+        "passed": 422,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -98,13 +98,13 @@
     },
     "contract": {
       "logicalCases": 46,
-      "collectedInstances": 62,
-      "executedInstances": 62,
+      "collectedInstances": 66,
+      "executedInstances": 66,
       "skippedInstances": 0,
-      "attempts": 62,
+      "attempts": 66,
       "retries": 0,
       "results": {
-        "passed": 62,
+        "passed": 66,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -127,14 +127,14 @@
       }
     },
     "integration": {
-      "logicalCases": 208,
-      "collectedInstances": 233,
-      "executedInstances": 233,
+      "logicalCases": 213,
+      "collectedInstances": 238,
+      "executedInstances": 238,
       "skippedInstances": 0,
-      "attempts": 233,
+      "attempts": 238,
       "retries": 0,
       "results": {
-        "passed": 233,
+        "passed": 238,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -142,14 +142,14 @@
       }
     },
     "unit": {
-      "logicalCases": 576,
-      "collectedInstances": 803,
-      "executedInstances": 803,
+      "logicalCases": 584,
+      "collectedInstances": 821,
+      "executedInstances": 821,
       "skippedInstances": 0,
-      "attempts": 803,
+      "attempts": 821,
       "retries": 0,
       "results": {
-        "passed": 803,
+        "passed": 821,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -159,14 +159,14 @@
   },
   "executionProfiles": {
     "pr": {
-      "logicalCases": 1050,
-      "collectedInstances": 1312,
-      "executedInstances": 1312,
+      "logicalCases": 1061,
+      "collectedInstances": 1338,
+      "executedInstances": 1338,
       "skippedInstances": 0,
-      "attempts": 1312,
+      "attempts": 1338,
       "retries": 0,
       "results": {
-        "passed": 1312,
+        "passed": 1338,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -174,14 +174,14 @@
       }
     },
     "main": {
-      "logicalCases": 211,
-      "collectedInstances": 236,
-      "executedInstances": 236,
+      "logicalCases": 213,
+      "collectedInstances": 238,
+      "executedInstances": 238,
       "skippedInstances": 0,
-      "attempts": 236,
+      "attempts": 238,
       "retries": 0,
       "results": {
-        "passed": 236,
+        "passed": 238,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -2333,6 +2333,138 @@
       }
     },
     {
+      "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_cli_detects_drift_regenerates_both_sections_and_then_passes",
+      "framework": "pytest",
+      "sourcePath": "tests/test_backlog_consistency.py",
+      "selector": "test_cli_detects_drift_regenerates_both_sections_and_then_passes",
+      "classificationStatus": "classified",
+      "executionProfile": "main",
+      "nature": "integration",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_cli_reports_unreadable_input",
+      "framework": "pytest",
+      "sourcePath": "tests/test_backlog_consistency.py",
+      "selector": "test_cli_reports_unreadable_input",
+      "classificationStatus": "classified",
+      "executionProfile": "main",
+      "nature": "integration",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_generation_rejects_missing_governance_marker",
+      "framework": "pytest",
+      "sourcePath": "tests/test_backlog_consistency.py",
+      "selector": "test_generation_rejects_missing_governance_marker",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_generation_requires_one_feature_in_progress",
+      "framework": "pytest",
+      "sourcePath": "tests/test_backlog_consistency.py",
+      "selector": "test_generation_requires_one_feature_in_progress",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "integration",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_registry_rejects_invalid_sources",
+      "framework": "pytest",
+      "sourcePath": "tests/test_backlog_consistency.py",
+      "selector": "test_registry_rejects_invalid_sources",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 6,
+      "executedInstances": 6,
+      "skippedInstances": 0,
+      "attempts": 6,
+      "retries": 0,
+      "results": {
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_repository_backlog_status_and_generated_sections_are_exact",
+      "framework": "pytest",
+      "sourcePath": "tests/test_backlog_consistency.py",
+      "selector": "test_repository_backlog_status_and_generated_sections_are_exact",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "integration",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
       "logicalCaseId": "pytest:tests/test_check_no_secrets.py::test_ado_scanner_ignores_comments_and_placeholders",
       "framework": "pytest",
       "sourcePath": "tests/test_check_no_secrets.py",
@@ -3719,6 +3851,28 @@
       }
     },
     {
+      "logicalCaseId": "pytest:tests/test_maintainability.py::test_lower_ratchet_limits_block_the_first_new_violation",
+      "framework": "pytest",
+      "sourcePath": "tests/test_maintainability.py",
+      "selector": "test_lower_ratchet_limits_block_the_first_new_violation",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
       "logicalCaseId": "pytest:tests/test_maintainability.py::test_metric_debt_records_file_and_function_values",
       "framework": "pytest",
       "sourcePath": "tests/test_maintainability.py",
@@ -3880,6 +4034,28 @@
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "pytest:tests/test_maintainability.py::test_repository_ratchet_limits_and_baseline_are_locked",
+      "framework": "pytest",
+      "sourcePath": "tests/test_maintainability.py",
+      "selector": "test_repository_ratchet_limits_and_baseline_are_locked",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "integration",
       "logicalCases": 1,
       "collectedInstances": 1,
       "executedInstances": 1,
@@ -7841,13 +8017,13 @@
       "executionProfile": "pr",
       "nature": "component",
       "logicalCases": 1,
-      "collectedInstances": 8,
-      "executedInstances": 8,
+      "collectedInstances": 9,
+      "executedInstances": 9,
       "skippedInstances": 0,
-      "attempts": 8,
+      "attempts": 9,
       "retries": 0,
       "results": {
-        "passed": 8,
+        "passed": 9,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -8237,13 +8413,13 @@
       "executionProfile": "pr",
       "nature": "contract",
       "logicalCases": 1,
-      "collectedInstances": 5,
-      "executedInstances": 5,
+      "collectedInstances": 9,
+      "executedInstances": 9,
       "skippedInstances": 0,
-      "attempts": 5,
+      "attempts": 9,
       "retries": 0,
       "results": {
-        "passed": 5,
+        "passed": 9,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -14811,6 +14987,72 @@
       "framework": "vitest",
       "sourcePath": "frontend/src/api/simulationMappers.test.ts",
       "selector": "simulation HTTP mappers > maps a complete response DTO to the camelCase business result [41:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a non-canonical samples_count value: %s [225:4]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/api/simulationMappers.test.ts",
+      "selector": "simulation HTTP mappers > rejects a non-canonical samples_count value: %s [225:4]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 4,
+      "executedInstances": 4,
+      "skippedInstances": 0,
+      "attempts": 4,
+      "retries": 0,
+      "results": {
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a reliability computed from a different sample history [236:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/api/simulationMappers.test.ts",
+      "selector": "simulation HTTP mappers > rejects a reliability computed from a different sample history [236:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a response result kind outside the closed HTTP contract [247:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/api/simulationMappers.test.ts",
+      "selector": "simulation HTTP mappers > rejects a response result kind outside the closed HTTP contract [247:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27391,10 +27633,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [683:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [699:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulation.test.ts",
-      "selector": "simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [683:3]",
+      "selector": "simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [699:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27413,10 +27655,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [599:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [615:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulation.test.ts",
-      "selector": "simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [599:3]",
+      "selector": "simulateMonteCarloLocal > falls back to conservative backlog quantiles when the total simulation count is unavailable [615:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27435,10 +27677,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [607:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [623:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulation.test.ts",
-      "selector": "simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [607:3]",
+      "selector": "simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [623:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27457,10 +27699,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [657:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [673:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulation.test.ts",
-      "selector": "simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [657:3]",
+      "selector": "simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [673:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27479,10 +27721,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [595:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [611:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulation.test.ts",
-      "selector": "simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [595:3]",
+      "selector": "simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [611:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27501,10 +27743,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [721:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [737:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulation.test.ts",
-      "selector": "simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [721:3]",
+      "selector": "simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [737:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27545,10 +27787,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [698:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [714:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulation.test.ts",
-      "selector": "simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [698:3]",
+      "selector": "simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [714:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27567,10 +27809,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [621:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [637:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulation.test.ts",
-      "selector": "simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [621:3]",
+      "selector": "simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [637:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27589,10 +27831,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [639:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [655:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulation.test.ts",
-      "selector": "simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [639:3]",
+      "selector": "simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [655:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27633,10 +27875,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [262:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [281:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-      "selector": "captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [262:3]",
+      "selector": "captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [281:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27655,10 +27897,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [128:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [147:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-      "selector": "captured TypeScript non-regression references > preserves the complete backlog result [128:3]",
+      "selector": "captured TypeScript non-regression references > preserves the complete backlog result [147:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27677,10 +27919,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [175:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [194:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-      "selector": "captured TypeScript non-regression references > preserves the complete weeks-to-items result [175:3]",
+      "selector": "captured TypeScript non-regression references > preserves the complete weeks-to-items result [194:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27765,10 +28007,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [118:3]",
+      "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > keeps concrete generator construction outside engine logic [137:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
-      "selector": "sample index draw port in local engines > keeps concrete generator construction outside engine logic [118:3]",
+      "selector": "sample index draw port in local engines > keeps concrete generator construction outside engine logic [137:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -27824,6 +28066,50 @@
       "retries": 0,
       "results": {
         "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an excessive deterministic skip without advancing the sequence [129:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
+      "selector": "sample index draw port in local engines > rejects an excessive deterministic skip without advancing the sequence [129:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an invalid deterministic skip count without consuming a draw: %s [118:48]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/utils/simulationDrawPort.test.ts",
+      "selector": "sample index draw port in local engines > rejects an invalid deterministic skip count without consuming a draw: %s [118:48]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 3,
+      "executedInstances": 3,
+      "skippedInstances": 0,
+      "attempts": 3,
+      "retries": 0,
+      "results": {
+        "passed": 3,
         "failed": 0,
         "skipped": 0,
         "todo": 0,

@@ -171,18 +171,12 @@ export function simulateMonteCarloLocal(
   drawPort: SampleIndexDrawPort,
 ): SimulationResult {
   const samples = command.throughputSamples.usableValues;
-  if (command.mode === "backlog_to_weeks" && command.backlogSize === undefined) {
-    throw new Error("backlog_size requis pour le mode backlog_to_weeks.");
-  }
-  if (command.mode === "weeks_to_items" && command.targetWeeks === undefined) {
-    throw new Error("target_weeks requis pour le mode weeks_to_items.");
-  }
   const backlogSimulation = command.mode === "backlog_to_weeks"
-    ? simulateBacklogToWeeks(samples, command.backlogSize!, command.nSims, drawPort)
+    ? simulateBacklogToWeeks(samples, command.backlogSize, command.nSims, drawPort)
     : undefined;
   const results = command.mode === "backlog_to_weeks"
     ? backlogSimulation!.results
-    : simulateWeeksToItems(samples, command.targetWeeks!, command.nSims, drawPort);
+    : simulateWeeksToItems(samples, command.targetWeeks, command.nSims, drawPort);
   const distributionValues = backlogSimulation === undefined
     ? results
     : results.filter((_value, index) => backlogSimulation.completedFlags[index]);
@@ -200,10 +194,7 @@ export function simulateMonteCarloLocal(
     backlogSimulation === undefined ? undefined : results.length,
   );
   const riskScore = riskScoreFromPercentiles(command.mode, resultPercentiles);
-  const throughputReliability = computeThroughputReliability(samples);
-  if (throughputReliability === null) {
-    throw new Error("throughput_reliability est requis dans la reponse canonique.");
-  }
+  const throughputReliability = computeThroughputReliability(samples)!;
   return Object.freeze({
     resultKind: command.mode === "backlog_to_weeks" ? "weeks" : "items",
     samplesCount: samples.length,

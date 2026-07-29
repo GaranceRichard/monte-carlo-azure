@@ -20,6 +20,8 @@ DOD_FIXTURE_PATHS = (
     "docs/vitals-traceability.md",
     "docs/vitals-coverage-map.json",
     "docs/maintainability.md",
+    "docs/backlog.md",
+    "docs/backlog-governance.md",
     "config/maintainability.json",
     "config/maintainability-baseline.json",
     "config/maintainability-exceptions.json",

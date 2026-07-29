@@ -14,6 +14,13 @@ import maintainability_config  # noqa: E402
 import maintainability_dependencies  # noqa: E402
 import maintainability_metrics  # noqa: E402
 
+RATCHET_LIMITS = {
+    "file.lines": 350,
+    "file.complexity": 50,
+    "function.lines": 50,
+    "function.complexity": 15,
+}
+
 
 def _config() -> dict:
     return {
@@ -248,6 +255,42 @@ def test_metric_debt_records_file_and_function_values() -> None:
         "function.complexity",
     }
     assert any(item.get("symbol") == "work" for item in debt)
+
+
+def test_repository_ratchet_limits_and_baseline_are_locked() -> None:
+    config = json.loads((ROOT / "config" / "maintainability.json").read_text(encoding="utf-8"))
+    baseline = json.loads(
+        (ROOT / "config" / "maintainability-baseline.json").read_text(encoding="utf-8")
+    )
+
+    assert config["limits"] == RATCHET_LIMITS
+    assert baseline["limits"] == RATCHET_LIMITS
+
+
+def test_lower_ratchet_limits_block_the_first_new_violation() -> None:
+    limits = {**RATCHET_LIMITS, "file.lines": 2}
+    debt = maintainability_metrics.collect_metric_debt(
+        {
+            "src/at-limit.py": "first = 1\nsecond = 2\n",
+            "src/over-limit.py": "first = 1\nsecond = 2\nthird = 3\n",
+        },
+        limits,
+    )
+
+    assert [item for item in debt if item["metric"] == "file.lines"] == [
+        {
+            "path": "src/over-limit.py",
+            "metric": "file.lines",
+            "limit": 2,
+            "value": 3,
+        }
+    ]
+    snapshot = {**_empty_baseline(), "limits": limits, "metrics": debt}
+    baseline = {**_empty_baseline(), "limits": limits}
+    assert any(
+        "baseline=none" in error
+        for error in check_maintainability.compare_snapshot(snapshot, baseline, [])
+    )
 
 
 def test_dependency_collection_resolves_relative_external_and_js_imports() -> None:

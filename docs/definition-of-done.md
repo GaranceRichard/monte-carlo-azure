@@ -67,8 +67,9 @@ restent applicables.
 - Build : `npm --prefix frontend run build` passe sans erreur.
 - Sécurité, secrets, frontière d’identité, README, DoD et convention de nommage restent bloquants lorsqu’ils
   sont applicables.
-- Le ratchet de maintenabilité reste bloquant : une dette enregistrée peut rester stable ou diminuer, mais
-  une dette nouvelle ou aggravée échoue.
+- Le ratchet de maintenabilité reste bloquant avec 350 lignes non vides et 50 points de complexité par
+  fichier, 50 lignes non vides et 15 points de complexité par fonction : une dette enregistrée peut rester
+  stable ou diminuer, mais une dette nouvelle ou aggravée échoue.
 
 Aucune fusion n’est autorisée si un contrôle requis échoue.
 
@@ -186,6 +187,7 @@ Seuls le code trivial et le code purement déclaratif sans logique peuvent reste
 - [ ] Artefacts de couverture présents, cohérents, frais et issus de l’exécution attendue.
 - [ ] Aucun secret commité et frontière d’identité respectée.
 - [ ] Ratchet de maintenabilité vert, sans régénération automatique de la baseline.
+- [ ] Synthèse du backlog et répartition des reliquats régénérées depuis les tables de PBI, sans divergence.
 - [ ] Documentation normative et README cohérents avec le comportement livré ; `README.md` contient une
       évolution pertinente et figure comme fichier ajouté ou modifié dans tout index non vide.
 - [ ] Worktree et branche vérifiés ; remote GitHub présent avant toute déclaration de publiabilité.

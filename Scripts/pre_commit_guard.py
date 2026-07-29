@@ -9,6 +9,7 @@ Checks:
 3) README French prose is not massively de-accented.
 4) Secret scan via Scripts/check_no_secrets.py.
 5) DoD compliance guard via Scripts/check_dod_compliance.py.
+6) Generated backlog consistency via Scripts/check_backlog_consistency.py.
 """
 
 from __future__ import annotations
@@ -36,6 +37,7 @@ from Scripts.git_staging import (  # noqa: E402
 README_PATH = REPO_ROOT / "README.md"
 SECRET_CHECK_PATH = REPO_ROOT / "Scripts" / "check_no_secrets.py"
 DOD_CHECK_PATH = REPO_ROOT / "Scripts" / "check_dod_compliance.py"
+BACKLOG_CHECK_PATH = REPO_ROOT / "Scripts" / "check_backlog_consistency.py"
 
 # Typical mojibake fragments seen when UTF-8 is decoded as cp1252/latin1.
 MOJIBAKE_TOKENS = (
@@ -236,6 +238,20 @@ def check_dod_compliance() -> int:
     return 0
 
 
+def check_backlog_consistency() -> int:
+    if not BACKLOG_CHECK_PATH.exists():
+        print("ERROR: Scripts/check_backlog_consistency.py is missing.", file=sys.stderr)
+        return 1
+    p = run([sys.executable, str(BACKLOG_CHECK_PATH)])
+    if p.returncode != 0:
+        if p.stdout:
+            print(p.stdout, file=sys.stderr, end="")
+        if p.stderr:
+            print(p.stderr, file=sys.stderr, end="")
+        return p.returncode
+    return 0
+
+
 def guard_plan(
     changes: list[StagedChange],
     *,
@@ -255,6 +271,7 @@ def guard_plan(
         GuardCheck("README French accents", ("git-index",), check_readme_french_accents),
         GuardCheck("Secret scan", ("git-index",), check_no_secrets),
         GuardCheck("DoD compliance", ("git-index",), check_dod_compliance),
+        GuardCheck("Backlog consistency", ("git-index",), check_backlog_consistency),
     )
 
 

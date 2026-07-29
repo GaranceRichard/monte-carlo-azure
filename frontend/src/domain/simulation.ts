@@ -30,14 +30,23 @@ export type {
 
 export type SimulationResultKind = "weeks" | "items";
 
-export type SimulationCommand = Readonly<{
+type SimulationCommandCommon = {
   throughputSamples: ThroughputSamples;
-  mode: SimulationMode;
-  backlogSize?: BacklogSize;
-  targetWeeks?: SimulationHorizon;
   nSims: SimulationCount;
   seed: SimulationSeed;
-}>;
+};
+
+export type SimulationCommand =
+  | Readonly<SimulationCommandCommon & {
+      mode: "backlog_to_weeks";
+      backlogSize: BacklogSize;
+      targetWeeks?: never;
+    }>
+  | Readonly<SimulationCommandCommon & {
+      mode: "weeks_to_items";
+      backlogSize?: never;
+      targetWeeks: SimulationHorizon;
+    }>;
 
 export type SimulationCommandInput = {
   throughputSamples: readonly unknown[];
@@ -102,7 +111,6 @@ export function createSimulationCommand(input: SimulationCommandInput): Simulati
   );
   const common = {
     throughputSamples,
-    mode: input.mode,
     nSims: createSimulationCount(input.nSims),
     seed: input.seed,
   };
@@ -115,6 +123,7 @@ export function createSimulationCommand(input: SimulationCommandInput): Simulati
     }
     return Object.freeze({
       ...common,
+      mode: input.mode,
       backlogSize: createBacklogSize(input.backlogSize),
     });
   }
@@ -126,6 +135,7 @@ export function createSimulationCommand(input: SimulationCommandInput): Simulati
   }
   return Object.freeze({
     ...common,
+    mode: input.mode,
     targetWeeks: createSimulationHorizon(input.targetWeeks),
   });
 }

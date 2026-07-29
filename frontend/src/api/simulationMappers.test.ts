@@ -216,4 +216,42 @@ describe("simulation HTTP mappers", () => {
 
     expect(() => simulateResponseDtoToResult(value, 1000)).toThrow(message);
   });
+
+  it.each([
+    ["6"],
+    [Number.MAX_SAFE_INTEGER + 1],
+    [5],
+    [522],
+  ])("rejects a non-canonical samples_count value: %s", (samplesCount) => {
+    expect(() => simulateResponseDtoToResult({
+      result_kind: "items",
+      samples_count: samplesCount,
+      seed: 7,
+      result_percentiles: { P50: 30 },
+      result_distribution: [{ x: 30, count: 1000 }],
+      throughput_reliability: reliabilityDto,
+    }, 1000)).toThrow("samples_count doit etre un entier compris entre 6 et 521");
+  });
+
+  it("rejects a reliability computed from a different sample history", () => {
+    expect(() => simulateResponseDtoToResult({
+      result_kind: "items",
+      samples_count: 7,
+      seed: 7,
+      result_percentiles: { P50: 30 },
+      result_distribution: [{ x: 30, count: 1000 }],
+      throughput_reliability: reliabilityDto,
+    }, 1000)).toThrow("samples_count doit correspondre a throughput_reliability");
+  });
+
+  it("rejects a response result kind outside the closed HTTP contract", () => {
+    expect(() => simulateResponseDtoToResult({
+      result_kind: "days",
+      samples_count: 6,
+      seed: 7,
+      result_percentiles: { P50: 30 },
+      result_distribution: [{ x: 30, count: 1000 }],
+      throughput_reliability: reliabilityDto,
+    }, 1000)).toThrow("result_kind invalide");
+  });
 });

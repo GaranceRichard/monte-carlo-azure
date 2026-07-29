@@ -15,9 +15,9 @@
     "Scripts/**/*.py"
   ],
   "limits": {
-    "file.lines": 500,
-    "file.complexity": 80,
-    "function.lines": 80,
+    "file.lines": 350,
+    "file.complexity": 50,
+    "function.lines": 50,
     "function.complexity": 15
   },
   "dependencyRules": [

@@ -1,23 +1,36 @@
 {
   "schemaVersion": 1,
   "limits": {
-    "file.lines": 500,
-    "file.complexity": 80,
-    "function.lines": 80,
+    "file.lines": 350,
+    "file.complexity": 50,
+    "function.lines": 50,
     "function.complexity": 15
   },
   "metrics": [
     {
       "path": "Scripts/check_dod_compliance.py",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 374
+    },
+    {
+      "path": "Scripts/check_dod_compliance.py",
       "metric": "function.lines",
-      "limit": 80,
-      "value": 152,
+      "limit": 50,
+      "value": 148,
       "symbol": "collect_dod_errors"
+    },
+    {
+      "path": "Scripts/check_dod_compliance.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 72,
+      "symbol": "pages_workflow_run_errors"
     },
     {
       "path": "Scripts/check_e2e_coverage.py",
       "metric": "file.complexity",
-      "limit": 80,
+      "limit": 50,
       "value": 101
     },
     {
@@ -44,28 +57,53 @@
     {
       "path": "Scripts/check_e2e_coverage.py",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
+      "value": 75,
+      "symbol": "normalize_coverage_metric"
+    },
+    {
+      "path": "Scripts/check_e2e_coverage.py",
+      "metric": "function.lines",
+      "limit": 50,
       "value": 90,
       "symbol": "validate_artifact_payload"
+    },
+    {
+      "path": "Scripts/check_identity_boundary.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 74
+    },
+    {
+      "path": "Scripts/check_identity_boundary.py",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 438
+    },
+    {
+      "path": "Scripts/check_vitals_compliance.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 53
     },
     {
       "path": "Scripts/check_vitals_compliance.py",
       "metric": "function.complexity",
       "limit": 15,
-      "value": 22,
+      "value": 16,
       "symbol": "main"
     },
     {
       "path": "Scripts/quality_gate.py",
       "metric": "file.complexity",
-      "limit": 80,
-      "value": 238
+      "limit": 50,
+      "value": 233
     },
     {
       "path": "Scripts/quality_gate.py",
       "metric": "file.lines",
-      "limit": 500,
-      "value": 1573
+      "limit": 350,
+      "value": 1431
     },
     {
       "path": "Scripts/quality_gate.py",
@@ -84,23 +122,96 @@
     {
       "path": "Scripts/quality_gate.py",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
       "value": 118,
       "symbol": "_classify_changed_path"
     },
     {
       "path": "Scripts/quality_gate.py",
       "metric": "function.lines",
-      "limit": 80,
-      "value": 208,
-      "symbol": "build_execution_plan"
+      "limit": 50,
+      "value": 52,
+      "symbol": "_execute_gate_plan"
     },
     {
       "path": "Scripts/quality_gate.py",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
+      "value": 57,
+      "symbol": "_run_docker_http_smoke"
+    },
+    {
+      "path": "Scripts/quality_gate.py",
+      "metric": "function.lines",
+      "limit": 50,
       "value": 88,
       "symbol": "build_push_validation_plan"
+    },
+    {
+      "path": "Scripts/quality_gate.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 66,
+      "symbol": "resolve_tests"
+    },
+    {
+      "path": "Scripts/quality_gate.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 56,
+      "symbol": "run_pre_push_gate"
+    },
+    {
+      "path": "Scripts/quality_gate_plan.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 61,
+      "symbol": "_aggregate_commands"
+    },
+    {
+      "path": "Scripts/report_test_execution_counts.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 76
+    },
+    {
+      "path": "Scripts/report_test_strategy.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 54
+    },
+    {
+      "path": "Scripts/report_test_strategy.py",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 470
+    },
+    {
+      "path": "Scripts/report_test_strategy.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 62,
+      "symbol": "_assemble_model"
+    },
+    {
+      "path": "Scripts/report_test_strategy.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 72,
+      "symbol": "_strategic_dimensions"
+    },
+    {
+      "path": "Scripts/report_test_strategy.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 55,
+      "symbol": "build_report_model"
+    },
+    {
+      "path": "Scripts/report_vitals_coverage.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 77
     },
     {
       "path": "Scripts/report_vitals_coverage.py",
@@ -110,43 +221,223 @@
       "symbol": "_raw_istanbul_metrics"
     },
     {
+      "path": "Scripts/run_statistical_reference_corpus.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 59,
+      "symbol": "run_control"
+    },
+    {
+      "path": "Scripts/statistical_parity_report.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 72
+    },
+    {
+      "path": "Scripts/statistical_parity_report.py",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 409
+    },
+    {
+      "path": "Scripts/statistical_parity_report.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 58,
+      "symbol": "build_validation_alignment"
+    },
+    {
+      "path": "Scripts/statistical_parity_report.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 80,
+      "symbol": "render_markdown"
+    },
+    {
+      "path": "Scripts/statistical_reference_corpus_invariants.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 62
+    },
+    {
+      "path": "Scripts/statistical_reference_corpus_normative.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 63
+    },
+    {
+      "path": "Scripts/test_classification_contract.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 65
+    },
+    {
+      "path": "Scripts/test_classification_rules_validation.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 53
+    },
+    {
+      "path": "Scripts/test_classifier_engine.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 61
+    },
+    {
+      "path": "Scripts/test_governance_detection.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 55
+    },
+    {
+      "path": "Scripts/test_governance_reporting.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 58
+    },
+    {
+      "path": "Scripts/test_governance_reporting.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 52,
+      "symbol": "build_report"
+    },
+    {
+      "path": "Scripts/test_governance_validation.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 69
+    },
+    {
+      "path": "Scripts/test_strategy_coverage.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 73,
+      "symbol": "_collect_one"
+    },
+    {
+      "path": "Scripts/test_strategy_evidence.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 54
+    },
+    {
+      "path": "Scripts/test_strategy_evidence.py",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 382
+    },
+    {
+      "path": "Scripts/test_strategy_evidence.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 57,
+      "symbol": "_load_native"
+    },
+    {
+      "path": "Scripts/test_strategy_evidence.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 57,
+      "symbol": "load_source"
+    },
+    {
+      "path": "Scripts/test_strategy_nodes.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 54,
+      "symbol": "_load_node"
+    },
+    {
+      "path": "Scripts/test_strategy_rendering.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 57,
+      "symbol": "render_markdown"
+    },
+    {
+      "path": "Scripts/validate_statistical_reference_corpus.py",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 427
+    },
+    {
+      "path": "Scripts/validate_statistical_reference_corpus.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 51,
+      "symbol": "validate_contract"
+    },
+    {
       "path": "backend/api_routes_simulate.py",
       "metric": "function.lines",
-      "limit": 80,
-      "value": 100,
+      "limit": 50,
+      "value": 55,
       "symbol": "simulate"
     },
     {
       "path": "backend/mc_core.py",
-      "metric": "function.complexity",
-      "limit": 15,
-      "value": 21,
-      "symbol": "throughput_reliability"
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 65,
+      "symbol": "mc_finish_weeks"
+    },
+    {
+      "path": "backend/simulation_models.py",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 57,
+      "symbol": "SimulationCommand.create"
+    },
+    {
+      "path": "backend/simulation_value_objects.py",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 67
+    },
+    {
+      "path": "backend/simulation_value_objects.py",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 367
     },
     {
       "path": "frontend/src/App.tsx",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
       "value": 93,
       "symbol": "App"
     },
     {
       "path": "frontend/src/AppFlowContent.test.tsx",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
       "value": 110,
       "symbol": "buildProps"
     },
     {
+      "path": "frontend/src/adapters/seededSampleIndexDrawPort.test.ts",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 73,
+      "symbol": "verifyCapturedContract"
+    },
+    {
+      "path": "frontend/src/adoClient.test.ts",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 449
+    },
+    {
       "path": "frontend/src/adoClient.ts",
       "metric": "file.complexity",
-      "limit": 80,
+      "limit": 50,
       "value": 96
     },
     {
       "path": "frontend/src/adoClient.ts",
       "metric": "file.lines",
-      "limit": 500,
+      "limit": 350,
       "value": 622
     },
     {
@@ -159,16 +450,42 @@
     {
       "path": "frontend/src/adoClient.ts",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
       "value": 86,
       "symbol": "checkPatDirect"
     },
     {
       "path": "frontend/src/adoClient.ts",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
       "value": 200,
       "symbol": "getTeamDeliveryDataDirect"
+    },
+    {
+      "path": "frontend/src/adoClient.ts",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 73,
+      "symbol": "task#2"
+    },
+    {
+      "path": "frontend/src/components/steps/PortfolioStep.test.tsx",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 51,
+      "symbol": "basePortfolioMock"
+    },
+    {
+      "path": "frontend/src/components/steps/SimulationChartTabs.test.tsx",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 461
+    },
+    {
+      "path": "frontend/src/components/steps/SimulationChartTabs.tsx",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 460
     },
     {
       "path": "frontend/src/components/steps/SimulationChartTabs.tsx",
@@ -180,58 +497,78 @@
     {
       "path": "frontend/src/components/steps/SimulationChartTabs.tsx",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
       "value": 427,
       "symbol": "SimulationChartTabs"
     },
     {
       "path": "frontend/src/components/steps/SimulationModeAndParametersControls.tsx",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
       "value": 83,
       "symbol": "SimulationModeAndParametersControls"
     },
     {
       "path": "frontend/src/components/steps/SimulationResultsPanel.test.tsx",
       "metric": "file.lines",
-      "limit": 500,
+      "limit": 350,
       "value": 736
     },
     {
       "path": "frontend/src/components/steps/portfolioPrintReport.test.ts",
       "metric": "file.lines",
-      "limit": 500,
+      "limit": 350,
       "value": 699
     },
     {
       "path": "frontend/src/components/steps/portfolioPrintReport.test.ts",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
       "value": 95,
       "symbol": "baseArgs"
     },
     {
       "path": "frontend/src/components/steps/portfolioPrintReport.ts",
       "metric": "file.lines",
-      "limit": 500,
+      "limit": 350,
       "value": 804
+    },
+    {
+      "path": "frontend/src/components/steps/simulationChartsSvg.ts",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 371
+    },
+    {
+      "path": "frontend/src/components/steps/simulationChartsSvg.ts",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 64,
+      "symbol": "renderCycleTimeChart"
+    },
+    {
+      "path": "frontend/src/components/steps/simulationChartsSvg.ts",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 54,
+      "symbol": "renderOverlayProbabilityChart"
     },
     {
       "path": "frontend/src/components/steps/simulationExportModules.test.ts",
       "metric": "file.lines",
-      "limit": 500,
+      "limit": 350,
       "value": 1376
     },
     {
       "path": "frontend/src/components/steps/simulationPdfDownload.ts",
       "metric": "file.complexity",
-      "limit": 80,
+      "limit": 50,
       "value": 186
     },
     {
       "path": "frontend/src/components/steps/simulationPdfDownload.ts",
       "metric": "file.lines",
-      "limit": 500,
+      "limit": 350,
       "value": 944
     },
     {
@@ -251,22 +588,78 @@
     {
       "path": "frontend/src/components/steps/simulationPdfDownload.ts",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
       "value": 352,
       "symbol": "downloadPortfolioPdf"
     },
     {
       "path": "frontend/src/components/steps/simulationPdfDownload.ts",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
       "value": 149,
       "symbol": "downloadSimulationPdf"
     },
     {
+      "path": "frontend/src/components/steps/simulationPrintReport.test.ts",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 371
+    },
+    {
+      "path": "frontend/src/domain/simulationValueObjects.test.ts",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 477
+    },
+    {
+      "path": "frontend/src/domain/simulationValueObjects.ts",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 68
+    },
+    {
+      "path": "frontend/src/domain/simulationValueObjects.ts",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 368
+    },
+    {
+      "path": "frontend/src/hooks/Simulationforecastservice.test.tsx",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 500
+    },
+    {
+      "path": "frontend/src/hooks/simulationForecastCore.ts",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 58,
+      "symbol": "fetchTeamThroughputCore"
+    },
+    {
+      "path": "frontend/src/hooks/simulationForecastCore.ts",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 71,
+      "symbol": "runSimulationForecastCore"
+    },
+    {
       "path": "frontend/src/hooks/useOnboarding.test.tsx",
       "metric": "file.lines",
-      "limit": 500,
+      "limit": 350,
       "value": 663
+    },
+    {
+      "path": "frontend/src/hooks/useOnboarding.ts",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 70
+    },
+    {
+      "path": "frontend/src/hooks/useOnboarding.ts",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 356
     },
     {
       "path": "frontend/src/hooks/useOnboarding.ts",
@@ -278,20 +671,33 @@
     {
       "path": "frontend/src/hooks/useOnboarding.ts",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
       "value": 87,
       "symbol": "submitPat"
     },
     {
+      "path": "frontend/src/hooks/usePortfolio.test.tsx",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 402
+    },
+    {
+      "path": "frontend/src/hooks/usePortfolio.ts",
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 52,
+      "symbol": "loadTeamOptions"
+    },
+    {
       "path": "frontend/src/hooks/usePortfolioReport.test.tsx",
       "metric": "file.lines",
-      "limit": 500,
-      "value": 502
+      "limit": 350,
+      "value": 501
     },
     {
       "path": "frontend/src/hooks/usePortfolioReport.ts",
       "metric": "file.lines",
-      "limit": 500,
+      "limit": 350,
       "value": 536
     },
     {
@@ -304,16 +710,15 @@
     {
       "path": "frontend/src/hooks/usePortfolioReport.ts",
       "metric": "function.lines",
-      "limit": 80,
+      "limit": 50,
       "value": 359,
       "symbol": "handleGenerateReport"
     },
     {
-      "path": "frontend/src/hooks/useSimulationHistory.ts",
-      "metric": "function.complexity",
-      "limit": 15,
-      "value": 21,
-      "symbol": "migrateSimulationHistoryEntry"
+      "path": "frontend/src/hooks/useSimulation.ts",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 464
     },
     {
       "path": "frontend/src/utils/cycleTime.ts",
@@ -321,6 +726,18 @@
       "limit": 15,
       "value": 26,
       "symbol": "calculateCycleTimeData"
+    },
+    {
+      "path": "frontend/src/utils/decisionLanguage.test.ts",
+      "metric": "file.lines",
+      "limit": 350,
+      "value": 455
+    },
+    {
+      "path": "frontend/src/utils/decisionLanguage.ts",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 56
     },
     {
       "path": "frontend/src/utils/decisionLanguage.ts",
@@ -332,33 +749,39 @@
     {
       "path": "frontend/src/utils/forecastDiagnostics.ts",
       "metric": "file.complexity",
-      "limit": 80,
+      "limit": 50,
       "value": 104
     },
     {
       "path": "frontend/src/utils/forecastDiagnostics.ts",
       "metric": "file.lines",
-      "limit": 500,
+      "limit": 350,
       "value": 573
     },
     {
       "path": "frontend/src/utils/simulation.test.ts",
       "metric": "file.lines",
-      "limit": 500,
-      "value": 702
+      "limit": 350,
+      "value": 665
     },
     {
       "path": "frontend/src/utils/simulation.ts",
       "metric": "file.complexity",
-      "limit": 80,
-      "value": 94
+      "limit": 50,
+      "value": 74
     },
     {
       "path": "frontend/src/utils/simulation.ts",
-      "metric": "function.complexity",
-      "limit": 15,
-      "value": 20,
-      "symbol": "computeThroughputReliability"
+      "metric": "function.lines",
+      "limit": 50,
+      "value": 52,
+      "symbol": "buildCorrelatedPortfolioWeeklyThroughputs"
+    },
+    {
+      "path": "frontend/src/utils/simulationSignature.ts",
+      "metric": "file.complexity",
+      "limit": 50,
+      "value": 51
     },
     {
       "path": "frontend/src/utils/simulationSignature.ts",
@@ -369,22 +792,6 @@
     }
   ],
   "cycles": [
-    {
-      "nodes": [
-        "frontend/src/api.ts",
-        "frontend/src/apiHelpers.ts"
-      ],
-      "edges": [
-        [
-          "frontend/src/api.ts",
-          "frontend/src/apiHelpers.ts"
-        ],
-        [
-          "frontend/src/apiHelpers.ts",
-          "frontend/src/api.ts"
-        ]
-      ]
-    },
     {
       "nodes": [
         "frontend/src/demoData.ts",
