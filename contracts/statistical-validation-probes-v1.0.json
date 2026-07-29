@@ -1,0 +1,269 @@
+{
+  "schema_version": "1.0",
+  "normative_contract": "STD-STAT-001",
+  "cases": [
+    {
+      "id": "backlog-inclusive-minima",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "accepted": true
+    },
+    {
+      "id": "backlog-inclusive-maxima",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 1000000,
+        "n_sims": 200000
+      },
+      "seed": 4294967295,
+      "accepted": true
+    },
+    {
+      "id": "items-zero-weeks-included",
+      "input": {
+        "throughput_samples": [0, 0, 0, 0, 0, 0],
+        "include_zero_weeks": true,
+        "mode": "weeks_to_items",
+        "target_weeks": 521,
+        "n_sims": 1000
+      },
+      "seed": 1,
+      "accepted": true
+    },
+    {
+      "id": "items-six-usable-after-zero-filter",
+      "input": {
+        "throughput_samples": [0, 1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 2,
+      "accepted": true
+    },
+    {
+      "id": "sample-string-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, "6"],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "sample-decimal-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6.5],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "sample-negative-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, -1],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "sample-boolean-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, true],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "raw-history-short-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "usable-history-short-rejected",
+      "input": {
+        "throughput_samples": [0, 1, 2, 3, 4, 5],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "zero-policy-string-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": "false",
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "zero-policy-default-forbidden",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "simulation-count-default-forbidden",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "simulation-count-lower-bound-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 999
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "active-parameter-missing",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "inactive-parameter-present",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "target_weeks": 12,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "unknown-field-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000,
+        "unexpected": 1
+      },
+      "seed": 0,
+      "accepted": false
+    },
+    {
+      "id": "seed-string-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000
+      },
+      "seed": "0",
+      "accepted": false
+    },
+    {
+      "id": "seed-decimal-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000
+      },
+      "seed": 1.5,
+      "accepted": false
+    },
+    {
+      "id": "seed-negative-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000
+      },
+      "seed": -1,
+      "accepted": false
+    },
+    {
+      "id": "seed-overflow-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "backlog_to_weeks",
+        "backlog_size": 10,
+        "n_sims": 1000
+      },
+      "seed": 4294967296,
+      "accepted": false
+    },
+    {
+      "id": "target-decimal-rejected",
+      "input": {
+        "throughput_samples": [1, 2, 3, 4, 5, 6],
+        "include_zero_weeks": false,
+        "mode": "weeks_to_items",
+        "target_weeks": 12.5,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "accepted": false
+    }
+  ]
+}

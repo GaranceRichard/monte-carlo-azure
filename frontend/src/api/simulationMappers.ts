@@ -12,6 +12,8 @@ import {
   createSimulationPercentiles,
   createSimulationSeed,
   createThroughputReliability,
+  SIMULATION_THROUGHPUT_SAMPLES_MAX,
+  SIMULATION_THROUGHPUT_SAMPLES_MIN,
 } from "../domain/simulationValueObjects";
 import type {
   CompletionSummaryDto,
@@ -20,6 +22,40 @@ import type {
   SimulationHistoryItemDto,
   ThroughputReliabilityDto,
 } from "./simulationDtos";
+
+function closedRecord(
+  value: unknown,
+  fieldName: string,
+  allowedKeys: readonly string[],
+): Record<string, unknown> {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`${fieldName} doit etre un objet.`);
+  }
+  const record = value as Record<string, unknown>;
+  if (Object.keys(record).some((key) => !allowedKeys.includes(key))) {
+    throw new Error(`${fieldName} contient des champs inconnus.`);
+  }
+  return record;
+}
+
+function canonicalSamplesCount(value: unknown): number {
+  if (
+    typeof value !== "number"
+    || !Number.isSafeInteger(value)
+    || value < SIMULATION_THROUGHPUT_SAMPLES_MIN
+    || value > SIMULATION_THROUGHPUT_SAMPLES_MAX
+  ) {
+    throw new Error("samples_count doit etre un entier compris entre 6 et 521.");
+  }
+  return value;
+}
+
+function canonicalRiskScore(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+    throw new Error("risk_score doit etre un nombre fini >= 0.");
+  }
+  return value;
+}
 
 function toCompletionSummary(
   dto: CompletionSummaryDto,
@@ -44,34 +80,45 @@ function toThroughputReliability(dto: ThroughputReliabilityDto) {
   });
 }
 
-export function simulationCommandToDto(command: SimulationCommand): SimulateRequestDto {
-  return {
-    throughput_samples: [...command.throughputSamples.rawValues],
-    include_zero_weeks: command.throughputSamples.includeZeroWeeks,
-    mode: command.mode,
-    backlog_size: command.backlogSize,
-    target_weeks: command.targetWeeks,
-    n_sims: command.nSims,
-    seed: command.seed,
-  };
+function canonicalDistribution(
+  value: unknown,
+): { x: unknown; count: unknown }[] {
+  if (!Array.isArray(value)) {
+    throw new Error("result_distribution doit etre une collection.");
+  }
+  return value.map((bucket) => {
+    const record = closedRecord(
+      bucket,
+      "result_distribution.bucket",
+      ["x", "count"],
+    );
+    return { x: record.x, count: record.count };
+  });
 }
 
-export function simulateResponseDtoToResult(
-  dto: SimulateResponseDto,
-  expectedNSims?: number,
-): SimulationResult {
-  const mode = dto.result_kind === "weeks" ? "backlog_to_weeks" : "weeks_to_items";
-  const completionTotal = dto.completion_summary === undefined
+function canonicalCompletion(
+  dto: Record<string, unknown>,
+  expectedNSims: number | undefined,
+  distributionDto: { x: unknown; count: unknown }[],
+) {
+  const completionDto = dto.completion_summary === undefined
     ? undefined
-    : dto.completion_summary.completed_count + dto.completion_summary.censored_count;
+    : closedRecord(
+        dto.completion_summary,
+        "completion_summary",
+        ["completed_count", "censored_count", "censored_rate", "horizon_weeks"],
+      );
+  const completionTotal = completionDto === undefined
+    ? undefined
+    : Number(completionDto.completed_count) + Number(completionDto.censored_count);
   const nSims = createSimulationCount(expectedNSims ?? completionTotal ?? (
-    dto.result_distribution?.reduce((sum, bucket) => sum + bucket.count, 0)
+    distributionDto.reduce((sum, bucket) => sum + Number(bucket.count), 0)
   ));
-  const completionSummary = dto.completion_summary === undefined
+  const completionSummary = completionDto === undefined
     ? undefined
-    : toCompletionSummary(dto.completion_summary, nSims);
+    : toCompletionSummary(completionDto as CompletionSummaryDto, nSims);
   const resultDistribution = createHistogram(
-    dto.result_distribution ?? [],
+    distributionDto,
     completionSummary?.completedCount ?? nSims,
   );
   if (dto.result_kind === "weeks" && completionSummary === undefined) {
@@ -80,17 +127,95 @@ export function simulateResponseDtoToResult(
   if (dto.result_kind === "items" && completionSummary !== undefined) {
     throw new Error("completion_summary est interdit pour weeks_to_items.");
   }
+  return { completionSummary, resultDistribution };
+}
+
+function canonicalReliability(
+  value: unknown,
+  samplesCount: number,
+) {
+  const reliabilityDto = closedRecord(
+    value,
+    "throughput_reliability",
+    ["cv", "iqr_ratio", "slope_norm", "label", "samples_count"],
+  );
+  const reliability = toThroughputReliability(
+    reliabilityDto as ThroughputReliabilityDto,
+  );
+  if (samplesCount !== reliability.samplesCount) {
+    throw new Error("samples_count doit correspondre a throughput_reliability.");
+  }
+  return reliability;
+}
+
+export function simulationCommandToDto(command: SimulationCommand): SimulateRequestDto {
+  const common = {
+    throughput_samples: [...command.throughputSamples.rawValues],
+    include_zero_weeks: command.throughputSamples.includeZeroWeeks,
+    mode: command.mode,
+    n_sims: command.nSims,
+    seed: command.seed,
+  };
+  if (command.mode === "backlog_to_weeks") {
+    if (command.backlogSize === undefined) {
+      throw new Error("backlog_size requis pour le mode backlog_to_weeks.");
+    }
+    return { ...common, mode: command.mode, backlog_size: command.backlogSize };
+  }
+  if (command.targetWeeks === undefined) {
+    throw new Error("target_weeks requis pour le mode weeks_to_items.");
+  }
+  return { ...common, mode: command.mode, target_weeks: command.targetWeeks };
+}
+
+export function simulateResponseDtoToResult(
+  dtoValue: SimulateResponseDto | unknown,
+  expectedNSims?: number,
+): SimulationResult {
+  const dto = closedRecord(
+    dtoValue,
+    "La reponse",
+    [
+      "result_kind",
+      "samples_count",
+      "seed",
+      "result_percentiles",
+      "risk_score",
+      "result_distribution",
+      "completion_summary",
+      "throughput_reliability",
+    ],
+  );
+  if (dto.result_kind !== "weeks" && dto.result_kind !== "items") {
+    throw new Error("result_kind invalide.");
+  }
+  const mode = dto.result_kind === "weeks" ? "backlog_to_weeks" : "weeks_to_items";
+  const resultPercentiles = createSimulationPercentiles(
+    mode,
+    closedRecord(dto.result_percentiles, "result_percentiles", ["P50", "P70", "P90"]),
+  );
+  const { completionSummary, resultDistribution } = canonicalCompletion(
+    dto,
+    expectedNSims,
+    canonicalDistribution(dto.result_distribution),
+  );
+  const samplesCount = canonicalSamplesCount(dto.samples_count);
+  const throughputReliability = canonicalReliability(
+    dto.throughput_reliability,
+    samplesCount,
+  );
+  const riskScore = "risk_score" in dto
+    ? canonicalRiskScore(dto.risk_score)
+    : undefined;
   return Object.freeze({
     resultKind: dto.result_kind,
-    samplesCount: dto.samples_count,
+    samplesCount,
     seed: createSimulationSeed(dto.seed),
-    resultPercentiles: createSimulationPercentiles(mode, dto.result_percentiles),
-    ...(dto.risk_score === undefined ? {} : { riskScore: dto.risk_score }),
+    resultPercentiles,
+    ...(riskScore === undefined ? {} : { riskScore }),
     resultDistribution,
     ...(completionSummary === undefined ? {} : { completionSummary }),
-    ...(dto.throughput_reliability === undefined
-      ? {}
-      : { throughputReliability: toThroughputReliability(dto.throughput_reliability) }),
+    throughputReliability,
   });
 }
 

@@ -23,34 +23,33 @@ def request_to_command(
 
 
 def result_to_response(result: SimulationResult) -> SimulateResponse:
-    return SimulateResponse(
-        result_kind=result.result_kind,
-        result_percentiles=result.result_percentiles.to_dict(),
-        risk_score=result.risk_score,
-        result_distribution=[
+    values: dict[str, Any] = {
+        "result_kind": result.result_kind,
+        "result_percentiles": result.result_percentiles.to_dict(),
+        "result_distribution": [
             {"x": bucket.x, "count": bucket.count}
             for bucket in result.result_distribution.buckets
         ],
-        completion_summary=(
-            {
-                "completed_count": result.completion_summary.completed_count,
-                "censored_count": result.completion_summary.censored_count,
-                "censored_rate": result.completion_summary.censored_rate,
-                "horizon_weeks": result.completion_summary.horizon_weeks,
-            }
-            if result.completion_summary is not None
-            else None
-        ),
-        samples_count=result.samples_count,
-        throughput_reliability={
+        "samples_count": result.samples_count,
+        "throughput_reliability": {
             "cv": result.throughput_reliability.cv,
             "iqr_ratio": result.throughput_reliability.iqr_ratio,
             "slope_norm": result.throughput_reliability.slope_norm,
             "label": result.throughput_reliability.label,
             "samples_count": result.throughput_reliability.samples_count,
         },
-        seed=result.seed.value,
-    )
+        "seed": result.seed.value,
+    }
+    if result.risk_score is not None:
+        values["risk_score"] = result.risk_score
+    if result.completion_summary is not None:
+        values["completion_summary"] = {
+            "completed_count": result.completion_summary.completed_count,
+            "censored_count": result.completion_summary.censored_count,
+            "censored_rate": result.completion_summary.censored_rate,
+            "horizon_weeks": result.completion_summary.horizon_weeks,
+        }
+    return SimulateResponse(**values)
 
 
 def persistence_row_to_history_item(

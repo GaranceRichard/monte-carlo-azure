@@ -115,13 +115,13 @@ def test_throughput_rejects_invalid_collection_and_zero_week_flag():
         ThroughputSamples.create([1] * 6, 1)
 
 
-def test_commands_resolve_only_the_active_mode_parameter():
+def test_commands_require_only_the_active_mode_parameter():
     backlog = SimulationCommand.create(
         throughput_samples=[1] * 6,
         include_zero_weeks=False,
         mode="backlog_to_weeks",
         backlog_size=10,
-        target_weeks="inactive",
+        target_weeks=None,
         n_sims=1000,
         seed=SimulationSeed(0),
     )
@@ -129,7 +129,7 @@ def test_commands_resolve_only_the_active_mode_parameter():
         throughput_samples=[1] * 6,
         include_zero_weeks=False,
         mode="weeks_to_items",
-        backlog_size="inactive",
+        backlog_size=None,
         target_weeks=12,
         n_sims=1000,
         seed=SimulationSeed(SIMULATION_SEED_MAX),
@@ -147,6 +147,12 @@ def test_commands_resolve_only_the_active_mode_parameter():
         {"mode": "invalid"},
         {"mode": "backlog_to_weeks", "backlog_size": None},
         {"mode": "weeks_to_items", "target_weeks": None},
+        {"mode": "backlog_to_weeks", "target_weeks": 12},
+        {
+            "mode": "weeks_to_items",
+            "backlog_size": 10,
+            "target_weeks": 12,
+        },
         {"throughput_samples": "123456"},
         {"seed": 0},
     ],
@@ -165,6 +171,108 @@ def test_commands_reject_unresolved_domain_inputs(overrides):
 
     with pytest.raises(StatisticalValueError):
         SimulationCommand.create(**values)
+
+
+def test_normalized_commands_are_closed_explicit_and_seeded_with_uint32():
+    backlog = SimulationCommand.from_normalized_input(
+        {
+            "throughput_samples": [0, 1, 2, 3, 4, 5],
+            "include_zero_weeks": True,
+            "mode": "backlog_to_weeks",
+            "backlog_size": 10,
+            "n_sims": 1000,
+        },
+        0,
+    )
+    items = SimulationCommand.from_normalized_input(
+        {
+            "throughput_samples": [0, 1, 2, 3, 4, 5, 6],
+            "include_zero_weeks": False,
+            "mode": "weeks_to_items",
+            "target_weeks": 521,
+            "n_sims": 200000,
+        },
+        SIMULATION_SEED_MAX,
+    )
+
+    assert backlog.seed == SimulationSeed(0)
+    assert backlog.throughput_samples.usable_values == (0, 1, 2, 3, 4, 5)
+    assert items.seed == SimulationSeed(SIMULATION_SEED_MAX)
+    assert items.throughput_samples.usable_values == (1, 2, 3, 4, 5, 6)
+
+
+@pytest.mark.parametrize(
+    ("input_value", "seed"),
+    [
+        (None, 0),
+        (
+            {
+                "throughput_samples": [1] * 6,
+                "include_zero_weeks": False,
+                "mode": "backlog_to_weeks",
+                "backlog_size": 10,
+                "n_sims": 1000,
+                "unknown": True,
+            },
+            0,
+        ),
+        (
+            {
+                "throughput_samples": [1] * 6,
+                "mode": "backlog_to_weeks",
+                "backlog_size": 10,
+                "n_sims": 1000,
+            },
+            0,
+        ),
+        (
+            {
+                "throughput_samples": [1] * 6,
+                "include_zero_weeks": False,
+                "mode": "backlog_to_weeks",
+                "target_weeks": 12,
+                "n_sims": 1000,
+            },
+            0,
+        ),
+        (
+            {
+                "throughput_samples": [1] * 6,
+                "include_zero_weeks": False,
+                "mode": "backlog_to_weeks",
+                "backlog_size": 10,
+                "target_weeks": 12,
+                "n_sims": 1000,
+            },
+            0,
+        ),
+        (
+            {
+                "throughput_samples": [1] * 6,
+                "include_zero_weeks": False,
+                "mode": "invalid",
+                "n_sims": 1000,
+            },
+            0,
+        ),
+        (
+            {
+                "throughput_samples": [1] * 6,
+                "include_zero_weeks": False,
+                "mode": "backlog_to_weeks",
+                "backlog_size": 10,
+                "n_sims": 1000,
+            },
+            4294967296,
+        ),
+    ],
+)
+def test_normalized_commands_reject_open_unresolved_or_invalid_shapes(
+    input_value,
+    seed,
+):
+    with pytest.raises(StatisticalValueError):
+        SimulationCommand.from_normalized_input(input_value, seed)
 
 
 def test_direct_command_construction_requires_value_objects_and_resolved_mode():

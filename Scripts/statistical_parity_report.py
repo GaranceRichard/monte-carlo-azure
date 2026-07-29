@@ -191,10 +191,115 @@ def _summary(
     }
 
 
+def _validation_probe_map(report: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {case["id"]: case for case in report.get("cases", [])}
+
+
+def build_validation_alignment(
+    probes: dict[str, Any],
+    python_report: dict[str, Any],
+    typescript_report: dict[str, Any],
+) -> dict[str, Any]:
+    python_cases = _validation_probe_map(python_report)
+    typescript_cases = _validation_probe_map(typescript_report)
+    cases: list[dict[str, Any]] = []
+    for probe in probes["cases"]:
+        expected = probe["accepted"]
+        python_case = python_cases.get(probe["id"])
+        typescript_case = typescript_cases.get(probe["id"])
+        python_accepted = (python_case or {}).get("accepted", _MISSING)
+        typescript_accepted = (typescript_case or {}).get("accepted", _MISSING)
+        matches = (python_accepted, typescript_accepted) == (expected, expected)
+        case = {
+            "id": probe["id"],
+            "expected_accepted": expected,
+            "status": "match" if matches else "divergence",
+        }
+        if python_accepted is not _MISSING:
+            case["python_accepted"] = python_accepted
+        if typescript_accepted is not _MISSING:
+            case["typescript_accepted"] = typescript_accepted
+        cases.append(case)
+    engine_errors = sum(
+        report.get("status") == "engine_error"
+        for report in (python_report, typescript_report)
+    )
+    matching_probes = sum(case["status"] == "match" for case in cases)
+    return {
+        "pbi": "2.13",
+        "fixture": "contracts/statistical-validation-probes-v1.0.json",
+        "status": (
+            "engine_error"
+            if engine_errors
+            else "match"
+            if matching_probes == len(cases)
+            else "divergence"
+        ),
+        "summary": {
+            "probe_count": len(cases),
+            "matching_probes": matching_probes,
+            "divergent_probes": len(cases) - matching_probes,
+            "engine_errors": engine_errors,
+        },
+        "engines": {
+            "python": {
+                key: value for key, value in python_report.items() if key != "cases"
+            },
+            "typescript": {
+                key: value
+                for key, value in typescript_report.items()
+                if key != "cases"
+            },
+        },
+        "cases": cases,
+    }
+
+
+def _optional_validation_alignment(
+    validation_probes: dict[str, Any] | None,
+    python_report: dict[str, Any] | None,
+    typescript_report: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if any(
+        report is None
+        for report in (validation_probes, python_report, typescript_report)
+    ):
+        return None
+    return build_validation_alignment(
+        validation_probes,
+        python_report,
+        typescript_report,
+    )
+
+
+def _parity_status(
+    summary: dict[str, int],
+    validation_alignment: dict[str, Any] | None,
+) -> str:
+    validation_status = (validation_alignment or {}).get("status")
+    engine_error = bool(
+        summary["fatal_engine_errors"]
+        + summary["engine_error_cases"]
+        + int(validation_status == "engine_error")
+    )
+    divergence = bool(
+        summary["normative_divergence_cases"]
+        + summary["engine_divergence_cases"]
+        + int(validation_status == "divergence")
+    )
+    return ("match", "divergence", "engine_error")[
+        max(int(divergence), 2 * int(engine_error))
+    ]
+
+
 def build_parity_report(
     corpus: dict[str, Any],
     python_report: dict[str, Any],
     typescript_report: dict[str, Any],
+    *,
+    validation_probes: dict[str, Any] | None = None,
+    python_validation_report: dict[str, Any] | None = None,
+    typescript_validation_report: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     python_cases = _case_map(python_report)
     typescript_cases = _case_map(typescript_report)
@@ -207,16 +312,15 @@ def build_parity_report(
         for reference_case in corpus["cases"]
     ]
     summary = _summary(case_reports, [python_report, typescript_report])
-    if summary["fatal_engine_errors"] or summary["engine_error_cases"]:
-        status = "engine_error"
-    elif summary["normative_divergence_cases"] or summary["engine_divergence_cases"]:
-        status = "divergence"
-    else:
-        status = "match"
-    return {
-        "report_version": "1.0",
+    validation_alignment = _optional_validation_alignment(
+        validation_probes,
+        python_validation_report,
+        typescript_validation_report,
+    )
+    report = {
+        "report_version": "1.1",
         "enforcement": "informational",
-        "status": status,
+        "status": _parity_status(summary, validation_alignment),
         "corpus": {
             "id": corpus["corpus_id"],
             "schema_version": corpus["schema_version"],
@@ -233,11 +337,14 @@ def build_parity_report(
         },
         "cases": case_reports,
     }
+    if validation_alignment is not None:
+        report["validation_alignment"] = validation_alignment
+    return report
 
 
 def invalid_corpus_report(kind: str, diagnostics: list[str]) -> dict[str, Any]:
     return {
-        "report_version": "1.0",
+        "report_version": "1.1",
         "enforcement": "informational",
         "status": "invalid_corpus",
         "invalidity": kind,
@@ -266,13 +373,25 @@ def render_markdown(report: dict[str, Any]) -> str:
             ]
         )
         return "\n".join(lines) + "\n"
-
     summary = report["summary"]
     lines.extend(
         [
             f"- Statut : `{report['status']}`",
             f"- Corpus : `{report['corpus']['id']}` `1.0` / `mca-prng-v1`",
             f"- Cas : {summary['case_count']}",
+        ]
+    )
+    validation_alignment = report.get("validation_alignment")
+    if validation_alignment is not None:
+        validation_summary = validation_alignment["summary"]
+        lines.append(
+            "- Validation PBI 2.13 : "
+            f"`{validation_alignment['status']}` "
+            f"({validation_summary['matching_probes']}/{validation_summary['probe_count']} "
+            "probes concordantes)"
+        )
+    lines.extend(
+        [
             "",
             "| Cas | Python / norme | TypeScript / norme | Python / TypeScript |",
             "| --- | --- | --- | --- |",
@@ -295,6 +414,31 @@ def render_markdown(report: dict[str, Any]) -> str:
             "réordonnancement d’histogramme ni valeur absente reconstruite.",
         ]
     )
+    if validation_alignment is not None:
+        lines.extend(
+            [
+                "",
+                "## Alignement de validation PBI 2.13",
+                "",
+                "| Probe | Attendu | Python | TypeScript | Statut |",
+                "| --- | --- | --- | --- | --- |",
+            ]
+        )
+        for probe in validation_alignment["cases"]:
+            lines.append(
+                f"| `{probe['id']}` | `{probe['expected_accepted']}` "
+                f"| `{probe.get('python_accepted', 'omis')}` | "
+                f"`{probe.get('typescript_accepted', 'omis')}` | `{probe['status']}` |"
+            )
+        lines.extend(
+            [
+                "",
+                "Ces probes couvrent la forme fermée, les valeurs par défaut résolues, "
+                "le paramètre de mode exclusif, les entiers stricts, les zéros, "
+                "les bornes et la seed uint32. Ils n’exécutent ni ne modifient "
+                "les formules réservées aux PBI 2.14 à 2.16.",
+            ]
+        )
     return "\n".join(lines) + "\n"
 
 

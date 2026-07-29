@@ -72,6 +72,13 @@ function baseParams(overrides: Partial<Parameters<typeof runSimulationForecast>[
   };
 }
 
+const SAMPLE_PARAMS = {
+  throughputSamples: [5, 7, 4, 6, 8, 5],
+  simulationMode: "backlog_to_weeks" as const,
+  backlogSize: 80, targetWeeks: 12,
+  nSims: 20000,
+};
+
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({ weeklyThroughput: WEEKLY_6, cycleTimeDaysData: [] });
@@ -152,39 +159,38 @@ describe("demo mode et normalisation", () => {
     expect(vi.mocked(postSimulate)).not.toHaveBeenCalled();
   });
 
-  it("calcule risk_score localement si le backend ne le renvoie pas", async () => {
-    vi.mocked(postSimulate).mockResolvedValue({
-      ...API_RESPONSE_WEEKS,
-      risk_score: undefined,
-    } as never);
+  it("ne reconstruit pas risk_score si le backend l'omet", async () => {
+    vi.mocked(postSimulate).mockResolvedValue(API_RESPONSE_WEEKS);
 
-    const result = await simulateForecastFromSamples({
-      throughputSamples: [5, 7, 4, 6, 8, 5],
-      simulationMode: "backlog_to_weeks",
-      backlogSize: 80,
-      targetWeeks: 12,
-      nSims: 20000,
-    });
+    const result = await simulateForecastFromSamples(SAMPLE_PARAMS);
 
-    expect(result.riskScore).toBeCloseTo((13 - 8) / 8);
+    expect(result).not.toHaveProperty("riskScore");
   });
 
   it("laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent", async () => {
     vi.mocked(postSimulate).mockResolvedValue({
       ...API_RESPONSE_WEEKS,
       result_percentiles: { P70: 10 },
-      risk_score: undefined,
     } as never);
 
-    const result = await simulateForecastFromSamples({
-      throughputSamples: [5, 7, 4, 6, 8, 5],
-      simulationMode: "backlog_to_weeks",
-      backlogSize: 80,
-      targetWeeks: 12,
-      nSims: 20000,
-    });
+    const result = await simulateForecastFromSamples(SAMPLE_PARAMS);
 
     expect(result.riskScore).toBeUndefined();
+  });
+
+  it("resout les memes valeurs par defaut que la frontiere Python", async () => {
+    await simulateForecastFromSamples({
+      ...SAMPLE_PARAMS,
+      throughputSamples: [0, 1, 2, 3, 4, 5, 6],
+      nSims: undefined,
+    });
+
+    expect(postSimulate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        include_zero_weeks: false,
+        n_sims: 20000,
+      }),
+    );
   });
 });
 
@@ -228,10 +234,10 @@ describe("appels réseau", () => {
       expect.objectContaining({
         mode: "backlog_to_weeks",
         backlog_size: 80,
-        target_weeks: undefined,
         n_sims: 20000,
       }),
     );
+    expect(vi.mocked(postSimulate).mock.calls[0]?.[0]).not.toHaveProperty("target_weeks");
     expect(vi.mocked(postSimulate).mock.calls[0]?.[0]).not.toHaveProperty("client_context");
     expect(vi.mocked(postSimulate).mock.calls[0]?.[0]).not.toHaveProperty("selected_team");
     expect(vi.mocked(postSimulate).mock.calls[0]?.[0]).not.toHaveProperty("pat");
@@ -247,9 +253,9 @@ describe("appels réseau", () => {
       expect.objectContaining({
         mode: "weeks_to_items",
         target_weeks: 12,
-        backlog_size: undefined,
       }),
     );
+    expect(vi.mocked(postSimulate).mock.calls[0]?.[0]).not.toHaveProperty("backlog_size");
   });
 
   it("couvre directement backlog_size pour simulateForecastFromSamples", async () => {
@@ -265,9 +271,9 @@ describe("appels réseau", () => {
       expect.objectContaining({
         mode: "backlog_to_weeks",
         backlog_size: 80,
-        target_weeks: undefined,
       }),
     );
+    expect(vi.mocked(postSimulate).mock.calls[0]?.[0]).not.toHaveProperty("target_weeks");
   });
 
   it("couvre directement target_weeks pour simulateForecastFromSamples", async () => {
@@ -284,10 +290,10 @@ describe("appels réseau", () => {
     expect(postSimulate).toHaveBeenCalledWith(
       expect.objectContaining({
         mode: "weeks_to_items",
-        backlog_size: undefined,
         target_weeks: 12,
       }),
     );
+    expect(vi.mocked(postSimulate).mock.calls[0]?.[0]).not.toHaveProperty("backlog_size");
   });
 
   it("rejette une distribution absente qui ne conserve pas la masse", async () => {
@@ -300,7 +306,7 @@ describe("appels réseau", () => {
       throughput_reliability: { cv: 0.22, iqr_ratio: 0.3, slope_norm: -0.02, label: "fiable", samples_count: 6 },
     } as never);
 
-    await expect(runSimulationForecast(baseParams())).rejects.toThrow("masse totale");
+    await expect(runSimulationForecast(baseParams())).rejects.toThrow("collection");
   });
 
   it("propage throughput_reliability tel quel", async () => {
@@ -579,4 +585,3 @@ describe("cohérence du résultat retourné", () => {
     expect(historyEntry.warning).toContain("1/3");
   });
 });
-

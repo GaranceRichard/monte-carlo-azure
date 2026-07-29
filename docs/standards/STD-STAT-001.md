@@ -352,6 +352,13 @@ sans tolérance, tri ou valeur absente reconstruite. Treize cas concordent avec 
 les deux cas d’histogrammes agrégés conservent des divergences explicites orientées vers le PBI 2.16.
 Le rapport reste informatif jusqu’au contrôle bloquant prévu par le PBI 2.19.
 
+Le PBI 2.13 aligne les fabriques Python et TypeScript sur l’entrée normalisée fermée du contrat `1.0` :
+types et bornes stricts, entiers finis positifs ou nuls, six observations utilisables, seed `uint32` et
+présence exclusive du paramètre actif. Il aligne aussi la forme canonique fermée et l’omission des valeurs
+indisponibles, sans sentinelle. Les 22 sondes partagées en apportent une preuve interlangage. Les frontières
+DTO, API, MongoDB et `localStorage` restent primitives ; aucune formule statistique ni géométrie
+d’histogramme n’est modifiée.
+
 ### STAT-PAR-047 — Version de rejeu
 
 Le contrat normatif **DOIT** porter la version `1.0`. Toute preuve ou donnée destinée au rejeu **DOIT**

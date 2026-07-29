@@ -1,5 +1,5 @@
 import { createSeededSampleIndexDrawPort } from "./adapters/seededSampleIndexDrawPort";
-import { createSimulationCommand } from "./domain/simulation";
+import { createSimulationCommandFromNormalizedInput } from "./domain/simulation";
 import type { SimulationResult } from "./domain/simulation";
 import { createSimulationSeed } from "./domain/simulationValueObjects";
 import { simulateMonteCarloLocal } from "./utils/simulation";
@@ -29,6 +29,17 @@ export type StatisticalCorpus = {
 export type CanonicalResult = Record<string, unknown>;
 export type TypeScriptCaseExecutor = (referenceCase: ReferenceCase) => CanonicalResult;
 
+export type ValidationProbeDocument = {
+  schema_version: string;
+  normative_contract: string;
+  cases: readonly {
+    id: string;
+    input: unknown;
+    seed: unknown;
+    accepted: boolean;
+  }[];
+};
+
 export function canonicalizeTypeScriptResult(result: SimulationResult): CanonicalResult {
   const canonical: CanonicalResult = {
     result_kind: result.resultKind,
@@ -47,33 +58,30 @@ export function canonicalizeTypeScriptResult(result: SimulationResult): Canonica
     };
   }
   canonical.samples_count = result.samplesCount;
-  if (result.throughputReliability !== undefined) {
-    canonical.throughput_reliability = {
-      cv: result.throughputReliability.cv,
-      iqr_ratio: result.throughputReliability.iqrRatio,
-      slope_norm: result.throughputReliability.slopeNorm,
-      label: result.throughputReliability.label,
-      samples_count: result.throughputReliability.samplesCount,
-    };
+  if (result.throughputReliability === undefined) {
+    throw new Error("throughput_reliability est requis dans la reponse canonique.");
   }
+  canonical.throughput_reliability = {
+    cv: result.throughputReliability.cv,
+    iqr_ratio: result.throughputReliability.iqrRatio,
+    slope_norm: result.throughputReliability.slopeNorm,
+    label: result.throughputReliability.label,
+    samples_count: result.throughputReliability.samplesCount,
+  };
   canonical.seed = result.seed;
   return canonical;
 }
 
 export function executeTypeScriptCase(referenceCase: ReferenceCase): CanonicalResult {
-  const input = referenceCase.input;
-  const seed = createSimulationSeed(referenceCase.seed);
-  const command = createSimulationCommand({
-    throughputSamples: input.throughput_samples,
-    includeZeroWeeks: input.include_zero_weeks,
-    mode: input.mode,
-    backlogSize: input.backlog_size,
-    targetWeeks: input.target_weeks,
-    nSims: input.n_sims,
-    seed,
-  });
+  const command = createSimulationCommandFromNormalizedInput(
+    referenceCase.input,
+    createSimulationSeed(referenceCase.seed),
+  );
   return canonicalizeTypeScriptResult(
-    simulateMonteCarloLocal(command, createSeededSampleIndexDrawPort(seed)),
+    simulateMonteCarloLocal(
+      command,
+      createSeededSampleIndexDrawPort(command.seed),
+    ),
   );
 }
 
@@ -124,5 +132,27 @@ export function runTypeScriptCorpus(
       ? "engine_error"
       : "completed",
     cases,
+  };
+}
+
+export function runTypeScriptValidationProbes(
+  probes: ValidationProbeDocument,
+): Record<string, unknown> {
+  return {
+    engine: "typescript",
+    schema_version: probes.schema_version,
+    normative_contract: probes.normative_contract,
+    status: "completed",
+    cases: probes.cases.map((probe) => {
+      try {
+        createSimulationCommandFromNormalizedInput(
+          probe.input,
+          createSimulationSeed(probe.seed),
+        );
+        return { id: probe.id, accepted: true };
+      } catch {
+        return { id: probe.id, accepted: false };
+      }
+    }),
   };
 }

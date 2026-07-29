@@ -23,26 +23,46 @@ export type ThroughputReliabilityDto = {
   samples_count: number;
 };
 
-export type SimulateRequestDto = {
+type SimulateRequestCommonDto = {
   throughput_samples: number[];
   include_zero_weeks?: boolean;
-  mode: SimulationModeDto;
-  backlog_size?: number;
-  target_weeks?: number;
-  n_sims: number;
+  n_sims?: number;
   seed?: number;
 };
 
-export type SimulateResponseDto = {
+export type SimulateRequestDto = SimulateRequestCommonDto & (
+  | {
+      mode: "backlog_to_weeks";
+      backlog_size: number;
+      target_weeks?: never;
+    }
+  | {
+      mode: "weeks_to_items";
+      backlog_size?: never;
+      target_weeks: number;
+    }
+);
+
+type SimulateResponseCommonDto = {
   result_kind: SimulationResultKindDto;
   samples_count: number;
   seed: number;
   result_percentiles: SimulationPercentilesDto;
   risk_score?: number;
   result_distribution: HistogramBucketDto[];
-  completion_summary?: CompletionSummaryDto;
-  throughput_reliability?: ThroughputReliabilityDto;
+  throughput_reliability: ThroughputReliabilityDto;
 };
+
+export type SimulateResponseDto = SimulateResponseCommonDto & (
+  | {
+      result_kind: "weeks";
+      completion_summary: CompletionSummaryDto;
+    }
+  | {
+      result_kind: "items";
+      completion_summary?: never;
+    }
+);
 
 export type SimulationHistoryItemDto = {
   created_at: string;

@@ -19,6 +19,12 @@ Périmètre : PBI **2.1 — Auditer les divergences statistiques Python et TypeS
 > agrégés reproduisent ST-33 : `100` buckets Python contre `51` centres impairs TypeScript sur `0..100`,
 > puis `50/9951` contre `51/10050` sur la plage discontinue, alors que la norme fixe `50/9999`. Le rapport
 > reste informatif et aucune observation historique n’est corrigée dans ce PBI.
+>
+> **Alignement postérieur — PBI 2.13.** Les validations normalisées et la forme canonique de réponse sont
+> maintenant fermées et identiques dans les deux langages. Les 22 sondes partagées concordent, les valeurs
+> absentes sont omises sans sentinelle et les frontières applicatives restent primitives. Les formules
+> statistiques de l’audit ne sont pas modifiées : les deux écarts ST-33 restent visibles et le rapport
+> demeure informatif jusqu’au PBI 2.19.
 
 ## 1. Objet et périmètre
 

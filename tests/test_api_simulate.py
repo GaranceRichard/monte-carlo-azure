@@ -173,6 +173,45 @@ def test_simulate_requires_target_weeks_for_weeks_mode():
     assert "target_weeks" in str(r.json()["detail"])
 
 
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {
+            "throughput_samples": [1, 2, 3, 4, 5, 6],
+            "mode": "backlog_to_weeks",
+            "backlog_size": 10,
+            "target_weeks": 12,
+            "n_sims": 1000,
+        },
+        {
+            "throughput_samples": [1, 2, 3, 4, 5, 6],
+            "mode": "weeks_to_items",
+            "backlog_size": 10,
+            "target_weeks": 12,
+            "n_sims": 1000,
+        },
+        {
+            "throughput_samples": [1, 2, 3, 4, 5, 6],
+            "mode": "backlog_to_weeks",
+            "backlog_size": 10,
+            "target_weeks": None,
+            "n_sims": 1000,
+        },
+        {
+            "throughput_samples": [1, 2, 3, 4, 5, 6],
+            "mode": "backlog_to_weeks",
+            "backlog_size": 10,
+            "n_sims": 1000,
+            "unknown": True,
+        },
+    ],
+)
+def test_simulate_rejects_inactive_or_unknown_fields(payload):
+    response = ApiTestClient(app).post("/simulate", json=payload)
+
+    assert response.status_code == 422
+
+
 def test_simulate_rejects_insufficient_non_zero_history():
     client = ApiTestClient(app)
     r = client.post(

@@ -1,8 +1,10 @@
 import corpusDocument from "../../contracts/statistical-reference-corpus-v1.0.json";
+import validationProbes from "../../contracts/statistical-validation-probes-v1.0.json";
 import { describe, expect, it, vi } from "vitest";
 import type { SimulationResult } from "./domain/simulation";
 import {
   canonicalizeTypeScriptResult,
+  runTypeScriptValidationProbes,
   runTypeScriptCorpus,
 } from "./statisticalCorpusRunner";
 import type {
@@ -77,6 +79,26 @@ describe("shared statistical corpus TypeScript runner", () => {
     expect(executeCase).not.toHaveBeenCalled();
   });
 
+  it("applies every shared positive and negative normalized-input probe", () => {
+    const report = runTypeScriptValidationProbes(validationProbes);
+    const expected = new Map(
+      validationProbes.cases.map((probe) => [probe.id, probe.accepted]),
+    );
+
+    expect(report).toMatchObject({
+      engine: "typescript",
+      schema_version: "1.0",
+      normative_contract: "STD-STAT-001",
+      status: "completed",
+    });
+    expect(report.cases).toEqual(
+      validationProbes.cases.map((probe) => ({
+        id: probe.id,
+        accepted: expected.get(probe.id),
+      })),
+    );
+  });
+
   it("reports Error and non-Error engine failures per case", () => {
     const candidate = {
       ...corpus,
@@ -113,6 +135,13 @@ describe("shared statistical corpus TypeScript runner", () => {
       seed: 0,
       resultPercentiles: {},
       resultDistribution: [],
+      throughputReliability: {
+        cv: 0,
+        iqrRatio: 0,
+        slopeNorm: 0,
+        label: "incertain",
+        samplesCount: 6,
+      },
     } as unknown as SimulationResult;
 
     expect(canonicalizeTypeScriptResult(result)).toEqual({
@@ -120,7 +149,18 @@ describe("shared statistical corpus TypeScript runner", () => {
       result_percentiles: {},
       result_distribution: [],
       samples_count: 6,
+      throughput_reliability: {
+        cv: 0,
+        iqr_ratio: 0,
+        slope_norm: 0,
+        label: "incertain",
+        samples_count: 6,
+      },
       seed: 0,
     });
+    expect(() => canonicalizeTypeScriptResult({
+      ...result,
+      throughputReliability: undefined,
+    } as unknown as SimulationResult)).toThrow("throughput_reliability");
   });
 });

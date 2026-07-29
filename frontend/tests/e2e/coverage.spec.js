@@ -677,6 +677,13 @@ test.describe("e2e istanbul coverage", () => {
                   result_percentiles: { P50: 30, P70: 24, P90: 20 },
                   result_distribution: [{ x: 20, count: nSims }],
                   samples_count: 70,
+                  throughput_reliability: {
+                    cv: 0.2,
+                    iqr_ratio: 0.2,
+                    slope_norm: 0,
+                    label: "fiable",
+                    samples_count: 70,
+                  },
                 }),
                 { status: 200, headers: { "content-type": "application/json" } },
               );
@@ -694,6 +701,13 @@ test.describe("e2e istanbul coverage", () => {
                   horizon_weeks: 521,
                 },
                 samples_count: 70,
+                throughput_reliability: {
+                  cv: 0.2,
+                  iqr_ratio: 0.2,
+                  slope_norm: 0,
+                  label: "fiable",
+                  samples_count: 70,
+                },
               }),
               { status: 200, headers: { "content-type": "application/json" } },
             );
@@ -1495,6 +1509,13 @@ test.describe("e2e istanbul coverage", () => {
               censored_count: 0,
               censored_rate: 0,
               horizon_weeks: 521,
+            },
+            throughput_reliability: {
+              cv: 0.2,
+              iqr_ratio: 0.2,
+              slope_norm: 0,
+              label: "fiable",
+              samples_count: 8,
             },
           });
         }
@@ -2504,6 +2525,13 @@ test.describe("e2e istanbul coverage", () => {
                 result_percentiles: { P50: 30, P70: 24, P90: 20 },
                 samples_count: 6,
                 result_distribution: [{ x: 20, count: nSims }],
+                throughput_reliability: {
+                  cv: 0.2,
+                  iqr_ratio: 0.2,
+                  slope_norm: 0,
+                  label: "fiable",
+                  samples_count: 6,
+                },
               });
             }
             return jsonResponse({
@@ -2518,6 +2546,13 @@ test.describe("e2e istanbul coverage", () => {
                 censored_count: 0,
                 censored_rate: 0,
                 horizon_weeks: 521,
+              },
+              throughput_reliability: {
+                cv: 0.2,
+                iqr_ratio: 0.2,
+                slope_norm: 0,
+                label: "fiable",
+                samples_count: 6,
               },
             });
           }

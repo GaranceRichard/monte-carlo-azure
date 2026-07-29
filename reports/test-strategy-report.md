@@ -6,14 +6,14 @@ strategyEvidenceStatus: `incomplete`
 
 ## Global reference
 
-Known logical cases: 1249
+Known logical cases: 1264
 
 ## Profile execution
 
-Selected logical cases: 1246
-Collected instances: 1506
-Executed instances: 1506
-Attempts: 1506
+Selected logical cases: 1261
+Collected instances: 1552
+Executed instances: 1552
+Attempts: 1552
 Retries: 0
 
 ## Evidence manifest

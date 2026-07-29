@@ -121,6 +121,7 @@ contracts/
   mca-prng-v1-vectors.json # sorties uint32 et indices canoniques partagés
   statistical-reference-corpus-v1.0.schema.json # contrat JSON Schema normatif du corpus
   statistical-reference-corpus-v1.0.json # cas normatifs 2.10/2.11, scores, fiabilité et histogrammes
+  statistical-validation-probes-v1.0.json # validations normalisées partagées du PBI 2.13
   examples/
     statistical-reference-corpus-v1.0.minimal.json # preuve structurelle minimale
     statistical-reference-corpus-v1.0.invalid.json # contre-exemple de fermeture
@@ -354,7 +355,8 @@ La composition appartient aux frontières d’exécution :
 Les moteurs ne connaissent toujours que `SampleIndexDrawPort` et ne créent aucun PRNG. Le contrat commun,
 l’ordre logique et les tests de lots prouvent la stabilité de l’affectation des tirages. Les PBI 2.10 et
 2.11 matérialisent les cas normatifs jusqu’aux scores, labels et buckets. Le PBI 2.12 les exécute désormais
-dans les deux moteurs ; l’égalité complète des résultats relève encore des PBI 2.13 à 2.17.
+dans les deux moteurs. Le PBI 2.13 aligne leur validation normalisée et leur forme de résultat ; les
+formules statistiques et l’égalité complète des résultats relèvent encore des PBI 2.14 à 2.17.
 
 ### Contrat du corpus statistique
 
@@ -392,12 +394,21 @@ du contrat, sans recalcul statistique, tolérance, tri ou valeur par défaut.
 valeurs. Le rapport sépare la conformité de chaque moteur à `expected_result` de leur égalité mutuelle ;
 les absences de champ restent distinctes de `null` ou de zéro. Le coordinateur
 `Scripts/run_statistical_reference_corpus.py` refuse tout corpus invalide avant d’appeler un moteur,
-isole les erreurs par cas et publie les rapports JSON et Markdown déterministes sous `reports/`.
+isole les erreurs par cas, exécute aussi les 22 sondes de validation du contrat `1.0` et publie les rapports
+JSON et Markdown déterministes sous `reports/`.
 L’enforcement reste `informational` et n’appartient pas au DAG `main` avant le PBI 2.19.
 
 Cette frontière ne constitue pas une nouvelle API applicative : aucun mapper, DTO, document MongoDB ou
-objet `localStorage` ne la consomme. Le PBI 2.12 ne modifie aucun moteur ni aucune formule ; il expose les
-divergences existantes, dont les deux géométries d’histogrammes agrégés réservées au PBI 2.16.
+objet `localStorage` ne consomme directement le corpus. Le PBI 2.13 applique néanmoins les mêmes règles
+fermées dans les fabriques métier et les mappers : types stricts, bornes communes, six observations utiles,
+seed `uint32`, paramètre actif exclusif et omission des valeurs absentes. Les DTO, payloads API, documents
+MongoDB et objets `localStorage` ne portent que des primitives ; les Value Objects sont créés après lecture
+et décomposés avant écriture.
+
+Le PBI 2.12 ne modifie aucun moteur ni aucune formule ; cette limite historique reste la base du rapport
+informatif. Le PBI 2.13 ne modifie à son tour aucune formule de censure, percentile, Risk Score, fiabilité
+ou histogramme. Les deux géométries d’histogrammes agrégés restent donc explicitement divergentes et
+réservées au PBI 2.16.
 
 Le PBI 2.7 a conservé les résultats frontend seed-à-seed en reprenant son algorithme bitwise historique,
 mais le PBI 2.8 change volontairement l’affectation locale des tirages `backlog_to_weeks` après une fin

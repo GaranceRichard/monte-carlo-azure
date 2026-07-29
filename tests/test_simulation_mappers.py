@@ -1,4 +1,7 @@
-from backend.api_models import SimulateRequest
+import pytest
+from pydantic import ValidationError
+
+from backend.api_models import SimulateRequest, SimulateResponse
 from backend.simulation_mappers import (
     persistence_row_to_history_item,
     request_to_command,
@@ -71,6 +74,22 @@ def test_request_to_command_resolves_transport_values_and_seed():
     assert command.seed.value == 98765
 
 
+def test_request_transport_defaults_are_explicitly_aligned_before_the_domain():
+    request = SimulateRequest(
+        throughput_samples=[0, 1, 2, 3, 4, 5, 6],
+        mode="weeks_to_items",
+        target_weeks=12,
+    )
+
+    command = request_to_command(request, SimulationSeed(0))
+
+    assert request.include_zero_weeks is False
+    assert request.n_sims == 20000
+    assert command.include_zero_weeks is False
+    assert command.n_sims == SimulationCount(20000)
+    assert command.throughput_samples.usable_values == (1, 2, 3, 4, 5, 6)
+
+
 def test_result_to_response_preserves_public_json_and_omits_none_values():
     response = result_to_response(_result(with_optional_values=True))
     assert response.model_dump(exclude_none=True) == {
@@ -99,6 +118,52 @@ def test_result_to_response_preserves_public_json_and_omits_none_values():
     serialized = without_optional.model_dump(exclude_none=True)
     assert "risk_score" not in serialized
     assert "completion_summary" not in serialized
+
+
+@pytest.mark.parametrize(
+    "override",
+    [
+        {"risk_score": None},
+        {"completion_summary": None},
+        {"unknown": True},
+        {"result_percentiles": {"P50": 8, "P80": 4}},
+        {"result_percentiles": {"P50": None}},
+        {"result_kind": "weeks"},
+        {
+            "completion_summary": {
+                "completed_count": 1000,
+                "censored_count": 0,
+                "censored_rate": 0,
+                "horizon_weeks": 521,
+            }
+        },
+        {
+            "throughput_reliability": {
+                "cv": 0.2,
+                "iqr_ratio": 0.3,
+                "slope_norm": 0,
+                "label": "fiable",
+                "samples_count": 7,
+            }
+        },
+        {
+            "throughput_reliability": {
+                "cv": float("nan"),
+                "iqr_ratio": 0.3,
+                "slope_norm": 0,
+                "label": "fiable",
+                "samples_count": 6,
+            }
+        },
+    ],
+)
+def test_response_dto_rejects_null_non_finite_and_open_shapes(override):
+    values = _result(with_optional_values=False)
+    payload = result_to_response(values).model_dump(exclude_none=True)
+    payload.update(override)
+
+    with pytest.raises(ValidationError):
+        SimulateResponse.model_validate(payload)
 
 
 def test_persistence_row_to_history_item_preserves_legacy_optional_fields():

@@ -2,6 +2,20 @@
 
 ## Recent
 
+### Validation normalisée et forme des résultats — PBI 2.13
+
+- alignement Python/TypeScript des types stricts, bornes, entiers, valeurs finies, négatifs, traitement des
+  zéros et minimum de six observations utilisables
+- validation fermée de la seed `uint32`, des champs inconnus et de la présence exclusive du paramètre actif,
+  avec valeurs par défaut de transport communes (`include_zero_weeks = false`, `n_sims = 20000`)
+- forme canonique de réponse fermée, champs obligatoires typés et omission stricte du Risk Score ou de la
+  complétion indisponibles, sans `0`, `null`, `NaN`, chaîne vide ni autre sentinelle
+- maintien de DTO, API, MongoDB et `localStorage` comme frontières primitives, sans objet métier sérialisé
+- ajout de 22 sondes positives et négatives partagées, exécutées par les deux runners et concordantes dans
+  les rapports de parité
+- formules de censure, percentiles, Risk Score, fiabilité et histogrammes inchangées ; les deux divergences
+  d’histogrammes de 2.12 restent visibles et le contrôle demeure informatif jusqu’au PBI 2.19
+
 ### Exécution interlangage du corpus partagé — PBI 2.12
 
 - ajout de runners Python et TypeScript consommant les quinze mêmes cas `1.0`, leurs entrées, seeds et

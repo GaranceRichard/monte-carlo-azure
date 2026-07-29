@@ -302,6 +302,13 @@ export async function setupAppRoutes(page, options = {}) {
               },
             }),
         samples_count: 30,
+        throughput_reliability: {
+          cv: 0.2,
+          iqr_ratio: 0.2,
+          slope_norm: 0,
+          label: "fiable",
+          samples_count: 30,
+        },
       }),
     });
   });

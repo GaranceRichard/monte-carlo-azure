@@ -771,8 +771,26 @@ en échec. Le profil `main` ne lance pas ce contrôle avant le PBI 2.19.
 L’exécution courante trouve 13 cas entièrement conformes et deux divergences d’histogrammes déjà attendues
 par l’audit : Python produit 100 buckets et TypeScript 51 centres impairs pour `0..100`; sur
 `0..99 + 10000`, les représentants sont `50/9951` en Python et `51/10050` en TypeScript, contre
-`50/9999` dans la norme. Le PBI 2.12 ne corrige aucun de ces écarts et ne modifie ni formule, DTO, payload
-API, document MongoDB ni objet `localStorage`.
+`50/9999` dans la norme.
+
+Le PBI 2.13 aligne désormais, avant tout calcul, les validations normalisées des deux moteurs : tableau
+fermé de 6 à 521 entiers finis positifs ou nuls, au moins six observations après application de la règle
+des zéros, bornes communes, seed `uint32`, entrée fermée et présence exclusive du paramètre actif. Les
+frontières de transport résolvent les mêmes valeurs par défaut (`include_zero_weeks = false`,
+`n_sims = 20000`) puis transmettent des primitives aux Value Objects.
+
+La réponse canonique exige `result_kind`, les percentiles présents seulement, la distribution,
+`samples_count`, la fiabilité et la seed. Le Risk Score et la complétion sont strictement omis lorsqu’ils
+sont indisponibles : `0`, `null`, `NaN`, chaîne vide et toute autre sentinelle sont refusés. Les DTO,
+payloads API, documents MongoDB et objets `localStorage` restent des frontières primitives ; aucun objet
+métier ne les franchit.
+
+Le fichier partagé
+[`contracts/statistical-validation-probes-v1.0.json`](contracts/statistical-validation-probes-v1.0.json)
+porte 22 sondes positives et négatives, toutes concordantes entre Python et TypeScript dans le rapport de
+parité. Cet alignement ne modifie aucune formule de censure, percentile, Risk Score, fiabilité ou
+histogramme : les deux divergences d’histogrammes restent visibles et le contrôle reste informatif jusqu’au
+PBI 2.19.
 
 Purge planifiée:
 

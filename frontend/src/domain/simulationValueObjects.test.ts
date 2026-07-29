@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { createSimulationCommand } from "./simulation";
+import {
+  createSimulationCommand,
+  createSimulationCommandFromNormalizedInput,
+} from "./simulation";
 import simulationSource from "./simulation.ts?raw";
 import valueObjectSource from "./simulationValueObjects.ts?raw";
 import {
@@ -124,6 +127,7 @@ describe("throughput samples", () => {
 
   it("requires a strict boolean zero-week flag", () => {
     expect(() => createThroughputSamples([1, 2, 3, 4, 5, 6], 1)).toThrow("booleen strict");
+    expect(() => createThroughputSamples(null, false)).toThrow("collection");
   });
 });
 
@@ -135,17 +139,15 @@ describe("resolved simulation commands", () => {
     seed: createSimulationSeed(0),
   };
 
-  it("keeps only the active mode parameter", () => {
+  it("requires only the active mode parameter", () => {
     const backlog = createSimulationCommand({
       ...common,
       mode: "backlog_to_weeks",
       backlogSize: 10,
-      targetWeeks: "inactive",
     });
     const horizon = createSimulationCommand({
       ...common,
       mode: "weeks_to_items",
-      backlogSize: "inactive",
       targetWeeks: 12,
     });
 
@@ -154,6 +156,19 @@ describe("resolved simulation commands", () => {
     expect(horizon).toMatchObject({ targetWeeks: 12 });
     expect(horizon).not.toHaveProperty("backlogSize");
     expect(Object.isFrozen(backlog)).toBe(true);
+
+    expect(() => createSimulationCommand({
+      ...common,
+      mode: "backlog_to_weeks",
+      backlogSize: 10,
+      targetWeeks: "inactive",
+    })).toThrow("absent");
+    expect(() => createSimulationCommand({
+      ...common,
+      mode: "weeks_to_items",
+      backlogSize: "inactive",
+      targetWeeks: 12,
+    })).toThrow("absent");
   });
 
   it("rejects invalid modes and missing active parameters", () => {
@@ -176,6 +191,80 @@ describe("resolved simulation commands", () => {
         mode: "weeks_to_items",
       }),
     ).toThrow("target_weeks");
+    expect(() =>
+      createSimulationCommand({
+        ...common,
+        mode: "backlog_to_weeks",
+        backlogSize: 10,
+        unknown: true,
+      } as never),
+    ).toThrow("champs inconnus");
+  });
+
+  it("consumes the closed fully resolved corpus 1.0 input shape", () => {
+    expect(createSimulationCommandFromNormalizedInput({
+      throughput_samples: [0, 1, 2, 3, 4, 5],
+      include_zero_weeks: true,
+      mode: "backlog_to_weeks",
+      backlog_size: 10,
+      n_sims: 1000,
+    }, createSimulationSeed(0))).toMatchObject({
+      mode: "backlog_to_weeks",
+      backlogSize: 10,
+      seed: 0,
+    });
+    expect(createSimulationCommandFromNormalizedInput({
+      throughput_samples: [0, 1, 2, 3, 4, 5, 6],
+      include_zero_weeks: false,
+      mode: "weeks_to_items",
+      target_weeks: 521,
+      n_sims: 200000,
+    }, createSimulationSeed(SIMULATION_SEED_MAX))).toMatchObject({
+      mode: "weeks_to_items",
+      targetWeeks: 521,
+      seed: SIMULATION_SEED_MAX,
+    });
+  });
+
+  it.each([
+    [null, createSimulationSeed(0)],
+    [{
+      throughput_samples: [1, 2, 3, 4, 5, 6],
+      include_zero_weeks: false,
+      mode: "backlog_to_weeks",
+      backlog_size: 10,
+      n_sims: 1000,
+      unknown: true,
+    }, createSimulationSeed(0)],
+    [{
+      throughput_samples: [1, 2, 3, 4, 5, 6],
+      mode: "backlog_to_weeks",
+      backlog_size: 10,
+      n_sims: 1000,
+    }, createSimulationSeed(0)],
+    [{
+      throughput_samples: [1, 2, 3, 4, 5, 6],
+      include_zero_weeks: false,
+      mode: "backlog_to_weeks",
+      target_weeks: 12,
+      n_sims: 1000,
+    }, createSimulationSeed(0)],
+    [{
+      throughput_samples: [1, 2, 3, 4, 5, 6],
+      include_zero_weeks: false,
+      mode: "backlog_to_weeks",
+      backlog_size: 10,
+      target_weeks: 12,
+      n_sims: 1000,
+    }, createSimulationSeed(0)],
+    [{
+      throughput_samples: [1, 2, 3, 4, 5, 6],
+      include_zero_weeks: false,
+      mode: "invalid",
+      n_sims: 1000,
+    }, createSimulationSeed(0)],
+  ])("rejects open, unresolved or invalid normalized inputs", (input, seed) => {
+    expect(() => createSimulationCommandFromNormalizedInput(input, seed)).toThrow();
   });
 });
 

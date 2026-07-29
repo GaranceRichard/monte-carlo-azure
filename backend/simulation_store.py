@@ -164,16 +164,6 @@ class SimulationStore:
                 "created_at": now,
                 "last_seen": now,
                 "mode": command.mode,
-                "backlog_size": (
-                    command.backlog_size.value
-                    if command.backlog_size is not None
-                    else None
-                ),
-                "target_weeks": (
-                    command.target_weeks.value
-                    if command.target_weeks is not None
-                    else None
-                ),
                 "n_sims": command.n_sims.value,
                 "samples_count": result.samples_count,
                 "percentiles": result.result_percentiles.to_dict(),
@@ -181,16 +171,6 @@ class SimulationStore:
                     {"x": bucket.x, "count": bucket.count}
                     for bucket in result.result_distribution.buckets
                 ],
-                "completion_summary": (
-                    {
-                        "completed_count": result.completion_summary.completed_count,
-                        "censored_count": result.completion_summary.censored_count,
-                        "censored_rate": result.completion_summary.censored_rate,
-                        "horizon_weeks": result.completion_summary.horizon_weeks,
-                    }
-                    if result.completion_summary is not None
-                    else None
-                ),
                 "throughput_reliability": {
                     "cv": result.throughput_reliability.cv,
                     "iqr_ratio": result.throughput_reliability.iqr_ratio,
@@ -201,6 +181,17 @@ class SimulationStore:
                 "include_zero_weeks": command.include_zero_weeks,
                 "seed": result.seed.value,
             }
+            if command.backlog_size is not None:
+                doc["backlog_size"] = command.backlog_size.value
+            if command.target_weeks is not None:
+                doc["target_weeks"] = command.target_weeks.value
+            if result.completion_summary is not None:
+                doc["completion_summary"] = {
+                    "completed_count": result.completion_summary.completed_count,
+                    "censored_count": result.completion_summary.censored_count,
+                    "censored_rate": result.completion_summary.censored_rate,
+                    "horizon_weeks": result.completion_summary.horizon_weeks,
+                }
             coll.insert_one(doc)
             coll.update_many({"mc_client_id": mc_client_id}, {"$set": {"last_seen": now}})
 

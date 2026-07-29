@@ -13,10 +13,13 @@ from typing import Any
 
 from backend.simulation_models import SimulationCommand, SimulationResult
 from backend.simulation_service import run_simulation
-from backend.simulation_value_objects import SimulationSeed
+from backend.simulation_value_objects import StatisticalValueError
 
 ROOT = Path(__file__).resolve().parents[1]
 TYPESCRIPT_BRIDGE = ROOT / "frontend/scripts/run-statistical-reference-corpus.mjs"
+TYPESCRIPT_VALIDATION_BRIDGE = (
+    ROOT / "frontend/scripts/run-statistical-validation-probes.mjs"
+)
 
 CanonicalResult = dict[str, Any]
 CaseExecutor = Callable[[dict[str, Any]], CanonicalResult]
@@ -56,15 +59,9 @@ def canonicalize_python_result(result: SimulationResult) -> CanonicalResult:
 
 
 def execute_python_case(reference_case: dict[str, Any]) -> CanonicalResult:
-    input_value = reference_case["input"]
-    command = SimulationCommand.create(
-        throughput_samples=input_value["throughput_samples"],
-        include_zero_weeks=input_value["include_zero_weeks"],
-        mode=input_value["mode"],
-        backlog_size=input_value.get("backlog_size"),
-        target_weeks=input_value.get("target_weeks"),
-        n_sims=input_value["n_sims"],
-        seed=SimulationSeed(reference_case["seed"]),
+    command = SimulationCommand.from_normalized_input(
+        reference_case["input"],
+        reference_case["seed"],
     )
     return canonicalize_python_result(run_simulation(command))
 
@@ -114,6 +111,24 @@ def run_python_corpus(
     return {**_engine_header("python", corpus), "status": status, "cases": case_reports}
 
 
+def run_python_validation_probes(probes: dict[str, Any]) -> dict[str, Any]:
+    case_reports: list[dict[str, Any]] = []
+    for probe in probes["cases"]:
+        try:
+            SimulationCommand.from_normalized_input(probe["input"], probe["seed"])
+            accepted = True
+        except StatisticalValueError:
+            accepted = False
+        case_reports.append({"id": probe["id"], "accepted": accepted})
+    return {
+        "engine": "python",
+        "schema_version": probes["schema_version"],
+        "normative_contract": probes["normative_contract"],
+        "status": "completed",
+        "cases": case_reports,
+    }
+
+
 def _resolved_node_executable(node_executable: str | None) -> str:
     resolved = node_executable or shutil.which("node")
     if not resolved:
@@ -152,6 +167,43 @@ def run_typescript_corpus(
         raise RuntimeError("TypeScript corpus bridge returned invalid JSON.") from exc
     if not isinstance(report, dict) or report.get("engine") != "typescript":
         raise RuntimeError("TypeScript corpus bridge returned an invalid engine report.")
+    return report
+
+
+def run_typescript_validation_probes(
+    probes_path: Path,
+    *,
+    node_executable: str | None = None,
+) -> dict[str, Any]:
+    completed = subprocess.run(
+        [
+            _resolved_node_executable(node_executable),
+            str(TYPESCRIPT_VALIDATION_BRIDGE),
+            str(probes_path.resolve()),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    if completed.returncode:
+        detail = completed.stderr.strip() or completed.stdout.strip()
+        raise RuntimeError(
+            "TypeScript validation probe bridge failed with exit code "
+            f"{completed.returncode}: {detail}"
+        )
+    try:
+        report = json.loads(completed.stdout)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(
+            "TypeScript validation probe bridge returned invalid JSON."
+        ) from exc
+    if not isinstance(report, dict) or report.get("engine") != "typescript":
+        raise RuntimeError(
+            "TypeScript validation probe bridge returned an invalid engine report."
+        )
     return report
 
 

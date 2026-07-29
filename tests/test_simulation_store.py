@@ -355,10 +355,60 @@ def test_save_simulation_inserts_and_updates(monkeypatch):
     assert fake_coll.inserted[0]["mc_client_id"] == "c1"
     assert fake_coll.inserted[0]["seed"] == 98765
     assert fake_coll.inserted[0]["distribution"] == [{"x": 8, "count": 2000}]
+    assert fake_coll.inserted[0]["backlog_size"] == 20
+    assert "target_weeks" not in fake_coll.inserted[0]
+    assert "completion_summary" in fake_coll.inserted[0]
     assert "selected_org" not in fake_coll.inserted[0]
     assert "client_context" not in fake_coll.inserted[0]
     assert len(fake_coll.updated) == 1
     assert fake_coll.updated[0][0] == {"mc_client_id": "c1"}
+
+
+def test_save_items_omits_unavailable_mode_and_completion_fields(monkeypatch):
+    command = SimulationCommand.create(
+        throughput_samples=(1, 2, 3, 4, 5, 6),
+        include_zero_weeks=False,
+        mode="weeks_to_items",
+        backlog_size=None,
+        target_weeks=12,
+        n_sims=1000,
+        seed=SimulationSeed(7),
+    )
+    result = SimulationResult(
+        result_kind="items",
+        result_percentiles=SimulationPercentiles.create(
+            "weeks_to_items",
+            {"P50": 9, "P70": 7, "P90": 5},
+        ),
+        result_distribution=Histogram.create(
+            [{"x": 9, "count": 1000}],
+            expected_mass=1000,
+        ),
+        completion_summary=None,
+        samples_count=6,
+        throughput_reliability=ThroughputReliability.create(
+            cv=0.2,
+            iqr_ratio=0.3,
+            slope_norm=0,
+            label="fiable",
+            samples_count=6,
+        ),
+        seed=SimulationSeed(7),
+    )
+    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    fake_coll = _FakeCollection()
+    fake_client = _FakeMongoClient(fake_coll)
+    monkeypatch.setattr(
+        "backend.simulation_store.MongoClient",
+        lambda *_args, **_kwargs: fake_client,
+    )
+
+    store.save_simulation("c2", command, result)
+
+    document = fake_coll.inserted[0]
+    assert document["target_weeks"] == 12
+    assert "backlog_size" not in document
+    assert "completion_summary" not in document
 
 
 def test_list_recent_returns_empty_when_disabled_or_empty_client():

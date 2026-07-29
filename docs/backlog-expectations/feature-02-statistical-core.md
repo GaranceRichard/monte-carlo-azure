@@ -183,6 +183,22 @@ Implémentation retenue :
 - éviter toute coercion ou valeur sentinelle divergente ;
 - ne modifier aucune formule statistique relevant des PBI suivants.
 
+Implémentation retenue :
+
+- les fabriques Python et TypeScript consomment une entrée normalisée fermée, entièrement explicite,
+  limitée à des entiers finis dans les bornes de `STD-STAT-001`, avec au moins six observations après la
+  politique des zéros ;
+- la seed est un `uint32`, les champs inconnus sont refusés et seul le paramètre du mode actif peut être
+  présent ; les frontières de transport harmonisent leurs valeurs par défaut avant la création métier ;
+- les mappers exigent une réponse canonique fermée et omettent strictement Risk Score et complétion
+  indisponibles, sans coercition ni sentinelle ;
+- les DTO HTTP, payloads JSON, documents MongoDB et objets `localStorage` restent primitifs ; aucun Value
+  Object ou objet métier ne franchit ces frontières ;
+- `contracts/statistical-validation-probes-v1.0.json` contient 22 sondes positives et négatives exécutées
+  par les deux runners ; le rapport constate 22 verdicts identiques ;
+- aucune formule de censure, percentile, Risk Score, fiabilité ou histogramme n’est modifiée. Les deux
+  divergences d’histogrammes restent visibles et la parité reste informative jusqu’au PBI 2.19.
+
 ### Résultat attendu du PBI 2.14
 
 - aligner les règles de censure ;

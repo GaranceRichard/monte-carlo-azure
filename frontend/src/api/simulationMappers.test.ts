@@ -16,6 +16,13 @@ const command = createSimulationCommand({
   nSims: 20000,
   seed: createSimulationSeed(123456),
 });
+const reliabilityDto = {
+  cv: 0.2,
+  iqr_ratio: 0.3,
+  slope_norm: -0.02,
+  label: "fiable" as const,
+  samples_count: 6,
+};
 
 describe("simulation HTTP mappers", () => {
   it("maps a business command to the unchanged public request DTO", () => {
@@ -82,6 +89,7 @@ describe("simulation HTTP mappers", () => {
       seed: 7,
       result_percentiles: { P50: 30 },
       result_distribution: [{ x: 30, count: 1000 }],
+      throughput_reliability: reliabilityDto,
     }, 1000);
     const history = simulationHistoryItemDtoToModel({
       created_at: "2026-02-26T10:00:00Z",
@@ -121,7 +129,13 @@ describe("simulation HTTP mappers", () => {
 
     expect(result).not.toHaveProperty("riskScore");
     expect(result).not.toHaveProperty("completionSummary");
-    expect(result).not.toHaveProperty("throughputReliability");
+    expect(result.throughputReliability).toEqual({
+      cv: 0.2,
+      iqrRatio: 0.3,
+      slopeNorm: -0.02,
+      label: "fiable",
+      samplesCount: 6,
+    });
     expect(history).not.toHaveProperty("seed");
     expect(history).not.toHaveProperty("backlogSize");
     expect(history).not.toHaveProperty("completionSummary");
@@ -142,6 +156,7 @@ describe("simulation HTTP mappers", () => {
       seed: 7,
       result_percentiles: { P50: 30 },
       result_distribution: [{ x: 30, count: 1000 }],
+      throughput_reliability: reliabilityDto,
     }).resultDistribution).toEqual([{ x: 30, count: 1000 }]);
 
     expect(() => simulateResponseDtoToResult({
@@ -157,6 +172,7 @@ describe("simulation HTTP mappers", () => {
       seed: 7,
       result_percentiles: { P50: 30 },
       result_distribution: [{ x: 30, count: 1000 }],
+      throughput_reliability: reliabilityDto,
       completion_summary: {
         completed_count: 1000,
         censored_count: 0,
@@ -174,5 +190,30 @@ describe("simulation HTTP mappers", () => {
       percentiles: { P50: 30 },
       distribution: [{ x: 30, count: 999 }],
     })).toThrow("masse totale");
+  });
+
+  it.each([
+    [{}, "throughput_reliability"],
+    [{ risk_score: null }, "risk_score"],
+    [{ risk_score: Number.NaN }, "risk_score"],
+    [{ completion_summary: null }, "completion_summary"],
+    [{ result_percentiles: { P50: 30, P80: 10 } }, "result_percentiles"],
+    [{ result_distribution: [{ x: 30, count: 1000, extra: true }] }, "bucket"],
+    [{ throughput_reliability: { ...reliabilityDto, extra: true } }, "throughput_reliability"],
+    [{ unknown: true }, "champs inconnus"],
+  ])("rejects absent sentinels and open canonical response shapes", (override, message) => {
+    const base = {
+      result_kind: "items",
+      samples_count: 6,
+      seed: 7,
+      result_percentiles: { P50: 30 },
+      result_distribution: [{ x: 30, count: 1000 }],
+      throughput_reliability: reliabilityDto,
+    };
+    const value = Object.keys(override).length === 0
+      ? { ...base, throughput_reliability: undefined }
+      : { ...base, ...override };
+
+    expect(() => simulateResponseDtoToResult(value, 1000)).toThrow(message);
   });
 });

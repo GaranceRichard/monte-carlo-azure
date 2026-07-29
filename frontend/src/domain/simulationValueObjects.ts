@@ -173,11 +173,14 @@ function validateRawThroughput(values: readonly unknown[]): readonly number[] {
 }
 
 export function createThroughputSamples(
-  values: readonly unknown[],
+  values: unknown,
   includeZeroWeeks: unknown,
 ): ThroughputSamples {
   if (typeof includeZeroWeeks !== "boolean") {
     throw new Error("include_zero_weeks doit etre un booleen strict.");
+  }
+  if (!Array.isArray(values)) {
+    throw new Error("throughput_samples doit etre une collection.");
   }
   const rawValues = validateRawThroughput(values);
   const usableValues = includeZeroWeeks

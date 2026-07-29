@@ -2,66 +2,66 @@
   "schemaVersion": "1.0.0",
   "schema": "config/test-strategy-report.schema.json",
   "profile": "main",
-  "evidenceBundleId": "e396474b442ebdfd81c758cb2caa59a77804ec056813b59e2cd1b0d654c9c350",
+  "evidenceBundleId": "fde353d070cbcff7a736e811633bd1b37046af4128c00c7965ee91dfd1f3590b",
   "evidenceBundleIdentityDisclaimer": "This identifier names the exact evidence bundle; it does not prove that every source came from the same physical execution.",
   "globalReference": {
     "inventory": {
       "path": "reports/test-classification-inventory.json",
-      "sha256": "9f3fac6fec6aaef530cd689a681e1e8d85b587cda024d910b105bee4278b8307",
-      "logicalCases": 1249
+      "sha256": "1d7b5fc69785e1303ef9b32bbdcef0e010272fca9ef07431bd5c3c8809a822cf",
+      "logicalCases": 1264
     },
     "classification": {
       "breakdowns": {
         "status": {
-          "classified": 1249
+          "classified": 1264
         },
         "framework": {
           "playwright": 32,
-          "pytest": 543,
-          "vitest": 674
+          "pytest": 553,
+          "vitest": 679
         },
         "nature": {
-          "component": 400,
-          "contract": 44,
+          "component": 402,
+          "contract": 46,
           "e2e": 32,
-          "integration": 206,
-          "unit": 567
+          "integration": 208,
+          "unit": 576
         },
         "purpose": {
           "accessibility": 106,
           "compatibility": 104,
           "data_quality": 131,
-          "functional": 1249,
+          "functional": 1264,
           "migration_recovery": 20,
-          "observability": 241,
+          "observability": 243,
           "performance": 11,
-          "resilience": 128,
+          "resilience": 130,
           "security": 124
         },
         "primaryProfile": {
-          "main": 209,
+          "main": 211,
           "nightly": 1,
-          "pr": 1037,
+          "pr": 1050,
           "release": 2
         },
         "domain": {
-          "api": 125,
+          "api": 126,
           "azure_devops": 263,
           "data": 127,
           "deployment": 43,
           "history": 104,
           "identity": 92,
-          "persistence": 81,
+          "persistence": 82,
           "portfolio": 145,
           "quality_chain": 238,
-          "reporting": 225,
-          "statistical_engine": 487,
-          "user_interface": 314
+          "reporting": 227,
+          "statistical_engine": 496,
+          "user_interface": 315
         },
         "criticality": {
-          "critical": 202,
+          "critical": 203,
           "high": 20,
-          "unassigned": 1027
+          "unassigned": 1041
         }
       },
       "riskAssociations": {
@@ -69,7 +69,7 @@
         "RISK-002": 9,
         "RISK-003": 20,
         "RISK-004": 20,
-        "RISK-005": 10,
+        "RISK-005": 11,
         "RISK-006": 6,
         "RISK-007": 6,
         "RISK-009": 100,
@@ -86,7 +86,7 @@
       "criticalPathAssociations": {
         "CP-001": 11,
         "CP-002": 3,
-        "CP-003": 70,
+        "CP-003": 71,
         "CP-004": 6,
         "CP-005": 100,
         "CP-007": 20,
@@ -99,16 +99,16 @@
     "executionCounts": {
       "path": "reports/test-execution-counts.json",
       "schemaVersion": "1.0.0",
-      "inventorySha256": "9f3fac6fec6aaef530cd689a681e1e8d85b587cda024d910b105bee4278b8307",
+      "inventorySha256": "1d7b5fc69785e1303ef9b32bbdcef0e010272fca9ef07431bd5c3c8809a822cf",
       "totals": {
-        "logicalCases": 1249,
-        "collectedInstances": 1509,
-        "executedInstances": 1509,
+        "logicalCases": 1264,
+        "collectedInstances": 1551,
+        "executedInstances": 1551,
         "skippedInstances": 0,
-        "attempts": 1509,
+        "attempts": 1551,
         "retries": 0,
         "results": {
-          "passed": 1509,
+          "passed": 1551,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -122,18 +122,18 @@
         "includedProfiles": [
           "pr"
         ],
-        "logicalCases": 1037,
+        "logicalCases": 1050,
         "frameworks": {
-          "pytest": 363,
-          "vitest": 674
+          "pytest": 371,
+          "vitest": 679
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 363,
+          "backend-tests": 371,
           "e2e": 0,
           "frontend-static": 0,
-          "frontend-tests": 674,
+          "frontend-tests": 679,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -144,19 +144,19 @@
           "pr",
           "main"
         ],
-        "logicalCases": 1246,
+        "logicalCases": 1261,
         "frameworks": {
           "playwright": 32,
-          "pytest": 540,
-          "vitest": 674
+          "pytest": 550,
+          "vitest": 679
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 540,
+          "backend-tests": 550,
           "e2e": 32,
           "frontend-static": 0,
-          "frontend-tests": 674,
+          "frontend-tests": 679,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -168,19 +168,19 @@
           "main",
           "nightly"
         ],
-        "logicalCases": 1247,
+        "logicalCases": 1262,
         "frameworks": {
           "playwright": 32,
-          "pytest": 541,
-          "vitest": 674
+          "pytest": 551,
+          "vitest": 679
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 541,
+          "backend-tests": 551,
           "e2e": 32,
           "frontend-static": 0,
-          "frontend-tests": 674,
+          "frontend-tests": 679,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -192,19 +192,19 @@
           "main",
           "release"
         ],
-        "logicalCases": 1248,
+        "logicalCases": 1263,
         "frameworks": {
           "playwright": 32,
-          "pytest": 542,
-          "vitest": 674
+          "pytest": 552,
+          "vitest": 679
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 542,
+          "backend-tests": 552,
           "e2e": 32,
           "frontend-static": 0,
-          "frontend-tests": 674,
+          "frontend-tests": 679,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -217,30 +217,30 @@
       "pr",
       "main"
     ],
-    "selectedLogicalCases": 1246,
+    "selectedLogicalCases": 1261,
     "logicalCaseIds": [
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2738:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2792:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app global org backspace [2723:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app project and team backspace [2764:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches ado client direct [1062:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches ado platform [1014:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches print and pdf direct [2366:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches team sort et simulation history [788:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolio direct [1603:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolioReport direct [1420:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: cycle time utility direct branches [1374:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: entry and portfolio components direct [2052:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2773:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2827:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app global org backspace [2758:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app project and team backspace [2799:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches ado client direct [1076:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches ado platform [1028:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches print and pdf direct [2387:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches team sort et simulation history [802:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolio direct [1624:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolioReport direct [1434:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: cycle time utility direct branches [1388:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: entry and portfolio components direct [2073:3]",
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: flux complet front [154:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: onboarding hook direct [1782:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: org listee + stepper retour [748:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3438:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: onboarding hook direct [1803:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: org listee + stepper retour [762:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3473:3]",
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: public pages direct [118:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation context direct [2994:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation prefs direct [3317:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation utils direct [2831:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: sla identite direct [2468:3]",
-      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: useTeamOptions direct [3058:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation context direct [3029:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation prefs direct [3352:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation utils direct [2866:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: sla identite direct [2489:3]",
+      "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: useTeamOptions direct [3093:3]",
       "playwright:frontend/tests/e2e/onboarding.spec.js::onboarding: app header branches for disconnect and theme [84:1]",
       "playwright:frontend/tests/e2e/onboarding.spec.js::onboarding: app shell toggles disconnect and demo badge across standard and demo flows [117:1]",
       "playwright:frontend/tests/e2e/onboarding.spec.js::onboarding: demo entry hides disconnect and lets user choose a team [108:1]",
@@ -301,6 +301,7 @@
       "pytest:tests/test_api_simulate.py::test_simulate_logs_warning_and_stays_permissive_when_rate_limit_storage_fails",
       "pytest:tests/test_api_simulate.py::test_simulate_preserves_requested_seed_without_generation",
       "pytest:tests/test_api_simulate.py::test_simulate_rate_limit_returns_429",
+      "pytest:tests/test_api_simulate.py::test_simulate_rejects_inactive_or_unknown_fields",
       "pytest:tests/test_api_simulate.py::test_simulate_rejects_insufficient_non_zero_history",
       "pytest:tests/test_api_simulate.py::test_simulate_rejects_invalid_seed",
       "pytest:tests/test_api_simulate.py::test_simulate_rejects_out_of_range_numeric_contract_values",
@@ -580,6 +581,8 @@
       "pytest:tests/test_simulation_domain_models.py::test_statistical_domain_has_no_framework_or_engine_dependency",
       "pytest:tests/test_simulation_mappers.py::test_persistence_row_to_history_item_preserves_legacy_optional_fields",
       "pytest:tests/test_simulation_mappers.py::test_request_to_command_resolves_transport_values_and_seed",
+      "pytest:tests/test_simulation_mappers.py::test_request_transport_defaults_are_explicitly_aligned_before_the_domain",
+      "pytest:tests/test_simulation_mappers.py::test_response_dto_rejects_null_non_finite_and_open_shapes",
       "pytest:tests/test_simulation_mappers.py::test_result_to_response_preserves_public_json_and_omits_none_values",
       "pytest:tests/test_simulation_service.py::test_mc_core_has_no_concrete_rng_access",
       "pytest:tests/test_simulation_service.py::test_service_and_engine_keep_seed_resolution_outside_the_draw_port_contract",
@@ -606,19 +609,22 @@
       "pytest:tests/test_simulation_store.py::test_run_with_reconnect_raises_runtime_error_on_unexpected_empty_retry_loop",
       "pytest:tests/test_simulation_store.py::test_run_with_reconnect_reraises_after_second_pymongo_error",
       "pytest:tests/test_simulation_store.py::test_save_and_list_recent_with_real_mongo",
+      "pytest:tests/test_simulation_store.py::test_save_items_omits_unavailable_mode_and_completion_fields",
       "pytest:tests/test_simulation_store.py::test_save_simulation_inserts_and_updates",
       "pytest:tests/test_simulation_store.py::test_save_simulation_noop_when_disabled_or_empty_client",
       "pytest:tests/test_simulation_store.py::test_save_simulation_reconnects_once_after_pymongo_error",
       "pytest:tests/test_simulation_value_objects.py::test_bounded_integer_value_objects_accept_inclusive_bounds",
       "pytest:tests/test_simulation_value_objects.py::test_bounded_integer_value_objects_reject_out_of_bounds_and_non_integers",
       "pytest:tests/test_simulation_value_objects.py::test_commands_reject_unresolved_domain_inputs",
-      "pytest:tests/test_simulation_value_objects.py::test_commands_resolve_only_the_active_mode_parameter",
+      "pytest:tests/test_simulation_value_objects.py::test_commands_require_only_the_active_mode_parameter",
       "pytest:tests/test_simulation_value_objects.py::test_completion_supports_complete_partial_and_fully_censored_counts",
       "pytest:tests/test_simulation_value_objects.py::test_completion_uses_round_half_up_and_rejects_inconsistent_counts",
       "pytest:tests/test_simulation_value_objects.py::test_direct_command_construction_requires_value_objects_and_resolved_mode",
       "pytest:tests/test_simulation_value_objects.py::test_histogram_accepts_exact_and_aggregated_immutable_buckets",
       "pytest:tests/test_simulation_value_objects.py::test_histogram_rejects_invalid_buckets_order_and_mass",
       "pytest:tests/test_simulation_value_objects.py::test_histogram_rejects_more_than_one_hundred_buckets",
+      "pytest:tests/test_simulation_value_objects.py::test_normalized_commands_are_closed_explicit_and_seeded_with_uint32",
+      "pytest:tests/test_simulation_value_objects.py::test_normalized_commands_reject_open_unresolved_or_invalid_shapes",
       "pytest:tests/test_simulation_value_objects.py::test_percentiles_preserve_absences_and_mode_order",
       "pytest:tests/test_simulation_value_objects.py::test_percentiles_reject_invalid_keys_values_and_order",
       "pytest:tests/test_simulation_value_objects.py::test_reliability_normalizes_before_categorization",
@@ -631,13 +637,17 @@
       "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
       "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
       "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_fatal_engine_errors_and_cli_statuses",
+      "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_invalid_validation_probe_document",
       "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
       "pytest:tests/test_statistical_corpus_runner.py::test_exact_comparator_preserves_absence_order_types_lengths_and_values",
       "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_distinguishes_normative_engine_and_execution_divergences",
+      "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_includes_validation_alignment_without_blocking_it",
       "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_executes_all_cases_with_exact_canonical_results",
       "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_reports_case_errors_without_stopping_following_cases",
       "pytest:tests/test_statistical_corpus_runner.py::test_report_rendering_is_deterministic_readable_and_writable",
+      "pytest:tests/test_statistical_corpus_runner.py::test_shared_validation_probes_match_in_python_and_typescript",
       "pytest:tests/test_statistical_corpus_runner.py::test_typescript_bridge_parses_report_and_classifies_failures",
+      "pytest:tests/test_statistical_corpus_runner.py::test_typescript_validation_bridge_classifies_protocol_failures",
       "pytest:tests/test_statistical_corpus_runner.py::test_validation_rejects_invalid_schema_and_corpus_before_engines",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
@@ -866,10 +876,11 @@
       "vitest:frontend/src/api.test.ts::postSimulate > keeps network errors observable to callers [24:3]",
       "vitest:frontend/src/api.test.ts::postSimulate > posts the public payload and returns a valid response [7:3]",
       "vitest:frontend/src/api.test.ts::postSimulate > reports HTTP failures, including invalid JSON bodies [19:3]",
-      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > derives a response mass when needed and rejects completion in the wrong mode [138:3]",
-      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > keeps absent optional response and history values absent [78:3]",
-      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a business command to the unchanged public request DTO [21:3]",
-      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a complete response DTO to the camelCase business result [34:3]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > derives a response mass when needed and rejects completion in the wrong mode [152:3]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > keeps absent optional response and history values absent [85:3]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a business command to the unchanged public request DTO [28:3]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a complete response DTO to the camelCase business result [41:3]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects absent sentinels and open canonical response shapes [204:4]",
       "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
       "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [9:3]",
       "vitest:frontend/src/apiHelpers.test.ts::api helpers > uses the configured API base [5:3]",
@@ -1123,67 +1134,70 @@
       "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [93:3]",
       "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [82:3]",
       "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo weekly throughput [73:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > accepts the inclusive bounds [34:4]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects out-of-bounds and non-integer values [44:4]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects unsafe JavaScript integers at unbounded integer boundaries [70:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > requires runtime factories for opaque value-object types [59:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [363:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [348:4]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [413:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [307:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [329:13]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [333:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > derives a half-up risk score only when P50 and P90 are usable [207:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > keeps the public key set closed, preserves absences and enforces mode order [183:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rejects invalid keys, values and order [203:13]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [231:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > keeps only the active mode parameter [138:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > rejects invalid modes and missing active parameters [159:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [284:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [256:13]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [271:4]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > enforces raw and usable limits [106:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > rejects invalid values without filtering them [102:4]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > requires a strict boolean zero-week flag [125:3]",
-      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > validates raw values before zero processing and freezes both collections [83:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > accepts the inclusive bounds [37:4]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects out-of-bounds and non-integer values [47:4]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > rejects unsafe JavaScript integers at unbounded integer boundaries [73:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > requires runtime factories for opaque value-object types [62:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > rounds half up and rejects inconsistent counts, rates and horizon [452:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::completion summary > supports complete, partial and fully censored counts [437:4]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::domain independence > does not depend on UI, HTTP, persistence or numeric frameworks [502:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > accepts exact and aggregated histograms while freezing every bucket [396:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects invalid buckets, order and mass [418:13]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::histograms > rejects more than one hundred buckets [422:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > derives a half-up risk score only when P50 and P90 are usable [296:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > keeps the public key set closed, preserves absences and enforces mode order [272:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rejects invalid keys, values and order [292:13]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::percentiles > rounds exact decimal midpoints without binary floating-point drift [320:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > consumes the closed fully resolved corpus 1.0 input shape [204:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > rejects invalid modes and missing active parameters [174:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > rejects open, unresolved or invalid normalized inputs [266:4]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::resolved simulation commands > requires only the active mode parameter [142:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > accepts only the closed serialized label set [373:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > normalizes before applying category priority [345:13]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput reliability > rejects invalid metrics [360:4]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > enforces raw and usable limits [109:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > rejects invalid values without filtering them [105:4]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > requires a strict boolean zero-week flag [128:3]",
+      "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > validates raw values before zero processing and freezes both collections [86:3]",
       "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > renders children inside SimulationProvider [31:3]",
       "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > returns provider value when used inside SimulationProvider [13:3]",
       "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > throws when hook is used outside provider [7:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle getTeamDeliveryDataDirect avec les bons parametres [206:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle postSimulate en mode backlog_to_weeks avec backlog_size [223:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle postSimulate en mode weeks_to_items avec target_weeks [241:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > couvre directement backlog_size pour simulateForecastFromSamples [255:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > couvre directement target_weeks pour simulateForecastFromSamples [273:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > propage throughput_reliability tel quel [306:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > rejette une distribution absente qui ne conserve pas la masse [293:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > utilise la forme objet weeklyThroughput + warning quand ADO renvoie un warning [192:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > propage un warning de données partielles [569:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > result est identique dans le retour et dans historyEntry [559:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > sampleStats est identique dans le retour et dans historyEntry [564:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > weeklyThroughput est identique dans le retour et dans historyEntry [554:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > calcule risk_score localement si le backend ne le renvoie pas [155:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > filters out zero weeks in demo mode when includeZeroWeeks is false [104:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent [172:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses local simulation in demo backlog mode without API calls [139:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses local simulation in demo mode without API calls [123:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses the demo throughput source without network calls [82:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::filtrage des throughput samples > exclut les semaines à 0 quand includeZeroWeeks = false [314:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::filtrage des throughput samples > inclut les semaines à 0 quand includeZeroWeeks = true [337:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > applique toSafeNumber sur backlogSize, targetWeeks et nSims [480:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > contient les métadonnées de session correctes [450:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > copie défensivement les tableaux [518:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > génère un id unique et une date ISO valide [472:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > retombe sur un id date-seed quand crypto.randomUUID est indisponible [491:5]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage l'erreur si getTeamDeliveryDataDirect echoue [533:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage l'erreur si postSimulate échoue [540:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage une erreur 422 backend [546:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::sampleStats > calcule correctement totalWeeks, zeroWeeks et usedWeeks [429:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > accepte exactement 6 semaines valides [390:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > accepte les bornes d'horizon et d'historique et les transmet telles quelles [408:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > lève une erreur si moins de 6 semaines au total [373:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > lève une erreur si moins de 6 semaines non nulles [360:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > rejette un contrôle vide avant l'appel API [394:3]",
-      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > renvoie un message lisible [384:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle getTeamDeliveryDataDirect avec les bons parametres [212:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle postSimulate en mode backlog_to_weeks avec backlog_size [229:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle postSimulate en mode weeks_to_items avec target_weeks [247:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > couvre directement backlog_size pour simulateForecastFromSamples [261:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > couvre directement target_weeks pour simulateForecastFromSamples [279:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > propage throughput_reliability tel quel [312:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > rejette une distribution absente qui ne conserve pas la masse [299:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > utilise la forme objet weeklyThroughput + warning quand ADO renvoie un warning [198:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > propage un warning de données partielles [575:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > result est identique dans le retour et dans historyEntry [565:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > sampleStats est identique dans le retour et dans historyEntry [570:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > weeklyThroughput est identique dans le retour et dans historyEntry [560:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > filters out zero weeks in demo mode when includeZeroWeeks is false [111:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent [170:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > ne reconstruit pas risk_score si le backend l'omet [162:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > resout les memes valeurs par defaut que la frontiere Python [181:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses local simulation in demo backlog mode without API calls [146:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses local simulation in demo mode without API calls [130:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses the demo throughput source without network calls [89:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::filtrage des throughput samples > exclut les semaines à 0 quand includeZeroWeeks = false [320:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::filtrage des throughput samples > inclut les semaines à 0 quand includeZeroWeeks = true [343:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > applique toSafeNumber sur backlogSize, targetWeeks et nSims [486:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > contient les métadonnées de session correctes [456:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > copie défensivement les tableaux [524:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > génère un id unique et une date ISO valide [478:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > retombe sur un id date-seed quand crypto.randomUUID est indisponible [497:5]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage l'erreur si getTeamDeliveryDataDirect echoue [539:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage l'erreur si postSimulate échoue [546:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage une erreur 422 backend [552:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::sampleStats > calcule correctement totalWeeks, zeroWeeks et usedWeeks [435:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > accepte exactement 6 semaines valides [396:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > accepte les bornes d'horizon et d'historique et les transmet telles quelles [414:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > lève une erreur si moins de 6 semaines au total [379:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > lève une erreur si moins de 6 semaines non nulles [366:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > rejette un contrôle vide avant l'appel API [400:3]",
+      "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > renvoie un message lisible [390:3]",
       "vitest:frontend/src/hooks/probability.test.ts::buildAtLeastPercentiles > computes at-least percentiles from histogram buckets [100:3]",
       "vitest:frontend/src/hooks/probability.test.ts::buildAtLeastPercentiles > matches the conservative survival percentiles for a known discrete distribution [114:3]",
       "vitest:frontend/src/hooks/probability.test.ts::buildAtLeastPercentiles > returns empty object for empty points [88:3]",
@@ -1325,10 +1339,11 @@
       "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
       "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
       "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode on pages builds without query flags [51:3]",
-      "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > executes the same 1.0 corpus with mca-prng-v1 and canonical output [23:3]",
-      "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [109:3]",
-      "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [63:3]",
-      "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [80:3]",
+      "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [82:3]",
+      "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > executes the same 1.0 corpus with mca-prng-v1 and canonical output [25:3]",
+      "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [131:3]",
+      "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [65:3]",
+      "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [102:3]",
       "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
       "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
       "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -1483,14 +1498,14 @@
         }
       },
       "pytest": {
-        "logicalCases": 540,
-        "collectedInstances": 721,
-        "executedInstances": 721,
+        "logicalCases": 550,
+        "collectedInstances": 750,
+        "executedInstances": 750,
         "skippedInstances": 0,
-        "attempts": 721,
+        "attempts": 750,
         "retries": 0,
         "results": {
-          "passed": 721,
+          "passed": 750,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -1498,14 +1513,14 @@
         }
       },
       "vitest": {
-        "logicalCases": 674,
-        "collectedInstances": 753,
-        "executedInstances": 753,
+        "logicalCases": 679,
+        "collectedInstances": 770,
+        "executedInstances": 770,
         "skippedInstances": 0,
-        "attempts": 753,
+        "attempts": 770,
         "retries": 0,
         "results": {
-          "passed": 753,
+          "passed": 770,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -1520,7 +1535,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/preflight/result.json",
         "exitCode": 0,
-        "durationSeconds": 9.202,
+        "durationSeconds": 9.368,
         "reasons": []
       },
       {
@@ -1529,7 +1544,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 0.154,
+        "durationSeconds": 0.11,
         "reasons": []
       },
       {
@@ -1538,7 +1553,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 33.371,
+        "durationSeconds": 33.614,
         "reasons": []
       },
       {
@@ -1547,7 +1562,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 94.12,
+        "durationSeconds": 96.309,
         "reasons": []
       },
       {
@@ -1556,7 +1571,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 101.523,
+        "durationSeconds": 101.684,
         "reasons": []
       },
       {
@@ -1565,7 +1580,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/e2e/result.json",
         "exitCode": 0,
-        "durationSeconds": 44.264,
+        "durationSeconds": 42.823,
         "reasons": []
       },
       {
@@ -1574,7 +1589,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/release-or-container-checks/result.json",
         "exitCode": 0,
-        "durationSeconds": 41.675,
+        "durationSeconds": 40.565,
         "reasons": []
       },
       {
@@ -1587,20 +1602,20 @@
         "reasons": []
       }
     ],
-    "collectedInstances": 1506,
-    "executedInstances": 1506,
+    "collectedInstances": 1552,
+    "executedInstances": 1552,
     "skippedInstances": 0,
-    "attempts": 1506,
+    "attempts": 1552,
     "retries": 0,
     "initialResults": {
-      "passed": 1506,
+      "passed": 1552,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
       "infrastructureError": 0
     },
     "finalResults": {
-      "passed": 1506,
+      "passed": 1552,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -1618,14 +1633,14 @@
       "instabilities": 0,
       "instabilityRatePercent": 0.0,
       "initialResults": {
-        "passed": 1506,
+        "passed": 1552,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
         "infrastructureError": 0
       },
       "finalResults": {
-        "passed": 1506,
+        "passed": 1552,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -1641,14 +1656,14 @@
         "thresholdSource": ".coveragerc",
         "metrics": {
           "lines": {
-            "total": 7253,
-            "covered": 7253,
+            "total": 7418,
+            "covered": 7418,
             "pct": 100.0
           },
           "branches": {
-            "total": 2490,
-            "covered": 2452,
-            "pct": 98.47
+            "total": 2558,
+            "covered": 2519,
+            "pct": 98.48
           }
         },
         "thresholds": {
@@ -1665,24 +1680,24 @@
         "thresholdSource": "frontend/vitest.config.js",
         "metrics": {
           "statements": {
-            "total": 3949,
-            "covered": 3910,
-            "pct": 99.01
+            "total": 4029,
+            "covered": 3982,
+            "pct": 98.83
           },
           "branches": {
-            "total": 3085,
-            "covered": 2861,
-            "pct": 92.74
+            "total": 3147,
+            "covered": 2918,
+            "pct": 92.72
           },
           "functions": {
-            "total": 919,
-            "covered": 918,
+            "total": 934,
+            "covered": 933,
             "pct": 99.89
           },
           "lines": {
-            "total": 3949,
-            "covered": 3910,
-            "pct": 99.01
+            "total": 4029,
+            "covered": 3982,
+            "pct": 98.83
           }
         },
         "thresholds": {
@@ -1701,24 +1716,24 @@
         "thresholdSource": "frontend/e2e-coverage.config.json",
         "metrics": {
           "statements": {
-            "total": 12353,
-            "covered": 11274,
-            "pct": 91.26
+            "total": 12567,
+            "covered": 11460,
+            "pct": 91.19
           },
           "branches": {
-            "total": 2730,
-            "covered": 2261,
-            "pct": 82.82
+            "total": 2760,
+            "covered": 2283,
+            "pct": 82.71
           },
           "functions": {
-            "total": 443,
-            "covered": 409,
-            "pct": 92.32
+            "total": 452,
+            "covered": 418,
+            "pct": 92.47
           },
           "lines": {
-            "total": 12247,
-            "covered": 11171,
-            "pct": 91.21
+            "total": 12378,
+            "covered": 11298,
+            "pct": 91.27
           }
         },
         "thresholds": {
@@ -1757,18 +1772,18 @@
             "pct": 100.0
           },
           "CP-001:frontend_unit:statements": {
-            "total": 46,
-            "covered": 46,
+            "total": 44,
+            "covered": 44,
             "pct": 100.0
           },
           "CP-001:frontend_unit:branches": {
-            "total": 27,
-            "covered": 27,
+            "total": 24,
+            "covered": 24,
             "pct": 100.0
           },
           "CP-001:frontend_unit:lines": {
-            "total": 42,
-            "covered": 42,
+            "total": 40,
+            "covered": 40,
             "pct": 100.0
           },
           "CP-001:frontend_unit:functions": {
@@ -1982,18 +1997,18 @@
             "id": "frontend_unit",
             "metrics": {
               "statements": {
-                "total": 46,
-                "covered": 46,
+                "total": 44,
+                "covered": 44,
                 "pct": 100.0
               },
               "branches": {
-                "total": 27,
-                "covered": 27,
+                "total": 24,
+                "covered": 24,
                 "pct": 100.0
               },
               "lines": {
-                "total": 42,
-                "covered": 42,
+                "total": 40,
+                "covered": 40,
                 "pct": 100.0
               },
               "functions": {
@@ -2307,7 +2322,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "9f3fac6fec6aaef530cd689a681e1e8d85b587cda024d910b105bee4278b8307",
+      "fingerprint": "1d7b5fc69785e1303ef9b32bbdcef0e010272fca9ef07431bd5c3c8809a822cf",
       "schemaVersion": null,
       "status": "valid",
       "reasons": []
@@ -2339,7 +2354,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "afac182ce10bd16e3c4cb38f0f5cd404be9c44d5312eb582dc804555d554eec1",
+      "fingerprint": "cc440c395134cf524ac3aacc5ca9ebc831881121be78c99240d7fa23bedfcf02",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2355,7 +2370,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "22ce348bdafd8155b267f8ac3918087e6c8bc46b99e7cbace0bbca4e4a175703",
+      "fingerprint": "d5f3eb4229f92d18a51a5b4b10e10f1725ca4427077d74144b7056e95ee67020",
       "schemaVersion": 3,
       "status": "valid",
       "reasons": []
@@ -2371,7 +2386,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "7e207fbb8da7b75d76dc59b1f928ccbc200c6be950003a3ba412fdc99060836f",
+      "fingerprint": "8f88051f1787999db4d88455b4589332a34c1f15468dc7f7262a05d226c112e0",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2387,7 +2402,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "0167fc38799f774db8c5835749fcdbf45f50823e800318c7db661780edc9a61a",
+      "fingerprint": "4dc3187b21c84ce237dfe2e21b7124c9229b2e78ea0a547923c05491bc7c0561",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2403,7 +2418,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "73059169ee72fd7e15319be5f05fb876521601c72d208b6fdf708561997f80df",
+      "fingerprint": "6f07668c6265aba182eb554c4ab829839562670d0a07478f1546cda2cc3d53b6",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2419,7 +2434,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "4021afdc01feaa0d4cf9f19830c6138b93f9250660df74f3a19a21de59efeb41",
+      "fingerprint": "c6c91c19e58141d03c70fcc351e98d99840be6ddd6623ece534adf7dad44adab",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2451,7 +2466,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "6f94653b13558199d690304b60566b0321e18027b1d9d4014b14fb40ff867845",
+      "fingerprint": "7301e0b948060d8e62e9d2cab3f1267b9b255cea16a2948bd9f2bb5fc7d2cb46",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2467,7 +2482,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "fdcef594e3e03c21940c822e7079648f0c989eb91d8166d53bba376763887a59",
+      "fingerprint": "db92dbb6c7866a6e0bdbf0603ce65c87277e539141f8838a9723e60928a903dc",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2483,7 +2498,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "3c41306476451ff283573911fb62adef6d090279c17a275bd024cc54b0b0586d",
+      "fingerprint": "7d9b49af9455473ba770bd25898f8042c1ed58e5aa8b495c3ec086b41b2970c1",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2499,7 +2514,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "f010581b2b762c6322c9be3143e0be5b4ecb83154059de4741889fd5ea15b885",
+      "fingerprint": "df53384bb4f18c15c75e91c8560c41b6c7467a7f7c73d8885e2f0293b4516eb8",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2515,7 +2530,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "4cdcfa0e6656276241023f7f3848da59ec139050c6e28e3b2fa9932f3e4b640a",
+      "fingerprint": "ff05fe0f2068a696ad0289a6b32446f441a787590b6a53e66dec80e75aed8ffa",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2531,7 +2546,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "88216917a6d61e1705f3e74e6c3060ebe78934324c7978ee14e39377b7865339",
+      "fingerprint": "58344afc0c0138ddbc3fa42a43989997febd1984bdc2eda26abfff21588f4f3c",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2547,7 +2562,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "4d14e8dc68150e62ea660f4a427eee2d46c43aec4582b1e2a20c89fae8a22b95",
+      "fingerprint": "09181ee60be76c4b90e3f4819caae3c498ab330e7bcf1ab668db4db3c537d50a",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2563,7 +2578,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "7017f8f6e2d912439c848c21b322b00c3056f5196b14a3a24602bf6ddae43d44",
+      "fingerprint": "905868ac8a08d57869bf35178fa603f268601fcc39b0955afbd218d4da23da40",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2579,7 +2594,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "b66a1b4a257ea59cb992ade441d905606e64fd25e824f5fcde143392c62d5ecc",
+      "fingerprint": "9f483658e6f9dc8ef291d84dc4b8eb0e31ca5b0b6e6cfa716555866d63814f9b",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2595,7 +2610,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "d6bf8133baa845ad489e5a1804ca3f09d8c5927a5191564c06d3c8a4867d8747",
+      "fingerprint": "ec6d2ed513866aa3ebf95838f56eb652e95b799c7918b6c44bf061231967f22a",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2611,7 +2626,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "0bc54f79eceb2b114c7c7f8ba324f45a87ee4b1be2c1789ad8634c0aa196e9ae",
+      "fingerprint": "46339dfd722a206a9f14fb5918b6ae3e2c41e4ca46d372699a10e764ac936289",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []

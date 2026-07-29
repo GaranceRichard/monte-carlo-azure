@@ -13,7 +13,6 @@ import { createSimulationCommand } from "../domain/simulation";
 import { createThroughputSamples } from "../domain/simulationValueObjects";
 import { toSafeNumber } from "../utils/math";
 import {
-  computeRiskScoreFromPercentiles,
   simulateMonteCarloLocal,
 } from "../utils/simulation";
 import { resolveSimulationSeed } from "./simulationSeedResolver";
@@ -133,11 +132,11 @@ export async function simulateForecastFromSamplesCore(
     demoMode = false,
     seed,
     throughputSamples,
-    includeZeroWeeks = true,
+    includeZeroWeeks = false,
     simulationMode,
     backlogSize,
     targetWeeks,
-    nSims,
+    nSims = 20_000,
   } = params;
   const simulationSeed = resolveSimulationSeed(seed);
   const command = createSimulationCommand({
@@ -161,17 +160,10 @@ export async function simulateForecastFromSamplesCore(
     );
   }
 
-  const response = simulateResponseDtoToResult(
+  return simulateResponseDtoToResult(
     await postSimulate(simulationCommandToDto(command)),
     command.nSims,
   );
-  const resolvedRiskScore = response.riskScore
-    ?? computeRiskScoreFromPercentiles(simulationMode, response.resultPercentiles);
-  return {
-    ...response,
-    riskScore: resolvedRiskScore ?? undefined,
-    resultDistribution: response.resultDistribution,
-  };
 }
 
 async function simulateForecastWithHistoryTranslation(

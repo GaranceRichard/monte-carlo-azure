@@ -366,6 +366,34 @@ les divergences d’histogrammes déjà isolées par 2.11 :
 Les seeds, tirages, distributions brutes, percentiles, scores et métriques de fiabilité ne sont pas modifiés
 par le runner. L’alignement de ces sorties reste explicitement hors du PBI 2.12.
 
+## Sondes de validation et forme canonique du PBI 2.13
+
+[`contracts/statistical-validation-probes-v1.0.json`](../contracts/statistical-validation-probes-v1.0.json)
+complète le corpus sans changer ses quinze résultats normatifs. Ses 22 sondes sont soumises aux deux
+fabriques normalisées avant tout appel moteur :
+
+- les sondes positives couvrent les bornes, les deux modes, les zéros inclus et les six observations
+  restant utilisables après exclusion ;
+- les sondes négatives couvrent types non entiers, booléens, décimaux, négatifs, cardinalités brutes et
+  utiles, champs obligatoires ou inconnus, paramètre actif/inactif et seed hors `uint32` ;
+- les valeurs non finies, qui ne sont pas représentables dans un JSON strict, sont couvertes directement
+  dans les suites Python et TypeScript.
+
+Une entrée normalisée est fermée et entièrement explicite : `samples`, `include_zero_weeks`, `n_sims`,
+`mode` et le seul paramètre actif sont obligatoires. Les valeurs par défaut appartiennent aux frontières de
+transport, qui résolvent de manière commune `false` et `20000` avant de créer les objets métier. Les DTO,
+l’API, MongoDB et `localStorage` restent constitués de primitives.
+
+La réponse canonique est elle aussi fermée. Elle exige le type de résultat, les percentiles présents, la
+distribution, le nombre d’échantillons, la fiabilité et la seed. Le Risk Score et la complétion ne sont
+émis que lorsqu’ils existent ; leur absence ne peut jamais devenir `0`, `null`, `NaN`, une chaîne vide ou
+une autre sentinelle. La complétion n’est autorisée que pour `backlog_to_weeks`.
+
+Le rapport expose `validation_alignment`: les 22 sondes concordent entre Python et TypeScript, sans
+divergence ni erreur. Les quinze cas statistiques restent à 13 conformités et deux divergences
+d’histogrammes. Aucune formule réservée aux PBI 2.14 à 2.16 n’a été modifiée et `enforcement` demeure
+`informational` jusqu’au PBI 2.19.
+
 ## Évolution
 
 La version `1.0` est immuable. Toute évolution incompatible des entrées, de la seed, des résultats ou du

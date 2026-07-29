@@ -1,5 +1,5 @@
 {
-  "report_version": "1.0",
+  "report_version": "1.1",
   "enforcement": "informational",
   "status": "divergence",
   "corpus": {
@@ -5259,5 +5259,186 @@
         ]
       }
     }
-  ]
+  ],
+  "validation_alignment": {
+    "pbi": "2.13",
+    "fixture": "contracts/statistical-validation-probes-v1.0.json",
+    "status": "match",
+    "summary": {
+      "probe_count": 22,
+      "matching_probes": 22,
+      "divergent_probes": 0,
+      "engine_errors": 0
+    },
+    "engines": {
+      "python": {
+        "engine": "python",
+        "schema_version": "1.0",
+        "normative_contract": "STD-STAT-001",
+        "status": "completed"
+      },
+      "typescript": {
+        "engine": "typescript",
+        "schema_version": "1.0",
+        "normative_contract": "STD-STAT-001",
+        "status": "completed"
+      }
+    },
+    "cases": [
+      {
+        "id": "backlog-inclusive-minima",
+        "expected_accepted": true,
+        "status": "match",
+        "python_accepted": true,
+        "typescript_accepted": true
+      },
+      {
+        "id": "backlog-inclusive-maxima",
+        "expected_accepted": true,
+        "status": "match",
+        "python_accepted": true,
+        "typescript_accepted": true
+      },
+      {
+        "id": "items-zero-weeks-included",
+        "expected_accepted": true,
+        "status": "match",
+        "python_accepted": true,
+        "typescript_accepted": true
+      },
+      {
+        "id": "items-six-usable-after-zero-filter",
+        "expected_accepted": true,
+        "status": "match",
+        "python_accepted": true,
+        "typescript_accepted": true
+      },
+      {
+        "id": "sample-string-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "sample-decimal-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "sample-negative-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "sample-boolean-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "raw-history-short-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "usable-history-short-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "zero-policy-string-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "zero-policy-default-forbidden",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "simulation-count-default-forbidden",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "simulation-count-lower-bound-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "active-parameter-missing",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "inactive-parameter-present",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "unknown-field-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "seed-string-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "seed-decimal-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "seed-negative-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "seed-overflow-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      },
+      {
+        "id": "target-decimal-rejected",
+        "expected_accepted": false,
+        "status": "match",
+        "python_accepted": false,
+        "typescript_accepted": false
+      }
+    ]
+  }
 }
