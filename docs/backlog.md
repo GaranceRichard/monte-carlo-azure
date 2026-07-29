@@ -48,7 +48,7 @@ Ce document constitue le registre de pilotage des Features et PBI. Les règles t
 | 2.12 | Exécuter le corpus partagé dans les deux moteurs | L | Sol Très élevé | 28/07/2026 |
 | 2.13 | Aligner la validation normalisée et la forme des résultats | M | Sol Très élevé | 28/07/2026 |
 | 2.14 | Aligner les censures, percentiles et Risk Score | M | Sol Très élevé | 28/07/2026 |
-| 2.15 | Aligner les métriques et labels de fiabilité du throughput | M | Sol Très élevé | |
+| 2.15 | Aligner les métriques et labels de fiabilité du throughput | M | Sol Très élevé | 29/07/2026 |
 | 2.16 | Aligner la construction des histogrammes | M | Sol Très élevé | |
 | 2.17 | Établir le rejeu exact interlangage sur le corpus versionné | L | Sol Ultra | |
 | 2.18 | Produire le rapport de parité déterministe et distributionnelle | M | Sol Très élevé | |
@@ -303,15 +303,15 @@ passage interactif ou asynchrone et maîtriser jobs, workers, progression, repri
 
 # Synthèse du backlog
 
-**Feature en cours :** Feature 2 — Garantir la fiabilité du cœur statistique — 14/20 PBI réalisés (70 %).
-**Prochain PBI :** `2.15` — Aligner les métriques et labels de fiabilité du throughput — non commencé.
-**Reliquats de la Feature 2 :** `2.15`, `2.16`, `2.17`, `2.18`, `2.19`, `2.20`.
-**Progression globale :** 25/140 PBI réalisés (17,86 %) ; 115 restants.
+**Feature en cours :** Feature 2 — Garantir la fiabilité du cœur statistique — 15/20 PBI réalisés (75 %).
+**Prochain PBI :** `2.16` — Aligner la construction des histogrammes — non commencé.
+**Reliquats de la Feature 2 :** `2.16`, `2.17`, `2.18`, `2.19`, `2.20`.
+**Progression globale :** 26/140 PBI réalisés (18,57 %) ; 114 restants.
 
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
 | 1 — Disposer d’un système de preuve qualité gouverné | 11 | 11 | 0 |
-| 2 — Garantir la fiabilité du cœur statistique | 20 | 14 | 6 |
+| 2 — Garantir la fiabilité du cœur statistique | 20 | 15 | 5 |
 | 3 — Distribuer un moteur statistique Python réutilisable | 12 | 0 | 12 |
 | 4 — Sécuriser la mise en production personnelle | 6 | 0 | 6 |
 | 5 — Valider la valeur d’usage du mode portefeuille | 4 | 0 | 4 |
@@ -324,7 +324,7 @@ passage interactif ou asynchrone et maîtriser jobs, workers, progression, repri
 | 12 — Étendre le produit au pilotage de programme | 7 | 0 | 7 |
 | 13 — Rationaliser le dispositif de gouvernance technique | 10 | 0 | 10 |
 | 14 — Clarifier la stratégie de diffusion et réduire la friction d’adoption | 9 | 0 | 9 |
-| **Total** | **140** | **25** | **115** |
+| **Total** | **140** | **26** | **114** |
 
 Aucun PBI n’est classé XL.
 

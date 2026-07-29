@@ -221,8 +221,7 @@ def build_validation_alignment(
             case["typescript_accepted"] = typescript_accepted
         cases.append(case)
     engine_errors = sum(
-        report.get("status") == "engine_error"
-        for report in (python_report, typescript_report)
+        report.get("status") == "engine_error" for report in (python_report, typescript_report)
     )
     matching_probes = sum(case["status"] == "match" for case in cases)
     return {
@@ -242,13 +241,9 @@ def build_validation_alignment(
             "engine_errors": engine_errors,
         },
         "engines": {
-            "python": {
-                key: value for key, value in python_report.items() if key != "cases"
-            },
+            "python": {key: value for key, value in python_report.items() if key != "cases"},
             "typescript": {
-                key: value
-                for key, value in typescript_report.items()
-                if key != "cases"
+                key: value for key, value in typescript_report.items() if key != "cases"
             },
         },
         "cases": cases,
@@ -260,10 +255,7 @@ def _optional_validation_alignment(
     python_report: dict[str, Any] | None,
     typescript_report: dict[str, Any] | None,
 ) -> dict[str, Any] | None:
-    if any(
-        report is None
-        for report in (validation_probes, python_report, typescript_report)
-    ):
+    if any(report is None for report in (validation_probes, python_report, typescript_report)):
         return None
     return build_validation_alignment(
         validation_probes,
@@ -287,9 +279,7 @@ def _parity_status(
         + summary["engine_divergence_cases"]
         + int(validation_status == "divergence")
     )
-    return ("match", "divergence", "engine_error")[
-        max(int(divergence), 2 * int(engine_error))
-    ]
+    return ("match", "divergence", "engine_error")[max(int(divergence), 2 * int(engine_error))]
 
 
 def build_parity_report(
@@ -328,9 +318,7 @@ def build_parity_report(
         },
         "summary": summary,
         "engines": {
-            "python": {
-                key: value for key, value in python_report.items() if key != "cases"
-            },
+            "python": {key: value for key, value in python_report.items() if key != "cases"},
             "typescript": {
                 key: value for key, value in typescript_report.items() if key != "cases"
             },
@@ -436,7 +424,7 @@ def render_markdown(report: dict[str, Any]) -> str:
                 "Ces probes couvrent la forme fermée, les valeurs par défaut résolues, "
                 "le paramètre de mode exclusif, les entiers stricts, les zéros, "
                 "les bornes et la seed uint32. Ils ne modifient aucune formule statistique ; "
-                "le corpus démontre le PBI 2.14. Les PBI 2.15 et 2.16 restent inchangés.",
+                "le corpus démontre les PBI 2.14 et 2.15. Le PBI 2.16 reste inchangé.",
             ]
         )
     return "\n".join(lines) + "\n"

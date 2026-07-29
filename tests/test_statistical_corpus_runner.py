@@ -16,9 +16,7 @@ from Scripts import statistical_parity_report as parity_report
 from Scripts import validate_statistical_reference_corpus as corpus_validation
 
 VALIDATION_PROBES_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "contracts"
-    / "statistical-validation-probes-v1.0.json"
+    Path(__file__).resolve().parents[1] / "contracts" / "statistical-validation-probes-v1.0.json"
 )
 
 
@@ -67,10 +65,7 @@ def _matching_validation_report(
         "schema_version": probes["schema_version"],
         "normative_contract": probes["normative_contract"],
         "status": "completed",
-        "cases": [
-            {"id": probe["id"], "accepted": probe["accepted"]}
-            for probe in probes["cases"]
-        ],
+        "cases": [{"id": probe["id"], "accepted": probe["accepted"]} for probe in probes["cases"]],
     }
 
 
@@ -80,7 +75,7 @@ def test_python_runner_executes_all_cases_with_exact_canonical_results() -> None
 
     assert engine_report["engine"] == "python"
     assert engine_report["status"] == "completed"
-    assert len(engine_report["cases"]) == 15
+    assert len(engine_report["cases"]) == 16
     expected = {case["id"]: case["expected_result"] for case in corpus["cases"]}
     actual = {case["id"]: case["result"] for case in engine_report["cases"]}
     matching = [
@@ -88,7 +83,7 @@ def test_python_runner_executes_all_cases_with_exact_canonical_results() -> None
         for case_id in expected
         if parity_report.compare_canonical(expected[case_id], actual[case_id]) == []
     ]
-    assert len(matching) == 13
+    assert len(matching) == 14
     assert set(expected) - set(matching) == {
         "histogram-aggregated-contiguous-101",
         "histogram-aggregated-discontinuous",
@@ -132,15 +127,9 @@ def test_shared_validation_probes_match_in_python_and_typescript() -> None:
     expected = {probe["id"]: probe["accepted"] for probe in probes["cases"]}
 
     python_report = corpus_runner.run_python_validation_probes(probes)
-    typescript_report = corpus_runner.run_typescript_validation_probes(
-        VALIDATION_PROBES_PATH
-    )
-    python_results = {
-        case["id"]: case["accepted"] for case in python_report["cases"]
-    }
-    typescript_results = {
-        case["id"]: case["accepted"] for case in typescript_report["cases"]
-    }
+    typescript_report = corpus_runner.run_typescript_validation_probes(VALIDATION_PROBES_PATH)
+    python_results = {case["id"]: case["accepted"] for case in python_report["cases"]}
+    typescript_results = {case["id"]: case["accepted"] for case in typescript_report["cases"]}
 
     assert python_report["status"] == "completed"
     assert typescript_report["status"] == "completed"
@@ -167,11 +156,14 @@ def test_typescript_bridge_parses_report_and_classifies_failures(
         return SimpleNamespace(**values)
 
     monkeypatch.setattr(corpus_runner.subprocess, "run", lambda *_args, **_kwargs: completed())
-    assert corpus_runner.run_typescript_corpus(
-        corpus_path,
-        node_executable="node-test",
-        python_executable="python-test",
-    ) == valid_report
+    assert (
+        corpus_runner.run_typescript_corpus(
+            corpus_path,
+            node_executable="node-test",
+            python_executable="python-test",
+        )
+        == valid_report
+    )
 
     monkeypatch.setattr(
         corpus_runner.subprocess,
@@ -221,10 +213,13 @@ def test_typescript_validation_bridge_classifies_protocol_failures(
         "run",
         lambda *_args, **_kwargs: completed(),
     )
-    assert corpus_runner.run_typescript_validation_probes(
-        VALIDATION_PROBES_PATH,
-        node_executable="node-test",
-    ) == valid_report
+    assert (
+        corpus_runner.run_typescript_validation_probes(
+            VALIDATION_PROBES_PATH,
+            node_executable="node-test",
+        )
+        == valid_report
+    )
 
     monkeypatch.setattr(
         corpus_runner.subprocess,
@@ -341,9 +336,7 @@ def test_parity_report_includes_validation_alignment_without_blocking_it() -> No
         "divergent_probes": 0,
         "engine_errors": 0,
     }
-    assert "Alignement de validation PBI 2.13" in parity_report.render_markdown(
-        matching
-    )
+    assert "Alignement de validation PBI 2.13" in parity_report.render_markdown(matching)
 
     typescript["cases"][0]["accepted"] = not probes["cases"][0]["accepted"]
     divergent = parity_report.build_parity_report(
@@ -531,7 +524,7 @@ def test_control_reports_fatal_engine_errors_and_cli_statuses(
     monkeypatch.setattr(corpus_control, "run_control", lambda **_kwargs: engine_error)
     assert corpus_control.main([]) == 1
     engine_output = capsys.readouterr().out
-    assert "engine error cases=15" in engine_output
+    assert "engine error cases=16" in engine_output
     assert "fatal engine errors=1" in engine_output
 
     matching = parity_report.build_parity_report(
@@ -540,20 +533,23 @@ def test_control_reports_fatal_engine_errors_and_cli_statuses(
         _matching_engine_report("typescript", _single_case_corpus()),
     )
     monkeypatch.setattr(corpus_control, "run_control", lambda **_kwargs: matching)
-    assert corpus_control.main(
-        [
-            "--schema",
-            "schema.json",
-            "--corpus",
-            "corpus.json",
-            "--json-report",
-            "report.json",
-            "--markdown-report",
-            "report.md",
-            "--validation-probes",
-            "validation-probes.json",
-        ]
-    ) == 0
+    assert (
+        corpus_control.main(
+            [
+                "--schema",
+                "schema.json",
+                "--corpus",
+                "corpus.json",
+                "--json-report",
+                "report.json",
+                "--markdown-report",
+                "report.md",
+                "--validation-probes",
+                "validation-probes.json",
+            ]
+        )
+        == 0
+    )
     assert "matches=1" in capsys.readouterr().out
 
 

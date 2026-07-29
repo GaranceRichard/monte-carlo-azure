@@ -2,52 +2,52 @@
   "schemaVersion": "1.0.0",
   "schema": "config/test-strategy-report.schema.json",
   "profile": "main",
-  "evidenceBundleId": "76dbf12d50f3f77f94cb5a51c74d9286f82f3bc4c84015c0f86cd9dd524574c0",
+  "evidenceBundleId": "c613702b331fd30edf1c4741a708a9930bd633130cfe174517cabd4ba7926390",
   "evidenceBundleIdentityDisclaimer": "This identifier names the exact evidence bundle; it does not prove that every source came from the same physical execution.",
   "globalReference": {
     "inventory": {
       "path": "reports/test-classification-inventory.json",
-      "sha256": "93415de8b89525f9b565c4746cdc445e8d01386b636c16b0a9f6a48817e08071",
-      "logicalCases": 1279
+      "sha256": "3d3e513bedddb7c0ce100ace3ac96e8a3f8b37d47f10e22c3ca0f447cce82ac0",
+      "logicalCases": 1285
     },
     "classification": {
       "breakdowns": {
         "status": {
-          "classified": 1279
+          "classified": 1285
         },
         "framework": {
           "playwright": 32,
-          "pytest": 566,
-          "vitest": 681
+          "pytest": 569,
+          "vitest": 684
         },
         "nature": {
           "component": 402,
           "contract": 46,
           "e2e": 32,
           "integration": 211,
-          "unit": 588
+          "unit": 594
         },
         "purpose": {
           "accessibility": 106,
           "compatibility": 105,
-          "data_quality": 134,
-          "functional": 1279,
+          "data_quality": 137,
+          "functional": 1285,
           "migration_recovery": 21,
-          "observability": 246,
+          "observability": 247,
           "performance": 11,
-          "resilience": 129,
+          "resilience": 130,
           "security": 124
         },
         "primaryProfile": {
           "main": 213,
           "nightly": 1,
-          "pr": 1063,
+          "pr": 1069,
           "release": 2
         },
         "domain": {
           "api": 128,
           "azure_devops": 263,
-          "data": 131,
+          "data": 133,
           "deployment": 43,
           "history": 108,
           "identity": 92,
@@ -59,16 +59,16 @@
           "user_interface": 316
         },
         "criticality": {
-          "critical": 203,
+          "critical": 202,
           "high": 20,
-          "unassigned": 1056
+          "unassigned": 1063
         }
       },
       "riskAssociations": {
         "RISK-001": 17,
         "RISK-002": 9,
-        "RISK-003": 20,
-        "RISK-004": 20,
+        "RISK-003": 19,
+        "RISK-004": 19,
         "RISK-005": 11,
         "RISK-006": 6,
         "RISK-007": 6,
@@ -86,7 +86,7 @@
       "criticalPathAssociations": {
         "CP-001": 11,
         "CP-002": 3,
-        "CP-003": 71,
+        "CP-003": 70,
         "CP-004": 6,
         "CP-005": 100,
         "CP-007": 20,
@@ -99,16 +99,16 @@
     "executionCounts": {
       "path": "reports/test-execution-counts.json",
       "schemaVersion": "1.0.0",
-      "inventorySha256": "93415de8b89525f9b565c4746cdc445e8d01386b636c16b0a9f6a48817e08071",
+      "inventorySha256": "3d3e513bedddb7c0ce100ace3ac96e8a3f8b37d47f10e22c3ca0f447cce82ac0",
       "totals": {
-        "logicalCases": 1279,
-        "collectedInstances": 1584,
-        "executedInstances": 1584,
+        "logicalCases": 1285,
+        "collectedInstances": 1595,
+        "executedInstances": 1595,
         "skippedInstances": 0,
-        "attempts": 1584,
+        "attempts": 1595,
         "retries": 0,
         "results": {
-          "passed": 1584,
+          "passed": 1595,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -122,18 +122,18 @@
         "includedProfiles": [
           "pr"
         ],
-        "logicalCases": 1063,
+        "logicalCases": 1069,
         "frameworks": {
-          "pytest": 382,
-          "vitest": 681
+          "pytest": 385,
+          "vitest": 684
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 382,
+          "backend-tests": 385,
           "e2e": 0,
           "frontend-static": 0,
-          "frontend-tests": 681,
+          "frontend-tests": 684,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -144,19 +144,19 @@
           "pr",
           "main"
         ],
-        "logicalCases": 1276,
+        "logicalCases": 1282,
         "frameworks": {
           "playwright": 32,
-          "pytest": 563,
-          "vitest": 681
+          "pytest": 566,
+          "vitest": 684
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 563,
+          "backend-tests": 566,
           "e2e": 32,
           "frontend-static": 0,
-          "frontend-tests": 681,
+          "frontend-tests": 684,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -168,19 +168,19 @@
           "main",
           "nightly"
         ],
-        "logicalCases": 1277,
+        "logicalCases": 1283,
         "frameworks": {
           "playwright": 32,
-          "pytest": 564,
-          "vitest": 681
+          "pytest": 567,
+          "vitest": 684
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 564,
+          "backend-tests": 567,
           "e2e": 32,
           "frontend-static": 0,
-          "frontend-tests": 681,
+          "frontend-tests": 684,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -192,19 +192,19 @@
           "main",
           "release"
         ],
-        "logicalCases": 1278,
+        "logicalCases": 1284,
         "frameworks": {
           "playwright": 32,
-          "pytest": 565,
-          "vitest": 681
+          "pytest": 568,
+          "vitest": 684
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 565,
+          "backend-tests": 568,
           "e2e": 32,
           "frontend-static": 0,
-          "frontend-tests": 681,
+          "frontend-tests": 684,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -217,7 +217,7 @@
       "pr",
       "main"
     ],
-    "selectedLogicalCases": 1276,
+    "selectedLogicalCases": 1282,
     "logicalCaseIds": [
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2775:3]",
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2829:3]",
@@ -432,7 +432,6 @@
       "pytest:tests/test_mc_core.py::test_percentiles_weeks_to_items_use_survival_lower_quantiles",
       "pytest:tests/test_mc_core.py::test_simulation_batch_size_must_be_positive",
       "pytest:tests/test_mc_core.py::test_throughput_reliability_marks_downward_trend_as_non_fiable",
-      "pytest:tests/test_mc_core.py::test_throughput_reliability_marks_moderate_trend_as_incertain",
       "pytest:tests/test_mc_core.py::test_throughput_reliability_marks_short_history_as_non_fiable",
       "pytest:tests/test_mc_core.py::test_throughput_reliability_marks_stable_history_as_fiable",
       "pytest:tests/test_mc_core.py::test_throughput_reliability_marks_volatile_history_as_fragile",
@@ -674,6 +673,7 @@
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_210_reference_cases_are_exact_readable_and_scope_complete",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_214_reference_cases_protect_censorship_percentiles_and_risk_score",
+      "pytest:tests/test_statistical_reference_corpus_contract.py::test_pbi_215_reference_cases_protect_reliability_metrics_and_labels",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_schema_rejects_contract_drift_with_localized_actionable_diagnostics",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_scope_and_probe_controls_report_actionable_regressions",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_script_entrypoint_runs_the_autonomous_control",
@@ -798,6 +798,9 @@
       "pytest:tests/test_test_strategy_reporting.py::test_unknown_source_version_and_inventory_hash_are_incomplete",
       "pytest:tests/test_test_strategy_reporting.py::test_validator_and_cli_error_paths_are_explicit",
       "pytest:tests/test_test_strategy_reporting.py::test_write_reports_and_cli_do_not_launch_test_runners",
+      "pytest:tests/test_throughput_reliability.py::test_calculation_requires_a_collection",
+      "pytest:tests/test_throughput_reliability.py::test_invalid_sample_histories_are_rejected",
+      "pytest:tests/test_throughput_reliability.py::test_population_moments_linear_quartiles_and_least_squares",
       "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_metrics_below_threshold",
       "pytest:tests/test_vitals_compliance.py::test_append_vitals_rate_errors_flags_missing_matches",
       "pytest:tests/test_vitals_compliance.py::test_backend_aggregation_and_report_building_cover_each_source",
@@ -889,14 +892,14 @@
       "vitest:frontend/src/api.test.ts::postSimulate > keeps network errors observable to callers [24:3]",
       "vitest:frontend/src/api.test.ts::postSimulate > posts the public payload and returns a valid response [7:3]",
       "vitest:frontend/src/api.test.ts::postSimulate > reports HTTP failures, including invalid JSON bodies [19:3]",
-      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > derives a response mass when needed and rejects completion in the wrong mode [175:3]",
-      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > keeps absent optional response and history values absent [108:3]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > derives a response mass when needed and rejects completion in the wrong mode [179:3]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > keeps absent optional response and history values absent [112:3]",
       "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a business command to the unchanged public request DTO [28:3]",
       "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > maps a complete response DTO to the camelCase business result [41:3]",
-      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a non-canonical samples_count value: %s [248:4]",
-      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a reliability computed from a different sample history [259:3]",
-      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a response result kind outside the closed HTTP contract [270:3]",
-      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects absent sentinels and open canonical response shapes [227:4]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a non-canonical samples_count value: %s [252:4]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a reliability computed from a different sample history [263:3]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects a response result kind outside the closed HTTP contract [274:3]",
+      "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > rejects absent sentinels and open canonical response shapes [231:4]",
       "vitest:frontend/src/api/simulationMappers.test.ts::simulation HTTP mappers > requires the exact authoritative risk score on calculable responses [85:3]",
       "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
       "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [9:3]",
@@ -1176,6 +1179,8 @@
       "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > rejects invalid values without filtering them [105:4]",
       "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > requires a strict boolean zero-week flag [128:3]",
       "vitest:frontend/src/domain/simulationValueObjects.test.ts::throughput samples > validates raw values before zero processing and freezes both collections [86:3]",
+      "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > rejects invalid sample histories at the calculation boundary [33:3]",
+      "vitest:frontend/src/domain/throughputReliability.test.ts::throughput reliability calculation > uses population moments, linear quartiles and least-squares slope [26:13]",
       "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > renders children inside SimulationProvider [31:3]",
       "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > returns provider value when used inside SimulationProvider [13:3]",
       "vitest:frontend/src/hooks/SimulationContext.test.tsx::SimulationContext > throws when hook is used outside provider [7:3]",
@@ -1429,53 +1434,51 @@
       "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > marks common correlated history as observed without recommending it [75:3]",
       "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > raises a fragile and declining team as a portfolio fact to verify [85:3]",
       "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > reports trend divergence without causal or unproven substitutability claims [102:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > applies includeZeroWeeks after aggregating the portfolio total [192:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > is not mathematically forced to match optimistic independent draws [208:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps ISO week timestamps aligned after normalization [317:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps only the intersection of aligned weeks [157:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > returns the same history for a single team [179:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > sums aligned weekly throughput for two teams [132:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws an explicit error when no complete common week exists [236:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when a weekly row has an invalid week or throughput [264:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when includeZeroWeeks keeps only negative common totals [330:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when one team contains the same week twice [284:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when one team has no usable weekly history [252:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when the correlated portfolio input is empty [248:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when zero-week filtering removes every common weekly total [298:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > applies no friction penalty with one team, then starts at the second team [85:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > builds optimistic, aligned and friction samples for 2 teams [60:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > clamps alignment rate before computing aligned and friction samples [47:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > keeps the displayed friction percent aligned with the rounded sample factor [102:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > throws explicit error when a team has no samples [124:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > throws explicit error when teamSamples is empty [120:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > uses same values for all scenarios with 1 team [78:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::computeRiskLegend > covers fiable and incertain ranges [344:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::computeRiskLegend > covers fragile and non fiable ranges [349:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > downgrades otherwise stable short histories to incertain [400:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > handles a single finite sample without slope computation [412:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > handles zero-only histories with zero mean and quartiles [424:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks highly volatile histories as fragile [382:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks moderate variability as incertain [389:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks steep downward trends as non fiable [356:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks very short histories as non fiable [370:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > matches the expected reliability labels for demo teams [436:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > returns null for empty samples and rejects non-finite samples [363:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > returns the expected rounded ratio values for the reference series [442:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null for reliable or uncertain non-volatile histories [493:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null when reliability is absent [454:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the non fiable notice when the label is non fiable without high volatility [481:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the volatility notice when cv or iqr_ratio is high [459:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [699:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [623:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [673:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > omits backlog percentiles whose rank is not reachable in the total simulation population [610:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [737:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects shared contract violations with explicit messages [533:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [714:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > requires the total backlog population and uses exact small-population ranks [614:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [637:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [655:3]",
-      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > validates the shared contract boundaries [507:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > applies includeZeroWeeks after aggregating the portfolio total [191:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > is not mathematically forced to match optimistic independent draws [207:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps ISO week timestamps aligned after normalization [316:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps only the intersection of aligned weeks [156:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > returns the same history for a single team [178:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > sums aligned weekly throughput for two teams [131:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws an explicit error when no complete common week exists [235:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when a weekly row has an invalid week or throughput [263:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when includeZeroWeeks keeps only negative common totals [329:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when one team contains the same week twice [283:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when one team has no usable weekly history [251:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when the correlated portfolio input is empty [247:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > throws when zero-week filtering removes every common weekly total [297:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > applies no friction penalty with one team, then starts at the second team [84:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > builds optimistic, aligned and friction samples for 2 teams [59:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > clamps alignment rate before computing aligned and friction samples [46:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > keeps the displayed friction percent aligned with the rounded sample factor [101:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > throws explicit error when a team has no samples [123:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > throws explicit error when teamSamples is empty [119:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::buildScenarioSamples > uses same values for all scenarios with 1 team [77:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::computeRiskLegend > covers fiable and incertain ranges [343:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::computeRiskLegend > covers fragile and non fiable ranges [348:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > downgrades otherwise stable short histories to incertain [399:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > handles a single finite sample without slope computation [411:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > handles zero-only histories with zero mean and quartiles [423:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks highly volatile histories as fragile [381:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks moderate variability as incertain [388:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks steep downward trends as non fiable [355:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > marks very short histories as non fiable [369:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > matches the expected reliability labels for demo teams [435:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > returns null for empty samples and rejects non-finite samples [362:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::computeThroughputReliability > returns the expected rounded ratio values for the reference series [441:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null for reliable or uncertain non-volatile histories [492:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns null when reliability is absent [453:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the non fiable notice when the label is non fiable without high volatility [480:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::getProjectionReliabilityNotice > returns the volatility notice when cv or iqr_ratio is high [458:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > aggregates histogram buckets when too many unique outcomes are produced [685:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps compact histograms unchanged when there are few unique outcomes [609:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > keeps risk_score consistent with the returned business percentiles in both modes [659:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects negative or fractional contract inputs instead of correcting them silently [723:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > rejects shared contract violations with explicit messages [532:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > reports a fully censored backlog when zero throughput never burns backlog [700:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in backlog mode [623:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > returns a backend-compatible structure in target-weeks mode [641:3]",
+      "vitest:frontend/src/utils/simulation.test.ts::simulateMonteCarloLocal > validates the shared contract boundaries [506:3]",
       "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the captured portfolio bootstrap samples [281:3]",
       "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete backlog result [147:3]",
       "vitest:frontend/src/utils/simulationDrawPort.test.ts::captured TypeScript non-regression references > preserves the complete weeks-to-items result [194:3]",
@@ -1487,6 +1490,9 @@
       "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > makes simulateMonteCarloLocal consume only its injected port [62:3]",
       "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an excessive deterministic skip without advancing the sequence [129:3]",
       "vitest:frontend/src/utils/simulationDrawPort.test.ts::sample index draw port in local engines > rejects an invalid deterministic skip count without consuming a draw: %s [118:48]",
+      "vitest:frontend/src/utils/simulationPercentiles.test.ts::discrete simulation percentiles > omits backlog ranks that censorship makes unreachable [5:3]",
+      "vitest:frontend/src/utils/simulationPercentiles.test.ts::discrete simulation percentiles > rejects modes and population arguments outside their business contract [20:3]",
+      "vitest:frontend/src/utils/simulationPercentiles.test.ts::discrete simulation percentiles > requires the total backlog population and uses exact small-population ranks [11:3]",
       "vitest:frontend/src/utils/simulationRiskScore.test.ts::riskScoreFromPercentiles authority > computes both normalized spreads and preserves missing values [18:3]",
       "vitest:frontend/src/utils/simulationRiskScore.test.ts::riskScoreFromPercentiles authority > rejects invalid domain percentiles [32:13]",
       "vitest:frontend/src/utils/simulationSignature.test.ts::simulation signature > finds the newest exact reusable entry [62:3]",
@@ -1513,14 +1519,14 @@
         }
       },
       "pytest": {
-        "logicalCases": 563,
-        "collectedInstances": 772,
-        "executedInstances": 772,
+        "logicalCases": 566,
+        "collectedInstances": 779,
+        "executedInstances": 779,
         "skippedInstances": 0,
-        "attempts": 772,
+        "attempts": 779,
         "retries": 0,
         "results": {
-          "passed": 772,
+          "passed": 779,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -1528,14 +1534,14 @@
         }
       },
       "vitest": {
-        "logicalCases": 681,
-        "collectedInstances": 777,
-        "executedInstances": 777,
+        "logicalCases": 684,
+        "collectedInstances": 781,
+        "executedInstances": 781,
         "skippedInstances": 0,
-        "attempts": 777,
+        "attempts": 781,
         "retries": 0,
         "results": {
-          "passed": 777,
+          "passed": 781,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -1550,7 +1556,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/preflight/result.json",
         "exitCode": 0,
-        "durationSeconds": 9.397,
+        "durationSeconds": 10.102,
         "reasons": []
       },
       {
@@ -1559,7 +1565,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 0.128,
+        "durationSeconds": 0.144,
         "reasons": []
       },
       {
@@ -1568,7 +1574,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 32.544,
+        "durationSeconds": 35.075,
         "reasons": []
       },
       {
@@ -1577,7 +1583,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 96.388,
+        "durationSeconds": 104.015,
         "reasons": []
       },
       {
@@ -1586,7 +1592,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 124.663,
+        "durationSeconds": 129.8,
         "reasons": []
       },
       {
@@ -1595,7 +1601,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/e2e/result.json",
         "exitCode": 0,
-        "durationSeconds": 43.481,
+        "durationSeconds": 49.182,
         "reasons": []
       },
       {
@@ -1604,7 +1610,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/release-or-container-checks/result.json",
         "exitCode": 0,
-        "durationSeconds": 49.5,
+        "durationSeconds": 41.773,
         "reasons": []
       },
       {
@@ -1617,20 +1623,20 @@
         "reasons": []
       }
     ],
-    "collectedInstances": 1581,
-    "executedInstances": 1581,
+    "collectedInstances": 1592,
+    "executedInstances": 1592,
     "skippedInstances": 0,
-    "attempts": 1581,
+    "attempts": 1592,
     "retries": 0,
     "initialResults": {
-      "passed": 1581,
+      "passed": 1592,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
       "infrastructureError": 0
     },
     "finalResults": {
-      "passed": 1581,
+      "passed": 1592,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -1648,14 +1654,14 @@
       "instabilities": 0,
       "instabilityRatePercent": 0.0,
       "initialResults": {
-        "passed": 1581,
+        "passed": 1592,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
         "infrastructureError": 0
       },
       "finalResults": {
-        "passed": 1581,
+        "passed": 1592,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -1671,14 +1677,14 @@
         "thresholdSource": ".coveragerc",
         "metrics": {
           "lines": {
-            "total": 7634,
-            "covered": 7634,
+            "total": 7694,
+            "covered": 7694,
             "pct": 100.0
           },
           "branches": {
-            "total": 2636,
-            "covered": 2594,
-            "pct": 98.41
+            "total": 2652,
+            "covered": 2610,
+            "pct": 98.42
           }
         },
         "thresholds": {
@@ -1695,14 +1701,14 @@
         "thresholdSource": "frontend/vitest.config.js",
         "metrics": {
           "statements": {
-            "total": 3996,
-            "covered": 3957,
-            "pct": 99.02
+            "total": 3986,
+            "covered": 3951,
+            "pct": 99.12
           },
           "branches": {
-            "total": 3109,
-            "covered": 2902,
-            "pct": 93.34
+            "total": 3101,
+            "covered": 2900,
+            "pct": 93.52
           },
           "functions": {
             "total": 926,
@@ -1710,9 +1716,9 @@
             "pct": 99.89
           },
           "lines": {
-            "total": 3996,
-            "covered": 3957,
-            "pct": 99.02
+            "total": 3986,
+            "covered": 3951,
+            "pct": 99.12
           }
         },
         "thresholds": {
@@ -1731,24 +1737,24 @@
         "thresholdSource": "frontend/e2e-coverage.config.json",
         "metrics": {
           "statements": {
-            "total": 12542,
-            "covered": 11451,
-            "pct": 91.3
+            "total": 12539,
+            "covered": 11457,
+            "pct": 91.37
           },
           "branches": {
-            "total": 2723,
-            "covered": 2252,
-            "pct": 82.7
+            "total": 2719,
+            "covered": 2247,
+            "pct": 82.64
           },
           "functions": {
             "total": 451,
-            "covered": 417,
-            "pct": 92.46
+            "covered": 416,
+            "pct": 92.23
           },
           "lines": {
-            "total": 12341,
-            "covered": 11284,
-            "pct": 91.43
+            "total": 12345,
+            "covered": 11289,
+            "pct": 91.44
           }
         },
         "thresholds": {
@@ -1862,18 +1868,18 @@
             "pct": 100.0
           },
           "CP-003:backend:statements": {
-            "total": 255,
-            "covered": 255,
+            "total": 241,
+            "covered": 241,
             "pct": 100.0
           },
           "CP-003:backend:branches": {
-            "total": 84,
-            "covered": 84,
+            "total": 82,
+            "covered": 82,
             "pct": 100.0
           },
           "CP-003:backend:lines": {
-            "total": 255,
-            "covered": 255,
+            "total": 241,
+            "covered": 241,
             "pct": 100.0
           },
           "CP-004:e2e:statements": {
@@ -2125,18 +2131,18 @@
             "id": "backend",
             "metrics": {
               "statements": {
-                "total": 255,
-                "covered": 255,
+                "total": 241,
+                "covered": 241,
                 "pct": 100.0
               },
               "branches": {
-                "total": 84,
-                "covered": 84,
+                "total": 82,
+                "covered": 82,
                 "pct": 100.0
               },
               "lines": {
-                "total": 255,
-                "covered": 255,
+                "total": 241,
+                "covered": 241,
                 "pct": 100.0
               }
             }
@@ -2337,7 +2343,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "93415de8b89525f9b565c4746cdc445e8d01386b636c16b0a9f6a48817e08071",
+      "fingerprint": "3d3e513bedddb7c0ce100ace3ac96e8a3f8b37d47f10e22c3ca0f447cce82ac0",
       "schemaVersion": null,
       "status": "valid",
       "reasons": []
@@ -2369,7 +2375,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "217a485b4818bd28e24e321dc408983d548febea47124f534c73d98e839d89c2",
+      "fingerprint": "f56140c0a836494013ad398f1900d3d19d939001d12a83ac2aee19040fe4d498",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2385,7 +2391,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "9e159ed7586feadebb8b5164b76791c96d2385d5eba3502a3e63f37720c13b9d",
+      "fingerprint": "a1a08e1c0b6501d20f40fec3170723dac1774592b731b772b61078f6f72a79a1",
       "schemaVersion": 3,
       "status": "valid",
       "reasons": []
@@ -2401,7 +2407,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "7ea0631d5b8d827368139f7441762841c407e66b1078fbffb345acb2d1999870",
+      "fingerprint": "473ef466e40c3db9c65d5951c873fd4bd0cb4390e807548373386575afd1eae2",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2417,7 +2423,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "506a73e1cdc8cd0a1d50226b65bc6c1c2b075010a1aff094379a54ef6a8c9652",
+      "fingerprint": "3c86775060a9ae0cfad9dfe4c6b0469f46b45a49cbad365683bffb85a1e69c9f",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2433,7 +2439,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "c16ef9c0295a2e76c9845305f71332e5da5636edfc2f5eab64651bccd3b7f9b3",
+      "fingerprint": "fee65c0e72963fae5d6c4931d476c03c5ada3e3ffaef3e3035615f25112b5e3a",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2449,7 +2455,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "fb3381eb38d32740dae83c03c6433dea214837435425cfc592c400a475d6ca2c",
+      "fingerprint": "e5ebcc34e0b1362ce60fc805f0021830b646dce19e67ae5cb00a4cea0d2cf9c2",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2481,7 +2487,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "65badb3b2ea5778e69fb7e8bf3542089e90f25d42754c77bfee7c7f39daf5d10",
+      "fingerprint": "6de8c37851229538124df38a7c8281eb1eb6946b62979d98afe7d17c0cd90f6e",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2497,7 +2503,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "2399f3a397e25e4219c3b9a42bf0b42dde0224f9104c9ede32772eabd9074e46",
+      "fingerprint": "48c1447331712500fe835b9218eb1e5aa569897edc5ba1681edf65ef160fc805",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2513,7 +2519,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "f89a252ce9e957e362ba2c28741242b7b6ed91d031e3ec467c7d4914786a6dc9",
+      "fingerprint": "abca7034a8afb80b406e2d8b3b19fb8bf5a2ebacc7bd9e3f8e4d13ec2aca8d5f",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2529,7 +2535,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "9199114a2621df0505fa523ec4069271a9aa99dec26fac5e2b2cfc08210bb4e8",
+      "fingerprint": "eb57f8ca535ad314a74f128afb9853c3727715ac16abfaa3228873c4e3f48d35",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2545,7 +2551,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "d751ffbf8d0fca16b6e8ffea49699c728a3d8be4afbb64d738f40a49a8f156e6",
+      "fingerprint": "1dffa431b0a1b2755a8a4713bf71b039a95f8da0ef7fe3072bbe9b3b49cbb972",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2561,7 +2567,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "038a78806da58239b90e1b00e9000788cf40469d915d561d1dec1debe5698eec",
+      "fingerprint": "3ca5554abe734a0707e8565ba8d6e10280dec761f4621e65e846340bcf4afe5b",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2577,7 +2583,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "8ceabdd16b6f912414bb54d91f344a53692b56b4e3c8c23e71f5fb163ff8cc45",
+      "fingerprint": "e1c2cb257f7af88db2087af2d584abb60690a7f218d9c50ed35a1599026de36f",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2593,7 +2599,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "f1c938d28fc1be15168e96ddcb76c3ee795ef9e5f766124c0d52a3ecefc7b3c2",
+      "fingerprint": "7e6ee598665a28f382f5e02b256b1ccf96b5b890ef116f54b4241e73c70eab73",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2625,7 +2631,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "67cdce62aea2961e141300dd0ee842b1f963ecefb6012b36bd47224aba4a7562",
+      "fingerprint": "7292bad693ff867175b1424cf0736bd0289849d6f7bbc0ec8784559a62888340",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2641,7 +2647,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "8eb1690311802137462bdec849c6ac1eda6951934f1f089b403daa6183363e82",
+      "fingerprint": "2d879bde532107e17922c291122175b2087cd2d81b86c1fc511ff0f4105b0e1a",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []

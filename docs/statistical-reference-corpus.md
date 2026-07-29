@@ -5,8 +5,8 @@ d’entrées, de modes, de zéros, d’horizon, de censures et de percentiles. L
 cas du Risk Score, des seuils de fiabilité et des histogrammes exacts ou agrégés. Le PBI 2.12 exécute les
 quinze cas dans les moteurs Python et TypeScript et compare leurs sorties à cette référence et entre elles,
 sans corriger les divergences observées. Le PBI 2.13 aligne les frontières normalisées ; le PBI 2.14
-réutilise six cas discriminants pour aligner censures, percentiles et Risk Score sans changer le corpus
-versionné.
+réutilise six cas discriminants pour aligner censures, percentiles et Risk Score. Le PBI 2.15 aligne les
+métriques et labels de fiabilité et ajoute une seizième preuve à sept observations.
 
 ## Autorité et fichiers
 
@@ -15,7 +15,8 @@ Le contrat normatif initial est la version `1.0`, exprimée en JSON Schema draft
 - [`contracts/statistical-reference-corpus-v1.0.schema.json`](../contracts/statistical-reference-corpus-v1.0.schema.json)
   est l’autorité machine, indépendante de Python et TypeScript ;
 - [`contracts/statistical-reference-corpus-v1.0.json`](../contracts/statistical-reference-corpus-v1.0.json)
-  est le corpus normatif `1.0`, formé des cinq cas du PBI 2.10 et des dix cas du PBI 2.11 ;
+  est le corpus normatif `1.0`, formé des cinq cas du PBI 2.10, des dix cas du PBI 2.11 et du cas
+  complémentaire à sept observations du PBI 2.15 ;
 - [`contracts/examples/statistical-reference-corpus-v1.0.minimal.json`](../contracts/examples/statistical-reference-corpus-v1.0.minimal.json)
   reste une preuve de structure avec un seul cas trivial ;
 - [`contracts/examples/statistical-reference-corpus-v1.0.invalid.json`](../contracts/examples/statistical-reference-corpus-v1.0.invalid.json)
@@ -232,6 +233,20 @@ restent sous leurs seuils. Pour `0..100`, `Q25 = 25`, médiane `50`, `Q75 = 75`,
 l’historique constant de six valeurs est dégradé en `incertain`, tandis que la censure partielle conserve
 un résultat `fiable`.
 
+Le PBI 2.15 ajoute `reliability-seven-observations-degraded`. Pour les samples
+`9,9,10,10,10,11,11`, la moyenne vaut `10` et la variance de population vaut `4/7`; le CV est donc
+`sqrt(4/7) / 10 = 0.075592...`, normalisé à `0.0756`. Les positions de quartile `1.5/3/4.5` donnent
+`Q25 = 9.5`, médiane `10`, `Q75 = 10.5`, soit `iqr_ratio = 0.1000`. Avec `x = 0..6`, le dénominateur
+de régression vaut `28`, le numérateur `10`, la pente `5/14` et `slope_norm = 1/28 = 0.035714...`,
+normalisé à `0.0357`. Ces trois métriques seraient `fiable`; les sept observations imposent la dégradation
+finale en `incertain`.
+
+Le rejeu de cette référence n’est pas issu d’un moteur. La récurrence scalaire `mca-prng-v1`, vérifiée
+contre ses vecteurs contractuels, donne pour les sept indices les comptes
+`130/145/150/162/129/147/137`. Leur regroupement sur les valeurs dupliquées donne les buckets
+`9:275`, `10:441`, `11:284`, puis P50/P70/P90 `10/10/9`. Les invariants figent à la fois cette
+dérivation et les métriques ci-dessus.
+
 ### Histogrammes exacts, agrégés, masse et représentants
 
 L’histogramme exact préservé de `items-zero-weeks-excluded` contient les six valeurs `1..6`, dans l’ordre,
@@ -300,7 +315,8 @@ Le point d’entrée délègue les invariants interchamps et de périmètre à
 `Scripts/statistical_reference_corpus_invariants.py` afin de conserver des contrôles courts et auditables ;
 ce module ne dépend lui non plus d’aucun moteur.
 
-Il valide le métaschème et le corpus, vérifie la complétude des périmètres 2.10, 2.11 et 2.14, exécute les
+Il valide le métaschème et le corpus, vérifie la complétude des périmètres 2.10, 2.11, 2.14 et 2.15,
+exécute les
 24 probes d’entrées, contrôle les invariants interchamps structurels, la formule et les gardes du Risk Score,
 les métriques et labels de fiabilité normalisés, les représentants de buckets à une semaine et l’identité
 des résultats spécialisés. Il accepte l’exemple positif et exige le rejet du contre-exemple. Ce rejet doit
@@ -326,7 +342,7 @@ La commande commune est :
 Le flux est ordonné et fermé :
 
 1. `Scripts/run_statistical_reference_corpus.py` charge et vérifie le JSON Schema draft 2020-12 ;
-2. il valide le corpus, ses invariants interchamps et les périmètres figés 2.10/2.11 ;
+2. il valide le corpus, ses invariants interchamps et les périmètres figés 2.10/2.11/2.14/2.15 ;
 3. seulement si cette étape est verte, `Scripts/statistical_corpus_runner.py` construit chaque
    `SimulationCommand` Python avec la seed du cas et appelle `backend.simulation_service.run_simulation` ;
 4. le pont Node valide à nouveau le même fichier avant de charger
@@ -357,8 +373,9 @@ horodatage et leur ordre suit celui du corpus, ce qui rend deux exécutions iden
 le profil `main`. Un schéma/corpus invalide ou une erreur moteur reste une incapacité d’exécution et renvoie
 un code non nul.
 
-L’exécution 2.12 observe treize cas intégralement conformes dans les deux moteurs. Les deux autres confirment
-les divergences d’histogrammes déjà isolées par 2.11 :
+Les quinze références initiales de 2.12 observaient treize conformités. Après l’ajout de la preuve 2.15,
+l’exécution courante observe quatorze cas intégralement conformes dans les deux moteurs. Les deux autres
+confirment les divergences d’histogrammes déjà isolées par 2.11 :
 
 | Cas | Norme | Python | TypeScript |
 | --- | --- | --- | --- |
@@ -371,7 +388,7 @@ par le runner. L’alignement de ces sorties reste explicitement hors du PBI 2.1
 ## Sondes de validation et forme canonique du PBI 2.13
 
 [`contracts/statistical-validation-probes-v1.0.json`](../contracts/statistical-validation-probes-v1.0.json)
-complète le corpus sans changer ses quinze résultats normatifs. Ses 22 sondes sont soumises aux deux
+complète les quinze résultats normatifs alors présents sans les changer. Ses 22 sondes sont soumises aux deux
 fabriques normalisées avant tout appel moteur :
 
 - les sondes positives couvrent les bornes, les deux modes, les zéros inclus et les six observations
@@ -392,13 +409,13 @@ distribution, le nombre d’échantillons, la fiabilité et la seed. Le Risk Sco
 une autre sentinelle. La complétion n’est autorisée que pour `backlog_to_weeks`.
 
 Le rapport expose `validation_alignment`: les 22 sondes concordent entre Python et TypeScript, sans
-divergence ni erreur. Les quinze cas statistiques restent à 13 conformités et deux divergences
+divergence ni erreur. Les seize cas statistiques donnent 14 conformités et deux divergences
 d’histogrammes. Ces sondes ne modifient aucune formule statistique et `enforcement` demeure
 `informational` jusqu’au PBI 2.19.
 
 ## Alignement des censures, percentiles et Risk Score du PBI 2.14
 
-Le corpus `1.0` reste immuable : les six cas nécessaires existaient déjà et sont maintenant regroupés par
+Les six cas nécessaires au PBI 2.14 existaient déjà et restent inchangés. Ils sont regroupés par
 `PBI_214_CASE_IDS`, avec un contrôle de périmètre dédié :
 
 - `items-zero-weeks-excluded` démontre les quantiles de survie P50/P70/P90 `3/2/1` et le score `0.6667` ;
@@ -423,8 +440,32 @@ omettre le champ, mais cette absence est conservée.
 Les hooks et mappers n’utilisent plus l’histogramme comme source secondaire de percentiles. Une distribution
 riche ne peut donc pas recréer P50, P70 ou P90 absent. Le rapport de parité confirme les six cas 2.14 dans
 les deux langages. Son état global reste `divergence` uniquement à cause des deux constructions
-d’histogrammes agrégés réservées au PBI 2.16 ; les métriques et labels de fiabilité restent réservés au PBI
-2.15 et l’enforcement reste informatif jusqu’au PBI 2.19.
+d’histogrammes agrégés réservées au PBI 2.16 ; l’enforcement reste informatif jusqu’au PBI 2.19.
+
+## Alignement des métriques et labels de fiabilité du PBI 2.15
+
+`PBI_215_CASE_IDS` regroupe les seuils exacts issus du PBI 2.11, les quatre labels, les preuves existantes à
+six observations et `reliability-seven-observations-degraded`. Le contrôle de périmètre fige les métriques
+normalisées, les labels et le rejeu indépendant du nouveau cas. Le validateur autonome recalcule toujours
+moyenne, variance de population, quartiles et pente depuis les samples ; il ne lit jamais la sortie d’un
+moteur comme résultat attendu.
+
+Dans chaque langage, le calcul complet appartient désormais au domaine de fiabilité. Python utilise
+`calculate_throughput_reliability` dans `backend/throughput_reliability.py`; TypeScript utilise
+`computeThroughputReliability` dans `domain/throughputReliability.ts`. Le calculateur produit les métriques
+brutes et le Value Object porte leur normalisation et le label. Les deux suivent exactement :
+
+1. moyenne arithmétique et variance divisée par `n` ;
+2. `Q25`, médiane et `Q75` avec `h = (n - 1) × q` et interpolation linéaire ;
+3. pente des moindres carrés avec `x[i] = i`, sans `polyfit` ;
+4. ratios bruts, puis `round half up` à quatre décimales ;
+5. catégories dans l’ordre `non fiable`, `fragile`, `incertain`, `fiable` ;
+6. dégradation d’un résultat autrement fiable à `incertain` lorsque `n` vaut `6` ou `7`.
+
+`backend/mc_core.py` et `frontend/src/utils/simulation.ts` ne portent plus de calcul concurrent. Les
+frontières sérialisées continuent à ne transporter que les cinq primitives de fiabilité existantes. Les
+histogrammes ne sont pas modifiés, le rejeu exact complet reste réservé au PBI 2.17 et le rapport demeure
+informatif jusqu’au PBI 2.19.
 
 ## Évolution
 

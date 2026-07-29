@@ -23,9 +23,7 @@ class FinishWeeksSimulation:
             raise ValueError("completed_weeks doit etre un tableau unidimensionnel")
         if type(self.simulation_count) is not int or self.simulation_count < values.size:
             raise ValueError("simulation_count doit couvrir toutes les simulations terminees")
-        if values.size and (
-            np.any(values < 1) or np.any(values > self.horizon_weeks)
-        ):
+        if values.size and (np.any(values < 1) or np.any(values > self.horizon_weeks)):
             raise ValueError("completed_weeks doit rester dans l'horizon de simulation")
         object.__setattr__(self, "completed_weeks", values)
 
@@ -233,14 +231,8 @@ def percentiles(
     sorted_values = np.sort(values)
     out: Dict[str, int] = {}
     if mode == "backlog_to_weeks":
-        if (
-            type(total_count) is not int
-            or total_count <= 0
-            or total_count < values.size
-        ):
-            raise ValueError(
-                "total_count doit etre un entier couvrant la population totale"
-            )
+        if type(total_count) is not int or total_count <= 0 or total_count < values.size:
+            raise ValueError("total_count doit etre un entier couvrant la population totale")
         for p in ps:
             rank = (p * total_count + 99) // 100
             if values.size >= rank:
@@ -255,34 +247,3 @@ def percentiles(
         index = ((100 - p) * (values.size - 1)) // 100
         out[f"P{p}"] = int(sorted_values[index])
     return out
-
-
-def throughput_reliability_metrics(samples: np.ndarray) -> Dict[str, float | int]:
-    """
-    Evalue la fiabilite de l'historique de throughput brut avant simulation.
-
-    Retourne uniquement les primitives de calcul. La normalisation et la
-    categorisation appartiennent au Value Object du domaine.
-    """
-    values = np.asarray(samples, dtype=float)
-    if values.size == 0:
-        raise ValueError("throughput_samples est vide")
-
-    n = int(values.size)
-    mean = float(np.mean(values))
-    std = float(np.std(values))
-    q25, q50, q75 = np.percentile(values, [25, 50, 75])
-    slope = float(np.polyfit(np.arange(n, dtype=float), values, deg=1)[0]) if n >= 2 else 0.0
-
-    cv = 0.0 if mean <= 0 else std / mean
-    iqr = float(q75 - q25)
-    iqr_ratio = 0.0 if q50 <= 0 else iqr / float(q50)
-    slope_norm = 0.0 if mean <= 0 else slope / mean
-
-    return {
-        "cv": cv,
-        "iqr_ratio": iqr_ratio,
-        "slope_norm": slope_norm,
-        "samples_count": n,
-        "mean": mean,
-    }

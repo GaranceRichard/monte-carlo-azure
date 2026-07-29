@@ -230,6 +230,23 @@ Implémentation retenue :
 - appliquer exactement l’ordre de catégorisation normatif ;
 - prouver les cas limites, notamment six et sept observations.
 
+Implémentation retenue :
+
+- `backend/throughput_reliability.py` et `frontend/src/domain/throughputReliability.ts` sont les autorités
+  uniques du calcul : moyenne, variance et écart-type de population, quartiles linéaires et pente des
+  moindres carrés avec `x[i] = i`; les Value Objects portent la normalisation et la catégorisation ;
+- les trois métriques exposées sont arrondies à quatre décimales par `round half up` avant les seuils, puis
+  les labels sont évalués une seule fois dans l’ordre `non fiable`, `fragile`, `incertain`, `fiable` ;
+- un résultat autrement fiable est dégradé en `incertain` pour six ou sept observations ; les séries
+  non fiables, fragiles ou incertaines conservent leur catégorie prioritaire ;
+- Python n’emploie plus `numpy.percentile` ni `numpy.polyfit`, et `mc_core.py` comme
+  `frontend/src/utils/simulation.ts` ne portent plus de calcul concurrent ;
+- le corpus conserve les preuves à six observations et ajoute `reliability-seven-observations-degraded`,
+  dérivé indépendamment de `STD-STAT-001` et `mca-prng-v1`; les deux runners concordent exactement sur les
+  métriques, le label, les percentiles et les comptes `275/441/284` ;
+- les seize cas donnent quatorze conformités. Les deux seules divergences restent les histogrammes agrégés
+  du PBI 2.16 ; le rejeu exact du PBI 2.17 et l’enforcement informatif avant 2.19 sont inchangés.
+
 ### Résultat attendu du PBI 2.16
 
 - remplacer les constructions historiques divergentes par l’algorithme normatif ;

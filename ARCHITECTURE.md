@@ -356,8 +356,8 @@ Les moteurs ne connaissent toujours que `SampleIndexDrawPort` et ne créent aucu
 l’ordre logique et les tests de lots prouvent la stabilité de l’affectation des tirages. Les PBI 2.10 et
 2.11 matérialisent les cas normatifs jusqu’aux scores, labels et buckets. Le PBI 2.12 les exécute désormais
 dans les deux moteurs. Le PBI 2.13 aligne leur validation normalisée et leur forme de résultat ; les
-formules de censure, de percentiles et de Risk Score sont alignées par le PBI 2.14. La fiabilité,
-les histogrammes et l’égalité complète des résultats relèvent encore des PBI 2.15 à 2.17.
+formules de censure, de percentiles et de Risk Score sont alignées par le PBI 2.14, puis la fiabilité par
+le PBI 2.15. Les histogrammes et l’égalité complète des résultats relèvent encore des PBI 2.16 et 2.17.
 
 ### Contrat du corpus statistique
 
@@ -367,7 +367,8 @@ est la frontière sérialisée interlangage du corpus. Le document racine porte 
 le résultat attendu et l’un des quatre niveaux de preuve normatifs.
 
 [`contracts/statistical-reference-corpus-v1.0.json`](contracts/statistical-reference-corpus-v1.0.json)
-porte les cinq cas du PBI 2.10 et les dix cas du PBI 2.11. Les premiers couvrent zéros inclus et exclus,
+porte les cinq cas du PBI 2.10, les dix cas du PBI 2.11 et la preuve complémentaire à sept observations du
+PBI 2.15. Les premiers couvrent zéros inclus et exclus,
 paramètres actifs des deux modes, censure absente, partielle ou totale, fin exacte en semaine 521 et rangs
 de P50, P70 et P90. Les seconds couvrent les gardes et l’arrondi du Risk Score, les seuils exacts de CV,
 IQR relatif et pente normalisée, les quatre labels, l’histogramme exact et les agrégations continues ou
@@ -381,7 +382,8 @@ normative `$comment` et détaillés dans
 [`docs/statistical-reference-corpus.md`](docs/statistical-reference-corpus.md), sans `$data` ni dépendance à
 un langage. `Scripts/validate_statistical_reference_corpus.py`, appuyé par le module court
 `Scripts/statistical_reference_corpus_invariants.py`, contrôle le métaschème, le corpus, ses invariants
-structurels, sa complétude 2.10/2.11/2.14, les formules et gardes du score, les métriques et labels normalisés,
+structurels, sa complétude 2.10/2.11/2.14/2.15, les formules et gardes du score, les métriques et labels
+normalisés,
 les représentants de buckets, l’unicité des scénarios, 24 probes négatives et les exemples positif et
 négatif sans importer les moteurs.
 
@@ -422,9 +424,14 @@ est calculable et la refuse autrement. MongoDB et l’historique HTTP peuvent d�
 optionnelle `risk_score`; une ligne legacy sans ce champ reste valide et son absence est préservée. Les
 consommateurs UI, portefeuille et PDF utilisent exclusivement la valeur reçue.
 
-Les métriques et labels de fiabilité ne sont pas modifiés. Les deux géométries d’histogrammes agrégés
-restent explicitement divergentes et réservées au PBI 2.16 ; le rapport de parité reste informatif jusqu’au
-PBI 2.19.
+Le PBI 2.15 place l’unique calcul de fiabilité dans
+`backend/throughput_reliability.py` et `frontend/src/domain/throughputReliability.ts`. Ces calculateurs de
+domaine calculent moyenne, variance de population, quartiles linéaires et pente des moindres carrés, puis
+délèguent la normalisation et l’ordre des labels au Value Object de leur langage. `mc_core.py` ne dépend
+plus de `numpy.percentile` ou `numpy.polyfit`, et `utils/simulation.ts` ne contient plus de second calcul.
+
+Les deux géométries d’histogrammes agrégés restent explicitement divergentes et réservées au PBI 2.16 ;
+le rejeu exact reste réservé au PBI 2.17 et le rapport de parité reste informatif jusqu’au PBI 2.19.
 
 Le PBI 2.7 a conservé les résultats frontend seed-à-seed en reprenant son algorithme bitwise historique,
 mais le PBI 2.8 change volontairement l’affectation locale des tirages `backlog_to_weeks` après une fin

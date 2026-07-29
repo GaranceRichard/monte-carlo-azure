@@ -42,8 +42,8 @@ describe("shared statistical corpus TypeScript runner", () => {
       prng_contract: "mca-prng-v1",
       status: "completed",
     });
-    expect(cases).toHaveLength(15);
-    expect(matching).toHaveLength(13);
+    expect(cases).toHaveLength(16);
+    expect(matching).toHaveLength(14);
     expect(
       cases
         .filter((caseReport) => !matching.includes(caseReport))

@@ -7,11 +7,11 @@ from backend.mc_core import (
     mc_finish_weeks,
     mc_items_done_for_weeks,
     percentiles,
-    throughput_reliability_metrics,
 )
 from backend.mca_prng_v1_sample_index_draw_port import McaPrngV1SampleIndexDrawPort
 from backend.simulation_limits import SIMULATION_HORIZON_WEEKS_MAX, SIMULATION_N_SIMS_MAX
 from backend.simulation_value_objects import SimulationSeed, ThroughputReliability
+from backend.throughput_reliability import calculate_throughput_reliability
 from tests.deterministic_sample_index_draw_port import (
     DeterministicSampleIndexDrawPort,
     RecordingSampleIndexDrawPort,
@@ -23,7 +23,7 @@ def _prng_draw_port(seed: int) -> McaPrngV1SampleIndexDrawPort:
 
 
 def _reliability(samples: np.ndarray) -> ThroughputReliability:
-    return ThroughputReliability.create(**throughput_reliability_metrics(samples))
+    return calculate_throughput_reliability(samples.tolist())
 
 
 def test_empty_finish_result_guardrails():
@@ -51,12 +51,6 @@ def test_empty_finish_result_guardrails():
             simulation_count=1,
             horizon_weeks=10,
         )
-    with pytest.raises(ValueError, match="throughput_samples est vide"):
-        throughput_reliability_metrics(np.array([], dtype=int))
-
-
-def test_throughput_reliability_marks_moderate_trend_as_incertain():
-    assert _reliability(np.arange(7, 15)).label == "incertain"
 
 
 def test_mc_finish_weeks_shape_and_bounds():
@@ -221,9 +215,7 @@ def test_mc_items_done_for_weeks_invalid_inputs():
 def test_mc_finish_weeks_consumes_imposed_indices_for_known_censored_result():
     first_simulation = [1, 1, *([0] * (SIMULATION_HORIZON_WEEKS_MAX - 2))]
     second_simulation = [0] * SIMULATION_HORIZON_WEEKS_MAX
-    draw_port = DeterministicSampleIndexDrawPort(
-        [*first_simulation, *second_simulation]
-    )
+    draw_port = DeterministicSampleIndexDrawPort([*first_simulation, *second_simulation])
 
     result = mc_finish_weeks(
         backlog_size=3,
@@ -444,10 +436,13 @@ def test_mc_items_done_for_weeks_processes_incomplete_last_batch():
     assert np.array_equal(out, np.full(10, 15, dtype=int))
 
 
-@pytest.mark.parametrize("function_name, kwargs", [
-    ("mc_finish_weeks", {"backlog_size": 10, "throughput_samples": np.array([1], dtype=int)}),
-    ("mc_items_done_for_weeks", {"weeks": 3, "throughput_samples": np.array([1], dtype=int)}),
-])
+@pytest.mark.parametrize(
+    "function_name, kwargs",
+    [
+        ("mc_finish_weeks", {"backlog_size": 10, "throughput_samples": np.array([1], dtype=int)}),
+        ("mc_items_done_for_weeks", {"weeks": 3, "throughput_samples": np.array([1], dtype=int)}),
+    ],
+)
 def test_simulation_batch_size_must_be_positive(function_name, kwargs):
     function = mc_finish_weeks if function_name == "mc_finish_weeks" else mc_items_done_for_weeks
 

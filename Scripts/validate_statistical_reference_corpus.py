@@ -31,6 +31,7 @@ from Scripts.statistical_reference_corpus_pbi_214 import (  # noqa: E402, I001
     PBI_214_CASE_IDS as _PBI_214_CASE_IDS,
     validate_pbi_214_scope,
 )
+from Scripts.statistical_reference_corpus_pbi_215 import validate_pbi_215_scope  # noqa: E402
 
 PBI_210_CASE_IDS = _PBI_210_CASE_IDS
 PBI_211_CASE_IDS = _PBI_211_CASE_IDS
@@ -401,6 +402,7 @@ def run_control(instance_paths: list[Path] | None = None) -> list[str]:
     errors.extend(issue.render(CORPUS_PATH) for issue in validate_pbi_210_scope(corpus))
     errors.extend(issue.render(CORPUS_PATH) for issue in validate_pbi_211_scope(corpus))
     errors.extend(issue.render(CORPUS_PATH) for issue in validate_pbi_214_scope(corpus))
+    errors.extend(issue.render(CORPUS_PATH) for issue in validate_pbi_215_scope(corpus))
     errors.extend(
         f"{CORPUS_PATH.as_posix()}:/cases: [inputRejectionProbe] {error}"
         for error in validate_input_rejection_probes(corpus, schema)
@@ -443,7 +445,8 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     print(
         "Statistical reference corpus 1.0 and its schema are valid; "
-        "PBI 2.10, PBI 2.11 and PBI 2.14 scopes are complete, input rejection probes pass, "
+        "PBI 2.10, PBI 2.11, PBI 2.14 and PBI 2.15 scopes are complete, "
+        "input rejection probes pass, "
         "positive example is accepted and negative example is rejected."
     )
     return 0

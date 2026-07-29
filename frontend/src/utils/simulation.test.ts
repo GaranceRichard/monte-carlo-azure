@@ -12,7 +12,6 @@ import {
   computeFrictionRatePercent,
   computeRiskLegend,
   computeThroughputReliability,
-  discretePercentiles,
   getProjectionReliabilityNotice,
   simulateMonteCarloLocal,
 } from "./simulation";
@@ -605,19 +604,6 @@ describe("simulateMonteCarloLocal", () => {
         nSims: SIMULATION_N_SIMS_MIN,
       }),
     ).toThrow("entiers >= 0");
-  });
-
-  it("omits backlog percentiles whose rank is not reachable in the total simulation population", () => {
-    expect(discretePercentiles([521, 521], "backlog_to_weeks", [50, 70, 90], 3)).toEqual({ P50: 521 });
-  });
-
-  it("requires the total backlog population and uses exact small-population ranks", () => {
-    expect(() => discretePercentiles([3, 4, 6, 8, 10], "backlog_to_weeks", [50, 70, 90])).toThrow("population totale");
-    expect(discretePercentiles([1, 9], "backlog_to_weeks", [50, 70, 90], 2)).toEqual({
-      P50: 1,
-      P70: 9,
-      P90: 9,
-    });
   });
 
   it("keeps compact histograms unchanged when there are few unique outcomes", () => {

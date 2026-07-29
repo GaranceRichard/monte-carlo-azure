@@ -11,11 +11,13 @@ import {
   createCompletionSummary,
   createHistogram,
   createSimulationPercentiles,
-  createThroughputReliability,
   riskScoreFromPercentiles,
   SIMULATION_HORIZON_WEEKS_MAX,
 } from "../domain/simulationValueObjects";
+import { computeThroughputReliability } from "../domain/throughputReliability";
 import { clamp } from "./math";
+
+export { computeThroughputReliability };
 
 export type ScenarioSamples = {
   optimistic: number[];
@@ -46,19 +48,6 @@ function pickBootstrapSample(
   drawPort: SampleIndexDrawPort,
 ): number {
   return samples[drawPort.drawSampleIndex(samples.length)] ?? 0;
-}
-
-function percentile(values: number[], p: number): number {
-  if (!values.length) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  if (sorted.length === 1) return sorted[0] ?? 0;
-  const rank = (p / 100) * (sorted.length - 1);
-  const lower = Math.floor(rank);
-  const upper = Math.ceil(rank);
-  const weight = rank - lower;
-  const lowerValue = sorted[lower] ?? 0;
-  const upperValue = sorted[upper] ?? lowerValue;
-  return lowerValue + (upperValue - lowerValue) * weight;
 }
 
 function histogramBuckets(values: number[], maxBuckets = 100): { x: number; count: number }[] {
@@ -327,41 +316,6 @@ export function computeRiskLegend(score: number): "fiable" | "incertain" | "frag
   if (score <= 0.5) return "incertain";
   if (score <= 0.8) return "fragile";
   return "non fiable";
-}
-
-export function computeThroughputReliability(samples: readonly number[]): ThroughputReliability | null {
-  if (!samples.length) return null;
-  if (samples.some((value) => !Number.isInteger(value) || value < 0)) {
-    throw new Error("throughput_samples doit contenir uniquement des entiers finis >= 0.");
-  }
-  const values = [...samples];
-
-  const sampleCount = values.length;
-  const mean = values.reduce((sum, value) => sum + value, 0) / sampleCount;
-  const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / sampleCount;
-  const std = Math.sqrt(variance);
-  const q25 = percentile(values, 25);
-  const q50 = percentile(values, 50);
-  const q75 = percentile(values, 75);
-  const cv = mean <= 0 ? 0 : std / mean;
-  const iqrRatio = q50 <= 0 ? 0 : (q75 - q25) / q50;
-
-  let slope = 0;
-  if (sampleCount >= 2) {
-    const xMean = (sampleCount - 1) / 2;
-    const numerator = values.reduce((sum, value, index) => sum + (index - xMean) * (value - mean), 0);
-    const denominator = values.reduce((sum, _value, index) => sum + (index - xMean) ** 2, 0);
-    slope = denominator === 0 ? 0 : numerator / denominator;
-  }
-  const slopeNorm = mean <= 0 ? 0 : slope / mean;
-
-  return createThroughputReliability({
-    cv,
-    iqrRatio,
-    slopeNorm,
-    samplesCount: sampleCount,
-    mean,
-  });
 }
 
 export function getProjectionReliabilityNotice(reliability?: ThroughputReliability | null): string | null {

@@ -869,6 +869,59 @@
       }
     },
     {
+      "id": "reliability-seven-observations-degraded",
+      "description": "Seven values 9,9,10,10,10,11,11 prove population variance, linearly interpolated quartiles and least-squares slope; otherwise fiable metrics are degraded to incertain for a seven-observation history.",
+      "proof_level": "replay",
+      "input": {
+        "throughput_samples": [
+          9,
+          9,
+          10,
+          10,
+          10,
+          11,
+          11
+        ],
+        "include_zero_weeks": false,
+        "mode": "weeks_to_items",
+        "target_weeks": 1,
+        "n_sims": 1000
+      },
+      "seed": 0,
+      "expected_result": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 10,
+          "P70": 10,
+          "P90": 9
+        },
+        "risk_score": 0.1,
+        "result_distribution": [
+          {
+            "x": 9,
+            "count": 275
+          },
+          {
+            "x": 10,
+            "count": 441
+          },
+          {
+            "x": 11,
+            "count": 284
+          }
+        ],
+        "samples_count": 7,
+        "throughput_reliability": {
+          "cv": 0.0756,
+          "iqr_ratio": 0.1,
+          "slope_norm": 0.0357,
+          "label": "incertain",
+          "samples_count": 7
+        },
+        "seed": 0
+      }
+    },
+    {
       "id": "histogram-aggregated-contiguous-101",
       "description": "The 101 values 0..100 force width 2 and 51 non-empty normative buckets; each representative uses the real inclusive bounds, including 0 and 100.",
       "proof_level": "replay",

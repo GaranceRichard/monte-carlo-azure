@@ -99,6 +99,10 @@ describe("simulation HTTP mappers", () => {
       ...base,
       risk_score: 0.2499,
     }, 1000)).toThrow("valeur d'autorite");
+    expect(() => simulateResponseDtoToResult({
+      ...base,
+      risk_score: -0.1,
+    }, 1000)).toThrow("nombre fini >= 0");
     expect(simulateResponseDtoToResult({
       ...base,
       risk_score: 0.25,

@@ -38,7 +38,7 @@ Cette capacité de backtesting et de calibration est inscrite au backlog ; elle 
   [`docs/backlog-governance.md`](docs/backlog-governance.md)
 - attendus détaillés des Features, PBI et sujets conditionnels:
   [`docs/backlog-expectations/`](docs/backlog-expectations/README.md)
-- état courant : Feature 2 en cours, PBI 2.14 réalisé et PBI 2.15 non commencé comme prochain item
+- état courant : Feature 2 en cours, PBI 2.15 réalisé et PBI 2.16 non commencé comme prochain item
 - architecture, sécurité, API, CI: [`ARCHITECTURE.md`](ARCHITECTURE.md)
   - inclut la convention de nommage: identifiants de code en anglais, textes utilisateur en français
 - historique des évolutions: [`CHANGELOG.md`](CHANGELOG.md)
@@ -747,7 +747,7 @@ Ces cas matérialisent les divergences ST-24/D-02, ST-25, ST-30/D-03 et ST-33 de
 anciens centres `50/9951` et `51/10050`, sans aligner les moteurs.
 
 Le contrôle autonome valide le métaschème, le corpus, ses invariants interchamps et sa complétude
-2.10/2.11/2.14.
+2.10/2.11/2.14/2.15.
 Il recalcule indépendamment les gardes/formules du score, les métriques et labels normalisés, protège les
 résultats spécialisés et les représentants de buckets, et refuse les scénarios dupliqués. Il applique aussi
 24 probes minimaux prouvant le rejet des types et bornes invalides, des zéros laissant moins de six
@@ -778,7 +778,8 @@ Les statuts distinguent `schema_invalid` ou `corpus_invalid`, `engine_error`,
 que le contrôle reste informatif dans 2.12 ; un corpus inexécutable ou une erreur moteur rend la commande
 en échec. Le profil `main` ne lance pas ce contrôle avant le PBI 2.19.
 
-L’exécution courante trouve 13 cas entièrement conformes et deux divergences d’histogrammes déjà attendues
+Le PBI 2.15 ajoute une seizième référence dédiée à sept observations. L’exécution courante trouve donc
+14 cas entièrement conformes et deux divergences d’histogrammes déjà attendues
 par l’audit : Python produit 100 buckets et TypeScript 51 centres impairs pour `0..100`; sur
 `0..99 + 10000`, les représentants sont `50/9951` en Python et `51/10050` en TypeScript, contre
 `50/9999` dans la norme.
@@ -812,9 +813,23 @@ vérifient cette valeur et les consommateurs la propagent sans recalcul. P90 cen
 `P50 <= 0` conservent l’absence du score. Aucun percentile absent n’est reconstruit depuis une distribution,
 même pour un historique ancien.
 
-Le rapport reste à 13 cas intégralement conformes et deux divergences limitées aux histogrammes agrégés,
-réservés au PBI 2.16. Les métriques et labels de fiabilité restent réservés au PBI 2.15 et le contrôle de
-parité demeure informatif jusqu’au PBI 2.19.
+Le PBI 2.15 centralise ensuite le calcul de fiabilité dans un calculateur de domaine et un Value Object par
+langage. Les deux moteurs utilisent la moyenne arithmétique, la variance et l’écart-type de population, les
+quartiles linéaires, la pente des moindres carrés avec `x[i] = i`, puis normalisent `cv`, `iqr_ratio` et
+`slope_norm` à quatre décimales par `round half up` avant toute comparaison. Python ne dépend plus de
+`numpy.percentile` ni de `numpy.polyfit`; le moteur et les consommateurs TypeScript ne portent plus de
+calcul concurrent.
+
+La catégorisation suit strictement `non fiable`, `fragile`, `incertain`, puis `fiable`. Une série
+initialement fiable de six ou sept observations est ensuite dégradée en `incertain`. Le corpus conserve la
+preuve à six observations et ajoute `reliability-seven-observations-degraded` : pour
+`9,9,10,10,10,11,11`, la moyenne vaut `10`, la variance de population `4/7`, les quartiles
+`9.5/10/10.5` et la pente normalisée `1/28`; les métriques exposées sont donc
+`0.0756/0.1000/0.0357` et le label final `incertain`.
+
+Le rapport reste à 14 cas intégralement conformes et deux divergences limitées aux histogrammes agrégés,
+réservés au PBI 2.16. Le rejeu exact demeure réservé au PBI 2.17 et le contrôle de parité reste informatif
+jusqu’au PBI 2.19.
 
 Purge planifiée:
 

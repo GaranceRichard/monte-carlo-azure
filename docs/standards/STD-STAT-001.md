@@ -359,6 +359,15 @@ indisponibles, sans sentinelle. Les 22 sondes partagées en apportent une preuve
 DTO, API, MongoDB et `localStorage` restent primitives ; aucune formule statistique ni géométrie
 d’histogramme n’est modifiée.
 
+Le PBI 2.14 aligne censures, rangs, quantiles de survie et Risk Score sans reconstruire les percentiles
+absents. Le PBI 2.15 aligne ensuite `STAT-PAR-030` à `STAT-PAR-035` dans une autorité de domaine par langage :
+moyenne et variance de population, quartiles linéaires, pente déterministe, normalisation `round half up`
+avant les seuils et ordre exact des quatre labels. Une seizième référence démontre le cas de sept
+observations en complément des preuves à six ; les résultats sont dérivés du présent standard et de
+`mca-prng-v1` sans prendre un moteur comme oracle. Quatorze références concordent exactement ; seules les
+deux géométries d’histogrammes réservées au PBI 2.16 divergent encore, et le contrôle reste informatif
+jusqu’au PBI 2.19.
+
 ### STAT-PAR-047 — Version de rejeu
 
 Le contrat normatif **DOIT** porter la version `1.0`. Toute preuve ou donnée destinée au rejeu **DOIT**

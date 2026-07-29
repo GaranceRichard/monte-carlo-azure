@@ -11,6 +11,7 @@ import pytest
 from jsonschema.exceptions import SchemaError
 
 from Scripts import validate_statistical_reference_corpus as corpus_validation
+from Scripts.statistical_reference_corpus_pbi_215 import PBI_215_CASE_IDS
 
 
 def _contract() -> tuple[dict[str, object], dict[str, object]]:
@@ -44,7 +45,7 @@ def test_bundled_control_accepts_minimal_contract_and_rejects_negative_example(
     assert corpus_validation.main([]) == 0
     output = capsys.readouterr()
     assert "corpus 1.0 and its schema are valid" in output.out
-    assert "PBI 2.10, PBI 2.11 and PBI 2.14 scopes are complete" in output.out
+    assert "PBI 2.10, PBI 2.11, PBI 2.14 and PBI 2.15 scopes are complete" in output.out
     assert "input rejection probes pass" in output.out
     assert output.err == ""
 
@@ -82,9 +83,9 @@ def test_pbi_210_reference_cases_are_exact_readable_and_scope_complete() -> None
 
     cases = {case["id"]: case for case in corpus["cases"]}
     assert set(cases) == (
-        corpus_validation.PBI_210_CASE_IDS | corpus_validation.PBI_211_CASE_IDS
+        corpus_validation.PBI_210_CASE_IDS | corpus_validation.PBI_211_CASE_IDS | PBI_215_CASE_IDS
     )
-    assert len(cases) == len(corpus["cases"]) == 15
+    assert len(cases) == len(corpus["cases"]) == 16
     assert all(case["description"] for case in cases.values())
 
     items = cases["items-zero-weeks-excluded"]
@@ -310,6 +311,51 @@ def test_pbi_214_reference_cases_protect_censorship_percentiles_and_risk_score()
     assert "risk_score" not in cases["risk-p50-zero-absent"]["expected_result"]
 
 
+def test_pbi_215_reference_cases_protect_reliability_metrics_and_labels() -> None:
+    schema, corpus = _reference_corpus()
+    assert corpus_validation.validate_contract(corpus, schema) == []
+    assert corpus_validation.validate_pbi_215_scope(corpus) == []
+
+    cases = {case["id"]: case for case in corpus["cases"]}
+    six_observations = cases["weeks-exact-horizon-completion"]["expected_result"][
+        "throughput_reliability"
+    ]
+    seven_observations = cases["reliability-seven-observations-degraded"]
+    assert six_observations == {
+        "cv": 0,
+        "iqr_ratio": 0,
+        "slope_norm": 0,
+        "label": "incertain",
+        "samples_count": 6,
+    }
+    assert seven_observations["input"]["throughput_samples"] == [
+        9,
+        9,
+        10,
+        10,
+        10,
+        11,
+        11,
+    ]
+    assert seven_observations["expected_result"]["throughput_reliability"] == {
+        "cv": 0.0756,
+        "iqr_ratio": 0.1,
+        "slope_norm": 0.0357,
+        "label": "incertain",
+        "samples_count": 7,
+    }
+    assert seven_observations["expected_result"]["result_distribution"] == [
+        {"x": 9, "count": 275},
+        {"x": 10, "count": 441},
+        {"x": 11, "count": 284},
+    ]
+    labels = {
+        cases[case_id]["expected_result"]["throughput_reliability"]["label"]
+        for case_id in PBI_215_CASE_IDS
+    }
+    assert labels == {"fiable", "incertain", "fragile", "non fiable"}
+
+
 def test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes() -> None:
     schema, corpus = _reference_corpus()
     probes = corpus_validation.INPUT_REJECTION_PROBES
@@ -504,23 +550,72 @@ def test_scope_and_probe_controls_report_actionable_regressions(
     assert corpus_validation.validate_pbi_210_scope([])[0].instance_path == "/"
     assert corpus_validation.validate_pbi_211_scope([])[0].instance_path == "/"
     assert corpus_validation.validate_pbi_214_scope([])[0].instance_path == "/"
+    assert corpus_validation.validate_pbi_215_scope([])[0].instance_path == "/"
 
     missing = deepcopy(corpus)
     missing["cases"] = missing["cases"][1:]
     missing_issues = corpus_validation.validate_pbi_210_scope(missing)
     assert "items-zero-weeks-excluded" in missing_issues[0].message
-    assert "items-zero-weeks-excluded" in corpus_validation.validate_pbi_214_scope(
-        missing
-    )[0].message
+    assert (
+        "items-zero-weeks-excluded" in corpus_validation.validate_pbi_214_scope(missing)[0].message
+    )
+    assert (
+        "items-zero-weeks-excluded" in corpus_validation.validate_pbi_215_scope(missing)[0].message
+    )
 
     malformed_pbi_214 = deepcopy(corpus)
     zero_case = next(
-        case
-        for case in malformed_pbi_214["cases"]
-        if case["id"] == "risk-p50-zero-absent"
+        case for case in malformed_pbi_214["cases"] if case["id"] == "risk-p50-zero-absent"
     )
     zero_case["expected_result"] = None
     assert len(corpus_validation.validate_pbi_214_scope(malformed_pbi_214)) == 2
+
+    malformed_pbi_215 = deepcopy(corpus)
+    seven_case = next(
+        case
+        for case in malformed_pbi_215["cases"]
+        if case["id"] == "reliability-seven-observations-degraded"
+    )
+    seven_case["expected_result"]["throughput_reliability"]["cv"] = 0.0816
+    seven_case["expected_result"]["result_distribution"][0]["count"] = 274
+    assert len(corpus_validation.validate_pbi_215_scope(malformed_pbi_215)) == 2
+
+    malformed_seven_observations = deepcopy(corpus)
+    seven_observations = next(
+        case
+        for case in malformed_seven_observations["cases"]
+        if case["id"] == "reliability-seven-observations-degraded"
+    )
+    seven_observations["expected_result"] = None
+    messages = [
+        issue.message
+        for issue in corpus_validation.validate_pbi_215_scope(malformed_seven_observations)
+    ]
+    assert messages == [
+        (
+            "reliability-seven-observations-degraded must preserve its exact normative "
+            "reliability metrics and label"
+        ),
+        "the seven-observation case must preserve its independently derived replay",
+    ]
+
+    malformed_labels = deepcopy(corpus)
+    reliable_case = next(
+        case
+        for case in malformed_labels["cases"]
+        if case["id"] == "weeks-partial-censorship"
+    )
+    reliable_case["expected_result"]["throughput_reliability"]["label"] = "incertain"
+    messages = [
+        issue.message for issue in corpus_validation.validate_pbi_215_scope(malformed_labels)
+    ]
+    assert messages == [
+        (
+            "weeks-partial-censorship must preserve its exact normative reliability "
+            "metrics and label"
+        ),
+        "the PBI 2.15 proof must retain all four normative labels",
+    ]
 
     regressions = [
         ("items-zero-weeks-excluded", ("expected_result", "samples_count"), 7),
@@ -558,9 +653,9 @@ def test_scope_and_probe_controls_report_actionable_regressions(
     missing_211["cases"] = [
         case for case in missing_211["cases"] if case["id"] != "risk-p50-zero-absent"
     ]
-    assert "risk-p50-zero-absent" in corpus_validation.validate_pbi_211_scope(
-        missing_211
-    )[0].message
+    assert (
+        "risk-p50-zero-absent" in corpus_validation.validate_pbi_211_scope(missing_211)[0].message
+    )
 
     reconstructed_percentile = deepcopy(corpus)
     partial_case = next(
@@ -603,9 +698,7 @@ def test_scope_and_probe_controls_report_actionable_regressions(
 
     exact_regression = deepcopy(corpus)
     exact_case = next(
-        case
-        for case in exact_regression["cases"]
-        if case["id"] == "items-zero-weeks-excluded"
+        case for case in exact_regression["cases"] if case["id"] == "items-zero-weeks-excluded"
     )
     exact_case["expected_result"]["risk_score"] = 0.6666
     assert any(
@@ -615,9 +708,7 @@ def test_scope_and_probe_controls_report_actionable_regressions(
 
     absent_regression = deepcopy(corpus)
     absent_case = next(
-        case
-        for case in absent_regression["cases"]
-        if case["id"] == "weeks-partial-censorship"
+        case for case in absent_regression["cases"] if case["id"] == "weeks-partial-censorship"
     )
     absent_case["expected_result"]["risk_score"] = 0
     assert any(
@@ -675,9 +766,7 @@ def test_scope_and_probe_controls_report_actionable_regressions(
 
     invalid_result_shape = deepcopy(corpus)
     pbi_211_case = next(
-        case
-        for case in invalid_result_shape["cases"]
-        if case["id"] == "risk-p50-zero-absent"
+        case for case in invalid_result_shape["cases"] if case["id"] == "risk-p50-zero-absent"
     )
     pbi_211_case["expected_result"] = []
     assert any(
@@ -703,6 +792,8 @@ def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope
     for case_id in corpus_validation.PBI_210_CASE_IDS:
         assert f"`{case_id}`" in corpus_doc
     for case_id in corpus_validation.PBI_211_CASE_IDS:
+        assert f"`{case_id}`" in corpus_doc
+    for case_id in PBI_215_CASE_IDS:
         assert f"`{case_id}`" in corpus_doc
     assert "sans appeler\nle moteur Python ni le moteur TypeScript" in corpus_doc
     assert "floor(0,5 × 999) = 499" in corpus_doc
@@ -744,7 +835,7 @@ def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope
             "Le PBI 2.12 exécute les quinze références",
         ],
         "docs/risk-control-matrix.md": [
-            "Treize cas concordent",
+            "Quatorze cas concordent",
             "refus du corpus avant toute exécution moteur",
         ],
     }

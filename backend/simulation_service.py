@@ -8,7 +8,6 @@ from .mc_core import (
     mc_finish_weeks,
     mc_items_done_for_weeks,
     percentiles,
-    throughput_reliability_metrics,
 )
 from .mca_prng_v1_sample_index_draw_port import McaPrngV1SampleIndexDrawPort
 from .sample_index_draw_port import SampleIndexDrawPort
@@ -20,8 +19,8 @@ from .simulation_value_objects import (
     CompletionSummary,
     Histogram,
     SimulationPercentiles,
-    ThroughputReliability,
 )
+from .throughput_reliability import calculate_throughput_reliability
 
 
 def _prepare_samples(command: SimulationCommand) -> np.ndarray:
@@ -88,8 +87,9 @@ def run_simulation(command: SimulationCommand) -> SimulationResult:
             total_count=percentile_total_count,
         ),
     )
-    reliability_values = throughput_reliability_metrics(samples)
-    throughput_reliability = ThroughputReliability.create(**reliability_values)
+    throughput_reliability = calculate_throughput_reliability(
+        command.throughput_samples.usable_values
+    )
     expected_mass = (
         completion_summary.completed_count
         if completion_summary is not None

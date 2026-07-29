@@ -3,7 +3,7 @@
 - Contrôle : informatif, non bloquant
 - Statut : `divergence`
 - Corpus : `mca-statistical-reference-corpus` `1.0` / `mca-prng-v1`
-- Cas : 15
+- Cas : 16
 - Validation PBI 2.13 : `match` (22/22 probes concordantes)
 
 | Cas | Python / norme | TypeScript / norme | Python / TypeScript |
@@ -21,6 +21,7 @@
 | `reliability-cv-100-rounded` | `match` (0) | `match` (0) | `match` (0) |
 | `reliability-cv-150-rounded` | `match` (0) | `match` (0) | `match` (0) |
 | `reliability-iqr-050-rounded` | `match` (0) | `match` (0) | `match` (0) |
+| `reliability-seven-observations-degraded` | `match` (0) | `match` (0) | `match` (0) |
 | `histogram-aggregated-contiguous-101` | `normative_divergence` (149) | `normative_divergence` (51) | `engine_divergence` (149) |
 | `histogram-aggregated-discontinuous` | `normative_divergence` (1) | `normative_divergence` (2) | `engine_divergence` (2) |
 
@@ -53,4 +54,4 @@ Les nombres entre parenthèses comptent les différences exactes. Le rapport JSO
 | `seed-overflow-rejected` | `False` | `False` | `False` | `match` |
 | `target-decimal-rejected` | `False` | `False` | `False` | `match` |
 
-Ces probes couvrent la forme fermée, les valeurs par défaut résolues, le paramètre de mode exclusif, les entiers stricts, les zéros, les bornes et la seed uint32. Ils ne modifient aucune formule statistique ; le corpus démontre le PBI 2.14. Les PBI 2.15 et 2.16 restent inchangés.
+Ces probes couvrent la forme fermée, les valeurs par défaut résolues, le paramètre de mode exclusif, les entiers stricts, les zéros, les bornes et la seed uint32. Ils ne modifient aucune formule statistique ; le corpus démontre les PBI 2.14 et 2.15. Le PBI 2.16 reste inchangé.

@@ -8,8 +8,8 @@
     "prng_contract": "mca-prng-v1"
   },
   "summary": {
-    "case_count": 15,
-    "matching_cases": 13,
+    "case_count": 16,
+    "matching_cases": 14,
     "normative_divergence_cases": 2,
     "engine_divergence_cases": 2,
     "engine_error_cases": 0,
@@ -435,7 +435,7 @@
           "throughput_reliability": {
             "cv": 0.0,
             "iqr_ratio": 0.0,
-            "slope_norm": -0.0,
+            "slope_norm": 0.0,
             "label": "incertain",
             "samples_count": 6
           },
@@ -841,7 +841,7 @@
           "throughput_reliability": {
             "cv": 0.0,
             "iqr_ratio": 0.0,
-            "slope_norm": -0.0,
+            "slope_norm": 0.0,
             "label": "incertain",
             "samples_count": 6
           },
@@ -1580,7 +1580,7 @@
           "throughput_reliability": {
             "cv": 0.5,
             "iqr_ratio": 0.0,
-            "slope_norm": -0.0,
+            "slope_norm": 0.0,
             "label": "incertain",
             "samples_count": 10
           },
@@ -1682,7 +1682,7 @@
           "throughput_reliability": {
             "cv": 1.0,
             "iqr_ratio": 0.0,
-            "slope_norm": -0.0,
+            "slope_norm": 0.0,
             "label": "fragile",
             "samples_count": 10
           },
@@ -1784,7 +1784,7 @@
           "throughput_reliability": {
             "cv": 1.5,
             "iqr_ratio": 0.0,
-            "slope_norm": -0.0,
+            "slope_norm": 0.0,
             "label": "non fiable",
             "samples_count": 10
           },
@@ -1933,6 +1933,120 @@
             "slope_norm": 0.0083,
             "label": "incertain",
             "samples_count": 9
+          },
+          "seed": 0
+        },
+        "differences": []
+      },
+      "inter_engine": {
+        "status": "match",
+        "differences": []
+      }
+    },
+    {
+      "id": "reliability-seven-observations-degraded",
+      "outcomes": [
+        "match"
+      ],
+      "expected": {
+        "result_kind": "items",
+        "result_percentiles": {
+          "P50": 10,
+          "P70": 10,
+          "P90": 9
+        },
+        "risk_score": 0.1,
+        "result_distribution": [
+          {
+            "x": 9,
+            "count": 275
+          },
+          {
+            "x": 10,
+            "count": 441
+          },
+          {
+            "x": 11,
+            "count": 284
+          }
+        ],
+        "samples_count": 7,
+        "throughput_reliability": {
+          "cv": 0.0756,
+          "iqr_ratio": 0.1,
+          "slope_norm": 0.0357,
+          "label": "incertain",
+          "samples_count": 7
+        },
+        "seed": 0
+      },
+      "python": {
+        "status": "match",
+        "result": {
+          "result_kind": "items",
+          "result_percentiles": {
+            "P50": 10,
+            "P70": 10,
+            "P90": 9
+          },
+          "risk_score": 0.1,
+          "result_distribution": [
+            {
+              "x": 9,
+              "count": 275
+            },
+            {
+              "x": 10,
+              "count": 441
+            },
+            {
+              "x": 11,
+              "count": 284
+            }
+          ],
+          "samples_count": 7,
+          "throughput_reliability": {
+            "cv": 0.0756,
+            "iqr_ratio": 0.1,
+            "slope_norm": 0.0357,
+            "label": "incertain",
+            "samples_count": 7
+          },
+          "seed": 0
+        },
+        "differences": []
+      },
+      "typescript": {
+        "status": "match",
+        "result": {
+          "result_kind": "items",
+          "result_percentiles": {
+            "P50": 10,
+            "P70": 10,
+            "P90": 9
+          },
+          "risk_score": 0.1,
+          "result_distribution": [
+            {
+              "x": 9,
+              "count": 275
+            },
+            {
+              "x": 10,
+              "count": 441
+            },
+            {
+              "x": 11,
+              "count": 284
+            }
+          ],
+          "samples_count": 7,
+          "throughput_reliability": {
+            "cv": 0.0756,
+            "iqr_ratio": 0.1,
+            "slope_norm": 0.0357,
+            "label": "incertain",
+            "samples_count": 7
           },
           "seed": 0
         },

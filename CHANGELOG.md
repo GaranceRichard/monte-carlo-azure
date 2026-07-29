@@ -2,6 +2,22 @@
 
 ## Recent
 
+### Métriques et labels de fiabilité du throughput — PBI 2.15
+
+- centralisation du calcul de fiabilité dans un calculateur de domaine et un Value Object par langage, sans
+  calcul concurrent dans `mc_core.py` ou `utils/simulation.ts`
+- alignement explicite sur moyenne, variance et écart-type de population, quartiles à interpolation
+  linéaire et pente déterministe des moindres carrés ; suppression de `numpy.percentile` et `numpy.polyfit`
+- normalisation `round half up` à quatre décimales avant les seuils et application stricte de l’ordre
+  `non fiable`, `fragile`, `incertain`, `fiable`, avec dégradation des historiques fiables de six ou sept
+  observations
+- ajout au corpus d’un seizième cas à sept observations dérivé de `STD-STAT-001` et `mca-prng-v1` sans
+  moteur oracle, avec invariants de périmètre et tests exacts dans les deux langages
+- résorption par des tests métier des branches invalides de Risk Score, mode et population qui laissaient
+  rouges `simulationMappers.ts:56` et `simulation.ts:100,112`
+- rapport à 14 cas conformes et deux seules divergences d’histogrammes agrégés ; construction des
+  histogrammes, rejeu exact et enforcement informatif inchangés avant les PBI 2.16, 2.17 et 2.19
+
 ### Censures, percentiles et Risk Score — PBI 2.14
 
 - suppression des durées sentinelles de censure dans les deux moteurs : seules les simulations terminées
