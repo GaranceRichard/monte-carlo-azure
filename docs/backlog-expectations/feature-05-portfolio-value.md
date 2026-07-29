@@ -1,10 +1,7 @@
-# Feature 5 — Valider la valeur d’usage du mode portefeuille
+# Feature 5 — Démontrer la valeur d’usage du mode portefeuille
 
-**Description :** observer l’utilisation réelle du portefeuille avant d’ajouter de nouveaux scénarios, diagnostics ou niveaux de complexité à l’interface.
-
-**Flux de valeur :** vérifier que les quatre hypothèses et les trois dimensions de diagnostic facilitent réellement la décision en comité plutôt que d’augmenter la charge cognitive et le besoin d’explication.
-
-**Backlog :** [`../backlog.md`](../backlog.md)
+Le résultat observable, le flux de valeur et le statut de la Feature sont définis dans le
+[`registre du backlog`](../backlog.md). Ce document ne porte que ses attendus détaillés.
 
 ## Mesures attendues
 

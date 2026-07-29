@@ -1,10 +1,7 @@
-# Feature 12 — Étendre le produit au pilotage de programme
+# Feature 12 — Soutenir le pilotage de programme avec des relations opérationnelles explicites
 
-**Description :** enrichir le modèle portefeuille avec des relations opérationnelles explicites et consolider plusieurs projets dans une vue adaptée aux arbitrages de direction.
-
-**Flux de valeur :** transformer une comparaison statistique multiéquipes en capacité de pilotage de programme, sans confondre hypothèses, dépendances réelles, risques et décisions humaines.
-
-**Backlog :** [`../backlog.md`](../backlog.md)
+Le résultat observable, le flux de valeur et le statut de la Feature sont définis dans le
+[`registre du backlog`](../backlog.md). Ce document ne porte que ses attendus détaillés.
 
 ## État du raffinement
 

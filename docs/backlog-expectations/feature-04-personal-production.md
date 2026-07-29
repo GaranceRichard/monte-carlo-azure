@@ -1,10 +1,7 @@
-# Feature 4 — Sécuriser la mise en production personnelle
+# Feature 4 — Disposer d’une mise en production personnelle sécurisée
 
-**Description :** corriger les risques immédiats de persistance, de conteneurisation et d’identification des clients avant toute exposition réelle de l’application.
-
-**Flux de valeur :** permettre un déploiement personnel exploitable sans croissance silencieuse du stockage, privilèges excessifs dans le conteneur ou contournement du rate limiting.
-
-**Backlog :** [`../backlog.md`](../backlog.md)
+Le résultat observable, le flux de valeur et le statut de la Feature sont définis dans le
+[`registre du backlog`](../backlog.md). Ce document ne porte que ses attendus détaillés.
 
 ## État du raffinement
 

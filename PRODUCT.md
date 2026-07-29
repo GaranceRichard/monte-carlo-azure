@@ -1,4 +1,9 @@
-# Product Vision
+# Vision produit
+
+Ce document fait autorité pour le problème traité, les utilisateurs, le positionnement, les cas d’usage,
+la proposition de valeur et la vision de Monte Carlo Azure. Le [`README.md`](README.md) en fournit une
+synthèse d’entrée ; la [`roadmap`](docs/roadmap.md) ordonne les horizons de valeur sans redéfinir cette
+vision.
 
 ## Monte Carlo Azure
 
@@ -279,20 +284,6 @@ Indicateurs utiles :
 - taux d'erreur API
 - usage du mode portefeuille
 - qualité de restitution des scénarios
-
-## État récent du produit
-
-Les évolutions récentes les plus structurantes sont :
-
-- refonte du mode portefeuille autour de 4 scénarios explicites
-- harmonisation du calcul du `Risk Score` avec les percentiles affichés
-- suppression des divergences restantes entre backend, interface et export PDF
-- ajout de tests de cohérence dédiés sur `Risk Score`, `cv`, `iqr_ratio` et `slope_norm`
-- génération parallèle du rapport portefeuille avec progression visible
-- tolérance aux échecs partiels lors de l'agrégation portefeuille
-- enrichissement du rapport PDF avec une page de synthèse orientée décision
-- durcissement des tests, de la CI et des contrôles de conformité repo
-- mise sous contrôle des points vitaux via traçabilité et coverage dédiée
 
 ## Vision
 

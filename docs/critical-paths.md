@@ -89,9 +89,10 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   `tests/test_simulation_service.py`, `tests/test_api_history.py`, `tests/test_simulation_store.py`,
   `frontend/src/api/simulationMappers.test.ts`, `frontend/src/storage/simulationHistoryMappers.test.ts`.
 - **État** : partiellement couvert.
-- **Lacunes connues** : les frontières DTO/domaine/persistance sont explicites, mais le contrat statistique
-  n'est pas encore aligné Python/TypeScript; absence de test de charge, de preuve d'annulation du thread
-  après timeout et de politique de proxy de confiance.
+- **Lacunes connues** : les frontières DTO/domaine/persistance sont explicites et les validations,
+  censures, percentiles, Risk Score et métriques de fiabilité concordent entre Python et TypeScript. Les
+  histogrammes agrégés divergent encore, le contrôle de parité reste informatif, et il n’existe toujours
+  ni test de charge, ni preuve d'annulation du thread après timeout, ni politique de proxy de confiance.
 
 ### CP-004 — Flux onboarding critique
 

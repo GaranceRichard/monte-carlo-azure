@@ -1,12 +1,9 @@
 # Contrat du corpus de référence statistique
 
-Le PBI 2.9 établit le format sérialisé commun. Le PBI 2.10 matérialise dans ce format les cas normatifs
-d’entrées, de modes, de zéros, d’horizon, de censures et de percentiles. Le PBI 2.11 l’enrichit avec les
-cas du Risk Score, des seuils de fiabilité et des histogrammes exacts ou agrégés. Le PBI 2.12 exécute les
-quinze cas dans les moteurs Python et TypeScript et compare leurs sorties à cette référence et entre elles,
-sans corriger les divergences observées. Le PBI 2.13 aligne les frontières normalisées ; le PBI 2.14
-réutilise six cas discriminants pour aligner censures, percentiles et Risk Score. Le PBI 2.15 aligne les
-métriques et labels de fiabilité et ajoute une seizième preuve à sept observations.
+Ce document explique la forme, les dérivations indépendantes, la validation et l’exécution du corpus
+statistique partagé. Le [standard `STD-STAT-001`](standards/STD-STAT-001.md) reste l’autorité normative ;
+les fichiers JSON décrits ci-dessous sont les autorités machine. L’état observable des moteurs appartient au
+[rapport de parité](../reports/statistical-parity-report.md).
 
 ## Autorité et fichiers
 
@@ -15,8 +12,8 @@ Le contrat normatif initial est la version `1.0`, exprimée en JSON Schema draft
 - [`contracts/statistical-reference-corpus-v1.0.schema.json`](../contracts/statistical-reference-corpus-v1.0.schema.json)
   est l’autorité machine, indépendante de Python et TypeScript ;
 - [`contracts/statistical-reference-corpus-v1.0.json`](../contracts/statistical-reference-corpus-v1.0.json)
-  est le corpus normatif `1.0`, formé des cinq cas du PBI 2.10, des dix cas du PBI 2.11 et du cas
-  complémentaire à sept observations du PBI 2.15 ;
+  est le corpus normatif `1.0`, formé de cinq cas d’entrées et de modes, dix cas de Risk Score, fiabilité
+  et histogrammes, puis d’un cas complémentaire à sept observations ;
 - [`contracts/examples/statistical-reference-corpus-v1.0.minimal.json`](../contracts/examples/statistical-reference-corpus-v1.0.minimal.json)
   reste une preuve de structure avec un seul cas trivial ;
 - [`contracts/examples/statistical-reference-corpus-v1.0.invalid.json`](../contracts/examples/statistical-reference-corpus-v1.0.invalid.json)
@@ -66,17 +63,17 @@ dans le `$comment` normatif de `expectedResult` et restent gouvernées par `STD-
 
 Ces relations arithmétiques ne sont pas remplacées par une extension propriétaire comme `$data` : le
 contrat reste lisible par tout validateur standard draft 2020-12. Le contrôle autonome vérifie désormais
-les relations structurelles nécessaires au corpus avant que le coordinateur 2.12 autorise l’un ou l’autre
+les relations structurelles nécessaires au corpus avant que le coordinateur autorise l’un ou l’autre
 moteur à exécuter un cas.
 
-## Cas normatifs du PBI 2.10
+## Cas normatifs des entrées, modes, censures et percentiles
 
-Le corpus contient exactement cinq cas 2.10, chacun avec `n_sims = 1000`. Les cas de rejeu consomment
+Le corpus contient exactement cinq cas de cette famille, chacun avec `n_sims = 1000`. Les cas de rejeu consomment
 `mca-prng-v1` selon l’ordre simulation-major de `STAT-PAR-003`, `STAT-PAR-004`, `STAT-PAR-018` et
 `STAT-PAR-019`. Les cas déterministes utilisent un throughput constant : leur résultat ne dépend donc pas
 de l’indice tiré.
 
-| Cas | Règles matérialisées | Résultat 2.10 |
+| Cas | Règles matérialisées | Résultat attendu |
 | --- | --- | --- |
 | `items-zero-weeks-excluded` | zéro exclu avant calcul, six samples utilisables, `weeks_to_items`, seul `target_weeks` actif | P50 = 3, P70 = 2, P90 = 1 |
 | `weeks-zero-weeks-included-no-censorship` | zéro conservé, `backlog_to_weeks`, seul `backlog_size` actif, censure absente | 1 000 fins ; P50 = 2, P70 = 3, P90 = 4 |
@@ -85,9 +82,9 @@ de l’indice tiré.
 | `weeks-total-censorship` | throughput fixé à 1, backlog 522 | 0 fin, 1 000 censures ; tous les percentiles absents |
 
 Les champs `risk_score`, `throughput_reliability` et `result_distribution` restent présents lorsque le
-schéma et `STD-STAT-001` l’exigent pour former un résultat normatif complet. Le PBI 2.10 ne leur a ajouté
-aucun scénario limite ni aucune revendication de couverture. Le PBI 2.11 réutilise sans modifier deux
-preuves 2.10 lorsqu’elles sont déjà minimales et discriminantes : le score `0.6667` et l’histogramme exact
+schéma et `STD-STAT-001` l’exigent pour former un résultat normatif complet. Cette famille ne leur ajoute
+aucun scénario limite ni aucune revendication de couverture. La famille suivante réutilise sans modifier
+deux preuves déjà minimales et discriminantes : le score `0.6667` et l’histogramme exact
 de `items-zero-weeks-excluded`, puis l’absence de score avec P90 non identifiable dans
 `weeks-partial-censorship`.
 
@@ -166,11 +163,11 @@ Il reste `1000 - 748 = 252` censures, donc `censored_rate = 252 / 1000 = 0,2520`
 Le rang 500 se trouve en semaine 518 et le rang 700 en semaine 521. Le rang 900 dépasse les 748 fins :
 `P50 = 518`, `P70 = 521` et P90 est omis, sans `null`, zéro ni sentinelle.
 
-## Cas normatifs du PBI 2.11
+## Cas normatifs du Risk Score, de la fiabilité et des histogrammes
 
 Les dix nouveaux cas utilisent `n_sims = 1000`, `target_weeks = 1` et la seed `0`. Ce choix rend chaque
 tirage égal à un sample utilisable et garde les distributions lisibles. La récurrence indépendante employée
-pour le PBI 2.10 est réutilisée sans importer un moteur ; ses indices sont de nouveau contrôlés contre le
+pour la première famille est réutilisée sans importer un moteur ; ses indices sont de nouveau contrôlés contre le
 vecteur canonique avant de calculer les comptes.
 
 | Cas | Frontière isolée | Attendu discriminant |
@@ -193,7 +190,7 @@ aussi deux identifiants différents qui décriraient le même scénario.
 
 Trois gardes complémentaires sont protégées :
 
-- dans le cas 2.10 `items-zero-weeks-excluded`, `P50 = 3` et `P90 = 1`, donc
+- dans le cas `items-zero-weeks-excluded`, `P50 = 3` et `P90 = 1`, donc
   `roundHalfUp((3 - 1) / 3, 4) = 0.6667` en mode capacité ; cette valeur matérialise aussi l’écart historique
   ST-25 entre flottant natif et valeur normative arrondie ;
 - dans `weeks-partial-censorship`, P50 existe mais P90 n’est pas identifiable : `risk_score` est omis. Cette
@@ -229,11 +226,12 @@ annule la pente et garde l’IQR nul :
 Pour `reliability-iqr-050-rounded`, les trois occurrences de `3`, `4` et `5` donnent `Q25 = 3`,
 médiane `4`, `Q75 = 5` et `(5 - 3) / 4 = 0.5000`; le CV `0.2041` et la pente normalisée `0.0083`
 restent sous leurs seuils. Pour `0..100`, `Q25 = 25`, médiane `50`, `Q75 = 75`, donc
-`iqr_ratio = 1.0000` et le label est `fragile`. Les cas 2.10 préservés complètent les quatre labels :
+`iqr_ratio = 1.0000` et le label est `fragile`. Les cas préservés de la première famille complètent les
+quatre labels :
 l’historique constant de six valeurs est dégradé en `incertain`, tandis que la censure partielle conserve
 un résultat `fiable`.
 
-Le PBI 2.15 ajoute `reliability-seven-observations-degraded`. Pour les samples
+Le cas complémentaire `reliability-seven-observations-degraded` utilise les samples
 `9,9,10,10,10,11,11`, la moyenne vaut `10` et la variance de population vaut `4/7`; le CV est donc
 `sqrt(4/7) / 10 = 0.075592...`, normalisé à `0.0756`. Les positions de quartile `1.5/3/4.5` donnent
 `Q25 = 9.5`, médiane `10`, `Q75 = 10.5`, soit `iqr_ratio = 0.1000`. Avec `x = 0..6`, le dénominateur
@@ -286,7 +284,7 @@ TypeScript ; la référence normative choisit explicitement `50/9999` sans align
 
 ## Probes de validation des entrées
 
-Un cas invalide ne peut pas appartenir à `cases` sans rendre le corpus contraire au schéma 2.9. Le contrôle
+Un cas invalide ne peut pas appartenir à `cases` sans rendre le corpus contraire au schéma. Le contrôle
 autonome construit donc, à partir des cas valides, 24 mutations négatives minimales et exige le diagnostic
 JSON Schema localisé :
 
@@ -315,8 +313,7 @@ Le point d’entrée délègue les invariants interchamps et de périmètre à
 `Scripts/statistical_reference_corpus_invariants.py` afin de conserver des contrôles courts et auditables ;
 ce module ne dépend lui non plus d’aucun moteur.
 
-Il valide le métaschème et le corpus, vérifie la complétude des périmètres 2.10, 2.11, 2.14 et 2.15,
-exécute les
+Il valide le métaschème et le corpus, vérifie la complétude des familles de preuve, exécute les
 24 probes d’entrées, contrôle les invariants interchamps structurels, la formule et les gardes du Risk Score,
 les métriques et labels de fiabilité normalisés, les représentants de buckets à une semaine et l’identité
 des résultats spécialisés. Il accepte l’exemple positif et exige le rejet du contre-exemple. Ce rejet doit
@@ -331,7 +328,7 @@ candidate.json:/cases/0/seed: [maximum] 4294967296 is greater than the maximum o
 Le chargeur refuse aussi les propriétés JSON dupliquées avant la validation, car un parseur JSON ordinaire
 les écraserait avant que JSON Schema puisse les observer.
 
-## Exécution partagée et rapport du PBI 2.12
+## Exécution partagée et rapport
 
 La commande commune est :
 
@@ -342,7 +339,7 @@ La commande commune est :
 Le flux est ordonné et fermé :
 
 1. `Scripts/run_statistical_reference_corpus.py` charge et vérifie le JSON Schema draft 2020-12 ;
-2. il valide le corpus, ses invariants interchamps et les périmètres figés 2.10/2.11/2.14/2.15 ;
+2. il valide le corpus, ses invariants interchamps et les familles de preuve figées ;
 3. seulement si cette étape est verte, `Scripts/statistical_corpus_runner.py` construit chaque
    `SimulationCommand` Python avec la seed du cas et appelle `backend.simulation_service.run_simulation` ;
 4. le pont Node valide à nouveau le même fichier avant de charger
@@ -373,9 +370,8 @@ horodatage et leur ordre suit celui du corpus, ce qui rend deux exécutions iden
 le profil `main`. Un schéma/corpus invalide ou une erreur moteur reste une incapacité d’exécution et renvoie
 un code non nul.
 
-Les quinze références initiales de 2.12 observaient treize conformités. Après l’ajout de la preuve 2.15,
-l’exécution courante observe quatorze cas intégralement conformes dans les deux moteurs. Les deux autres
-confirment les divergences d’histogrammes déjà isolées par 2.11 :
+L’exécution courante observe quatorze cas intégralement conformes dans les deux moteurs. Les deux autres
+confirment les divergences d’histogrammes déjà isolées :
 
 | Cas | Norme | Python | TypeScript |
 | --- | --- | --- | --- |
@@ -383,9 +379,9 @@ confirment les divergences d’histogrammes déjà isolées par 2.11 :
 | `histogram-aggregated-discontinuous` | `50`, `9999` | `50`, `9951` | `51`, `10050` |
 
 Les seeds, tirages, distributions brutes, percentiles, scores et métriques de fiabilité ne sont pas modifiés
-par le runner. L’alignement de ces sorties reste explicitement hors du PBI 2.12.
+par le runner.
 
-## Sondes de validation et forme canonique du PBI 2.13
+## Sondes de validation et forme canonique
 
 [`contracts/statistical-validation-probes-v1.0.json`](../contracts/statistical-validation-probes-v1.0.json)
 complète les quinze résultats normatifs alors présents sans les changer. Ses 22 sondes sont soumises aux deux
@@ -411,11 +407,11 @@ une autre sentinelle. La complétion n’est autorisée que pour `backlog_to_wee
 Le rapport expose `validation_alignment`: les 22 sondes concordent entre Python et TypeScript, sans
 divergence ni erreur. Les seize cas statistiques donnent 14 conformités et deux divergences
 d’histogrammes. Ces sondes ne modifient aucune formule statistique et `enforcement` demeure
-`informational` jusqu’au PBI 2.19.
+`informational`.
 
-## Alignement des censures, percentiles et Risk Score du PBI 2.14
+## Preuves des censures, percentiles et Risk Score
 
-Les six cas nécessaires au PBI 2.14 existaient déjà et restent inchangés. Ils sont regroupés par
+Les six cas discriminants restent inchangés. Ils sont regroupés par l’identifiant technique
 `PBI_214_CASE_IDS`, avec un contrôle de périmètre dédié :
 
 - `items-zero-weeks-excluded` démontre les quantiles de survie P50/P70/P90 `3/2/1` et le score `0.6667` ;
@@ -438,13 +434,13 @@ calculable ; l’interface et les rapports la consomment sans recalcul. Les hist
 omettre le champ, mais cette absence est conservée.
 
 Les hooks et mappers n’utilisent plus l’histogramme comme source secondaire de percentiles. Une distribution
-riche ne peut donc pas recréer P50, P70 ou P90 absent. Le rapport de parité confirme les six cas 2.14 dans
+riche ne peut donc pas recréer P50, P70 ou P90 absent. Le rapport de parité confirme les six cas dans
 les deux langages. Son état global reste `divergence` uniquement à cause des deux constructions
-d’histogrammes agrégés réservées au PBI 2.16 ; l’enforcement reste informatif jusqu’au PBI 2.19.
+d’histogrammes agrégés ; l’enforcement reste informatif.
 
-## Alignement des métriques et labels de fiabilité du PBI 2.15
+## Preuves des métriques et labels de fiabilité
 
-`PBI_215_CASE_IDS` regroupe les seuils exacts issus du PBI 2.11, les quatre labels, les preuves existantes à
+`PBI_215_CASE_IDS` regroupe les seuils exacts, les quatre labels, les preuves existantes à
 six observations et `reliability-seven-observations-degraded`. Le contrôle de périmètre fige les métriques
 normalisées, les labels et le rejeu indépendant du nouveau cas. Le validateur autonome recalcule toujours
 moyenne, variance de population, quartiles et pente depuis les samples ; il ne lit jamais la sortie d’un
@@ -464,8 +460,7 @@ brutes et le Value Object porte leur normalisation et le label. Les deux suivent
 
 `backend/mc_core.py` et `frontend/src/utils/simulation.ts` ne portent plus de calcul concurrent. Les
 frontières sérialisées continuent à ne transporter que les cinq primitives de fiabilité existantes. Les
-histogrammes ne sont pas modifiés, le rejeu exact complet reste réservé au PBI 2.17 et le rapport demeure
-informatif jusqu’au PBI 2.19.
+histogrammes ne sont pas modifiés et le rapport demeure informatif.
 
 ## Évolution
 

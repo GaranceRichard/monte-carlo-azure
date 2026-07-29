@@ -1,10 +1,7 @@
 # Feature 1 — Disposer d’un système de preuve qualité gouverné
 
-**Description :** mettre en place un dispositif capable de classifier, sélectionner, exécuter, dénombrer et piloter automatiquement les tests selon leur nature réelle, leurs finalités, leurs risques et leurs profils d’exécution.
-
-**Flux de valeur :** rendre mesurable et vérifiable la confiance apportée par la stratégie de test, plutôt que de s’appuyer uniquement sur le volume de tests ou la couverture du code.
-
-**Backlog :** [`../backlog.md`](../backlog.md)
+Le résultat observable, le flux de valeur et le statut de la Feature sont définis dans le
+[`registre du backlog`](../backlog.md). Ce document ne porte que ses attendus détaillés.
 
 ## État du raffinement
 

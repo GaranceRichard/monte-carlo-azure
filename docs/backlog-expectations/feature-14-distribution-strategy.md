@@ -1,10 +1,7 @@
-# Feature 14 — Clarifier la stratégie de diffusion et réduire la friction d’adoption
+# Feature 14 — Disposer d’une stratégie de diffusion claire et d’une adoption simplifiée
 
-**Description :** expliciter l’ambition du produit, son modèle de pérennité, son marché cible, ses modes de distribution et le parcours permettant à une organisation Azure DevOps de l’adopter réellement.
-
-**Flux de valeur :** transformer un dépôt techniquement crédible en proposition lisible, testable et adoptable par ses utilisateurs et intégrateurs cibles.
-
-**Backlog :** [`../backlog.md`](../backlog.md)
+Le résultat observable, le flux de valeur et le statut de la Feature sont définis dans le
+[`registre du backlog`](../backlog.md). Ce document ne porte que ses attendus détaillés.
 
 ## Décisions possibles
 

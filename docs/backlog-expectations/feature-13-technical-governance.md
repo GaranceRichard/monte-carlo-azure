@@ -1,10 +1,8 @@
-# Feature 13 — Rationaliser le dispositif de gouvernance technique
+# Feature 13 — Disposer d’une gouvernance technique rationalisée
 
-**Description :** mesurer la valeur, le coût et les recouvrements des contrôles du dépôt, puis simplifier le dispositif sans affaiblir les protections critiques.
-
-**Flux de valeur :** conserver une forte confiance dans le produit tout en réduisant le temps de changement, la charge de maintenance et la complexité de reprise par un autre contributeur.
-
-**Backlog :** [`../backlog.md`](../backlog.md)
+Le résultat observable, le flux de valeur et le statut de la Feature sont définis dans le
+[`registre du backlog`](../backlog.md). Ce document ne porte que ses attendus détaillés et preuves de
+cadrage.
 
 ## Principe de rationalisation
 
@@ -22,7 +20,7 @@ Chaque contrôle doit être évalué selon :
 Les contrôles de sécurité, de contrat, de parité statistique et de protection des parcours critiques restent prioritaires.
 
 
-## Résultat attendu du PBI 13.10
+## 13.10 — Approvisionnement des images de services CI indépendant et immuable
 
 - supprimer la dépendance directe de la CI à Docker Hub pour les images de services critiques ;
 - répliquer l’image MongoDB approuvée dans GitHub Container Registry ;
@@ -32,9 +30,10 @@ Les contrôles de sécurité, de contrat, de parité statistique et de protectio
 - distinguer explicitement les échecs de récupération d’image, de démarrage du service et de tests backend ;
 - ne modifier ni le comportement MongoDB attendu, ni les tests produit, ni les seuils de qualité.
 
-## Statut vérifié du PBI 13.10
+## Preuves de cadrage sans effet sur le statut
 
-Le PBI reste **non réalisé** au 27/07/2026 :
+La colonne `Réalisé le` du [`registre du backlog`](../backlog.md) reste la seule autorité de statut. Au
+27/07/2026, les preuves de cadrage disponibles étaient :
 
 - `.github/workflows/ci.yml` référence encore directement `mongo:7` pour le service MongoDB ;
 - le commit `e1d64b6948105359533fec4ef915a4d9c25f0a60` du 26/07/2026 ajoute le PBI au backlog ;

@@ -1,21 +1,19 @@
 # Feature 2 — Garantir la fiabilité du cœur statistique
 
-**Description :** formaliser les règles statistiques communes, supprimer les divergences involontaires entre Python et TypeScript et protéger les invariants du moteur par des contrats, un rejeu déterministe et des références partagées.
-
-**Flux de valeur :** assurer que les projections, diagnostics et décisions reposent sur des calculs cohérents, reproductibles et explicables, quel que soit le chemin d’exécution utilisé.
-
-**Backlog :** [`../backlog.md`](../backlog.md)
+Le résultat observable, le flux de valeur et le statut de la Feature sont définis dans le
+[`registre du backlog`](../backlog.md). Ce document conserve les attendus, décisions et preuves propres à
+chaque PBI de la Feature.
 
 ## Phase A — Déterminisme d’exécution : PBI 2.5 à 2.8
 
-### Résultat attendu du PBI 2.5
+### 2.5 — Seed résolue exclusivement aux frontières d’exécution
 
 - résoudre la seed aux frontières API, UI et démo avant l’appel du moteur ;
 - conserver exactement une seed uint32 déjà validée ;
 - supprimer les générations ou normalisations silencieuses dans le cœur ;
 - ne pas injecter ici l’horloge ou les identifiants techniques sans effet statistique.
 
-### Résultat attendu du PBI 2.6
+### 2.6 — Port de tirage déterministe disponible dans les deux moteurs
 
 - définir une interface minimale de tirage consommée par les moteurs ;
 - remplacer l’accès direct aux bibliothèques aléatoires dans la logique Monte Carlo ;
@@ -31,7 +29,7 @@ Architecture introduite par le PBI 2.6 et conservée :
 - les adaptateurs transitoires NumPy et Mulberry32 livrés par le PBI 2.6 sont remplacés par le contrat
   commun du PBI 2.7, sans changer les signatures ni la composition.
 
-### Résultat attendu du PBI 2.7
+### 2.7 — PRNG contractuel commun opérationnel en Python et TypeScript
 
 - implémenter le même PRNG contractuel dans les deux langages ;
 - définir son état, son domaine, sa sortie et ses vecteurs de vérification ;
@@ -54,7 +52,7 @@ Implémentation retenue :
 - l’ordre logique et l’indépendance du batching restent réservés au PBI 2.8 ; la version externe du
   contrat et les règles de migration restent réservées au PBI 2.20.
 
-### Résultat attendu du PBI 2.8
+### 2.8 — Ordre logique des tirages stable et indépendant du batching
 
 - figer l’ordre logique de consommation des tirages ;
 - rendre les résultats indépendants du découpage en lots ;
@@ -76,7 +74,7 @@ Implémentation retenue :
 
 ## Phase B — Corpus partagé : PBI 2.9 à 2.12
 
-### Résultat attendu du PBI 2.9
+### 2.9 — Schéma du corpus de référence statistique versionné
 
 - définir un format sérialisé strict et versionné ;
 - distinguer entrées normalisées, résultats attendus et niveau de preuve ;
@@ -96,7 +94,7 @@ Implémentation retenue :
 - aucun cas statistique complet, runner moteur, changement de formule, migration de DTO, API, MongoDB ou
   `localStorage` n’est introduit.
 
-### Résultat attendu du PBI 2.10
+### 2.10 — Cas de référence des entrées, modes, censures et percentiles disponibles
 
 - couvrir bornes, types invalides, traitement des zéros et paramètres actifs ;
 - couvrir les deux modes, la fin exacte à l’horizon, les censures totale et partielle ;
@@ -119,7 +117,7 @@ Implémentation retenue :
 - aucun runner moteur, changement de formule, cas dédié au Risk Score, à la fiabilité ou aux histogrammes,
   ni migration de DTO, API, MongoDB ou `localStorage` n’est introduit.
 
-### Résultat attendu du PBI 2.11
+### 2.11 — Cas de référence du Risk Score, de la fiabilité et des histogrammes disponibles
 
 - couvrir le calcul et l’absence du Risk Score ;
 - couvrir les seuils exacts de fiabilité après arrondi normatif ;
@@ -146,7 +144,7 @@ Implémentation retenue :
 - aucun runner Python ou TypeScript du PBI 2.12, aucun alignement des PBI 2.13 à 2.16 et aucune modification
   de DTO, API, MongoDB ou `localStorage` n’est introduit.
 
-### Résultat attendu du PBI 2.12
+### 2.12 — Corpus partagé exécuté dans les deux moteurs
 
 - fournir un runner Python et un runner TypeScript du même corpus ;
 - produire des sorties canoniques comparables ;
@@ -176,7 +174,7 @@ Implémentation retenue :
 
 ## Phase C — Alignement statistique : PBI 2.13 à 2.17
 
-### Résultat attendu du PBI 2.13
+### 2.13 — Validation normalisée et forme des résultats alignées
 
 - aligner validations, paramètres actifs, valeurs absentes et forme normative de réponse ;
 - conserver les DTO et persistances comme frontières primitives ;
@@ -199,7 +197,7 @@ Implémentation retenue :
 - aucune formule de censure, percentile, Risk Score, fiabilité ou histogramme n’est modifiée. Les deux
   divergences d’histogrammes restent visibles et la parité reste informative jusqu’au PBI 2.19.
 
-### Résultat attendu du PBI 2.14
+### 2.14 — Censures, percentiles et Risk Score alignés
 
 - aligner les règles de censure ;
 - aligner les rangs et quantiles de P50, P70 et P90 ;
@@ -223,7 +221,7 @@ Implémentation retenue :
   labels de fiabilité, les géométries d’histogrammes et l’enforcement de parité restent respectivement dans
   les PBI 2.15, 2.16 et 2.19.
 
-### Résultat attendu du PBI 2.15
+### 2.15 — Métriques et labels de fiabilité du throughput alignés
 
 - aligner moyenne, variance de population, quartiles et pente ;
 - appliquer l’arrondi `round half up` avant les seuils ;
@@ -247,7 +245,7 @@ Implémentation retenue :
 - les seize cas donnent quatorze conformités. Les deux seules divergences restent les histogrammes agrégés
   du PBI 2.16 ; le rejeu exact du PBI 2.17 et l’enforcement informatif avant 2.19 sont inchangés.
 
-### Résultat attendu du PBI 2.16
+### 2.16 — Construction des histogrammes alignée
 
 - remplacer les constructions historiques divergentes par l’algorithme normatif ;
 - appliquer `right = min(max, left + width - 1)` ;
@@ -255,7 +253,7 @@ Implémentation retenue :
 - garantir au plus 100 buckets, la masse et les représentants attendus ;
 - invalider ou migrer explicitement toute référence historique devenue incompatible.
 
-### Résultat attendu du PBI 2.17
+### 2.17 — Rejeu exact interlangage démontré sur le corpus versionné
 
 - démontrer l’égalité exacte des résultats normatifs à entrée, seed et version identiques ;
 - couvrir les deux modes, censures, percentiles, score, fiabilité et histogrammes ;
@@ -264,21 +262,21 @@ Implémentation retenue :
 
 ## Phase D — Gouvernance de la parité : PBI 2.18 à 2.20
 
-### Résultat attendu du PBI 2.18
+### 2.18 — Rapport de parité déterministe et distributionnelle disponible
 
 - consolider les résultats déterministes, de rejeu et distributionnels ;
 - identifier précisément la fixture, la règle et le moteur en défaut ;
 - séparer échec fonctionnel, incompatibilité de version et erreur d’infrastructure ;
 - publier un rapport JSON canonique et une synthèse Markdown.
 
-### Résultat attendu du PBI 2.19
+### 2.19 — Contrôles de parité bloquants dans le profil `main`
 
 - exécuter les contrôles de parité dans le profil `main` ;
 - bloquer toute divergence normative ;
 - conserver un diagnostic local actionnable ;
 - interdire skip, retry, quarantaine ou exemption silencieuse.
 
-### Résultat attendu du PBI 2.20
+### 2.20 — Dérives de version et de compatibilité statistique bloquées
 
 - rendre obligatoire la version du contrat pour toute preuve de rejeu ;
 - détecter les changements affectant tirages, censures, percentiles, scores, labels, histogrammes ou réponse ;

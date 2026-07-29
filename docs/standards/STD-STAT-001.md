@@ -10,9 +10,9 @@
 
 ## 1. Objet et autorité
 
-Le présent standard tranche les décisions ouvertes par l'[audit de parité statistique du PBI 2.1](../statistical-parity-audit.md).
-Il définit la cible contractuelle commune préalable aux PBI 2.3 à 2.8. Il ne décrit pas le comportement
-actuel comme déjà conforme et n'aligne aucun moteur dans le cadre du PBI 2.2.
+Le présent standard tranche les décisions ouvertes par l’[audit historique de parité
+statistique](../statistical-parity-audit.md). Il définit la cible contractuelle commune ; son adoption ne
+constitue pas à elle seule une preuve de conformité des moteurs.
 
 Les termes normatifs ont le sens suivant :
 
@@ -327,46 +327,44 @@ Time **DOIT** rester explicitement hors du contrat de parité Monte Carlo.
 
 ### Matérialisation du corpus version `1.0`
 
-Le PBI 2.9 matérialise la frontière sérialisée de rejeu dans
+La frontière sérialisée de rejeu est matérialisée dans
 [`contracts/statistical-reference-corpus-v1.0.schema.json`](../../contracts/statistical-reference-corpus-v1.0.schema.json).
 Ce JSON Schema draft 2020-12 associe explicitement chaque entrée normalisée à sa seed uint32, au contrat
 `mca-prng-v1`, à son résultat normatif attendu et à l’un des quatre niveaux de parité de `STAT-PAR-001`.
 Le schéma est fermé et indépendant des DTO et des moteurs.
 
-Le PBI 2.10 instancie cette frontière dans
+Cette frontière est instanciée dans
 [`contracts/statistical-reference-corpus-v1.0.json`](../../contracts/statistical-reference-corpus-v1.0.json).
 Ses cinq cas matérialisent `STAT-PAR-012` à `STAT-PAR-025` pour les entrées, zéros, modes, horizon,
 censures et percentiles. Les résultats attendus sont dérivés du présent standard et de `mca-prng-v1` sans
 utiliser un moteur comme oracle.
 
-Le PBI 2.11 ajoute dix cas discriminants pour `STAT-PAR-026` à `STAT-PAR-039`. Ils figent le calcul et les
+Le corpus contient aussi dix cas discriminants pour `STAT-PAR-026` à `STAT-PAR-039`. Ils figent le calcul et les
 gardes d’absence du Risk Score, tous les seuils de `cv`, `iqr_ratio` et `slope_norm` après arrondi normatif,
 les quatre labels dans leur ordre de priorité, ainsi que les histogrammes exacts et agrégés avec masse,
 largeur, bornes et représentants. Les cas `0..100` et `0..99 + 10000` matérialisent explicitement les
 géométries historiquement divergentes recensées par l’audit. Leurs résultats sont eux aussi dérivés du
 présent standard, du contrat sérialisé et de calculs indépendants.
 
-Le PBI 2.12 exécute les quinze références dans les deux moteurs avec leurs seeds et `mca-prng-v1`, après
+Le runner partagé exécute les références dans les deux moteurs avec leurs seeds et `mca-prng-v1`, après
 validation du schéma et du corpus. Les sorties sont comparées exactement dans la forme sérialisée commune,
-sans tolérance, tri ou valeur absente reconstruite. Treize cas concordent avec la norme et entre moteurs ;
-les deux cas d’histogrammes agrégés conservent des divergences explicites orientées vers le PBI 2.16.
-Le rapport reste informatif jusqu’au contrôle bloquant prévu par le PBI 2.19.
+sans tolérance, tri ou valeur absente reconstruite.
 
-Le PBI 2.13 aligne les fabriques Python et TypeScript sur l’entrée normalisée fermée du contrat `1.0` :
+Les fabriques Python et TypeScript appliquent l’entrée normalisée fermée du contrat `1.0` :
 types et bornes stricts, entiers finis positifs ou nuls, six observations utilisables, seed `uint32` et
-présence exclusive du paramètre actif. Il aligne aussi la forme canonique fermée et l’omission des valeurs
+présence exclusive du paramètre actif. Elles alignent aussi la forme canonique fermée et l’omission des valeurs
 indisponibles, sans sentinelle. Les 22 sondes partagées en apportent une preuve interlangage. Les frontières
 DTO, API, MongoDB et `localStorage` restent primitives ; aucune formule statistique ni géométrie
 d’histogramme n’est modifiée.
 
-Le PBI 2.14 aligne censures, rangs, quantiles de survie et Risk Score sans reconstruire les percentiles
-absents. Le PBI 2.15 aligne ensuite `STAT-PAR-030` à `STAT-PAR-035` dans une autorité de domaine par langage :
+Les censures, rangs, quantiles de survie et Risk Score sont alignés sans reconstruire les percentiles
+absents. Les règles `STAT-PAR-030` à `STAT-PAR-035` sont portées par une autorité de domaine par langage :
 moyenne et variance de population, quartiles linéaires, pente déterministe, normalisation `round half up`
 avant les seuils et ordre exact des quatre labels. Une seizième référence démontre le cas de sept
 observations en complément des preuves à six ; les résultats sont dérivés du présent standard et de
-`mca-prng-v1` sans prendre un moteur comme oracle. Quatorze références concordent exactement ; seules les
-deux géométries d’histogrammes réservées au PBI 2.16 divergent encore, et le contrôle reste informatif
-jusqu’au PBI 2.19.
+`mca-prng-v1` sans prendre un moteur comme oracle. L’état de conformité, les divergences et le caractère
+informatif ou bloquant du contrôle sont publiés dans le
+[`rapport de parité`](../../reports/statistical-parity-report.md), pas dans le présent standard.
 
 ### STAT-PAR-047 — Version de rejeu
 
@@ -380,138 +378,47 @@ un histogramme ou la forme d'une réponse **DOIT** entraîner une décision expl
 à jour de version, une mise à jour du corpus partagé et une migration ou une invalidation documentée des
 historiques et caches concernés.
 
-### STAT-PAR-049 — Limite du PBI 2.2
+### STAT-PAR-049 — Adoption et preuve de conformité
 
-Le PBI 2.2 **NE DOIT PAS** être interprété comme l'implémentation de la séparation des DTO, des Value Objects,
-de l'injection ou du choix du PRNG commun, des fixtures partagées, de l'alignement des moteurs, de la gate de
-parité, des migrations de données ou des changements UI/PDF. Ces travaux **DOIVENT** être réalisés par les
-PBI 2.3 à 2.8 selon les matrices ci-dessous avant de revendiquer la conformité d'exécution à ce standard.
+L’adoption documentaire du présent standard **NE DOIT PAS** être interprétée comme une preuve
+d’implémentation. La séparation des DTO, les Value Objects, le PRNG commun, le corpus partagé, l’alignement
+des moteurs, la gate de parité, les décisions de migration et la consommation fidèle par l’UI et les PDF
+**DOIVENT** être démontrés par des contrats, des tests et des rapports observables avant de revendiquer la
+conformité d’exécution.
 
-## 13. Orientation des exigences vers les PBI d'implémentation
+## 13. Traçabilité des exigences
 
-Une exigence peut relever de plusieurs PBI : le total par PBI n'est donc pas une partition des 49 exigences.
+Le standard reste l’autorité normative. Les documents suivants portent les responsabilités complémentaires
+sans redéfinir ses règles :
 
-| Exigence | PBI d'implémentation |
-| --- | --- |
-| STAT-PAR-001 | 2.6, 2.8 |
-| STAT-PAR-002 | 2.5, 2.6, 2.7, 2.8 |
-| STAT-PAR-003 | 2.5, 2.6, 2.7, 2.8 |
-| STAT-PAR-004 | 2.5, 2.6, 2.7, 2.8 |
-| STAT-PAR-005 | 2.6, 2.8 |
-| STAT-PAR-006 | 2.5, 2.6, 2.7, 2.8 |
-| STAT-PAR-007 | 2.4, 2.5, 2.6, 2.7, 2.8 |
-| STAT-PAR-008 | 2.4, 2.5, 2.6, 2.7, 2.8 |
-| STAT-PAR-009 | 2.4, 2.5, 2.6, 2.7, 2.8 |
-| STAT-PAR-010 | 2.3, 2.4, 2.5, 2.6, 2.7, 2.8 |
-| STAT-PAR-011 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-012 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-013 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-014 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-015 | 2.3, 2.6, 2.7, 2.8 |
-| STAT-PAR-016 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-017 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-018 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-019 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-020 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-021 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-022 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-023 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-024 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-025 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-026 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-027 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-028 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-029 | 2.3, 2.6, 2.7, 2.8 |
-| STAT-PAR-030 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-031 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-032 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-033 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-034 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-035 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-036 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-037 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-038 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-039 | 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-040 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-041 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-042 | 2.3, 2.4, 2.6, 2.7, 2.8 |
-| STAT-PAR-043 | 2.3, 2.6, 2.7, 2.8 |
-| STAT-PAR-044 | 2.3, 2.4, 2.5, 2.6, 2.7, 2.8 |
-| STAT-PAR-045 | 2.3, 2.6, 2.7, 2.8 |
-| STAT-PAR-046 | 2.3, 2.6, 2.7, 2.8 |
-| STAT-PAR-047 | 2.3, 2.4, 2.5, 2.6, 2.7, 2.8 |
-| STAT-PAR-048 | 2.3, 2.4, 2.5, 2.6, 2.7, 2.8 |
-| STAT-PAR-049 | 2.3, 2.4, 2.5, 2.6, 2.7, 2.8 |
+- le [corpus de référence](../statistical-reference-corpus.md) relie les exigences aux cas, aux dérivations
+  indépendantes et à leur exécution interlangage ;
+- l’[audit de parité](../statistical-parity-audit.md) conserve l’inventaire historique des responsabilités
+  `ST-01` à `ST-51`, des divergences et des décisions qui ont conduit au standard ;
+- l’[architecture](../../ARCHITECTURE.md) décrit les frontières DTO, domaine, persistance et présentation ;
+- le [rapport de parité](../../reports/statistical-parity-report.md) publie l’état observable des moteurs ;
+- la [matrice risques–contrôles](../risk-control-matrix.md) suit la maîtrise courante et les traitements
+  futurs ;
+- le [backlog](../backlog.md) reste seul responsable du statut, des priorités, dépendances et dates des
+  outcomes futurs.
 
-## 14. Traçabilité avec les responsabilités de l'audit PBI 2.1
+| Famille normative | Exigences | Preuve spécialisée |
+| --- | --- | --- |
+| Niveaux de parité, seed et tirages | `STAT-PAR-001` à `STAT-PAR-010` | Vecteurs `mca-prng-v1`, tests des ports et corpus de rejeu |
+| Préparation des données | `STAT-PAR-011` à `STAT-PAR-017` | Schéma du corpus, sondes de validation et mappers |
+| Modes, censures et percentiles | `STAT-PAR-018` à `STAT-PAR-025` | Cas normatifs de délai et de capacité |
+| Risk Score et fiabilité | `STAT-PAR-026` à `STAT-PAR-035` | Cas de score, métriques, seuils et labels |
+| Histogrammes et forme de réponse | `STAT-PAR-036` à `STAT-PAR-043` | Cas exacts et agrégés, comparateur interlangage |
+| Frontière de parité | `STAT-PAR-044` à `STAT-PAR-046` | Architecture et tests des consommateurs |
+| Versionnement, évolution et preuve | `STAT-PAR-047` à `STAT-PAR-049` | Version du corpus, décisions de compatibilité et rapports |
 
-La colonne « PBI » indique où la décision doit être matérialisée ou contrôlée. Pour une responsabilité
-frontend-only, elle indique où référencer la frontière sans créer d'équivalent Python.
+## 14. État d’adoption
 
-| Responsabilité | Exigence normative | Décision retenue | PBI |
-| --- | --- | --- | --- |
-| ST-01 | STAT-PAR-012, STAT-PAR-015, STAT-PAR-017, STAT-PAR-040, STAT-PAR-041 | Contrat strict, entièrement résolu, extras refusés et absences omises. | 2.3, 2.4, 2.6 |
-| ST-02 | STAT-PAR-014 | Bornes actuelles conservées comme bornes communes. | 2.4, 2.6 |
-| ST-03 | STAT-PAR-016 | Paramètre actif obligatoire ; paramètre inactif sans effet. | 2.3, 2.4, 2.6 |
-| ST-04 | STAT-PAR-014 | Historique brut limité à 6..521 valeurs. | 2.4, 2.6 |
-| ST-05 | STAT-PAR-013, STAT-PAR-014 | Minimum de six valeurs après traitement explicite des zéros. | 2.4, 2.6 |
-| ST-06 | STAT-PAR-012, STAT-PAR-013, STAT-PAR-035 | Rejet global des invalides avant filtrage métier des zéros. | 2.3, 2.4, 2.6, 2.7 |
-| ST-07 | STAT-PAR-012 | Entiers stricts ; aucune troncature ni coercion numérique. | 2.3, 2.4, 2.6, 2.7 |
-| ST-08 | STAT-PAR-014 | Entiers bornés pour objectifs et volume de simulation. | 2.4, 2.6 |
-| ST-09 | STAT-PAR-007 à STAT-PAR-010 | Seed uint32 explicite et jamais normalisée silencieusement. | 2.4, 2.5, 2.6, 2.7 |
-| ST-10 | STAT-PAR-017 | Défauts permis aux frontières, contrat moteur toujours explicite. | 2.3, 2.4, 2.6 |
-| ST-11 | STAT-PAR-006, STAT-PAR-010 | Génération propre à l'environnement permise ; seed résolue rejouable. | 2.5, 2.6 |
-| ST-12 | STAT-PAR-002, STAT-PAR-003, STAT-PAR-007 | PRNG contractuel commun requis pour le rejeu interlangage. | 2.5, 2.6, 2.7, 2.8 |
-| ST-13 | STAT-PAR-002, STAT-PAR-047 | Rejeu exact lié à la seed et à la version du contrat. | 2.5, 2.6, 2.8 |
-| ST-14 | STAT-PAR-003, STAT-PAR-004, STAT-PAR-018, STAT-PAR-019 | Ordre et consommation communs, indépendants du batching. | 2.5, 2.6, 2.7, 2.8 |
-| ST-15 | STAT-PAR-018 | Arrêt, semaine initiale et fin exacte à l'horizon figés. | 2.6, 2.7, 2.8 |
-| ST-16 | STAT-PAR-020 à STAT-PAR-022, STAT-PAR-042 | Censure séparée des durées et résumée explicitement. | 2.4, 2.6, 2.7, 2.8 |
-| ST-17 | STAT-PAR-002 à STAT-PAR-005, STAT-PAR-020 à STAT-PAR-022 | Rejeu exact prioritaire ; multi-seeds complémentaire au rang censuré. | 2.5, 2.6, 2.7, 2.8 |
-| ST-18 | STAT-PAR-019 | Nombre exact de tirages et somme entière. | 2.6, 2.7, 2.8 |
-| ST-19 | STAT-PAR-021, STAT-PAR-022 | Rang conservateur et identifiabilité explicite en mode backlog. | 2.4, 2.6, 2.7, 2.8 |
-| ST-20 | STAT-PAR-020 à STAT-PAR-022 | Rang calculé sur `n_sims`, censures exclues des durées terminées. | 2.4, 2.6, 2.7, 2.8 |
-| ST-21 | STAT-PAR-023 | Quantile de survie discret conservateur. | 2.4, 2.6, 2.7, 2.8 |
-| ST-22 | STAT-PAR-024, STAT-PAR-040 | Contrat public fermé à P50/P70/P90 dans la version 1.0. | 2.3, 2.4, 2.6 |
-| ST-23 | STAT-PAR-025 | Invariants d'ordre sans fabrication des absences. | 2.4, 2.6, 2.8 |
-| ST-24 | STAT-PAR-026, STAT-PAR-027 | P50 et P90 requis ; formules par mode figées. | 2.4, 2.6, 2.7, 2.8 |
-| ST-25 | STAT-PAR-028, STAT-PAR-029 | Score d'autorité arrondi à quatre décimales, non recalculé. | 2.3, 2.4, 2.6, 2.7 |
-| ST-26 | STAT-PAR-029, STAT-PAR-045, STAT-PAR-046 | Légende frontend-only fondée sur le score normatif reçu. | 2.4, 2.6, 2.8 |
-| ST-27 | STAT-PAR-030, STAT-PAR-032 | Moments de population et valeur normalisée commune. | 2.4, 2.6, 2.7, 2.8 |
-| ST-28 | STAT-PAR-030 | Quartiles linéaires et ratio interquartile communs. | 2.4, 2.6, 2.7, 2.8 |
-| ST-29 | STAT-PAR-031, STAT-PAR-032 | Formule de pente déterministe, indépendante de `polyfit`. | 2.4, 2.6, 2.7, 2.8 |
-| ST-30 | STAT-PAR-032 à STAT-PAR-034 | Seuils appliqués après normalisation commune et dans l'ordre fixé. | 2.4, 2.6, 2.7, 2.8 |
-| ST-31 | STAT-PAR-012, STAT-PAR-035 | Non-finis rejetés avant tout helper de fiabilité. | 2.3, 2.4, 2.6, 2.7 |
-| ST-32 | STAT-PAR-037 | Bucket exact jusqu'à 100 valeurs distinctes. | 2.4, 2.6, 2.7, 2.8 |
-| ST-33 | STAT-PAR-038, STAT-PAR-039 | Largeur, rattachement et représentant agrégés figés. | 2.4, 2.6, 2.7, 2.8 |
-| ST-34 | STAT-PAR-039 | Masse, comptes, ordre et absence de buckets vides protégés. | 2.4, 2.6, 2.8 |
-| ST-35 | STAT-PAR-020 à STAT-PAR-022, STAT-PAR-045, STAT-PAR-046 | Courbe frontend-only alimentée par la censure normative. | 2.6, 2.8 |
-| ST-36 | STAT-PAR-023, STAT-PAR-045, STAT-PAR-046 | Courbe de survie frontend-only alimentée par les résultats normatifs. | 2.6, 2.8 |
-| ST-37 | STAT-PAR-036, STAT-PAR-041, STAT-PAR-043, STAT-PAR-045, STAT-PAR-046 | Aucun percentile normatif reconstruit depuis un histogramme legacy. | 2.3, 2.6, 2.8 |
-| ST-38 | STAT-PAR-040 à STAT-PAR-042 | Forme commune et omission des valeurs absentes. | 2.3, 2.4, 2.6, 2.8 |
-| ST-39 | STAT-PAR-041, STAT-PAR-043, STAT-PAR-048 | Persistance fidèle et migration/invalidation versionnée. | 2.3, 2.6, 2.8 |
-| ST-40 | STAT-PAR-002, STAT-PAR-006, STAT-PAR-009, STAT-PAR-041, STAT-PAR-043, STAT-PAR-048 | Historique local fidèle, seed exacte et compatibilité décidée. | 2.3, 2.5, 2.6, 2.8 |
-| ST-41 | STAT-PAR-011, STAT-PAR-045, STAT-PAR-046 | Semaines complètes frontend-only ; samples normalisés à l'entrée du cœur. | 2.6, 2.8 |
-| ST-42 | STAT-PAR-045, STAT-PAR-046 | Bootstrap portefeuille frontend-only, sans équivalent Python. | 2.6, 2.8 |
-| ST-43 | STAT-PAR-045, STAT-PAR-046 | Scénario Arrimé frontend-only, consommateur du cœur commun. | 2.6, 2.8 |
-| ST-44 | STAT-PAR-045, STAT-PAR-046 | Friction frontend-only, sans extension artificielle du moteur. | 2.6, 2.8 |
-| ST-45 | STAT-PAR-045, STAT-PAR-046 | Intersection corrélée frontend-only, en amont du cœur. | 2.6, 2.8 |
-| ST-46 | STAT-PAR-026, STAT-PAR-029, STAT-PAR-043, STAT-PAR-045, STAT-PAR-046 | Diagnostic frontend-only sans altération des absences ni du score. | 2.3, 2.6, 2.8 |
-| ST-47 | STAT-PAR-043, STAT-PAR-045, STAT-PAR-046 | Sensibilité des fenêtres hors cœur, résultats normatifs préservés. | 2.6, 2.8 |
-| ST-48 | STAT-PAR-043, STAT-PAR-045, STAT-PAR-046 | Diagnostic comparatif hors cœur, sans modification des résultats. | 2.6, 2.8 |
-| ST-49 | STAT-PAR-045, STAT-PAR-046 | Cycle Time explicitement non comparable et hors contrat. | 2.8 |
-| ST-50 | STAT-PAR-036, STAT-PAR-043, STAT-PAR-045, STAT-PAR-046 | Lissage de présentation séparé de la distribution d'autorité. | 2.6, 2.8 |
-| ST-51 | STAT-PAR-029, STAT-PAR-036, STAT-PAR-041, STAT-PAR-043, STAT-PAR-046 | UI/PDF consommateurs, sans recalcul normatif divergent. | 2.3, 2.6, 2.7, 2.8 |
+Le présent standard n’incorpore pas un compteur de conformité ni une chronologie de fabrication. L’état
+courant est consultable dans le rapport de parité et la matrice risques–contrôles. Cette séparation empêche
+qu’une norme stable devienne une seconde autorité de statut ou un changelog.
 
-## 15. Séquence de mise en œuvre
-
-La mise en conformité est répartie comme suit :
-
-- **2.3** : séparer DTO, modèles statistiques et formes de persistance ;
-- **2.4** : introduire les Value Objects de seed, entrées, percentiles, fiabilité, histogramme et complétion ;
-- **2.5** : injecter les sources variables et adopter le PRNG contractuel ;
-- **2.6** : construire le corpus partagé couvrant règles déterministes, censure, limites et rejeu ;
-- **2.7** : aligner les deux moteurs et les consommateurs sur la version `1.0` ;
-- **2.8** : rendre la parité, les invariants et la compatibilité bloquants.
-
-Avant l'achèvement de ces PBI, le standard constitue la cible adoptée, pas une preuve que les moteurs
-existants satisfont déjà la parité de rejeu.
+Une revendication de conformité exige des preuves exécutables couvrant l’entrée normalisée, le PRNG,
+l’ordre des tirages, les deux modes, les censures, les percentiles, le Risk Score, la fiabilité, les
+histogrammes, la forme commune, le versionnement et la consommation fidèle des résultats. Une divergence
+connue ou un contrôle seulement informatif doit rester visible dans les documents de preuve.

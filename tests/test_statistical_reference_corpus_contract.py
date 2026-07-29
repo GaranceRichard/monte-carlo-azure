@@ -802,21 +802,20 @@ def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope
     assert "`slope_norm = 0.0500`" in corpus_doc
     assert "la référence normative choisit explicitement `50/9999`" in corpus_doc
     assert "aucun moteur" in corpus_doc
-    assert "PBI 2.12" in corpus_doc
+    assert "Scripts/run_statistical_reference_corpus.py" in corpus_doc
 
     documentation_expectations = {
         "README.md": [
-            "contracts/statistical-reference-corpus-v1.0.json",
-            "censure partielle avec 748 fins et 252 censures",
-            "aucun moteur Python ou TypeScript n’a servi d’oracle",
-            "anciens centres `50/9951` et `51/10050`",
-            "Le PBI 2.12 exécute désormais ces quinze cas",
+            "docs/standards/STD-STAT-001.md",
+            "docs/statistical-reference-corpus.md",
+            "quatorze cas",
+            "deux divergences limitées aux histogrammes agrégés",
         ],
         "ARCHITECTURE.md": [
             "statistical-reference-corpus-v1.0.json",
             "24 probes négatives",
-            "sa complétude 2.10/2.11",
-            "Le PBI 2.12 ne modifie aucun moteur ni aucune formule",
+            "la complétude des familles de preuve",
+            "Les deux géométries d’histogrammes agrégés restent explicitement divergentes",
         ],
         "CHANGELOG.md": [
             "Risk Score, fiabilité et histogrammes de référence — PBI 2.11",
@@ -830,9 +829,9 @@ def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope
             "aucun runner Python ou TypeScript du PBI 2.12",
         ],
         "docs/standards/STD-STAT-001.md": [
-            "Le PBI 2.10 instancie cette frontière",
-            "Le PBI 2.11 ajoute dix cas discriminants",
-            "Le PBI 2.12 exécute les quinze références",
+            "Cette frontière est instanciée",
+            "Le corpus contient aussi dix cas discriminants",
+            "Le runner partagé exécute les références",
         ],
         "docs/risk-control-matrix.md": [
             "Quatorze cas concordent",
@@ -842,6 +841,15 @@ def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope
     for relative_path, expected_fragments in documentation_expectations.items():
         content = (root / relative_path).read_text(encoding="utf-8")
         assert all(fragment in content for fragment in expected_fragments)
+
+    for relative_path in [
+        "README.md",
+        "ARCHITECTURE.md",
+        "docs/standards/STD-STAT-001.md",
+        "docs/statistical-reference-corpus.md",
+        "docs/test-classification.md",
+    ]:
+        assert "PBI " not in (root / relative_path).read_text(encoding="utf-8")
 
     backlog = (root / "docs/backlog.md").read_text(encoding="utf-8")
     pbi_line = next(line for line in backlog.splitlines() if line.startswith("| 2.10 |"))

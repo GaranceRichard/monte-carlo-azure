@@ -1,11 +1,7 @@
-# Feature 10 — Concevoir l’expérience de simulation et ses restitutions
+# Feature 10 — Disposer d’une expérience de simulation cohérente et de restitutions fiables
 
-**Description :** porter la configuration, la progression visible, l’historique, la comparaison et les
-restitutions UI, PDF et export, tout en fiabilisant le cache local et l’état de l’expérience.
-
-**Flux de valeur :** empêcher l’affichage ou l’export de résultats devenus incohérents et permettre au décideur de retrouver la même information dans l’interface et dans les rapports.
-
-**Backlog :** [`../backlog.md`](../backlog.md)
+Le résultat observable, le flux de valeur et le statut de la Feature sont définis dans le
+[`registre du backlog`](../backlog.md). Ce document ne porte que ses attendus détaillés.
 
 ## Périmètre
 
@@ -38,7 +34,7 @@ L'expérience devra rendre lisibles les points de rejeu, la trajectoire de créd
 résultat réel, les diagnostics temporels et la calibration sans les présenter comme une surveillance en
 temps réel. Une progression UI n'implique pas à elle seule une exécution asynchrone.
 
-## Résultat attendu du PBI 10.10
+## 10.10 — Composants frontend à responsabilités multiples audités et découpés
 
 L’audit et le découpage frontend doivent :
 

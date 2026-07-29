@@ -1,13 +1,7 @@
-# Feature 9 — Rejouer les prévisions dans le temps et les calibrer
+# Feature 9 — Disposer de prévisions rejouables dans le temps et calibrées
 
-**Description :** reconstruire les états historiques d’une livraison passée, rejouer les prévisions à
-plusieurs dates d’observation sans fuite d’information future et confronter leur trajectoire de crédibilité
-au résultat réel.
-
-**Flux de valeur :** distinguer une simulation ponctuelle techniquement calculable d’une méthode
-empiriquement calibrée pour soutenir une décision.
-
-**Backlog :** [`../backlog.md`](../backlog.md)
+Le résultat observable, le flux de valeur et le statut de la Feature sont définis dans le
+[`registre du backlog`](../backlog.md). Ce document ne porte que ses attendus détaillés.
 
 ## Positionnement et limites
 
@@ -41,7 +35,7 @@ un préalable global à l'audit.
 
 ## Attendus par PBI
 
-### 9.1 — Définir le protocole de backtesting sans fuite d'information future
+### 9.1 — Protocole de backtesting sans fuite d'information future établi
 
 - définir la date d'observation et la date du résultat observé ;
 - interdire l'usage de données créées, révisées ou clôturées après la date d'observation ;
@@ -49,7 +43,7 @@ un préalable global à l'audit.
 - documenter les biais de sélection, de survivance et de disponibilité des données ;
 - produire un protocole reproductible avant toute interprétation des résultats.
 
-### 9.2 — Reconstruire les états historiques et les points de rejeu
+### 9.2 — États historiques et points de rejeu reconstructibles
 
 - reconstruire, pour chaque point de rejeu, l'état qui aurait été visible à cette date ;
 - traiter explicitement semaines incomplètes, révisions tardives, données manquantes et changements de
@@ -58,35 +52,35 @@ un préalable global à l'audit.
   les choisir ;
 - associer à chaque état une empreinte de données vérifiable.
 
-### 9.3 — Rejouer les prévisions et construire la trajectoire de crédibilité
+### 9.3 — Trajectoire de crédibilité produite par rejeu des prévisions
 
 - exécuter les modes et scénarios retenus avec leurs fenêtres historiques ;
 - conserver seed, paramètres, versions et empreinte de données pour rendre le rejeu interprétable ;
 - produire une série temporelle comparable de percentiles, dispersion, complétion et diagnostics ;
 - distinguer variation liée aux données, à la fenêtre, au scénario et au bruit de simulation.
 
-### 9.4 — Confronter les prévisions aux résultats observés
+### 9.4 — Prévisions confrontées aux résultats observés
 
 - relier chaque prévision à un résultat dont la définition est identique et vérifiable ;
 - mesurer écarts, couverture et franchissement des percentiles selon le mode ;
 - préserver les censures et les résultats non observables au lieu de les convertir artificiellement ;
 - séparer erreur de prévision, indisponibilité des données et changement réel de périmètre.
 
-### 9.5 — Diagnostiquer stabilité, volatilité, dérive et rupture
+### 9.5 — Stabilité, volatilité, dérive et rupture diagnostiquées
 
 - mesurer la stabilité et la volatilité de la trajectoire ;
 - détecter dérives progressives et ruptures de régime ;
 - contextualiser les signaux sans transformer une coïncidence temporelle en causalité ;
 - rendre visibles les diagnostics non calculables ou insuffisamment étayés.
 
-### 9.6 — Mesurer délai de détection, faux signaux et robustesse
+### 9.6 — Délai de détection, faux signaux et robustesse mesurés
 
 - mesurer le délai entre un changement observable et sa détection ;
 - quantifier les faux signaux et les détections manquées ;
 - tester la robustesse aux points de rejeu, seeds, scénarios, fenêtres et données manquantes ;
 - éviter tout seuil universel sans validation empirique.
 
-### 9.7 — Calibrer les percentiles et comparer les fenêtres historiques
+### 9.7 — Percentiles calibrés et fenêtres historiques comparées
 
 - mesurer la couverture empirique de chaque percentile ;
 - comparer fenêtres récentes, longues et alternatives sur les mêmes cas ;
@@ -95,7 +89,7 @@ un préalable global à l'audit.
 - ne sélectionner aucun réglage sur les mêmes observations que celles utilisées pour l'évaluer sans
   protocole de séparation explicite.
 
-### 9.8 — Formaliser la synthèse métier et décider empiriquement du Risk Score
+### 9.8 — Synthèse métier formalisée et rôle du Risk Score décidé empiriquement
 
 - définir le contrat de synthèse de la trajectoire, du résultat réel, des diagnostics et de leurs limites ;
 - exposer les comparaisons métier entre points de rejeu, scénarios, fenêtres et percentiles ;

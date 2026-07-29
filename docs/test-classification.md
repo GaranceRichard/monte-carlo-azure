@@ -62,9 +62,9 @@ de portée.
 
 ## Collecte et génération de l’inventaire
 
-Le PBI 1.4 a défini le contrat, le PBI 1.5 a ajouté la collecte et la classification automatiques, le PBI
-1.7 a rendu l’inventaire bloquant, le PBI 1.8 rend les profils exécutables par un DAG commun et le PBI 1.9
-ajoute une gouvernance indépendante des mécanismes qui modifient l'exécution.
+Le dépôt sépare le contrat de classification, la collecte automatique, le contrôle bloquant, les profils
+exécutables et la gouvernance des mécanismes qui modifient l’exécution. Chacune de ces responsabilités
+possède son propre artefact ou contrôle.
 
 La commande suivante reconstruit l’inventaire complet, sans donnée volatile :
 
@@ -262,11 +262,9 @@ rapport [`reports/test-governance-report.json`](../reports/test-governance-repor
 détails, échéances et taux d'instabilité sans timestamp ni chemin absolu. Il est produit par l'unique commande
 `Test governance compliance`, rattachée au nœud `aggregate` sans ajouter de branche au DAG.
 
-L'audit initial du PBI 1.9 a trouvé trois appels `pytest.skip(...)` et deux sélections `skipif` de plateforme.
-Les deux préconditions de fichiers versionnés et les deux sélections Windows étaient devenues inutiles ; elles
-ont été supprimées. Le test Mongo réel échoue désormais explicitement si le service requis par son profil
-`main` est absent. L'inventaire final ne contient aucun mécanisme de skip, expected failure, quarantaine ou
-retry et le contrat reste donc vide, sans métadonnée fabriquée.
+L’état courant ne contient aucun mécanisme de skip, expected failure, quarantaine ou retry. Le test Mongo
+réel échoue explicitement si le service requis par son profil `main` est absent ; le contrat reste donc vide,
+sans métadonnée fabriquée.
 
 ## Reporting stratégique consolidé
 

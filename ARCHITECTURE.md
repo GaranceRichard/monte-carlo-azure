@@ -120,8 +120,8 @@ Garde-fous serveur :
 contracts/
   mca-prng-v1-vectors.json # sorties uint32 et indices canoniques partagés
   statistical-reference-corpus-v1.0.schema.json # contrat JSON Schema normatif du corpus
-  statistical-reference-corpus-v1.0.json # cas normatifs 2.10/2.11, scores, fiabilité et histogrammes
-  statistical-validation-probes-v1.0.json # validations normalisées partagées du PBI 2.13
+  statistical-reference-corpus-v1.0.json # cas normatifs, scores, fiabilité et histogrammes
+  statistical-validation-probes-v1.0.json # validations normalisées partagées
   examples/
     statistical-reference-corpus-v1.0.minimal.json # preuve structurelle minimale
     statistical-reference-corpus-v1.0.invalid.json # contre-exemple de fermeture
@@ -251,16 +251,16 @@ calcul ; les mappers déballent les Value Objects vers les formats JSON, MongoDB
 
 ### Orientation future : audit rétrospectif
 
-L'architecture actuelle exécute une simulation ponctuelle. L'audit rétrospectif prévu par la Feature 9
-devra rester une capacité distincte et respecter les frontières suivantes :
+L'architecture actuelle exécute une simulation ponctuelle. L’audit rétrospectif décrit dans la
+[`roadmap`](docs/roadmap.md) devra rester une capacité distincte et respecter les frontières suivantes :
 
-- la Feature 8 fournit des états historiques temporellement cohérents ;
-- la Feature 9 définit le protocole sans fuite d'information future, les points de rejeu, la trajectoire de
-  crédibilité, la confrontation au réel, les diagnostics et la calibration ;
-- la Feature 10 porte la configuration, la progression visible, l'historique, la comparaison, l'UI, les
+- les données d’entrée doivent fournir des états historiques temporellement cohérents ;
+- la logique métier doit définir le protocole sans fuite d'information future, les points de rejeu, la
+  trajectoire de crédibilité, la confrontation au réel, les diagnostics et la calibration ;
+- l’expérience porte la configuration, la progression visible, l'historique, la comparaison, l'UI, les
   PDF, les exports et le cache local ;
-- la Feature 11 ne devient nécessaire que lorsque les mesures de charge justifient une exécution
-  asynchrone ou distribuée.
+- une exécution asynchrone ou distribuée ne devient nécessaire que lorsque les mesures de charge le
+  justifient.
 
 La charge conceptuelle d'un audit est :
 
@@ -341,7 +341,7 @@ slots logiques ; le batching ne peut donc modifier ni trajectoire ni censure.
 [`contracts/mca-prng-v1-vectors.json`](contracts/mca-prng-v1-vectors.json) est l’unique preuve canonique
 figée du contrat. Les tests Python et TypeScript lisent ce même fichier pour vérifier les sorties uint32
 et les indices pour `sampleCount` `1`, `2`, `3`, `6`, `17` et `2^33`; ce dernier cas prouve le calcul
-large sans overflow. Ce fichier reste distinct du futur corpus statistique du PBI 2.9.
+large sans overflow. Ce fichier reste distinct du corpus statistique partagé.
 
 La composition appartient aux frontières d’exécution :
 
@@ -352,12 +352,11 @@ La composition appartient aux frontières d’exécution :
 - `frontend/src/hooks/usePortfolioReport.ts` construit l’adaptateur du bootstrap depuis la seed optimiste
   déjà résolue, sans modifier le nombre ni l’ordre des résolutions de seed.
 
-Les moteurs ne connaissent toujours que `SampleIndexDrawPort` et ne créent aucun PRNG. Le contrat commun,
-l’ordre logique et les tests de lots prouvent la stabilité de l’affectation des tirages. Les PBI 2.10 et
-2.11 matérialisent les cas normatifs jusqu’aux scores, labels et buckets. Le PBI 2.12 les exécute désormais
-dans les deux moteurs. Le PBI 2.13 aligne leur validation normalisée et leur forme de résultat ; les
-formules de censure, de percentiles et de Risk Score sont alignées par le PBI 2.14, puis la fiabilité par
-le PBI 2.15. Les histogrammes et l’égalité complète des résultats relèvent encore des PBI 2.16 et 2.17.
+Les moteurs ne connaissent que `SampleIndexDrawPort` et ne créent aucun PRNG. Le contrat commun, l’ordre
+logique et les tests de lots prouvent la stabilité de l’affectation des tirages. Le corpus partagé couvre
+les entrées, censures, percentiles, scores, labels et buckets, puis exécute les mêmes références dans les
+deux moteurs. Les validations normalisées, la forme des résultats, les censures, les percentiles, le
+Risk Score et la fiabilité concordent. Les deux géométries d’histogrammes agrégés divergent encore.
 
 ### Contrat du corpus statistique
 
@@ -367,8 +366,8 @@ est la frontière sérialisée interlangage du corpus. Le document racine porte 
 le résultat attendu et l’un des quatre niveaux de preuve normatifs.
 
 [`contracts/statistical-reference-corpus-v1.0.json`](contracts/statistical-reference-corpus-v1.0.json)
-porte les cinq cas du PBI 2.10, les dix cas du PBI 2.11 et la preuve complémentaire à sept observations du
-PBI 2.15. Les premiers couvrent zéros inclus et exclus,
+porte seize cas : cinq références sur les entrées et modes, dix références sur le Risk Score, la fiabilité
+et les histogrammes, puis une preuve complémentaire à sept observations. Les premiers couvrent zéros inclus et exclus,
 paramètres actifs des deux modes, censure absente, partielle ou totale, fin exacte en semaine 521 et rangs
 de P50, P70 et P90. Les seconds couvrent les gardes et l’arrondi du Risk Score, les seuils exacts de CV,
 IQR relatif et pente normalisée, les quatre labels, l’histogramme exact et les agrégations continues ou
@@ -382,7 +381,7 @@ normative `$comment` et détaillés dans
 [`docs/statistical-reference-corpus.md`](docs/statistical-reference-corpus.md), sans `$data` ni dépendance à
 un langage. `Scripts/validate_statistical_reference_corpus.py`, appuyé par le module court
 `Scripts/statistical_reference_corpus_invariants.py`, contrôle le métaschème, le corpus, ses invariants
-structurels, sa complétude 2.10/2.11/2.14/2.15, les formules et gardes du score, les métriques et labels
+structurels, la complétude des familles de preuve, les formules et gardes du score, les métriques et labels
 normalisés,
 les représentants de buckets, l’unicité des scénarios, 24 probes négatives et les exemples positif et
 négatif sans importer les moteurs.
@@ -399,20 +398,16 @@ les absences de champ restent distinctes de `null` ou de zéro. Le coordinateur
 `Scripts/run_statistical_reference_corpus.py` refuse tout corpus invalide avant d’appeler un moteur,
 isole les erreurs par cas, exécute aussi les 22 sondes de validation du contrat `1.0` et publie les rapports
 JSON et Markdown déterministes sous `reports/`.
-L’enforcement reste `informational` et n’appartient pas au DAG `main` avant le PBI 2.19.
+L’enforcement reste `informational` et n’appartient pas encore au DAG `main`.
 
 Cette frontière ne constitue pas une nouvelle API applicative : aucun mapper, DTO, document MongoDB ou
-objet `localStorage` ne consomme directement le corpus. Le PBI 2.13 applique néanmoins les mêmes règles
-fermées dans les fabriques métier et les mappers : types stricts, bornes communes, six observations utiles,
+objet `localStorage` ne consomme directement le corpus. Les fabriques métier et les mappers appliquent les
+mêmes règles fermées : types stricts, bornes communes, six observations utiles,
 seed `uint32`, paramètre actif exclusif et omission des valeurs absentes. Les DTO, payloads API, documents
 MongoDB et objets `localStorage` ne portent que des primitives ; les Value Objects sont créés après lecture
 et décomposés avant écriture.
 
-Le PBI 2.12 ne modifie aucun moteur ni aucune formule ; cette limite historique reste la base du rapport
-informatif. Le PBI 2.13 ne modifie à son tour aucune formule de censure, percentile, Risk Score, fiabilité
-ou histogramme.
-
-Le PBI 2.14 supprime ensuite toute durée sentinelle pour les censures dans les deux moteurs : le résultat
+Le résultat
 interne `backlog_to_weeks` conserve uniquement les semaines terminées, la population totale et l’horizon.
 Les rangs P50/P70/P90 sont calculés dans `n_sims` et omis lorsqu’ils ne sont pas atteignables ; le mode
 `weeks_to_items` applique les quantiles de survie discrets sur la population complète. Les percentiles
@@ -424,21 +419,18 @@ est calculable et la refuse autrement. MongoDB et l’historique HTTP peuvent d�
 optionnelle `risk_score`; une ligne legacy sans ce champ reste valide et son absence est préservée. Les
 consommateurs UI, portefeuille et PDF utilisent exclusivement la valeur reçue.
 
-Le PBI 2.15 place l’unique calcul de fiabilité dans
+L’unique calcul de fiabilité réside dans
 `backend/throughput_reliability.py` et `frontend/src/domain/throughputReliability.ts`. Ces calculateurs de
 domaine calculent moyenne, variance de population, quartiles linéaires et pente des moindres carrés, puis
 délèguent la normalisation et l’ordre des labels au Value Object de leur langage. `mc_core.py` ne dépend
 plus de `numpy.percentile` ou `numpy.polyfit`, et `utils/simulation.ts` ne contient plus de second calcul.
 
-Les deux géométries d’histogrammes agrégés restent explicitement divergentes et réservées au PBI 2.16 ;
-le rejeu exact reste réservé au PBI 2.17 et le rapport de parité reste informatif jusqu’au PBI 2.19.
-
-Le PBI 2.7 a conservé les résultats frontend seed-à-seed en reprenant son algorithme bitwise historique,
-mais le PBI 2.8 change volontairement l’affectation locale des tirages `backlog_to_weeks` après une fin
-anticipée. Le backend, déjà organisé en lignes complètes, et le mode local `weeks_to_items` conservent leur
-ordre. Les résultats déjà persistés restent inchangés et aucun historique n’est supprimé ou migré. Aucun
-champ n’est ajouté aux DTO, au JSON, à MongoDB ou à `localStorage`; la version externe du contrat et les
-règles de migration restent réservées au PBI 2.20.
+Les deux géométries d’histogrammes agrégés restent explicitement divergentes et le rapport de parité reste
+informatif. L’adoption de l’ordre simulation-major peut changer le rejeu local `backlog_to_weeks` d’une
+seed issue de l’ordre antérieur ; le backend déjà organisé en lignes complètes et le mode local
+`weeks_to_items` conservent leur ordre. Les résultats déjà persistés restent inchangés et aucun historique
+n’est supprimé ou migré. Aucun identifiant de PRNG n’est ajouté aux DTO, au JSON, à MongoDB ou à
+`localStorage`.
 
 ## Convention de nommage
 
@@ -619,6 +611,12 @@ En `backlog_to_weeks`, `completion_summary` peut aussi être présent :
 
 ## Qualité technique
 
+Cette section décrit seulement l’architecture de la chaîne qualité. Le standard de test, son application
+au dépôt et les conditions de validation restent respectivement sous l’autorité de
+[`STD-TEST-001`](docs/standards/STD-TEST-001.md),
+[`docs/test-classification.md`](docs/test-classification.md) et de la
+[`Definition of Done`](docs/definition-of-done.md).
+
 Le standard [`STD-TEST-001`](docs/standards/STD-TEST-001.md) définit la norme de classification, de qualité
 et de pilotage des tests. Son versionnement constitue la référence normative de la stratégie de test ; il
 n’implique pas que le dépôt satisfait déjà l’ensemble de ses exigences. Les conditions opérationnelles et
@@ -640,7 +638,7 @@ et justifiées de `config/test-classification-overrides.json`. Il écrit l’inv
 `reports/test-classification-inventory.json`; aucune horloge ni information d’environnement n’entre dans sa
 sérialisation.
 
-Le comptage du PBI 1.6 forme une couche séparée. Les hooks Pytest et les reporters Vitest/Playwright observent
+Le comptage forme une couche séparée. Les hooks Pytest et les reporters Vitest/Playwright observent
 les collections et résultats natifs, puis `Scripts/report_test_execution_counts.py` rattache chaque instance
 à l'identité de l'inventaire. La classification décrit ce qu'est un cas logique ; la collecte décrit les
 instances développées par les paramètres et projets ; l'exécution décrit les instances réellement tentées ;
@@ -650,8 +648,8 @@ rattachements absents ou ambigus. Le rapport agrège aussi les quatre profils pr
 Les artefacts natifs sous `reports/test-execution-native/` sont des entrées locales régénérables. Seul le
 rapport déterministe `reports/test-execution-counts.json`, lié par SHA-256 à l'inventaire, est versionné.
 
-Le PBI 1.9 ajoute une couche indépendante dans `config/test-governance.json`, avec son propre schéma Draft
-2020-12. Elle cible les `logicalCaseId` sans enrichir ni surcharger la classification. Le détecteur statique
+Une couche indépendante réside dans `config/test-governance.json`, avec son propre schéma Draft 2020-12.
+Elle cible les `logicalCaseId` sans enrichir ni surcharger la classification. Le détecteur statique
 reconnaît les skips, désactivations, expected failures, quarantaines et retries des trois frameworks, ainsi que
 les marqueurs inconnus et les retries globaux. Le validateur bloque les cas non gouvernés, les entrées
 invalides, expirées ou orphelines, les tests critiques ignorés et les quarantaines critiques non compensées.
@@ -662,7 +660,7 @@ produit `reports/test-governance-report.json` avec nombres, détails, expiration
 commande `Test governance compliance` est construite une seule fois par plan et rattachée au nœud existant
 `aggregate` ; aucun nœud ni seuil du DAG n'est supprimé ou contourné.
 
-Le PBI 1.10 ajoute une consolidation au même nœud, sans faire du dénombrement son agrégateur général.
+La consolidation s’exécute au même nœud, sans faire du dénombrement son agrégateur général.
 `Scripts/report_test_strategy.py` construit une fois un modèle pur à partir de l'inventaire, du plan, du
 snapshot de dénombrement, de la gouvernance, des résultats de nœuds et des couvertures déjà produits. Les
 adaptateurs de preuves sont séparés du résumé stratégique et des renderers ; JSON et Markdown reçoivent le
@@ -780,7 +778,7 @@ timestamps, le périmètre, son fingerprint, la fraîcheur et la cohérence des 
 Python — pour sa portion backend —, frontend et E2E alimentent une agrégation Vitals unique, ensuite
 réutilisée par la conformité.
 
-## Notes d’implémentation récentes
+## Composants d’implémentation
 
 Frontend :
 

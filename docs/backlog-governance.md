@@ -2,17 +2,18 @@
 
 ## Responsabilité des documents
 
-- [`backlog.md`](backlog.md) est le registre de pilotage : il porte les Features, les PBI, leur complexité, leur modèle Codex et leur date de réalisation.
+- [`backlog.md`](backlog.md) est le registre de pilotage : il porte les Features, les PBI, leurs résultats
+  observables, leur complexité, leur modèle Codex et leur date de réalisation.
 - Le présent document porte les règles transverses de gouvernance, de statut, de raffinement et d’attribution.
 - [`backlog-expectations/`](backlog-expectations/README.md) porte les attendus détaillés des Features et PBI ainsi que les sujets conditionnels.
 
 ## Séquence prioritaire actuelle
 
 1. **Feature 2 — Garantir la fiabilité du cœur statistique**
-2. **Feature 8 — Fiabiliser les données Azure DevOps et leur cohérence temporelle**
-3. **Feature 9 — Rejouer les prévisions dans le temps et les calibrer**
-4. **Feature 10 — Concevoir l’expérience et les restitutions**
-5. **Feature 11 — Exécuter les traitements coûteux à l’échelle**, seulement lorsque les benchmarks
+2. **Feature 8 — Disposer de données Azure DevOps fiables et contextualisées par sprint**
+3. **Feature 9 — Disposer de prévisions rejouables dans le temps et calibrées**
+4. **Feature 10 — Disposer d’une expérience de simulation cohérente et de restitutions fiables**
+5. **Feature 11 — Rendre les traitements coûteux exécutables à l’échelle**, seulement lorsque les benchmarks
    démontrent que l’exécution interactive ne suffit plus
 
 Cette séquence exprime les dépendances `Feature 2 → Feature 8 → Feature 9 → Feature 10 / Feature 11`.
@@ -63,7 +64,8 @@ Aucun PBI `XL` ne peut être engagé.
 
 ## Règle de raffinement des PBI
 
-Un PBI doit produire un résultat principal démontrable et rester livrable indépendamment des PBI suivants.
+Un PBI doit être formulé comme un résultat principal observable et démontrable, sans décrire seulement
+l’activité de fabrication, et rester livrable indépendamment des PBI suivants.
 
 Un raffinement est obligatoire lorsqu’un item combine au moins deux natures de transformation parmi :
 

@@ -1,12 +1,7 @@
-# Feature 11 — Exécuter les traitements coûteux à l’échelle
+# Feature 11 — Rendre les traitements coûteux exécutables à l’échelle
 
-**Description :** mesurer la charge des audits et autres traitements longs, décider empiriquement du
-passage interactif ou asynchrone et maîtriser jobs, workers, progression, reprise et ressources.
-
-**Flux de valeur :** conserver une expérience prévisible et des ressources maîtrisées lorsque la charge ne
-peut plus être traitée interactivement.
-
-**Backlog :** [`../backlog.md`](../backlog.md)
+Le résultat observable, le flux de valeur et le statut de la Feature sont définis dans le
+[`registre du backlog`](../backlog.md). Ce document ne porte que ses attendus détaillés.
 
 ## Principe de charge
 
@@ -31,21 +26,21 @@ tant que les mesures le justifient ; seuls les traitements coûteux basculent ve
 
 ## Attendus par PBI
 
-### 11.1 — Modéliser la charge conceptuelle et les enveloppes à mesurer
+### 11.1 — Modèle de charge conceptuelle et enveloppes mesurables établis
 
 - définir les dimensions de charge, leur cardinalité et leurs interactions ;
 - inclure CPU, mémoire, durée, concurrence, volume de résultats et coût de persistance ;
 - construire des enveloppes réalistes sans seuil arbitraire ;
 - identifier les métriques nécessaires à la décision interactif/asynchrone.
 
-### 11.2 — Benchmarker les exécutions interactives et asynchrones
+### 11.2 — Performances interactives et asynchrones comparées par benchmark
 
 - mesurer le chemin interactif sur les enveloppes définies ;
 - mesurer le coût propre aux jobs, files, persistances et workers ;
 - comparer latence, débit, mémoire, concurrence, stabilité et coût ;
 - conserver les conditions et versions de chaque benchmark.
 
-### 11.3 — Décider le seuil interactif ou asynchrone à partir des mesures
+### 11.3 — Seuil interactif ou asynchrone justifié par les mesures
 
 - formaliser une politique explicable fondée sur les métriques mesurées ;
 - prévoir une estimation de charge avant lancement ;
@@ -53,7 +48,7 @@ tant que les mesures le justifient ; seuls les traitements coûteux basculent ve
 - versionner la politique et permettre sa révision après de nouveaux benchmarks ;
 - ne fixer aucun seuil avant preuve empirique.
 
-### 11.4 — Persister de façon minimisée les jobs et résultats agrégés
+### 11.4 — Jobs et résultats agrégés persistés de façon minimisée
 
 La persistance MongoDB future est limitée à :
 
@@ -78,7 +73,7 @@ Sont exclus :
 Les identifiants techniques indispensables sont pseudonymisés. La minimisation et la pseudonymisation ne
 doivent pas être qualifiées d'anonymisation sans preuve dédiée.
 
-### 11.5 — Gérer jobs, progression, annulation et reprise
+### 11.5 — Jobs, progression, annulation et reprise maîtrisés
 
 - définir les états et transitions de job ;
 - exposer une progression cohérente aux consommateurs de la Feature 10 ;
@@ -86,7 +81,7 @@ doivent pas être qualifiées d'anonymisation sans preuve dédiée.
 - définir reprise, nouvelle tentative, idempotence et résultat partiel ;
 - distinguer interruption utilisateur, erreur transitoire et échec définitif.
 
-### 11.6 — Mettre en place des workers distribuables et maîtrisés
+### 11.6 — Workers distribuables avec ressources maîtrisées
 
 - isoler l'exécution des jobs des requêtes interactives ;
 - borner concurrence, CPU, mémoire, temps et volume de résultats ;
@@ -94,7 +89,7 @@ doivent pas être qualifiées d'anonymisation sans preuve dédiée.
 - définir la distribution, la reprise après perte d'un worker et la compatibilité de versions ;
 - préserver les invariants statistiques de la Feature 2.
 
-### 11.7 — Observer les traitements, ressources et coûts
+### 11.7 — Traitements, ressources et coûts observables
 
 - corréler job, worker, version, progression et métriques sans réintroduire de contexte Azure DevOps ;
 - observer latence de file, durée de calcul, mémoire, CPU, annulations, reprises et échecs ;
@@ -102,7 +97,7 @@ doivent pas être qualifiées d'anonymisation sans preuve dédiée.
   continu des prévisions ;
 - suivre les coûts par enveloppe de charge.
 
-### 11.8 — Valider charge nominale, pointe, endurance et reprise
+### 11.8 — Charge nominale, pointe, endurance et reprise validées
 
 - démontrer le comportement nominal et en pointe ;
 - vérifier endurance, files saturées, annulation et reprise ;
