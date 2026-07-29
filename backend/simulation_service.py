@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import numpy as np
 
+from .histogram import build_histogram
 from .mc_core import (
     FinishWeeksSimulation,
-    histogram_buckets,
     mc_finish_weeks,
     mc_items_done_for_weeks,
     percentiles,
@@ -100,7 +100,7 @@ def run_simulation(command: SimulationCommand) -> SimulationResult:
         result_kind=result_kind,
         result_percentiles=result_percentiles,
         result_distribution=Histogram.create(
-            histogram_buckets(distribution_values),
+            build_histogram(distribution_values),
             expected_mass=expected_mass,
         ),
         completion_summary=completion_summary,

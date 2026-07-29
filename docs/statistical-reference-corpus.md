@@ -287,7 +287,15 @@ width = ceil((10000 - 0 + 1) / 100) = 101
 
 La masse vaut encore `1000`, les deux comptes sont strictement positifs et les représentants sont dans les
 bornes réelles. L’audit recensait les centres historiques `50/9951` côté Python et `51/10050` côté
-TypeScript ; la référence normative choisit explicitement `50/9999` sans aligner ici aucun moteur.
+TypeScript ; la référence normative choisit explicitement `50/9999`, sans moteur oracle, et les deux
+moteurs appliquent désormais cette géométrie.
+
+Le validateur indépendant ne se contente pas d’autoriser un représentant possible. Pour chaque cas
+`weeks_to_items` à une semaine, il rejoue la récurrence scalaire `mca-prng-v1`, forme la distribution brute,
+puis reconstruit l’histogramme exact ou agrégé avec la largeur, les bornes inclusives et le plancher
+normatifs. Il compare ensuite exactement la séquence des représentants et chaque effectif du corpus. Les
+cas continus, discontinus et fortement asymétriques protègent ainsi les deux extrémités, l’absence de
+buckets vides, l’ordre, la non-superposition implicite des intervalles et la conservation de masse.
 
 ## Probes de validation des entrées
 
@@ -381,16 +389,17 @@ horodatage et leur ordre suit celui du corpus, ce qui rend deux exécutions iden
 le profil `main`. Un schéma/corpus invalide ou une erreur moteur reste une incapacité d’exécution et renvoie
 un code non nul.
 
-L’exécution courante observe quatorze cas intégralement conformes dans les deux moteurs. Les deux autres
-confirment les divergences d’histogrammes déjà isolées :
+L’exécution courante observe seize cas intégralement conformes dans les deux moteurs. Les deux références
+qui isolaient les constructions historiques convergent désormais :
 
-| Cas | Norme | Python | TypeScript |
-| --- | --- | --- | --- |
-| `histogram-aggregated-contiguous-101` | 51 représentants pairs `0..100` | 100 buckets, premier centre `1` | 51 représentants impairs `1..101` |
-| `histogram-aggregated-discontinuous` | `50`, `9999` | `50`, `9951` | `51`, `10050` |
+| Cas | Norme, Python et TypeScript | Anciennes sorties invalidées comme références courantes |
+| --- | --- | --- |
+| `histogram-aggregated-contiguous-101` | 51 représentants pairs `0..100` | Python : 100 buckets ; TypeScript : centres impairs `1..101` |
+| `histogram-aggregated-discontinuous` | `50`, `9999` | Python : `50/9951` ; TypeScript : `51/10050` |
 
 Les seeds, tirages, distributions brutes, percentiles, scores et métriques de fiabilité ne sont pas modifiés
-par le runner.
+par le runner. Les anciennes sorties agrégées restent des observations historiques et ne peuvent plus être
+utilisées comme oracle ou référence normative `1.0`.
 
 ## Sondes de validation et forme canonique
 
@@ -416,9 +425,8 @@ distribution, le nombre d’échantillons, la fiabilité et la seed. Le Risk Sco
 une autre sentinelle. La complétion n’est autorisée que pour `backlog_to_weeks`.
 
 Le rapport expose `validation_alignment`: les 22 sondes concordent entre Python et TypeScript, sans
-divergence ni erreur. Les seize cas statistiques donnent 14 conformités et deux divergences
-d’histogrammes. Ces sondes ne modifient aucune formule statistique et `enforcement` demeure
-`informational`.
+divergence ni erreur. Les seize cas statistiques concordent aussi exactement avec la norme et entre les
+deux moteurs. Ces sondes ne modifient aucune formule statistique et `enforcement` demeure `informational`.
 
 ## Preuves des censures, percentiles et Risk Score
 
@@ -446,8 +454,7 @@ omettre le champ, mais cette absence est conservée.
 
 Les hooks et mappers n’utilisent plus l’histogramme comme source secondaire de percentiles. Une distribution
 riche ne peut donc pas recréer P50, P70 ou P90 absent. Le rapport de parité confirme les six cas dans
-les deux langages. Son état global reste `divergence` uniquement à cause des deux constructions
-d’histogrammes agrégés ; l’enforcement reste informatif.
+les deux langages. Son état global est `match` et l’enforcement reste informatif.
 
 ## Preuves des métriques et labels de fiabilité
 
@@ -471,7 +478,8 @@ brutes et le Value Object porte leur normalisation et le label. Les deux suivent
 
 `backend/mc_core.py` et `frontend/src/utils/simulation.ts` ne portent plus de calcul concurrent. Les
 frontières sérialisées continuent à ne transporter que les cinq primitives de fiabilité existantes. Les
-histogrammes ne sont pas modifiés et le rapport demeure informatif.
+histogrammes sont construits par leurs autorités de domaine dédiées sans modifier ces métriques ni ces
+frontières ; le rapport demeure informatif.
 
 ## Évolution
 

@@ -1,7 +1,7 @@
 # Rapport de parité statistique
 
 - Contrôle : informatif, non bloquant
-- Statut : `divergence`
+- Statut : `match`
 - Corpus : `mca-statistical-reference-corpus` `1.0` / `mca-prng-v1`
 - Cas : 16
 - Validation PBI 2.13 : `match` (22/22 probes concordantes)
@@ -22,8 +22,8 @@
 | `reliability-cv-150-rounded` | `match` (0) | `match` (0) | `match` (0) |
 | `reliability-iqr-050-rounded` | `match` (0) | `match` (0) | `match` (0) |
 | `reliability-seven-observations-degraded` | `match` (0) | `match` (0) | `match` (0) |
-| `histogram-aggregated-contiguous-101` | `normative_divergence` (149) | `normative_divergence` (51) | `engine_divergence` (149) |
-| `histogram-aggregated-discontinuous` | `normative_divergence` (1) | `normative_divergence` (2) | `engine_divergence` (2) |
+| `histogram-aggregated-contiguous-101` | `match` (0) | `match` (0) | `match` (0) |
+| `histogram-aggregated-discontinuous` | `match` (0) | `match` (0) | `match` (0) |
 
 Les nombres entre parenthèses comptent les différences exactes. Le rapport JSON conserve chaque chemin et chaque valeur, sans tolérance numérique, réordonnancement d’histogramme ni valeur absente reconstruite.
 
@@ -54,4 +54,4 @@ Les nombres entre parenthèses comptent les différences exactes. Le rapport JSO
 | `seed-overflow-rejected` | `False` | `False` | `False` | `match` |
 | `target-decimal-rejected` | `False` | `False` | `False` | `match` |
 
-Ces probes couvrent la forme fermée, les valeurs par défaut résolues, le paramètre de mode exclusif, les entiers stricts, les zéros, les bornes et la seed uint32. Ils ne modifient aucune formule statistique ; le corpus démontre les PBI 2.14 et 2.15. Le PBI 2.16 reste inchangé.
+Ces probes couvrent la forme fermée, les valeurs par défaut résolues, le paramètre de mode exclusif, les entiers stricts, les zéros, les bornes et la seed uint32. Ils ne modifient aucune formule statistique ; le corpus prouve les PBI 2.14 à 2.16 ; rapport informatif jusqu’au PBI 2.19.

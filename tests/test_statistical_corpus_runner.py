@@ -83,11 +83,14 @@ def test_python_runner_executes_all_cases_with_exact_canonical_results() -> None
         for case_id in expected
         if parity_report.compare_canonical(expected[case_id], actual[case_id]) == []
     ]
-    assert len(matching) == 14
-    assert set(expected) - set(matching) == {
-        "histogram-aggregated-contiguous-101",
-        "histogram-aggregated-discontinuous",
-    }
+    assert matching == list(expected)
+    assert actual["histogram-aggregated-contiguous-101"]["result_distribution"] == (
+        expected["histogram-aggregated-contiguous-101"]["result_distribution"]
+    )
+    assert actual["histogram-aggregated-discontinuous"]["result_distribution"] == [
+        {"x": 50, "count": 994},
+        {"x": 9999, "count": 6},
+    ]
     assert actual["weeks-total-censorship"]["result_percentiles"] == {}
     assert "risk_score" not in actual["weeks-total-censorship"]
     assert actual["weeks-exact-horizon-completion"]["completion_summary"] == {

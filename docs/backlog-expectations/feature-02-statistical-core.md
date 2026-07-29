@@ -259,6 +259,26 @@ Implémentation retenue :
 - garantir au plus 100 buckets, la masse et les représentants attendus ;
 - invalider ou migrer explicitement toute référence historique devenue incompatible.
 
+Implémentation retenue :
+
+- `backend/histogram.py` et `frontend/src/domain/histogram.ts` sont les autorités uniques de construction ;
+  l’histogramme exact est conservé jusqu’à 100 valeurs distinctes, puis la largeur, l’index, les bornes
+  inclusives tronquées et le plancher du représentant suivent `STAT-PAR-037` à `STAT-PAR-039` ;
+- les chemins historiques `numpy.histogram` avec centres flottants arrondis et
+  `Math.round(left + width / 2)` sans borne droite réelle sont supprimés des moteurs ; les présentations,
+  mappers et runners ne recalculent aucune géométrie ;
+- le validateur autonome rejoue scalairement `mca-prng-v1` pour les cas à une semaine et reconstruit
+  indépendamment représentants et effectifs, sans importer Python ou TypeScript comme oracle ;
+- les tests des deux langages couvrent histogrammes exacts, plage continue `0..100`, discontinuité
+  `0..99 + 10000`, borne droite extrême et plage fortement asymétrique, avec ordre, comptes positifs,
+  limite de buckets et masse exacte ;
+- les sorties historiques Python à 100 buckets ou `50/9951`, et TypeScript aux centres impairs ou
+  `51/10050`, restent documentées mais sont invalidées comme références courantes ; aucun historique
+  persistant n’est migré et aucune frontière primitive ni version de contrat n’est modifiée ;
+- les seize cas concordent exactement avec la norme et entre moteurs. Le rapport reste
+  `informational` jusqu’au PBI 2.19 ; le rejeu exact et la gouvernance de version restent réservés aux
+  PBI 2.17 et 2.20.
+
 ### 2.17 — Rejeu exact interlangage démontré sur le corpus versionné
 
 - démontrer l’égalité exacte des résultats normatifs à entrée, seed et version identiques ;

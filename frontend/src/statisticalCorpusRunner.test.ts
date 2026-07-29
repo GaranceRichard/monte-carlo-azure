@@ -43,14 +43,17 @@ describe("shared statistical corpus TypeScript runner", () => {
       status: "completed",
     });
     expect(cases).toHaveLength(16);
-    expect(matching).toHaveLength(14);
-    expect(
-      cases
-        .filter((caseReport) => !matching.includes(caseReport))
-        .map((caseReport) => caseReport.id),
-    ).toEqual([
-      "histogram-aggregated-contiguous-101",
-      "histogram-aggregated-discontinuous",
+    expect(matching).toHaveLength(16);
+    expect(cases.find((caseReport) => (
+      caseReport.id === "histogram-aggregated-contiguous-101"
+    ))?.result?.result_distribution).toEqual(
+      expectedById.get("histogram-aggregated-contiguous-101")?.result_distribution,
+    );
+    expect(cases.find((caseReport) => (
+      caseReport.id === "histogram-aggregated-discontinuous"
+    ))?.result?.result_distribution).toEqual([
+      { x: 50, count: 994 },
+      { x: 9999, count: 6 },
     ]);
     expect(cases.find((caseReport) => caseReport.id === "items-zero-weeks-excluded")?.result)
       .toMatchObject({

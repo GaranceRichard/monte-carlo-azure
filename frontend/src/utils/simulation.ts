@@ -7,6 +7,7 @@ import type {
 } from "../domain/simulation";
 import type { SampleIndexDrawPort } from "../domain/sampleIndexDrawPort";
 import type { WeeklyThroughputRow } from "../types";
+import { buildHistogram } from "../domain/histogram";
 import {
   createCompletionSummary,
   createHistogram,
@@ -48,35 +49,6 @@ function pickBootstrapSample(
   drawPort: SampleIndexDrawPort,
 ): number {
   return samples[drawPort.drawSampleIndex(samples.length)] ?? 0;
-}
-
-function histogramBuckets(values: number[], maxBuckets = 100): { x: number; count: number }[] {
-  if (!values.length) return [];
-
-  const counts = new Map<number, number>();
-  values.forEach((value) => {
-    counts.set(value, (counts.get(value) ?? 0) + 1);
-  });
-  const unique = Array.from(counts.entries()).sort((a, b) => a[0] - b[0]);
-  if (unique.length <= maxBuckets) {
-    return unique.map(([x, count]) => ({ x, count }));
-  }
-
-  const minValue = unique[0]?.[0] ?? 0;
-  const maxValue = unique[unique.length - 1]?.[0] ?? 0;
-  const bucketWidth = Math.max(1, Math.ceil((maxValue - minValue + 1) / maxBuckets));
-  const buckets = new Map<number, number>();
-
-  values.forEach((value) => {
-    const bucketIndex = Math.floor((value - minValue) / bucketWidth);
-    const left = minValue + bucketIndex * bucketWidth;
-    const center = Math.round(left + bucketWidth / 2);
-    buckets.set(center, (buckets.get(center) ?? 0) + 1);
-  });
-
-  return Array.from(buckets.entries())
-    .sort((a, b) => a[0] - b[0])
-    .map(([x, count]) => ({ x, count }));
 }
 
 export function discretePercentiles(
@@ -193,7 +165,7 @@ export function simulateMonteCarloLocal(
     resultPercentiles,
     ...(riskScore === undefined ? {} : { riskScore }),
     resultDistribution: createHistogram(
-      histogramBuckets(distributionValues),
+      buildHistogram(distributionValues),
       distributionValues.length,
     ),
     ...(completionSummary === undefined ? {} : { completionSummary }),

@@ -13,6 +13,7 @@ from jsonschema.exceptions import SchemaError
 
 from Scripts import statistical_reference_corpus_validation as corpus_scopes
 from Scripts import validate_statistical_reference_corpus as corpus_validation
+from Scripts.statistical_reference_corpus_histogram import normative_histogram
 from Scripts.statistical_reference_corpus_normative import (
     expected_reliability,
     reliability_statistics,
@@ -51,7 +52,10 @@ def test_bundled_control_accepts_minimal_contract_and_rejects_negative_example(
     assert corpus_validation.main([]) == 0
     output = capsys.readouterr()
     assert "corpus 1.0 and its schema are valid" in output.out
-    assert "PBI 2.10, PBI 2.11, PBI 2.14 and PBI 2.15 scopes are complete" in output.out
+    assert (
+        "PBI 2.10, PBI 2.11, PBI 2.14, PBI 2.15 and PBI 2.16 scopes are complete"
+        in output.out
+    )
     assert "input rejection probes pass" in output.out
     assert output.err == ""
 
@@ -292,6 +296,27 @@ def test_pbi_211_reference_cases_protect_scores_thresholds_and_histograms() -> N
     ]
     assert discontinuous == [{"x": 50, "count": 994}, {"x": 9999, "count": 6}]
     assert sum(bucket["count"] for bucket in discontinuous) == 1000
+
+
+def test_independent_histogram_derivation_covers_exact_continuous_and_asymmetric_ranges() -> None:
+    assert normative_histogram([]) == []
+    assert normative_histogram([4, 1, 4, 2, 1, 4]) == [
+        {"x": 1, "count": 2},
+        {"x": 2, "count": 1},
+        {"x": 4, "count": 3},
+    ]
+    assert normative_histogram(list(range(101))) == [
+        {"x": representative, "count": 1 if representative == 100 else 2}
+        for representative in range(0, 101, 2)
+    ]
+    assert normative_histogram([*range(100), 10_000]) == [
+        {"x": 50, "count": 100},
+        {"x": 9_999, "count": 1},
+    ]
+    assert normative_histogram([*range(100), 1_000_000]) == [
+        {"x": 5_000, "count": 100},
+        {"x": 995_049, "count": 1},
+    ]
 
 
 def test_pbi_214_reference_cases_protect_censorship_percentiles_and_risk_score() -> None:
@@ -568,6 +593,15 @@ def test_cross_field_invariants_reject_structural_result_regressions(
             "/cases/0/expected_result/result_distribution",
             "histogramRepresentative",
         ),
+        (
+            "histogram-aggregated-discontinuous",
+            lambda result: (
+                result["result_distribution"][0].__setitem__("count", 993),
+                result["result_distribution"][1].__setitem__("count", 7),
+            ),
+            "/cases/0/expected_result/result_distribution",
+            "histogramCount",
+        ),
     ],
 )
 def test_normative_result_invariants_reject_score_reliability_and_bucket_drift(
@@ -802,7 +836,7 @@ def test_scope_and_probe_controls_report_actionable_regressions(
     invalid_zero_policy = deepcopy(corpus["cases"][0])
     invalid_zero_policy["input"]["include_zero_weeks"] = "false"
     assert not any(
-        issue.keyword == "histogramRepresentative"
+        issue.keyword in {"histogramRepresentative", "histogramCount"}
         for issue in corpus_validation._validate_case_semantics(invalid_zero_policy, 0)
     )
 
@@ -850,16 +884,18 @@ def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope
         "README.md": [
             "docs/standards/STD-STAT-001.md",
             "docs/statistical-reference-corpus.md",
-            "quatorze cas",
-            "deux divergences limitées aux histogrammes agrégés",
+            "les seize cas du corpus statistique courant concordent exactement",
+            "parité reste toutefois informatif",
         ],
         "ARCHITECTURE.md": [
             "statistical-reference-corpus-v1.0.json",
             "24 probes négatives",
             "la complétude des familles de preuve",
-            "Les deux géométries d’histogrammes agrégés restent explicitement divergentes",
+            "`backend/histogram.py`",
+            "ne sont plus des références conformes",
         ],
         "CHANGELOG.md": [
+            "Construction normative des histogrammes — PBI 2.16",
             "Risk Score, fiabilité et histogrammes de référence — PBI 2.11",
             "aucun runner du PBI 2.12",
             "Cas d’entrées, modes, censures et percentiles — PBI 2.10",
@@ -869,14 +905,21 @@ def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope
             "P50 = 518 et P70 = 521",
             "les représentants `50` et `9999`",
             "aucun runner Python ou TypeScript du PBI 2.12",
+            "`backend/histogram.py` et `frontend/src/domain/histogram.ts`",
+        ],
+        "docs/statistical-parity-audit.md": [
+            "Suivi du PBI 2.16",
+            "explicitement invalidées comme références",
+            "16 cas conformes",
         ],
         "docs/standards/STD-STAT-001.md": [
             "Cette frontière est instanciée",
             "Le corpus contient aussi dix cas discriminants",
             "Le runner partagé exécute les références",
+            "Le validateur",
         ],
         "docs/risk-control-matrix.md": [
-            "Quatorze cas concordent",
+            "Les seize cas et les validations concordent exactement",
             "refus du corpus avant toute exécution moteur",
         ],
     }

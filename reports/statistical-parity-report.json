@@ -1,7 +1,7 @@
 {
   "report_version": "1.1",
   "enforcement": "informational",
-  "status": "divergence",
+  "status": "match",
   "corpus": {
     "id": "mca-statistical-reference-corpus",
     "schema_version": "1.0",
@@ -9,9 +9,9 @@
   },
   "summary": {
     "case_count": 16,
-    "matching_cases": 14,
-    "normative_divergence_cases": 2,
-    "engine_divergence_cases": 2,
+    "matching_cases": 16,
+    "normative_divergence_cases": 0,
+    "engine_divergence_cases": 0,
     "engine_error_cases": 0,
     "fatal_engine_errors": 0
   },
@@ -2060,8 +2060,7 @@
     {
       "id": "histogram-aggregated-contiguous-101",
       "outcomes": [
-        "normative_divergence",
-        "engine_divergence"
+        "match"
       ],
       "expected": {
         "result_kind": "items",
@@ -2288,7 +2287,7 @@
         "seed": 0
       },
       "python": {
-        "status": "normative_divergence",
+        "status": "match",
         "result": {
           "result_kind": "items",
           "result_percentiles": {
@@ -2299,400 +2298,204 @@
           "risk_score": 0.7959,
           "result_distribution": [
             {
-              "x": 1,
+              "x": 0,
               "count": 19
             },
             {
               "x": 2,
-              "count": 10
-            },
-            {
-              "x": 3,
-              "count": 10
+              "count": 20
             },
             {
               "x": 4,
-              "count": 5
-            },
-            {
-              "x": 5,
-              "count": 9
+              "count": 14
             },
             {
               "x": 6,
-              "count": 9
-            },
-            {
-              "x": 7,
-              "count": 8
+              "count": 17
             },
             {
               "x": 8,
-              "count": 13
-            },
-            {
-              "x": 9,
-              "count": 13
+              "count": 26
             },
             {
               "x": 10,
-              "count": 9
-            },
-            {
-              "x": 11,
-              "count": 5
+              "count": 14
             },
             {
               "x": 12,
-              "count": 11
-            },
-            {
-              "x": 13,
-              "count": 7
-            },
-            {
-              "x": 14,
-              "count": 8
-            },
-            {
-              "x": 15,
-              "count": 11
-            },
-            {
-              "x": 16,
-              "count": 11
-            },
-            {
-              "x": 17,
-              "count": 12
-            },
-            {
-              "x": 18,
-              "count": 10
-            },
-            {
-              "x": 19,
-              "count": 12
-            },
-            {
-              "x": 20,
-              "count": 10
-            },
-            {
-              "x": 21,
-              "count": 8
-            },
-            {
-              "x": 22,
-              "count": 13
-            },
-            {
-              "x": 23,
-              "count": 11
-            },
-            {
-              "x": 24,
-              "count": 9
-            },
-            {
-              "x": 25,
-              "count": 11
-            },
-            {
-              "x": 26,
-              "count": 8
-            },
-            {
-              "x": 27,
-              "count": 7
-            },
-            {
-              "x": 28,
-              "count": 9
-            },
-            {
-              "x": 29,
-              "count": 10
-            },
-            {
-              "x": 30,
-              "count": 9
-            },
-            {
-              "x": 31,
-              "count": 10
-            },
-            {
-              "x": 32,
-              "count": 12
-            },
-            {
-              "x": 33,
-              "count": 10
-            },
-            {
-              "x": 34,
-              "count": 9
-            },
-            {
-              "x": 35,
-              "count": 14
-            },
-            {
-              "x": 36,
-              "count": 12
-            },
-            {
-              "x": 37,
-              "count": 7
-            },
-            {
-              "x": 38,
-              "count": 11
-            },
-            {
-              "x": 39,
-              "count": 6
-            },
-            {
-              "x": 40,
-              "count": 11
-            },
-            {
-              "x": 41,
-              "count": 11
-            },
-            {
-              "x": 42,
-              "count": 10
-            },
-            {
-              "x": 43,
-              "count": 11
-            },
-            {
-              "x": 44,
-              "count": 10
-            },
-            {
-              "x": 45,
-              "count": 11
-            },
-            {
-              "x": 46,
-              "count": 10
-            },
-            {
-              "x": 47,
-              "count": 14
-            },
-            {
-              "x": 48,
-              "count": 16
-            },
-            {
-              "x": 49,
-              "count": 13
-            },
-            {
-              "x": 50,
-              "count": 8
-            },
-            {
-              "x": 51,
-              "count": 6
-            },
-            {
-              "x": 52,
-              "count": 15
-            },
-            {
-              "x": 53,
-              "count": 12
-            },
-            {
-              "x": 54,
-              "count": 7
-            },
-            {
-              "x": 55,
-              "count": 15
-            },
-            {
-              "x": 56,
-              "count": 10
-            },
-            {
-              "x": 57,
-              "count": 9
-            },
-            {
-              "x": 58,
-              "count": 10
-            },
-            {
-              "x": 59,
-              "count": 11
-            },
-            {
-              "x": 60,
-              "count": 6
-            },
-            {
-              "x": 61,
-              "count": 10
-            },
-            {
-              "x": 62,
-              "count": 11
-            },
-            {
-              "x": 63,
-              "count": 6
-            },
-            {
-              "x": 64,
-              "count": 12
-            },
-            {
-              "x": 65,
-              "count": 13
-            },
-            {
-              "x": 66,
-              "count": 7
-            },
-            {
-              "x": 67,
-              "count": 10
-            },
-            {
-              "x": 68,
-              "count": 7
-            },
-            {
-              "x": 69,
-              "count": 6
-            },
-            {
-              "x": 70,
-              "count": 9
-            },
-            {
-              "x": 71,
-              "count": 10
-            },
-            {
-              "x": 72,
-              "count": 7
-            },
-            {
-              "x": 73,
-              "count": 12
-            },
-            {
-              "x": 74,
-              "count": 6
-            },
-            {
-              "x": 75,
-              "count": 10
-            },
-            {
-              "x": 76,
-              "count": 5
-            },
-            {
-              "x": 77,
-              "count": 8
-            },
-            {
-              "x": 78,
               "count": 18
             },
             {
-              "x": 79,
-              "count": 14
+              "x": 14,
+              "count": 19
             },
             {
-              "x": 80,
-              "count": 8
+              "x": 16,
+              "count": 23
             },
             {
-              "x": 81,
-              "count": 7
+              "x": 18,
+              "count": 22
             },
             {
-              "x": 82,
-              "count": 11
+              "x": 20,
+              "count": 18
             },
             {
-              "x": 83,
-              "count": 12
+              "x": 22,
+              "count": 24
             },
             {
-              "x": 84,
-              "count": 12
+              "x": 24,
+              "count": 20
             },
             {
-              "x": 85,
-              "count": 5
-            },
-            {
-              "x": 86,
+              "x": 26,
               "count": 15
             },
             {
-              "x": 87,
-              "count": 9
+              "x": 28,
+              "count": 19
             },
             {
-              "x": 88,
-              "count": 12
+              "x": 30,
+              "count": 19
             },
             {
-              "x": 89,
+              "x": 32,
+              "count": 22
+            },
+            {
+              "x": 34,
+              "count": 23
+            },
+            {
+              "x": 36,
+              "count": 19
+            },
+            {
+              "x": 38,
+              "count": 17
+            },
+            {
+              "x": 40,
+              "count": 22
+            },
+            {
+              "x": 42,
+              "count": 21
+            },
+            {
+              "x": 44,
+              "count": 21
+            },
+            {
+              "x": 46,
+              "count": 24
+            },
+            {
+              "x": 48,
+              "count": 29
+            },
+            {
+              "x": 50,
               "count": 14
             },
             {
-              "x": 90,
-              "count": 4
+              "x": 52,
+              "count": 27
             },
             {
-              "x": 91,
+              "x": 54,
+              "count": 22
+            },
+            {
+              "x": 56,
+              "count": 19
+            },
+            {
+              "x": 58,
+              "count": 21
+            },
+            {
+              "x": 60,
+              "count": 16
+            },
+            {
+              "x": 62,
+              "count": 17
+            },
+            {
+              "x": 64,
+              "count": 25
+            },
+            {
+              "x": 66,
+              "count": 17
+            },
+            {
+              "x": 68,
               "count": 13
+            },
+            {
+              "x": 70,
+              "count": 19
+            },
+            {
+              "x": 72,
+              "count": 19
+            },
+            {
+              "x": 74,
+              "count": 16
+            },
+            {
+              "x": 76,
+              "count": 13
+            },
+            {
+              "x": 78,
+              "count": 32
+            },
+            {
+              "x": 80,
+              "count": 15
+            },
+            {
+              "x": 82,
+              "count": 23
+            },
+            {
+              "x": 84,
+              "count": 17
+            },
+            {
+              "x": 86,
+              "count": 24
+            },
+            {
+              "x": 88,
+              "count": 26
+            },
+            {
+              "x": 90,
+              "count": 17
             },
             {
               "x": 92,
-              "count": 13
-            },
-            {
-              "x": 93,
-              "count": 5
+              "count": 18
             },
             {
               "x": 94,
-              "count": 12
-            },
-            {
-              "x": 95,
-              "count": 12
+              "count": 24
             },
             {
               "x": 96,
-              "count": 8
-            },
-            {
-              "x": 97,
-              "count": 12
+              "count": 20
             },
             {
               "x": 98,
-              "count": 9
-            },
-            {
-              "x": 99,
-              "count": 6
+              "count": 15
             },
             {
               "x": 100,
@@ -2709,1003 +2512,10 @@
           },
           "seed": 0
         },
-        "differences": [
-          {
-            "path": "/result_distribution",
-            "kind": "array_length",
-            "expected": 51,
-            "actual": 100
-          },
-          {
-            "path": "/result_distribution/0/x",
-            "kind": "value_mismatch",
-            "expected": 0,
-            "actual": 1
-          },
-          {
-            "path": "/result_distribution/1/count",
-            "kind": "value_mismatch",
-            "expected": 20,
-            "actual": 10
-          },
-          {
-            "path": "/result_distribution/2/count",
-            "kind": "value_mismatch",
-            "expected": 14,
-            "actual": 10
-          },
-          {
-            "path": "/result_distribution/2/x",
-            "kind": "value_mismatch",
-            "expected": 4,
-            "actual": 3
-          },
-          {
-            "path": "/result_distribution/3/count",
-            "kind": "value_mismatch",
-            "expected": 17,
-            "actual": 5
-          },
-          {
-            "path": "/result_distribution/3/x",
-            "kind": "value_mismatch",
-            "expected": 6,
-            "actual": 4
-          },
-          {
-            "path": "/result_distribution/4/count",
-            "kind": "value_mismatch",
-            "expected": 26,
-            "actual": 9
-          },
-          {
-            "path": "/result_distribution/4/x",
-            "kind": "value_mismatch",
-            "expected": 8,
-            "actual": 5
-          },
-          {
-            "path": "/result_distribution/5/count",
-            "kind": "value_mismatch",
-            "expected": 14,
-            "actual": 9
-          },
-          {
-            "path": "/result_distribution/5/x",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 6
-          },
-          {
-            "path": "/result_distribution/6/count",
-            "kind": "value_mismatch",
-            "expected": 18,
-            "actual": 8
-          },
-          {
-            "path": "/result_distribution/6/x",
-            "kind": "value_mismatch",
-            "expected": 12,
-            "actual": 7
-          },
-          {
-            "path": "/result_distribution/7/count",
-            "kind": "value_mismatch",
-            "expected": 19,
-            "actual": 13
-          },
-          {
-            "path": "/result_distribution/7/x",
-            "kind": "value_mismatch",
-            "expected": 14,
-            "actual": 8
-          },
-          {
-            "path": "/result_distribution/8/count",
-            "kind": "value_mismatch",
-            "expected": 23,
-            "actual": 13
-          },
-          {
-            "path": "/result_distribution/8/x",
-            "kind": "value_mismatch",
-            "expected": 16,
-            "actual": 9
-          },
-          {
-            "path": "/result_distribution/9/count",
-            "kind": "value_mismatch",
-            "expected": 22,
-            "actual": 9
-          },
-          {
-            "path": "/result_distribution/9/x",
-            "kind": "value_mismatch",
-            "expected": 18,
-            "actual": 10
-          },
-          {
-            "path": "/result_distribution/10/count",
-            "kind": "value_mismatch",
-            "expected": 18,
-            "actual": 5
-          },
-          {
-            "path": "/result_distribution/10/x",
-            "kind": "value_mismatch",
-            "expected": 20,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/11/count",
-            "kind": "value_mismatch",
-            "expected": 24,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/11/x",
-            "kind": "value_mismatch",
-            "expected": 22,
-            "actual": 12
-          },
-          {
-            "path": "/result_distribution/12/count",
-            "kind": "value_mismatch",
-            "expected": 20,
-            "actual": 7
-          },
-          {
-            "path": "/result_distribution/12/x",
-            "kind": "value_mismatch",
-            "expected": 24,
-            "actual": 13
-          },
-          {
-            "path": "/result_distribution/13/count",
-            "kind": "value_mismatch",
-            "expected": 15,
-            "actual": 8
-          },
-          {
-            "path": "/result_distribution/13/x",
-            "kind": "value_mismatch",
-            "expected": 26,
-            "actual": 14
-          },
-          {
-            "path": "/result_distribution/14/count",
-            "kind": "value_mismatch",
-            "expected": 19,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/14/x",
-            "kind": "value_mismatch",
-            "expected": 28,
-            "actual": 15
-          },
-          {
-            "path": "/result_distribution/15/count",
-            "kind": "value_mismatch",
-            "expected": 19,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/15/x",
-            "kind": "value_mismatch",
-            "expected": 30,
-            "actual": 16
-          },
-          {
-            "path": "/result_distribution/16/count",
-            "kind": "value_mismatch",
-            "expected": 22,
-            "actual": 12
-          },
-          {
-            "path": "/result_distribution/16/x",
-            "kind": "value_mismatch",
-            "expected": 32,
-            "actual": 17
-          },
-          {
-            "path": "/result_distribution/17/count",
-            "kind": "value_mismatch",
-            "expected": 23,
-            "actual": 10
-          },
-          {
-            "path": "/result_distribution/17/x",
-            "kind": "value_mismatch",
-            "expected": 34,
-            "actual": 18
-          },
-          {
-            "path": "/result_distribution/18/count",
-            "kind": "value_mismatch",
-            "expected": 19,
-            "actual": 12
-          },
-          {
-            "path": "/result_distribution/18/x",
-            "kind": "value_mismatch",
-            "expected": 36,
-            "actual": 19
-          },
-          {
-            "path": "/result_distribution/19/count",
-            "kind": "value_mismatch",
-            "expected": 17,
-            "actual": 10
-          },
-          {
-            "path": "/result_distribution/19/x",
-            "kind": "value_mismatch",
-            "expected": 38,
-            "actual": 20
-          },
-          {
-            "path": "/result_distribution/20/count",
-            "kind": "value_mismatch",
-            "expected": 22,
-            "actual": 8
-          },
-          {
-            "path": "/result_distribution/20/x",
-            "kind": "value_mismatch",
-            "expected": 40,
-            "actual": 21
-          },
-          {
-            "path": "/result_distribution/21/count",
-            "kind": "value_mismatch",
-            "expected": 21,
-            "actual": 13
-          },
-          {
-            "path": "/result_distribution/21/x",
-            "kind": "value_mismatch",
-            "expected": 42,
-            "actual": 22
-          },
-          {
-            "path": "/result_distribution/22/count",
-            "kind": "value_mismatch",
-            "expected": 21,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/22/x",
-            "kind": "value_mismatch",
-            "expected": 44,
-            "actual": 23
-          },
-          {
-            "path": "/result_distribution/23/count",
-            "kind": "value_mismatch",
-            "expected": 24,
-            "actual": 9
-          },
-          {
-            "path": "/result_distribution/23/x",
-            "kind": "value_mismatch",
-            "expected": 46,
-            "actual": 24
-          },
-          {
-            "path": "/result_distribution/24/count",
-            "kind": "value_mismatch",
-            "expected": 29,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/24/x",
-            "kind": "value_mismatch",
-            "expected": 48,
-            "actual": 25
-          },
-          {
-            "path": "/result_distribution/25/count",
-            "kind": "value_mismatch",
-            "expected": 14,
-            "actual": 8
-          },
-          {
-            "path": "/result_distribution/25/x",
-            "kind": "value_mismatch",
-            "expected": 50,
-            "actual": 26
-          },
-          {
-            "path": "/result_distribution/26/count",
-            "kind": "value_mismatch",
-            "expected": 27,
-            "actual": 7
-          },
-          {
-            "path": "/result_distribution/26/x",
-            "kind": "value_mismatch",
-            "expected": 52,
-            "actual": 27
-          },
-          {
-            "path": "/result_distribution/27/count",
-            "kind": "value_mismatch",
-            "expected": 22,
-            "actual": 9
-          },
-          {
-            "path": "/result_distribution/27/x",
-            "kind": "value_mismatch",
-            "expected": 54,
-            "actual": 28
-          },
-          {
-            "path": "/result_distribution/28/count",
-            "kind": "value_mismatch",
-            "expected": 19,
-            "actual": 10
-          },
-          {
-            "path": "/result_distribution/28/x",
-            "kind": "value_mismatch",
-            "expected": 56,
-            "actual": 29
-          },
-          {
-            "path": "/result_distribution/29/count",
-            "kind": "value_mismatch",
-            "expected": 21,
-            "actual": 9
-          },
-          {
-            "path": "/result_distribution/29/x",
-            "kind": "value_mismatch",
-            "expected": 58,
-            "actual": 30
-          },
-          {
-            "path": "/result_distribution/30/count",
-            "kind": "value_mismatch",
-            "expected": 16,
-            "actual": 10
-          },
-          {
-            "path": "/result_distribution/30/x",
-            "kind": "value_mismatch",
-            "expected": 60,
-            "actual": 31
-          },
-          {
-            "path": "/result_distribution/31/count",
-            "kind": "value_mismatch",
-            "expected": 17,
-            "actual": 12
-          },
-          {
-            "path": "/result_distribution/31/x",
-            "kind": "value_mismatch",
-            "expected": 62,
-            "actual": 32
-          },
-          {
-            "path": "/result_distribution/32/count",
-            "kind": "value_mismatch",
-            "expected": 25,
-            "actual": 10
-          },
-          {
-            "path": "/result_distribution/32/x",
-            "kind": "value_mismatch",
-            "expected": 64,
-            "actual": 33
-          },
-          {
-            "path": "/result_distribution/33/count",
-            "kind": "value_mismatch",
-            "expected": 17,
-            "actual": 9
-          },
-          {
-            "path": "/result_distribution/33/x",
-            "kind": "value_mismatch",
-            "expected": 66,
-            "actual": 34
-          },
-          {
-            "path": "/result_distribution/34/count",
-            "kind": "value_mismatch",
-            "expected": 13,
-            "actual": 14
-          },
-          {
-            "path": "/result_distribution/34/x",
-            "kind": "value_mismatch",
-            "expected": 68,
-            "actual": 35
-          },
-          {
-            "path": "/result_distribution/35/count",
-            "kind": "value_mismatch",
-            "expected": 19,
-            "actual": 12
-          },
-          {
-            "path": "/result_distribution/35/x",
-            "kind": "value_mismatch",
-            "expected": 70,
-            "actual": 36
-          },
-          {
-            "path": "/result_distribution/36/count",
-            "kind": "value_mismatch",
-            "expected": 19,
-            "actual": 7
-          },
-          {
-            "path": "/result_distribution/36/x",
-            "kind": "value_mismatch",
-            "expected": 72,
-            "actual": 37
-          },
-          {
-            "path": "/result_distribution/37/count",
-            "kind": "value_mismatch",
-            "expected": 16,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/37/x",
-            "kind": "value_mismatch",
-            "expected": 74,
-            "actual": 38
-          },
-          {
-            "path": "/result_distribution/38/count",
-            "kind": "value_mismatch",
-            "expected": 13,
-            "actual": 6
-          },
-          {
-            "path": "/result_distribution/38/x",
-            "kind": "value_mismatch",
-            "expected": 76,
-            "actual": 39
-          },
-          {
-            "path": "/result_distribution/39/count",
-            "kind": "value_mismatch",
-            "expected": 32,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/39/x",
-            "kind": "value_mismatch",
-            "expected": 78,
-            "actual": 40
-          },
-          {
-            "path": "/result_distribution/40/count",
-            "kind": "value_mismatch",
-            "expected": 15,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/40/x",
-            "kind": "value_mismatch",
-            "expected": 80,
-            "actual": 41
-          },
-          {
-            "path": "/result_distribution/41/count",
-            "kind": "value_mismatch",
-            "expected": 23,
-            "actual": 10
-          },
-          {
-            "path": "/result_distribution/41/x",
-            "kind": "value_mismatch",
-            "expected": 82,
-            "actual": 42
-          },
-          {
-            "path": "/result_distribution/42/count",
-            "kind": "value_mismatch",
-            "expected": 17,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/42/x",
-            "kind": "value_mismatch",
-            "expected": 84,
-            "actual": 43
-          },
-          {
-            "path": "/result_distribution/43/count",
-            "kind": "value_mismatch",
-            "expected": 24,
-            "actual": 10
-          },
-          {
-            "path": "/result_distribution/43/x",
-            "kind": "value_mismatch",
-            "expected": 86,
-            "actual": 44
-          },
-          {
-            "path": "/result_distribution/44/count",
-            "kind": "value_mismatch",
-            "expected": 26,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/44/x",
-            "kind": "value_mismatch",
-            "expected": 88,
-            "actual": 45
-          },
-          {
-            "path": "/result_distribution/45/count",
-            "kind": "value_mismatch",
-            "expected": 17,
-            "actual": 10
-          },
-          {
-            "path": "/result_distribution/45/x",
-            "kind": "value_mismatch",
-            "expected": 90,
-            "actual": 46
-          },
-          {
-            "path": "/result_distribution/46/count",
-            "kind": "value_mismatch",
-            "expected": 18,
-            "actual": 14
-          },
-          {
-            "path": "/result_distribution/46/x",
-            "kind": "value_mismatch",
-            "expected": 92,
-            "actual": 47
-          },
-          {
-            "path": "/result_distribution/47/count",
-            "kind": "value_mismatch",
-            "expected": 24,
-            "actual": 16
-          },
-          {
-            "path": "/result_distribution/47/x",
-            "kind": "value_mismatch",
-            "expected": 94,
-            "actual": 48
-          },
-          {
-            "path": "/result_distribution/48/count",
-            "kind": "value_mismatch",
-            "expected": 20,
-            "actual": 13
-          },
-          {
-            "path": "/result_distribution/48/x",
-            "kind": "value_mismatch",
-            "expected": 96,
-            "actual": 49
-          },
-          {
-            "path": "/result_distribution/49/count",
-            "kind": "value_mismatch",
-            "expected": 15,
-            "actual": 8
-          },
-          {
-            "path": "/result_distribution/49/x",
-            "kind": "value_mismatch",
-            "expected": 98,
-            "actual": 50
-          },
-          {
-            "path": "/result_distribution/50/x",
-            "kind": "value_mismatch",
-            "expected": 100,
-            "actual": 51
-          },
-          {
-            "path": "/result_distribution/51",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 52,
-              "count": 15
-            }
-          },
-          {
-            "path": "/result_distribution/52",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 53,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/53",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 54,
-              "count": 7
-            }
-          },
-          {
-            "path": "/result_distribution/54",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 55,
-              "count": 15
-            }
-          },
-          {
-            "path": "/result_distribution/55",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 56,
-              "count": 10
-            }
-          },
-          {
-            "path": "/result_distribution/56",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 57,
-              "count": 9
-            }
-          },
-          {
-            "path": "/result_distribution/57",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 58,
-              "count": 10
-            }
-          },
-          {
-            "path": "/result_distribution/58",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 59,
-              "count": 11
-            }
-          },
-          {
-            "path": "/result_distribution/59",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 60,
-              "count": 6
-            }
-          },
-          {
-            "path": "/result_distribution/60",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 61,
-              "count": 10
-            }
-          },
-          {
-            "path": "/result_distribution/61",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 62,
-              "count": 11
-            }
-          },
-          {
-            "path": "/result_distribution/62",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 63,
-              "count": 6
-            }
-          },
-          {
-            "path": "/result_distribution/63",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 64,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/64",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 65,
-              "count": 13
-            }
-          },
-          {
-            "path": "/result_distribution/65",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 66,
-              "count": 7
-            }
-          },
-          {
-            "path": "/result_distribution/66",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 67,
-              "count": 10
-            }
-          },
-          {
-            "path": "/result_distribution/67",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 68,
-              "count": 7
-            }
-          },
-          {
-            "path": "/result_distribution/68",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 69,
-              "count": 6
-            }
-          },
-          {
-            "path": "/result_distribution/69",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 70,
-              "count": 9
-            }
-          },
-          {
-            "path": "/result_distribution/70",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 71,
-              "count": 10
-            }
-          },
-          {
-            "path": "/result_distribution/71",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 72,
-              "count": 7
-            }
-          },
-          {
-            "path": "/result_distribution/72",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 73,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/73",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 74,
-              "count": 6
-            }
-          },
-          {
-            "path": "/result_distribution/74",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 75,
-              "count": 10
-            }
-          },
-          {
-            "path": "/result_distribution/75",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 76,
-              "count": 5
-            }
-          },
-          {
-            "path": "/result_distribution/76",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 77,
-              "count": 8
-            }
-          },
-          {
-            "path": "/result_distribution/77",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 78,
-              "count": 18
-            }
-          },
-          {
-            "path": "/result_distribution/78",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 79,
-              "count": 14
-            }
-          },
-          {
-            "path": "/result_distribution/79",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 80,
-              "count": 8
-            }
-          },
-          {
-            "path": "/result_distribution/80",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 81,
-              "count": 7
-            }
-          },
-          {
-            "path": "/result_distribution/81",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 82,
-              "count": 11
-            }
-          },
-          {
-            "path": "/result_distribution/82",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 83,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/83",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 84,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/84",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 85,
-              "count": 5
-            }
-          },
-          {
-            "path": "/result_distribution/85",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 86,
-              "count": 15
-            }
-          },
-          {
-            "path": "/result_distribution/86",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 87,
-              "count": 9
-            }
-          },
-          {
-            "path": "/result_distribution/87",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 88,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/88",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 89,
-              "count": 14
-            }
-          },
-          {
-            "path": "/result_distribution/89",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 90,
-              "count": 4
-            }
-          },
-          {
-            "path": "/result_distribution/90",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 91,
-              "count": 13
-            }
-          },
-          {
-            "path": "/result_distribution/91",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 92,
-              "count": 13
-            }
-          },
-          {
-            "path": "/result_distribution/92",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 93,
-              "count": 5
-            }
-          },
-          {
-            "path": "/result_distribution/93",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 94,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/94",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 95,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/95",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 96,
-              "count": 8
-            }
-          },
-          {
-            "path": "/result_distribution/96",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 97,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/97",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 98,
-              "count": 9
-            }
-          },
-          {
-            "path": "/result_distribution/98",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 99,
-              "count": 6
-            }
-          },
-          {
-            "path": "/result_distribution/99",
-            "kind": "unexpected_actual",
-            "actual": {
-              "x": 100,
-              "count": 6
-            }
-          }
-        ]
+        "differences": []
       },
       "typescript": {
-        "status": "normative_divergence",
+        "status": "match",
         "result": {
           "result_kind": "items",
           "result_percentiles": {
@@ -3716,207 +2526,207 @@
           "risk_score": 0.7959,
           "result_distribution": [
             {
-              "x": 1,
+              "x": 0,
               "count": 19
             },
             {
-              "x": 3,
+              "x": 2,
               "count": 20
             },
             {
-              "x": 5,
+              "x": 4,
               "count": 14
             },
             {
-              "x": 7,
+              "x": 6,
               "count": 17
             },
             {
-              "x": 9,
+              "x": 8,
               "count": 26
             },
             {
-              "x": 11,
+              "x": 10,
               "count": 14
             },
             {
-              "x": 13,
+              "x": 12,
               "count": 18
             },
             {
-              "x": 15,
+              "x": 14,
               "count": 19
             },
             {
-              "x": 17,
+              "x": 16,
               "count": 23
             },
             {
-              "x": 19,
+              "x": 18,
               "count": 22
             },
             {
-              "x": 21,
+              "x": 20,
               "count": 18
             },
             {
-              "x": 23,
+              "x": 22,
               "count": 24
             },
             {
-              "x": 25,
+              "x": 24,
               "count": 20
             },
             {
-              "x": 27,
+              "x": 26,
               "count": 15
             },
             {
-              "x": 29,
+              "x": 28,
               "count": 19
             },
             {
-              "x": 31,
+              "x": 30,
               "count": 19
             },
             {
-              "x": 33,
+              "x": 32,
               "count": 22
             },
             {
-              "x": 35,
+              "x": 34,
               "count": 23
             },
             {
-              "x": 37,
+              "x": 36,
               "count": 19
             },
             {
-              "x": 39,
+              "x": 38,
               "count": 17
             },
             {
-              "x": 41,
+              "x": 40,
               "count": 22
             },
             {
-              "x": 43,
+              "x": 42,
               "count": 21
             },
             {
-              "x": 45,
+              "x": 44,
               "count": 21
             },
             {
-              "x": 47,
+              "x": 46,
               "count": 24
             },
             {
-              "x": 49,
+              "x": 48,
               "count": 29
             },
             {
-              "x": 51,
+              "x": 50,
               "count": 14
             },
             {
-              "x": 53,
+              "x": 52,
               "count": 27
             },
             {
-              "x": 55,
+              "x": 54,
               "count": 22
             },
             {
-              "x": 57,
+              "x": 56,
               "count": 19
             },
             {
-              "x": 59,
+              "x": 58,
               "count": 21
             },
             {
-              "x": 61,
+              "x": 60,
               "count": 16
             },
             {
-              "x": 63,
+              "x": 62,
               "count": 17
             },
             {
-              "x": 65,
+              "x": 64,
               "count": 25
             },
             {
-              "x": 67,
+              "x": 66,
               "count": 17
             },
             {
-              "x": 69,
+              "x": 68,
               "count": 13
             },
             {
-              "x": 71,
+              "x": 70,
               "count": 19
             },
             {
-              "x": 73,
+              "x": 72,
               "count": 19
             },
             {
-              "x": 75,
+              "x": 74,
               "count": 16
             },
             {
-              "x": 77,
+              "x": 76,
               "count": 13
             },
             {
-              "x": 79,
+              "x": 78,
               "count": 32
             },
             {
-              "x": 81,
+              "x": 80,
               "count": 15
             },
             {
-              "x": 83,
+              "x": 82,
               "count": 23
             },
             {
-              "x": 85,
+              "x": 84,
               "count": 17
             },
             {
-              "x": 87,
+              "x": 86,
               "count": 24
             },
             {
-              "x": 89,
+              "x": 88,
               "count": 26
             },
             {
-              "x": 91,
+              "x": 90,
               "count": 17
             },
             {
-              "x": 93,
+              "x": 92,
               "count": 18
             },
             {
-              "x": 95,
+              "x": 94,
               "count": 24
             },
             {
-              "x": 97,
+              "x": 96,
               "count": 20
             },
             {
-              "x": 99,
+              "x": 98,
               "count": 15
             },
             {
-              "x": 101,
+              "x": 100,
               "count": 6
             }
           ],
@@ -3930,1318 +2740,17 @@
           },
           "seed": 0
         },
-        "differences": [
-          {
-            "path": "/result_distribution/0/x",
-            "kind": "value_mismatch",
-            "expected": 0,
-            "actual": 1
-          },
-          {
-            "path": "/result_distribution/1/x",
-            "kind": "value_mismatch",
-            "expected": 2,
-            "actual": 3
-          },
-          {
-            "path": "/result_distribution/2/x",
-            "kind": "value_mismatch",
-            "expected": 4,
-            "actual": 5
-          },
-          {
-            "path": "/result_distribution/3/x",
-            "kind": "value_mismatch",
-            "expected": 6,
-            "actual": 7
-          },
-          {
-            "path": "/result_distribution/4/x",
-            "kind": "value_mismatch",
-            "expected": 8,
-            "actual": 9
-          },
-          {
-            "path": "/result_distribution/5/x",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/6/x",
-            "kind": "value_mismatch",
-            "expected": 12,
-            "actual": 13
-          },
-          {
-            "path": "/result_distribution/7/x",
-            "kind": "value_mismatch",
-            "expected": 14,
-            "actual": 15
-          },
-          {
-            "path": "/result_distribution/8/x",
-            "kind": "value_mismatch",
-            "expected": 16,
-            "actual": 17
-          },
-          {
-            "path": "/result_distribution/9/x",
-            "kind": "value_mismatch",
-            "expected": 18,
-            "actual": 19
-          },
-          {
-            "path": "/result_distribution/10/x",
-            "kind": "value_mismatch",
-            "expected": 20,
-            "actual": 21
-          },
-          {
-            "path": "/result_distribution/11/x",
-            "kind": "value_mismatch",
-            "expected": 22,
-            "actual": 23
-          },
-          {
-            "path": "/result_distribution/12/x",
-            "kind": "value_mismatch",
-            "expected": 24,
-            "actual": 25
-          },
-          {
-            "path": "/result_distribution/13/x",
-            "kind": "value_mismatch",
-            "expected": 26,
-            "actual": 27
-          },
-          {
-            "path": "/result_distribution/14/x",
-            "kind": "value_mismatch",
-            "expected": 28,
-            "actual": 29
-          },
-          {
-            "path": "/result_distribution/15/x",
-            "kind": "value_mismatch",
-            "expected": 30,
-            "actual": 31
-          },
-          {
-            "path": "/result_distribution/16/x",
-            "kind": "value_mismatch",
-            "expected": 32,
-            "actual": 33
-          },
-          {
-            "path": "/result_distribution/17/x",
-            "kind": "value_mismatch",
-            "expected": 34,
-            "actual": 35
-          },
-          {
-            "path": "/result_distribution/18/x",
-            "kind": "value_mismatch",
-            "expected": 36,
-            "actual": 37
-          },
-          {
-            "path": "/result_distribution/19/x",
-            "kind": "value_mismatch",
-            "expected": 38,
-            "actual": 39
-          },
-          {
-            "path": "/result_distribution/20/x",
-            "kind": "value_mismatch",
-            "expected": 40,
-            "actual": 41
-          },
-          {
-            "path": "/result_distribution/21/x",
-            "kind": "value_mismatch",
-            "expected": 42,
-            "actual": 43
-          },
-          {
-            "path": "/result_distribution/22/x",
-            "kind": "value_mismatch",
-            "expected": 44,
-            "actual": 45
-          },
-          {
-            "path": "/result_distribution/23/x",
-            "kind": "value_mismatch",
-            "expected": 46,
-            "actual": 47
-          },
-          {
-            "path": "/result_distribution/24/x",
-            "kind": "value_mismatch",
-            "expected": 48,
-            "actual": 49
-          },
-          {
-            "path": "/result_distribution/25/x",
-            "kind": "value_mismatch",
-            "expected": 50,
-            "actual": 51
-          },
-          {
-            "path": "/result_distribution/26/x",
-            "kind": "value_mismatch",
-            "expected": 52,
-            "actual": 53
-          },
-          {
-            "path": "/result_distribution/27/x",
-            "kind": "value_mismatch",
-            "expected": 54,
-            "actual": 55
-          },
-          {
-            "path": "/result_distribution/28/x",
-            "kind": "value_mismatch",
-            "expected": 56,
-            "actual": 57
-          },
-          {
-            "path": "/result_distribution/29/x",
-            "kind": "value_mismatch",
-            "expected": 58,
-            "actual": 59
-          },
-          {
-            "path": "/result_distribution/30/x",
-            "kind": "value_mismatch",
-            "expected": 60,
-            "actual": 61
-          },
-          {
-            "path": "/result_distribution/31/x",
-            "kind": "value_mismatch",
-            "expected": 62,
-            "actual": 63
-          },
-          {
-            "path": "/result_distribution/32/x",
-            "kind": "value_mismatch",
-            "expected": 64,
-            "actual": 65
-          },
-          {
-            "path": "/result_distribution/33/x",
-            "kind": "value_mismatch",
-            "expected": 66,
-            "actual": 67
-          },
-          {
-            "path": "/result_distribution/34/x",
-            "kind": "value_mismatch",
-            "expected": 68,
-            "actual": 69
-          },
-          {
-            "path": "/result_distribution/35/x",
-            "kind": "value_mismatch",
-            "expected": 70,
-            "actual": 71
-          },
-          {
-            "path": "/result_distribution/36/x",
-            "kind": "value_mismatch",
-            "expected": 72,
-            "actual": 73
-          },
-          {
-            "path": "/result_distribution/37/x",
-            "kind": "value_mismatch",
-            "expected": 74,
-            "actual": 75
-          },
-          {
-            "path": "/result_distribution/38/x",
-            "kind": "value_mismatch",
-            "expected": 76,
-            "actual": 77
-          },
-          {
-            "path": "/result_distribution/39/x",
-            "kind": "value_mismatch",
-            "expected": 78,
-            "actual": 79
-          },
-          {
-            "path": "/result_distribution/40/x",
-            "kind": "value_mismatch",
-            "expected": 80,
-            "actual": 81
-          },
-          {
-            "path": "/result_distribution/41/x",
-            "kind": "value_mismatch",
-            "expected": 82,
-            "actual": 83
-          },
-          {
-            "path": "/result_distribution/42/x",
-            "kind": "value_mismatch",
-            "expected": 84,
-            "actual": 85
-          },
-          {
-            "path": "/result_distribution/43/x",
-            "kind": "value_mismatch",
-            "expected": 86,
-            "actual": 87
-          },
-          {
-            "path": "/result_distribution/44/x",
-            "kind": "value_mismatch",
-            "expected": 88,
-            "actual": 89
-          },
-          {
-            "path": "/result_distribution/45/x",
-            "kind": "value_mismatch",
-            "expected": 90,
-            "actual": 91
-          },
-          {
-            "path": "/result_distribution/46/x",
-            "kind": "value_mismatch",
-            "expected": 92,
-            "actual": 93
-          },
-          {
-            "path": "/result_distribution/47/x",
-            "kind": "value_mismatch",
-            "expected": 94,
-            "actual": 95
-          },
-          {
-            "path": "/result_distribution/48/x",
-            "kind": "value_mismatch",
-            "expected": 96,
-            "actual": 97
-          },
-          {
-            "path": "/result_distribution/49/x",
-            "kind": "value_mismatch",
-            "expected": 98,
-            "actual": 99
-          },
-          {
-            "path": "/result_distribution/50/x",
-            "kind": "value_mismatch",
-            "expected": 100,
-            "actual": 101
-          }
-        ]
+        "differences": []
       },
       "inter_engine": {
-        "status": "engine_divergence",
-        "differences": [
-          {
-            "path": "/result_distribution",
-            "kind": "array_length",
-            "expected": 100,
-            "actual": 51
-          },
-          {
-            "path": "/result_distribution/1/count",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 20
-          },
-          {
-            "path": "/result_distribution/1/x",
-            "kind": "value_mismatch",
-            "expected": 2,
-            "actual": 3
-          },
-          {
-            "path": "/result_distribution/2/count",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 14
-          },
-          {
-            "path": "/result_distribution/2/x",
-            "kind": "value_mismatch",
-            "expected": 3,
-            "actual": 5
-          },
-          {
-            "path": "/result_distribution/3/count",
-            "kind": "value_mismatch",
-            "expected": 5,
-            "actual": 17
-          },
-          {
-            "path": "/result_distribution/3/x",
-            "kind": "value_mismatch",
-            "expected": 4,
-            "actual": 7
-          },
-          {
-            "path": "/result_distribution/4/count",
-            "kind": "value_mismatch",
-            "expected": 9,
-            "actual": 26
-          },
-          {
-            "path": "/result_distribution/4/x",
-            "kind": "value_mismatch",
-            "expected": 5,
-            "actual": 9
-          },
-          {
-            "path": "/result_distribution/5/count",
-            "kind": "value_mismatch",
-            "expected": 9,
-            "actual": 14
-          },
-          {
-            "path": "/result_distribution/5/x",
-            "kind": "value_mismatch",
-            "expected": 6,
-            "actual": 11
-          },
-          {
-            "path": "/result_distribution/6/count",
-            "kind": "value_mismatch",
-            "expected": 8,
-            "actual": 18
-          },
-          {
-            "path": "/result_distribution/6/x",
-            "kind": "value_mismatch",
-            "expected": 7,
-            "actual": 13
-          },
-          {
-            "path": "/result_distribution/7/count",
-            "kind": "value_mismatch",
-            "expected": 13,
-            "actual": 19
-          },
-          {
-            "path": "/result_distribution/7/x",
-            "kind": "value_mismatch",
-            "expected": 8,
-            "actual": 15
-          },
-          {
-            "path": "/result_distribution/8/count",
-            "kind": "value_mismatch",
-            "expected": 13,
-            "actual": 23
-          },
-          {
-            "path": "/result_distribution/8/x",
-            "kind": "value_mismatch",
-            "expected": 9,
-            "actual": 17
-          },
-          {
-            "path": "/result_distribution/9/count",
-            "kind": "value_mismatch",
-            "expected": 9,
-            "actual": 22
-          },
-          {
-            "path": "/result_distribution/9/x",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 19
-          },
-          {
-            "path": "/result_distribution/10/count",
-            "kind": "value_mismatch",
-            "expected": 5,
-            "actual": 18
-          },
-          {
-            "path": "/result_distribution/10/x",
-            "kind": "value_mismatch",
-            "expected": 11,
-            "actual": 21
-          },
-          {
-            "path": "/result_distribution/11/count",
-            "kind": "value_mismatch",
-            "expected": 11,
-            "actual": 24
-          },
-          {
-            "path": "/result_distribution/11/x",
-            "kind": "value_mismatch",
-            "expected": 12,
-            "actual": 23
-          },
-          {
-            "path": "/result_distribution/12/count",
-            "kind": "value_mismatch",
-            "expected": 7,
-            "actual": 20
-          },
-          {
-            "path": "/result_distribution/12/x",
-            "kind": "value_mismatch",
-            "expected": 13,
-            "actual": 25
-          },
-          {
-            "path": "/result_distribution/13/count",
-            "kind": "value_mismatch",
-            "expected": 8,
-            "actual": 15
-          },
-          {
-            "path": "/result_distribution/13/x",
-            "kind": "value_mismatch",
-            "expected": 14,
-            "actual": 27
-          },
-          {
-            "path": "/result_distribution/14/count",
-            "kind": "value_mismatch",
-            "expected": 11,
-            "actual": 19
-          },
-          {
-            "path": "/result_distribution/14/x",
-            "kind": "value_mismatch",
-            "expected": 15,
-            "actual": 29
-          },
-          {
-            "path": "/result_distribution/15/count",
-            "kind": "value_mismatch",
-            "expected": 11,
-            "actual": 19
-          },
-          {
-            "path": "/result_distribution/15/x",
-            "kind": "value_mismatch",
-            "expected": 16,
-            "actual": 31
-          },
-          {
-            "path": "/result_distribution/16/count",
-            "kind": "value_mismatch",
-            "expected": 12,
-            "actual": 22
-          },
-          {
-            "path": "/result_distribution/16/x",
-            "kind": "value_mismatch",
-            "expected": 17,
-            "actual": 33
-          },
-          {
-            "path": "/result_distribution/17/count",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 23
-          },
-          {
-            "path": "/result_distribution/17/x",
-            "kind": "value_mismatch",
-            "expected": 18,
-            "actual": 35
-          },
-          {
-            "path": "/result_distribution/18/count",
-            "kind": "value_mismatch",
-            "expected": 12,
-            "actual": 19
-          },
-          {
-            "path": "/result_distribution/18/x",
-            "kind": "value_mismatch",
-            "expected": 19,
-            "actual": 37
-          },
-          {
-            "path": "/result_distribution/19/count",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 17
-          },
-          {
-            "path": "/result_distribution/19/x",
-            "kind": "value_mismatch",
-            "expected": 20,
-            "actual": 39
-          },
-          {
-            "path": "/result_distribution/20/count",
-            "kind": "value_mismatch",
-            "expected": 8,
-            "actual": 22
-          },
-          {
-            "path": "/result_distribution/20/x",
-            "kind": "value_mismatch",
-            "expected": 21,
-            "actual": 41
-          },
-          {
-            "path": "/result_distribution/21/count",
-            "kind": "value_mismatch",
-            "expected": 13,
-            "actual": 21
-          },
-          {
-            "path": "/result_distribution/21/x",
-            "kind": "value_mismatch",
-            "expected": 22,
-            "actual": 43
-          },
-          {
-            "path": "/result_distribution/22/count",
-            "kind": "value_mismatch",
-            "expected": 11,
-            "actual": 21
-          },
-          {
-            "path": "/result_distribution/22/x",
-            "kind": "value_mismatch",
-            "expected": 23,
-            "actual": 45
-          },
-          {
-            "path": "/result_distribution/23/count",
-            "kind": "value_mismatch",
-            "expected": 9,
-            "actual": 24
-          },
-          {
-            "path": "/result_distribution/23/x",
-            "kind": "value_mismatch",
-            "expected": 24,
-            "actual": 47
-          },
-          {
-            "path": "/result_distribution/24/count",
-            "kind": "value_mismatch",
-            "expected": 11,
-            "actual": 29
-          },
-          {
-            "path": "/result_distribution/24/x",
-            "kind": "value_mismatch",
-            "expected": 25,
-            "actual": 49
-          },
-          {
-            "path": "/result_distribution/25/count",
-            "kind": "value_mismatch",
-            "expected": 8,
-            "actual": 14
-          },
-          {
-            "path": "/result_distribution/25/x",
-            "kind": "value_mismatch",
-            "expected": 26,
-            "actual": 51
-          },
-          {
-            "path": "/result_distribution/26/count",
-            "kind": "value_mismatch",
-            "expected": 7,
-            "actual": 27
-          },
-          {
-            "path": "/result_distribution/26/x",
-            "kind": "value_mismatch",
-            "expected": 27,
-            "actual": 53
-          },
-          {
-            "path": "/result_distribution/27/count",
-            "kind": "value_mismatch",
-            "expected": 9,
-            "actual": 22
-          },
-          {
-            "path": "/result_distribution/27/x",
-            "kind": "value_mismatch",
-            "expected": 28,
-            "actual": 55
-          },
-          {
-            "path": "/result_distribution/28/count",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 19
-          },
-          {
-            "path": "/result_distribution/28/x",
-            "kind": "value_mismatch",
-            "expected": 29,
-            "actual": 57
-          },
-          {
-            "path": "/result_distribution/29/count",
-            "kind": "value_mismatch",
-            "expected": 9,
-            "actual": 21
-          },
-          {
-            "path": "/result_distribution/29/x",
-            "kind": "value_mismatch",
-            "expected": 30,
-            "actual": 59
-          },
-          {
-            "path": "/result_distribution/30/count",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 16
-          },
-          {
-            "path": "/result_distribution/30/x",
-            "kind": "value_mismatch",
-            "expected": 31,
-            "actual": 61
-          },
-          {
-            "path": "/result_distribution/31/count",
-            "kind": "value_mismatch",
-            "expected": 12,
-            "actual": 17
-          },
-          {
-            "path": "/result_distribution/31/x",
-            "kind": "value_mismatch",
-            "expected": 32,
-            "actual": 63
-          },
-          {
-            "path": "/result_distribution/32/count",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 25
-          },
-          {
-            "path": "/result_distribution/32/x",
-            "kind": "value_mismatch",
-            "expected": 33,
-            "actual": 65
-          },
-          {
-            "path": "/result_distribution/33/count",
-            "kind": "value_mismatch",
-            "expected": 9,
-            "actual": 17
-          },
-          {
-            "path": "/result_distribution/33/x",
-            "kind": "value_mismatch",
-            "expected": 34,
-            "actual": 67
-          },
-          {
-            "path": "/result_distribution/34/count",
-            "kind": "value_mismatch",
-            "expected": 14,
-            "actual": 13
-          },
-          {
-            "path": "/result_distribution/34/x",
-            "kind": "value_mismatch",
-            "expected": 35,
-            "actual": 69
-          },
-          {
-            "path": "/result_distribution/35/count",
-            "kind": "value_mismatch",
-            "expected": 12,
-            "actual": 19
-          },
-          {
-            "path": "/result_distribution/35/x",
-            "kind": "value_mismatch",
-            "expected": 36,
-            "actual": 71
-          },
-          {
-            "path": "/result_distribution/36/count",
-            "kind": "value_mismatch",
-            "expected": 7,
-            "actual": 19
-          },
-          {
-            "path": "/result_distribution/36/x",
-            "kind": "value_mismatch",
-            "expected": 37,
-            "actual": 73
-          },
-          {
-            "path": "/result_distribution/37/count",
-            "kind": "value_mismatch",
-            "expected": 11,
-            "actual": 16
-          },
-          {
-            "path": "/result_distribution/37/x",
-            "kind": "value_mismatch",
-            "expected": 38,
-            "actual": 75
-          },
-          {
-            "path": "/result_distribution/38/count",
-            "kind": "value_mismatch",
-            "expected": 6,
-            "actual": 13
-          },
-          {
-            "path": "/result_distribution/38/x",
-            "kind": "value_mismatch",
-            "expected": 39,
-            "actual": 77
-          },
-          {
-            "path": "/result_distribution/39/count",
-            "kind": "value_mismatch",
-            "expected": 11,
-            "actual": 32
-          },
-          {
-            "path": "/result_distribution/39/x",
-            "kind": "value_mismatch",
-            "expected": 40,
-            "actual": 79
-          },
-          {
-            "path": "/result_distribution/40/count",
-            "kind": "value_mismatch",
-            "expected": 11,
-            "actual": 15
-          },
-          {
-            "path": "/result_distribution/40/x",
-            "kind": "value_mismatch",
-            "expected": 41,
-            "actual": 81
-          },
-          {
-            "path": "/result_distribution/41/count",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 23
-          },
-          {
-            "path": "/result_distribution/41/x",
-            "kind": "value_mismatch",
-            "expected": 42,
-            "actual": 83
-          },
-          {
-            "path": "/result_distribution/42/count",
-            "kind": "value_mismatch",
-            "expected": 11,
-            "actual": 17
-          },
-          {
-            "path": "/result_distribution/42/x",
-            "kind": "value_mismatch",
-            "expected": 43,
-            "actual": 85
-          },
-          {
-            "path": "/result_distribution/43/count",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 24
-          },
-          {
-            "path": "/result_distribution/43/x",
-            "kind": "value_mismatch",
-            "expected": 44,
-            "actual": 87
-          },
-          {
-            "path": "/result_distribution/44/count",
-            "kind": "value_mismatch",
-            "expected": 11,
-            "actual": 26
-          },
-          {
-            "path": "/result_distribution/44/x",
-            "kind": "value_mismatch",
-            "expected": 45,
-            "actual": 89
-          },
-          {
-            "path": "/result_distribution/45/count",
-            "kind": "value_mismatch",
-            "expected": 10,
-            "actual": 17
-          },
-          {
-            "path": "/result_distribution/45/x",
-            "kind": "value_mismatch",
-            "expected": 46,
-            "actual": 91
-          },
-          {
-            "path": "/result_distribution/46/count",
-            "kind": "value_mismatch",
-            "expected": 14,
-            "actual": 18
-          },
-          {
-            "path": "/result_distribution/46/x",
-            "kind": "value_mismatch",
-            "expected": 47,
-            "actual": 93
-          },
-          {
-            "path": "/result_distribution/47/count",
-            "kind": "value_mismatch",
-            "expected": 16,
-            "actual": 24
-          },
-          {
-            "path": "/result_distribution/47/x",
-            "kind": "value_mismatch",
-            "expected": 48,
-            "actual": 95
-          },
-          {
-            "path": "/result_distribution/48/count",
-            "kind": "value_mismatch",
-            "expected": 13,
-            "actual": 20
-          },
-          {
-            "path": "/result_distribution/48/x",
-            "kind": "value_mismatch",
-            "expected": 49,
-            "actual": 97
-          },
-          {
-            "path": "/result_distribution/49/count",
-            "kind": "value_mismatch",
-            "expected": 8,
-            "actual": 15
-          },
-          {
-            "path": "/result_distribution/49/x",
-            "kind": "value_mismatch",
-            "expected": 50,
-            "actual": 99
-          },
-          {
-            "path": "/result_distribution/50/x",
-            "kind": "value_mismatch",
-            "expected": 51,
-            "actual": 101
-          },
-          {
-            "path": "/result_distribution/51",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 52,
-              "count": 15
-            }
-          },
-          {
-            "path": "/result_distribution/52",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 53,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/53",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 54,
-              "count": 7
-            }
-          },
-          {
-            "path": "/result_distribution/54",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 55,
-              "count": 15
-            }
-          },
-          {
-            "path": "/result_distribution/55",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 56,
-              "count": 10
-            }
-          },
-          {
-            "path": "/result_distribution/56",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 57,
-              "count": 9
-            }
-          },
-          {
-            "path": "/result_distribution/57",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 58,
-              "count": 10
-            }
-          },
-          {
-            "path": "/result_distribution/58",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 59,
-              "count": 11
-            }
-          },
-          {
-            "path": "/result_distribution/59",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 60,
-              "count": 6
-            }
-          },
-          {
-            "path": "/result_distribution/60",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 61,
-              "count": 10
-            }
-          },
-          {
-            "path": "/result_distribution/61",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 62,
-              "count": 11
-            }
-          },
-          {
-            "path": "/result_distribution/62",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 63,
-              "count": 6
-            }
-          },
-          {
-            "path": "/result_distribution/63",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 64,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/64",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 65,
-              "count": 13
-            }
-          },
-          {
-            "path": "/result_distribution/65",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 66,
-              "count": 7
-            }
-          },
-          {
-            "path": "/result_distribution/66",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 67,
-              "count": 10
-            }
-          },
-          {
-            "path": "/result_distribution/67",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 68,
-              "count": 7
-            }
-          },
-          {
-            "path": "/result_distribution/68",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 69,
-              "count": 6
-            }
-          },
-          {
-            "path": "/result_distribution/69",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 70,
-              "count": 9
-            }
-          },
-          {
-            "path": "/result_distribution/70",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 71,
-              "count": 10
-            }
-          },
-          {
-            "path": "/result_distribution/71",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 72,
-              "count": 7
-            }
-          },
-          {
-            "path": "/result_distribution/72",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 73,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/73",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 74,
-              "count": 6
-            }
-          },
-          {
-            "path": "/result_distribution/74",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 75,
-              "count": 10
-            }
-          },
-          {
-            "path": "/result_distribution/75",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 76,
-              "count": 5
-            }
-          },
-          {
-            "path": "/result_distribution/76",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 77,
-              "count": 8
-            }
-          },
-          {
-            "path": "/result_distribution/77",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 78,
-              "count": 18
-            }
-          },
-          {
-            "path": "/result_distribution/78",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 79,
-              "count": 14
-            }
-          },
-          {
-            "path": "/result_distribution/79",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 80,
-              "count": 8
-            }
-          },
-          {
-            "path": "/result_distribution/80",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 81,
-              "count": 7
-            }
-          },
-          {
-            "path": "/result_distribution/81",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 82,
-              "count": 11
-            }
-          },
-          {
-            "path": "/result_distribution/82",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 83,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/83",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 84,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/84",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 85,
-              "count": 5
-            }
-          },
-          {
-            "path": "/result_distribution/85",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 86,
-              "count": 15
-            }
-          },
-          {
-            "path": "/result_distribution/86",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 87,
-              "count": 9
-            }
-          },
-          {
-            "path": "/result_distribution/87",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 88,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/88",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 89,
-              "count": 14
-            }
-          },
-          {
-            "path": "/result_distribution/89",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 90,
-              "count": 4
-            }
-          },
-          {
-            "path": "/result_distribution/90",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 91,
-              "count": 13
-            }
-          },
-          {
-            "path": "/result_distribution/91",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 92,
-              "count": 13
-            }
-          },
-          {
-            "path": "/result_distribution/92",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 93,
-              "count": 5
-            }
-          },
-          {
-            "path": "/result_distribution/93",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 94,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/94",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 95,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/95",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 96,
-              "count": 8
-            }
-          },
-          {
-            "path": "/result_distribution/96",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 97,
-              "count": 12
-            }
-          },
-          {
-            "path": "/result_distribution/97",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 98,
-              "count": 9
-            }
-          },
-          {
-            "path": "/result_distribution/98",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 99,
-              "count": 6
-            }
-          },
-          {
-            "path": "/result_distribution/99",
-            "kind": "missing_actual",
-            "expected": {
-              "x": 100,
-              "count": 6
-            }
-          }
-        ]
+        "status": "match",
+        "differences": []
       }
     },
     {
       "id": "histogram-aggregated-discontinuous",
       "outcomes": [
-        "normative_divergence",
-        "engine_divergence"
+        "match"
       ],
       "expected": {
         "result_kind": "items",
@@ -5272,7 +2781,7 @@
         "seed": 0
       },
       "python": {
-        "status": "normative_divergence",
+        "status": "match",
         "result": {
           "result_kind": "items",
           "result_percentiles": {
@@ -5287,7 +2796,7 @@
               "count": 994
             },
             {
-              "x": 9951,
+              "x": 9999,
               "count": 6
             }
           ],
@@ -5301,17 +2810,10 @@
           },
           "seed": 0
         },
-        "differences": [
-          {
-            "path": "/result_distribution/1/x",
-            "kind": "value_mismatch",
-            "expected": 9999,
-            "actual": 9951
-          }
-        ]
+        "differences": []
       },
       "typescript": {
-        "status": "normative_divergence",
+        "status": "match",
         "result": {
           "result_kind": "items",
           "result_percentiles": {
@@ -5322,11 +2824,11 @@
           "risk_score": 0.7959,
           "result_distribution": [
             {
-              "x": 51,
+              "x": 50,
               "count": 994
             },
             {
-              "x": 10050,
+              "x": 9999,
               "count": 6
             }
           ],
@@ -5340,37 +2842,11 @@
           },
           "seed": 0
         },
-        "differences": [
-          {
-            "path": "/result_distribution/0/x",
-            "kind": "value_mismatch",
-            "expected": 50,
-            "actual": 51
-          },
-          {
-            "path": "/result_distribution/1/x",
-            "kind": "value_mismatch",
-            "expected": 9999,
-            "actual": 10050
-          }
-        ]
+        "differences": []
       },
       "inter_engine": {
-        "status": "engine_divergence",
-        "differences": [
-          {
-            "path": "/result_distribution/0/x",
-            "kind": "value_mismatch",
-            "expected": 50,
-            "actual": 51
-          },
-          {
-            "path": "/result_distribution/1/x",
-            "kind": "value_mismatch",
-            "expected": 9951,
-            "actual": 10050
-          }
-        ]
+        "status": "match",
+        "differences": []
       }
     }
   ],

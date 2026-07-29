@@ -1,15 +1,15 @@
 {
   "schemaVersion": "1.0.0",
-  "classificationInventorySha256": "7d6974fdbf0d4515fd0ac19b9b2b49f0c4cbd47d2eafc81d3f987a4d0509130f",
+  "classificationInventorySha256": "5319e0ffeb4c4adb7582fe3e45309900d4500c7d81f781eb5189504e3f60c0fd",
   "totals": {
-    "logicalCases": 1288,
-    "collectedInstances": 1617,
-    "executedInstances": 1617,
+    "logicalCases": 1292,
+    "collectedInstances": 1624,
+    "executedInstances": 1624,
     "skippedInstances": 0,
-    "attempts": 1617,
+    "attempts": 1624,
     "retries": 0,
     "results": {
-      "passed": 1617,
+      "passed": 1624,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -33,14 +33,14 @@
       }
     },
     "pytest": {
-      "logicalCases": 571,
-      "collectedInstances": 794,
-      "executedInstances": 794,
+      "logicalCases": 572,
+      "collectedInstances": 797,
+      "executedInstances": 797,
       "skippedInstances": 0,
-      "attempts": 794,
+      "attempts": 797,
       "retries": 0,
       "results": {
-        "passed": 794,
+        "passed": 797,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -48,14 +48,14 @@
       }
     },
     "vitest": {
-      "logicalCases": 685,
-      "collectedInstances": 791,
-      "executedInstances": 791,
+      "logicalCases": 688,
+      "collectedInstances": 795,
+      "executedInstances": 795,
       "skippedInstances": 0,
-      "attempts": 791,
+      "attempts": 795,
       "retries": 0,
       "results": {
-        "passed": 791,
+        "passed": 795,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -65,14 +65,14 @@
   },
   "classificationStatuses": {
     "classified": {
-      "logicalCases": 1288,
-      "collectedInstances": 1617,
-      "executedInstances": 1617,
+      "logicalCases": 1292,
+      "collectedInstances": 1624,
+      "executedInstances": 1624,
       "skippedInstances": 0,
-      "attempts": 1617,
+      "attempts": 1624,
       "retries": 0,
       "results": {
-        "passed": 1617,
+        "passed": 1624,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -142,14 +142,14 @@
       }
     },
     "unit": {
-      "logicalCases": 596,
-      "collectedInstances": 860,
-      "executedInstances": 860,
+      "logicalCases": 600,
+      "collectedInstances": 867,
+      "executedInstances": 867,
       "skippedInstances": 0,
-      "attempts": 860,
+      "attempts": 867,
       "retries": 0,
       "results": {
-        "passed": 860,
+        "passed": 867,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -159,14 +159,14 @@
   },
   "executionProfiles": {
     "pr": {
-      "logicalCases": 1071,
-      "collectedInstances": 1375,
-      "executedInstances": 1375,
+      "logicalCases": 1075,
+      "collectedInstances": 1382,
+      "executedInstances": 1382,
       "skippedInstances": 0,
-      "attempts": 1375,
+      "attempts": 1382,
       "retries": 0,
       "results": {
-        "passed": 1375,
+        "passed": 1382,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -4203,10 +4203,10 @@
       }
     },
     {
-      "logicalCaseId": "pytest:tests/test_mc_core.py::test_histogram_buckets_aggregated_bin_count_and_mass",
+      "logicalCaseId": "pytest:tests/test_mc_core.py::test_histogram_buckets_contiguous_range_uses_clipped_inclusive_bounds",
       "framework": "pytest",
       "sourcePath": "tests/test_mc_core.py",
-      "selector": "test_histogram_buckets_aggregated_bin_count_and_mass",
+      "selector": "test_histogram_buckets_contiguous_range_uses_clipped_inclusive_bounds",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -4225,21 +4225,21 @@
       }
     },
     {
-      "logicalCaseId": "pytest:tests/test_mc_core.py::test_histogram_buckets_aggregated_skips_zero_count_bins",
+      "logicalCaseId": "pytest:tests/test_mc_core.py::test_histogram_buckets_discontinuous_ranges_clip_the_extreme_right_bound",
       "framework": "pytest",
       "sourcePath": "tests/test_mc_core.py",
-      "selector": "test_histogram_buckets_aggregated_skips_zero_count_bins",
+      "selector": "test_histogram_buckets_discontinuous_ranges_clip_the_extreme_right_bound",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
       "logicalCases": 1,
-      "collectedInstances": 1,
-      "executedInstances": 1,
+      "collectedInstances": 2,
+      "executedInstances": 2,
       "skippedInstances": 0,
-      "attempts": 1,
+      "attempts": 2,
       "retries": 0,
       "results": {
-        "passed": 1,
+        "passed": 2,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -10143,6 +10143,28 @@
       }
     },
     {
+      "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_histogram_derivation_covers_exact_continuous_and_asymmetric_ranges",
+      "framework": "pytest",
+      "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+      "selector": "test_independent_histogram_derivation_covers_exact_continuous_and_asymmetric_ranges",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
       "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_reliability_derivation_proves_six_and_seven_observations",
       "framework": "pytest",
       "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
@@ -10195,13 +10217,13 @@
       "executionProfile": "pr",
       "nature": "unit",
       "logicalCases": 1,
-      "collectedInstances": 6,
-      "executedInstances": 6,
+      "collectedInstances": 7,
+      "executedInstances": 7,
       "skippedInstances": 0,
-      "attempts": 6,
+      "attempts": 7,
       "retries": 0,
       "results": {
-        "passed": 6,
+        "passed": 7,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -20901,6 +20923,72 @@
       }
     },
     {
+      "logicalCaseId": "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/domain/simulationHistogram.test.ts",
+      "selector": "buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 2,
+      "executedInstances": 2,
+      "skippedInstances": 0,
+      "attempts": 2,
+      "retries": 0,
+      "results": {
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > keeps exact histograms unchanged [6:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/domain/simulationHistogram.test.ts",
+      "selector": "buildHistogram > keeps exact histograms unchanged [6:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > uses clipped inclusive bounds for the continuous 0..100 range [15:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/domain/simulationHistogram.test.ts",
+      "selector": "buildHistogram > uses clipped inclusive bounds for the continuous 0..100 range [15:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
       "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > accepts the inclusive bounds [37:4]",
       "framework": "vitest",
       "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
@@ -25389,10 +25477,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [82:3]",
+      "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [85:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
-      "selector": "shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [82:3]",
+      "selector": "shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [85:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -25433,10 +25521,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [131:3]",
+      "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [134:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
-      "selector": "shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [131:3]",
+      "selector": "shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [134:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -25455,10 +25543,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [65:3]",
+      "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [68:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
-      "selector": "shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [65:3]",
+      "selector": "shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [68:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -25477,10 +25565,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [102:3]",
+      "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [105:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
-      "selector": "shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [102:3]",
+      "selector": "shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [105:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",

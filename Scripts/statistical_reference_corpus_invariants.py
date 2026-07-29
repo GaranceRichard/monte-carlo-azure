@@ -5,16 +5,13 @@ from __future__ import annotations
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, Callable
 
+from Scripts.statistical_reference_corpus_histogram import histogram_construction_issues
 from Scripts.statistical_reference_corpus_models import (
     InputRejectionProbe,
     ValidationIssue,
     semantic_issue,
 )
-from Scripts.statistical_reference_corpus_normative import (
-    histogram_representative_issues,
-    reliability_issues,
-    risk_score_issues,
-)
+from Scripts.statistical_reference_corpus_normative import reliability_issues, risk_score_issues
 from Scripts.statistical_reference_corpus_pbi_211 import (
     PBI_211_CASE_IDS as PBI_211_CASE_IDS,
 )
@@ -191,7 +188,9 @@ def validate_case_semantics(case: dict[str, Any], index: int) -> list[Validation
     distribution_issues, distribution_mass = _distribution_state(case_path, result)
     completion_issues, expected_mass = _completion_state(case_path, input_value, result)
     issues.extend(distribution_issues)
-    issues.extend(histogram_representative_issues(case_path, input_value, result))
+    issues.extend(
+        histogram_construction_issues(case_path, case.get("seed"), input_value, result)
+    )
     issues.extend(completion_issues)
     if (
         distribution_mass is not None

@@ -923,7 +923,7 @@
     },
     {
       "id": "histogram-aggregated-contiguous-101",
-      "description": "The 101 values 0..100 force width 2 and 51 non-empty normative buckets; each representative uses the real inclusive bounds, including 0 and 100.",
+      "description": "The continuous 0..100 range forces width 2 and 51 non-empty normative buckets; clipped inclusive bounds prove the extreme representatives 0 and 100.",
       "proof_level": "replay",
       "input": {
         "throughput_samples": [
@@ -1262,7 +1262,7 @@
     },
     {
       "id": "histogram-aggregated-discontinuous",
-      "description": "The 101 values 0..99 plus 10000 force width 101; occupied bucket representatives are 50 and 9999, materializing both historical center divergences.",
+      "description": "The strongly asymmetric 0..99 plus 10000 range forces width 101; the discontinuity and clipped extreme right bound produce representatives 50 and 9999.",
       "proof_level": "replay",
       "input": {
         "throughput_samples": [

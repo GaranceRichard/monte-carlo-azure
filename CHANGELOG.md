@@ -2,6 +2,24 @@
 
 ## Recent
 
+### Construction normative des histogrammes — PBI 2.16
+
+- remplacement des deux constructions historiques par une autorité de domaine par langage, conservant
+  l’histogramme exact jusqu’à 100 valeurs distinctes puis appliquant la largeur entière, la borne droite
+  inclusive tronquée et le représentant par plancher de `STD-STAT-001`
+- suppression de `numpy.histogram` et des centres flottants arrondis côté Python, ainsi que de
+  `Math.round(left + width / 2)` sans borne droite réelle côté TypeScript ; aucun recalcul de présentation
+  n’est introduit
+- renforcement du validateur autonome par un rejeu scalaire `mca-prng-v1` et une reconstruction indépendante
+  des représentants et effectifs, sans moteur oracle
+- preuves exactes, continues, discontinues, extrêmes et fortement asymétriques dans les deux langages ;
+  `0..100` produit 51 représentants pairs et `0..99 + 10000` produit `50/9999`, avec masse et ordre exacts
+- régénération du rapport à 16 cas conformes, aucune divergence normative ou inter-moteurs ; enforcement
+  toujours informatif jusqu’au PBI 2.19
+- anciennes sorties agrégées invalidées comme références courantes mais laissées lisibles dans les
+  historiques, sans migration, changement de DTO, API, MongoDB, `localStorage`, seed, tirage, batching,
+  percentile, censure, Risk Score, fiabilité ou version de contrat
+
 ### Métriques et labels de fiabilité du throughput — PBI 2.15
 
 - centralisation du calcul de fiabilité dans un calculateur de domaine et un Value Object par langage, sans

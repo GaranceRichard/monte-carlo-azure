@@ -82,16 +82,18 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   partielle et observabilité par logs.
 - **Preuves existantes** : `backend/api_models.py`, `backend/api_routes_simulate.py`,
   `backend/simulation_models.py`, `backend/simulation_mappers.py`, `backend/simulation_service.py`,
-  `backend/simulation_store.py`, `backend/mc_core.py`, `frontend/src/api/simulationDtos.ts`,
+  `backend/simulation_store.py`, `backend/mc_core.py`, `backend/histogram.py`,
+  `frontend/src/api/simulationDtos.ts`,
   `frontend/src/api/simulationMappers.ts`, `frontend/src/domain/simulation.ts`,
+  `frontend/src/domain/histogram.ts`,
   `frontend/src/storage/simulationHistoryDtos.ts`, `frontend/src/storage/simulationHistoryMappers.ts`,
   `tests/test_api_simulate.py`, `tests/test_mc_core.py`, `tests/test_simulation_mappers.py`,
   `tests/test_simulation_service.py`, `tests/test_api_history.py`, `tests/test_simulation_store.py`,
   `frontend/src/api/simulationMappers.test.ts`, `frontend/src/storage/simulationHistoryMappers.test.ts`.
 - **État** : partiellement couvert.
 - **Lacunes connues** : les frontières DTO/domaine/persistance sont explicites et les validations,
-  censures, percentiles, Risk Score et métriques de fiabilité concordent entre Python et TypeScript. Les
-  histogrammes agrégés divergent encore, le contrôle de parité reste informatif, et il n’existe toujours
+  censures, percentiles, Risk Score, métriques de fiabilité et histogrammes concordent entre Python et
+  TypeScript sur les seize cas. Le contrôle de parité reste informatif, et il n’existe toujours
   ni test de charge, ni preuve d'annulation du thread après timeout, ni politique de proxy de confiance.
 
 ### CP-004 — Flux onboarding critique

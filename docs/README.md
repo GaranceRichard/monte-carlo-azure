@@ -40,7 +40,7 @@ Il a relevé les recouvrements suivants :
   fabrication ;
 - l’attendu détaillé de la Feature 13 répétait un statut dont le registre du backlog est l’autorité ;
 - la description de `CP-003` présentait encore tout le contrat statistique comme non aligné, alors que les
-  preuves courantes limitent la divergence aux histogrammes agrégés et à l’absence de gate bloquante.
+  seize cas courants concordent et que l’absence de gate bloquante reste la limite observable.
 
 La répartition ci-dessus résout ces recouvrements. Une synthèse peut rappeler une garantie ou une limite,
 mais les formules, seuils, contrats, statuts, dates et preuves restent dans leur autorité spécialisée.

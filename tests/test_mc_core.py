@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 
+from backend.histogram import HISTOGRAM_MAX_BUCKETS, build_histogram
 from backend.mc_core import (
     FinishWeeksSimulation,
-    histogram_buckets,
     mc_finish_weeks,
     mc_items_done_for_weeks,
     percentiles,
@@ -502,9 +502,9 @@ def test_mc_items_done_for_weeks_include_zero_rejects_all_negative_samples():
 
 
 def test_histogram_buckets_empty_and_exact():
-    assert histogram_buckets(np.array([], dtype=int)) == []
+    assert build_histogram(np.array([], dtype=int)) == []
 
-    buckets = histogram_buckets(np.array([1, 1, 2, 4, 4, 4], dtype=int), max_buckets=10)
+    buckets = build_histogram(np.array([1, 1, 2, 4, 4, 4], dtype=int))
     assert buckets == [
         {"x": 1, "count": 2},
         {"x": 2, "count": 1},
@@ -512,19 +512,46 @@ def test_histogram_buckets_empty_and_exact():
     ]
 
 
-def test_histogram_buckets_aggregated_bin_count_and_mass():
-    data = np.arange(0, 1000, dtype=int)
-    buckets = histogram_buckets(data, max_buckets=20)
-    assert len(buckets) <= 20
-    assert sum(b["count"] for b in buckets) == len(data)
-    assert all(isinstance(b["x"], int) and isinstance(b["count"], int) for b in buckets)
+def test_histogram_buckets_contiguous_range_uses_clipped_inclusive_bounds():
+    buckets = build_histogram(np.arange(101, dtype=int))
+
+    assert buckets == [
+        {"x": representative, "count": 1 if representative == 100 else 2}
+        for representative in range(0, 101, 2)
+    ]
+    assert len(buckets) == 51
+    assert sum(bucket["count"] for bucket in buckets) == 101
 
 
-def test_histogram_buckets_aggregated_skips_zero_count_bins():
-    data = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1000], dtype=int)
-    buckets = histogram_buckets(data, max_buckets=10)
-    assert len(buckets) == 2
-    assert sum(b["count"] for b in buckets) == len(data)
+@pytest.mark.parametrize(
+    ("maximum", "expected"),
+    [
+        (
+            10_000,
+            [{"x": 50, "count": 100}, {"x": 9_999, "count": 1}],
+        ),
+        (
+            1_000_000,
+            [{"x": 5_000, "count": 100}, {"x": 995_049, "count": 1}],
+        ),
+    ],
+)
+def test_histogram_buckets_discontinuous_ranges_clip_the_extreme_right_bound(
+    maximum: int,
+    expected: list[dict[str, int]],
+):
+    data = np.concatenate((np.arange(100, dtype=int), np.array([maximum], dtype=int)))
+
+    buckets = build_histogram(data)
+
+    assert buckets == expected
+    assert len(buckets) <= HISTOGRAM_MAX_BUCKETS
+    assert all(bucket["count"] > 0 for bucket in buckets)
+    assert all(
+        left["x"] < right["x"]
+        for left, right in zip(buckets, buckets[1:])
+    )
+    assert sum(bucket["count"] for bucket in buckets) == len(data)
 
 
 def test_percentiles_default_public_keys_and_small_population_ranks():

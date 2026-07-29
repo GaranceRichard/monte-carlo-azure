@@ -354,8 +354,7 @@ Les fabriques Python et TypeScript appliquent l’entrée normalisée fermée du
 types et bornes stricts, entiers finis positifs ou nuls, six observations utilisables, seed `uint32` et
 présence exclusive du paramètre actif. Elles alignent aussi la forme canonique fermée et l’omission des valeurs
 indisponibles, sans sentinelle. Les 22 sondes partagées en apportent une preuve interlangage. Les frontières
-DTO, API, MongoDB et `localStorage` restent primitives ; aucune formule statistique ni géométrie
-d’histogramme n’est modifiée.
+DTO, API, MongoDB et `localStorage` restent primitives.
 
 Les censures, rangs, quantiles de survie et Risk Score sont alignés sans reconstruire les percentiles
 absents. Les règles `STAT-PAR-030` à `STAT-PAR-035` sont portées par une autorité de domaine par langage :
@@ -365,6 +364,12 @@ observations en complément des preuves à six ; les résultats sont dérivés d
 `mca-prng-v1` sans prendre un moteur comme oracle. L’état de conformité, les divergences et le caractère
 informatif ou bloquant du contrôle sont publiés dans le
 [`rapport de parité`](../../reports/statistical-parity-report.md), pas dans le présent standard.
+
+La construction conforme des histogrammes réside dans une autorité de domaine par langage. Le validateur
+indépendant reconstruit les tirages des cas à une semaine depuis `mca-prng-v1`, puis applique
+`STAT-PAR-037` à `STAT-PAR-039` pour vérifier exactement représentants, effectifs, ordre et masse sans
+prendre un moteur comme oracle. L’état observable et le niveau d’enforcement restent publiés uniquement
+dans le rapport de parité.
 
 ### STAT-PAR-047 — Version de rejeu
 

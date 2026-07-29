@@ -109,9 +109,8 @@ du [standard statistique](docs/standards/STD-STAT-001.md), du
 - les scénarios portefeuille sont des hypothèses d’agrégation : ils ne prouvent ni causalité, ni
   substituabilité des équipes, ni validité future ;
 - lorsque les preuves sont insuffisantes, l’absence de scénario recommandé est un résultat valide ;
-- la parité interlangage complète n’est pas encore acquise : le rapport courant constate quatorze cas
-  conformes et deux divergences limitées aux histogrammes agrégés ; le contrôle reste informatif et n’est
-  pas encore bloquant dans le profil `main` ;
+- les seize cas du corpus statistique courant concordent exactement dans les deux moteurs ; le contrôle de
+  parité reste toutefois informatif et n’est pas encore bloquant dans le profil `main` ;
 - les preuves existantes ne remplacent pas un backtesting empirique, des tests sur de vrais tenants Azure
   DevOps, une matrice multi-navigateurs ou une baseline de charge.
 

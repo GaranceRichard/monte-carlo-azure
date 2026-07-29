@@ -3571,10 +3571,10 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_mc_core.py::test_histogram_buckets_aggregated_bin_count_and_mass",
+    "logicalCaseId": "pytest:tests/test_mc_core.py::test_histogram_buckets_contiguous_range_uses_clipped_inclusive_bounds",
     "framework": "pytest",
     "sourcePath": "tests/test_mc_core.py",
-    "selector": "test_histogram_buckets_aggregated_bin_count_and_mass",
+    "selector": "test_histogram_buckets_contiguous_range_uses_clipped_inclusive_bounds",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -3586,7 +3586,8 @@
     ],
     "risks": [
       "RISK-003",
-      "RISK-004"
+      "RISK-004",
+      "RISK-016"
     ],
     "criticalPaths": [
       "CP-003"
@@ -3594,10 +3595,10 @@
     "criticality": "critical"
   },
   {
-    "logicalCaseId": "pytest:tests/test_mc_core.py::test_histogram_buckets_aggregated_skips_zero_count_bins",
+    "logicalCaseId": "pytest:tests/test_mc_core.py::test_histogram_buckets_discontinuous_ranges_clip_the_extreme_right_bound",
     "framework": "pytest",
     "sourcePath": "tests/test_mc_core.py",
-    "selector": "test_histogram_buckets_aggregated_skips_zero_count_bins",
+    "selector": "test_histogram_buckets_discontinuous_ranges_clip_the_extreme_right_bound",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -3609,7 +3610,8 @@
     ],
     "risks": [
       "RISK-003",
-      "RISK-004"
+      "RISK-004",
+      "RISK-016"
     ],
     "criticalPaths": [
       "CP-003"
@@ -8146,6 +8148,22 @@
     "nature": "integration",
     "purposes": [
       "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_histogram_derivation_covers_exact_continuous_and_asymmetric_ranges",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_independent_histogram_derivation_covers_exact_continuous_and_asymmetric_ranges",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "statistical_engine"
     ]
   },
   {
@@ -17144,6 +17162,51 @@
     ]
   },
   {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationHistogram.test.ts",
+    "selector": "buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > keeps exact histograms unchanged [6:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationHistogram.test.ts",
+    "selector": "buildHistogram > keeps exact histograms unchanged [6:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > uses clipped inclusive bounds for the continuous 0..100 range [15:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/simulationHistogram.test.ts",
+    "selector": "buildHistogram > uses clipped inclusive bounds for the continuous 0..100 range [15:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
     "logicalCaseId": "vitest:frontend/src/domain/simulationValueObjects.test.ts::bounded statistical value objects > accepts the inclusive bounds [37:4]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationValueObjects.test.ts",
@@ -20577,10 +20640,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [82:3]",
+    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [85:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
-    "selector": "shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [82:3]",
+    "selector": "shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [85:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20601,10 +20664,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [131:3]",
+    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [134:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
-    "selector": "shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [131:3]",
+    "selector": "shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [134:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20613,10 +20676,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [65:3]",
+    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [68:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
-    "selector": "shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [65:3]",
+    "selector": "shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [68:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20629,10 +20692,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [102:3]",
+    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [105:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
-    "selector": "shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [102:3]",
+    "selector": "shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [105:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",

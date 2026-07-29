@@ -444,7 +444,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     print(
         "Statistical reference corpus 1.0 and its schema are valid; "
-        "PBI 2.10, PBI 2.11, PBI 2.14 and PBI 2.15 scopes are complete, "
+        "PBI 2.10, PBI 2.11, PBI 2.14, PBI 2.15 and PBI 2.16 scopes are complete, "
         "input rejection probes pass, "
         "positive example is accepted and negative example is rejected."
     )

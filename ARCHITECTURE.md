@@ -356,7 +356,7 @@ Les moteurs ne connaissent que `SampleIndexDrawPort` et ne créent aucun PRNG. L
 logique et les tests de lots prouvent la stabilité de l’affectation des tirages. Le corpus partagé couvre
 les entrées, censures, percentiles, scores, labels et buckets, puis exécute les mêmes références dans les
 deux moteurs. Les validations normalisées, la forme des résultats, les censures, les percentiles, le
-Risk Score et la fiabilité concordent. Les deux géométries d’histogrammes agrégés divergent encore.
+Risk Score, la fiabilité et les histogrammes concordent sur les seize cas.
 
 ### Contrat du corpus statistique
 
@@ -383,9 +383,9 @@ un langage. `Scripts/validate_statistical_reference_corpus.py` s’appuie sur
 `Scripts/statistical_reference_corpus_validation.py`, qui compose les invariants partagés et les modules de
 périmètre 2.14/2.15, pour contrôler le métaschème, le corpus candidat, ses invariants
 structurels, la complétude des familles de preuve, les formules et gardes du score, les métriques et labels
-normalisés,
-les représentants de buckets, l’unicité des scénarios, 24 probes négatives et les exemples positif et
-négatif sans importer les moteurs.
+normalisés, ainsi que les représentants et effectifs de buckets reconstruits par une récurrence scalaire
+`mca-prng-v1` et l’algorithme normatif. Il contrôle aussi l’unicité des scénarios, 24 probes négatives et
+les exemples positif et négatif sans importer les moteurs.
 
 `Scripts/statistical_corpus_runner.py` adapte le corpus au service Python et lance le pont Node
 `frontend/scripts/run-statistical-reference-corpus.mjs`. Celui-ci valide d’abord le même fichier avec le
@@ -426,8 +426,16 @@ domaine calculent moyenne, variance de population, quartiles linéaires et pente
 délèguent la normalisation et l’ordre des labels au Value Object de leur langage. `mc_core.py` ne dépend
 plus de `numpy.percentile` ou `numpy.polyfit`, et `utils/simulation.ts` ne contient plus de second calcul.
 
-Les deux géométries d’histogrammes agrégés restent explicitement divergentes et le rapport de parité reste
-informatif. L’adoption de l’ordre simulation-major peut changer le rejeu local `backlog_to_weeks` d’une
+La construction des histogrammes appartient uniquement à `backend/histogram.py` et
+`frontend/src/domain/histogram.ts`. Les deux modules conservent l’histogramme exact jusqu’à 100 valeurs
+distinctes puis appliquent les mêmes bornes inclusives, la même largeur et le même représentant tronqué.
+Les hooks, graphiques et rapports consomment ces buckets sans en reconstruire la géométrie. Le rapport de
+parité reste informatif et extérieur au profil `main`.
+
+Les sorties agrégées produites avant cet alignement ne sont plus des références conformes à
+`STD-STAT-001` : elles restent des données historiques lisibles, sans migration ni suppression, et ne
+doivent pas servir d’oracle à une nouvelle exécution. L’adoption de l’ordre simulation-major peut changer
+le rejeu local `backlog_to_weeks` d’une
 seed issue de l’ordre antérieur ; le backend déjà organisé en lignes complètes et le mode local
 `weeks_to_items` conservent leur ordre. Les résultats déjà persistés restent inchangés et aucun historique
 n’est supprimé ou migré. Aucun identifiant de PRNG n’est ajouté aux DTO, au JSON, à MongoDB ou à

@@ -753,7 +753,29 @@ Le corpus partagé démontre ces invariants dans les deux langages. Les deux div
 concernent uniquement les histogrammes agrégés réservés au PBI 2.16. Les métriques et labels de fiabilité
 restent réservés au PBI 2.15 et le contrôle demeure informatif jusqu’au PBI 2.19.
 
-## 18. Conclusion
+## 18. Suivi du PBI 2.16
+
+Le PBI 2.16 résout les constats historiques ST-33 et les deux divergences d’histogrammes sans réécrire les
+mesures initiales de cet audit :
+
+- l’ancien chemin Python fondé sur `numpy.histogram` et les centres flottants arrondis est supprimé ;
+- l’ancien chemin TypeScript fondé sur `Math.round(left + width / 2)` sans borne droite tronquée est
+  supprimé ;
+- chaque langage possède une autorité de domaine unique qui conserve l’histogramme exact jusqu’à
+  100 valeurs distinctes puis applique la largeur, `right = min(max, left + width - 1)` et
+  `x = floor((left + right) / 2)` ;
+- le validateur autonome rejoue `mca-prng-v1` et reconstruit les représentants et effectifs sans importer
+  un moteur ;
+- le rapport régénéré donne 16 cas conformes, aucune divergence normative et aucune divergence entre
+  moteurs, tout en restant informatif jusqu’au PBI 2.19.
+
+Les sorties `100` buckets, centres impairs `1..101`, `50/9951` et `51/10050` consignées plus haut restent
+des preuves historiques des défauts corrigés. Elles sont explicitement invalidées comme références
+courantes ou oracles du contrat `1.0`. Aucun historique MongoDB ou `localStorage` n’est migré ou supprimé ;
+ses anciennes distributions agrégées restent lisibles comme données legacy, sans modifier les formats de
+frontière ni anticiper la gouvernance de version du PBI 2.20.
+
+## 19. Conclusion
 
 `CODE/EXP` : les deux moteurs partagent les règles déterministes essentielles, mais ne partagent ni PRNG ni
 contrat normatif complet. L'analyse multi-seeds ne démontre pas de biais interlangage sur le cas censuré;
