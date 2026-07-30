@@ -2,6 +2,27 @@
 
 ## Recent
 
+### Rejeu exact interlangage sur le corpus versionné — PBI 2.17
+
+- ajout de la commande dédiée
+  `.venv\Scripts\python.exe Scripts/run_statistical_exact_replay.py`, qui valide indépendamment le schéma,
+  le corpus `1.0` et ses invariants avant d’appeler les runners Python et TypeScript
+- rejeu des seize cas dans TypeScript et dans Python avec les batches backend `125`, `128`, `1000` et
+  `2048`, couvrant respectivement `8 × 125`, `7 × 128 + 104`, un lot exactement égal à la population et
+  un lot supérieur à la population
+- comparaison directe de chaque sortie à l’autorité `expected_result` du corpus, puis comparaison
+  interlangage, avec présence des champs, types primitifs JSON, valeurs et ordre des distributions exacts,
+  sans tolérance, arrondi, tri correctif ni normalisation silencieuse
+- publication de `reports/statistical-exact-replay-evidence.json` : 16 cas, 64 exécutions Python,
+  16 exécutions TypeScript, 80 comparaisons normatives conformes, 64 comparaisons interlangages conformes,
+  16 preuves d’indépendance du batching et aucun diagnostic
+- diagnostics déterministes portant le cas, le moteur, la taille de batch, le chemin JSON, les états
+  attendu et obtenu, ainsi que la classification `engine_error`, `normative_divergence` ou
+  `interlanguage_divergence`
+- contrôle maintenu informatif et explicitement distinct de l’équivalence distributionnelle, non évaluée ;
+  corpus ou configuration invalide et moteur inexécutable restent des échecs non nuls, sans anticiper la
+  consolidation du PBI 2.18, la gate du PBI 2.19 ni la gouvernance du PBI 2.20
+
 ### Construction normative des histogrammes — PBI 2.16
 
 - remplacement des deux constructions historiques par une autorité de domaine par langage, conservant

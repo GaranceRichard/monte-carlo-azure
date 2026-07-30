@@ -919,7 +919,7 @@ def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope
             "Le validateur",
         ],
         "docs/risk-control-matrix.md": [
-            "Les seize cas et les validations concordent exactement",
+            "Les 80 comparaisons normatives et 64 comparaisons interlangages concordent exactement",
             "refus du corpus avant toute exécution moteur",
         ],
     }
@@ -941,6 +941,72 @@ def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope
     assert pbi_line.endswith("| 28/07/2026 |")
     pbi_211_line = next(line for line in backlog.splitlines() if line.startswith("| 2.11 |"))
     assert pbi_211_line.endswith("| 28/07/2026 |")
+
+
+def test_documentation_traces_pbi_217_exact_replay_evidence() -> None:
+    root = corpus_validation.ROOT
+    expectations = {
+        "CHANGELOG.md": [
+            "Rejeu exact interlangage sur le corpus versionné — PBI 2.17",
+            "Scripts/run_statistical_exact_replay.py",
+            "reports/statistical-exact-replay-evidence.json",
+            "80 comparaisons normatives conformes",
+            "64 comparaisons interlangages conformes",
+            "aucun diagnostic",
+        ],
+        "docs/backlog-expectations/feature-02-statistical-core.md": [
+            "Scripts/run_statistical_exact_replay.py",
+            "`8 × 125`, `7 × 128 + 104`",
+            "80 comparaisons normatives exactes",
+            "64 comparaisons interlangages exactes",
+            "distributional_equivalence = not_evaluated",
+        ],
+        "docs/statistical-reference-corpus.md": [
+            "Preuve spécialisée de rejeu exact",
+            "Scripts/run_statistical_exact_replay.py",
+            "reports/statistical-exact-replay-evidence.json",
+            "`80/80` comparaisons normatives exactes",
+            "`64/64` comparaisons interlangages",
+            "`0` diagnostic",
+            "tests/test_statistical_exact_replay.py",
+        ],
+        "ARCHITECTURE.md": [
+            "Scripts/run_statistical_exact_replay.py",
+            "reports/statistical-exact-replay-evidence.json",
+            "64 exécutions Python et 16 TypeScript",
+            "distributional_equivalence = not_evaluated",
+        ],
+        "docs/standards/STD-STAT-001.md": [
+            "Scripts/run_statistical_exact_replay.py",
+            "reports/statistical-exact-replay-evidence.json",
+            "Le corpus reste l’autorité de résultat",
+        ],
+        "docs/statistical-parity-audit.md": [
+            "Suivi du PBI 2.17",
+            "80 comparaisons normatives conformes",
+            "64 comparaisons interlangages",
+            "16 cas indépendants du batching",
+        ],
+        "docs/risk-control-matrix.md": [
+            "reports/statistical-exact-replay-evidence.json",
+            "tests/test_statistical_exact_replay.py",
+            "batches `125`, `128`, `1000` et `2048`",
+            "sans diagnostic",
+        ],
+        "docs/critical-paths.md": [
+            "reports/statistical-exact-replay-evidence.json",
+            "tests/test_statistical_exact_replay.py",
+            "80 comparaisons normatives, 64 interlangages",
+            "16 cas",
+        ],
+        "docs/README.md": [
+            "reports/statistical-exact-replay-evidence.json",
+            "Preuve JSON régénérable du rejeu exact",
+        ],
+    }
+    for relative_path, expected_fragments in expectations.items():
+        content = (root / relative_path).read_text(encoding="utf-8")
+        assert all(fragment in content for fragment in expected_fragments)
 
 
 @pytest.mark.parametrize(

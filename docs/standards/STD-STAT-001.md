@@ -350,6 +350,21 @@ Le runner partagé exécute les références dans les deux moteurs avec leurs se
 validation du schéma et du corpus. Les sorties sont comparées exactement dans la forme sérialisée commune,
 sans tolérance, tri ou valeur absente reconstruite.
 
+La matérialisation spécialisée du rejeu exact est la commande
+`.venv\Scripts\python.exe Scripts/run_statistical_exact_replay.py` et son artefact déterministe
+[`reports/statistical-exact-replay-evidence.json`](../../reports/statistical-exact-replay-evidence.json).
+Elle exécute chaque référence dans TypeScript et dans Python selon plusieurs géométries de batch backend,
+puis compare chaque sortie directement à `expected_result` avant la comparaison interlangage. La présence
+des champs, les types primitifs JSON, les valeurs et l’ordre des distributions sont significatifs ; aucune
+tolérance, aucun arrondi, aucun tri correctif et aucune normalisation silencieuse ne sont admis. Un
+diagnostic localise le cas, le moteur, le batch, le chemin JSON, les états attendu et obtenu et qualifie
+l’erreur de moteur, la divergence normative ou la divergence interlangage.
+
+Cette matérialisation conserve séparément la nature de la preuve et l’enforcement. Un rejeu exact atteste
+`STAT-PAR-002` à `STAT-PAR-004` pour les références exécutées ; il ne constitue pas une évaluation
+distributionnelle au sens de `STAT-PAR-005`. Le corpus reste l’autorité de résultat et aucun moteur ou
+batch ne peut servir d’oracle à un autre.
+
 Les fabriques Python et TypeScript appliquent l’entrée normalisée fermée du contrat `1.0` :
 types et bornes stricts, entiers finis positifs ou nuls, six observations utilisables, seed `uint32` et
 présence exclusive du paramètre actif. Elles alignent aussi la forme canonique fermée et l’omission des valeurs

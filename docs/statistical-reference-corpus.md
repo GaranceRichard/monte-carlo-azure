@@ -401,6 +401,62 @@ Les seeds, tirages, distributions brutes, percentiles, scores et métriques de f
 par le runner. Les anciennes sorties agrégées restent des observations historiques et ne peuvent plus être
 utilisées comme oracle ou référence normative `1.0`.
 
+## Preuve spécialisée de rejeu exact
+
+La preuve dédiée se régénère localement avec :
+
+```powershell
+.venv\Scripts\python.exe Scripts/run_statistical_exact_replay.py
+```
+
+Elle produit
+[`reports/statistical-exact-replay-evidence.json`](../reports/statistical-exact-replay-evidence.json), sans
+horodatage ni dépendance à un résultat moteur antérieur. Le coordinateur réutilise d’abord la validation
+indépendante du schéma, du corpus `1.0` et de ses invariants. Le corpus partagé, plus précisément
+`expected_result`, reste la seule autorité des résultats attendus : Python ne sert jamais d’oracle à
+TypeScript, TypeScript ne sert jamais d’oracle à Python et un batch Python ne sert jamais d’oracle aux
+autres.
+
+Les seize cas sont rejoués une fois dans le moteur TypeScript et quatre fois dans le moteur Python. Les
+tailles de batch backend et leurs géométries sur les `1000` simulations de chaque cas sont :
+
+| Taille configurée | Géométrie effective | Propriété couverte |
+| ---: | --- | --- |
+| `125` | `8 × 125` | plusieurs lots, découpage divisible |
+| `128` | `7 × 128 + 104` | plusieurs lots, dernier lot non divisible |
+| `1000` | `1 × 1000` | lot unique exactement égal à la population |
+| `2048` | `1 × 1000` | lot configuré supérieur à la population |
+
+Chaque sortie Python et TypeScript est comparée directement à son `expected_result`, puis chaque sortie
+Python est comparée à la sortie TypeScript correspondante. La comparaison récursive exige la présence
+exacte des champs, les types primitifs JSON, les longueurs et valeurs, l’ordre des tableaux — notamment des
+buckets de distribution —, la présence des percentiles et la forme canonique complète. Elle n’applique
+aucune tolérance numérique, aucun arrondi, aucun tri correctif et aucune normalisation silencieuse.
+
+L’indépendance du batching n’est donc pas déduite d’une simple égalité entre deux exécutions : elle est
+démontrée, pour chaque cas, lorsque chacune des quatre géométries Python concorde séparément avec l’autorité
+versionnée. La preuve courante expose `16` cas indépendants sur `16`, avec `64` exécutions Python,
+`16` exécutions TypeScript, `80/80` comparaisons normatives exactes, `64/64` comparaisons interlangages
+exactes et `0` diagnostic.
+
+Un diagnostic de divergence contient toujours l’identifiant du cas, le moteur, la taille de batch
+applicable, le JSON Pointer divergent, la présence, le type et la valeur attendus, la présence, le type et
+la valeur obtenus, puis l’une des classifications `engine_error`, `normative_divergence` ou
+`interlanguage_divergence`. L’artefact distingue ainsi une erreur de moteur, une divergence à l’autorité
+normative et une divergence entre langages.
+
+`tests/test_statistical_exact_replay.py` couvre la complétude des dimensions, les quatre géométries, les
+comparaisons exactes, les diagnostics positifs et négatifs, le refus avant moteur et l’exécution réelle du
+corpus dans les deux langages.
+
+Cette preuve porte `proof_kind = exact_replay`,
+`distributional_equivalence = not_evaluated` et `enforcement = informational`. Elle démontre une égalité
+exacte seed par seed ; elle ne mesure ni ne revendique une équivalence distributionnelle sur plusieurs
+seeds. Une divergence fonctionnelle reste visible sans rendre ce contrôle bloquant, tandis qu’un schéma ou
+corpus invalide, un plan de batch invalide, une erreur d’infrastructure ou un moteur inexécutable rendent
+la commande inexécutable avec un code non nul. La consolidation générale des rapports, l’intégration au
+profil `main` et les décisions de compatibilité restent des responsabilités distinctes.
+
 ## Sondes de validation et forme canonique
 
 [`contracts/statistical-validation-probes-v1.0.json`](../contracts/statistical-validation-probes-v1.0.json)

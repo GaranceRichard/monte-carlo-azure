@@ -401,6 +401,28 @@ isole les erreurs par cas, exécute aussi les 22 sondes de validation du contrat
 JSON et Markdown déterministes sous `reports/`.
 L’enforcement reste `informational` et n’appartient pas encore au DAG `main`.
 
+`Scripts/run_statistical_exact_replay.py` spécialise cette orchestration pour la preuve de rejeu exact.
+Après la même validation indépendante, il exécute les seize cas dans TypeScript et dans Python avec les
+tailles de batch backend `125`, `128`, `1000` et `2048`. Pour `n_sims = 1000`, ce plan couvre
+respectivement `8 × 125`, `7 × 128 + 104`, un lot exactement égal à la population et un lot configuré
+au-dessus de la population. Chaque exécution est comparée directement à `expected_result` avant la
+comparaison Python/TypeScript ; aucun moteur ni aucune géométrie de batch ne devient un oracle.
+
+Le comparateur conserve la présence des champs, les types primitifs JSON, les valeurs, les longueurs et
+l’ordre des tableaux de la forme canonique. Il n’applique ni tolérance, ni arrondi, ni tri correctif, ni
+normalisation silencieuse. L’indépendance du batching est vraie seulement si les quatre sorties Python de
+chaque cas concordent séparément avec le corpus. La preuve régénérable
+`reports/statistical-exact-replay-evidence.json` consigne les géométries, les comparaisons normatives et
+interlangages et, en cas d’écart, le cas, le moteur, le batch, le JSON Pointer, les états attendu et obtenu
+et la classification de l’erreur.
+
+L’artefact courant totalise 64 exécutions Python et 16 TypeScript : ses 80 comparaisons normatives et
+64 comparaisons interlangages concordent, les 16 cas sont indépendants du batching et aucun diagnostic
+n’est présent. Il porte explicitement `proof_kind = exact_replay`,
+`distributional_equivalence = not_evaluated` et `enforcement = informational`. Un corpus ou un plan de
+batch invalide, une erreur d’infrastructure ou un moteur inexécutable reste toutefois un échec explicite
+avec code non nul.
+
 Cette frontière ne constitue pas une nouvelle API applicative : aucun mapper, DTO, document MongoDB ou
 objet `localStorage` ne consomme directement le corpus. Les fabriques métier et les mappers appliquent les
 mêmes règles fermées : types stricts, bornes communes, six observations utiles,

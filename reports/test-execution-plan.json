@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1075,
+      "logicalCases": 1085,
       "nodes": [
         {
           "id": "preflight",
@@ -366,6 +366,7 @@
             "pytest:tests/test_simulation_mappers.py::test_request_transport_defaults_are_explicitly_aligned_before_the_domain",
             "pytest:tests/test_simulation_mappers.py::test_response_dto_rejects_null_non_finite_and_open_shapes",
             "pytest:tests/test_simulation_mappers.py::test_result_to_response_preserves_public_json_and_omits_none_values",
+            "pytest:tests/test_simulation_service.py::test_explicit_batch_size_is_transmitted_and_preserves_exact_results",
             "pytest:tests/test_simulation_service.py::test_mc_core_has_no_concrete_rng_access",
             "pytest:tests/test_simulation_service.py::test_service_and_engine_keep_seed_resolution_outside_the_draw_port_contract",
             "pytest:tests/test_simulation_service.py::test_service_constructs_exactly_one_adapter_per_execution_and_passes_it_to_engine",
@@ -416,12 +417,21 @@
             "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_reports_case_errors_without_stopping_following_cases",
             "pytest:tests/test_statistical_corpus_runner.py::test_shared_validation_probes_match_in_python_and_typescript",
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_validation_bridge_classifies_protocol_failures",
+            "pytest:tests/test_statistical_exact_replay.py::test_batch_plan_requires_every_geometry_and_strict_unique_positive_integers",
+            "pytest:tests/test_statistical_exact_replay.py::test_engine_errors_identify_missing_and_fatal_case_reports_precisely",
+            "pytest:tests/test_statistical_exact_replay.py::test_engine_report_protocol_validates_headers_case_set_order_and_statuses",
+            "pytest:tests/test_statistical_exact_replay.py::test_identical_wrong_python_output_in_every_batch_is_not_batch_independence",
+            "pytest:tests/test_statistical_exact_replay.py::test_interlanguage_diagnostic_keeps_corpus_as_authority_for_two_wrong_engines",
+            "pytest:tests/test_statistical_exact_replay.py::test_matching_synthetic_report_proves_all_80_normative_and_64_pairwise_runs",
+            "pytest:tests/test_statistical_exact_replay.py::test_normative_diagnostics_preserve_types_values_presence_and_array_order",
+            "pytest:tests/test_statistical_exact_replay.py::test_versioned_corpus_covers_every_exact_replay_dimension_and_reports_a_gap",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_case_identifiers",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_contract_control_rejects_duplicate_normalized_scenarios",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_217_exact_replay_evidence",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_histogram_derivation_covers_exact_continuous_and_asymmetric_ranges",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_reliability_derivation_proves_six_and_seven_observations",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
@@ -502,18 +512,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 387
+            "pytest": 397
           },
           "natures": {
-            "component": 71,
+            "component": 72,
             "contract": 46,
-            "integration": 29,
-            "unit": 241
+            "integration": 30,
+            "unit": 249
           },
           "criticalities": {
             "critical": 73,
             "high": 16,
-            "unassigned": 298
+            "unassigned": 308
           }
         },
         {
@@ -1081,11 +1091,11 @@
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode on pages builds without query flags [51:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [85:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [95:3]",
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > executes the same 1.0 corpus with mca-prng-v1 and canonical output [25:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [134:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [68:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [105:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [144:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [74:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [115:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -1338,7 +1348,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1289,
+      "logicalCases": 1305,
       "nodes": [
         {
           "id": "preflight",
@@ -1786,6 +1796,7 @@
             "pytest:tests/test_simulation_mappers.py::test_request_transport_defaults_are_explicitly_aligned_before_the_domain",
             "pytest:tests/test_simulation_mappers.py::test_response_dto_rejects_null_non_finite_and_open_shapes",
             "pytest:tests/test_simulation_mappers.py::test_result_to_response_preserves_public_json_and_omits_none_values",
+            "pytest:tests/test_simulation_service.py::test_explicit_batch_size_is_transmitted_and_preserves_exact_results",
             "pytest:tests/test_simulation_service.py::test_mc_core_has_no_concrete_rng_access",
             "pytest:tests/test_simulation_service.py::test_service_and_engine_keep_seed_resolution_outside_the_draw_port_contract",
             "pytest:tests/test_simulation_service.py::test_service_constructs_exactly_one_adapter_per_execution_and_passes_it_to_engine",
@@ -1852,6 +1863,20 @@
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_bridge_parses_report_and_classifies_failures",
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_validation_bridge_classifies_protocol_failures",
             "pytest:tests/test_statistical_corpus_runner.py::test_validation_rejects_invalid_schema_and_corpus_before_engines",
+            "pytest:tests/test_statistical_exact_replay.py::test_batch_plan_requires_every_geometry_and_strict_unique_positive_integers",
+            "pytest:tests/test_statistical_exact_replay.py::test_cli_keeps_divergence_informational_but_fails_invalidity_and_engine_error",
+            "pytest:tests/test_statistical_exact_replay.py::test_control_encapsulates_runner_and_protocol_errors_as_engine_evidence",
+            "pytest:tests/test_statistical_exact_replay.py::test_control_rejects_invalid_corpus_coverage_and_batch_plan_before_engines",
+            "pytest:tests/test_statistical_exact_replay.py::test_control_script_entrypoint_propagates_failure_code",
+            "pytest:tests/test_statistical_exact_replay.py::test_control_writes_byte_stable_json_for_the_same_validated_inputs",
+            "pytest:tests/test_statistical_exact_replay.py::test_engine_errors_identify_missing_and_fatal_case_reports_precisely",
+            "pytest:tests/test_statistical_exact_replay.py::test_engine_report_protocol_validates_headers_case_set_order_and_statuses",
+            "pytest:tests/test_statistical_exact_replay.py::test_identical_wrong_python_output_in_every_batch_is_not_batch_independence",
+            "pytest:tests/test_statistical_exact_replay.py::test_interlanguage_diagnostic_keeps_corpus_as_authority_for_two_wrong_engines",
+            "pytest:tests/test_statistical_exact_replay.py::test_matching_synthetic_report_proves_all_80_normative_and_64_pairwise_runs",
+            "pytest:tests/test_statistical_exact_replay.py::test_normative_diagnostics_preserve_types_values_presence_and_array_order",
+            "pytest:tests/test_statistical_exact_replay.py::test_real_versioned_corpus_control_executes_completely_as_informational_evidence",
+            "pytest:tests/test_statistical_exact_replay.py::test_versioned_corpus_covers_every_exact_replay_dimension_and_reports_a_gap",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
@@ -1860,6 +1885,7 @@
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_217_exact_replay_evidence",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_histogram_derivation_covers_exact_continuous_and_asymmetric_ranges",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_reliability_derivation_proves_six_and_seven_observations",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
@@ -2013,18 +2039,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 569
+            "pytest": 585
           },
           "natures": {
-            "component": 71,
+            "component": 72,
             "contract": 46,
-            "integration": 211,
-            "unit": 241
+            "integration": 218,
+            "unit": 249
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 463
+            "unassigned": 479
           }
         },
         {
@@ -2592,11 +2618,11 @@
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode on pages builds without query flags [51:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [85:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [95:3]",
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > executes the same 1.0 corpus with mca-prng-v1 and canonical output [25:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [134:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [68:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [105:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [144:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [74:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [115:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -2890,7 +2916,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1290,
+      "logicalCases": 1306,
       "nodes": [
         {
           "id": "preflight",
@@ -3338,6 +3364,7 @@
             "pytest:tests/test_simulation_mappers.py::test_request_transport_defaults_are_explicitly_aligned_before_the_domain",
             "pytest:tests/test_simulation_mappers.py::test_response_dto_rejects_null_non_finite_and_open_shapes",
             "pytest:tests/test_simulation_mappers.py::test_result_to_response_preserves_public_json_and_omits_none_values",
+            "pytest:tests/test_simulation_service.py::test_explicit_batch_size_is_transmitted_and_preserves_exact_results",
             "pytest:tests/test_simulation_service.py::test_mc_core_has_no_concrete_rng_access",
             "pytest:tests/test_simulation_service.py::test_service_and_engine_keep_seed_resolution_outside_the_draw_port_contract",
             "pytest:tests/test_simulation_service.py::test_service_constructs_exactly_one_adapter_per_execution_and_passes_it_to_engine",
@@ -3404,6 +3431,20 @@
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_bridge_parses_report_and_classifies_failures",
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_validation_bridge_classifies_protocol_failures",
             "pytest:tests/test_statistical_corpus_runner.py::test_validation_rejects_invalid_schema_and_corpus_before_engines",
+            "pytest:tests/test_statistical_exact_replay.py::test_batch_plan_requires_every_geometry_and_strict_unique_positive_integers",
+            "pytest:tests/test_statistical_exact_replay.py::test_cli_keeps_divergence_informational_but_fails_invalidity_and_engine_error",
+            "pytest:tests/test_statistical_exact_replay.py::test_control_encapsulates_runner_and_protocol_errors_as_engine_evidence",
+            "pytest:tests/test_statistical_exact_replay.py::test_control_rejects_invalid_corpus_coverage_and_batch_plan_before_engines",
+            "pytest:tests/test_statistical_exact_replay.py::test_control_script_entrypoint_propagates_failure_code",
+            "pytest:tests/test_statistical_exact_replay.py::test_control_writes_byte_stable_json_for_the_same_validated_inputs",
+            "pytest:tests/test_statistical_exact_replay.py::test_engine_errors_identify_missing_and_fatal_case_reports_precisely",
+            "pytest:tests/test_statistical_exact_replay.py::test_engine_report_protocol_validates_headers_case_set_order_and_statuses",
+            "pytest:tests/test_statistical_exact_replay.py::test_identical_wrong_python_output_in_every_batch_is_not_batch_independence",
+            "pytest:tests/test_statistical_exact_replay.py::test_interlanguage_diagnostic_keeps_corpus_as_authority_for_two_wrong_engines",
+            "pytest:tests/test_statistical_exact_replay.py::test_matching_synthetic_report_proves_all_80_normative_and_64_pairwise_runs",
+            "pytest:tests/test_statistical_exact_replay.py::test_normative_diagnostics_preserve_types_values_presence_and_array_order",
+            "pytest:tests/test_statistical_exact_replay.py::test_real_versioned_corpus_control_executes_completely_as_informational_evidence",
+            "pytest:tests/test_statistical_exact_replay.py::test_versioned_corpus_covers_every_exact_replay_dimension_and_reports_a_gap",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
@@ -3412,6 +3453,7 @@
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_217_exact_replay_evidence",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_histogram_derivation_covers_exact_continuous_and_asymmetric_ranges",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_reliability_derivation_proves_six_and_seven_observations",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
@@ -3566,18 +3608,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 570
+            "pytest": 586
           },
           "natures": {
-            "component": 71,
+            "component": 72,
             "contract": 46,
-            "integration": 211,
-            "unit": 242
+            "integration": 218,
+            "unit": 250
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 464
+            "unassigned": 480
           }
         },
         {
@@ -4145,11 +4187,11 @@
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode on pages builds without query flags [51:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [85:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [95:3]",
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > executes the same 1.0 corpus with mca-prng-v1 and canonical output [25:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [134:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [68:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [105:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [144:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [74:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [115:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -4443,7 +4485,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1291,
+      "logicalCases": 1307,
       "nodes": [
         {
           "id": "preflight",
@@ -4892,6 +4934,7 @@
             "pytest:tests/test_simulation_mappers.py::test_request_transport_defaults_are_explicitly_aligned_before_the_domain",
             "pytest:tests/test_simulation_mappers.py::test_response_dto_rejects_null_non_finite_and_open_shapes",
             "pytest:tests/test_simulation_mappers.py::test_result_to_response_preserves_public_json_and_omits_none_values",
+            "pytest:tests/test_simulation_service.py::test_explicit_batch_size_is_transmitted_and_preserves_exact_results",
             "pytest:tests/test_simulation_service.py::test_mc_core_has_no_concrete_rng_access",
             "pytest:tests/test_simulation_service.py::test_service_and_engine_keep_seed_resolution_outside_the_draw_port_contract",
             "pytest:tests/test_simulation_service.py::test_service_constructs_exactly_one_adapter_per_execution_and_passes_it_to_engine",
@@ -4958,6 +5001,20 @@
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_bridge_parses_report_and_classifies_failures",
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_validation_bridge_classifies_protocol_failures",
             "pytest:tests/test_statistical_corpus_runner.py::test_validation_rejects_invalid_schema_and_corpus_before_engines",
+            "pytest:tests/test_statistical_exact_replay.py::test_batch_plan_requires_every_geometry_and_strict_unique_positive_integers",
+            "pytest:tests/test_statistical_exact_replay.py::test_cli_keeps_divergence_informational_but_fails_invalidity_and_engine_error",
+            "pytest:tests/test_statistical_exact_replay.py::test_control_encapsulates_runner_and_protocol_errors_as_engine_evidence",
+            "pytest:tests/test_statistical_exact_replay.py::test_control_rejects_invalid_corpus_coverage_and_batch_plan_before_engines",
+            "pytest:tests/test_statistical_exact_replay.py::test_control_script_entrypoint_propagates_failure_code",
+            "pytest:tests/test_statistical_exact_replay.py::test_control_writes_byte_stable_json_for_the_same_validated_inputs",
+            "pytest:tests/test_statistical_exact_replay.py::test_engine_errors_identify_missing_and_fatal_case_reports_precisely",
+            "pytest:tests/test_statistical_exact_replay.py::test_engine_report_protocol_validates_headers_case_set_order_and_statuses",
+            "pytest:tests/test_statistical_exact_replay.py::test_identical_wrong_python_output_in_every_batch_is_not_batch_independence",
+            "pytest:tests/test_statistical_exact_replay.py::test_interlanguage_diagnostic_keeps_corpus_as_authority_for_two_wrong_engines",
+            "pytest:tests/test_statistical_exact_replay.py::test_matching_synthetic_report_proves_all_80_normative_and_64_pairwise_runs",
+            "pytest:tests/test_statistical_exact_replay.py::test_normative_diagnostics_preserve_types_values_presence_and_array_order",
+            "pytest:tests/test_statistical_exact_replay.py::test_real_versioned_corpus_control_executes_completely_as_informational_evidence",
+            "pytest:tests/test_statistical_exact_replay.py::test_versioned_corpus_covers_every_exact_replay_dimension_and_reports_a_gap",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
@@ -4966,6 +5023,7 @@
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_control_reports_invalid_schema_and_negative_probe_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_cross_field_invariants_reject_structural_result_regressions",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope",
+            "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_217_exact_replay_evidence",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_histogram_derivation_covers_exact_continuous_and_asymmetric_ranges",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_independent_reliability_derivation_proves_six_and_seven_observations",
             "pytest:tests/test_statistical_reference_corpus_contract.py::test_input_contract_probes_cover_invalid_bounds_types_zeros_and_modes",
@@ -5120,18 +5178,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 571
+            "pytest": 587
           },
           "natures": {
-            "component": 71,
+            "component": 72,
             "contract": 46,
-            "integration": 212,
-            "unit": 242
+            "integration": 219,
+            "unit": 250
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 465
+            "unassigned": 481
           }
         },
         {
@@ -5699,11 +5757,11 @@
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode on pages builds without query flags [51:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [85:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [95:3]",
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > executes the same 1.0 corpus with mca-prng-v1 and canonical output [25:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [134:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [68:3]",
-            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [105:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [144:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [74:3]",
+            "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [115:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",

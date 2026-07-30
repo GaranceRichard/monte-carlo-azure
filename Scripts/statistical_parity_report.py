@@ -20,6 +20,18 @@ def _missing_difference(path: str, expected: Any, actual: Any) -> dict[str, Any]
     return {"path": path or "/", "kind": "unexpected_actual", "actual": actual}
 
 
+_JSON_TYPE_BY_TYPE = dict(
+    zip(
+        (dict, list, type(None), bool, int, float, str),
+        "object array null boolean number number string".split(),
+    )
+)
+
+
+def canonical_json_type(value: Any) -> str:
+    return _JSON_TYPE_BY_TYPE.get(type(value), type(value).__name__)
+
+
 def _compare_objects(
     expected: dict[str, Any],
     actual: dict[str, Any],
@@ -68,19 +80,23 @@ def compare_canonical(expected: Any, actual: Any, path: str = "") -> list[dict[s
 
     if expected is _MISSING or actual is _MISSING:
         return [_missing_difference(path, expected, actual)]
-    if isinstance(expected, dict) and isinstance(actual, dict):
-        return _compare_objects(expected, actual, path)
-    if isinstance(expected, list) and isinstance(actual, list):
-        return _compare_arrays(expected, actual, path)
-    if isinstance(expected, (dict, list)) or isinstance(actual, (dict, list)):
+    expected_type = canonical_json_type(expected)
+    actual_type = canonical_json_type(actual)
+    if expected_type != actual_type:
         return [
             {
                 "path": path or "/",
                 "kind": "type_mismatch",
+                "expected_type": expected_type,
+                "actual_type": actual_type,
                 "expected": expected,
                 "actual": actual,
             }
         ]
+    if expected_type == "object":
+        return _compare_objects(expected, actual, path)
+    if expected_type == "array":
+        return _compare_arrays(expected, actual, path)
     if expected != actual:
         return [
             {

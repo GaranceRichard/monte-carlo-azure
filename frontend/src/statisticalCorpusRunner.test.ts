@@ -31,19 +31,25 @@ describe("shared statistical corpus TypeScript runner", () => {
         referenceCase.expected_result,
       ]),
     );
-    const matching = cases.filter((caseReport) => (
-      JSON.stringify(caseReport.result) === JSON.stringify(expectedById.get(caseReport.id))
-    ));
 
     expect(report).toMatchObject({
       engine: "typescript",
       corpus_id: "mca-statistical-reference-corpus",
       schema_version: "1.0",
+      normative_contract: {
+        id: "STD-STAT-001",
+        version: "1.0",
+      },
       prng_contract: "mca-prng-v1",
       status: "completed",
     });
-    expect(cases).toHaveLength(16);
-    expect(matching).toHaveLength(16);
+    expect(cases).toStrictEqual(
+      corpusDocument.cases.map((referenceCase) => ({
+        id: referenceCase.id,
+        status: "ok",
+        result: referenceCase.expected_result,
+      })),
+    );
     expect(cases.find((caseReport) => (
       caseReport.id === "histogram-aggregated-contiguous-101"
     ))?.result?.result_distribution).toEqual(
@@ -74,6 +80,10 @@ describe("shared statistical corpus TypeScript runner", () => {
       engine: "typescript",
       corpus_id: "mca-statistical-reference-corpus",
       schema_version: "1.0",
+      normative_contract: {
+        id: "STD-STAT-001",
+        version: "1.0",
+      },
       prng_contract: "mca-prng-v1",
       status: "invalid_corpus",
       diagnostics: ["schema /cases/0 is invalid"],

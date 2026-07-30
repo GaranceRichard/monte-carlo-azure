@@ -13,7 +13,7 @@ from backend.api_routes_simulate import (
     _persist_simulation,
     limiter,
 )
-from backend.mc_core import FinishWeeksSimulation
+from backend.mc_core import SIMULATION_BATCH_SIZE, FinishWeeksSimulation
 from backend.simulation_limits import (
     SIMULATION_BACKLOG_SIZE_MAX,
     SIMULATION_HORIZON_WEEKS_MAX,
@@ -388,7 +388,8 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
     known_backlog = np.tile(np.array([3, 4, 6, 8, 10], dtype=int), 200)
     known_items = np.tile(np.array([18, 22, 24, 25, 27], dtype=int), 200)
 
-    def fake_compute(command, _samples, _draw_port):
+    def fake_compute(command, _samples, _draw_port, *, batch_size):
+        assert batch_size == SIMULATION_BATCH_SIZE
         if command.mode == "backlog_to_weeks":
             return (
                 FinishWeeksSimulation(
@@ -418,7 +419,8 @@ def test_simulate_returns_business_percentiles_for_known_discrete_results(monkey
 def test_simulate_backlog_to_weeks_omits_unidentifiable_percentiles_and_risk_score(monkeypatch):
     client = ApiTestClient(app)
 
-    def fake_compute(_command, _samples, _draw_port):
+    def fake_compute(_command, _samples, _draw_port, *, batch_size):
+        assert batch_size == SIMULATION_BATCH_SIZE
         return (
             FinishWeeksSimulation(
                 completed_weeks=np.array([], dtype=int),
@@ -457,7 +459,8 @@ def test_simulate_backlog_to_weeks_omits_unidentifiable_percentiles_and_risk_sco
 def test_simulate_backlog_to_weeks_keeps_exact_finish_at_horizon_distinct_from_censure(monkeypatch):
     client = ApiTestClient(app)
 
-    def fake_compute(_command, _samples, _draw_port):
+    def fake_compute(_command, _samples, _draw_port, *, batch_size):
+        assert batch_size == SIMULATION_BATCH_SIZE
         return (
             FinishWeeksSimulation(
                 completed_weeks=np.full(1000, 521, dtype=int),

@@ -75,6 +75,11 @@ def test_python_runner_executes_all_cases_with_exact_canonical_results() -> None
 
     assert engine_report["engine"] == "python"
     assert engine_report["status"] == "completed"
+    assert engine_report["batch_size"] == 2048
+    assert engine_report["normative_contract"] == {
+        "id": "STD-STAT-001",
+        "version": "1.0",
+    }
     assert len(engine_report["cases"]) == 16
     expected = {case["id"]: case["expected_result"] for case in corpus["cases"]}
     actual = {case["id"]: case["result"] for case in engine_report["cases"]}
@@ -84,8 +89,9 @@ def test_python_runner_executes_all_cases_with_exact_canonical_results() -> None
         if parity_report.compare_canonical(expected[case_id], actual[case_id]) == []
     ]
     assert matching == list(expected)
-    assert actual["histogram-aggregated-contiguous-101"]["result_distribution"] == (
-        expected["histogram-aggregated-contiguous-101"]["result_distribution"]
+    assert (
+        actual["histogram-aggregated-contiguous-101"]["result_distribution"]
+        == (expected["histogram-aggregated-contiguous-101"]["result_distribution"])
     )
     assert actual["histogram-aggregated-discontinuous"]["result_distribution"] == [
         {"x": 50, "count": 994},
@@ -260,6 +266,31 @@ def test_typescript_validation_bridge_classifies_protocol_failures(
 
 def test_exact_comparator_preserves_absence_order_types_lengths_and_values() -> None:
     assert parity_report.compare_canonical({"same": [1]}, {"same": [1]}) == []
+    assert parity_report.compare_canonical(1, 1.0) == []
+    assert parity_report.compare_canonical(True, 1) == [
+        {
+            "path": "/",
+            "kind": "type_mismatch",
+            "expected_type": "boolean",
+            "actual_type": "number",
+            "expected": True,
+            "actual": 1,
+        }
+    ]
+    assert parity_report.compare_canonical("1", 1) == [
+        {
+            "path": "/",
+            "kind": "type_mismatch",
+            "expected_type": "string",
+            "actual_type": "number",
+            "expected": "1",
+            "actual": 1,
+        }
+    ]
+    assert parity_report.compare_canonical([1, 2], [2, 1]) == [
+        {"path": "/0", "kind": "value_mismatch", "expected": 1, "actual": 2},
+        {"path": "/1", "kind": "value_mismatch", "expected": 2, "actual": 1},
+    ]
     differences = parity_report.compare_canonical(
         {"missing": 1, "array": [1, 2], "object": {"value": 2}},
         {"extra": 3, "array": [1], "object": [2]},
@@ -458,9 +489,7 @@ def test_execution_rejects_incomplete_pbi_215_scope_before_engines(
     )
     corpus = _corpus()
     corpus["cases"] = [
-        case
-        for case in corpus["cases"]
-        if case["id"] != "reliability-seven-observations-degraded"
+        case for case in corpus["cases"] if case["id"] != "reliability-seven-observations-degraded"
     ]
     corpus_path.write_text(json.dumps(corpus), encoding="utf-8")
 
@@ -471,8 +500,7 @@ def test_execution_rejects_incomplete_pbi_215_scope_before_engines(
     assert validated is None
     assert invalidity == "corpus_invalid"
     assert any(
-        "missing required PBI 2.15 case: reliability-seven-observations-degraded"
-        in diagnostic
+        "missing required PBI 2.15 case: reliability-seven-observations-degraded" in diagnostic
         for diagnostic in diagnostics
     )
 

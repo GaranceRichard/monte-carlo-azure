@@ -89,8 +89,11 @@ une connexion Azure DevOps réelle.
 - **Fiabilité explicable.** La dispersion, les quartiles et la tendance du throughput suivent les mêmes
   formules dans les deux moteurs ; les seuils utilisent les métriques arrondies avant d’attribuer les labels
   `non fiable`, `fragile`, `incertain` ou `fiable`.
-- **Rejeu explicite.** Une seed résolue accompagne l’exécution et peut être réutilisée. La portée exacte de
-  cette reproductibilité dépend de la version du moteur et du contrat aléatoire.
+  - **Rejeu exact vérifié.** À entrée normalisée, seed, version de contrat et configuration identiques, les
+  moteurs Python et TypeScript produisent exactement la même réponse canonique. Le résultat backend reste
+  indépendant du découpage en lots pour les configurations couvertes par la
+  [preuve de rejeu versionnée](reports/statistical-exact-replay-evidence.json). Cette garantie reste liée
+  aux versions déclarées du moteur, du contrat statistique et du contrat aléatoire.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 

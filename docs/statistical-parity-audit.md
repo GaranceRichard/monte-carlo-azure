@@ -775,7 +775,34 @@ courantes ou oracles du contrat `1.0`. Aucun historique MongoDB ou `localStorage
 ses anciennes distributions agrégées restent lisibles comme données legacy, sans modifier les formats de
 frontière ni anticiper la gouvernance de version du PBI 2.20.
 
-## 19. Conclusion
+## 19. Suivi du PBI 2.17
+
+Le PBI 2.17 ajoute une preuve spécialisée sans réécrire les observations, expériences ni conclusions
+historiques de cet audit. La commande
+`.venv\Scripts\python.exe Scripts/run_statistical_exact_replay.py` valide indépendamment le corpus `1.0`,
+puis rejoue ses seize cas dans TypeScript et dans Python avec les batches backend `125`, `128`, `1000` et
+`2048`. Ces tailles couvrent `8 × 125`, `7 × 128 + 104`, un lot exactement égal à la population et un lot
+configuré au-dessus de la population.
+
+Chaque résultat est comparé directement à `expected_result`, seule autorité, avant la comparaison entre
+langages. La preuve exige exactement présence des champs, types primitifs JSON, valeurs, longueurs, ordre
+des distributions et forme canonique, sans tolérance, arrondi, tri correctif ni normalisation silencieuse.
+L’indépendance du batching n’emploie pas un moteur ou un lot comme oracle : chacune des quatre exécutions
+Python doit concorder séparément avec le corpus.
+
+L’artefact déterministe `reports/statistical-exact-replay-evidence.json` observe 16 cas, 64 exécutions
+Python, 16 exécutions TypeScript, 80 comparaisons normatives conformes, 64 comparaisons interlangages
+conformes, 16 cas indépendants du batching et 0 diagnostic. Une divergence éventuelle identifie le cas, le
+moteur, le batch, le chemin JSON, les états attendu et obtenu, puis distingue `engine_error`,
+`normative_divergence` et `interlanguage_divergence`.
+
+Cette preuve est un rejeu exact ; l’équivalence distributionnelle porte explicitement
+`not_evaluated`. Son enforcement reste informatif, mais un corpus ou un plan de batch invalide, une erreur
+d’infrastructure ou un moteur inexécutable reste un échec explicite et non nul. La consolidation générale
+des rapports du PBI 2.18, la gate bloquante du PBI 2.19 et la gouvernance de compatibilité du PBI 2.20 ne
+sont pas réalisées ici.
+
+## 20. Conclusion
 
 `CODE/EXP` : les deux moteurs partagent les règles déterministes essentielles, mais ne partagent ni PRNG ni
 contrat normatif complet. L'analyse multi-seeds ne démontre pas de biais interlangage sur le cas censuré;

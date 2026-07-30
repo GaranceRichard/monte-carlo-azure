@@ -22,6 +22,10 @@ export type ReferenceCase = {
 export type StatisticalCorpus = {
   corpus_id: string;
   schema_version: string;
+  normative_contract: {
+    id: string;
+    version: string;
+  };
   prng_contract: { id: string };
   cases: readonly ReferenceCase[];
 };
@@ -101,6 +105,10 @@ export function runTypeScriptCorpus(
     engine: "typescript",
     corpus_id: corpus.corpus_id,
     schema_version: corpus.schema_version,
+    normative_contract: {
+      id: corpus.normative_contract.id,
+      version: corpus.normative_contract.version,
+    },
     prng_contract: corpus.prng_contract.id,
   };
   if (validationIssues.length > 0) {

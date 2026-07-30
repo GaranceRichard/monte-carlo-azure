@@ -6968,6 +6968,22 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_simulation_service.py::test_explicit_batch_size_is_transmitted_and_preserves_exact_results",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_service.py",
+    "selector": "test_explicit_batch_size_is_transmitted_and_preserves_exact_results",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional",
+      "performance"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_simulation_service.py::test_mc_core_has_no_concrete_rng_access",
     "framework": "pytest",
     "sourcePath": "tests/test_simulation_service.py",
@@ -8041,6 +8057,204 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_batch_plan_requires_every_geometry_and_strict_unique_positive_integers",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_batch_plan_requires_every_geometry_and_strict_unique_positive_integers",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "performance"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_cli_keeps_divergence_informational_but_fails_invalidity_and_engine_error",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_cli_keeps_divergence_informational_but_fails_invalidity_and_engine_error",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_control_encapsulates_runner_and_protocol_errors_as_engine_evidence",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_control_encapsulates_runner_and_protocol_errors_as_engine_evidence",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_control_rejects_invalid_corpus_coverage_and_batch_plan_before_engines",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_control_rejects_invalid_corpus_coverage_and_batch_plan_before_engines",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "performance",
+      "observability"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_control_script_entrypoint_propagates_failure_code",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_control_script_entrypoint_propagates_failure_code",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ],
+    "domains": [
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_control_writes_byte_stable_json_for_the_same_validated_inputs",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_control_writes_byte_stable_json_for_the_same_validated_inputs",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_engine_errors_identify_missing_and_fatal_case_reports_precisely",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_engine_errors_identify_missing_and_fatal_case_reports_precisely",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_engine_report_protocol_validates_headers_case_set_order_and_statuses",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_engine_report_protocol_validates_headers_case_set_order_and_statuses",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_identical_wrong_python_output_in_every_batch_is_not_batch_independence",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_identical_wrong_python_output_in_every_batch_is_not_batch_independence",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "performance"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_interlanguage_diagnostic_keeps_corpus_as_authority_for_two_wrong_engines",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_interlanguage_diagnostic_keeps_corpus_as_authority_for_two_wrong_engines",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_matching_synthetic_report_proves_all_80_normative_and_64_pairwise_runs",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_matching_synthetic_report_proves_all_80_normative_and_64_pairwise_runs",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_normative_diagnostics_preserve_types_values_presence_and_array_order",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_normative_diagnostics_preserve_types_values_presence_and_array_order",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_real_versioned_corpus_control_executes_completely_as_informational_evidence",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_real_versioned_corpus_control_executes_completely_as_informational_evidence",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_versioned_corpus_covers_every_exact_replay_dimension_and_reports_a_gap",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_exact_replay.py",
+    "selector": "test_versioned_corpus_covers_every_exact_replay_dimension_and_reports_a_gap",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "migration_recovery",
+      "observability"
+    ],
+    "domains": [
+      "history",
+      "reporting"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
     "framework": "pytest",
     "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
@@ -8148,6 +8362,22 @@
     "nature": "integration",
     "purposes": [
       "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_reference_corpus_contract.py::test_documentation_traces_pbi_217_exact_replay_evidence",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_reference_corpus_contract.py",
+    "selector": "test_documentation_traces_pbi_217_exact_replay_evidence",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "migration_recovery"
+    ],
+    "domains": [
+      "history"
     ]
   },
   {
@@ -20640,10 +20870,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [85:3]",
+    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [95:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
-    "selector": "shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [85:3]",
+    "selector": "shared statistical corpus TypeScript runner > applies every shared positive and negative normalized-input probe [95:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20664,10 +20894,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [134:3]",
+    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [144:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
-    "selector": "shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [134:3]",
+    "selector": "shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [144:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20676,10 +20906,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [68:3]",
+    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [74:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
-    "selector": "shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [68:3]",
+    "selector": "shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [74:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20692,10 +20922,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [105:3]",
+    "logicalCaseId": "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [115:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/statisticalCorpusRunner.test.ts",
-    "selector": "shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [105:3]",
+    "selector": "shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [115:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",

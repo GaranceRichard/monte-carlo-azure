@@ -20,13 +20,22 @@
       "engine": "python",
       "corpus_id": "mca-statistical-reference-corpus",
       "schema_version": "1.0",
+      "normative_contract": {
+        "id": "STD-STAT-001",
+        "version": "1.0"
+      },
       "prng_contract": "mca-prng-v1",
+      "batch_size": 2048,
       "status": "completed"
     },
     "typescript": {
       "engine": "typescript",
       "corpus_id": "mca-statistical-reference-corpus",
       "schema_version": "1.0",
+      "normative_contract": {
+        "id": "STD-STAT-001",
+        "version": "1.0"
+      },
       "prng_contract": "mca-prng-v1",
       "status": "completed"
     }

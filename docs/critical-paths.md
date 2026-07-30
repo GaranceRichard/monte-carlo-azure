@@ -76,8 +76,8 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
 - **Résultat attendu** : réponse conforme et reproductible avec seed, ou erreur HTTP explicite sans calcul
   hors bornes.
 - **Risques associés** : `RISK-003`, `RISK-004`, `RISK-005`, `RISK-011`, `RISK-013`, `RISK-016`, `RISK-017`.
-- **Niveaux actuellement mobilisés** : unitaire du moteur, composant/API, intégration Mongo conditionnelle et
-  contrôle de contrat par modèles Pydantic.
+- **Niveaux actuellement mobilisés** : unitaire du moteur, composant/API, intégration Mongo conditionnelle,
+  contrôle de contrat par modèles Pydantic et rejeu exact interlangage informatif sur le corpus versionné.
 - **Contrôles non fonctionnels** : sécurité, performance bornée, timeout, limitation de débit, résilience
   partielle et observabilité par logs.
 - **Preuves existantes** : `backend/api_models.py`, `backend/api_routes_simulate.py`,
@@ -89,12 +89,18 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   `frontend/src/storage/simulationHistoryDtos.ts`, `frontend/src/storage/simulationHistoryMappers.ts`,
   `tests/test_api_simulate.py`, `tests/test_mc_core.py`, `tests/test_simulation_mappers.py`,
   `tests/test_simulation_service.py`, `tests/test_api_history.py`, `tests/test_simulation_store.py`,
-  `frontend/src/api/simulationMappers.test.ts`, `frontend/src/storage/simulationHistoryMappers.test.ts`.
+  `frontend/src/api/simulationMappers.test.ts`, `frontend/src/storage/simulationHistoryMappers.test.ts`,
+  `Scripts/run_statistical_exact_replay.py`, `reports/statistical-exact-replay-evidence.json`,
+  `tests/test_statistical_exact_replay.py`, `tests/test_statistical_corpus_runner.py`,
+  `frontend/src/statisticalCorpusRunner.test.ts`.
 - **État** : partiellement couvert.
 - **Lacunes connues** : les frontières DTO/domaine/persistance sont explicites et les validations,
   censures, percentiles, Risk Score, métriques de fiabilité et histogrammes concordent entre Python et
-  TypeScript sur les seize cas. Le contrôle de parité reste informatif, et il n’existe toujours
-  ni test de charge, ni preuve d'annulation du thread après timeout, ni politique de proxy de confiance.
+  TypeScript sur les seize cas. Les batches backend `125`, `128`, `1000` et `2048` produisent chacun le
+  résultat exact du corpus ; la preuve compte 80 comparaisons normatives, 64 interlangages, 16 cas
+  indépendants du batching et aucun diagnostic. Ce rejeu exact reste informatif et l’équivalence
+  distributionnelle n’y est pas évaluée. Il n’existe toujours ni gate de parité bloquante, ni test de
+  charge, ni preuve d'annulation du thread après timeout, ni politique de proxy de confiance.
 
 ### CP-004 — Flux onboarding critique
 

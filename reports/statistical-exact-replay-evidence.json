@@ -1,0 +1,1155 @@
+{
+  "report_version": "1.0",
+  "proof_kind": "exact_replay",
+  "enforcement": "informational",
+  "distributional_equivalence": "not_evaluated",
+  "status": "match",
+  "comparison_policy": {
+    "authority": "versioned_corpus_expected_result",
+    "engine_as_oracle": false,
+    "field_presence": "exact",
+    "primitive_types": "exact_json_types",
+    "numeric_tolerance": "none",
+    "numeric_rounding": "none",
+    "distribution_order": "significant",
+    "silent_normalization": false
+  },
+  "corpus": {
+    "id": "mca-statistical-reference-corpus",
+    "schema_version": "1.0",
+    "normative_contract": {
+      "id": "STD-STAT-001",
+      "version": "1.0"
+    },
+    "prng_contract": "mca-prng-v1"
+  },
+  "coverage": {
+    "modes": [
+      "weeks_to_items",
+      "backlog_to_weeks"
+    ],
+    "censorship": [
+      "not_applicable",
+      "none",
+      "partial",
+      "total"
+    ],
+    "percentiles": [
+      "complete",
+      "partial",
+      "absent"
+    ],
+    "risk_score": [
+      "present",
+      "absent"
+    ],
+    "reliability_labels": [
+      "fragile",
+      "incertain",
+      "fiable",
+      "non fiable"
+    ],
+    "histograms": [
+      "exact",
+      "aggregated"
+    ]
+  },
+  "batching": {
+    "python_batch_sizes": [
+      125,
+      128,
+      1000,
+      2048
+    ],
+    "typescript_execution": "simulation_major_sequential",
+    "independence_rule": "every_python_batch_matches_corpus",
+    "independent": true
+  },
+  "summary": {
+    "case_count": 16,
+    "python_case_executions": 64,
+    "typescript_case_executions": 16,
+    "normative_comparisons": 80,
+    "normative_matches": 80,
+    "interlanguage_comparisons": 64,
+    "interlanguage_matches": 64,
+    "batch_independent_cases": 16,
+    "engine_error_cases": 0,
+    "diagnostic_count": 0
+  },
+  "cases": [
+    {
+      "id": "items-zero-weeks-excluded",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "weeks-zero-weeks-included-no-censorship",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "weeks-exact-horizon-completion",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "weeks-partial-censorship",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "weeks-total-censorship",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "risk-p50-zero-absent",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "reliability-slope-005-rounded",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "reliability-slope-010-rounded",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "reliability-slope-minus-015-rounded",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "reliability-cv-050-rounded",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "reliability-cv-100-rounded",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "reliability-cv-150-rounded",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "reliability-iqr-050-rounded",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "reliability-seven-observations-degraded",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "histogram-aggregated-contiguous-101",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    },
+    {
+      "id": "histogram-aggregated-discontinuous",
+      "outcomes": [
+        "match"
+      ],
+      "typescript": {
+        "status": "match",
+        "differences": []
+      },
+      "python_batches": [
+        {
+          "batch_size": 125,
+          "batch_count": 8,
+          "last_batch_size": 125,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 128,
+          "batch_count": 8,
+          "last_batch_size": 104,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 1000,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": true,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "batch_size": 2048,
+          "batch_count": 1,
+          "last_batch_size": 1000,
+          "divisible": false,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "interlanguage": [
+        {
+          "python_batch_size": 125,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 128,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 1000,
+          "status": "match",
+          "differences": []
+        },
+        {
+          "python_batch_size": 2048,
+          "status": "match",
+          "differences": []
+        }
+      ],
+      "batch_independent": true
+    }
+  ],
+  "diagnostics": []
+}

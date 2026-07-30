@@ -286,6 +286,34 @@ Implémentation retenue :
 - vérifier plusieurs tailles de batch ;
 - produire une preuve distincte de la seule équivalence distributionnelle.
 
+Implémentation retenue :
+
+- `.venv\Scripts\python.exe Scripts/run_statistical_exact_replay.py` valide d’abord indépendamment le
+  schéma, le corpus `1.0`, ses invariants et la couverture des deux modes, censures absente, partielle et
+  totale, percentiles complets, partiels ou absents, Risk Score présent ou absent, quatre labels de
+  fiabilité et histogrammes exacts ou agrégés ; aucun moteur n’est appelé si cette autorité est invalide ;
+- le corpus et son `expected_result` restent la seule autorité de résultat : les seize cas sont exécutés
+  une fois dans TypeScript et quatre fois dans Python, avec les batches backend `125`, `128`, `1000` et
+  `2048`, soit `8 × 125`, `7 × 128 + 104`, un lot exactement égal aux `1000` simulations et un lot
+  supérieur à cette population ;
+- chaque exécution moteur est comparée directement à l’attendu versionné avant toute comparaison mutuelle.
+  Le comparateur exige exactement présence des champs, types primitifs JSON, valeurs, longueurs, ordre des
+  distributions et forme canonique, sans tolérance numérique, arrondi, tri correctif ou normalisation
+  silencieuse ;
+- l’indépendance du batching est établie cas par cas lorsque les quatre exécutions Python concordent chacune
+  avec le corpus, et non par la prise d’un batch comme oracle ; les quatre résultats Python sont aussi
+  comparés au résultat TypeScript ;
+- `reports/statistical-exact-replay-evidence.json` constitue la preuve déterministe exploitable localement
+  et en revue : 16 cas, 64 exécutions Python, 16 exécutions TypeScript, 80 comparaisons normatives exactes,
+  64 comparaisons interlangages exactes, 16 cas indépendants du batching et 0 diagnostic ;
+- toute différence expose le cas, le moteur, la taille de batch, le chemin JSON divergent, les états
+  attendu et obtenu et la classification `engine_error`, `normative_divergence` ou
+  `interlanguage_divergence` ; un corpus ou un plan de batch invalide et un moteur inexécutable produisent
+  un échec non nul ;
+- `proof_kind = exact_replay` et `distributional_equivalence = not_evaluated` séparent explicitement le
+  rejeu exact de l’équivalence distributionnelle. L’enforcement reste `informational` sans consolidation
+  générale du PBI 2.18, intégration au profil `main` du PBI 2.19 ni décision de compatibilité du PBI 2.20.
+
 ## Phase D — Gouvernance de la parité : PBI 2.18 à 2.20
 
 ### 2.18 — Rapport de parité déterministe et distributionnelle disponible

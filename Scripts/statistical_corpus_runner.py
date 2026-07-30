@@ -11,15 +11,14 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+from backend.mc_core import SIMULATION_BATCH_SIZE
 from backend.simulation_models import SimulationCommand, SimulationResult
-from backend.simulation_service import run_simulation
+from backend.simulation_service import run_simulation_with_batch_size
 from backend.simulation_value_objects import StatisticalValueError
 
 ROOT = Path(__file__).resolve().parents[1]
 TYPESCRIPT_BRIDGE = ROOT / "frontend/scripts/run-statistical-reference-corpus.mjs"
-TYPESCRIPT_VALIDATION_BRIDGE = (
-    ROOT / "frontend/scripts/run-statistical-validation-probes.mjs"
-)
+TYPESCRIPT_VALIDATION_BRIDGE = ROOT / "frontend/scripts/run-statistical-validation-probes.mjs"
 
 CanonicalResult = dict[str, Any]
 CaseExecutor = Callable[[dict[str, Any]], CanonicalResult]
@@ -58,12 +57,18 @@ def canonicalize_python_result(result: SimulationResult) -> CanonicalResult:
     return canonical
 
 
-def execute_python_case(reference_case: dict[str, Any]) -> CanonicalResult:
+def execute_python_case(
+    reference_case: dict[str, Any],
+    *,
+    batch_size: int = SIMULATION_BATCH_SIZE,
+) -> CanonicalResult:
     command = SimulationCommand.from_normalized_input(
         reference_case["input"],
         reference_case["seed"],
     )
-    return canonicalize_python_result(run_simulation(command))
+    return canonicalize_python_result(
+        run_simulation_with_batch_size(command, batch_size=batch_size)
+    )
 
 
 def error_payload(error: object) -> dict[str, str]:
@@ -72,27 +77,48 @@ def error_payload(error: object) -> dict[str, str]:
     return {"type": type(error).__name__, "message": str(error)}
 
 
-def _engine_header(engine: str, corpus: dict[str, Any]) -> dict[str, Any]:
-    return {
+def _engine_header(
+    engine: str,
+    corpus: dict[str, Any],
+    *,
+    batch_size: int | None = None,
+) -> dict[str, Any]:
+    header: dict[str, Any] = {
         "engine": engine,
         "corpus_id": corpus["corpus_id"],
         "schema_version": corpus["schema_version"],
+        "normative_contract": {
+            "id": corpus["normative_contract"]["id"],
+            "version": corpus["normative_contract"]["version"],
+        },
         "prng_contract": corpus["prng_contract"]["id"],
     }
+    if batch_size is not None:
+        header["batch_size"] = batch_size
+    return header
 
 
 def run_python_corpus(
     corpus: dict[str, Any],
     execute_case: CaseExecutor = execute_python_case,
+    *,
+    batch_size: int = SIMULATION_BATCH_SIZE,
 ) -> dict[str, Any]:
     case_reports: list[dict[str, Any]] = []
     for reference_case in corpus["cases"]:
         try:
+            if execute_case is execute_python_case:
+                result = execute_python_case(
+                    reference_case,
+                    batch_size=batch_size,
+                )
+            else:
+                result = execute_case(reference_case)
             case_reports.append(
                 {
                     "id": reference_case["id"],
                     "status": "ok",
-                    "result": execute_case(reference_case),
+                    "result": result,
                 }
             )
         except Exception as exc:  # noqa: BLE001 - engine failures are report data
@@ -108,7 +134,11 @@ def run_python_corpus(
         if any(case_report["status"] == "engine_error" for case_report in case_reports)
         else "completed"
     )
-    return {**_engine_header("python", corpus), "status": status, "cases": case_reports}
+    return {
+        **_engine_header("python", corpus, batch_size=batch_size),
+        "status": status,
+        "cases": case_reports,
+    }
 
 
 def run_python_validation_probes(probes: dict[str, Any]) -> dict[str, Any]:
@@ -197,13 +227,9 @@ def run_typescript_validation_probes(
     try:
         report = json.loads(completed.stdout)
     except json.JSONDecodeError as exc:
-        raise RuntimeError(
-            "TypeScript validation probe bridge returned invalid JSON."
-        ) from exc
+        raise RuntimeError("TypeScript validation probe bridge returned invalid JSON.") from exc
     if not isinstance(report, dict) or report.get("engine") != "typescript":
-        raise RuntimeError(
-            "TypeScript validation probe bridge returned an invalid engine report."
-        )
+        raise RuntimeError("TypeScript validation probe bridge returned an invalid engine report.")
     return report
 
 

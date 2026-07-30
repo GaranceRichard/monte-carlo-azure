@@ -11,7 +11,10 @@ from backend.mc_core import (
     mc_items_done_for_weeks,
 )
 from backend.simulation_models import SimulationCommand
-from backend.simulation_service import run_simulation
+from backend.simulation_service import (
+    run_simulation,
+    run_simulation_with_batch_size,
+)
 from backend.simulation_value_objects import SimulationSeed, StatisticalValueError
 from tests.deterministic_sample_index_draw_port import RecordingSampleIndexDrawPort
 
@@ -54,6 +57,14 @@ def test_service_and_engine_keep_seed_resolution_outside_the_draw_port_contract(
         assert "seed" not in parameters
         assert parameters["draw_port"].default is Parameter.empty
     assert tuple(signature(run_simulation).parameters) == ("command",)
+    assert tuple(signature(run_simulation_with_batch_size).parameters) == (
+        "command",
+        "batch_size",
+    )
+    assert (
+        signature(run_simulation_with_batch_size).parameters["batch_size"].kind
+        is Parameter.KEYWORD_ONLY
+    )
     assert tuple(signature(mc_finish_weeks).parameters) == (
         "backlog_size",
         "throughput_samples",
@@ -85,9 +96,7 @@ def test_mc_core_has_no_concrete_rng_access():
 def test_service_runs_both_modes_without_changing_seeded_results():
     weeks = run_simulation(_command())
     repeated_weeks = run_simulation(_command())
-    items = run_simulation(
-        _command(mode="weeks_to_items", backlog_size=None, target_weeks=8)
-    )
+    items = run_simulation(_command(mode="weeks_to_items", backlog_size=None, target_weeks=8))
     repeated_items = run_simulation(
         _command(mode="weeks_to_items", backlog_size=None, target_weeks=8)
     )
@@ -102,6 +111,44 @@ def test_service_runs_both_modes_without_changing_seeded_results():
     assert items.seed.value == 123
     assert items.result_percentiles
     assert items.completion_summary is None
+
+
+@pytest.mark.parametrize(
+    ("command", "engine_name"),
+    [
+        (_command(n_sims=1000), "mc_finish_weeks"),
+        (
+            _command(
+                mode="weeks_to_items",
+                backlog_size=None,
+                target_weeks=8,
+                n_sims=1000,
+            ),
+            "mc_items_done_for_weeks",
+        ),
+    ],
+)
+@pytest.mark.parametrize("batch_size", [125, 333])
+def test_explicit_batch_size_is_transmitted_and_preserves_exact_results(
+    monkeypatch,
+    command,
+    engine_name,
+    batch_size,
+):
+    expected = run_simulation(command)
+    observed_batch_sizes: list[int] = []
+    engine = getattr(simulation_service, engine_name)
+
+    def record_batch_size(*args, **kwargs):
+        observed_batch_sizes.append(kwargs["batch_size"])
+        return engine(*args, **kwargs)
+
+    monkeypatch.setattr(simulation_service, engine_name, record_batch_size)
+
+    actual = run_simulation_with_batch_size(command, batch_size=batch_size)
+
+    assert observed_batch_sizes == [batch_size]
+    assert actual == expected
 
 
 def test_service_constructs_exactly_one_adapter_per_execution_and_passes_it_to_engine(
@@ -157,7 +204,10 @@ def test_service_preserves_total_and_partial_censure(
     )
     monkeypatch.setattr(
         "backend.simulation_service._run_engine",
-        lambda _command, _samples, _draw_port: (simulation, "weeks"),
+        lambda _command, _samples, _draw_port, **_kwargs: (
+            simulation,
+            "weeks",
+        ),
     )
 
     result = run_simulation(_command())
@@ -180,7 +230,10 @@ def test_service_preserves_histogram_reliability_and_risk_score(monkeypatch):
     )
     monkeypatch.setattr(
         "backend.simulation_service._run_engine",
-        lambda _command, _samples, _draw_port: (simulation, "weeks"),
+        lambda _command, _samples, _draw_port, **_kwargs: (
+            simulation,
+            "weeks",
+        ),
     )
 
     result = run_simulation(_command())

@@ -100,6 +100,7 @@ l’unique autorité de réalisation.
 | [`vitals-traceability.md`](vitals-traceability.md) | Qualité | Autorité de la traçabilité humaine des preuves Vitals | Preuve |
 | [`../CHANGELOG.md`](../CHANGELOG.md) | Utilisateurs, mainteneurs | Autorité de l’historique des changements | Historique |
 | [`../reports/statistical-parity-report.md`](../reports/statistical-parity-report.md) | Reviewers, statistique | Rendu généré de l’état de parité ; le JSON associé est exploitable en CI | Preuve générée |
+| [`../reports/statistical-exact-replay-evidence.json`](../reports/statistical-exact-replay-evidence.json) | Reviewers, statistique | Preuve JSON régénérable du rejeu exact et de l’indépendance du batching | Preuve générée |
 | [`../reports/test-strategy-report.md`](../reports/test-strategy-report.md) | Reviewers, qualité | Rendu généré de la stratégie de test ; le JSON associé est contractuel | Preuve générée |
 | [`../AGENTS.md`](../AGENTS.md) | Agents de contribution | Instructions locales contraignantes, hors documentation produit | Gouvernance |
 | [`README.md`](README.md) | Toute audience documentaire | Présente carte et index faisant autorité pour la répartition documentaire | Gouvernance documentaire |
@@ -153,8 +154,10 @@ l’unique autorité de réalisation.
 - [`critical-paths.md`](critical-paths.md) — parcours vitaux ;
 - [`vitals-traceability.md`](vitals-traceability.md) — preuves de couverture ;
 - [`../reports/statistical-parity-report.md`](../reports/statistical-parity-report.md) et
-  [`../reports/test-strategy-report.md`](../reports/test-strategy-report.md) — rendus générés, non autorités
-  éditoriales.
+  [`../reports/statistical-exact-replay-evidence.json`](../reports/statistical-exact-replay-evidence.json) —
+  preuves statistiques générées ;
+- [`../reports/test-strategy-report.md`](../reports/test-strategy-report.md) — rendu qualité généré, non
+  autorité éditoriale.
 
 ### Lire l’historique et les règles de contribution
 
