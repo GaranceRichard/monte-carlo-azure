@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from typing import Any
 
 MASSIVE_EXACT_PATHS = {
@@ -120,6 +120,14 @@ MASSIVE_TEST_PATHS = {
 }
 
 
+def needs_frontend_dependencies(commands: Iterable[Any], npm_command: str) -> bool:
+    """Whether commands need the immutable host frontend tool installation."""
+    return any(
+        command.requires_frontend_dependencies or command.argv[0] == npm_command
+        for command in commands
+    )
+
+
 def classification_gate_command(
     command_factory: Callable[..., Any],
     python_executable: str,
@@ -130,4 +138,5 @@ def classification_gate_command(
         (python_executable, "Scripts/check_test_classification.py"),
         "Regenerate and correct the test classification inventory, rules, or overrides.",
         input_sources=input_sources,
+        requires_frontend_dependencies=True,
     )

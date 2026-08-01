@@ -115,6 +115,13 @@ La découverte ne lance pas les tests :
 - Playwright est limité au répertoire configuré `frontend/tests/e2e`. Un appel de configuration comme
   `test.use` ou un hook n’est jamais assimilé à un scénario.
 
+Dans un snapshot isolé, le contrôle de classification déclare sa dépendance au compilateur TypeScript.
+L’orchestrateur expose donc une seule fois le `frontend/node_modules` installé dans le workspace hôte,
+indépendamment de la sélection d’une suite frontend. Le collector continue à lire les sources, règles et
+tests dans le snapshot construit depuis l’index ; il ne peut ni consulter les sources frontend du workspace
+hôte ni transformer une dépendance absente en découverte vide. L’exposition temporaire est nettoyée à la
+sortie du plan, y compris après échec ou interruption.
+
 Le sélecteur Pytest reprend `Classe::méthode` ou le nom de fonction. Les sélecteurs Vitest et Playwright
 reprennent le chemin de titres de suites et ajoutent la position de déclaration, ce qui distingue deux
 titres identiques sans compter les lignes de données de `.each`. `logicalCaseId` concatène de manière

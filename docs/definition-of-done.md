@@ -36,6 +36,11 @@ restent applicables.
 - Toute validation isolée transmet `MONTECARLO_E2E_PYTHON` avec l’interpréteur Python hôte à chaque chemin
   d’exécution : séquence, branches parallèles du DAG et nœud sélectionné. Le serveur Playwright du worktree
   réutilise ainsi explicitement les dépendances Python hôte.
+- Tout contrôle déclarant une dépendance à l’outillage frontend réutilise une exposition unique et temporaire
+  de `frontend/node_modules` depuis l’installation hôte, même si le plan ne contient aucune commande `npm`.
+  Le code, les configurations et les tests restent lus dans le snapshot isolé ; seuls les outils immuables
+  sont liés. Une dépendance hôte absente est bloquante et le lien est retiré après succès, échec ou
+  interruption.
 - La CI résout explicitement `pr`, `main`, `nightly` ou `release`, puis exécute
   `python Scripts/quality_gate.py ci --profile <profil> --node <nœud>` dans plusieurs jobs. `preflight`
   précède les branches indépendantes et `aggregate` dépend de toutes les branches.

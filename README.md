@@ -89,7 +89,7 @@ une connexion Azure DevOps réelle.
 - **Fiabilité explicable.** La dispersion, les quartiles et la tendance du throughput suivent les mêmes
   formules dans les deux moteurs ; les seuils utilisent les métriques arrondies avant d’attribuer les labels
   `non fiable`, `fragile`, `incertain` ou `fiable`.
-  - **Rejeu exact vérifié.** À entrée normalisée, seed, version de contrat et configuration identiques, les
+- **Rejeu exact vérifié.** À entrée normalisée, seed, version de contrat et configuration identiques, les
   moteurs Python et TypeScript produisent exactement la même réponse canonique. Le résultat backend reste
   indépendant du découpage en lots pour les configurations couvertes par la
   [preuve de rejeu versionnée](reports/statistical-exact-replay-evidence.json). Cette garantie reste liée
@@ -229,6 +229,12 @@ La validation complète est la tâche VS Code `Validation : profil main`, qui ex
 ```powershell
 .\.venv\Scripts\python.exe Scripts/quality_gate.py ci --profile main
 ```
+
+Le profil rapide valide exclusivement le snapshot construit depuis l’index Git. Lorsqu’un contrôle déclaré
+dépend de l’outillage frontend, la gate expose temporairement le seul `frontend/node_modules` de
+l’installation hôte dans ce snapshot, y compris si aucune suite frontend n’est sélectionnée. Les sources
+restent celles du snapshot, le lien est partagé puis nettoyé après succès, échec ou interruption, et
+l’absence des dépendances hôtes provoque un échec explicite.
 
 Une validation ciblée ne vaut pas validation complète. Les règles de couverture, de conformité DoD et de
 publiabilité restent définies dans [`docs/definition-of-done.md`](docs/definition-of-done.md).

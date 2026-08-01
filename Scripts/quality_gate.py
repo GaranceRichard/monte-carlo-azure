@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCKER_SMOKE_PORT = 18080
 sys.path.insert(0, str(ROOT))
 
+from Scripts import quality_gate_change_policy as change_policy  # noqa: E402
 from Scripts.git_staging import (  # noqa: E402
     GitStagingError,
     StagedChange,
@@ -32,11 +33,6 @@ from Scripts.git_staging import (  # noqa: E402
     index_git_environment,
     isolated_git_environment,
     read_staged_changes,
-)
-from Scripts.quality_gate_change_policy import (  # noqa: E402
-    MASSIVE_EXACT_PATHS,
-    MASSIVE_SCRIPT_NAMES,
-    MASSIVE_TEST_PATHS,
 )
 
 DOCUMENTATION_PATHS = {"README.md", "LICENSE", "NOTICE"}
@@ -114,6 +110,7 @@ class GateCommand:
     backend_test: bool = False
     input_sources: tuple[InputSource, ...] = (InputSource.WORKSPACE,)
     coverage_artifacts: tuple[str, ...] = ()
+    requires_frontend_dependencies: bool = False
 
 
 @dataclass(frozen=True)
@@ -540,12 +537,12 @@ def _classify_changed_path(path: str) -> PathClassification:
         )
 
     if (
-        normalized in MASSIVE_EXACT_PATHS
-        or normalized in MASSIVE_TEST_PATHS
+        normalized in change_policy.MASSIVE_EXACT_PATHS
+        or normalized in change_policy.MASSIVE_TEST_PATHS
         or any(normalized.startswith(prefix) for prefix in MASSIVE_PREFIXES)
         or (
             normalized.startswith("Scripts/")
-            and Path(normalized).name in MASSIVE_SCRIPT_NAMES
+            and Path(normalized).name in change_policy.MASSIVE_SCRIPT_NAMES
         )
         or "coverage" in parts
         or "coverage" in Path(lowered).name
@@ -1428,21 +1425,20 @@ def _execute_gate_plan(
     parallel: bool = False,
 ) -> int:
     execution_env = _command_environment(
-        command_env,
-        isolated_validation=isolated_validation,
+        command_env, isolated_validation=isolated_validation
     )
     contract_available = (
         validation_root / "config" / "test-execution-profiles.json"
     ).is_file()
     if not parallel and selected_node is None and not contract_available:
-        has_frontend = any(command.argv[0] == NPM_COMMAND for command in plan.commands)
-        if has_frontend:
+        needs_frontend = change_policy.needs_frontend_dependencies(plan.commands, NPM_COMMAND)
+        if needs_frontend:
             code = _ensure_frontend_dependencies()
             if code:
                 return code
         dependencies = (
             exposed_frontend_dependencies(validation_root)
-            if has_frontend and isolated_validation
+            if needs_frontend and isolated_validation
             else nullcontext()
         )
         try:

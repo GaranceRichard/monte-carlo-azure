@@ -97,7 +97,8 @@ Cette réalisation ne doit pas servir de modèle de granularité. Pour la suite 
 - l’introduction d’une abstraction est séparée de l’alignement des algorithmes ;
 - la construction d’un corpus est séparée de son exécution ;
 - l’alignement d’une famille de règles est séparé des autres familles ;
-- le reporting de parité, son intégration à la gate et la compatibilité versionnée restent trois résultats distincts ;
+- le protocole distributionnel, le reporting consolidé, la compatibilité versionnée et leur intégration à
+  la gate restent quatre résultats distincts ;
 - aucun PBI ne combine modèle, algorithmes, corpus, gate et migration.
 
 ## Attribution des modèles Codex
@@ -118,12 +119,12 @@ Un PBI `L` peut relever de Sol Élevé lorsqu’il est volumineux mais prévisib
 
 Aucun PBI actuel ne relève de **Sol Minimal**, réservé aux corrections mécaniques telles que le formatage, le renommage évident ou la résolution d’une erreur de lint isolée.
 
-## Répartition actuelle des 112 PBI non réalisés
+## Répartition actuelle des 113 PBI non réalisés
 
 | Modèle Codex | Nombre de PBI |
 | --- | ---: |
 | Sol Medium | 15 |
 | Sol Élevé | 30 |
-| Sol Très élevé | 64 |
+| Sol Très élevé | 65 |
 | Sol Ultra | 3 |
-| **Total** | **112** |
+| **Total** | **113** |

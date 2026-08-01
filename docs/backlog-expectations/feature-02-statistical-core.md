@@ -165,7 +165,7 @@ Implémentation retenue :
   `engine_error`, `normative_divergence` et `engine_divergence`, avec JSON Pointer, valeurs exactes et
   résultats canoniques complets dans le rapport JSON ;
 - les rapports déterministes `reports/statistical-parity-report.json` et `.md` sont informatifs et ne sont
-  pas inclus dans le profil `main`; leur promotion en gate relève toujours du PBI 2.19 ;
+  pas inclus dans le profil `main`; leur promotion en gate relève toujours du PBI 2.21 ;
 - treize cas sont conformes dans les deux moteurs. Les deux cas d’histogramme agrégé exposent les écarts
   historiques attendus : Python `100` buckets contre TypeScript `51` centres impairs sur `0..100`, puis
   `50/9951` contre `51/10050` sur la plage discontinue, la norme demandant `50/9999` ;
@@ -195,7 +195,7 @@ Implémentation retenue :
 - `contracts/statistical-validation-probes-v1.0.json` contient 22 sondes positives et négatives exécutées
   par les deux runners ; le rapport constate 22 verdicts identiques ;
 - aucune formule de censure, percentile, Risk Score, fiabilité ou histogramme n’est modifiée. Les deux
-  divergences d’histogrammes restent visibles et la parité reste informative jusqu’au PBI 2.19.
+  divergences d’histogrammes restent visibles et la parité reste informative jusqu’au PBI 2.21.
 
 ### 2.14 — Censures, percentiles et Risk Score alignés
 
@@ -219,7 +219,7 @@ Implémentation retenue :
   présentation et les rapports ;
 - six cas existants du corpus forment le périmètre 2.14 et les deux runners les démontrent. Les métriques et
   labels de fiabilité, les géométries d’histogrammes et l’enforcement de parité restent respectivement dans
-  les PBI 2.15, 2.16 et 2.19.
+  les PBI 2.15, 2.16 et 2.21.
 
 ### 2.15 — Métriques et labels de fiabilité du throughput alignés
 
@@ -249,7 +249,7 @@ Implémentation retenue :
   couvrent sa fermeture et sa construction commune ; les anciennes lignes rouges correspondantes ne
   subsistent plus dans le rapport de couverture ;
 - les seize cas donnent quatorze conformités. Les deux seules divergences restent les histogrammes agrégés
-  du PBI 2.16 ; le rejeu exact du PBI 2.17 et l’enforcement informatif avant 2.19 sont inchangés.
+  du PBI 2.16 ; le rejeu exact du PBI 2.17 et l’enforcement informatif avant 2.21 sont inchangés.
 
 ### 2.16 — Construction des histogrammes alignée
 
@@ -276,7 +276,7 @@ Implémentation retenue :
   `51/10050`, restent documentées mais sont invalidées comme références courantes ; aucun historique
   persistant n’est migré et aucune frontière primitive ni version de contrat n’est modifiée ;
 - les seize cas concordent exactement avec la norme et entre moteurs. Le rapport reste
-  `informational` jusqu’au PBI 2.19 ; le rejeu exact et la gouvernance de version restent réservés aux
+  `informational` jusqu’au PBI 2.21 ; le rejeu exact et la gouvernance de version restent réservés aux
   PBI 2.17 et 2.20.
 
 ### 2.17 — Rejeu exact interlangage démontré sur le corpus versionné
@@ -311,28 +311,46 @@ Implémentation retenue :
   `interlanguage_divergence` ; un corpus ou un plan de batch invalide et un moteur inexécutable produisent
   un échec non nul ;
 - `proof_kind = exact_replay` et `distributional_equivalence = not_evaluated` séparent explicitement le
-  rejeu exact de l’équivalence distributionnelle. L’enforcement reste `informational` sans consolidation
-  générale du PBI 2.18, intégration au profil `main` du PBI 2.19 ni décision de compatibilité du PBI 2.20.
+  rejeu exact de l’équivalence distributionnelle. L’enforcement reste `informational` sans protocole
+  distributionnel du PBI 2.18, consolidation générale du PBI 2.19, décision de compatibilité du PBI 2.20
+  ni intégration au profil `main` du PBI 2.21.
 
-## Phase D — Gouvernance de la parité : PBI 2.18 à 2.20
+## Phase D — Gouvernance de la parité : PBI 2.18 à 2.21
 
-### 2.18 — Rapport de parité déterministe et distributionnelle disponible
+### 2.18 — Protocole de parité distributionnelle versionné et testable
 
-- consolider les résultats déterministes, de rejeu et distributionnels ;
-- identifier précisément la fixture, la règle et le moteur en défaut ;
-- séparer échec fonctionnel, incompatibilité de version et erreur d’infrastructure ;
+- rendre explicitement versionnée la population de seeds du protocole ;
+- définir les scénarios et les entrées couverts ;
+- définir les métriques distributionnelles comparées ;
+- définir les règles de traitement des censures, des percentiles absents et des résultats non
+  identifiables ;
+- établir et justifier les seuils ou intervalles d’acceptation ;
+- maîtriser les faux positifs et la variabilité d’échantillonnage ;
+- rendre le protocole reproductible ;
+- distinguer explicitement la preuve distributionnelle du rejeu exact ;
+- produire une preuve dans un format exploitable par le futur rapport consolidé.
+
+Aucune valeur du protocole n’est arrêtée par ce raffinement. Les décisions statistiques seront établies
+pendant l’exécution du PBI 2.18 à partir du standard, de l’audit historique et de preuves documentées.
+
+### 2.19 — Rapport consolidé de parité déterministe, exacte et distributionnelle disponible
+
+- consolider les preuves déterministes, de rejeu exact et de parité distributionnelle ;
+- identifier précisément la fixture, la règle, la version et le moteur en défaut ;
+- séparer échec fonctionnel, incompatibilité de version, divergence distributionnelle et erreur
+  d’infrastructure ;
 - publier un rapport JSON canonique et une synthèse Markdown.
 
-### 2.19 — Contrôles de parité bloquants dans le profil `main`
-
-- exécuter les contrôles de parité dans le profil `main` ;
-- bloquer toute divergence normative ;
-- conserver un diagnostic local actionnable ;
-- interdire skip, retry, quarantaine ou exemption silencieuse.
-
-### 2.20 — Dérives de version et de compatibilité statistique bloquées
+### 2.20 — Dérives de version et décisions de compatibilité statistique bloquées
 
 - rendre obligatoire la version du contrat pour toute preuve de rejeu ;
 - détecter les changements affectant tirages, censures, percentiles, scores, labels, histogrammes ou réponse ;
 - exiger une décision de compatibilité, une nouvelle version et la mise à jour du corpus ;
 - documenter migration ou invalidation des caches et historiques concernés.
+
+### 2.21 — Contrôles complets de parité et de compatibilité bloquants dans le profil `main`
+
+- exécuter dans le profil `main` les contrôles déterministes, exacts, distributionnels et de compatibilité ;
+- bloquer toute divergence normative, distributionnelle ou de version non acceptée ;
+- conserver un diagnostic local actionnable ;
+- interdire skip, retry, quarantaine ou exemption silencieuse.

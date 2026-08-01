@@ -42,17 +42,18 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     governance = (ROOT / "docs" / "backlog-governance.md").read_text(encoding="utf-8")
     features = check_backlog_consistency.parse_registry(backlog)
 
-    assert sum(len(feature.pbis) for feature in features) == 140
+    assert sum(len(feature.pbis) for feature in features) == 141
     assert sum(feature.completed_count for feature in features) == 28
     feature_two = next(feature for feature in features if feature.number == 2)
     assert feature_two.completed_count == 17
     assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == [
         # PBI 2.17 completed on 29/07/2026 after exact replay and full validation.
         # The remaining sequence starts with PBI 2.18.
-        # Only the three later parity and compatibility PBIs remain open.
+        # Only the four later parity and compatibility PBIs remain open.
         "2.18",
         "2.19",
         "2.20",
+        "2.21",
     ]
     assert check_backlog_consistency.expected_documents(backlog, governance) == (
         backlog,

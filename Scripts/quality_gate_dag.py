@@ -304,14 +304,14 @@ def execute_gate_plan(
         print(f"ERROR: unknown execution node: {selected_node}")
         return 2
     selected_commands = grouped.get(selected_node, ()) if selected_node else plan.commands
-    has_frontend = any(command.argv[0] == q.NPM_COMMAND for command in selected_commands)
-    if has_frontend:
+    needs_frontend = q.change_policy.needs_frontend_dependencies(selected_commands, q.NPM_COMMAND)
+    if needs_frontend:
         code = q._ensure_frontend_dependencies()
         if code:
             return code
     dependency_manager = (
         q.exposed_frontend_dependencies(validation_root)
-        if has_frontend and isolated_validation
+        if needs_frontend and isolated_validation
         else nullcontext()
     )
     kwargs = {
