@@ -91,6 +91,7 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   `tests/test_simulation_service.py`, `tests/test_api_history.py`, `tests/test_simulation_store.py`,
   `frontend/src/api/simulationMappers.test.ts`, `frontend/src/storage/simulationHistoryMappers.test.ts`,
   `Scripts/run_statistical_exact_replay.py`, `reports/statistical-exact-replay-evidence.json`,
+  `Scripts/generate_statistical_consolidated_report.py`, `reports/statistical-consolidated-report.json`,
   `tests/test_statistical_exact_replay.py`, `tests/test_statistical_corpus_runner.py`,
   `frontend/src/statisticalCorpusRunner.test.ts`.
 - **État** : partiellement couvert.
@@ -100,8 +101,9 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   résultat exact du corpus ; la preuve compte 80 comparaisons normatives, 64 interlangages, 16 cas
   indépendants du batching et aucun diagnostic. Le protocole distributionnel distinct exécute cinq
   scénarios sur cohorts disjointes, compare 49 métriques avec contrôle des comparaisons multiples et conclut
-  actuellement `match`, sans utiliser les attendus exacts comme oracle. Les deux preuves restent
-  informatives : il n’existe toujours ni gate de parité bloquante, ni test de charge, ni preuve
+  actuellement `match`, sans utiliser les attendus exacts comme oracle. Le rapport consolidé vérifie et
+  localise ces garanties, les 22 sondes, leurs versions, empreintes et limites dans une autorité unique.
+  Toutes ces preuves restent informatives : il n’existe toujours ni gate de parité bloquante, ni test de charge, ni preuve
   d'annulation du thread après timeout, ni politique de proxy de confiance.
 
 ### CP-004 — Flux onboarding critique

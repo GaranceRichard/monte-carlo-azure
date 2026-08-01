@@ -371,6 +371,26 @@ Implémentation retenue :
   d’infrastructure ;
 - publier un rapport JSON canonique et une synthèse Markdown.
 
+Implémentation retenue :
+
+- `reports/statistical-consolidated-report.json` et sa synthèse Markdown proviennent d’un modèle commun
+  fermé `1.0`, sans horodatage mural, chemin absolu ni donnée machine ; leur contenu et leur SHA-256 sont
+  stables à sources identiques ;
+- dix sources spécialisées conservent identité, version, schéma de validation, SHA-256, empreinte embarquée
+  lorsqu’elle existe et statut ; le consolidateur vérifie leurs compteurs, complétudes et métadonnées sans
+  appeler un moteur ni recalibrer le protocole ;
+- cinq niveaux restent distincts : conformité algorithmique/normative, contrat et sondes, rejeu exact,
+  indépendance du batching et parité distributionnelle ; chaque limite demeure attachée à sa preuve ;
+- le verdict prend le diagnostic de plus haute priorité, d’`infrastructure_error` à `match`, sans supprimer
+  les diagnostics moins prioritaires ni transformer incompatibilité, non-conclusion ou absence de
+  divergence en une preuve différente ;
+- le générateur échoue sur source obligatoire absente, invalide, corrompue ou incohérente, empreinte fausse,
+  incompatibilité et erreur de protocole, moteur ou infrastructure, tout en publiant un rapport
+  `informational` exploitable ;
+- le rapport rappelle que l’exact vaut pour le corpus et les versions déclarées, que le distributionnel
+  vaut pour son design documenté et qu’aucune preuve ne constitue un backtesting Azure DevOps. La décision
+  de compatibilité future et l’enforcement bloquant complet restent réservés aux PBI 2.20 et 2.21.
+
 ### 2.20 — Dérives de version et décisions de compatibilité statistique bloquées
 
 - rendre obligatoire la version du contrat pour toute preuve de rejeu ;

@@ -97,6 +97,9 @@ une connexion Azure DevOps réelle.
 - **Validation distributionnelle distincte.** Des cohorts reproductibles de seeds différentes comparent
   aussi les lois de sortie, les censures et la disponibilité des indicateurs ; cette preuve statistique
   symétrique complète le rejeu exact sans le remplacer et reste distincte du backtesting sur données réelles.
+- **État consolidé vérifiable.** Un [rapport consolidé](reports/statistical-consolidated-report.md) réunit
+  les garanties normatives, exactes, de batching et distributionnelles tout en conservant leurs périmètres,
+  limites, versions et niveau d’enforcement informatif.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 
@@ -123,7 +126,7 @@ du [standard statistique](docs/standards/STD-STAT-001.md), du
 
 L’état détaillé des risques et des preuves se trouve dans la
 [matrice risques–contrôles](docs/risk-control-matrix.md) et le
-[rapport de parité statistique](reports/statistical-parity-report.md). La trajectoire future est décrite
+[état consolidé des garanties statistiques](reports/statistical-consolidated-report.md). La trajectoire future est décrite
 dans la [roadmap](docs/roadmap.md), sans promesse de calendrier.
 
 ## Utiliser le produit
@@ -257,6 +260,7 @@ README ne reproduit ni le prochain item, ni les dates, ni les compteurs.
 - [Changelog](CHANGELOG.md)
 - [Audit historique de parité](docs/statistical-parity-audit.md)
 - [Rapport de parité statistique](reports/statistical-parity-report.md)
+- [État consolidé des garanties statistiques](reports/statistical-consolidated-report.md)
 - [Rapport consolidé de stratégie de test](reports/test-strategy-report.md)
 
 ## Licence

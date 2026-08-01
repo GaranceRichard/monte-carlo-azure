@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/statistical-parity-report/1.1",
+  "title": "Deterministic statistical parity report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["report_version", "enforcement", "status", "corpus", "summary", "engines", "cases", "validation_alignment"],
+  "properties": {
+    "report_version": { "const": "1.1" },
+    "enforcement": { "const": "informational" },
+    "status": { "enum": ["match", "divergence", "engine_error"] },
+    "corpus": { "$ref": "#/$defs/corpus" },
+    "summary": { "$ref": "#/$defs/summary" },
+    "engines": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python", "typescript"],
+      "properties": {
+        "python": { "$ref": "#/$defs/engine" },
+        "typescript": { "$ref": "#/$defs/engine" }
+      }
+    },
+    "cases": { "type": "array", "items": { "$ref": "#/$defs/case" } },
+    "validation_alignment": { "$ref": "#/$defs/validation" }
+  },
+  "$defs": {
+    "corpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "schema_version", "prng_contract"],
+      "properties": {
+        "id": { "type": "string" },
+        "schema_version": { "type": "string" },
+        "prng_contract": { "type": "string" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_count", "matching_cases", "normative_divergence_cases", "engine_divergence_cases", "engine_error_cases", "fatal_engine_errors"],
+      "properties": {
+        "case_count": { "type": "integer", "minimum": 0 },
+        "matching_cases": { "type": "integer", "minimum": 0 },
+        "normative_divergence_cases": { "type": "integer", "minimum": 0 },
+        "engine_divergence_cases": { "type": "integer", "minimum": 0 },
+        "engine_error_cases": { "type": "integer", "minimum": 0 },
+        "fatal_engine_errors": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "type": "string" }
+      }
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engine", "corpus_id", "schema_version", "normative_contract", "prng_contract", "status"],
+      "properties": {
+        "engine": { "enum": ["python", "typescript"] },
+        "corpus_id": { "type": "string" },
+        "schema_version": { "type": "string" },
+        "normative_contract": { "$ref": "#/$defs/contract" },
+        "prng_contract": { "type": "string" },
+        "batch_size": { "type": "integer", "minimum": 1 },
+        "status": { "enum": ["completed", "engine_error"] },
+        "error": { "type": "object" }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["match", "normative_divergence", "engine_error"] },
+        "result": { "type": "object" },
+        "differences": { "type": "array", "items": { "type": "object" } },
+        "error": { "type": "object" }
+      }
+    },
+    "inter_engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "differences"],
+      "properties": {
+        "status": { "enum": ["match", "engine_divergence", "not_compared"] },
+        "differences": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "outcomes", "expected", "python", "typescript", "inter_engine"],
+      "properties": {
+        "id": { "type": "string" },
+        "outcomes": { "type": "array", "items": { "enum": ["match", "engine_error", "normative_divergence", "engine_divergence"] } },
+        "expected": { "type": "object" },
+        "python": { "$ref": "#/$defs/comparison" },
+        "typescript": { "$ref": "#/$defs/comparison" },
+        "inter_engine": { "$ref": "#/$defs/inter_engine" }
+      }
+    },
+    "validation_engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engine", "status"],
+      "properties": {
+        "engine": { "enum": ["python", "typescript"] },
+        "schema_version": { "type": "string" },
+        "normative_contract": { "type": "string" },
+        "status": { "enum": ["completed", "engine_error"] },
+        "error": { "type": "object" }
+      }
+    },
+    "probe_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "expected_accepted", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "expected_accepted": { "type": "boolean" },
+        "status": { "enum": ["match", "divergence"] },
+        "python_accepted": { "type": "boolean" },
+        "typescript_accepted": { "type": "boolean" }
+      }
+    },
+    "validation_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["probe_count", "matching_probes", "divergent_probes", "engine_errors"],
+      "properties": {
+        "probe_count": { "type": "integer", "minimum": 0 },
+        "matching_probes": { "type": "integer", "minimum": 0 },
+        "divergent_probes": { "type": "integer", "minimum": 0 },
+        "engine_errors": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pbi", "fixture", "status", "summary", "engines", "cases"],
+      "properties": {
+        "pbi": { "const": "2.13" },
+        "fixture": { "const": "contracts/statistical-validation-probes-v1.0.json" },
+        "status": { "enum": ["match", "divergence", "engine_error"] },
+        "summary": { "$ref": "#/$defs/validation_summary" },
+        "engines": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["python", "typescript"],
+          "properties": {
+            "python": { "$ref": "#/$defs/validation_engine" },
+            "typescript": { "$ref": "#/$defs/validation_engine" }
+          }
+        },
+        "cases": { "type": "array", "items": { "$ref": "#/$defs/probe_result" } }
+      }
+    }
+  }
+}

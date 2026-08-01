@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1096,
+      "logicalCases": 1106,
       "nodes": [
         {
           "id": "preflight",
@@ -409,6 +409,16 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_consolidated_report.py::test_all_semantic_inconsistency_guards_are_actionable",
+            "pytest:tests/test_statistical_consolidated_report.py::test_closed_report_schema_and_independent_validator_reject_drift",
+            "pytest:tests/test_statistical_consolidated_report.py::test_documentation_and_backlog_preserve_scope_and_informational_enforcement",
+            "pytest:tests/test_statistical_consolidated_report.py::test_json_markdown_and_sha_are_byte_stable_and_machine_independent",
+            "pytest:tests/test_statistical_consolidated_report.py::test_nominal_sources_schema_counters_scopes_and_limits_are_consolidated",
+            "pytest:tests/test_statistical_consolidated_report.py::test_report_schema_is_itself_valid",
+            "pytest:tests/test_statistical_consolidated_report.py::test_report_validator_detects_source_set_priority_and_diagnostic_order_drift",
+            "pytest:tests/test_statistical_consolidated_report.py::test_script_entrypoints_delegate_to_main",
+            "pytest:tests/test_statistical_consolidated_report.py::test_specialized_diagnostic_adapters_preserve_every_available_location",
+            "pytest:tests/test_statistical_consolidated_report.py::test_verdict_priority_is_explicit_deterministic_and_non_compensating",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
             "pytest:tests/test_statistical_corpus_runner.py::test_exact_comparator_preserves_absence_order_types_lengths_and_values",
             "pytest:tests/test_statistical_corpus_runner.py::test_parity_report_distinguishes_normative_engine_and_execution_divergences",
@@ -521,18 +531,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 406
+            "pytest": 416
           },
           "natures": {
-            "component": 75,
+            "component": 76,
             "contract": 46,
-            "integration": 31,
-            "unit": 254
+            "integration": 32,
+            "unit": 262
           },
           "criticalities": {
             "critical": 73,
             "high": 16,
-            "unassigned": 317
+            "unassigned": 327
           }
         },
         {
@@ -1359,7 +1369,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1322,
+      "logicalCases": 1343,
       "nodes": [
         {
           "id": "preflight",
@@ -1860,6 +1870,27 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_consolidated_report.py::test_all_semantic_inconsistency_guards_are_actionable",
+            "pytest:tests/test_statistical_consolidated_report.py::test_closed_report_schema_and_independent_validator_reject_drift",
+            "pytest:tests/test_statistical_consolidated_report.py::test_distributional_divergence_and_inconclusive_never_become_exact_match",
+            "pytest:tests/test_statistical_consolidated_report.py::test_documentation_and_backlog_preserve_scope_and_informational_enforcement",
+            "pytest:tests/test_statistical_consolidated_report.py::test_exact_specialized_outcomes_remain_localized",
+            "pytest:tests/test_statistical_consolidated_report.py::test_generator_rejects_a_non_object_report_schema",
+            "pytest:tests/test_statistical_consolidated_report.py::test_generator_validator_and_entrypoints_publish_both_views_from_one_model",
+            "pytest:tests/test_statistical_consolidated_report.py::test_infrastructure_failure_is_separate_and_generator_fails_but_writes_valid_findings",
+            "pytest:tests/test_statistical_consolidated_report.py::test_invalid_standard_identity_seed_fingerprint_and_schema_infrastructure_are_visible",
+            "pytest:tests/test_statistical_consolidated_report.py::test_json_markdown_and_sha_are_byte_stable_and_machine_independent",
+            "pytest:tests/test_statistical_consolidated_report.py::test_missing_stale_corrupt_schema_and_fingerprint_sources_remain_visible",
+            "pytest:tests/test_statistical_consolidated_report.py::test_nominal_sources_schema_counters_scopes_and_limits_are_consolidated",
+            "pytest:tests/test_statistical_consolidated_report.py::test_proof_section_status_branches_and_small_io_helpers",
+            "pytest:tests/test_statistical_consolidated_report.py::test_renderer_handles_unavailable_distribution_and_false_batch_value",
+            "pytest:tests/test_statistical_consolidated_report.py::test_report_schema_is_itself_valid",
+            "pytest:tests/test_statistical_consolidated_report.py::test_report_validator_detects_source_set_priority_and_diagnostic_order_drift",
+            "pytest:tests/test_statistical_consolidated_report.py::test_script_entrypoints_delegate_to_main",
+            "pytest:tests/test_statistical_consolidated_report.py::test_specialized_diagnostic_adapters_preserve_every_available_location",
+            "pytest:tests/test_statistical_consolidated_report.py::test_validator_and_generator_report_unreadable_inputs",
+            "pytest:tests/test_statistical_consolidated_report.py::test_verdict_priority_is_explicit_deterministic_and_non_compensating",
+            "pytest:tests/test_statistical_consolidated_report.py::test_version_incompatibility_and_protocol_error_are_not_functional_divergence",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_fatal_engine_errors_and_cli_statuses",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_invalid_validation_probe_document",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
@@ -2065,18 +2096,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 600
+            "pytest": 621
           },
           "natures": {
-            "component": 75,
+            "component": 76,
             "contract": 46,
-            "integration": 225,
-            "unit": 254
+            "integration": 237,
+            "unit": 262
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 494
+            "unassigned": 515
           }
         },
         {
@@ -2944,7 +2975,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1323,
+      "logicalCases": 1344,
       "nodes": [
         {
           "id": "preflight",
@@ -3445,6 +3476,27 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_consolidated_report.py::test_all_semantic_inconsistency_guards_are_actionable",
+            "pytest:tests/test_statistical_consolidated_report.py::test_closed_report_schema_and_independent_validator_reject_drift",
+            "pytest:tests/test_statistical_consolidated_report.py::test_distributional_divergence_and_inconclusive_never_become_exact_match",
+            "pytest:tests/test_statistical_consolidated_report.py::test_documentation_and_backlog_preserve_scope_and_informational_enforcement",
+            "pytest:tests/test_statistical_consolidated_report.py::test_exact_specialized_outcomes_remain_localized",
+            "pytest:tests/test_statistical_consolidated_report.py::test_generator_rejects_a_non_object_report_schema",
+            "pytest:tests/test_statistical_consolidated_report.py::test_generator_validator_and_entrypoints_publish_both_views_from_one_model",
+            "pytest:tests/test_statistical_consolidated_report.py::test_infrastructure_failure_is_separate_and_generator_fails_but_writes_valid_findings",
+            "pytest:tests/test_statistical_consolidated_report.py::test_invalid_standard_identity_seed_fingerprint_and_schema_infrastructure_are_visible",
+            "pytest:tests/test_statistical_consolidated_report.py::test_json_markdown_and_sha_are_byte_stable_and_machine_independent",
+            "pytest:tests/test_statistical_consolidated_report.py::test_missing_stale_corrupt_schema_and_fingerprint_sources_remain_visible",
+            "pytest:tests/test_statistical_consolidated_report.py::test_nominal_sources_schema_counters_scopes_and_limits_are_consolidated",
+            "pytest:tests/test_statistical_consolidated_report.py::test_proof_section_status_branches_and_small_io_helpers",
+            "pytest:tests/test_statistical_consolidated_report.py::test_renderer_handles_unavailable_distribution_and_false_batch_value",
+            "pytest:tests/test_statistical_consolidated_report.py::test_report_schema_is_itself_valid",
+            "pytest:tests/test_statistical_consolidated_report.py::test_report_validator_detects_source_set_priority_and_diagnostic_order_drift",
+            "pytest:tests/test_statistical_consolidated_report.py::test_script_entrypoints_delegate_to_main",
+            "pytest:tests/test_statistical_consolidated_report.py::test_specialized_diagnostic_adapters_preserve_every_available_location",
+            "pytest:tests/test_statistical_consolidated_report.py::test_validator_and_generator_report_unreadable_inputs",
+            "pytest:tests/test_statistical_consolidated_report.py::test_verdict_priority_is_explicit_deterministic_and_non_compensating",
+            "pytest:tests/test_statistical_consolidated_report.py::test_version_incompatibility_and_protocol_error_are_not_functional_divergence",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_fatal_engine_errors_and_cli_statuses",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_invalid_validation_probe_document",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
@@ -3651,18 +3703,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 601
+            "pytest": 622
           },
           "natures": {
-            "component": 75,
+            "component": 76,
             "contract": 46,
-            "integration": 225,
-            "unit": 255
+            "integration": 237,
+            "unit": 263
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 495
+            "unassigned": 516
           }
         },
         {
@@ -4530,7 +4582,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1324,
+      "logicalCases": 1345,
       "nodes": [
         {
           "id": "preflight",
@@ -5032,6 +5084,27 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_consolidated_report.py::test_all_semantic_inconsistency_guards_are_actionable",
+            "pytest:tests/test_statistical_consolidated_report.py::test_closed_report_schema_and_independent_validator_reject_drift",
+            "pytest:tests/test_statistical_consolidated_report.py::test_distributional_divergence_and_inconclusive_never_become_exact_match",
+            "pytest:tests/test_statistical_consolidated_report.py::test_documentation_and_backlog_preserve_scope_and_informational_enforcement",
+            "pytest:tests/test_statistical_consolidated_report.py::test_exact_specialized_outcomes_remain_localized",
+            "pytest:tests/test_statistical_consolidated_report.py::test_generator_rejects_a_non_object_report_schema",
+            "pytest:tests/test_statistical_consolidated_report.py::test_generator_validator_and_entrypoints_publish_both_views_from_one_model",
+            "pytest:tests/test_statistical_consolidated_report.py::test_infrastructure_failure_is_separate_and_generator_fails_but_writes_valid_findings",
+            "pytest:tests/test_statistical_consolidated_report.py::test_invalid_standard_identity_seed_fingerprint_and_schema_infrastructure_are_visible",
+            "pytest:tests/test_statistical_consolidated_report.py::test_json_markdown_and_sha_are_byte_stable_and_machine_independent",
+            "pytest:tests/test_statistical_consolidated_report.py::test_missing_stale_corrupt_schema_and_fingerprint_sources_remain_visible",
+            "pytest:tests/test_statistical_consolidated_report.py::test_nominal_sources_schema_counters_scopes_and_limits_are_consolidated",
+            "pytest:tests/test_statistical_consolidated_report.py::test_proof_section_status_branches_and_small_io_helpers",
+            "pytest:tests/test_statistical_consolidated_report.py::test_renderer_handles_unavailable_distribution_and_false_batch_value",
+            "pytest:tests/test_statistical_consolidated_report.py::test_report_schema_is_itself_valid",
+            "pytest:tests/test_statistical_consolidated_report.py::test_report_validator_detects_source_set_priority_and_diagnostic_order_drift",
+            "pytest:tests/test_statistical_consolidated_report.py::test_script_entrypoints_delegate_to_main",
+            "pytest:tests/test_statistical_consolidated_report.py::test_specialized_diagnostic_adapters_preserve_every_available_location",
+            "pytest:tests/test_statistical_consolidated_report.py::test_validator_and_generator_report_unreadable_inputs",
+            "pytest:tests/test_statistical_consolidated_report.py::test_verdict_priority_is_explicit_deterministic_and_non_compensating",
+            "pytest:tests/test_statistical_consolidated_report.py::test_version_incompatibility_and_protocol_error_are_not_functional_divergence",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_fatal_engine_errors_and_cli_statuses",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_invalid_validation_probe_document",
             "pytest:tests/test_statistical_corpus_runner.py::test_control_script_entrypoint",
@@ -5238,18 +5311,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 602
+            "pytest": 623
           },
           "natures": {
-            "component": 75,
+            "component": 76,
             "contract": 46,
-            "integration": 226,
-            "unit": 255
+            "integration": 238,
+            "unit": 263
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 496
+            "unassigned": 517
           }
         },
         {

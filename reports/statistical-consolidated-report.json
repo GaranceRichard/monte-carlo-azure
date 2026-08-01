@@ -1,0 +1,832 @@
+{
+  "compatibility": {
+    "declarations": [
+      {
+        "compatible": true,
+        "id": "STD-STAT-001",
+        "source": "normative_standard",
+        "version": "1.0"
+      },
+      {
+        "compatible": true,
+        "id": "mca-prng-v1",
+        "source": "prng_vectors",
+        "version": "1.0"
+      },
+      {
+        "compatible": true,
+        "id": "mca-statistical-reference-corpus",
+        "source": "reference_corpus",
+        "version": "1.0"
+      },
+      {
+        "compatible": true,
+        "id": "mca-statistical-validation-probes",
+        "source": "validation_probes",
+        "version": "1.0"
+      },
+      {
+        "compatible": true,
+        "id": "mca-statistical-parity-report",
+        "source": "deterministic_parity",
+        "version": "1.1"
+      },
+      {
+        "compatible": true,
+        "id": "exact_replay",
+        "source": "exact_replay",
+        "version": "1.0"
+      },
+      {
+        "compatible": true,
+        "id": "mca-statistical-distributional-parity",
+        "source": "distribution_protocol",
+        "version": "1.0"
+      },
+      {
+        "compatible": true,
+        "id": "mca-distributional-seed-population",
+        "source": "distribution_seed_population",
+        "version": "1.0"
+      },
+      {
+        "compatible": true,
+        "id": "mca-distributional-calibration",
+        "source": "distribution_calibration",
+        "version": "1.0"
+      },
+      {
+        "compatible": true,
+        "id": "distributional_parity",
+        "source": "distribution_evidence",
+        "version": "1.0"
+      }
+    ],
+    "scope": "Declared identities and versions only; no migration or future-version decision.",
+    "status": "match"
+  },
+  "contracts": {
+    "corpus": {
+      "id": "mca-statistical-reference-corpus",
+      "version": "1.0"
+    },
+    "distributional_protocol": {
+      "id": "mca-statistical-distributional-parity",
+      "version": "1.0"
+    },
+    "normative_contract": {
+      "id": "STD-STAT-001",
+      "version": "1.0"
+    },
+    "prng": {
+      "id": "mca-prng-v1",
+      "version": "1.0"
+    }
+  },
+  "diagnostics": [],
+  "enforcement": {
+    "blocking": false,
+    "full_main_enforcement_scope": "PBI 2.21",
+    "generator_failure_classifications": [
+      "infrastructure_error",
+      "protocol_error",
+      "invalid_evidence",
+      "version_incompatibility",
+      "engine_error"
+    ],
+    "level": "informational"
+  },
+  "format_version": "1.0",
+  "generation": {
+    "kind": "deterministic_source_snapshot",
+    "source_set_sha256": "263fd524df56ef005633b21b417f77a1d7bc558fb4efb4956124d30a6248dc79"
+  },
+  "integrity": {
+    "content_sha256": "751c5d6a684d90861c9a70a1734b834506eaf25efe2cd252162a7e47fb9c4c2e",
+    "method": "sha256-canonical-json-without-content-sha256"
+  },
+  "limits": [
+    {
+      "proof_level": "algorithmic_normative_compliance",
+      "statements": [
+        "Corpus 1.0 only; no claim for inputs or versions outside that corpus."
+      ]
+    },
+    {
+      "proof_level": "contract_and_probe_validation",
+      "statements": [
+        "Probe acceptance does not prove statistical equivalence."
+      ]
+    },
+    {
+      "proof_level": "exact_interlanguage_replay",
+      "statements": [
+        "Exact replay applies only to the corpus and declared versions."
+      ]
+    },
+    {
+      "proof_level": "batching_independence",
+      "statements": [
+        "Independence is not extrapolated beyond the recorded batch geometries."
+      ]
+    },
+    {
+      "proof_level": "distributional_parity",
+      "statements": [
+        "Distributional evidence is not exact replay and is bounded by documented power."
+      ]
+    }
+  ],
+  "not_evaluated": [
+    {
+      "id": "azure_devops_empirical_backtesting",
+      "statement": "No empirical Azure DevOps backtesting is evaluated."
+    },
+    {
+      "id": "universal_equivalence",
+      "statement": "No equivalence is claimed outside recorded corpus cases and protocol scenarios."
+    },
+    {
+      "id": "future_version_compatibility",
+      "statement": "No compatibility decision or migration for future versions is evaluated."
+    },
+    {
+      "id": "blocking_main_enforcement",
+      "statement": "Complete blocking enforcement in main remains outside this report."
+    }
+  ],
+  "proof_levels": [
+    {
+      "counters": [
+        {
+          "id": "cases",
+          "value": 16
+        },
+        {
+          "id": "matches",
+          "value": 16
+        },
+        {
+          "id": "normative_divergences",
+          "value": 0
+        },
+        {
+          "id": "engine_errors",
+          "value": 0
+        }
+      ],
+      "id": "algorithmic_normative_compliance",
+      "limits": [
+        "Corpus 1.0 only; no claim for inputs or versions outside that corpus."
+      ],
+      "scope": "Versioned corpus expected results in both declared engines.",
+      "source": "deterministic_parity",
+      "status": "match"
+    },
+    {
+      "counters": [
+        {
+          "id": "probes",
+          "value": 22
+        },
+        {
+          "id": "matches",
+          "value": 22
+        },
+        {
+          "id": "divergences",
+          "value": 0
+        },
+        {
+          "id": "engine_errors",
+          "value": 0
+        }
+      ],
+      "id": "contract_and_probe_validation",
+      "limits": [
+        "Probe acceptance does not prove statistical equivalence."
+      ],
+      "scope": "Closed input contract and shared validation probes.",
+      "source": "deterministic_parity",
+      "status": "match"
+    },
+    {
+      "counters": [
+        {
+          "id": "cases",
+          "value": 16
+        },
+        {
+          "id": "normative_comparisons",
+          "value": 80
+        },
+        {
+          "id": "normative_matches",
+          "value": 80
+        },
+        {
+          "id": "interlanguage_comparisons",
+          "value": 64
+        },
+        {
+          "id": "interlanguage_matches",
+          "value": 64
+        }
+      ],
+      "id": "exact_interlanguage_replay",
+      "limits": [
+        "Exact replay applies only to the corpus and declared versions."
+      ],
+      "scope": "Exact canonical replay against corpus 1.0 and between declared languages.",
+      "source": "exact_replay",
+      "status": "match"
+    },
+    {
+      "counters": [
+        {
+          "id": "cases",
+          "value": 16
+        },
+        {
+          "id": "independent_cases",
+          "value": 16
+        },
+        {
+          "id": "python_executions",
+          "value": 64
+        }
+      ],
+      "id": "batching_independence",
+      "limits": [
+        "Independence is not extrapolated beyond the recorded batch geometries."
+      ],
+      "scope": "Python batch sizes declared by exact-replay evidence.",
+      "source": "exact_replay",
+      "status": "match"
+    },
+    {
+      "counters": [
+        {
+          "id": "scenarios",
+          "value": 5
+        },
+        {
+          "id": "metrics",
+          "value": 49
+        },
+        {
+          "id": "matches",
+          "value": 49
+        },
+        {
+          "id": "divergences",
+          "value": 0
+        },
+        {
+          "id": "inconclusive",
+          "value": 0
+        }
+      ],
+      "id": "distributional_parity",
+      "limits": [
+        "Distributional evidence is not exact replay and is bounded by documented power."
+      ],
+      "scope": "Protocol 1.0 scenarios, cohorts, metrics, margins and documented power.",
+      "source": "distribution_evidence",
+      "status": "match"
+    }
+  ],
+  "report_id": "mca-statistical-consolidated-parity",
+  "scope_summary": {
+    "distribution_scenarios": [
+      {
+        "cohort_size": 64,
+        "distribution_view": "exact-outcome-cdf",
+        "divergent_metrics": 0,
+        "id": "items-discrete-exact",
+        "inconclusive_metrics": 0,
+        "matching_metrics": 10,
+        "metric_count": 10,
+        "mode": "weeks_to_items",
+        "n_sims": 4000,
+        "source_case_id": "items-zero-weeks-excluded",
+        "status": "match"
+      },
+      {
+        "cohort_size": 128,
+        "distribution_view": "reported-histogram-cdf",
+        "divergent_metrics": 0,
+        "id": "items-histogram-aggregated",
+        "inconclusive_metrics": 0,
+        "matching_metrics": 10,
+        "metric_count": 10,
+        "mode": "weeks_to_items",
+        "n_sims": 4000,
+        "source_case_id": "histogram-aggregated-discontinuous",
+        "status": "match"
+      },
+      {
+        "cohort_size": 64,
+        "distribution_view": "exact-outcome-cdf",
+        "divergent_metrics": 0,
+        "id": "weeks-no-censorship",
+        "inconclusive_metrics": 0,
+        "matching_metrics": 11,
+        "metric_count": 11,
+        "mode": "backlog_to_weeks",
+        "n_sims": 2000,
+        "source_case_id": "weeks-zero-weeks-included-no-censorship",
+        "status": "match"
+      },
+      {
+        "cohort_size": 64,
+        "distribution_view": "exact-outcome-cdf",
+        "divergent_metrics": 0,
+        "id": "weeks-partial-censorship",
+        "inconclusive_metrics": 0,
+        "matching_metrics": 11,
+        "metric_count": 11,
+        "mode": "backlog_to_weeks",
+        "n_sims": 1000,
+        "source_case_id": "weeks-partial-censorship",
+        "status": "match"
+      },
+      {
+        "cohort_size": 8,
+        "distribution_view": "structural-censor-state",
+        "divergent_metrics": 0,
+        "id": "weeks-total-censorship",
+        "inconclusive_metrics": 0,
+        "matching_metrics": 7,
+        "metric_count": 7,
+        "mode": "backlog_to_weeks",
+        "n_sims": 1000,
+        "source_case_id": "weeks-total-censorship",
+        "status": "match"
+      }
+    ],
+    "normative_cases": [
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "items-zero-weeks-excluded",
+        "normative_family": "replay"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "weeks-zero-weeks-included-no-censorship",
+        "normative_family": "replay"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "weeks-exact-horizon-completion",
+        "normative_family": "deterministic"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "weeks-partial-censorship",
+        "normative_family": "replay"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "weeks-total-censorship",
+        "normative_family": "deterministic"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "risk-p50-zero-absent",
+        "normative_family": "deterministic"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "reliability-slope-005-rounded",
+        "normative_family": "replay"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "reliability-slope-010-rounded",
+        "normative_family": "replay"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "reliability-slope-minus-015-rounded",
+        "normative_family": "replay"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "reliability-cv-050-rounded",
+        "normative_family": "replay"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "reliability-cv-100-rounded",
+        "normative_family": "replay"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "reliability-cv-150-rounded",
+        "normative_family": "replay"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "reliability-iqr-050-rounded",
+        "normative_family": "replay"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "reliability-seven-observations-degraded",
+        "normative_family": "replay"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "histogram-aggregated-contiguous-101",
+        "normative_family": "replay"
+      },
+      {
+        "algorithmic_status": "match",
+        "batch_independent": true,
+        "exact_replay_status": "match",
+        "id": "histogram-aggregated-discontinuous",
+        "normative_family": "replay"
+      }
+    ],
+    "validation_probes": [
+      {
+        "expected_accepted": true,
+        "id": "backlog-inclusive-minima",
+        "status": "match"
+      },
+      {
+        "expected_accepted": true,
+        "id": "backlog-inclusive-maxima",
+        "status": "match"
+      },
+      {
+        "expected_accepted": true,
+        "id": "items-zero-weeks-included",
+        "status": "match"
+      },
+      {
+        "expected_accepted": true,
+        "id": "items-six-usable-after-zero-filter",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "sample-string-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "sample-decimal-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "sample-negative-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "sample-boolean-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "raw-history-short-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "usable-history-short-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "zero-policy-string-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "zero-policy-default-forbidden",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "simulation-count-default-forbidden",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "simulation-count-lower-bound-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "active-parameter-missing",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "inactive-parameter-present",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "unknown-field-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "seed-string-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "seed-decimal-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "seed-negative-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "seed-overflow-rejected",
+        "status": "match"
+      },
+      {
+        "expected_accepted": false,
+        "id": "target-decimal-rejected",
+        "status": "match"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "canonical_fingerprint": null,
+      "declared": {
+        "id": "STD-STAT-001",
+        "version": "1.0"
+      },
+      "fingerprint_valid": null,
+      "id": "normative_standard",
+      "kind": "normative_contract",
+      "path": "docs/standards/STD-STAT-001.md",
+      "required": true,
+      "schema": {
+        "id": "STD-STAT-001-document-header",
+        "path": null,
+        "sha256": null,
+        "version": "1.0"
+      },
+      "sha256": "353454806bf873de8eaec7dfaec0f87b759eef14524072655750106af5b6e4f0",
+      "validation_status": "valid"
+    },
+    {
+      "canonical_fingerprint": null,
+      "declared": {
+        "id": "mca-prng-v1",
+        "version": "1.0"
+      },
+      "fingerprint_valid": null,
+      "id": "prng_vectors",
+      "kind": "prng_contract",
+      "path": "contracts/mca-prng-v1-vectors.json",
+      "required": true,
+      "schema": {
+        "id": "mca-prng-v1-vector-contract",
+        "path": null,
+        "sha256": null,
+        "version": "1.0"
+      },
+      "sha256": "fd405aab04b04ba34e3372a2a581f504bfa501cca925055e20f655f1fda29826",
+      "validation_status": "valid"
+    },
+    {
+      "canonical_fingerprint": null,
+      "declared": {
+        "id": "mca-statistical-reference-corpus",
+        "version": "1.0"
+      },
+      "fingerprint_valid": null,
+      "id": "reference_corpus",
+      "kind": "normative_corpus",
+      "path": "contracts/statistical-reference-corpus-v1.0.json",
+      "required": true,
+      "schema": {
+        "id": "https://montecarlo.local/schemas/statistical-reference-corpus/1.0",
+        "path": "contracts/statistical-reference-corpus-v1.0.schema.json",
+        "sha256": "65e926c8aa4ade3082d99c3e9fa4a12fd09597cccec0b3bd2b27ad5e72966522",
+        "version": "1.0"
+      },
+      "sha256": "c81c699319faef4ded0cb9fe974fad76d22ecd9a661ce807d581cb3acc04c49d",
+      "validation_status": "valid"
+    },
+    {
+      "canonical_fingerprint": null,
+      "declared": {
+        "id": "mca-statistical-validation-probes",
+        "version": "1.0"
+      },
+      "fingerprint_valid": null,
+      "id": "validation_probes",
+      "kind": "validation_contract",
+      "path": "contracts/statistical-validation-probes-v1.0.json",
+      "required": true,
+      "schema": {
+        "id": "https://montecarlo.local/schemas/statistical-validation-probes/1.0",
+        "path": "contracts/statistical-validation-probes-v1.0.schema.json",
+        "sha256": "d11d9ac4c32fe0b661c73eac36714a7a2dad6fbe0c1138351c4853f0fbc41868",
+        "version": "1.0"
+      },
+      "sha256": "1dbdd37dbd4bd068bb18372ba7292eef01f3fbaba9f12cfb798d359aa9ef1e3c",
+      "validation_status": "valid"
+    },
+    {
+      "canonical_fingerprint": null,
+      "declared": {
+        "id": "mca-statistical-parity-report",
+        "version": "1.1"
+      },
+      "fingerprint_valid": null,
+      "id": "deterministic_parity",
+      "kind": "deterministic_evidence",
+      "path": "reports/statistical-parity-report.json",
+      "required": true,
+      "schema": {
+        "id": "https://montecarlo.local/schemas/statistical-parity-report/1.1",
+        "path": "contracts/statistical-parity-report-v1.1.schema.json",
+        "sha256": "634222a34971a8304b9cdd8ce2ff6346335afcb57b220361d94481ece526fff2",
+        "version": "1.1"
+      },
+      "sha256": "d20c374c00861286083a084c2e0e8280b3725b6d847317f7cccd4b7435d95ba8",
+      "validation_status": "valid"
+    },
+    {
+      "canonical_fingerprint": null,
+      "declared": {
+        "id": "exact_replay",
+        "version": "1.0"
+      },
+      "fingerprint_valid": null,
+      "id": "exact_replay",
+      "kind": "exact_evidence",
+      "path": "reports/statistical-exact-replay-evidence.json",
+      "required": true,
+      "schema": {
+        "id": "https://montecarlo.local/schemas/statistical-exact-replay-evidence/1.0",
+        "path": "contracts/statistical-exact-replay-evidence-v1.0.schema.json",
+        "sha256": "c7653d306ae69a94dac49f6bdfdbdcc7334fda185fb8ddf20d17b7ce8f69e360",
+        "version": "1.0"
+      },
+      "sha256": "1261606e510f363187d28dd3980ccaa8a5183176e08978c18662e1c93c66a606",
+      "validation_status": "valid"
+    },
+    {
+      "canonical_fingerprint": null,
+      "declared": {
+        "id": "mca-statistical-distributional-parity",
+        "version": "1.0"
+      },
+      "fingerprint_valid": null,
+      "id": "distribution_protocol",
+      "kind": "distributional_protocol",
+      "path": "contracts/statistical-distribution-protocol-v1.0.json",
+      "required": true,
+      "schema": {
+        "id": "https://montecarlo.local/schemas/statistical-distribution-protocol/1.0",
+        "path": "contracts/statistical-distribution-protocol-v1.0.schema.json",
+        "sha256": "cf8cc0e9b4579e73e135a6edfa5c59d7aa4b4489fbdddf2e1f1cb749d6bc2c0d",
+        "version": "1.0"
+      },
+      "sha256": "c90ea0ff645cd8928562b2a71bfaf2d942a13a91336a512c99525b807da417b5",
+      "validation_status": "valid"
+    },
+    {
+      "canonical_fingerprint": "889e757eab13c3766225989e5df3660affccd90dddc91d9314e7b0e3e4a621e9",
+      "declared": {
+        "id": "mca-distributional-seed-population",
+        "version": "1.0"
+      },
+      "fingerprint_valid": true,
+      "id": "distribution_seed_population",
+      "kind": "seed_population",
+      "path": "contracts/statistical-distribution-seeds-v1.0.json",
+      "required": true,
+      "schema": {
+        "id": "https://montecarlo.local/schemas/statistical-distribution-seeds/1.0",
+        "path": "contracts/statistical-distribution-seeds-v1.0.schema.json",
+        "sha256": "947dd82efe0495e7df0db095d34cc9b6dac9f94391f50d5041d8a63b1b6f8f6a",
+        "version": "1.0"
+      },
+      "sha256": "e9a350d7eabafe682b34e97817573e2dbbe52403565af830afeefd57092098cf",
+      "validation_status": "valid"
+    },
+    {
+      "canonical_fingerprint": "6a86b14a6ab9d6cc40b6b357220126a038a6f47b37619e10653ff03be988d7be",
+      "declared": {
+        "id": "mca-distributional-calibration",
+        "version": "1.0"
+      },
+      "fingerprint_valid": true,
+      "id": "distribution_calibration",
+      "kind": "calibration_evidence",
+      "path": "reports/statistical-distribution-calibration.json",
+      "required": true,
+      "schema": {
+        "id": "https://montecarlo.local/schemas/statistical-distribution-calibration/1.0",
+        "path": "contracts/statistical-distribution-calibration-v1.0.schema.json",
+        "sha256": "744bc2bbd214ebb7c22ca3451a4e10b7297ff9599fa00e9bef46139760cc4b90",
+        "version": "1.0"
+      },
+      "sha256": "d11ea89dbe4514b229d57cc11f52a745823430892619609e638d189603521f58",
+      "validation_status": "valid"
+    },
+    {
+      "canonical_fingerprint": "f464e271f8c1eaa44aa1cb859ebefa0179de7196be5ff37073efb858b02aa756",
+      "declared": {
+        "id": "distributional_parity",
+        "version": "1.0"
+      },
+      "fingerprint_valid": true,
+      "id": "distribution_evidence",
+      "kind": "distributional_evidence",
+      "path": "reports/statistical-distribution-evidence.json",
+      "required": true,
+      "schema": {
+        "id": "https://montecarlo.local/schemas/statistical-distribution-evidence/1.0",
+        "path": "contracts/statistical-distribution-evidence-v1.0.schema.json",
+        "sha256": "a1bc03ac8541936931dc75e68ee6482646d044653cdc0715842adda5a31badf5",
+        "version": "1.0"
+      },
+      "sha256": "b6cb2d7754e1a63afa11db1731d89606a77abcfc8dc5e9f217e5ef42a755fd54",
+      "validation_status": "valid"
+    }
+  ],
+  "summary": {
+    "diagnostic_count": 0,
+    "distribution_metric_count": 49,
+    "distribution_scenario_count": 5,
+    "divergent_proof_level_count": 0,
+    "inconclusive_proof_level_count": 0,
+    "invalid_source_count": 0,
+    "matching_proof_level_count": 5,
+    "normative_case_count": 16,
+    "proof_level_count": 5,
+    "source_count": 10,
+    "unavailable_proof_level_count": 0,
+    "valid_source_count": 10,
+    "validation_probe_count": 22
+  },
+  "verdict": {
+    "all_diagnostics_preserved": true,
+    "observed_classifications": [
+      "match"
+    ],
+    "priority_order": [
+      "infrastructure_error",
+      "protocol_error",
+      "invalid_evidence",
+      "version_incompatibility",
+      "engine_error",
+      "normative_divergence",
+      "interlanguage_divergence",
+      "distributional_divergence",
+      "statistically_inconclusive",
+      "match"
+    ],
+    "rule": "highest-priority-observed-classification-v1",
+    "status": "match"
+  }
+}

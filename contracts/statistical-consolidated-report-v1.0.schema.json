@@ -1,0 +1,297 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/statistical-consolidated-report/1.0",
+  "title": "Consolidated statistical compliance report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "report_id", "generation", "contracts", "sources", "compatibility", "proof_levels", "scope_summary", "summary", "verdict", "enforcement", "limits", "not_evaluated", "diagnostics", "integrity"],
+  "properties": {
+    "format_version": { "const": "1.0" },
+    "report_id": { "const": "mca-statistical-consolidated-parity" },
+    "generation": { "$ref": "#/$defs/generation" },
+    "contracts": { "$ref": "#/$defs/contracts" },
+    "sources": { "type": "array", "items": { "$ref": "#/$defs/source" } },
+    "compatibility": { "$ref": "#/$defs/compatibility" },
+    "proof_levels": { "type": "array", "items": { "$ref": "#/$defs/proof_level" } },
+    "scope_summary": { "$ref": "#/$defs/scope_summary" },
+    "summary": { "$ref": "#/$defs/summary" },
+    "verdict": { "$ref": "#/$defs/verdict" },
+    "enforcement": { "$ref": "#/$defs/enforcement" },
+    "limits": { "type": "array", "items": { "$ref": "#/$defs/limit" } },
+    "not_evaluated": { "type": "array", "items": { "$ref": "#/$defs/statement" } },
+    "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/diagnostic" } },
+    "integrity": { "$ref": "#/$defs/integrity" }
+  },
+  "$defs": {
+    "sha": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "type": "string" }
+      }
+    },
+    "generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "source_set_sha256"],
+      "properties": {
+        "kind": { "const": "deterministic_source_snapshot" },
+        "source_set_sha256": { "$ref": "#/$defs/sha" }
+      }
+    },
+    "contracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["normative_contract", "corpus", "prng", "distributional_protocol"],
+      "properties": {
+        "normative_contract": { "$ref": "#/$defs/identity" },
+        "corpus": { "$ref": "#/$defs/identity" },
+        "prng": { "$ref": "#/$defs/identity" },
+        "distributional_protocol": { "$ref": "#/$defs/identity" }
+      }
+    },
+    "nullable_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": ["string", "null"] },
+        "version": { "type": ["string", "null"] }
+      }
+    },
+    "schema_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "path", "sha256"],
+      "properties": {
+        "id": { "type": ["string", "null"] },
+        "version": { "type": "string" },
+        "path": { "type": ["string", "null"] },
+        "sha256": { "anyOf": [{ "$ref": "#/$defs/sha" }, { "type": "null" }] }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "path", "required", "declared", "schema", "sha256", "canonical_fingerprint", "fingerprint_valid", "validation_status"],
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "type": "string" },
+        "path": { "type": "string", "not": { "pattern": "^(?:[A-Za-z]:|/|\\\\)" } },
+        "required": { "const": true },
+        "declared": { "$ref": "#/$defs/nullable_identity" },
+        "schema": { "$ref": "#/$defs/schema_reference" },
+        "sha256": { "anyOf": [{ "$ref": "#/$defs/sha" }, { "type": "null" }] },
+        "canonical_fingerprint": { "anyOf": [{ "$ref": "#/$defs/sha" }, { "type": "null" }] },
+        "fingerprint_valid": { "type": ["boolean", "null"] },
+        "validation_status": { "enum": ["valid", "missing", "unreadable", "invalid", "stale", "incompatible"] }
+      }
+    },
+    "compatibility_declaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "id", "version", "compatible"],
+      "properties": {
+        "source": { "type": "string" },
+        "id": { "type": ["string", "null"] },
+        "version": { "type": ["string", "null"] },
+        "compatible": { "type": "boolean" }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "scope", "declarations"],
+      "properties": {
+        "status": { "enum": ["match", "version_incompatibility", "not_evaluated"] },
+        "scope": { "type": "string" },
+        "declarations": { "type": "array", "items": { "$ref": "#/$defs/compatibility_declaration" } }
+      }
+    },
+    "classification": {
+      "enum": ["match", "distributional_divergence", "normative_divergence", "interlanguage_divergence", "statistically_inconclusive", "version_incompatibility", "engine_error", "protocol_error", "infrastructure_error", "invalid_evidence"]
+    },
+    "counter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "value"],
+      "properties": {
+        "id": { "type": "string" },
+        "value": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "proof_level": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "source", "scope", "counters", "limits"],
+      "properties": {
+        "id": { "type": "string" },
+        "status": { "$ref": "#/$defs/classification" },
+        "source": { "type": "string" },
+        "scope": { "type": "string" },
+        "counters": { "type": "array", "items": { "$ref": "#/$defs/counter" } },
+        "limits": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "normative_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "normative_family", "algorithmic_status", "exact_replay_status", "batch_independent"],
+      "properties": {
+        "id": { "type": "string" },
+        "normative_family": { "type": "string" },
+        "algorithmic_status": { "anyOf": [{ "$ref": "#/$defs/classification" }, { "const": "not_evaluated" }] },
+        "exact_replay_status": { "anyOf": [{ "$ref": "#/$defs/classification" }, { "const": "not_evaluated" }] },
+        "batch_independent": { "type": ["boolean", "null"] }
+      }
+    },
+    "probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "expected_accepted", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "expected_accepted": { "type": "boolean" },
+        "status": { "enum": ["match", "divergence", "not_evaluated"] }
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source_case_id", "mode", "cohort_size", "n_sims", "distribution_view", "status", "metric_count", "matching_metrics", "divergent_metrics", "inconclusive_metrics"],
+      "properties": {
+        "id": { "type": "string" },
+        "source_case_id": { "type": "string" },
+        "mode": { "type": "string" },
+        "cohort_size": { "type": "integer", "minimum": 1 },
+        "n_sims": { "type": "integer", "minimum": 1 },
+        "distribution_view": { "type": "string" },
+        "status": { "$ref": "#/$defs/classification" },
+        "metric_count": { "type": "integer", "minimum": 0 },
+        "matching_metrics": { "type": "integer", "minimum": 0 },
+        "divergent_metrics": { "type": "integer", "minimum": 0 },
+        "inconclusive_metrics": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "scope_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["normative_cases", "validation_probes", "distribution_scenarios"],
+      "properties": {
+        "normative_cases": { "type": "array", "items": { "$ref": "#/$defs/normative_case" } },
+        "validation_probes": { "type": "array", "items": { "$ref": "#/$defs/probe" } },
+        "distribution_scenarios": { "type": "array", "items": { "$ref": "#/$defs/scenario" } }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_count", "valid_source_count", "invalid_source_count", "proof_level_count", "matching_proof_level_count", "divergent_proof_level_count", "inconclusive_proof_level_count", "unavailable_proof_level_count", "normative_case_count", "validation_probe_count", "distribution_scenario_count", "distribution_metric_count", "diagnostic_count"],
+      "properties": {
+        "source_count": { "type": "integer", "minimum": 0 },
+        "valid_source_count": { "type": "integer", "minimum": 0 },
+        "invalid_source_count": { "type": "integer", "minimum": 0 },
+        "proof_level_count": { "type": "integer", "minimum": 0 },
+        "matching_proof_level_count": { "type": "integer", "minimum": 0 },
+        "divergent_proof_level_count": { "type": "integer", "minimum": 0 },
+        "inconclusive_proof_level_count": { "type": "integer", "minimum": 0 },
+        "unavailable_proof_level_count": { "type": "integer", "minimum": 0 },
+        "normative_case_count": { "type": "integer", "minimum": 0 },
+        "validation_probe_count": { "type": "integer", "minimum": 0 },
+        "distribution_scenario_count": { "type": "integer", "minimum": 0 },
+        "distribution_metric_count": { "type": "integer", "minimum": 0 },
+        "diagnostic_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "rule", "priority_order", "observed_classifications", "all_diagnostics_preserved"],
+      "properties": {
+        "status": { "$ref": "#/$defs/classification" },
+        "rule": { "const": "highest-priority-observed-classification-v1" },
+        "priority_order": { "type": "array", "items": { "$ref": "#/$defs/classification" } },
+        "observed_classifications": { "type": "array", "items": { "$ref": "#/$defs/classification" } },
+        "all_diagnostics_preserved": { "const": true }
+      }
+    },
+    "enforcement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "blocking", "generator_failure_classifications", "full_main_enforcement_scope"],
+      "properties": {
+        "level": { "const": "informational" },
+        "blocking": { "const": false },
+        "generator_failure_classifications": { "type": "array", "items": { "$ref": "#/$defs/classification" } },
+        "full_main_enforcement_scope": { "const": "PBI 2.21" }
+      }
+    },
+    "limit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proof_level", "statements"],
+      "properties": {
+        "proof_level": { "type": "string" },
+        "statements": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "statement"],
+      "properties": {
+        "id": { "type": "string" },
+        "statement": { "type": "string" }
+      }
+    },
+    "cohort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["size", "python", "typescript"],
+      "properties": {
+        "size": { "type": "integer", "minimum": 1 },
+        "python": { "type": "string" },
+        "typescript": { "type": "string" }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "classification", "code", "message", "consequence"],
+      "properties": {
+        "source": { "type": "string" },
+        "proof_level": { "type": "string" },
+        "case_id": { "type": "string" },
+        "scenario_id": { "type": ["string", "null"] },
+        "fixture_id": { "type": "string" },
+        "rule": { "type": "string" },
+        "metric": { "type": ["string", "null"] },
+        "engine": { "type": "string" },
+        "cohort": { "$ref": "#/$defs/cohort" },
+        "batch": { "type": ["integer", "null"] },
+        "json_path": { "type": "string" },
+        "expected": {},
+        "actual": {},
+        "threshold": { "type": "number" },
+        "interval": { "type": "object" },
+        "margin": { "type": "number" },
+        "classification": { "$ref": "#/$defs/classification" },
+        "code": { "type": "string" },
+        "message": { "type": "string" },
+        "consequence": { "enum": ["generator_failure", "contributes_to_consolidated_verdict"] }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "content_sha256"],
+      "properties": {
+        "method": { "const": "sha256-canonical-json-without-content-sha256" },
+        "content_sha256": { "$ref": "#/$defs/sha" }
+      }
+    }
+  }
+}

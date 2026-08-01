@@ -389,6 +389,10 @@ horodatage et leur ordre suit celui du corpus, ce qui rend deux exécutions iden
 le profil `main`. Un schéma/corpus invalide ou une erreur moteur reste une incapacité d’exécution et renvoie
 un code non nul.
 
+Le [rapport consolidé de conformité statistique](statistical-consolidated-report.md) consomme ces artefacts
+comme preuves versionnées. Il ne rejoue pas le corpus pendant la consolidation et ne modifie ni ses attendus,
+ni ses familles normatives, ni ses diagnostics spécialisés.
+
 L’exécution courante observe seize cas intégralement conformes dans les deux moteurs. Les deux références
 qui isolaient les constructions historiques convergent désormais :
 

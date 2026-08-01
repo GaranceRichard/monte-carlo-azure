@@ -180,5 +180,5 @@ premières appartiennent à une exécution statistiquement valide. Le contrôle 
 ```
 
 Le protocole ne consolide pas les autres preuves, ne décide aucune compatibilité future et n’ajoute aucun
-blocage au profil `main`. Ces responsabilités restent respectivement dans les travaux suivants de la
-Feature 2.
+blocage au profil `main`. Le [rapport consolidé](statistical-consolidated-report.md) le consomme comme une
+source spécialisée sans modifier ses scénarios, métriques, calibrations, seuils ni limites.

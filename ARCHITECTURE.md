@@ -124,6 +124,9 @@ contracts/
   statistical-distribution-protocol-v1.0.json # scénarios, métriques et décision multi-seeds
   statistical-distribution-seeds-v1.0.json # règle et partitions de la population de seeds
   statistical-distribution-evidence-v1.0.schema.json # forme fermée de la preuve ciblée
+  statistical-parity-report-v1.1.schema.json # forme fermée de la preuve déterministe
+  statistical-exact-replay-evidence-v1.0.schema.json # forme fermée du rejeu exact
+  statistical-consolidated-report-v1.0.schema.json # autorité consolidée machine
   statistical-validation-probes-v1.0.json # validations normalisées partagées
   examples/
     statistical-reference-corpus-v1.0.minimal.json # preuve structurelle minimale
@@ -455,6 +458,31 @@ Le contrôle reste informatif et extérieur au profil `main`; il ne consolide pa
 pas la compatibilité d’une future version et ne constitue pas un backtesting sur données Azure DevOps.
 La méthode, les autorités statistiques et les limites sont détaillées dans
 [`docs/statistical-distribution-protocol.md`](docs/statistical-distribution-protocol.md).
+
+### Consolidation des preuves statistiques
+
+`Scripts/generate_statistical_consolidated_report.py` charge les autorités spécialisées déjà publiées et
+construit un modèle unique sans appeler les moteurs ni recalculer la calibration. Les validateurs contrôlent
+les schémas fermés, les identités `STD-STAT-001`/corpus/PRNG/protocole, les compteurs et complétudes, les
+empreintes disponibles et la cohérence mutuelle des métadonnées. Le SHA-256 de chaque source et de son
+schéma reste traçable dans le modèle.
+
+Le modèle sépare conformité algorithmique et normative, contrat et sondes, rejeu exact, indépendance du
+batching et parité distributionnelle. Les cas du corpus conservent leurs statuts normatif, exact et de batch ;
+les scénarios distributionnels conservent cohort, métriques et verdict. Les diagnostics spécialisés sont
+normalisés sans suppression de leur source, localisation, attendu, obtenu, seuil, intervalle ou marge.
+
+La priorité `infrastructure_error`, `protocol_error`, `invalid_evidence`, `version_incompatibility`,
+`engine_error`, `normative_divergence`, `interlanguage_divergence`, `distributional_divergence`,
+`statistically_inconclusive`, `match` choisit le verdict sans compenser les niveaux de preuve. Le JSON
+canonique `reports/statistical-consolidated-report.json` et le Markdown associé proviennent du même modèle.
+Leur identité logique dépend uniquement des sources ; l’empreinte exclut son propre champ et aucun chemin
+absolu, timestamp mural ou identifiant machine n’entre dans la partie canonique.
+
+Le rapport reste `informational`. Les preuves absentes, invalides ou inexécutables font échouer le
+générateur et restent visibles dans le rapport, mais aucune dérive future n’est gouvernée et aucun contrôle
+de parité n’est ajouté au DAG `main`. Ces limites et les règles de lecture sont détaillées dans
+[`docs/statistical-consolidated-report.md`](docs/statistical-consolidated-report.md).
 
 Cette frontière ne constitue pas une nouvelle API applicative : aucun mapper, DTO, document MongoDB ou
 objet `localStorage` ne consomme directement le corpus. Les fabriques métier et les mappers appliquent les

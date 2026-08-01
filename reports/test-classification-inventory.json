@@ -7853,6 +7853,342 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_all_semantic_inconsistency_guards_are_actionable",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_all_semantic_inconsistency_guards_are_actionable",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_closed_report_schema_and_independent_validator_reject_drift",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_closed_report_schema_and_independent_validator_reject_drift",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_distributional_divergence_and_inconclusive_never_become_exact_match",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_distributional_divergence_and_inconclusive_never_become_exact_match",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_documentation_and_backlog_preserve_scope_and_informational_enforcement",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_documentation_and_backlog_preserve_scope_and_informational_enforcement",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_exact_specialized_outcomes_remain_localized",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_exact_specialized_outcomes_remain_localized",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_generator_rejects_a_non_object_report_schema",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_generator_rejects_a_non_object_report_schema",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_generator_validator_and_entrypoints_publish_both_views_from_one_model",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_generator_validator_and_entrypoints_publish_both_views_from_one_model",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting",
+      "user_interface",
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_infrastructure_failure_is_separate_and_generator_fails_but_writes_valid_findings",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_infrastructure_failure_is_separate_and_generator_fails_but_writes_valid_findings",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_invalid_standard_identity_seed_fingerprint_and_schema_infrastructure_are_visible",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_invalid_standard_identity_seed_fingerprint_and_schema_infrastructure_are_visible",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_json_markdown_and_sha_are_byte_stable_and_machine_independent",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_json_markdown_and_sha_are_byte_stable_and_machine_independent",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting",
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_missing_stale_corrupt_schema_and_fingerprint_sources_remain_visible",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_missing_stale_corrupt_schema_and_fingerprint_sources_remain_visible",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_nominal_sources_schema_counters_scopes_and_limits_are_consolidated",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_nominal_sources_schema_counters_scopes_and_limits_are_consolidated",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_proof_section_status_branches_and_small_io_helpers",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_proof_section_status_branches_and_small_io_helpers",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting",
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_renderer_handles_unavailable_distribution_and_false_batch_value",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_renderer_handles_unavailable_distribution_and_false_batch_value",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "performance",
+      "resilience"
+    ],
+    "domains": [
+      "reporting",
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_report_schema_is_itself_valid",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_report_schema_is_itself_valid",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_report_validator_detects_source_set_priority_and_diagnostic_order_drift",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_report_validator_detects_source_set_priority_and_diagnostic_order_drift",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_script_entrypoints_delegate_to_main",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_script_entrypoints_delegate_to_main",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting",
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_specialized_diagnostic_adapters_preserve_every_available_location",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_specialized_diagnostic_adapters_preserve_every_available_location",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_validator_and_generator_report_unreadable_inputs",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_validator_and_generator_report_unreadable_inputs",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_verdict_priority_is_explicit_deterministic_and_non_compensating",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_verdict_priority_is_explicit_deterministic_and_non_compensating",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_version_incompatibility_and_protocol_error_are_not_functional_divergence",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_consolidated_report.py",
+    "selector": "test_version_incompatibility_and_protocol_error_are_not_functional_divergence",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security",
+      "compatibility"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops",
+      "reporting"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_statistical_corpus_runner.py::test_control_reports_fatal_engine_errors_and_cli_statuses",
     "framework": "pytest",
     "sourcePath": "tests/test_statistical_corpus_runner.py",

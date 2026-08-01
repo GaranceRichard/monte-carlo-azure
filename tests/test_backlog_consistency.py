@@ -43,14 +43,12 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     features = check_backlog_consistency.parse_registry(backlog)
 
     assert sum(len(feature.pbis) for feature in features) == 141
-    assert sum(feature.completed_count for feature in features) == 29
+    assert sum(feature.completed_count for feature in features) == 30
     feature_two = next(feature for feature in features if feature.number == 2)
-    assert feature_two.completed_count == 18
+    assert feature_two.completed_count == 19
     assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == [
-        # PBI 2.18 completed on 01/08/2026 after calibrated distributional parity.
-        # The remaining sequence starts with PBI 2.19.
-        # Only the three later consolidation and compatibility PBIs remain open.
-        "2.19",
+        # PBI 2.19 completed on 01/08/2026 with the consolidated evidence report.
+        # Only compatibility governance and blocking enforcement remain open.
         "2.20",
         "2.21",
     ]
@@ -122,12 +120,16 @@ def test_generation_rejects_missing_governance_marker() -> None:
 
 
 def test_generation_requires_one_feature_in_progress() -> None:
-    completed = _source_backlog().replace(
-        "| 2.2 | Ensuite | M | Sol Très élevé | |",
-        "| 2.2 | Ensuite | M | Sol Très élevé | 28/07/2026 |",
-    ).replace(
-        "| 2.3 | Enfin | L | Sol Ultra | |",
-        "| 2.3 | Enfin | L | Sol Ultra | 28/07/2026 |",
+    completed = (
+        _source_backlog()
+        .replace(
+            "| 2.2 | Ensuite | M | Sol Très élevé | |",
+            "| 2.2 | Ensuite | M | Sol Très élevé | 28/07/2026 |",
+        )
+        .replace(
+            "| 2.3 | Enfin | L | Sol Ultra | |",
+            "| 2.3 | Enfin | L | Sol Ultra | 28/07/2026 |",
+        )
     )
     features = check_backlog_consistency.parse_registry(completed)
 

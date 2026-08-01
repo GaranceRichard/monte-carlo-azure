@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/statistical-exact-replay-evidence/1.0",
+  "title": "Exact interlanguage replay evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["report_version", "proof_kind", "enforcement", "distributional_equivalence", "status", "comparison_policy", "corpus", "coverage", "batching", "summary", "cases", "diagnostics"],
+  "properties": {
+    "report_version": { "const": "1.0" },
+    "proof_kind": { "const": "exact_replay" },
+    "enforcement": { "const": "informational" },
+    "distributional_equivalence": { "const": "not_evaluated" },
+    "status": { "enum": ["match", "divergence", "engine_error"] },
+    "comparison_policy": { "$ref": "#/$defs/policy" },
+    "corpus": { "$ref": "#/$defs/corpus" },
+    "coverage": { "$ref": "#/$defs/coverage" },
+    "batching": { "$ref": "#/$defs/batching" },
+    "summary": { "$ref": "#/$defs/summary" },
+    "cases": { "type": "array", "items": { "$ref": "#/$defs/case" } },
+    "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/diagnostic" } }
+  },
+  "$defs": {
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "engine_as_oracle", "field_presence", "primitive_types", "numeric_tolerance", "numeric_rounding", "distribution_order", "silent_normalization"],
+      "properties": {
+        "authority": { "const": "versioned_corpus_expected_result" },
+        "engine_as_oracle": { "const": false },
+        "field_presence": { "const": "exact" },
+        "primitive_types": { "const": "exact_json_types" },
+        "numeric_tolerance": { "const": "none" },
+        "numeric_rounding": { "const": "none" },
+        "distribution_order": { "const": "significant" },
+        "silent_normalization": { "const": false }
+      }
+    },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": { "id": { "type": "string" }, "version": { "type": "string" } }
+    },
+    "corpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "schema_version", "normative_contract", "prng_contract"],
+      "properties": {
+        "id": { "type": "string" },
+        "schema_version": { "type": "string" },
+        "normative_contract": { "$ref": "#/$defs/contract" },
+        "prng_contract": { "type": "string" }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["modes", "censorship", "percentiles", "risk_score", "reliability_labels", "histograms"],
+      "properties": {
+        "modes": { "type": "array", "items": { "type": "string" } },
+        "censorship": { "type": "array", "items": { "type": "string" } },
+        "percentiles": { "type": "array", "items": { "type": "string" } },
+        "risk_score": { "type": "array", "items": { "type": "string" } },
+        "reliability_labels": { "type": "array", "items": { "type": "string" } },
+        "histograms": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "batching": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python_batch_sizes", "typescript_execution", "independence_rule", "independent"],
+      "properties": {
+        "python_batch_sizes": { "type": "array", "items": { "type": "integer", "minimum": 1 } },
+        "typescript_execution": { "const": "simulation_major_sequential" },
+        "independence_rule": { "const": "every_python_batch_matches_corpus" },
+        "independent": { "type": "boolean" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_count", "python_case_executions", "typescript_case_executions", "normative_comparisons", "normative_matches", "interlanguage_comparisons", "interlanguage_matches", "batch_independent_cases", "engine_error_cases", "diagnostic_count"],
+      "properties": {
+        "case_count": { "type": "integer", "minimum": 0 },
+        "python_case_executions": { "type": "integer", "minimum": 0 },
+        "typescript_case_executions": { "type": "integer", "minimum": 0 },
+        "normative_comparisons": { "type": "integer", "minimum": 0 },
+        "normative_matches": { "type": "integer", "minimum": 0 },
+        "interlanguage_comparisons": { "type": "integer", "minimum": 0 },
+        "interlanguage_matches": { "type": "integer", "minimum": 0 },
+        "batch_independent_cases": { "type": "integer", "minimum": 0 },
+        "engine_error_cases": { "type": "integer", "minimum": 0 },
+        "diagnostic_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["match", "normative_divergence", "interlanguage_divergence", "engine_error", "not_compared"] },
+        "differences": { "type": "array", "items": { "type": "object" } },
+        "error": { "type": "object" }
+      }
+    },
+    "batch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["batch_size", "batch_count", "last_batch_size", "divisible", "status"],
+      "properties": {
+        "batch_size": { "type": "integer", "minimum": 1 },
+        "batch_count": { "type": "integer", "minimum": 1 },
+        "last_batch_size": { "type": "integer", "minimum": 1 },
+        "divisible": { "type": "boolean" },
+        "status": { "enum": ["match", "normative_divergence", "engine_error"] },
+        "differences": { "type": "array", "items": { "type": "object" } },
+        "error": { "type": "object" }
+      }
+    },
+    "interlanguage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python_batch_size", "status", "differences"],
+      "properties": {
+        "python_batch_size": { "type": "integer", "minimum": 1 },
+        "status": { "enum": ["match", "interlanguage_divergence", "not_compared"] },
+        "differences": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "outcomes", "typescript", "python_batches", "interlanguage", "batch_independent"],
+      "properties": {
+        "id": { "type": "string" },
+        "outcomes": { "type": "array", "items": { "enum": ["match", "engine_error", "normative_divergence", "interlanguage_divergence"] } },
+        "typescript": { "$ref": "#/$defs/comparison" },
+        "python_batches": { "type": "array", "items": { "$ref": "#/$defs/batch" } },
+        "interlanguage": { "type": "array", "items": { "$ref": "#/$defs/interlanguage" } },
+        "batch_independent": { "type": "boolean" }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "engine", "batch_size", "comparison", "classification", "path", "kind", "expected", "actual"],
+      "properties": {
+        "case_id": { "type": "string" },
+        "engine": { "type": "string" },
+        "batch_size": { "type": ["integer", "null"] },
+        "comparison": { "enum": ["normative", "interlanguage"] },
+        "classification": { "enum": ["engine_error", "normative_divergence", "interlanguage_divergence"] },
+        "path": { "type": "string" },
+        "kind": { "type": "string" },
+        "expected": { "type": "object" },
+        "actual": { "type": "object" }
+      }
+    }
+  }
+}

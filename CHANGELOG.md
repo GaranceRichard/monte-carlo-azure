@@ -2,6 +2,20 @@
 
 ## Recent
 
+### Rapport consolidé de conformité statistique — PBI 2.19
+
+- publication d’un JSON canonique fermé `1.0` et d’une synthèse Markdown issus du même modèle, avec dix
+  sources versionnées, leurs SHA-256, leurs validations et les empreintes canoniques disponibles
+- consolidation sans rejeu opportuniste des conformités normative et algorithmique, des 22 sondes, du
+  rejeu exact, de l’indépendance des quatre géométries de batching et des 49 métriques distributionnelles
+- priorité déterministe des verdicts, diagnostics spécialisés exhaustifs et séparation stricte entre
+  divergence normative, interlangage ou distributionnelle, résultat non concluant, incompatibilité,
+  erreur moteur, protocole, infrastructure et preuve invalide
+- génération byte-stable sans chemin absolu ni horodatage variable ; verdict courant `match`, 10 sources
+  valides, 5 niveaux conformes, 16 cas, 22 sondes, 5 scénarios, 49 métriques et 0 diagnostic
+- enforcement maintenu `informational` ; aucune décision de compatibilité future ni intégration bloquante
+  au profil `main`, qui restent respectivement dans les PBI 2.20 et 2.21
+
 ### Protocole de parité distributionnelle versionné et testable — PBI 2.18
 
 - ajout d’un protocole JSON fermé `1.0`, de son schéma, d’une population SHA-256 reproductible de 256 seeds
