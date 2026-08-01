@@ -2,6 +2,27 @@
 
 ## Recent
 
+### Protocole de parité distributionnelle versionné et testable — PBI 2.18
+
+- ajout d’un protocole JSON fermé `1.0`, de son schéma, d’une population SHA-256 reproductible de 256 seeds
+  en deux cohorts disjointes et de cinq scénarios issus des entrées du corpus `1.0`, sans lire leurs
+  résultats exacts ni coupler les seeds entre moteurs
+- comparaison symétrique de 49 métriques : CDF discrètes et histogrammes restitués, taux de complétion et
+  de censure, présence et valeurs conditionnelles de P50/P70/P90 et du Risk Score, plus invariants exacts de
+  fiabilité et de censure totale
+- décision par bandes DKW, intervalles Newcombe–Wilson, permutations de blocs, Bonferroni simultané et
+  Holm–Bonferroni ; résultats `match`, `divergence`, `inconclusive` et `invalid` distincts, sans succès
+  implicite lorsque la puissance ou les observations conditionnelles sont insuffisantes
+- calibration déterministe sur 200 répétitions, 12 designs, trois lois nulles et quatre écarts contrôlés :
+  0 famille faussement positive sur 200, enveloppe binomiale 99 % à 18 et puissance observée de `1,00` au
+  design de production, avec artefact byte-stable
+- ajout des validateurs indépendants du protocole, de la calibration et de la preuve, du runner Python/Node
+  et des preuves `reports/statistical-distribution-calibration.json` et
+  `reports/statistical-distribution-evidence.json` ; verdict courant `match` sur 5 scénarios et 49 métriques
+- contrôle maintenu informatif et séparé du backtesting, du rapport consolidé, de la gouvernance de
+  compatibilité et de l’intégration bloquante au profil `main`; invalidité, moteur ou infrastructure en
+  erreur conservent un code non nul
+
 ### Rejeu exact interlangage sur le corpus versionné — PBI 2.17
 
 - ajout de la commande dédiée

@@ -60,7 +60,7 @@ déterministe, des preuves exactes et distributionnelles et des références par
 | 2.15 | Métriques et labels de fiabilité du throughput alignés | M | Sol Très élevé | 29/07/2026 |
 | 2.16 | Construction des histogrammes alignée | M | Sol Très élevé | 29/07/2026 |
 | 2.17 | Rejeu exact interlangage démontré sur le corpus versionné | L | Sol Ultra | 29/07/2026 |
-| 2.18 | Protocole de parité distributionnelle versionné et testable | M | Sol Très élevé | |
+| 2.18 | Protocole de parité distributionnelle versionné et testable | M | Sol Très élevé | 01/08/2026 |
 | 2.19 | Rapport consolidé de parité déterministe, exacte et distributionnelle disponible | M | Sol Très élevé | |
 | 2.20 | Dérives de version et décisions de compatibilité statistique bloquées | M | Sol Très élevé | |
 | 2.21 | Contrôles complets de parité et de compatibilité bloquants dans le profil `main` | M | Sol Très élevé | |
@@ -322,15 +322,15 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 
 # Synthèse du backlog
 
-**Feature en cours :** Feature 2 — Garantir la fiabilité du cœur statistique — 17/21 PBI réalisés (80,95 %).
-**Prochain PBI :** `2.18` — Protocole de parité distributionnelle versionné et testable — non commencé.
-**Reliquats de la Feature 2 :** `2.18`, `2.19`, `2.20`, `2.21`.
-**Progression globale :** 28/141 PBI réalisés (19,86 %) ; 113 restants.
+**Feature en cours :** Feature 2 — Garantir la fiabilité du cœur statistique — 18/21 PBI réalisés (85,71 %).
+**Prochain PBI :** `2.19` — Rapport consolidé de parité déterministe, exacte et distributionnelle disponible — non commencé.
+**Reliquats de la Feature 2 :** `2.19`, `2.20`, `2.21`.
+**Progression globale :** 29/141 PBI réalisés (20,57 %) ; 112 restants.
 
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
 | 1 — Disposer d’un système de preuve qualité gouverné | 11 | 11 | 0 |
-| 2 — Garantir la fiabilité du cœur statistique | 21 | 17 | 4 |
+| 2 — Garantir la fiabilité du cœur statistique | 21 | 18 | 3 |
 | 3 — Disposer d’un moteur statistique Python réutilisable et distribuable | 12 | 0 | 12 |
 | 4 — Disposer d’une mise en production personnelle sécurisée | 6 | 0 | 6 |
 | 5 — Démontrer la valeur d’usage du mode portefeuille | 4 | 0 | 4 |
@@ -343,7 +343,7 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 | 12 — Soutenir le pilotage de programme avec des relations opérationnelles explicites | 7 | 0 | 7 |
 | 13 — Disposer d’une gouvernance technique rationalisée | 10 | 0 | 10 |
 | 14 — Disposer d’une stratégie de diffusion claire et d’une adoption simplifiée | 9 | 0 | 9 |
-| **Total** | **141** | **28** | **113** |
+| **Total** | **141** | **29** | **112** |
 
 Aucun PBI n’est classé XL.
 

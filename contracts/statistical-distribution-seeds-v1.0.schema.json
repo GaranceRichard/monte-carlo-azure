@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/statistical-distribution-seeds/1.0",
+  "title": "Population de seeds du protocole de parité distributionnelle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "population_id",
+    "version",
+    "construction",
+    "partitions",
+    "population_fingerprint"
+  ],
+  "properties": {
+    "population_id": { "const": "mca-distributional-seed-population" },
+    "version": { "const": "1.0" },
+    "construction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "namespace", "encoding", "uint32_byte_order", "collision_policy", "size"],
+      "properties": {
+        "algorithm": { "const": "sha256-counter-first-uint32-v1" },
+        "namespace": { "const": "mca-distributional-parity-seeds-v1.0" },
+        "encoding": { "const": "utf-8-namespace-colon-ascii-counter" },
+        "uint32_byte_order": { "const": "big-endian" },
+        "collision_policy": { "const": "reject-duplicate-and-continue" },
+        "size": { "const": 256 }
+      }
+    },
+    "partitions": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        { "$ref": "#/$defs/cohortA" },
+        { "$ref": "#/$defs/cohortB" }
+      ],
+      "items": false
+    },
+    "population_fingerprint": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "partition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "offset", "size", "fingerprint"],
+      "properties": {
+        "id": { "type": "string" },
+        "offset": { "type": "integer", "minimum": 0 },
+        "size": { "const": 128 },
+        "fingerprint": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "cohortA": {
+      "allOf": [
+        { "$ref": "#/$defs/partition" },
+        { "properties": { "id": { "const": "cohort-a" }, "offset": { "const": 0 } } }
+      ]
+    },
+    "cohortB": {
+      "allOf": [
+        { "$ref": "#/$defs/partition" },
+        { "properties": { "id": { "const": "cohort-b" }, "offset": { "const": 128 } } }
+      ]
+    }
+  }
+}

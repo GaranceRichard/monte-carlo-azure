@@ -537,6 +537,19 @@ frontières sérialisées continuent à ne transporter que les cinq primitives d
 histogrammes sont construits par leurs autorités de domaine dédiées sans modifier ces métriques ni ces
 frontières ; le rapport demeure informatif.
 
+## Réutilisation par le protocole distributionnel
+
+Le [protocole de parité distributionnelle](statistical-distribution-protocol.md) référence cinq cas de ce
+corpus uniquement comme autorités d’entrées normalisées. Il remplace la seed et `n_sims` par ceux de son
+plan versionné, et n’inclut jamais `expected_result` dans un plan moteur. Ses cohorts Python et TypeScript
+sont disjointes : cette preuve compare des lois, alors que
+`reports/statistical-exact-replay-evidence.json` conserve l’autorité distincte de l’égalité exacte pour une
+même seed.
+
+Le validateur distributionnel appelle d’abord le validateur indépendant du corpus. Un corpus invalide ou
+une version différente empêche donc toute exécution, mais les résultats exacts du corpus ne peuvent pas
+transformer la décision multi-seeds en rejeu.
+
 ## Évolution
 
 La version `1.0` est immuable. Toute évolution incompatible des entrées, de la seed, des résultats ou du

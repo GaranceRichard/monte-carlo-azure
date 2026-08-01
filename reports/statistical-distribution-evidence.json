@@ -1,0 +1,1172 @@
+{
+  "evidence_version": "1.0",
+  "proof_kind": "distributional_parity",
+  "enforcement": "informational",
+  "status": "match",
+  "error_classification": null,
+  "protocol": {
+    "id": "mca-statistical-distributional-parity",
+    "version": "1.0"
+  },
+  "authorities": {
+    "corpus": {
+      "id": "mca-statistical-reference-corpus",
+      "version": "1.0"
+    },
+    "normative_contract": {
+      "id": "STD-STAT-001",
+      "version": "1.0"
+    },
+    "prng": {
+      "id": "mca-prng-v1",
+      "version": "1.0"
+    },
+    "seed_population": {
+      "id": "mca-distributional-seed-population",
+      "version": "1.0"
+    }
+  },
+  "seed_population": {
+    "id": "mca-distributional-seed-population",
+    "version": "1.0",
+    "fingerprint": "889e757eab13c3766225989e5df3660affccd90dddc91d9314e7b0e3e4a621e9",
+    "assignments": {
+      "python": "cohort-a",
+      "typescript": "cohort-b",
+      "same_seed_pairing": false,
+      "engine_oracle": false
+    }
+  },
+  "inference": {
+    "familywise_alpha": 0.05,
+    "confidence_adjustment": "bonferroni-simultaneous",
+    "divergence_adjustment": "holm-bonferroni",
+    "discrete_test": "seed-block-permutation",
+    "permutations": 2047,
+    "permutation_seed": 218001,
+    "equivalence_margins": {
+      "pooled_cdf": 0.025,
+      "pooled_rate": 0.02,
+      "cohort_rate": 0.45,
+      "conditional_cdf": 0.6
+    },
+    "minimum_conditional_observations": 8,
+    "decision_rule": {
+      "match": "all-required-confidence-regions-inside-equivalence-margins",
+      "divergence": "holm-adjusted-p-at-most-alpha-and-effect-above-margin",
+      "inconclusive": "valid-execution-without-match-or-divergence",
+      "invalid": "version-protocol-artifact-engine-or-infrastructure-error"
+    }
+  },
+  "scenarios": [
+    {
+      "id": "items-discrete-exact",
+      "source_case_id": "items-zero-weeks-excluded",
+      "mode": "weeks_to_items",
+      "cohort_size": 64,
+      "n_sims": 4000,
+      "distribution_view": "exact-outcome-cdf",
+      "metrics": [
+        {
+          "id": "outcome_cdf",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 256000,
+            "typescript": 256000
+          },
+          "observed": {
+            "effect": 0.00083984
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.00880446,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.025,
+          "raw_p_value": 0.91503906,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P50_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.14099803,
+            "upper": 0.14099803,
+            "absolute_upper": 0.14099803,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P70_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.14099803,
+            "upper": 0.14099803,
+            "absolute_upper": 0.14099803,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P90_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.14099803,
+            "upper": 0.14099803,
+            "absolute_upper": 0.14099803,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P50_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.03125
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.53497662,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 0.85400391,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P70_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.50372662,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P90_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.50372662,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "risk_score_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.14099803,
+            "upper": 0.14099803,
+            "absolute_upper": 0.14099803,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "risk_score_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.03125
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.53497662,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 0.87109375,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "throughput_reliability",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        }
+      ],
+      "verdict": "match"
+    },
+    {
+      "id": "items-histogram-aggregated",
+      "source_case_id": "histogram-aggregated-discontinuous",
+      "mode": "weeks_to_items",
+      "cohort_size": 128,
+      "n_sims": 4000,
+      "distribution_view": "reported-histogram-cdf",
+      "metrics": [
+        {
+          "id": "outcome_cdf",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 512000,
+            "typescript": 512000
+          },
+          "observed": {
+            "effect": 0.00019922
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.00583105,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.025,
+          "raw_p_value": 0.33349609,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P50_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 128,
+            "typescript": 128
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.07584609,
+            "upper": 0.07584609,
+            "absolute_upper": 0.07584609,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P70_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 128,
+            "typescript": 128
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.07584609,
+            "upper": 0.07584609,
+            "absolute_upper": 0.07584609,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P90_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 128,
+            "typescript": 128
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.07584609,
+            "upper": 0.07584609,
+            "absolute_upper": 0.07584609,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P50_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 128,
+            "typescript": 128
+          },
+          "observed": {
+            "effect": 0.0390625
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.39525101,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 0.82666016,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P70_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 128,
+            "typescript": 128
+          },
+          "observed": {
+            "effect": 0.0625
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.41868851,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 0.50439453,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P90_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 128,
+            "typescript": 128
+          },
+          "observed": {
+            "effect": 0.03125
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.38743851,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 0.75585938,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "risk_score_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 128,
+            "typescript": 128
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.07584609,
+            "upper": 0.07584609,
+            "absolute_upper": 0.07584609,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "risk_score_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 128,
+            "typescript": 128
+          },
+          "observed": {
+            "effect": 0.0546875
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.41087601,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 0.79443359,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "throughput_reliability",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 128,
+            "typescript": 128
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        }
+      ],
+      "verdict": "match"
+    },
+    {
+      "id": "weeks-no-censorship",
+      "source_case_id": "weeks-zero-weeks-included-no-censorship",
+      "mode": "backlog_to_weeks",
+      "cohort_size": 64,
+      "n_sims": 2000,
+      "distribution_view": "exact-outcome-cdf",
+      "metrics": [
+        {
+          "id": "outcome_cdf",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 128000,
+            "typescript": 128000
+          },
+          "observed": {
+            "effect": 0.00228906
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.01355273,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.025,
+          "raw_p_value": 0.37744141,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "censored_rate",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 128000,
+            "typescript": 128000
+          },
+          "observed": {
+            "python_rate": 0.0,
+            "typescript_rate": 0.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -8.206e-05,
+            "upper": 8.206e-05,
+            "absolute_upper": 8.206e-05,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.02,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P50_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.14099803,
+            "upper": 0.14099803,
+            "absolute_upper": 0.14099803,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P70_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.14099803,
+            "upper": 0.14099803,
+            "absolute_upper": 0.14099803,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P90_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.14099803,
+            "upper": 0.14099803,
+            "absolute_upper": 0.14099803,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P50_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.50372662,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P70_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.50372662,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P90_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.50372662,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "risk_score_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.14099803,
+            "upper": 0.14099803,
+            "absolute_upper": 0.14099803,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "risk_score_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.50372662,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "throughput_reliability",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        }
+      ],
+      "verdict": "match"
+    },
+    {
+      "id": "weeks-partial-censorship",
+      "source_case_id": "weeks-partial-censorship",
+      "mode": "backlog_to_weeks",
+      "cohort_size": 64,
+      "n_sims": 1000,
+      "distribution_view": "exact-outcome-cdf",
+      "metrics": [
+        {
+          "id": "outcome_cdf",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 64000,
+            "typescript": 64000
+          },
+          "observed": {
+            "effect": 0.00229688
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.01822611,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.025,
+          "raw_p_value": 0.90283203,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "censored_rate",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64000,
+            "typescript": 64000
+          },
+          "observed": {
+            "python_rate": 0.24098438,
+            "typescript_rate": 0.24082813,
+            "effect": 0.00015625
+          },
+          "confidence_interval": {
+            "lower": -0.0108007,
+            "upper": 0.01111315,
+            "absolute_upper": 0.01111315,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.02,
+          "raw_p_value": 0.95605469,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P50_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.14099803,
+            "upper": 0.14099803,
+            "absolute_upper": 0.14099803,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P70_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "python_rate": 1.0,
+            "typescript_rate": 1.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.14099803,
+            "upper": 0.14099803,
+            "absolute_upper": 0.14099803,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P90_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "python_rate": 0.0,
+            "typescript_rate": 0.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.14099803,
+            "upper": 0.14099803,
+            "absolute_upper": 0.14099803,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P50_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.50372662,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P70_values",
+          "kind": "discrete_cdf",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.015625
+          },
+          "confidence_interval": {
+            "lower": 0.0,
+            "upper": 0.51935162,
+            "alpha": 0.00119048,
+            "method": "two-sample-dkw-union-bound"
+          },
+          "equivalence_margin": 0.6,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "P90_values",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 0,
+            "typescript": 0
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        },
+        {
+          "id": "risk_score_presence",
+          "kind": "rate_difference",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "python_rate": 0.0,
+            "typescript_rate": 0.0,
+            "effect": 0.0
+          },
+          "confidence_interval": {
+            "lower": -0.14099803,
+            "upper": 0.14099803,
+            "absolute_upper": 0.14099803,
+            "alpha": 0.00119048,
+            "method": "newcombe-wilson-independent-proportions"
+          },
+          "equivalence_margin": 0.45,
+          "raw_p_value": 1.0,
+          "equivalence_supported": true,
+          "adjusted_p_value": 1.0,
+          "verdict": "match"
+        },
+        {
+          "id": "risk_score_values",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 0,
+            "typescript": 0
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        },
+        {
+          "id": "throughput_reliability",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 64,
+            "typescript": 64
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        }
+      ],
+      "verdict": "match"
+    },
+    {
+      "id": "weeks-total-censorship",
+      "source_case_id": "weeks-total-censorship",
+      "mode": "backlog_to_weeks",
+      "cohort_size": 8,
+      "n_sims": 1000,
+      "distribution_view": "structural-censor-state",
+      "metrics": [
+        {
+          "id": "outcome_cdf",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 8,
+            "typescript": 8
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        },
+        {
+          "id": "censored_rate",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 8,
+            "typescript": 8
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        },
+        {
+          "id": "P50_presence",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 8,
+            "typescript": 8
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        },
+        {
+          "id": "P70_presence",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 8,
+            "typescript": 8
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        },
+        {
+          "id": "P90_presence",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 8,
+            "typescript": 8
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        },
+        {
+          "id": "risk_score_presence",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 8,
+            "typescript": 8
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        },
+        {
+          "id": "throughput_reliability",
+          "kind": "exact_structural",
+          "sample_sizes": {
+            "python": 8,
+            "typescript": 8
+          },
+          "observed": {
+            "effect": 0.0
+          },
+          "equivalence_margin": 0.0,
+          "equivalence_supported": true,
+          "exact_mismatch": false,
+          "verdict": "match"
+        }
+      ],
+      "verdict": "match"
+    }
+  ],
+  "summary": {
+    "scenario_count": 5,
+    "metric_count": 49,
+    "matches": 49,
+    "divergences": 0,
+    "inconclusive": 0
+  },
+  "diagnostics": [],
+  "stability": {
+    "deterministic": true,
+    "fingerprint_method": "sha256-canonical-json-without-artifact-fingerprint",
+    "artifact_fingerprint": "f464e271f8c1eaa44aa1cb859ebefa0179de7196be5ff37073efb858b02aa756"
+  }
+}

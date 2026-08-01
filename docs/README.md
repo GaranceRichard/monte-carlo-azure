@@ -17,6 +17,7 @@ les règles, les preuves ou l’historique.
 | Frontières, composants, flux, API et sécurité structurelle | Développeurs et exploitants | [`ARCHITECTURE.md`](../ARCHITECTURE.md) | Architecture et contrats applicatifs | Technique |
 | Règles statistiques normatives | Développeurs du moteur et reviewers | [`STD-STAT-001.md`](standards/STD-STAT-001.md) | Standard normatif | Norme |
 | Forme, dérivation et exécution du corpus statistique | Développeurs du moteur et reviewers | [`statistical-reference-corpus.md`](statistical-reference-corpus.md) | Contrat opératoire et preuves dérivées | Contrat |
+| Protocole, calibration et preuve de parité distributionnelle | Statisticiens, développeurs et reviewers | [`statistical-distribution-protocol.md`](statistical-distribution-protocol.md) | Contrat d’inférence multi-seeds et limites | Contrat |
 | Classification et stratégie des tests | Développeurs et qualité | [`STD-TEST-001.md`](standards/STD-TEST-001.md) et [`test-classification.md`](test-classification.md) | Norme puis application au dépôt | Norme |
 | Validation, couverture et publiabilité | Contributeurs | [`definition-of-done.md`](definition-of-done.md) | Procédure normative du dépôt | Gouvernance |
 | Risques, chemins critiques et preuves Vitals | Qualité, sécurité et reviewers | [`risk-control-matrix.md`](risk-control-matrix.md), [`critical-paths.md`](critical-paths.md) et [`vitals-traceability.md`](vitals-traceability.md) | État de maîtrise et traçabilité | Preuve |
@@ -91,6 +92,7 @@ l’unique autorité de réalisation.
 | [`backlog-expectations/conditional-topics.md`](backlog-expectations/conditional-topics.md) | Product owner | Sujets conditionnels hors registre engagé | Chantier |
 | [`standards/STD-STAT-001.md`](standards/STD-STAT-001.md) | Statistique, développement | Autorité normative du contrat statistique | Norme |
 | [`statistical-reference-corpus.md`](statistical-reference-corpus.md) | Statistique, développement | Guide du corpus ; les JSON liés sont les autorités machine | Contrat |
+| [`statistical-distribution-protocol.md`](statistical-distribution-protocol.md) | Statistique, développement | Protocole distributionnel, calibration, décisions et limites | Contrat |
 | [`statistical-parity-audit.md`](statistical-parity-audit.md) | Reviewers, statistique | Relevé historique des divergences et décisions ouvertes | Preuve historique |
 | [`standards/STD-TEST-001.md`](standards/STD-TEST-001.md) | Qualité, développement | Autorité normative de la stratégie de test | Norme |
 | [`test-classification.md`](test-classification.md) | Qualité, développement | Application opératoire du modèle de classification | Contrat |
@@ -101,6 +103,8 @@ l’unique autorité de réalisation.
 | [`../CHANGELOG.md`](../CHANGELOG.md) | Utilisateurs, mainteneurs | Autorité de l’historique des changements | Historique |
 | [`../reports/statistical-parity-report.md`](../reports/statistical-parity-report.md) | Reviewers, statistique | Rendu généré de l’état de parité ; le JSON associé est exploitable en CI | Preuve générée |
 | [`../reports/statistical-exact-replay-evidence.json`](../reports/statistical-exact-replay-evidence.json) | Reviewers, statistique | Preuve JSON régénérable du rejeu exact et de l’indépendance du batching | Preuve générée |
+| [`../reports/statistical-distribution-calibration.json`](../reports/statistical-distribution-calibration.json) | Reviewers, statistique | Calibration reproductible des faux positifs, tailles et écarts contrôlés | Preuve générée |
+| [`../reports/statistical-distribution-evidence.json`](../reports/statistical-distribution-evidence.json) | Reviewers, statistique | Preuve JSON multi-seeds et verdict distributionnel ciblé | Preuve générée |
 | [`../reports/test-strategy-report.md`](../reports/test-strategy-report.md) | Reviewers, qualité | Rendu généré de la stratégie de test ; le JSON associé est contractuel | Preuve générée |
 | [`../AGENTS.md`](../AGENTS.md) | Agents de contribution | Instructions locales contraignantes, hors documentation produit | Gouvernance |
 | [`README.md`](README.md) | Toute audience documentaire | Présente carte et index faisant autorité pour la répartition documentaire | Gouvernance documentaire |
@@ -146,6 +150,8 @@ l’unique autorité de réalisation.
 
 - [`standards/STD-STAT-001.md`](standards/STD-STAT-001.md) — norme statistique ;
 - [`statistical-reference-corpus.md`](statistical-reference-corpus.md) — corpus et dérivations ;
+- [`statistical-distribution-protocol.md`](statistical-distribution-protocol.md) — protocole multi-seeds,
+  calibration et interprétation des verdicts ;
 - [`statistical-parity-audit.md`](statistical-parity-audit.md) — audit historique de parité ;
 - [`standards/STD-TEST-001.md`](standards/STD-TEST-001.md) — norme de test ;
 - [`test-classification.md`](test-classification.md) — application de la classification ;
@@ -154,7 +160,8 @@ l’unique autorité de réalisation.
 - [`critical-paths.md`](critical-paths.md) — parcours vitaux ;
 - [`vitals-traceability.md`](vitals-traceability.md) — preuves de couverture ;
 - [`../reports/statistical-parity-report.md`](../reports/statistical-parity-report.md) et
-  [`../reports/statistical-exact-replay-evidence.json`](../reports/statistical-exact-replay-evidence.json) —
+  [`../reports/statistical-exact-replay-evidence.json`](../reports/statistical-exact-replay-evidence.json),
+  [`../reports/statistical-distribution-evidence.json`](../reports/statistical-distribution-evidence.json) —
   preuves statistiques générées ;
 - [`../reports/test-strategy-report.md`](../reports/test-strategy-report.md) — rendu qualité généré, non
   autorité éditoriale.

@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/statistical-distribution-protocol/1.0",
+  "title": "Protocole de parité distributionnelle Python / TypeScript",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol_id",
+    "version",
+    "schema_version",
+    "enforcement",
+    "authorities",
+    "cohort_assignment",
+    "scenarios",
+    "inference",
+    "calibration"
+  ],
+  "properties": {
+    "protocol_id": { "const": "mca-statistical-distributional-parity" },
+    "version": { "const": "1.0" },
+    "schema_version": { "const": "1.0" },
+    "enforcement": { "const": "informational" },
+    "authorities": { "$ref": "#/$defs/authorities" },
+    "cohort_assignment": { "$ref": "#/$defs/cohortAssignment" },
+    "scenarios": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": { "$ref": "#/$defs/scenario" }
+    },
+    "inference": { "$ref": "#/$defs/inference" },
+    "calibration": { "$ref": "#/$defs/calibration" }
+  },
+  "$defs": {
+    "versionedAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "const": "1.0" }
+      }
+    },
+    "authorities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["corpus", "normative_contract", "prng", "seed_population"],
+      "properties": {
+        "corpus": {
+          "allOf": [
+            { "$ref": "#/$defs/versionedAuthority" },
+            { "properties": { "id": { "const": "mca-statistical-reference-corpus" } } }
+          ]
+        },
+        "normative_contract": {
+          "allOf": [
+            { "$ref": "#/$defs/versionedAuthority" },
+            { "properties": { "id": { "const": "STD-STAT-001" } } }
+          ]
+        },
+        "prng": {
+          "allOf": [
+            { "$ref": "#/$defs/versionedAuthority" },
+            { "properties": { "id": { "const": "mca-prng-v1" } } }
+          ]
+        },
+        "seed_population": {
+          "allOf": [
+            { "$ref": "#/$defs/versionedAuthority" },
+            { "properties": { "id": { "const": "mca-distributional-seed-population" } } }
+          ]
+        }
+      }
+    },
+    "cohortAssignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python", "typescript", "same_seed_pairing", "engine_oracle"],
+      "properties": {
+        "python": { "const": "cohort-a" },
+        "typescript": { "const": "cohort-b" },
+        "same_seed_pairing": { "const": false },
+        "engine_oracle": { "const": false }
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source_case_id", "mode", "cohort_size", "n_sims", "distribution_view", "metrics"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "source_case_id": { "type": "string", "minLength": 1 },
+        "mode": { "enum": ["backlog_to_weeks", "weeks_to_items"] },
+        "cohort_size": { "enum": [8, 32, 64, 128] },
+        "n_sims": { "enum": [1000, 2000, 4000] },
+        "distribution_view": { "enum": ["exact-outcome-cdf", "reported-histogram-cdf", "structural-censor-state"] },
+        "metrics": {
+          "type": "array",
+          "minItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "outcome_cdf",
+              "censored_rate",
+              "completion_count",
+              "P50_presence",
+              "P70_presence",
+              "P90_presence",
+              "P50_values",
+              "P70_values",
+              "P90_values",
+              "risk_score_presence",
+              "risk_score_values",
+              "throughput_reliability"
+            ]
+          }
+        }
+      }
+    },
+    "inference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "familywise_alpha",
+        "confidence_adjustment",
+        "divergence_adjustment",
+        "discrete_test",
+        "permutations",
+        "permutation_seed",
+        "equivalence_margins",
+        "minimum_conditional_observations",
+        "decision_rule"
+      ],
+      "properties": {
+        "familywise_alpha": { "const": 0.05 },
+        "confidence_adjustment": { "const": "bonferroni-simultaneous" },
+        "divergence_adjustment": { "const": "holm-bonferroni" },
+        "discrete_test": { "const": "seed-block-permutation" },
+        "permutations": { "const": 2047 },
+        "permutation_seed": { "const": 218001 },
+        "equivalence_margins": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pooled_cdf", "pooled_rate", "cohort_rate", "conditional_cdf"],
+          "properties": {
+            "pooled_cdf": { "const": 0.025 },
+            "pooled_rate": { "const": 0.02 },
+            "cohort_rate": { "const": 0.45 },
+            "conditional_cdf": { "const": 0.6 }
+          }
+        },
+        "minimum_conditional_observations": { "const": 8 },
+        "decision_rule": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["match", "divergence", "inconclusive", "invalid"],
+          "properties": {
+            "match": { "const": "all-required-confidence-regions-inside-equivalence-margins" },
+            "divergence": { "const": "holm-adjusted-p-at-most-alpha-and-effect-above-margin" },
+            "inconclusive": { "const": "valid-execution-without-match-or-divergence" },
+            "invalid": { "const": "version-protocol-artifact-engine-or-infrastructure-error" }
+          }
+        }
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method_id", "version", "repetitions", "generator", "cohort_sizes", "simulation_sizes", "null_laws", "controlled_alternatives", "acceptance"],
+      "properties": {
+        "method_id": { "const": "mca-distributional-calibration" },
+        "version": { "const": "1.0" },
+        "repetitions": { "const": 200 },
+        "generator": { "const": "numpy-pcg64-seed-218002" },
+        "cohort_sizes": {
+          "const": [16, 32, 64, 128]
+        },
+        "simulation_sizes": {
+          "const": [1000, 2000, 4000]
+        },
+        "null_laws": {
+          "const": ["bernoulli-0.10", "bernoulli-0.50", "discrete-0.20-0.50-0.30"]
+        },
+        "controlled_alternatives": {
+          "const": ["censor-rate-plus-0.05", "presence-rate-0.30-vs-1.00", "cdf-mass-shift-0.10", "conditional-cdf-shift-0.80"]
+        },
+        "acceptance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["false_positive_rule", "power_rule", "stability_rule"],
+          "properties": {
+            "false_positive_rule": { "const": "observed-fwer-not-above-99pct-binomial-alpha-envelope" },
+            "power_rule": { "const": "at-least-0.80-for-decision-affecting-alternatives-at-production-design" },
+            "stability_rule": { "const": "identical-input-calibration-is-byte-stable" }
+          }
+        }
+      }
+    }
+  }
+}

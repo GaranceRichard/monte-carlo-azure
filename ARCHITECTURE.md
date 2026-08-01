@@ -121,6 +121,9 @@ contracts/
   mca-prng-v1-vectors.json # sorties uint32 et indices canoniques partagés
   statistical-reference-corpus-v1.0.schema.json # contrat JSON Schema normatif du corpus
   statistical-reference-corpus-v1.0.json # cas normatifs, scores, fiabilité et histogrammes
+  statistical-distribution-protocol-v1.0.json # scénarios, métriques et décision multi-seeds
+  statistical-distribution-seeds-v1.0.json # règle et partitions de la population de seeds
+  statistical-distribution-evidence-v1.0.schema.json # forme fermée de la preuve ciblée
   statistical-validation-probes-v1.0.json # validations normalisées partagées
   examples/
     statistical-reference-corpus-v1.0.minimal.json # preuve structurelle minimale
@@ -422,6 +425,36 @@ n’est présent. Il porte explicitement `proof_kind = exact_replay`,
 `distributional_equivalence = not_evaluated` et `enforcement = informational`. Un corpus ou un plan de
 batch invalide, une erreur d’infrastructure ou un moteur inexécutable reste toutefois un échec explicite
 avec code non nul.
+
+### Protocole de parité distributionnelle
+
+[`contracts/statistical-distribution-protocol-v1.0.json`](contracts/statistical-distribution-protocol-v1.0.json)
+décrit cinq scénarios normalisés issus des entrées du corpus, mais ne consomme aucun `expected_result`.
+[`contracts/statistical-distribution-seeds-v1.0.json`](contracts/statistical-distribution-seeds-v1.0.json)
+construit par SHA-256 deux partitions disjointes de 128 seeds : Python exécute `cohort-a` et TypeScript
+`cohort-b`. L’absence de seed commune empêche le rejeu exact de se substituer à l’inférence. Les plans
+éphémères ne transportent que les entrées normalisées, leur seed et les versions d’autorité.
+
+`Scripts/run_statistical_distribution.py` valide protocole, schémas, population, empreintes, corpus et
+versions avant d’appeler le service Python et `frontend/src/statisticalDistributionRunner.ts`. Les
+histogrammes de chaque seed deviennent des blocs de comptes ; en mode délai, les censures forment un état
+analytique après l’horizon sans modifier la sortie du moteur. Les CDF discrètes, taux de censure, présences
+et valeurs conditionnelles de P50/P70/P90 et du Risk Score sont comparés symétriquement. La fiabilité,
+déterministe par entrée, reste un invariant exact.
+
+Les bandes DKW et intervalles Newcombe–Wilson établissent l’équivalence ; les permutations de blocs de
+seeds testent la divergence. Bonferroni protège simultanément les régions de confiance et Holm ajuste les
+valeurs p. Toute région trop large devient `inconclusive`. Les résultats invalides sont classés séparément
+en incompatibilité de version, erreur de protocole, moteur ou infrastructure. La calibration PCG64
+contrôlée mesure faux positifs, puissance, tailles de cohorts et de simulations sans utiliser un moteur
+comme oracle ; son artefact est recalculé exactement par un validateur indépendant.
+
+Les preuves `reports/statistical-distribution-calibration.json` et
+`reports/statistical-distribution-evidence.json` sont déterministes et portent leur empreinte canonique.
+Le contrôle reste informatif et extérieur au profil `main`; il ne consolide pas la preuve exacte, ne décide
+pas la compatibilité d’une future version et ne constitue pas un backtesting sur données Azure DevOps.
+La méthode, les autorités statistiques et les limites sont détaillées dans
+[`docs/statistical-distribution-protocol.md`](docs/statistical-distribution-protocol.md).
 
 Cette frontière ne constitue pas une nouvelle API applicative : aucun mapper, DTO, document MongoDB ou
 objet `localStorage` ne consomme directement le corpus. Les fabriques métier et les mappers appliquent les

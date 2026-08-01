@@ -1,0 +1,101 @@
+{
+  "protocol_id": "mca-statistical-distributional-parity",
+  "version": "1.0",
+  "schema_version": "1.0",
+  "enforcement": "informational",
+  "authorities": {
+    "corpus": { "id": "mca-statistical-reference-corpus", "version": "1.0" },
+    "normative_contract": { "id": "STD-STAT-001", "version": "1.0" },
+    "prng": { "id": "mca-prng-v1", "version": "1.0" },
+    "seed_population": { "id": "mca-distributional-seed-population", "version": "1.0" }
+  },
+  "cohort_assignment": {
+    "python": "cohort-a",
+    "typescript": "cohort-b",
+    "same_seed_pairing": false,
+    "engine_oracle": false
+  },
+  "scenarios": [
+    {
+      "id": "items-discrete-exact",
+      "source_case_id": "items-zero-weeks-excluded",
+      "mode": "weeks_to_items",
+      "cohort_size": 64,
+      "n_sims": 4000,
+      "distribution_view": "exact-outcome-cdf",
+      "metrics": ["outcome_cdf", "P50_presence", "P70_presence", "P90_presence", "P50_values", "P70_values", "P90_values", "risk_score_presence", "risk_score_values", "throughput_reliability"]
+    },
+    {
+      "id": "items-histogram-aggregated",
+      "source_case_id": "histogram-aggregated-discontinuous",
+      "mode": "weeks_to_items",
+      "cohort_size": 128,
+      "n_sims": 4000,
+      "distribution_view": "reported-histogram-cdf",
+      "metrics": ["outcome_cdf", "P50_presence", "P70_presence", "P90_presence", "P50_values", "P70_values", "P90_values", "risk_score_presence", "risk_score_values", "throughput_reliability"]
+    },
+    {
+      "id": "weeks-no-censorship",
+      "source_case_id": "weeks-zero-weeks-included-no-censorship",
+      "mode": "backlog_to_weeks",
+      "cohort_size": 64,
+      "n_sims": 2000,
+      "distribution_view": "exact-outcome-cdf",
+      "metrics": ["outcome_cdf", "censored_rate", "P50_presence", "P70_presence", "P90_presence", "P50_values", "P70_values", "P90_values", "risk_score_presence", "risk_score_values", "throughput_reliability"]
+    },
+    {
+      "id": "weeks-partial-censorship",
+      "source_case_id": "weeks-partial-censorship",
+      "mode": "backlog_to_weeks",
+      "cohort_size": 64,
+      "n_sims": 1000,
+      "distribution_view": "exact-outcome-cdf",
+      "metrics": ["outcome_cdf", "censored_rate", "P50_presence", "P70_presence", "P90_presence", "P50_values", "P70_values", "P90_values", "risk_score_presence", "risk_score_values", "throughput_reliability"]
+    },
+    {
+      "id": "weeks-total-censorship",
+      "source_case_id": "weeks-total-censorship",
+      "mode": "backlog_to_weeks",
+      "cohort_size": 8,
+      "n_sims": 1000,
+      "distribution_view": "structural-censor-state",
+      "metrics": ["outcome_cdf", "censored_rate", "P50_presence", "P70_presence", "P90_presence", "risk_score_presence", "throughput_reliability"]
+    }
+  ],
+  "inference": {
+    "familywise_alpha": 0.05,
+    "confidence_adjustment": "bonferroni-simultaneous",
+    "divergence_adjustment": "holm-bonferroni",
+    "discrete_test": "seed-block-permutation",
+    "permutations": 2047,
+    "permutation_seed": 218001,
+    "equivalence_margins": {
+      "pooled_cdf": 0.025,
+      "pooled_rate": 0.02,
+      "cohort_rate": 0.45,
+      "conditional_cdf": 0.6
+    },
+    "minimum_conditional_observations": 8,
+    "decision_rule": {
+      "match": "all-required-confidence-regions-inside-equivalence-margins",
+      "divergence": "holm-adjusted-p-at-most-alpha-and-effect-above-margin",
+      "inconclusive": "valid-execution-without-match-or-divergence",
+      "invalid": "version-protocol-artifact-engine-or-infrastructure-error"
+    }
+  },
+  "calibration": {
+    "method_id": "mca-distributional-calibration",
+    "version": "1.0",
+    "repetitions": 200,
+    "generator": "numpy-pcg64-seed-218002",
+    "cohort_sizes": [16, 32, 64, 128],
+    "simulation_sizes": [1000, 2000, 4000],
+    "null_laws": ["bernoulli-0.10", "bernoulli-0.50", "discrete-0.20-0.50-0.30"],
+    "controlled_alternatives": ["censor-rate-plus-0.05", "presence-rate-0.30-vs-1.00", "cdf-mass-shift-0.10", "conditional-cdf-shift-0.80"],
+    "acceptance": {
+      "false_positive_rule": "observed-fwer-not-above-99pct-binomial-alpha-envelope",
+      "power_rule": "at-least-0.80-for-decision-affecting-alternatives-at-production-design",
+      "stability_rule": "identical-input-calibration-is-byte-stable"
+    }
+  }
+}

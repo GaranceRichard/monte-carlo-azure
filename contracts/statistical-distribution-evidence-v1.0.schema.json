@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/statistical-distribution-evidence/1.0",
+  "title": "Preuve de parité distributionnelle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["evidence_version", "proof_kind", "enforcement", "status", "error_classification", "protocol", "authorities", "seed_population", "inference", "scenarios", "summary", "diagnostics", "stability"],
+  "properties": {
+    "evidence_version": { "const": "1.0" },
+    "proof_kind": { "const": "distributional_parity" },
+    "enforcement": { "const": "informational" },
+    "status": { "enum": ["match", "divergence", "inconclusive", "invalid"] },
+    "error_classification": {
+      "type": ["string", "null"],
+      "enum": [null, "version_incompatibility", "engine_error", "protocol_error", "infrastructure_error"]
+    },
+    "protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "const": "mca-statistical-distributional-parity" },
+        "version": { "const": "1.0" }
+      }
+    },
+    "authorities": { "type": "object" },
+    "seed_population": { "type": "object" },
+    "inference": { "type": "object" },
+    "scenarios": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/scenario" }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scenario_count", "metric_count", "matches", "divergences", "inconclusive"],
+      "properties": {
+        "scenario_count": { "type": "integer", "minimum": 0 },
+        "metric_count": { "type": "integer", "minimum": 0 },
+        "matches": { "type": "integer", "minimum": 0 },
+        "divergences": { "type": "integer", "minimum": 0 },
+        "inconclusive": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/diagnostic" }
+    },
+    "stability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deterministic", "fingerprint_method", "artifact_fingerprint"],
+      "properties": {
+        "deterministic": { "const": true },
+        "fingerprint_method": { "const": "sha256-canonical-json-without-artifact-fingerprint" },
+        "artifact_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    }
+  },
+  "$defs": {
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source_case_id", "mode", "cohort_size", "n_sims", "distribution_view", "metrics", "verdict"],
+      "properties": {
+        "id": { "type": "string" },
+        "source_case_id": { "type": "string" },
+        "mode": { "enum": ["backlog_to_weeks", "weeks_to_items"] },
+        "cohort_size": { "type": "integer", "minimum": 1 },
+        "n_sims": { "type": "integer", "minimum": 1000 },
+        "distribution_view": { "type": "string" },
+        "metrics": { "type": "array", "items": { "$ref": "#/$defs/metric" } },
+        "verdict": { "enum": ["match", "divergence", "inconclusive"] }
+      }
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "sample_sizes", "observed", "equivalence_margin", "equivalence_supported", "verdict"],
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "enum": ["discrete_cdf", "rate_difference", "exact_structural"] },
+        "sample_sizes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["python", "typescript"],
+          "properties": {
+            "python": { "type": "integer", "minimum": 0 },
+            "typescript": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "observed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["effect"],
+          "properties": {
+            "effect": { "type": "number", "minimum": 0 },
+            "python_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+            "typescript_rate": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "confidence_interval": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lower", "upper", "alpha", "method"],
+          "properties": {
+            "lower": { "type": "number" },
+            "upper": { "type": "number" },
+            "absolute_upper": { "type": "number", "minimum": 0 },
+            "alpha": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
+            "method": { "type": "string" }
+          }
+        },
+        "equivalence_margin": { "type": "number", "minimum": 0 },
+        "raw_p_value": { "type": "number", "minimum": 0, "maximum": 1 },
+        "adjusted_p_value": { "type": "number", "minimum": 0, "maximum": 1 },
+        "equivalence_supported": { "type": "boolean" },
+        "exact_mismatch": { "type": "boolean" },
+        "diagnostic": { "type": "string" },
+        "verdict": { "enum": ["match", "divergence", "inconclusive"] }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "scenario_id", "metric_id", "message"],
+      "properties": {
+        "classification": { "enum": ["distributional_divergence", "statistically_inconclusive", "version_incompatibility", "engine_error", "protocol_error", "infrastructure_error"] },
+        "scenario_id": { "type": ["string", "null"] },
+        "metric_id": { "type": ["string", "null"] },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "population_id": "mca-distributional-seed-population",
+  "version": "1.0",
+  "construction": {
+    "algorithm": "sha256-counter-first-uint32-v1",
+    "namespace": "mca-distributional-parity-seeds-v1.0",
+    "encoding": "utf-8-namespace-colon-ascii-counter",
+    "uint32_byte_order": "big-endian",
+    "collision_policy": "reject-duplicate-and-continue",
+    "size": 256
+  },
+  "partitions": [
+    {
+      "id": "cohort-a",
+      "offset": 0,
+      "size": 128,
+      "fingerprint": "b1e830b946f36f39a0411574cc34df9593cf00fa8272a22704de95af96b48c6f"
+    },
+    {
+      "id": "cohort-b",
+      "offset": 128,
+      "size": 128,
+      "fingerprint": "69430b9209e1c4c759ea22590ec63e8a05c147841bf7592fac15320f55daa1ba"
+    }
+  ],
+  "population_fingerprint": "889e757eab13c3766225989e5df3660affccd90dddc91d9314e7b0e3e4a621e9"
+}

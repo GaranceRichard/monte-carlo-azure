@@ -8057,6 +8057,208 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_calibration_is_stable_calibrated_and_exposes_size_effects",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_calibration_is_stable_calibrated_and_exposes_size_effects",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_cli_commands_and_entrypoints_report_success_and_failure",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_cli_commands_and_entrypoints_report_success_and_failure",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience",
+      "observability"
+    ],
+    "domains": [
+      "reporting",
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_closed_protocol_seed_population_and_schema_are_independently_valid",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_closed_protocol_seed_population_and_schema_are_independently_valid",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_control_classifies_protocol_engine_and_infrastructure_errors",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_control_classifies_protocol_engine_and_infrastructure_errors",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_distributional_authorities_are_documented_without_product_chronology",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_distributional_authorities_are_documented_without_product_chronology",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_evidence_supports_match_divergence_inconclusive_and_invalid",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_evidence_supports_match_divergence_inconclusive_and_invalid",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_evidence_validator_rejects_schema_summary_status_and_fingerprint",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_evidence_validator_rejects_schema_summary_status_and_fingerprint",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_execution_plans_are_disjoint_and_engine_protocol_is_strict",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_execution_plans_are_disjoint_and_engine_protocol_is_strict",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_json_loading_and_protocol_bundle_fail_explicitly",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_json_loading_and_protocol_bundle_fail_explicitly",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_metric_extraction_covers_censoring_absence_and_all_metric_kinds",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_metric_extraction_covers_censoring_absence_and_all_metric_kinds",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "statistical_engine"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_protocol_semantics_report_every_non_structural_fault",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_protocol_semantics_report_every_non_structural_fault",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_python_plan_and_typescript_bridge_error_classification",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_python_plan_and_typescript_bridge_error_classification",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_real_distributional_runner_is_informative_complete_and_stable",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_real_distributional_runner_is_informative_complete_and_stable",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_seed_collision_guard_and_population_fingerprint_diagnostics",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_seed_collision_guard_and_population_fingerprint_diagnostics",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_distribution_protocol.py::test_statistical_primitives_cover_discrete_rates_permutations_and_decisions",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_distribution_protocol.py",
+    "selector": "test_statistical_primitives_cover_discrete_rates_permutations_and_decisions",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_statistical_exact_replay.py::test_batch_plan_requires_every_geometry_and_strict_unique_positive_integers",
     "framework": "pytest",
     "sourcePath": "tests/test_statistical_exact_replay.py",
@@ -20936,6 +21138,36 @@
     ],
     "domains": [
       "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/statisticalDistributionRunner.test.ts::distributional TypeScript runner > executes a validated multi-seed plan without using expected corpus results [32:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/statisticalDistributionRunner.test.ts",
+    "selector": "distributional TypeScript runner > executes a validated multi-seed plan without using expected corpus results [32:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/statisticalDistributionRunner.test.ts::distributional TypeScript runner > rejects an incompatible plan before engine execution [47:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/statisticalDistributionRunner.test.ts",
+    "selector": "distributional TypeScript runner > rejects an incompatible plan before engine execution [47:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "security",
+      "compatibility"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops"
     ]
   },
   {

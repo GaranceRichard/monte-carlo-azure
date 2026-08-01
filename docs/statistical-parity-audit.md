@@ -25,6 +25,12 @@ Périmètre : PBI **2.1 — Auditer les divergences statistiques Python et TypeS
 > absentes sont omises sans sentinelle et les frontières applicatives restent primitives. Les formules
 > statistiques de l’audit ne sont pas modifiées : les deux écarts ST-33 restent visibles et le rapport
 > demeure informatif jusqu’au PBI 2.19.
+>
+> **Protocole postérieur — PBI 2.18.** Le protocole distributionnel `1.0` remplace les expériences
+> ponctuelles comme preuve courante : cohorts de seeds disjointes, cinq scénarios, CDF et taux avec régions
+> d’équivalence, permutations par blocs et comparaisons multiples contrôlées. Sa calibration observe le
+> comportement sous même loi, la puissance face à quatre écarts contrôlés et l’effet des tailles. Les
+> résultats historiques ci-dessous restent inchangés et ne servent ni de seuil, ni d’oracle.
 
 ## 1. Objet et périmètre
 

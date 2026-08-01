@@ -94,6 +94,9 @@ une connexion Azure DevOps réelle.
   indépendant du découpage en lots pour les configurations couvertes par la
   [preuve de rejeu versionnée](reports/statistical-exact-replay-evidence.json). Cette garantie reste liée
   aux versions déclarées du moteur, du contrat statistique et du contrat aléatoire.
+- **Validation distributionnelle distincte.** Des cohorts reproductibles de seeds différentes comparent
+  aussi les lois de sortie, les censures et la disponibilité des indicateurs ; cette preuve statistique
+  symétrique complète le rejeu exact sans le remplacer et reste distincte du backtesting sur données réelles.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 
@@ -112,8 +115,9 @@ du [standard statistique](docs/standards/STD-STAT-001.md), du
 - les scénarios portefeuille sont des hypothèses d’agrégation : ils ne prouvent ni causalité, ni
   substituabilité des équipes, ni validité future ;
 - lorsque les preuves sont insuffisantes, l’absence de scénario recommandé est un résultat valide ;
-- les seize cas du corpus statistique courant concordent exactement dans les deux moteurs ; le contrôle de
-  parité reste toutefois informatif et n’est pas encore bloquant dans le profil `main` ;
+- les seize cas du corpus statistique courant concordent exactement et le protocole multi-seeds conclut à
+  la parité distributionnelle sur ses scénarios ; le contrôle de parité reste toutefois informatif et
+  n’est pas encore bloquant dans le profil `main` ;
 - les preuves existantes ne remplacent pas un backtesting empirique, des tests sur de vrais tenants Azure
   DevOps, une matrice multi-navigateurs ou une baseline de charge.
 

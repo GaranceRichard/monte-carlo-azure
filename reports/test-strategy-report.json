@@ -2,66 +2,66 @@
   "schemaVersion": "1.0.0",
   "schema": "config/test-strategy-report.schema.json",
   "profile": "main",
-  "evidenceBundleId": "baeb42a11afea354068a55833ab91c069758e211c9d29d6ed12cbe61f2153353",
+  "evidenceBundleId": "6f35fd32c1d29a8f5d9eec9d619cdb0e1578a7a4c6d9aef6f48dee7b92f02d93",
   "evidenceBundleIdentityDisclaimer": "This identifier names the exact evidence bundle; it does not prove that every source came from the same physical execution.",
   "globalReference": {
     "inventory": {
       "path": "reports/test-classification-inventory.json",
-      "sha256": "b17f3e81f7edcbf6b99cdda2df111ac8a9ce262f340d05fa639fad6a455f8315",
-      "logicalCases": 1308
+      "sha256": "56b90fae22a96aff566b08237ba83460838bed99bd6ffcc008b9fb57828f1a57",
+      "logicalCases": 1325
     },
     "classification": {
       "breakdowns": {
         "status": {
-          "classified": 1308
+          "classified": 1325
         },
         "framework": {
           "playwright": 32,
-          "pytest": 588,
-          "vitest": 688
+          "pytest": 603,
+          "vitest": 690
         },
         "nature": {
-          "component": 403,
+          "component": 406,
           "contract": 46,
           "e2e": 32,
-          "integration": 219,
-          "unit": 608
+          "integration": 226,
+          "unit": 615
         },
         "purpose": {
           "accessibility": 107,
-          "compatibility": 105,
+          "compatibility": 106,
           "data_quality": 140,
-          "functional": 1308,
+          "functional": 1325,
           "migration_recovery": 23,
-          "observability": 253,
+          "observability": 257,
           "performance": 15,
-          "resilience": 132,
-          "security": 124
+          "resilience": 134,
+          "security": 125
         },
         "primaryProfile": {
-          "main": 220,
+          "main": 226,
           "nightly": 1,
-          "pr": 1085,
+          "pr": 1096,
           "release": 2
         },
         "domain": {
           "api": 128,
-          "azure_devops": 263,
+          "azure_devops": 264,
           "data": 134,
-          "deployment": 44,
+          "deployment": 45,
           "history": 110,
-          "identity": 92,
+          "identity": 93,
           "persistence": 84,
           "portfolio": 145,
           "quality_chain": 241,
-          "reporting": 232,
-          "statistical_engine": 508,
+          "reporting": 236,
+          "statistical_engine": 509,
           "user_interface": 316
         },
         "criticality": {
           "critical": 202,
           "high": 20,
-          "unassigned": 1086
+          "unassigned": 1103
         }
       },
       "riskAssociations": {
@@ -99,16 +99,16 @@
     "executionCounts": {
       "path": "reports/test-execution-counts.json",
       "schemaVersion": "1.0.0",
-      "inventorySha256": "b17f3e81f7edcbf6b99cdda2df111ac8a9ce262f340d05fa639fad6a455f8315",
+      "inventorySha256": "56b90fae22a96aff566b08237ba83460838bed99bd6ffcc008b9fb57828f1a57",
       "totals": {
-        "logicalCases": 1308,
-        "collectedInstances": 1643,
-        "executedInstances": 1643,
+        "logicalCases": 1325,
+        "collectedInstances": 1660,
+        "executedInstances": 1660,
         "skippedInstances": 0,
-        "attempts": 1643,
+        "attempts": 1660,
         "retries": 0,
         "results": {
-          "passed": 1643,
+          "passed": 1660,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -122,18 +122,18 @@
         "includedProfiles": [
           "pr"
         ],
-        "logicalCases": 1085,
+        "logicalCases": 1096,
         "frameworks": {
-          "pytest": 397,
-          "vitest": 688
+          "pytest": 406,
+          "vitest": 690
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 397,
+          "backend-tests": 406,
           "e2e": 0,
           "frontend-static": 0,
-          "frontend-tests": 688,
+          "frontend-tests": 690,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -144,19 +144,19 @@
           "pr",
           "main"
         ],
-        "logicalCases": 1305,
+        "logicalCases": 1322,
         "frameworks": {
           "playwright": 32,
-          "pytest": 585,
-          "vitest": 688
+          "pytest": 600,
+          "vitest": 690
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 585,
+          "backend-tests": 600,
           "e2e": 32,
           "frontend-static": 0,
-          "frontend-tests": 688,
+          "frontend-tests": 690,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -168,19 +168,19 @@
           "main",
           "nightly"
         ],
-        "logicalCases": 1306,
+        "logicalCases": 1323,
         "frameworks": {
           "playwright": 32,
-          "pytest": 586,
-          "vitest": 688
+          "pytest": 601,
+          "vitest": 690
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 586,
+          "backend-tests": 601,
           "e2e": 32,
           "frontend-static": 0,
-          "frontend-tests": 688,
+          "frontend-tests": 690,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -192,19 +192,19 @@
           "main",
           "release"
         ],
-        "logicalCases": 1307,
+        "logicalCases": 1324,
         "frameworks": {
           "playwright": 32,
-          "pytest": 587,
-          "vitest": 688
+          "pytest": 602,
+          "vitest": 690
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 587,
+          "backend-tests": 602,
           "e2e": 32,
           "frontend-static": 0,
-          "frontend-tests": 688,
+          "frontend-tests": 690,
           "preflight": 0,
           "release-or-container-checks": 0
         }
@@ -217,7 +217,7 @@
       "pr",
       "main"
     ],
-    "selectedLogicalCases": 1305,
+    "selectedLogicalCases": 1322,
     "logicalCaseIds": [
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2775:3]",
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2829:3]",
@@ -662,6 +662,21 @@
       "pytest:tests/test_statistical_corpus_runner.py::test_typescript_bridge_parses_report_and_classifies_failures",
       "pytest:tests/test_statistical_corpus_runner.py::test_typescript_validation_bridge_classifies_protocol_failures",
       "pytest:tests/test_statistical_corpus_runner.py::test_validation_rejects_invalid_schema_and_corpus_before_engines",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_calibration_is_stable_calibrated_and_exposes_size_effects",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_cli_commands_and_entrypoints_report_success_and_failure",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_closed_protocol_seed_population_and_schema_are_independently_valid",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_control_classifies_protocol_engine_and_infrastructure_errors",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_distributional_authorities_are_documented_without_product_chronology",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_evidence_supports_match_divergence_inconclusive_and_invalid",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_evidence_validator_rejects_schema_summary_status_and_fingerprint",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_execution_plans_are_disjoint_and_engine_protocol_is_strict",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_json_loading_and_protocol_bundle_fail_explicitly",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_metric_extraction_covers_censoring_absence_and_all_metric_kinds",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_protocol_semantics_report_every_non_structural_fault",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_python_plan_and_typescript_bridge_error_classification",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_real_distributional_runner_is_informative_complete_and_stable",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_seed_collision_guard_and_population_fingerprint_diagnostics",
+      "pytest:tests/test_statistical_distribution_protocol.py::test_statistical_primitives_cover_discrete_rates_permutations_and_decisions",
       "pytest:tests/test_statistical_exact_replay.py::test_batch_plan_requires_every_geometry_and_strict_unique_positive_integers",
       "pytest:tests/test_statistical_exact_replay.py::test_cli_keeps_divergence_informational_but_fails_invalidity_and_engine_error",
       "pytest:tests/test_statistical_exact_replay.py::test_control_encapsulates_runner_and_protocol_errors_as_engine_evidence",
@@ -1385,6 +1400,8 @@
       "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [144:3]",
       "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [74:3]",
       "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [115:3]",
+      "vitest:frontend/src/statisticalDistributionRunner.test.ts::distributional TypeScript runner > executes a validated multi-seed plan without using expected corpus results [32:3]",
+      "vitest:frontend/src/statisticalDistributionRunner.test.ts::distributional TypeScript runner > rejects an incompatible plan before engine execution [47:3]",
       "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
       "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
       "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -1542,14 +1559,14 @@
         }
       },
       "pytest": {
-        "logicalCases": 585,
-        "collectedInstances": 813,
-        "executedInstances": 813,
+        "logicalCases": 600,
+        "collectedInstances": 828,
+        "executedInstances": 828,
         "skippedInstances": 0,
-        "attempts": 813,
+        "attempts": 828,
         "retries": 0,
         "results": {
-          "passed": 813,
+          "passed": 828,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -1557,14 +1574,14 @@
         }
       },
       "vitest": {
-        "logicalCases": 688,
-        "collectedInstances": 795,
-        "executedInstances": 795,
+        "logicalCases": 690,
+        "collectedInstances": 797,
+        "executedInstances": 797,
         "skippedInstances": 0,
-        "attempts": 795,
+        "attempts": 797,
         "retries": 0,
         "results": {
-          "passed": 795,
+          "passed": 797,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -1579,7 +1596,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/preflight/result.json",
         "exitCode": 0,
-        "durationSeconds": 9.294,
+        "durationSeconds": 9.052,
         "reasons": []
       },
       {
@@ -1588,7 +1605,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 0.123,
+        "durationSeconds": 0.102,
         "reasons": []
       },
       {
@@ -1597,7 +1614,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 31.354,
+        "durationSeconds": 31.562,
         "reasons": []
       },
       {
@@ -1606,7 +1623,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 102.326,
+        "durationSeconds": 160.35,
         "reasons": []
       },
       {
@@ -1615,7 +1632,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 103.289,
+        "durationSeconds": 100.829,
         "reasons": []
       },
       {
@@ -1624,7 +1641,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/e2e/result.json",
         "exitCode": 0,
-        "durationSeconds": 43.322,
+        "durationSeconds": 46.231,
         "reasons": []
       },
       {
@@ -1633,7 +1650,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/release-or-container-checks/result.json",
         "exitCode": 0,
-        "durationSeconds": 42.519,
+        "durationSeconds": 51.961,
         "reasons": []
       },
       {
@@ -1646,20 +1663,20 @@
         "reasons": []
       }
     ],
-    "collectedInstances": 1640,
-    "executedInstances": 1640,
+    "collectedInstances": 1657,
+    "executedInstances": 1657,
     "skippedInstances": 0,
-    "attempts": 1640,
+    "attempts": 1657,
     "retries": 0,
     "initialResults": {
-      "passed": 1640,
+      "passed": 1657,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
       "infrastructureError": 0
     },
     "finalResults": {
-      "passed": 1640,
+      "passed": 1657,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -1677,14 +1694,14 @@
       "instabilities": 0,
       "instabilityRatePercent": 0.0,
       "initialResults": {
-        "passed": 1640,
+        "passed": 1657,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
         "infrastructureError": 0
       },
       "finalResults": {
-        "passed": 1640,
+        "passed": 1657,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -1700,14 +1717,14 @@
         "thresholdSource": ".coveragerc",
         "metrics": {
           "lines": {
-            "total": 8036,
-            "covered": 8036,
+            "total": 8786,
+            "covered": 8786,
             "pct": 100.0
           },
           "branches": {
-            "total": 2746,
-            "covered": 2704,
-            "pct": 98.47
+            "total": 2924,
+            "covered": 2881,
+            "pct": 98.53
           }
         },
         "thresholds": {
@@ -1724,23 +1741,23 @@
         "thresholdSource": "frontend/vitest.config.js",
         "metrics": {
           "statements": {
-            "total": 3988,
-            "covered": 3953,
+            "total": 3991,
+            "covered": 3956,
             "pct": 99.12
           },
           "branches": {
-            "total": 3100,
-            "covered": 2899,
+            "total": 3104,
+            "covered": 2903,
             "pct": 93.52
           },
           "functions": {
-            "total": 926,
-            "covered": 925,
+            "total": 927,
+            "covered": 926,
             "pct": 99.89
           },
           "lines": {
-            "total": 3988,
-            "covered": 3953,
+            "total": 3991,
+            "covered": 3956,
             "pct": 99.12
           }
         },
@@ -1765,9 +1782,9 @@
             "pct": 91.32
           },
           "branches": {
-            "total": 2718,
-            "covered": 2243,
-            "pct": 82.52
+            "total": 2720,
+            "covered": 2245,
+            "pct": 82.53
           },
           "functions": {
             "total": 451,
@@ -2366,7 +2383,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "b17f3e81f7edcbf6b99cdda2df111ac8a9ce262f340d05fa639fad6a455f8315",
+      "fingerprint": "56b90fae22a96aff566b08237ba83460838bed99bd6ffcc008b9fb57828f1a57",
       "schemaVersion": null,
       "status": "valid",
       "reasons": []
@@ -2398,7 +2415,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "3e825eed5439a59a7817fd9a10fb67864f62fbd1047ea1de929e15da5a4311ee",
+      "fingerprint": "debea5f95e33e7867e426ff5e3c17858a60f7544f777d8e1ee5480c2b59f6c2c",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2414,7 +2431,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "4ff08a7b5c7ec68ba9170b00933920d7f3d3d1e8253387d83598a3aaa681861c",
+      "fingerprint": "807d86ef44b3cd290b6ec1f7c38fb92782a1e2ed4cca5b850338f740489762be",
       "schemaVersion": 3,
       "status": "valid",
       "reasons": []
@@ -2430,7 +2447,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "7ae101c96a3c7f20031e636a2577b237da49b48303a1fbc37fae84dd76ac13ad",
+      "fingerprint": "81a0091dcd48bee31bb846e5178ab4e1a714a90f87e404850c274acdf497e4c4",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2446,7 +2463,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "50c96c4f9423a54ff8ef371c78a4360da53391a39abe10aee3d16d8a8e15f4e5",
+      "fingerprint": "df35058c2ef27422216acedd6900bab9276f9f5eb720ec7c001008c8b0a00f77",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2462,7 +2479,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "ff37e8720fa9fad4ab2cc59a3885778981d7727546de6d7ba6f9382618d60850",
+      "fingerprint": "8ecd8c7e655a8272b19ad7f7464be159e7f885624dd751bc7bae1712eadcf095",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2478,7 +2495,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "71b3814bc5a680ce9fec7d94a8a4c7f0ecbc6393e6d81983bd94fb3d44504b1d",
+      "fingerprint": "568f1cf5a8d600bdb574d18cb127e6f66371b3136cb26574c325e1bf4cbb4b0e",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2510,7 +2527,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "7b4be1e676fca8203ea2b6788f42b4baec9a05ba370434b0a44f3ae3a80414bd",
+      "fingerprint": "48e98b587e888bda8271f858a6a73d1c6a0af1d97fda67d045f526f33060f3e3",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2526,7 +2543,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "4d7676258bfc0721d5f614373df888dda62532be9bb023e3f0e64481de89740d",
+      "fingerprint": "f4f3aa1533c1fc4c04c7fc9f7721f6aaebeb751cd9c02f1d6dc281386d664a19",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2542,7 +2559,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "5fe05925201b5fc33e774257234d503bc5bfa5dc10e3ca460b44343926df96c3",
+      "fingerprint": "9a17803777e1d3f3e8c7a89585a3f6eb0f7bd97e3661c5d09f1c2d516b150f36",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2558,7 +2575,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "ecb23047bcf3e24a7ecd76b6c76c54a1390a8a4bf5ed343bb52b4b2e788428bf",
+      "fingerprint": "8a79abd7178251723c0995e3fe5470a685b261206238b61ffa4d0b793467c3ba",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2574,7 +2591,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "7d90183012f8d3bfddc5d3c3c9d124137610bee100f12116d9376e2f803fe306",
+      "fingerprint": "f0604bb6d216246a6d8923afd584a22a1815ba86377816f5bf33efcc766691f0",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2590,7 +2607,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "e1fbbc4b818e1259afb3639bded379781bd415d7d93abdacf305a5106d7631ce",
+      "fingerprint": "0d4a461acaa42ca1421011feaf0947c045d665209dc20552b7771dee45dd0e03",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2606,7 +2623,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "b5ad9321fc331dde6f8ef9c036910c5e50d4b33bfc097b5836ec92bc1b92d75d",
+      "fingerprint": "d0b935f767f8d0f31833aac746923492998cc751744a86f43d57b1edd585ef75",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2622,7 +2639,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "ab030f35fe9b80386494eeca0f7bc5c152749796ade12052f54a868ae62ae710",
+      "fingerprint": "575c28f1d4c55c7b0361fc3195b87aba00623a9d38d1d52fcd2b1829069241cb",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2654,7 +2671,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "0001cbb244bccda8c97c34d6c21b9242c263754ee91ebe7ca0fb7492d3789dfe",
+      "fingerprint": "ce64c18f486fd2f53c81a1cc1c4d50fb3c23f96556b0cbcc705be62301732770",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2670,7 +2687,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "a4151cd790715c62c1a2808c75f3f60f780d443fb8fdb8958cce940b24d84c12",
+      "fingerprint": "d4362065bcfa34d6889423ef15712698ecb4745e97d3e2e125851a5b98385812",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []

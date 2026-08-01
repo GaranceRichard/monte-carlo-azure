@@ -98,9 +98,11 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   censures, percentiles, Risk Score, métriques de fiabilité et histogrammes concordent entre Python et
   TypeScript sur les seize cas. Les batches backend `125`, `128`, `1000` et `2048` produisent chacun le
   résultat exact du corpus ; la preuve compte 80 comparaisons normatives, 64 interlangages, 16 cas
-  indépendants du batching et aucun diagnostic. Ce rejeu exact reste informatif et l’équivalence
-  distributionnelle n’y est pas évaluée. Il n’existe toujours ni gate de parité bloquante, ni test de
-  charge, ni preuve d'annulation du thread après timeout, ni politique de proxy de confiance.
+  indépendants du batching et aucun diagnostic. Le protocole distributionnel distinct exécute cinq
+  scénarios sur cohorts disjointes, compare 49 métriques avec contrôle des comparaisons multiples et conclut
+  actuellement `match`, sans utiliser les attendus exacts comme oracle. Les deux preuves restent
+  informatives : il n’existe toujours ni gate de parité bloquante, ni test de charge, ni preuve
+  d'annulation du thread après timeout, ni politique de proxy de confiance.
 
 ### CP-004 — Flux onboarding critique
 

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/statistical-distribution-calibration/1.0",
+  "title": "Calibration du protocole de parité distributionnelle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["calibration_version", "method", "protocol", "repetitions", "family_size", "grid", "false_positive", "production_sensitivity", "stability", "status", "diagnostics"],
+  "properties": {
+    "calibration_version": { "const": "1.0" },
+    "method": { "const": "mca-distributional-calibration" },
+    "protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "const": "mca-statistical-distributional-parity" },
+        "version": { "const": "1.0" }
+      }
+    },
+    "repetitions": { "const": 200 },
+    "family_size": { "type": "integer", "minimum": 1 },
+    "grid": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "items": { "$ref": "#/$defs/gridEntry" }
+    },
+    "false_positive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observed_families", "observed_rate", "binomial_99pct_maximum", "familywise_alpha", "passed"],
+      "properties": {
+        "observed_families": { "type": "integer", "minimum": 0 },
+        "observed_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "binomial_99pct_maximum": { "type": "integer", "minimum": 0 },
+        "familywise_alpha": { "const": 0.05 },
+        "passed": { "type": "boolean" }
+      }
+    },
+    "production_sensitivity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["censor_rate_plus_0_05", "presence_rate_0_30_vs_1_00", "cdf_mass_shift_0_10", "conditional_cdf_shift_0_80", "minimum_required_power", "passed"],
+      "properties": {
+        "censor_rate_plus_0_05": { "type": "number", "minimum": 0, "maximum": 1 },
+        "presence_rate_0_30_vs_1_00": { "type": "number", "minimum": 0, "maximum": 1 },
+        "cdf_mass_shift_0_10": { "type": "number", "minimum": 0, "maximum": 1 },
+        "conditional_cdf_shift_0_80": { "type": "number", "minimum": 0, "maximum": 1 },
+        "minimum_required_power": { "const": 0.8 },
+        "passed": { "type": "boolean" }
+      }
+    },
+    "stability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deterministic", "fingerprint_method", "artifact_fingerprint"],
+      "properties": {
+        "deterministic": { "const": true },
+        "fingerprint_method": { "const": "sha256-canonical-json-without-artifact-fingerprint" },
+        "artifact_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "status": { "enum": ["calibrated", "invalid"] },
+    "diagnostics": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "gridEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cohort_size", "n_sims", "same_law", "controlled_power"],
+      "properties": {
+        "cohort_size": { "enum": [16, 32, 64, 128] },
+        "n_sims": { "enum": [1000, 2000, 4000] },
+        "same_law": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pooled_rate_match", "pooled_cdf_match", "conditional_cdf_match"],
+          "properties": {
+            "pooled_rate_match": { "type": "number", "minimum": 0, "maximum": 1 },
+            "pooled_cdf_match": { "type": "number", "minimum": 0, "maximum": 1 },
+            "conditional_cdf_match": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "controlled_power": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["censor_rate_plus_0_05", "cdf_mass_shift_0_10", "conditional_cdf_shift_0_80"],
+          "properties": {
+            "censor_rate_plus_0_05": { "type": "number", "minimum": 0, "maximum": 1 },
+            "cdf_mass_shift_0_10": { "type": "number", "minimum": 0, "maximum": 1 },
+            "conditional_cdf_shift_0_80": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    }
+  }
+}

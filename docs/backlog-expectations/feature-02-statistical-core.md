@@ -333,6 +333,36 @@ Implémentation retenue :
 Aucune valeur du protocole n’est arrêtée par ce raffinement. Les décisions statistiques seront établies
 pendant l’exécution du PBI 2.18 à partir du standard, de l’audit historique et de preuves documentées.
 
+Implémentation retenue :
+
+- le protocole fermé `mca-statistical-distributional-parity` `1.0` référence `STD-STAT-001`, le corpus
+  `1.0`, `mca-prng-v1` et une population SHA-256 versionnée de 256 seeds, répartie en deux cohorts
+  disjointes de 128 ; Python et TypeScript ne reçoivent jamais les mêmes seeds et aucun moteur ne sert
+  d’oracle ;
+- cinq scénarios issus des seules entrées du corpus couvrent les deux modes, distribution discrète exacte,
+  histogramme agrégé, censure absente, partielle et totale, tailles de `1 000` à `4 000` simulations et
+  cohorts de 8 à 128 seeds ; `expected_result` n’entre dans aucun plan d’exécution ;
+- 49 métriques comparent CDF discrètes, taux de complétion/censure, présence puis valeurs conditionnelles de
+  P50/P70/P90 et du Risk Score ; la fiabilité, déterministe par entrée, reste une garde exacte et la censure
+  totale une garde structurelle, sans fabriquer de percentile ni de score ;
+- l’équivalence utilise bandes DKW ou intervalles Newcombe–Wilson ; la divergence utilise 2 047
+  permutations de blocs de seeds. Bonferroni protège les régions simultanées et Holm ajuste les valeurs p
+  au risque familial `0,05`; l’absence de puissance devient toujours `inconclusive` ;
+- la calibration PCG64 contrôlée exécute 200 répétitions sur 12 couples taille de cohort/taille de
+  simulation, trois lois nulles et quatre écarts décisionnels. Elle observe 0 famille faussement positive
+  sur 200 sous une enveloppe binomiale 99 % de 18 et une puissance de `1,00` sur chaque alternative au
+  design de production ; deux exécutions produisent exactement le même artefact ;
+- `Scripts/validate_statistical_distribution_protocol.py`,
+  `Scripts/validate_statistical_distribution_calibration.py` et
+  `Scripts/validate_statistical_distribution_evidence.py` sont indépendants des moteurs et refusent forme,
+  version, empreinte, résumé ou artefact incohérent ;
+- `reports/statistical-distribution-evidence.json` conclut `match` sur 5 scénarios et 49 métriques, avec
+  0 divergence, 0 résultat non concluant et une empreinte canonique stable ; les tests couvrent aussi
+  `divergence`, `inconclusive`, `invalid`, les erreurs de version, protocole, moteur et infrastructure ;
+- `Scripts/run_statistical_distribution.py` reste informatif pour tout résultat statistiquement valide et échoue sur invalidité ou
+  inexécutabilité. Il ne consolide aucune preuve, ne gouverne aucune compatibilité et n’entre pas dans le
+  profil `main` avant les PBI qui portent explicitement ces responsabilités.
+
 ### 2.19 — Rapport consolidé de parité déterministe, exacte et distributionnelle disponible
 
 - consolider les preuves déterministes, de rejeu exact et de parité distributionnelle ;

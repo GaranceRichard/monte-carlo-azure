@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1085,
+      "logicalCases": 1096,
       "nodes": [
         {
           "id": "preflight",
@@ -417,6 +417,15 @@
             "pytest:tests/test_statistical_corpus_runner.py::test_python_runner_reports_case_errors_without_stopping_following_cases",
             "pytest:tests/test_statistical_corpus_runner.py::test_shared_validation_probes_match_in_python_and_typescript",
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_validation_bridge_classifies_protocol_failures",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_calibration_is_stable_calibrated_and_exposes_size_effects",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_closed_protocol_seed_population_and_schema_are_independently_valid",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_distributional_authorities_are_documented_without_product_chronology",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_execution_plans_are_disjoint_and_engine_protocol_is_strict",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_metric_extraction_covers_censoring_absence_and_all_metric_kinds",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_protocol_semantics_report_every_non_structural_fault",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_python_plan_and_typescript_bridge_error_classification",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_seed_collision_guard_and_population_fingerprint_diagnostics",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_statistical_primitives_cover_discrete_rates_permutations_and_decisions",
             "pytest:tests/test_statistical_exact_replay.py::test_batch_plan_requires_every_geometry_and_strict_unique_positive_integers",
             "pytest:tests/test_statistical_exact_replay.py::test_engine_errors_identify_missing_and_fatal_case_reports_precisely",
             "pytest:tests/test_statistical_exact_replay.py::test_engine_report_protocol_validates_headers_case_set_order_and_statuses",
@@ -512,18 +521,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 397
+            "pytest": 406
           },
           "natures": {
-            "component": 72,
+            "component": 75,
             "contract": 46,
-            "integration": 30,
-            "unit": 249
+            "integration": 31,
+            "unit": 254
           },
           "criticalities": {
             "critical": 73,
             "high": 16,
-            "unassigned": 308
+            "unassigned": 317
           }
         },
         {
@@ -1096,6 +1105,8 @@
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [144:3]",
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [74:3]",
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [115:3]",
+            "vitest:frontend/src/statisticalDistributionRunner.test.ts::distributional TypeScript runner > executes a validated multi-seed plan without using expected corpus results [32:3]",
+            "vitest:frontend/src/statisticalDistributionRunner.test.ts::distributional TypeScript runner > rejects an incompatible plan before engine execution [47:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -1237,15 +1248,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 688
+            "vitest": 690
           },
           "natures": {
             "component": 331,
-            "unit": 357
+            "unit": 359
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 580
+            "unassigned": 582
           }
         },
         {
@@ -1348,7 +1359,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1305,
+      "logicalCases": 1322,
       "nodes": [
         {
           "id": "preflight",
@@ -1863,6 +1874,21 @@
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_bridge_parses_report_and_classifies_failures",
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_validation_bridge_classifies_protocol_failures",
             "pytest:tests/test_statistical_corpus_runner.py::test_validation_rejects_invalid_schema_and_corpus_before_engines",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_calibration_is_stable_calibrated_and_exposes_size_effects",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_cli_commands_and_entrypoints_report_success_and_failure",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_closed_protocol_seed_population_and_schema_are_independently_valid",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_control_classifies_protocol_engine_and_infrastructure_errors",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_distributional_authorities_are_documented_without_product_chronology",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_evidence_supports_match_divergence_inconclusive_and_invalid",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_evidence_validator_rejects_schema_summary_status_and_fingerprint",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_execution_plans_are_disjoint_and_engine_protocol_is_strict",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_json_loading_and_protocol_bundle_fail_explicitly",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_metric_extraction_covers_censoring_absence_and_all_metric_kinds",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_protocol_semantics_report_every_non_structural_fault",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_python_plan_and_typescript_bridge_error_classification",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_real_distributional_runner_is_informative_complete_and_stable",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_seed_collision_guard_and_population_fingerprint_diagnostics",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_statistical_primitives_cover_discrete_rates_permutations_and_decisions",
             "pytest:tests/test_statistical_exact_replay.py::test_batch_plan_requires_every_geometry_and_strict_unique_positive_integers",
             "pytest:tests/test_statistical_exact_replay.py::test_cli_keeps_divergence_informational_but_fails_invalidity_and_engine_error",
             "pytest:tests/test_statistical_exact_replay.py::test_control_encapsulates_runner_and_protocol_errors_as_engine_evidence",
@@ -2039,18 +2065,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 585
+            "pytest": 600
           },
           "natures": {
-            "component": 72,
+            "component": 75,
             "contract": 46,
-            "integration": 218,
-            "unit": 249
+            "integration": 225,
+            "unit": 254
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 479
+            "unassigned": 494
           }
         },
         {
@@ -2623,6 +2649,8 @@
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [144:3]",
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [74:3]",
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [115:3]",
+            "vitest:frontend/src/statisticalDistributionRunner.test.ts::distributional TypeScript runner > executes a validated multi-seed plan without using expected corpus results [32:3]",
+            "vitest:frontend/src/statisticalDistributionRunner.test.ts::distributional TypeScript runner > rejects an incompatible plan before engine execution [47:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -2764,15 +2792,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 688
+            "vitest": 690
           },
           "natures": {
             "component": 331,
-            "unit": 357
+            "unit": 359
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 580
+            "unassigned": 582
           }
         },
         {
@@ -2916,7 +2944,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1306,
+      "logicalCases": 1323,
       "nodes": [
         {
           "id": "preflight",
@@ -3431,6 +3459,21 @@
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_bridge_parses_report_and_classifies_failures",
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_validation_bridge_classifies_protocol_failures",
             "pytest:tests/test_statistical_corpus_runner.py::test_validation_rejects_invalid_schema_and_corpus_before_engines",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_calibration_is_stable_calibrated_and_exposes_size_effects",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_cli_commands_and_entrypoints_report_success_and_failure",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_closed_protocol_seed_population_and_schema_are_independently_valid",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_control_classifies_protocol_engine_and_infrastructure_errors",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_distributional_authorities_are_documented_without_product_chronology",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_evidence_supports_match_divergence_inconclusive_and_invalid",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_evidence_validator_rejects_schema_summary_status_and_fingerprint",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_execution_plans_are_disjoint_and_engine_protocol_is_strict",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_json_loading_and_protocol_bundle_fail_explicitly",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_metric_extraction_covers_censoring_absence_and_all_metric_kinds",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_protocol_semantics_report_every_non_structural_fault",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_python_plan_and_typescript_bridge_error_classification",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_real_distributional_runner_is_informative_complete_and_stable",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_seed_collision_guard_and_population_fingerprint_diagnostics",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_statistical_primitives_cover_discrete_rates_permutations_and_decisions",
             "pytest:tests/test_statistical_exact_replay.py::test_batch_plan_requires_every_geometry_and_strict_unique_positive_integers",
             "pytest:tests/test_statistical_exact_replay.py::test_cli_keeps_divergence_informational_but_fails_invalidity_and_engine_error",
             "pytest:tests/test_statistical_exact_replay.py::test_control_encapsulates_runner_and_protocol_errors_as_engine_evidence",
@@ -3608,18 +3651,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 586
+            "pytest": 601
           },
           "natures": {
-            "component": 72,
+            "component": 75,
             "contract": 46,
-            "integration": 218,
-            "unit": 250
+            "integration": 225,
+            "unit": 255
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 480
+            "unassigned": 495
           }
         },
         {
@@ -4192,6 +4235,8 @@
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [144:3]",
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [74:3]",
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [115:3]",
+            "vitest:frontend/src/statisticalDistributionRunner.test.ts::distributional TypeScript runner > executes a validated multi-seed plan without using expected corpus results [32:3]",
+            "vitest:frontend/src/statisticalDistributionRunner.test.ts::distributional TypeScript runner > rejects an incompatible plan before engine execution [47:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -4333,15 +4378,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 688
+            "vitest": 690
           },
           "natures": {
             "component": 331,
-            "unit": 357
+            "unit": 359
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 580
+            "unassigned": 582
           }
         },
         {
@@ -4485,7 +4530,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1307,
+      "logicalCases": 1324,
       "nodes": [
         {
           "id": "preflight",
@@ -5001,6 +5046,21 @@
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_bridge_parses_report_and_classifies_failures",
             "pytest:tests/test_statistical_corpus_runner.py::test_typescript_validation_bridge_classifies_protocol_failures",
             "pytest:tests/test_statistical_corpus_runner.py::test_validation_rejects_invalid_schema_and_corpus_before_engines",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_calibration_is_stable_calibrated_and_exposes_size_effects",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_cli_commands_and_entrypoints_report_success_and_failure",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_closed_protocol_seed_population_and_schema_are_independently_valid",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_control_classifies_protocol_engine_and_infrastructure_errors",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_distributional_authorities_are_documented_without_product_chronology",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_evidence_supports_match_divergence_inconclusive_and_invalid",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_evidence_validator_rejects_schema_summary_status_and_fingerprint",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_execution_plans_are_disjoint_and_engine_protocol_is_strict",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_json_loading_and_protocol_bundle_fail_explicitly",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_metric_extraction_covers_censoring_absence_and_all_metric_kinds",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_protocol_semantics_report_every_non_structural_fault",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_python_plan_and_typescript_bridge_error_classification",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_real_distributional_runner_is_informative_complete_and_stable",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_seed_collision_guard_and_population_fingerprint_diagnostics",
+            "pytest:tests/test_statistical_distribution_protocol.py::test_statistical_primitives_cover_discrete_rates_permutations_and_decisions",
             "pytest:tests/test_statistical_exact_replay.py::test_batch_plan_requires_every_geometry_and_strict_unique_positive_integers",
             "pytest:tests/test_statistical_exact_replay.py::test_cli_keeps_divergence_informational_but_fails_invalidity_and_engine_error",
             "pytest:tests/test_statistical_exact_replay.py::test_control_encapsulates_runner_and_protocol_errors_as_engine_evidence",
@@ -5178,18 +5238,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 587
+            "pytest": 602
           },
           "natures": {
-            "component": 72,
+            "component": 75,
             "contract": 46,
-            "integration": 219,
-            "unit": 250
+            "integration": 226,
+            "unit": 255
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 481
+            "unassigned": 496
           }
         },
         {
@@ -5762,6 +5822,8 @@
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > preserves absent optional engine fields instead of fabricating values [144:3]",
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > refuses execution when the shared schema validator reports an issue [74:3]",
             "vitest:frontend/src/statisticalCorpusRunner.test.ts::shared statistical corpus TypeScript runner > reports Error and non-Error engine failures per case [115:3]",
+            "vitest:frontend/src/statisticalDistributionRunner.test.ts::distributional TypeScript runner > executes a validated multi-seed plan without using expected corpus results [32:3]",
+            "vitest:frontend/src/statisticalDistributionRunner.test.ts::distributional TypeScript runner > rejects an incompatible plan before engine execution [47:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > builds scoped quick-filters keys [49:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > normalizes non-array quick filter payload to empty arrays [75:3]",
             "vitest:frontend/src/storage.test.ts::storage helpers > reads legacy arrimageRate portfolio prefs [95:3]",
@@ -5903,15 +5965,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 688
+            "vitest": 690
           },
           "natures": {
             "component": 331,
-            "unit": 357
+            "unit": 359
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 580
+            "unassigned": 582
           }
         },
         {
