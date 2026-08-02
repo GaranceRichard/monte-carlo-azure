@@ -1,5 +1,12 @@
 {
   "compatibility": {
+    "authority": {
+      "id": "mca-statistical-compatibility-authority",
+      "schema_version": "1.0",
+      "semantic_fingerprint": "faa724ac5ab7aaadea64dfa0b6591e91f73cf85a51671d789278d0f5e5e35065",
+      "version": "1.0"
+    },
+    "blocking_when_executed": true,
     "declarations": [
       {
         "compatible": true,
@@ -60,10 +67,25 @@
         "id": "distributional_parity",
         "source": "distribution_evidence",
         "version": "1.0"
+      },
+      {
+        "compatible": true,
+        "id": "statistical_compatibility",
+        "source": "compatibility_evidence",
+        "version": "1.0"
       }
     ],
-    "scope": "Declared identities and versions only; no migration or future-version decision.",
-    "status": "match"
+    "scope": "Versioned semantic authorities, compatibility decisions, proof freshness, and explicit historical-data treatments.",
+    "source": "compatibility_evidence",
+    "status": "match",
+    "summary": {
+      "blocked_component_count": 0,
+      "component_count": 15,
+      "diagnostic_count": 0,
+      "matching_component_count": 15,
+      "matching_proof_count": 8,
+      "proof_count": 8
+    }
   },
   "contracts": {
     "corpus": {
@@ -99,10 +121,10 @@
   "format_version": "1.0",
   "generation": {
     "kind": "deterministic_source_snapshot",
-    "source_set_sha256": "263fd524df56ef005633b21b417f77a1d7bc558fb4efb4956124d30a6248dc79"
+    "source_set_sha256": "59262cf646ad88c5aeff7fe43f186661c8485db75716692cba8d638a41004366"
   },
   "integrity": {
-    "content_sha256": "751c5d6a684d90861c9a70a1734b834506eaf25efe2cd252162a7e47fb9c4c2e",
+    "content_sha256": "f26eb671fa5f9a8390897d68b5ec9b0d2beb476c44aea52478b3785651f454d9",
     "method": "sha256-canonical-json-without-content-sha256"
   },
   "limits": [
@@ -135,6 +157,12 @@
       "statements": [
         "Distributional evidence is not exact replay and is bounded by documented power."
       ]
+    },
+    {
+      "proof_level": "statistical_compatibility",
+      "statements": [
+        "The control blocks when called directly; complete main-profile integration is PBI 2.21."
+      ]
     }
   ],
   "not_evaluated": [
@@ -145,10 +173,6 @@
     {
       "id": "universal_equivalence",
       "statement": "No equivalence is claimed outside recorded corpus cases and protocol scenarios."
-    },
-    {
-      "id": "future_version_compatibility",
-      "statement": "No compatibility decision or migration for future versions is evaluated."
     },
     {
       "id": "blocking_main_enforcement",
@@ -293,6 +317,37 @@
       ],
       "scope": "Protocol 1.0 scenarios, cohorts, metrics, margins and documented power.",
       "source": "distribution_evidence",
+      "status": "match"
+    },
+    {
+      "counters": [
+        {
+          "id": "components",
+          "value": 15
+        },
+        {
+          "id": "matching_components",
+          "value": 15
+        },
+        {
+          "id": "proofs",
+          "value": 8
+        },
+        {
+          "id": "matching_proofs",
+          "value": 8
+        },
+        {
+          "id": "diagnostics",
+          "value": 0
+        }
+      ],
+      "id": "statistical_compatibility",
+      "limits": [
+        "The control blocks when called directly; complete main-profile integration is PBI 2.21."
+      ],
+      "scope": "Versioned semantic authorities, decisions, proofs, and historical-data treatments.",
+      "source": "compatibility_evidence",
       "status": "match"
     }
   ],
@@ -610,7 +665,7 @@
         "sha256": null,
         "version": "1.0"
       },
-      "sha256": "353454806bf873de8eaec7dfaec0f87b759eef14524072655750106af5b6e4f0",
+      "sha256": "f12470f710096606674c0f46ded53c35045e0fc9052f3279ba6c53e54efab9ee",
       "validation_status": "valid"
     },
     {
@@ -792,6 +847,26 @@
       },
       "sha256": "b6cb2d7754e1a63afa11db1731d89606a77abcfc8dc5e9f217e5ef42a755fd54",
       "validation_status": "valid"
+    },
+    {
+      "canonical_fingerprint": "e9214dee975b0448e97fd65c30ccfda66646a23fd02ea32cf46e24c110c6a5c5",
+      "declared": {
+        "id": "statistical_compatibility",
+        "version": "1.0"
+      },
+      "fingerprint_valid": true,
+      "id": "compatibility_evidence",
+      "kind": "compatibility_evidence",
+      "path": "reports/statistical-compatibility-evidence.json",
+      "required": true,
+      "schema": {
+        "id": "https://montecarlo.local/schemas/statistical-compatibility-evidence/1.0",
+        "path": "contracts/statistical-compatibility-evidence-v1.0.schema.json",
+        "sha256": "b521c5ac04320716b12943baf66708f516ef3a3aa77572447b483da5ed23977b",
+        "version": "1.0"
+      },
+      "sha256": "5fc9763f274a48d1511b8b2198cf943fb04a4966759fe920b46911107ea40011",
+      "validation_status": "valid"
     }
   ],
   "summary": {
@@ -801,12 +876,12 @@
     "divergent_proof_level_count": 0,
     "inconclusive_proof_level_count": 0,
     "invalid_source_count": 0,
-    "matching_proof_level_count": 5,
+    "matching_proof_level_count": 6,
     "normative_case_count": 16,
-    "proof_level_count": 5,
-    "source_count": 10,
+    "proof_level_count": 6,
+    "source_count": 11,
     "unavailable_proof_level_count": 0,
-    "valid_source_count": 10,
+    "valid_source_count": 11,
     "validation_probe_count": 22
   },
   "verdict": {

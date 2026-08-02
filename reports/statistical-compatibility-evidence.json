@@ -1,0 +1,817 @@
+{
+  "authority": {
+    "id": "mca-statistical-compatibility-authority",
+    "schema_version": "1.0",
+    "semantic_fingerprint": "faa724ac5ab7aaadea64dfa0b6591e91f73cf85a51671d789278d0f5e5e35065",
+    "version": "1.0"
+  },
+  "classification": "no_normative_impact",
+  "components": [
+    {
+      "actual_semantic_fingerprint": "5f8e4db976d08aa8c3cc374035846d42f862150199f237964f97aaa4e3d7db07",
+      "affected_data": [
+        "replay_artifacts"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "replay_artifacts",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "The baseline records current behavior and does not alter existing replay artifacts.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-input-contract",
+      "expected_semantic_fingerprint": "5f8e4db976d08aa8c3cc374035846d42f862150199f237964f97aaa4e3d7db07",
+      "id": "input-contract",
+      "identity": "STD-STAT-001-input-contract",
+      "required_proofs": [
+        "validation-probes",
+        "deterministic-parity",
+        "exact-replay"
+      ],
+      "status": "match",
+      "surfaces": [
+        "input_validation_and_normalization"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "4fd6c645e9bcef1a6ea9f80d59b6727ea533998e2378aedf2dfa915a169390fe",
+      "affected_data": [
+        "seeded_results"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "seeded_results",
+          "evidence": [
+            "reports/statistical-parity-report.json"
+          ],
+          "rationale": "No default changed while establishing this compatibility baseline.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-resolved-defaults",
+      "expected_semantic_fingerprint": "4fd6c645e9bcef1a6ea9f80d59b6727ea533998e2378aedf2dfa915a169390fe",
+      "id": "resolved-defaults",
+      "identity": "STD-STAT-001-resolved-defaults",
+      "required_proofs": [
+        "validation-probes",
+        "deterministic-parity"
+      ],
+      "status": "match",
+      "surfaces": [
+        "resolved_defaults"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "a16e57336adfa934348978474ba6b01ede971a63f1fd960b8082bc3faccec42c",
+      "affected_data": [
+        "seeded_results",
+        "replay_artifacts"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "seeded_results",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Recorded seeds keep their current meaning under the adopted baseline.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "replay_artifacts",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Existing replay artifacts already bind the current uint32 seed contract.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-seed-contract",
+      "expected_semantic_fingerprint": "a16e57336adfa934348978474ba6b01ede971a63f1fd960b8082bc3faccec42c",
+      "id": "seed-contract",
+      "identity": "STD-STAT-001-seed-contract",
+      "required_proofs": [
+        "validation-probes",
+        "deterministic-parity",
+        "exact-replay",
+        "distribution-evidence"
+      ],
+      "status": "match",
+      "surfaces": [
+        "seed_domain_and_resolution"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "b3b9728649356db1e89a07dc56264b1fa0aa4a70b00ef47ee3ccb76cac8c7677",
+      "affected_data": [
+        "seeded_results",
+        "replay_artifacts",
+        "generated_proofs"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "seeded_results",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Existing seeded results already use the adopted mca-prng-v1 identity.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "replay_artifacts",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Existing replay artifacts bind the same PRNG identity and vectors.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "generated_proofs",
+          "evidence": [
+            "reports/statistical-distribution-evidence.json"
+          ],
+          "rationale": "Existing proofs were generated with the adopted mca-prng-v1 baseline.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-mca-prng-v1",
+      "expected_semantic_fingerprint": "b3b9728649356db1e89a07dc56264b1fa0aa4a70b00ef47ee3ccb76cac8c7677",
+      "id": "prng",
+      "identity": "mca-prng-v1",
+      "required_proofs": [
+        "reference-corpus",
+        "deterministic-parity",
+        "exact-replay",
+        "distribution-calibration",
+        "distribution-evidence"
+      ],
+      "status": "match",
+      "surfaces": [
+        "prng_algorithm",
+        "draw_to_index_conversion"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "64088f319ec7910aaad4e4f17ca7cb53d66da9359d7a9a384f6b17a7a25193bc",
+      "affected_data": [
+        "seeded_results",
+        "replay_artifacts"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "seeded_results",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "No logical draw slot changed while adopting this baseline.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "replay_artifacts",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Existing batch evidence already demonstrates the adopted ordering.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-draw-order",
+      "expected_semantic_fingerprint": "64088f319ec7910aaad4e4f17ca7cb53d66da9359d7a9a384f6b17a7a25193bc",
+      "id": "draw-order-and-batching",
+      "identity": "STD-STAT-001-draw-order",
+      "required_proofs": [
+        "reference-corpus",
+        "deterministic-parity",
+        "exact-replay"
+      ],
+      "status": "match",
+      "surfaces": [
+        "logical_draw_order",
+        "batching_behavior"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "07aba8db3f98fdbdbaed887607077b1496fe1da6ada73eac1edf12086115ce01",
+      "affected_data": [
+        "backend_history",
+        "local_history",
+        "seeded_results"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "backend_history",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Backend history retains results produced by the unchanged current modes.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "local_history",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Local history retains results produced by the unchanged current modes.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "seeded_results",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Seeded results remain replayable under unchanged stopping conditions.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-simulation-modes",
+      "expected_semantic_fingerprint": "07aba8db3f98fdbdbaed887607077b1496fe1da6ada73eac1edf12086115ce01",
+      "id": "simulation-modes",
+      "identity": "STD-STAT-001-simulation-modes",
+      "required_proofs": [
+        "reference-corpus",
+        "deterministic-parity",
+        "exact-replay",
+        "distribution-evidence"
+      ],
+      "status": "match",
+      "surfaces": [
+        "simulation_modes_and_stop_conditions"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "46507c89144f90b8f3a342e5c044acee94ac6383bad0bb3dca9297b86d931828",
+      "affected_data": [
+        "backend_history",
+        "local_history",
+        "reports_and_exports",
+        "seeded_results"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "backend_history",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Stored backend percentiles keep their current normative interpretation.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "local_history",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Stored local percentiles keep their current normative interpretation.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "reports_and_exports",
+          "evidence": [
+            "reports/statistical-parity-report.json"
+          ],
+          "rationale": "Existing reports retain the same percentile and censorship semantics.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "seeded_results",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "No percentile rank or censorship rule changed for seeded results.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-censorship-percentiles",
+      "expected_semantic_fingerprint": "46507c89144f90b8f3a342e5c044acee94ac6383bad0bb3dca9297b86d931828",
+      "id": "censorship-and-percentiles",
+      "identity": "STD-STAT-001-censorship-percentiles",
+      "required_proofs": [
+        "reference-corpus",
+        "deterministic-parity",
+        "exact-replay",
+        "distribution-evidence"
+      ],
+      "status": "match",
+      "surfaces": [
+        "censorship",
+        "percentiles_p50_p70_p90"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "ddd785a52312b21b060f977e43d5e92bf6d043fd22052055b09f90a2525168bc",
+      "affected_data": [
+        "backend_history",
+        "local_history",
+        "reports_and_exports"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "backend_history",
+          "evidence": [
+            "reports/statistical-parity-report.json"
+          ],
+          "rationale": "Persisted backend scores already follow the adopted authority formula.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "local_history",
+          "evidence": [
+            "reports/statistical-parity-report.json"
+          ],
+          "rationale": "Persisted local scores already follow the adopted authority formula.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "reports_and_exports",
+          "evidence": [
+            "reports/statistical-parity-report.json"
+          ],
+          "rationale": "Reports consume the unchanged authoritative score without recalculation.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-risk-score",
+      "expected_semantic_fingerprint": "ddd785a52312b21b060f977e43d5e92bf6d043fd22052055b09f90a2525168bc",
+      "id": "risk-score",
+      "identity": "STD-STAT-001-risk-score",
+      "required_proofs": [
+        "reference-corpus",
+        "deterministic-parity",
+        "exact-replay",
+        "distribution-evidence"
+      ],
+      "status": "match",
+      "surfaces": [
+        "risk_score"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "dc0ea2296d642b9695f7fbb101145711339b9162e3573a9c9a92adc2e4e6565b",
+      "affected_data": [
+        "backend_history",
+        "local_history",
+        "reports_and_exports"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "backend_history",
+          "evidence": [
+            "reports/statistical-parity-report.json"
+          ],
+          "rationale": "Backend reliability fields preserve the adopted current interpretation.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "local_history",
+          "evidence": [
+            "reports/statistical-parity-report.json"
+          ],
+          "rationale": "Local reliability fields preserve the adopted current interpretation.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "reports_and_exports",
+          "evidence": [
+            "reports/statistical-parity-report.json"
+          ],
+          "rationale": "Reports preserve unchanged reliability metrics and label meanings.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-throughput-reliability",
+      "expected_semantic_fingerprint": "dc0ea2296d642b9695f7fbb101145711339b9162e3573a9c9a92adc2e4e6565b",
+      "id": "throughput-reliability",
+      "identity": "STD-STAT-001-throughput-reliability",
+      "required_proofs": [
+        "reference-corpus",
+        "deterministic-parity",
+        "exact-replay",
+        "distribution-evidence"
+      ],
+      "status": "match",
+      "surfaces": [
+        "reliability_metrics_and_labels"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "b5a1c1f15ea8b931e558c9b398d642fa2feac76e072f4fd76819f0e7db8e9f7b",
+      "affected_data": [
+        "backend_history",
+        "local_history",
+        "reports_and_exports",
+        "runtime_caches"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "backend_history",
+          "evidence": [
+            "reports/statistical-parity-report.json"
+          ],
+          "rationale": "Backend histogram history already uses the adopted geometry.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "local_history",
+          "evidence": [
+            "reports/statistical-parity-report.json"
+          ],
+          "rationale": "Local histogram history already uses the adopted geometry.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "reports_and_exports",
+          "evidence": [
+            "reports/statistical-parity-report.json"
+          ],
+          "rationale": "Reports and exports preserve the unchanged histogram representation.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "runtime_caches",
+          "evidence": [
+            "docs/statistical-compatibility.md"
+          ],
+          "rationale": "No cached histogram requires invalidation for baseline adoption.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-histogram",
+      "expected_semantic_fingerprint": "b5a1c1f15ea8b931e558c9b398d642fa2feac76e072f4fd76819f0e7db8e9f7b",
+      "id": "histogram",
+      "identity": "STD-STAT-001-histogram",
+      "required_proofs": [
+        "reference-corpus",
+        "deterministic-parity",
+        "exact-replay",
+        "distribution-evidence"
+      ],
+      "status": "match",
+      "surfaces": [
+        "histograms"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "a6fa38902743fa093abdee874f2b764604baecb7091f0e4f684768263c781311",
+      "affected_data": [
+        "backend_history",
+        "local_history",
+        "reports_and_exports",
+        "replay_artifacts"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "backend_history",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Backend history uses the current unchanged canonical response fields.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "local_history",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Local history uses the current unchanged canonical response fields.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "reports_and_exports",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Reports and exports consume the unchanged canonical response.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "replay_artifacts",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Field presence and primitive types are already exact in replay evidence.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-canonical-response",
+      "expected_semantic_fingerprint": "a6fa38902743fa093abdee874f2b764604baecb7091f0e4f684768263c781311",
+      "id": "canonical-response",
+      "identity": "STD-STAT-001-canonical-response",
+      "required_proofs": [
+        "reference-corpus",
+        "validation-probes",
+        "deterministic-parity",
+        "exact-replay"
+      ],
+      "status": "match",
+      "surfaces": [
+        "canonical_response_shape",
+        "field_presence_and_absence"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "86fc879517cfa9432ace11a7df25f2622359a751ca0d9d2cb4145fad7791b187",
+      "affected_data": [
+        "backend_history",
+        "local_history",
+        "runtime_caches",
+        "reports_and_exports",
+        "generated_proofs",
+        "seeded_results",
+        "replay_artifacts"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "2.0",
+      "data_treatments": [
+        {
+          "category": "backend_history",
+          "evidence": [
+            "docs/statistical-compatibility.md"
+          ],
+          "rationale": "No backend document is rewritten by baseline adoption.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "local_history",
+          "evidence": [
+            "docs/statistical-compatibility.md"
+          ],
+          "rationale": "Existing schemaVersion 2 entries remain unchanged and readable.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "runtime_caches",
+          "evidence": [
+            "docs/statistical-compatibility.md"
+          ],
+          "rationale": "No cache invalidation is justified because semantics are unchanged.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "reports_and_exports",
+          "evidence": [
+            "docs/statistical-compatibility.md"
+          ],
+          "rationale": "Existing exports retain their current interpretation without rewriting.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "generated_proofs",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Generated proofs already identify their current statistical versions.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "seeded_results",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Persisted seeds retain their current replay semantics.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "replay_artifacts",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Replay artifacts require no migration for baseline adoption.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-history-v2",
+      "expected_semantic_fingerprint": "86fc879517cfa9432ace11a7df25f2622359a751ca0d9d2cb4145fad7791b187",
+      "id": "serialization-and-history",
+      "identity": "mca-simulation-history-v2",
+      "required_proofs": [
+        "deterministic-parity",
+        "exact-replay"
+      ],
+      "status": "match",
+      "surfaces": [
+        "result_serialization",
+        "persisted_results_and_history",
+        "caches_exports_and_replay_artifacts"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "7cc1168b57e6e9d64400aaf02535ece5800fb87e41f850938b6ac72c8e5d0a16",
+      "affected_data": [
+        "generated_proofs",
+        "replay_artifacts"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "generated_proofs",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Current proofs already derive from corpus and probe version 1.0.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "replay_artifacts",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "Current replay artifacts already bind corpus version 1.0.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-reference-corpus",
+      "expected_semantic_fingerprint": "7cc1168b57e6e9d64400aaf02535ece5800fb87e41f850938b6ac72c8e5d0a16",
+      "id": "reference-corpus-contract",
+      "identity": "mca-statistical-reference-corpus",
+      "required_proofs": [
+        "reference-corpus",
+        "validation-probes",
+        "deterministic-parity",
+        "exact-replay",
+        "distribution-evidence"
+      ],
+      "status": "match",
+      "surfaces": [
+        "corpus_schema",
+        "corpus_expected_results",
+        "validation_probes"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "62ed857f07933801df4e5b4d1f3a19766c8d540d2e3fccfc8a82cc78ce5a6bd5",
+      "affected_data": [
+        "generated_proofs",
+        "replay_artifacts"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "generated_proofs",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "The current exact proof already follows the adopted protocol.",
+          "treatment": "compatible_without_action"
+        },
+        {
+          "category": "replay_artifacts",
+          "evidence": [
+            "reports/statistical-exact-replay-evidence.json"
+          ],
+          "rationale": "No replay artifact is changed by protocol baseline adoption.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-exact-replay",
+      "expected_semantic_fingerprint": "62ed857f07933801df4e5b4d1f3a19766c8d540d2e3fccfc8a82cc78ce5a6bd5",
+      "id": "exact-replay-proof",
+      "identity": "exact_replay",
+      "required_proofs": [
+        "reference-corpus",
+        "deterministic-parity",
+        "exact-replay"
+      ],
+      "status": "match",
+      "surfaces": [
+        "exact_replay_protocol"
+      ]
+    },
+    {
+      "actual_semantic_fingerprint": "b457e109eec5209bd59243042649d4421bbad4420a3fac23f7fe6ee430a72cc9",
+      "affected_data": [
+        "generated_proofs"
+      ],
+      "classification": "no_normative_impact",
+      "current_version": "1.0",
+      "data_treatments": [
+        {
+          "category": "generated_proofs",
+          "evidence": [
+            "reports/statistical-distribution-evidence.json"
+          ],
+          "rationale": "Current distributional artifacts already bind one coherent protocol version.",
+          "treatment": "compatible_without_action"
+        }
+      ],
+      "decision_id": "PBI-2.20-baseline-distributional-proof",
+      "expected_semantic_fingerprint": "b457e109eec5209bd59243042649d4421bbad4420a3fac23f7fe6ee430a72cc9",
+      "id": "distributional-proof",
+      "identity": "mca-statistical-distributional-parity",
+      "required_proofs": [
+        "distribution-protocol",
+        "distribution-seeds",
+        "distribution-calibration",
+        "distribution-evidence"
+      ],
+      "status": "match",
+      "surfaces": [
+        "distributional_parity_protocol"
+      ]
+    }
+  ],
+  "diagnostics": [],
+  "enforcement": {
+    "direct_execution": "blocking",
+    "main_integration_scope": "PBI 2.21",
+    "main_profile": "not_integrated"
+  },
+  "evidence_version": "1.0",
+  "proof_artifacts": [
+    {
+      "actual_semantic_fingerprint": "8d448e6169832d663d460c31b6ed0fe027fb4ae95904212d16aadb418ebc3d28",
+      "expected_semantic_fingerprint": "8d448e6169832d663d460c31b6ed0fe027fb4ae95904212d16aadb418ebc3d28",
+      "id": "reference-corpus",
+      "status": "match",
+      "version": "1.0"
+    },
+    {
+      "actual_semantic_fingerprint": "edaae666e21023b39eb5a3fd0de5c0d2932d996672b56a3b561172ddbdd3f542",
+      "expected_semantic_fingerprint": "edaae666e21023b39eb5a3fd0de5c0d2932d996672b56a3b561172ddbdd3f542",
+      "id": "validation-probes",
+      "status": "match",
+      "version": "1.0"
+    },
+    {
+      "actual_semantic_fingerprint": "9c03522244da4eddae86beaa7e068db9af6220e1fa159b4dfcb00c8cee3afc04",
+      "expected_semantic_fingerprint": "9c03522244da4eddae86beaa7e068db9af6220e1fa159b4dfcb00c8cee3afc04",
+      "id": "deterministic-parity",
+      "status": "match",
+      "version": "1.1"
+    },
+    {
+      "actual_semantic_fingerprint": "ad881e25fbce9a26be3954824dc18ce81a62bc4b8f0c15b03b4d32c85f66f060",
+      "expected_semantic_fingerprint": "ad881e25fbce9a26be3954824dc18ce81a62bc4b8f0c15b03b4d32c85f66f060",
+      "id": "exact-replay",
+      "status": "match",
+      "version": "1.0"
+    },
+    {
+      "actual_semantic_fingerprint": "bec755f47ee8551b7a33fd36537df68b65e06c65b097f9c83cb1b0c02c1e94bd",
+      "expected_semantic_fingerprint": "bec755f47ee8551b7a33fd36537df68b65e06c65b097f9c83cb1b0c02c1e94bd",
+      "id": "distribution-protocol",
+      "status": "match",
+      "version": "1.0"
+    },
+    {
+      "actual_semantic_fingerprint": "6df0a2ccea365b45569a7de66e9fbff9b34ebdace0cad516fc54ade03b694d5d",
+      "expected_semantic_fingerprint": "6df0a2ccea365b45569a7de66e9fbff9b34ebdace0cad516fc54ade03b694d5d",
+      "id": "distribution-seeds",
+      "status": "match",
+      "version": "1.0"
+    },
+    {
+      "actual_semantic_fingerprint": "f86f31835498f8858420ae1853a13fd9d8e1a5c4b28e03cb5f44441804108c45",
+      "expected_semantic_fingerprint": "f86f31835498f8858420ae1853a13fd9d8e1a5c4b28e03cb5f44441804108c45",
+      "id": "distribution-calibration",
+      "status": "match",
+      "version": "1.0"
+    },
+    {
+      "actual_semantic_fingerprint": "65d64ad9ae7bd1026c2c2c40d362f5654a1d1a22c8e295da6970822c7a6da1bf",
+      "expected_semantic_fingerprint": "65d64ad9ae7bd1026c2c2c40d362f5654a1d1a22c8e295da6970822c7a6da1bf",
+      "id": "distribution-evidence",
+      "status": "match",
+      "version": "1.0"
+    }
+  ],
+  "proof_kind": "statistical_compatibility",
+  "stability": {
+    "artifact_fingerprint": "e9214dee975b0448e97fd65c30ccfda66646a23fd02ea32cf46e24c110c6a5c5",
+    "deterministic": true,
+    "method": "sha256-canonical-json-without-artifact-fingerprint"
+  },
+  "status": "match",
+  "summary": {
+    "blocked_component_count": 0,
+    "component_count": 15,
+    "diagnostic_count": 0,
+    "matching_component_count": 15,
+    "matching_proof_count": 8,
+    "proof_count": 8
+  }
+}

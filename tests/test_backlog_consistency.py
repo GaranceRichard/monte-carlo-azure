@@ -43,13 +43,12 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     features = check_backlog_consistency.parse_registry(backlog)
 
     assert sum(len(feature.pbis) for feature in features) == 141
-    assert sum(feature.completed_count for feature in features) == 30
+    assert sum(feature.completed_count for feature in features) == 31
     feature_two = next(feature for feature in features if feature.number == 2)
-    assert feature_two.completed_count == 19
+    assert feature_two.completed_count == 20
     assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == [
-        # PBI 2.19 completed on 01/08/2026 with the consolidated evidence report.
-        # Only compatibility governance and blocking enforcement remain open.
-        "2.20",
+        # PBI 2.20 completed on 01/08/2026 with direct compatibility enforcement.
+        # Only promotion to the main profile remains open.
         "2.21",
     ]
     assert check_backlog_consistency.expected_documents(backlog, governance) == (

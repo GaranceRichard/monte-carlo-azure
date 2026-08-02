@@ -398,6 +398,24 @@ Implémentation retenue :
 - exiger une décision de compatibilité, une nouvelle version et la mise à jour du corpus ;
 - documenter migration ou invalidation des caches et historiques concernés.
 
+Implémentation retenue :
+
+- une autorité JSON fermée `1.0` affecte exactement 23 surfaces à 15 composants et relie versions,
+  dépendances, autorités, consommateurs, empreintes sémantiques, preuves et données antérieures ;
+- l’extraction déterministe compare AST Python sans docstrings, tokens TypeScript sans commentaires,
+  sections `STAT-PAR` et fragments JSON sans champs descriptifs ; absence, ambiguïté et erreur d’analyse
+  sont bloquantes ;
+- les décisions forment une lignée append-only et utilisent une classification fermée ; une nouvelle release
+  doit correspondre à un changement sémantique, régénérer ses preuves et traiter toutes ses catégories de
+  données par une option fermée et justifiée ;
+- le contrôle bloque directement dérive non décidée, version inchangée, identité PRNG conservée à tort,
+  corpus ou preuve périmé, incohérence de dépendance, migration absente et réécriture d’une release acceptée ;
+- les mutations couvrent validation, PRNG, tirage–index, ordre, censure, percentile, Risk Score, fiabilité,
+  histogramme, réponse, version, corpus, preuve et migration, tandis que commentaires et descriptions ne
+  créent pas de dérive ;
+- la preuve canonique `reports/statistical-compatibility-evidence.json` devient la onzième source et le
+  sixième niveau du rapport consolidé. Le contrôle reste absent du profil `main` jusqu’au PBI 2.21.
+
 ### 2.21 — Contrôles complets de parité et de compatibilité bloquants dans le profil `main`
 
 - exécuter dans le profil `main` les contrôles déterministes, exacts, distributionnels et de compatibilité ;

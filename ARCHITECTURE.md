@@ -484,6 +484,28 @@ générateur et restent visibles dans le rapport, mais aucune dérive future n�
 de parité n’est ajouté au DAG `main`. Ces limites et les règles de lecture sont détaillées dans
 [`docs/statistical-consolidated-report.md`](docs/statistical-consolidated-report.md).
 
+### Autorité et contrôle de compatibilité statistique
+
+`contracts/statistical-compatibility-authority-v1.0.json`, fermé par son JSON Schema, découpe le contrat
+statistique en quinze composants versionnés et attribue chacune des vingt-trois surfaces normatives à un
+seul composant. Chaque composant relie autorités analysables, consommateurs, dépendances de version,
+preuves indépendantes et catégories de données antérieures. Ses décisions forment une lignée append-only :
+une release acceptée ne peut être réécrite et une nouvelle release doit porter un changement sémantique,
+une classification compatible avec le composant, toutes les preuves requises et un traitement explicite de
+chaque historique ou cache concerné.
+
+`Scripts/run_statistical_compatibility.py` extrait les déclarations Python par AST, les déclarations
+TypeScript sous forme de tokens sans commentaires, les règles `STAT-PAR` et les fragments JSON normatifs.
+Il refuse toute autorité absente, ambiguë ou non analysable, compare la lignée déjà acceptée dans Git quand
+elle existe, valide les preuves et produit `reports/statistical-compatibility-evidence.json`. Le contrôle
+est bloquant lorsqu’il est appelé directement. Il n’est pas encore une étape du profil `main`.
+
+Le rapport consolidé consomme cette preuve comme onzième source et conserve un sixième niveau
+`statistical_compatibility`. Cette intégration expose l’état sans relancer les moteurs, sans modifier les
+preuves spécialisées et sans changer l’ordre global d’enforcement. La méthode complète et la cartographie
+des historiques, caches, exports et artefacts de rejeu figurent dans
+[`docs/statistical-compatibility.md`](docs/statistical-compatibility.md).
+
 Cette frontière ne constitue pas une nouvelle API applicative : aucun mapper, DTO, document MongoDB ou
 objet `localStorage` ne consomme directement le corpus. Les fabriques métier et les mappers appliquent les
 mêmes règles fermées : types stricts, bornes communes, six observations utiles,

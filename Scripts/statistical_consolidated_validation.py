@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
+from Scripts.statistical_consolidated_compatibility_validation import (
+    validate_compatibility as _validate_compatibility,
+)
 from Scripts.statistical_consolidated_distribution_validation import (
     validate_calibration as _validate_calibration,
 )
@@ -83,4 +86,5 @@ def validate_sources(records: dict[str, SourceRecord]) -> list[dict[str, Any]]:
         records["distribution_protocol"],
         records["distribution_seed_population"],
     )
+    diagnostics += _validate_compatibility(records["compatibility_evidence"])
     return diagnostics

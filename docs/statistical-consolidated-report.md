@@ -16,13 +16,16 @@ Le générateur lit et vérifie les autorités suivantes sans appeler les moteur
 - la preuve de rejeu exact `1.0` ;
 - le protocole `mca-statistical-distributional-parity` version `1.0`, sa population de seeds et sa
   calibration ;
-- la preuve distributionnelle `1.0`.
+- la preuve distributionnelle `1.0` ;
+- la preuve de compatibilité statistique `1.0`, issue de l’autorité fermée des composants, décisions et
+  traitements historiques.
 
 Chaque entrée de `sources` conserve un chemin relatif stable, l’identité et la version déclarées, le
 contrat de validation, le SHA-256 des octets consommés, l’empreinte canonique embarquée lorsqu’elle existe
 et un statut explicite. Les schémas du corpus, des sondes, du rapport de parité, du rejeu exact, du
 protocole, des seeds, de la calibration, de la preuve distributionnelle et du rapport consolidé sont
-versionnés sous `contracts/`.
+versionnés sous `contracts/`. Le schéma de la preuve de compatibilité et celui de son autorité y sont aussi
+versionnés.
 
 La validation porte sur la forme fermée, la version, les identités corpus/standard/PRNG/protocole, la
 complétude et les compteurs spécialisés, les empreintes embarquées, les cas et scénarios attendus, puis la
@@ -31,13 +34,14 @@ dans le rapport avec son diagnostic ; aucune valeur manquante n’est reconstrui
 
 ## Niveaux de preuve conservés
 
-Le modèle sépare cinq niveaux qui ne se compensent pas :
+Le modèle sépare six niveaux qui ne se compensent pas :
 
 1. conformité algorithmique et normative de chaque moteur aux résultats du corpus ;
 2. validation du contrat fermé et des sondes partagées ;
 3. rejeu exact interlangage sur le corpus et les versions déclarées ;
 4. indépendance du batching pour les quatre géométries consignées ;
-5. parité distributionnelle sur les scénarios, cohorts, métriques, marges et puissance du protocole.
+5. parité distributionnelle sur les scénarios, cohorts, métriques, marges et puissance du protocole ;
+6. compatibilité des versions, empreintes sémantiques, décisions, preuves et traitements historiques.
 
 Les synthèses par cas gardent séparément le statut normatif, le statut de rejeu exact et l’indépendance du
 batching. Les synthèses distributionnelles gardent scénario source, mode, taille de cohort, simulations,
@@ -80,6 +84,7 @@ toutefois un code non nul lorsqu’une source obligatoire ou son schéma est abs
 lorsqu’une empreinte est fausse, lorsque les métadonnées sont incohérentes ou incompatibles, ou lorsqu’une
 erreur de protocole, moteur ou infrastructure rend la preuve inexploitable. Une divergence fonctionnelle
 ou un résultat statistiquement non concluant reste visible sans transformer ce PBI en enforcement complet.
+Le validateur spécialisé de compatibilité demeure, lui, bloquant lorsqu’il est exécuté directement.
 
 ```powershell
 .venv\Scripts\python.exe Scripts\generate_statistical_consolidated_report.py
@@ -91,5 +96,5 @@ ou un résultat statistiquement non concluant reste visible sans transformer ce 
 Le rejeu exact ne prouve que le corpus et les versions déclarées. La preuve distributionnelle ne porte que
 sur ses scénarios, cohorts, métriques, marges et puissance documentés et ne devient jamais une preuve
 exacte. Le rapport ne constitue ni un backtesting empirique Azure DevOps, ni une équivalence universelle,
-ni une décision de migration ou de compatibilité pour une future version. L’enforcement complet dans
-`main` appartient au PBI 2.21.
+ni une décision de migration à la place de l’autorité de compatibilité. L’enforcement complet dans `main`
+appartient au PBI 2.21.

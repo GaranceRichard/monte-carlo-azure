@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1106,
+      "logicalCases": 1121,
       "nodes": [
         {
           "id": "preflight",
@@ -409,6 +409,21 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_compatibility.py::test_current_authority_is_closed_complete_and_deterministic",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_authority_semantics_reject_duplicate_unknown_and_mismatched_references",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_consolidated_compatibility_maps_blocked_control_error_and_invalid_states",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_evidence_validation_covers_control_errors_counters_and_status",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_release_target_surface_baseline_and_current_version_are_validated",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_structural_and_catalog_failures_are_explicit",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_typescript_extractor_handles_comments_strings_and_malformed_declarations",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_accepted_release_history_and_new_proof_lineage_cannot_be_rewritten",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_canonical_evidence_is_current_and_entrypoints_execute",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_committed_authority_loader_handles_git_outcomes",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_committed_authority_loader_handles_process_failure",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_evolution_rejects_removed_authorities_and_untraced_manifest_edits",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_proof_manifest_change_requires_version_and_component_release",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_release_decision_must_match_semantics_identity_and_treatments",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_release_rejects_error_classification_incomplete_proofs_and_bad_plans",
             "pytest:tests/test_statistical_consolidated_report.py::test_all_semantic_inconsistency_guards_are_actionable",
             "pytest:tests/test_statistical_consolidated_report.py::test_closed_report_schema_and_independent_validator_reject_drift",
             "pytest:tests/test_statistical_consolidated_report.py::test_documentation_and_backlog_preserve_scope_and_informational_enforcement",
@@ -531,18 +546,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 416
+            "pytest": 431
           },
           "natures": {
-            "component": 76,
+            "component": 79,
             "contract": 46,
             "integration": 32,
-            "unit": 262
+            "unit": 274
           },
           "criticalities": {
             "critical": 73,
             "high": 16,
-            "unassigned": 327
+            "unassigned": 342
           }
         },
         {
@@ -1369,7 +1384,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1343,
+      "logicalCases": 1369,
       "nodes": [
         {
           "id": "preflight",
@@ -1870,6 +1885,32 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_compatibility.py::test_comments_and_descriptive_documentation_do_not_create_false_drift",
+            "pytest:tests/test_statistical_compatibility.py::test_controlled_mutations_are_blocked_for_the_expected_reason",
+            "pytest:tests/test_statistical_compatibility.py::test_current_authority_is_closed_complete_and_deterministic",
+            "pytest:tests/test_statistical_compatibility.py::test_engine_and_corpus_coordinated_edit_cannot_hide_draw_order_drift",
+            "pytest:tests/test_statistical_compatibility.py::test_missing_authority_and_direct_fingerprint_edit_are_explicit_control_failures",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_authority_semantics_reject_duplicate_unknown_and_mismatched_references",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_common_json_helpers_reject_duplicates_and_invalid_pointers",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_consolidated_compatibility_maps_blocked_control_error_and_invalid_states",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_evidence_validation_covers_control_errors_counters_and_status",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_markdown_python_json_and_unknown_extractors_fail_closed",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_proof_catalog_rejects_unavailable_invalid_and_unbound_proofs",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_release_target_surface_baseline_and_current_version_are_validated",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_structural_and_catalog_failures_are_explicit",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_typescript_extractor_handles_comments_strings_and_malformed_declarations",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_accepted_release_history_and_new_proof_lineage_cannot_be_rewritten",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_ambiguous_authority_and_direct_proof_fingerprint_edit_are_blocked",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_canonical_evidence_is_current_and_entrypoints_execute",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_cli_is_blocking_but_is_not_a_main_profile_step",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_cli_load_schema_and_freshness_failures_are_explicit",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_committed_authority_loader_handles_git_outcomes",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_committed_authority_loader_handles_process_failure",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_evolution_rejects_removed_authorities_and_untraced_manifest_edits",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_mixed_proof_versions_and_stale_evidence_are_rejected",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_proof_manifest_change_requires_version_and_component_release",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_release_decision_must_match_semantics_identity_and_treatments",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_release_rejects_error_classification_incomplete_proofs_and_bad_plans",
             "pytest:tests/test_statistical_consolidated_report.py::test_all_semantic_inconsistency_guards_are_actionable",
             "pytest:tests/test_statistical_consolidated_report.py::test_closed_report_schema_and_independent_validator_reject_drift",
             "pytest:tests/test_statistical_consolidated_report.py::test_distributional_divergence_and_inconclusive_never_become_exact_match",
@@ -2096,18 +2137,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 621
+            "pytest": 647
           },
           "natures": {
-            "component": 76,
+            "component": 79,
             "contract": 46,
-            "integration": 237,
-            "unit": 262
+            "integration": 248,
+            "unit": 274
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 515
+            "unassigned": 541
           }
         },
         {
@@ -2975,7 +3016,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1344,
+      "logicalCases": 1370,
       "nodes": [
         {
           "id": "preflight",
@@ -3476,6 +3517,32 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_compatibility.py::test_comments_and_descriptive_documentation_do_not_create_false_drift",
+            "pytest:tests/test_statistical_compatibility.py::test_controlled_mutations_are_blocked_for_the_expected_reason",
+            "pytest:tests/test_statistical_compatibility.py::test_current_authority_is_closed_complete_and_deterministic",
+            "pytest:tests/test_statistical_compatibility.py::test_engine_and_corpus_coordinated_edit_cannot_hide_draw_order_drift",
+            "pytest:tests/test_statistical_compatibility.py::test_missing_authority_and_direct_fingerprint_edit_are_explicit_control_failures",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_authority_semantics_reject_duplicate_unknown_and_mismatched_references",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_common_json_helpers_reject_duplicates_and_invalid_pointers",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_consolidated_compatibility_maps_blocked_control_error_and_invalid_states",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_evidence_validation_covers_control_errors_counters_and_status",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_markdown_python_json_and_unknown_extractors_fail_closed",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_proof_catalog_rejects_unavailable_invalid_and_unbound_proofs",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_release_target_surface_baseline_and_current_version_are_validated",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_structural_and_catalog_failures_are_explicit",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_typescript_extractor_handles_comments_strings_and_malformed_declarations",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_accepted_release_history_and_new_proof_lineage_cannot_be_rewritten",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_ambiguous_authority_and_direct_proof_fingerprint_edit_are_blocked",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_canonical_evidence_is_current_and_entrypoints_execute",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_cli_is_blocking_but_is_not_a_main_profile_step",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_cli_load_schema_and_freshness_failures_are_explicit",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_committed_authority_loader_handles_git_outcomes",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_committed_authority_loader_handles_process_failure",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_evolution_rejects_removed_authorities_and_untraced_manifest_edits",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_mixed_proof_versions_and_stale_evidence_are_rejected",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_proof_manifest_change_requires_version_and_component_release",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_release_decision_must_match_semantics_identity_and_treatments",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_release_rejects_error_classification_incomplete_proofs_and_bad_plans",
             "pytest:tests/test_statistical_consolidated_report.py::test_all_semantic_inconsistency_guards_are_actionable",
             "pytest:tests/test_statistical_consolidated_report.py::test_closed_report_schema_and_independent_validator_reject_drift",
             "pytest:tests/test_statistical_consolidated_report.py::test_distributional_divergence_and_inconclusive_never_become_exact_match",
@@ -3703,18 +3770,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 622
+            "pytest": 648
           },
           "natures": {
-            "component": 76,
+            "component": 79,
             "contract": 46,
-            "integration": 237,
-            "unit": 263
+            "integration": 248,
+            "unit": 275
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 516
+            "unassigned": 542
           }
         },
         {
@@ -4582,7 +4649,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1345,
+      "logicalCases": 1371,
       "nodes": [
         {
           "id": "preflight",
@@ -5084,6 +5151,32 @@
             "pytest:tests/test_simulation_value_objects.py::test_throughput_enforces_raw_and_usable_sample_limits",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_collection_and_zero_week_flag",
             "pytest:tests/test_simulation_value_objects.py::test_throughput_rejects_invalid_values_before_zero_processing",
+            "pytest:tests/test_statistical_compatibility.py::test_comments_and_descriptive_documentation_do_not_create_false_drift",
+            "pytest:tests/test_statistical_compatibility.py::test_controlled_mutations_are_blocked_for_the_expected_reason",
+            "pytest:tests/test_statistical_compatibility.py::test_current_authority_is_closed_complete_and_deterministic",
+            "pytest:tests/test_statistical_compatibility.py::test_engine_and_corpus_coordinated_edit_cannot_hide_draw_order_drift",
+            "pytest:tests/test_statistical_compatibility.py::test_missing_authority_and_direct_fingerprint_edit_are_explicit_control_failures",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_authority_semantics_reject_duplicate_unknown_and_mismatched_references",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_common_json_helpers_reject_duplicates_and_invalid_pointers",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_consolidated_compatibility_maps_blocked_control_error_and_invalid_states",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_evidence_validation_covers_control_errors_counters_and_status",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_markdown_python_json_and_unknown_extractors_fail_closed",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_proof_catalog_rejects_unavailable_invalid_and_unbound_proofs",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_release_target_surface_baseline_and_current_version_are_validated",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_structural_and_catalog_failures_are_explicit",
+            "pytest:tests/test_statistical_compatibility_edges.py::test_typescript_extractor_handles_comments_strings_and_malformed_declarations",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_accepted_release_history_and_new_proof_lineage_cannot_be_rewritten",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_ambiguous_authority_and_direct_proof_fingerprint_edit_are_blocked",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_canonical_evidence_is_current_and_entrypoints_execute",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_cli_is_blocking_but_is_not_a_main_profile_step",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_cli_load_schema_and_freshness_failures_are_explicit",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_committed_authority_loader_handles_git_outcomes",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_committed_authority_loader_handles_process_failure",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_evolution_rejects_removed_authorities_and_untraced_manifest_edits",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_mixed_proof_versions_and_stale_evidence_are_rejected",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_proof_manifest_change_requires_version_and_component_release",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_release_decision_must_match_semantics_identity_and_treatments",
+            "pytest:tests/test_statistical_compatibility_evolution.py::test_release_rejects_error_classification_incomplete_proofs_and_bad_plans",
             "pytest:tests/test_statistical_consolidated_report.py::test_all_semantic_inconsistency_guards_are_actionable",
             "pytest:tests/test_statistical_consolidated_report.py::test_closed_report_schema_and_independent_validator_reject_drift",
             "pytest:tests/test_statistical_consolidated_report.py::test_distributional_divergence_and_inconclusive_never_become_exact_match",
@@ -5311,18 +5404,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 623
+            "pytest": 649
           },
           "natures": {
-            "component": 76,
+            "component": 79,
             "contract": 46,
-            "integration": 238,
-            "unit": 263
+            "integration": 249,
+            "unit": 275
           },
           "criticalities": {
             "critical": 86,
             "high": 20,
-            "unassigned": 517
+            "unassigned": 543
           }
         },
         {

@@ -80,6 +80,24 @@ def _proof_lines(report: dict[str, Any]) -> list[str]:
     return lines
 
 
+def _compatibility_lines(report: dict[str, Any]) -> list[str]:
+    compatibility = report["compatibility"]
+    summary = compatibility["summary"]
+    return [
+        "## Compatibilité statistique",
+        "",
+        f"- Statut : `{compatibility['status']}`.",
+        f"- Autorité : `{compatibility['authority']['id']}` "
+        f"version `{compatibility['authority']['version']}`.",
+        "- Exécution directe : bloquante ; intégration obligatoire au profil "
+        "`main` réservée au PBI 2.21.",
+        f"- Composants conformes : {summary['matching_component_count']}/"
+        f"{summary['component_count']}.",
+        f"- Preuves conformes : {summary['matching_proof_count']}/{summary['proof_count']}.",
+        f"- Diagnostics : {summary['diagnostic_count']}.",
+    ]
+
+
 def _case_lines(report: dict[str, Any]) -> list[str]:
     lines = [
         "## Cas normatifs et rejeu exact",
@@ -174,6 +192,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         "",
         *_proof_lines(report),
         "",
+        *_compatibility_lines(report),
+        "",
         *_source_lines(report),
         "",
         *_case_lines(report),
@@ -192,10 +212,9 @@ def render_markdown(report: dict[str, Any]) -> str:
         "ne démontre pas "
         "une équivalence universelle.",
         "",
-        "Ces preuves ne constituent pas un backtesting empirique Azure DevOps. La décision de "
-        "compatibilité des futures versions reste hors périmètre, et l’enforcement complet dans "
-        "le profil "
-        "`main` appartient au PBI 2.21.",
+        "Ces preuves ne constituent pas un backtesting empirique Azure DevOps. Les dérives de "
+        "version et décisions de compatibilité sont contrôlées par la preuve spécialisée ; "
+        "l’enforcement complet dans le profil `main` appartient au PBI 2.21.",
     ]
     return "\n".join(lines) + "\n"
 

@@ -91,6 +91,7 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   `tests/test_simulation_service.py`, `tests/test_api_history.py`, `tests/test_simulation_store.py`,
   `frontend/src/api/simulationMappers.test.ts`, `frontend/src/storage/simulationHistoryMappers.test.ts`,
   `Scripts/run_statistical_exact_replay.py`, `reports/statistical-exact-replay-evidence.json`,
+  `Scripts/run_statistical_compatibility.py`, `reports/statistical-compatibility-evidence.json`,
   `Scripts/generate_statistical_consolidated_report.py`, `reports/statistical-consolidated-report.json`,
   `tests/test_statistical_exact_replay.py`, `tests/test_statistical_corpus_runner.py`,
   `frontend/src/statisticalCorpusRunner.test.ts`.
@@ -102,8 +103,10 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   indépendants du batching et aucun diagnostic. Le protocole distributionnel distinct exécute cinq
   scénarios sur cohorts disjointes, compare 49 métriques avec contrôle des comparaisons multiples et conclut
   actuellement `match`, sans utiliser les attendus exacts comme oracle. Le rapport consolidé vérifie et
-  localise ces garanties, les 22 sondes, leurs versions, empreintes et limites dans une autorité unique.
-  Toutes ces preuves restent informatives : il n’existe toujours ni gate de parité bloquante, ni test de charge, ni preuve
+  localise ces garanties, les 22 sondes, leurs versions, empreintes et limites dans une autorité unique. Le
+  contrôle de compatibilité bloque directement toute dérive non décidée et exige les traitements historiques
+  associés. Ces preuves ne sont pas encore intégrées à la gate `main` : il n’existe toujours ni gate complète
+  de parité et compatibilité, ni test de charge, ni preuve
   d'annulation du thread après timeout, ni politique de proxy de confiance.
 
 ### CP-004 — Flux onboarding critique
@@ -157,8 +160,11 @@ Ces candidats ne font pas partie de la liste officielle et ne sont pas présent�
 ### CP-006 — Restaurer ou rejouer une simulation
 
 Important pour éviter `RISK-008`, ce parcours invalide les résultats lorsque les paramètres significatifs
-changent et réutilise une seed connue. Il reste partiellement couvert faute d'E2E complet et de migrations de
-cache démontrées; les PBI 10.3 et 10.4 doivent traiter ces limites avant toute promotion.
+changent et réutilise une seed connue. L’autorité statistique impose désormais, selon la compatibilité,
+lecture legacy sans rejeu, migration déterministe, invalidation, purge, archivage versionné ou rejet. Aucun
+traitement réel n’est déclenché sans dérive acceptée. Le parcours reste partiellement couvert faute d'E2E
+complet et de migrations de cache démontrées ; les PBI 10.3 et 10.4 doivent traiter ces limites avant toute
+promotion.
 
 ### CP-007 — Persister et reprendre l'historique MongoDB
 
@@ -171,6 +177,8 @@ réelle et le multi-worker ne sont pas maîtrisés. Traitement prévu par les PB
 Important pour `RISK-020`, ce parcours orchestre couvertures, fraîcheur des artefacts, Vitals et ratchet. Il
 inclut maintenant classification, dénombrement, gouvernance des skips, quarantaines et retries, ainsi qu'un
 reporting stratégique consolidé qui distingue conformité opérationnelle et complétude des preuves. Le chemin
+statistique dispose aussi d’une preuve canonique de compatibilité et de mutations contrôlées, consommée par
+le rapport consolidé sans être encore raccordée au profil `main`. Le chemin
 de commit impose aussi, via `Scripts/pre_commit_guard.py`, un `README.md` racine ajouté ou modifié dans tout
 index non vide ; `tests/test_pre_commit_guard.py` couvre les statuts et les cas de refus sans muter l'index
 réel. Le parcours reste partiellement couvert : le rapport rend le mutation testing et la démonstration

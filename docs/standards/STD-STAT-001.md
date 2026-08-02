@@ -398,6 +398,10 @@ un histogramme ou la forme d'une réponse **DOIT** entraîner une décision expl
 à jour de version, une mise à jour du corpus partagé et une migration ou une invalidation documentée des
 historiques et caches concernés.
 
+L’[autorité de compatibilité](../statistical-compatibility.md) **DOIT** relier les surfaces modifiées à leurs
+versions, dépendances, empreintes sémantiques, preuves régénérées et traitements des résultats antérieurs.
+Une empreinte seule, un corpus seul ou l’accord simultané de deux moteurs **NE DOIT PAS** valoir décision.
+
 ### STAT-PAR-049 — Adoption et preuve de conformité
 
 L’adoption documentaire du présent standard **NE DOIT PAS** être interprétée comme une preuve

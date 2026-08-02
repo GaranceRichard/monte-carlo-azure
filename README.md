@@ -94,6 +94,8 @@ une connexion Azure DevOps réelle.
   indépendant du découpage en lots pour les configurations couvertes par la
   [preuve de rejeu versionnée](reports/statistical-exact-replay-evidence.json). Cette garantie reste liée
   aux versions déclarées du moteur, du contrat statistique et du contrat aléatoire.
+- **Compatibilité explicite.** La rejouabilité et l’interprétation des résultats sont liées à des versions
+  déclarées ; toute évolution incompatible exige une décision documentée de migration ou d’invalidation.
 - **Validation distributionnelle distincte.** Des cohorts reproductibles de seeds différentes comparent
   aussi les lois de sortie, les censures et la disponibilité des indicateurs ; cette preuve statistique
   symétrique complète le rejeu exact sans le remplacer et reste distincte du backtesting sur données réelles.

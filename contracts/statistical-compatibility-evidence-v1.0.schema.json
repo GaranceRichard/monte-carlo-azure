@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/statistical-compatibility-evidence/1.0",
+  "title": "Statistical compatibility evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["evidence_version", "proof_kind", "authority", "enforcement", "status", "classification", "components", "proof_artifacts", "summary", "diagnostics", "stability"],
+  "properties": {
+    "evidence_version": { "const": "1.0" },
+    "proof_kind": { "const": "statistical_compatibility" },
+    "authority": { "$ref": "#/$defs/authority" },
+    "enforcement": { "$ref": "#/$defs/enforcement" },
+    "status": { "enum": ["match", "blocked", "control_error"] },
+    "classification": { "$ref": "#/$defs/classification" },
+    "components": { "type": "array", "items": { "$ref": "#/$defs/component" } },
+    "proof_artifacts": { "type": "array", "items": { "$ref": "#/$defs/proof" } },
+    "summary": { "$ref": "#/$defs/summary" },
+    "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/diagnostic" } },
+    "stability": { "$ref": "#/$defs/stability" }
+  },
+  "$defs": {
+    "sha": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "nullable_sha": { "anyOf": [{ "$ref": "#/$defs/sha" }, { "type": "null" }] },
+    "classification": { "enum": ["no_normative_impact", "compatible_without_historical_result_change", "compatible_contract_extension", "normative_result_change", "replay_incompatibility", "pseudo_random_stream_change", "serialized_shape_change", "migration_required", "invalidation_required", "decision_missing", "version_not_incremented", "corpus_or_proof_not_updated", "compatibility_control_error"] },
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "version", "schema_version", "semantic_fingerprint"],
+      "properties": { "id": { "const": "mca-statistical-compatibility-authority" }, "version": { "const": "1.0" }, "schema_version": { "const": "1.0" }, "semantic_fingerprint": { "$ref": "#/$defs/sha" } }
+    },
+    "enforcement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["direct_execution", "main_profile", "main_integration_scope"],
+      "properties": { "direct_execution": { "const": "blocking" }, "main_profile": { "const": "not_integrated" }, "main_integration_scope": { "const": "PBI 2.21" } }
+    },
+    "data_treatment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["category", "treatment", "rationale", "evidence"],
+      "properties": { "category": { "type": "string" }, "treatment": { "type": "string" }, "rationale": { "type": "string" }, "evidence": { "type": "array", "items": { "type": "string" } } }
+    },
+    "component": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "identity", "current_version", "surfaces", "expected_semantic_fingerprint", "actual_semantic_fingerprint", "classification", "decision_id", "required_proofs", "affected_data", "data_treatments", "status"],
+      "properties": {
+        "id": { "type": "string" }, "identity": { "type": "string" }, "current_version": { "type": "string" },
+        "surfaces": { "type": "array", "items": { "type": "string" } },
+        "expected_semantic_fingerprint": { "$ref": "#/$defs/sha" }, "actual_semantic_fingerprint": { "$ref": "#/$defs/nullable_sha" },
+        "classification": { "$ref": "#/$defs/classification" }, "decision_id": { "type": "string" },
+        "required_proofs": { "type": "array", "items": { "type": "string" } }, "affected_data": { "type": "array", "items": { "type": "string" } },
+        "data_treatments": { "type": "array", "items": { "$ref": "#/$defs/data_treatment" } }, "status": { "enum": ["match", "blocked"] }
+      }
+    },
+    "proof": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "version", "expected_semantic_fingerprint", "actual_semantic_fingerprint", "status"],
+      "properties": { "id": { "type": "string" }, "version": { "type": "string" }, "expected_semantic_fingerprint": { "$ref": "#/$defs/sha" }, "actual_semantic_fingerprint": { "$ref": "#/$defs/nullable_sha" }, "status": { "enum": ["match", "blocked"] } }
+    },
+    "summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["component_count", "matching_component_count", "blocked_component_count", "proof_count", "matching_proof_count", "diagnostic_count"],
+      "properties": { "component_count": { "type": "integer", "minimum": 0 }, "matching_component_count": { "type": "integer", "minimum": 0 }, "blocked_component_count": { "type": "integer", "minimum": 0 }, "proof_count": { "type": "integer", "minimum": 0 }, "matching_proof_count": { "type": "integer", "minimum": 0 }, "diagnostic_count": { "type": "integer", "minimum": 0 } }
+    },
+    "diagnostic": {
+      "type": "object", "additionalProperties": false,
+      "required": ["component", "previous_version", "current_version", "surface", "authority", "expected_fingerprint", "actual_fingerprint", "classification", "expected_decision", "declared_decision", "missing_proofs", "affected_data", "corrective_action", "code"],
+      "properties": {
+        "component": { "type": "string" }, "previous_version": { "type": ["string", "null"] }, "current_version": { "type": ["string", "null"] }, "surface": { "type": ["string", "null"] }, "authority": { "type": "string" },
+        "expected_fingerprint": { "$ref": "#/$defs/nullable_sha" }, "actual_fingerprint": { "$ref": "#/$defs/nullable_sha" }, "classification": { "$ref": "#/$defs/classification" },
+        "expected_decision": { "type": "string" }, "declared_decision": { "type": ["string", "null"] }, "missing_proofs": { "type": "array", "items": { "type": "string" } }, "affected_data": { "type": "array", "items": { "type": "string" } }, "corrective_action": { "type": "string" }, "code": { "type": "string" }
+      }
+    },
+    "stability": {
+      "type": "object", "additionalProperties": false,
+      "required": ["deterministic", "method", "artifact_fingerprint"],
+      "properties": { "deterministic": { "const": true }, "method": { "const": "sha256-canonical-json-without-artifact-fingerprint" }, "artifact_fingerprint": { "$ref": "#/$defs/sha" } }
+    }
+  }
+}

@@ -35,10 +35,15 @@ from Scripts.statistical_consolidated_validation import validate_sources
 def _compatibility(
     records: dict[str, SourceRecord], diagnostics: list[dict[str, Any]]
 ) -> dict[str, Any]:
+    evidence = records["compatibility_evidence"]
     incompatible = any(item["classification"] == "version_incompatibility" for item in diagnostics)
     incomplete = any(record.entry["validation_status"] != "valid" for record in records.values())
     status = (
-        "version_incompatibility" if incompatible else "not_evaluated" if incomplete else "match"
+        "version_incompatibility"
+        if incompatible
+        else "not_evaluated"
+        if incomplete
+        else evidence.data["status"]
     )
     declarations = [
         {
@@ -49,9 +54,32 @@ def _compatibility(
         }
         for record in records.values()
     ]
+    evidence_data = evidence.data if isinstance(evidence.data, dict) else {}
+    fallback_authority = {
+        "id": "mca-statistical-compatibility-authority",
+        "version": "1.0",
+        "schema_version": "1.0",
+        "semantic_fingerprint": "0" * 64,
+    }
+    fallback_summary = {
+        "component_count": 0,
+        "matching_component_count": 0,
+        "blocked_component_count": 0,
+        "proof_count": 0,
+        "matching_proof_count": 0,
+        "diagnostic_count": 0,
+    }
     return {
         "status": status,
-        "scope": "Declared identities and versions only; no migration or future-version decision.",
+        "scope": (
+            "Versioned semantic authorities, compatibility decisions, proof freshness, "
+            "and explicit "
+            "historical-data treatments."
+        ),
+        "source": "compatibility_evidence",
+        "blocking_when_executed": True,
+        "authority": evidence_data.get("authority", fallback_authority),
+        "summary": evidence_data.get("summary", fallback_summary),
         "declarations": declarations,
     }
 
@@ -66,12 +94,6 @@ def _not_evaluated() -> list[dict[str, str]]:
             "id": "universal_equivalence",
             "statement": (
                 "No equivalence is claimed outside recorded corpus cases and protocol scenarios."
-            ),
-        },
-        {
-            "id": "future_version_compatibility",
-            "statement": (
-                "No compatibility decision or migration for future versions is evaluated."
             ),
         },
         {

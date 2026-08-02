@@ -117,4 +117,15 @@ SOURCE_DEFINITIONS = (
         "contracts/statistical-distribution-evidence-v1.0.schema.json",
         True,
     ),
+    SourceDefinition(
+        "compatibility_evidence",
+        "compatibility_evidence",
+        "reports/statistical-compatibility-evidence.json",
+        "statistical_compatibility",
+        "1.0",
+        ("proof_kind",),
+        ("evidence_version",),
+        "contracts/statistical-compatibility-evidence-v1.0.schema.json",
+        True,
+    ),
 )

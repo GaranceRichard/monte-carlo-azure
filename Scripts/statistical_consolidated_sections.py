@@ -88,6 +88,17 @@ def _distribution_level(record: SourceRecord, diagnostics: list[dict[str, Any]])
     }[record.data["status"]]
 
 
+def _compatibility_level(record: SourceRecord, diagnostics: list[dict[str, Any]]) -> str:
+    unavailable = _record_status(record, diagnostics)
+    if unavailable:
+        return unavailable
+    return {
+        "match": "match",
+        "blocked": "version_incompatibility",
+        "control_error": "invalid_evidence",
+    }[record.data["status"]]
+
+
 def _counters(**values: int) -> list[dict[str, Any]]:
     return [{"id": key, "value": value} for key, value in values.items()]
 
@@ -185,12 +196,37 @@ def _distribution_proof(
     }
 
 
+def _compatibility_proof(record: SourceRecord, diagnostics: list[dict[str, Any]]) -> dict[str, Any]:
+    summary = record.data.get("summary", {}) if isinstance(record.data, dict) else {}
+    return {
+        "id": "statistical_compatibility",
+        "status": _compatibility_level(record, diagnostics),
+        "source": "compatibility_evidence",
+        "scope": (
+            "Versioned semantic authorities, decisions, proofs, and "
+            "historical-data treatments."
+        ),
+        "counters": _counters(
+            components=summary.get("component_count", 0),
+            matching_components=summary.get("matching_component_count", 0),
+            proofs=summary.get("proof_count", 0),
+            matching_proofs=summary.get("matching_proof_count", 0),
+            diagnostics=summary.get("diagnostic_count", 0),
+        ),
+        "limits": [
+            "The control blocks when called directly; complete main-profile "
+            "integration is PBI 2.21."
+        ],
+    }
+
+
 def build_proof_levels(
     records: dict[str, SourceRecord], diagnostics: list[dict[str, Any]]
 ) -> list[dict[str, Any]]:
     parity = records["deterministic_parity"]
     exact = records["exact_replay"]
     distribution = records["distribution_evidence"]
+    compatibility = records["compatibility_evidence"]
     parity_summary = parity.data.get("summary", {}) if isinstance(parity.data, dict) else {}
     probe_summary = (
         parity.data.get("validation_alignment", {}).get("summary", {})
@@ -207,6 +243,7 @@ def build_proof_levels(
         _exact_proof(exact, exact_summary, diagnostics),
         _batch_proof(exact, exact_summary, diagnostics),
         _distribution_proof(distribution, dist_summary, diagnostics),
+        _compatibility_proof(compatibility, diagnostics),
     ]
 
 

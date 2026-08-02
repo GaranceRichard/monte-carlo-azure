@@ -459,7 +459,10 @@ exacte seed par seed ; elle ne mesure ni ne revendique une équivalence distribu
 seeds. Une divergence fonctionnelle reste visible sans rendre ce contrôle bloquant, tandis qu’un schéma ou
 corpus invalide, un plan de batch invalide, une erreur d’infrastructure ou un moteur inexécutable rendent
 la commande inexécutable avec un code non nul. La consolidation générale des rapports, l’intégration au
-profil `main` et les décisions de compatibilité restent des responsabilités distinctes.
+profil `main` et les décisions de compatibilité restent des responsabilités distinctes. Le
+[contrôle de compatibilité](statistical-compatibility.md) vérifie séparément l’empreinte du protocole, le
+corpus, les sondes et cette preuve : leur mise à jour coordonnée ne peut donc pas masquer une dérive d’un
+moteur, de l’ordre des tirages ou d’une règle statistique.
 
 ## Sondes de validation et forme canonique
 
@@ -560,3 +563,8 @@ La version `1.0` est immuable. Toute évolution incompatible des entrées, de la
 niveau de preuve requiert une nouvelle version normative et une décision de compatibilité conforme à
 `STAT-PAR-048`. Ce versionnement du corpus ne modifie aucun DTO, payload API, document MongoDB ni objet
 `localStorage`.
+
+L’autorité de compatibilité distingue le schéma, les résultats attendus et les sondes. Une nouvelle version
+doit référencer les preuves exactes et distributionnelles régénérées, conserver la lignée des empreintes et
+déclarer le sort des résultats seedés, historiques, caches, exports et artefacts de rejeu. Modifier seulement
+le corpus, son numéro de version ou son empreinte ne suffit pas à accepter une évolution.

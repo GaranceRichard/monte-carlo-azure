@@ -12,6 +12,9 @@ from typing import Any
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
+from Scripts.statistical_compatibility_evidence import (
+    evidence_fingerprint as compatibility_fingerprint,
+)
 from Scripts.statistical_consolidated_source_catalog import (
     SOURCE_DEFINITIONS,
     SourceDefinition,
@@ -241,6 +244,9 @@ def _embedded_fingerprint(record: SourceRecord) -> list[dict[str, Any]]:
     elif record.definition.source_id == "distribution_seed_population":
         fingerprint = data.get("population_fingerprint")
         valid = None
+    elif record.definition.source_id == "compatibility_evidence":
+        fingerprint = data.get("stability", {}).get("artifact_fingerprint")
+        valid = fingerprint == compatibility_fingerprint(data)
     else:
         return []
     record.entry["canonical_fingerprint"] = fingerprint

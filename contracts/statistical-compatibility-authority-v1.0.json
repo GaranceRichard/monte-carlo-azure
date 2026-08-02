@@ -1,0 +1,488 @@
+{
+  "authority_id": "mca-statistical-compatibility-authority",
+  "authority_version": "1.0",
+  "schema_version": "1.0",
+  "extraction_method": {
+    "id": "mca-semantic-authority-extraction",
+    "version": "1.0",
+    "documentation": "docs/statistical-compatibility.md"
+  },
+  "classifications": [
+    "no_normative_impact",
+    "compatible_without_historical_result_change",
+    "compatible_contract_extension",
+    "normative_result_change",
+    "replay_incompatibility",
+    "pseudo_random_stream_change",
+    "serialized_shape_change",
+    "migration_required",
+    "invalidation_required",
+    "decision_missing",
+    "version_not_incremented",
+    "corpus_or_proof_not_updated",
+    "compatibility_control_error"
+  ],
+  "historical_treatments": [
+    "compatible_without_action",
+    "deterministic_migration",
+    "legacy_read_only_without_replay",
+    "invalidation",
+    "purge",
+    "archival_with_previous_version",
+    "explicit_rejection"
+  ],
+  "historical_data_categories": [
+    "backend_history",
+    "local_history",
+    "runtime_caches",
+    "reports_and_exports",
+    "generated_proofs",
+    "seeded_results",
+    "replay_artifacts"
+  ],
+  "normative_surfaces": [
+    "input_validation_and_normalization",
+    "resolved_defaults",
+    "seed_domain_and_resolution",
+    "prng_algorithm",
+    "draw_to_index_conversion",
+    "logical_draw_order",
+    "batching_behavior",
+    "simulation_modes_and_stop_conditions",
+    "censorship",
+    "percentiles_p50_p70_p90",
+    "risk_score",
+    "reliability_metrics_and_labels",
+    "histograms",
+    "canonical_response_shape",
+    "field_presence_and_absence",
+    "result_serialization",
+    "corpus_schema",
+    "corpus_expected_results",
+    "validation_probes",
+    "exact_replay_protocol",
+    "distributional_parity_protocol",
+    "persisted_results_and_history",
+    "caches_exports_and_replay_artifacts"
+  ],
+  "proof_artifacts": [
+    {
+      "id": "reference-corpus",
+      "path": "contracts/statistical-reference-corpus-v1.0.json",
+      "schema_path": "contracts/statistical-reference-corpus-v1.0.schema.json",
+      "version": "1.0",
+      "semantic_fingerprint": "8d448e6169832d663d460c31b6ed0fe027fb4ae95904212d16aadb418ebc3d28",
+      "version_bindings": [
+        { "pointer": "/schema_version", "expected": "1.0" },
+        { "pointer": "/normative_contract/version", "expected": "1.0" },
+        { "pointer": "/prng_contract/id", "expected": "mca-prng-v1" }
+      ]
+    },
+    {
+      "id": "validation-probes",
+      "path": "contracts/statistical-validation-probes-v1.0.json",
+      "schema_path": "contracts/statistical-validation-probes-v1.0.schema.json",
+      "version": "1.0",
+      "semantic_fingerprint": "edaae666e21023b39eb5a3fd0de5c0d2932d996672b56a3b561172ddbdd3f542",
+      "version_bindings": [
+        { "pointer": "/schema_version", "expected": "1.0" },
+        { "pointer": "/normative_contract", "expected": "STD-STAT-001" }
+      ]
+    },
+    {
+      "id": "deterministic-parity",
+      "path": "reports/statistical-parity-report.json",
+      "schema_path": "contracts/statistical-parity-report-v1.1.schema.json",
+      "version": "1.1",
+      "semantic_fingerprint": "9c03522244da4eddae86beaa7e068db9af6220e1fa159b4dfcb00c8cee3afc04",
+      "version_bindings": [
+        { "pointer": "/report_version", "expected": "1.1" },
+        { "pointer": "/corpus/schema_version", "expected": "1.0" },
+        { "pointer": "/corpus/prng_contract", "expected": "mca-prng-v1" }
+      ]
+    },
+    {
+      "id": "exact-replay",
+      "path": "reports/statistical-exact-replay-evidence.json",
+      "schema_path": "contracts/statistical-exact-replay-evidence-v1.0.schema.json",
+      "version": "1.0",
+      "semantic_fingerprint": "ad881e25fbce9a26be3954824dc18ce81a62bc4b8f0c15b03b4d32c85f66f060",
+      "version_bindings": [
+        { "pointer": "/report_version", "expected": "1.0" },
+        { "pointer": "/corpus/schema_version", "expected": "1.0" },
+        { "pointer": "/corpus/normative_contract/version", "expected": "1.0" },
+        { "pointer": "/corpus/prng_contract", "expected": "mca-prng-v1" }
+      ]
+    },
+    {
+      "id": "distribution-protocol",
+      "path": "contracts/statistical-distribution-protocol-v1.0.json",
+      "schema_path": "contracts/statistical-distribution-protocol-v1.0.schema.json",
+      "version": "1.0",
+      "semantic_fingerprint": "bec755f47ee8551b7a33fd36537df68b65e06c65b097f9c83cb1b0c02c1e94bd",
+      "version_bindings": [
+        { "pointer": "/version", "expected": "1.0" },
+        { "pointer": "/authorities/corpus/version", "expected": "1.0" },
+        { "pointer": "/authorities/normative_contract/version", "expected": "1.0" },
+        { "pointer": "/authorities/prng/version", "expected": "1.0" }
+      ]
+    },
+    {
+      "id": "distribution-seeds",
+      "path": "contracts/statistical-distribution-seeds-v1.0.json",
+      "schema_path": "contracts/statistical-distribution-seeds-v1.0.schema.json",
+      "version": "1.0",
+      "semantic_fingerprint": "6df0a2ccea365b45569a7de66e9fbff9b34ebdace0cad516fc54ade03b694d5d",
+      "version_bindings": [{ "pointer": "/version", "expected": "1.0" }]
+    },
+    {
+      "id": "distribution-calibration",
+      "path": "reports/statistical-distribution-calibration.json",
+      "schema_path": "contracts/statistical-distribution-calibration-v1.0.schema.json",
+      "version": "1.0",
+      "semantic_fingerprint": "f86f31835498f8858420ae1853a13fd9d8e1a5c4b28e03cb5f44441804108c45",
+      "version_bindings": [
+        { "pointer": "/calibration_version", "expected": "1.0" },
+        { "pointer": "/protocol/version", "expected": "1.0" }
+      ]
+    },
+    {
+      "id": "distribution-evidence",
+      "path": "reports/statistical-distribution-evidence.json",
+      "schema_path": "contracts/statistical-distribution-evidence-v1.0.schema.json",
+      "version": "1.0",
+      "semantic_fingerprint": "65d64ad9ae7bd1026c2c2c40d362f5654a1d1a22c8e295da6970822c7a6da1bf",
+      "version_bindings": [
+        { "pointer": "/evidence_version", "expected": "1.0" },
+        { "pointer": "/protocol/version", "expected": "1.0" },
+        { "pointer": "/authorities/corpus/version", "expected": "1.0" },
+        { "pointer": "/authorities/normative_contract/version", "expected": "1.0" },
+        { "pointer": "/authorities/prng/id", "expected": "mca-prng-v1" }
+      ]
+    }
+  ],
+  "components": [
+    {
+      "id": "input-contract",
+      "current_version": "1.0",
+      "surfaces": ["input_validation_and_normalization"],
+      "consumers": ["backend API", "Python engine", "TypeScript engine", "corpus runners"],
+      "dependencies": [],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-011", "STAT-PAR-012", "STAT-PAR-013", "STAT-PAR-014", "STAT-PAR-015", "STAT-PAR-016"] },
+        { "path": "backend/simulation_limits.py", "kind": "python_ast", "selectors": ["SIMULATION_N_SIMS_MIN", "SIMULATION_N_SIMS_MAX", "SIMULATION_TARGET_WEEKS_MIN", "SIMULATION_HORIZON_WEEKS_MAX", "SIMULATION_THROUGHPUT_SAMPLES_MIN", "SIMULATION_THROUGHPUT_SAMPLES_MAX", "SIMULATION_BACKLOG_SIZE_MIN", "SIMULATION_BACKLOG_SIZE_MAX"] },
+        { "path": "backend/simulation_value_objects.py", "kind": "python_ast", "selectors": ["_strict_integer", "_bounded_integer", "ThroughputSamples"] },
+        { "path": "backend/simulation_models.py", "kind": "python_ast", "selectors": ["SimulationCommand"] },
+        { "path": "frontend/src/domain/simulationValueObjects.ts", "kind": "typescript_declarations", "selectors": ["SIMULATION_N_SIMS_MIN", "SIMULATION_N_SIMS_MAX", "SIMULATION_TARGET_WEEKS_MIN", "SIMULATION_HORIZON_WEEKS_MAX", "SIMULATION_THROUGHPUT_SAMPLES_MIN", "SIMULATION_THROUGHPUT_SAMPLES_MAX", "SIMULATION_BACKLOG_SIZE_MIN", "SIMULATION_BACKLOG_SIZE_MAX", "strictInteger", "boundedInteger", "validateRawThroughput", "createThroughputSamples"] },
+        { "path": "frontend/src/domain/simulation.ts", "kind": "typescript_declarations", "selectors": ["COMMAND_INPUT_KEYS", "NORMALIZED_COMMON_KEYS", "NORMALIZED_ALLOWED_KEYS", "createSimulationCommand", "createSimulationCommandFromNormalizedInput"] },
+        { "path": "contracts/statistical-reference-corpus-v1.0.schema.json", "kind": "json_semantic", "selectors": ["/$defs/normalizedInput", "/$defs/throughputSamples", "/$defs/simulationCount"] }
+      ],
+      "required_proofs": ["validation-probes", "deterministic-parity", "exact-replay"],
+      "affected_data": ["replay_artifacts"],
+      "default_drift_classification": "normative_result_change",
+      "releases": [{
+        "version": "1.0", "identity": "STD-STAT-001-input-contract", "semantic_fingerprint": "5f8e4db976d08aa8c3cc374035846d42f862150199f237964f97aaa4e3d7db07",
+        "decision": { "id": "PBI-2.20-baseline-input-contract", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "5f8e4db976d08aa8c3cc374035846d42f862150199f237964f97aaa4e3d7db07", "changed_surfaces": [], "rationale": "Initial semantic baseline adopted without changing any statistical behavior.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["validation-probes", "deterministic-parity", "exact-replay"], "data_treatments": [{ "category": "replay_artifacts", "treatment": "compatible_without_action", "rationale": "The baseline records current behavior and does not alter existing replay artifacts.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }] }
+      }]
+    },
+    {
+      "id": "resolved-defaults",
+      "current_version": "1.0",
+      "surfaces": ["resolved_defaults"],
+      "consumers": ["backend API", "frontend forecast service", "normalized engine command"],
+      "dependencies": [{ "component": "input-contract", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-017"] },
+        { "path": "backend/api_models.py", "kind": "python_ast", "selectors": ["SimulateRequest"] },
+        { "path": "frontend/src/hooks/simulationForecastCore.ts", "kind": "typescript_declarations", "selectors": ["simulateForecastFromSamplesCore"] }
+      ],
+      "required_proofs": ["validation-probes", "deterministic-parity"],
+      "affected_data": ["seeded_results"],
+      "default_drift_classification": "normative_result_change",
+      "releases": [{
+        "version": "1.0", "identity": "STD-STAT-001-resolved-defaults", "semantic_fingerprint": "4fd6c645e9bcef1a6ea9f80d59b6727ea533998e2378aedf2dfa915a169390fe",
+        "decision": { "id": "PBI-2.20-baseline-resolved-defaults", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "4fd6c645e9bcef1a6ea9f80d59b6727ea533998e2378aedf2dfa915a169390fe", "changed_surfaces": [], "rationale": "Initial semantic baseline adopted without changing resolved defaults.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["validation-probes", "deterministic-parity"], "data_treatments": [{ "category": "seeded_results", "treatment": "compatible_without_action", "rationale": "No default changed while establishing this compatibility baseline.", "evidence": ["reports/statistical-parity-report.json"] }] }
+      }]
+    },
+    {
+      "id": "seed-contract",
+      "current_version": "1.0",
+      "surfaces": ["seed_domain_and_resolution"],
+      "consumers": ["backend API", "frontend UI", "both engines", "histories", "replay"],
+      "dependencies": [{ "component": "input-contract", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-006", "STAT-PAR-007", "STAT-PAR-008", "STAT-PAR-009", "STAT-PAR-010"] },
+        { "path": "backend/simulation_limits.py", "kind": "python_ast", "selectors": ["SIMULATION_SEED_MIN", "SIMULATION_SEED_MAX"] },
+        { "path": "backend/simulation_value_objects.py", "kind": "python_ast", "selectors": ["SimulationSeed"] },
+        { "path": "backend/simulation_seed.py", "kind": "python_ast", "selectors": ["resolve_simulation_seed"] },
+        { "path": "frontend/src/domain/simulationValueObjects.ts", "kind": "typescript_declarations", "selectors": ["SIMULATION_SEED_MIN", "SIMULATION_SEED_MAX", "createSimulationSeed"] },
+        { "path": "frontend/src/hooks/simulationSeedResolver.ts", "kind": "typescript_declarations", "selectors": ["resolveSimulationSeed"] }
+      ],
+      "required_proofs": ["validation-probes", "deterministic-parity", "exact-replay", "distribution-evidence"],
+      "affected_data": ["seeded_results", "replay_artifacts"],
+      "default_drift_classification": "replay_incompatibility",
+      "releases": [{
+        "version": "1.0", "identity": "STD-STAT-001-seed-contract", "semantic_fingerprint": "a16e57336adfa934348978474ba6b01ede971a63f1fd960b8082bc3faccec42c",
+        "decision": { "id": "PBI-2.20-baseline-seed-contract", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "a16e57336adfa934348978474ba6b01ede971a63f1fd960b8082bc3faccec42c", "changed_surfaces": [], "rationale": "Initial uint32 seed baseline adopted without changing seed resolution.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["validation-probes", "deterministic-parity", "exact-replay", "distribution-evidence"], "data_treatments": [{ "category": "seeded_results", "treatment": "compatible_without_action", "rationale": "Recorded seeds keep their current meaning under the adopted baseline.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "replay_artifacts", "treatment": "compatible_without_action", "rationale": "Existing replay artifacts already bind the current uint32 seed contract.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }] }
+      }]
+    },
+    {
+      "id": "prng",
+      "current_version": "1.0",
+      "surfaces": ["prng_algorithm", "draw_to_index_conversion"],
+      "consumers": ["Python engine", "TypeScript engine", "corpus derivation", "exact replay"],
+      "dependencies": [{ "component": "seed-contract", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-003"] },
+        { "path": "contracts/mca-prng-v1-vectors.json", "kind": "json_semantic", "selectors": [""] },
+        { "path": "backend/mca_prng_v1_sample_index_draw_port.py", "kind": "python_ast", "selectors": ["MCA_PRNG_V1_CONTRACT_ID", "_UINT32_MASK", "_UINT32_RANGE", "_STATE_INCREMENT", "_MAX_SAMPLE_COUNT", "_imul32", "McaPrngV1SampleIndexDrawPort"] },
+        { "path": "frontend/src/adapters/seededSampleIndexDrawPort.ts", "kind": "typescript_declarations", "selectors": ["MCA_PRNG_CONTRACT_ID", "STATE_INCREMENT", "createSeededSampleIndexDrawPort"] }
+      ],
+      "required_proofs": ["reference-corpus", "deterministic-parity", "exact-replay", "distribution-calibration", "distribution-evidence"],
+      "affected_data": ["seeded_results", "replay_artifacts", "generated_proofs"],
+      "default_drift_classification": "pseudo_random_stream_change",
+      "releases": [{
+        "version": "1.0", "identity": "mca-prng-v1", "semantic_fingerprint": "b3b9728649356db1e89a07dc56264b1fa0aa4a70b00ef47ee3ccb76cac8c7677",
+        "decision": { "id": "PBI-2.20-baseline-mca-prng-v1", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "b3b9728649356db1e89a07dc56264b1fa0aa4a70b00ef47ee3ccb76cac8c7677", "changed_surfaces": [], "rationale": "Initial mca-prng-v1 semantic baseline adopted from existing vectors and engines.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["reference-corpus", "deterministic-parity", "exact-replay", "distribution-calibration", "distribution-evidence"], "data_treatments": [{ "category": "seeded_results", "treatment": "compatible_without_action", "rationale": "Existing seeded results already use the adopted mca-prng-v1 identity.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "replay_artifacts", "treatment": "compatible_without_action", "rationale": "Existing replay artifacts bind the same PRNG identity and vectors.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "generated_proofs", "treatment": "compatible_without_action", "rationale": "Existing proofs were generated with the adopted mca-prng-v1 baseline.", "evidence": ["reports/statistical-distribution-evidence.json"] }] }
+      }]
+    },
+    {
+      "id": "draw-order-and-batching",
+      "current_version": "1.0",
+      "surfaces": ["logical_draw_order", "batching_behavior"],
+      "consumers": ["Python engine", "TypeScript local engine", "exact replay"],
+      "dependencies": [{ "component": "prng", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-004"] },
+        { "path": "backend/mc_core.py", "kind": "python_ast", "selectors": ["SIMULATION_BATCH_SIZE", "mc_finish_weeks", "mc_items_done_for_weeks", "_resolve_batch_size", "_draw_samples_batch"] },
+        { "path": "frontend/src/utils/simulation.ts", "kind": "typescript_declarations", "selectors": ["simulateBacklogToWeeks", "simulateWeeksToItems"] },
+        { "path": "frontend/src/adapters/seededSampleIndexDrawPort.ts", "kind": "typescript_declarations", "selectors": ["createSeededSampleIndexDrawPort"] }
+      ],
+      "required_proofs": ["reference-corpus", "deterministic-parity", "exact-replay"],
+      "affected_data": ["seeded_results", "replay_artifacts"],
+      "default_drift_classification": "replay_incompatibility",
+      "releases": [{
+        "version": "1.0", "identity": "STD-STAT-001-draw-order", "semantic_fingerprint": "64088f319ec7910aaad4e4f17ca7cb53d66da9359d7a9a384f6b17a7a25193bc",
+        "decision": { "id": "PBI-2.20-baseline-draw-order", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "64088f319ec7910aaad4e4f17ca7cb53d66da9359d7a9a384f6b17a7a25193bc", "changed_surfaces": [], "rationale": "Initial simulation-major draw-order and batch-independence baseline adopted.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["reference-corpus", "deterministic-parity", "exact-replay"], "data_treatments": [{ "category": "seeded_results", "treatment": "compatible_without_action", "rationale": "No logical draw slot changed while adopting this baseline.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "replay_artifacts", "treatment": "compatible_without_action", "rationale": "Existing batch evidence already demonstrates the adopted ordering.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }] }
+      }]
+    },
+    {
+      "id": "simulation-modes",
+      "current_version": "1.0",
+      "surfaces": ["simulation_modes_and_stop_conditions"],
+      "consumers": ["both engines", "API", "local simulation", "corpus"],
+      "dependencies": [{ "component": "draw-order-and-batching", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-018", "STAT-PAR-019"] },
+        { "path": "backend/mc_core.py", "kind": "python_ast", "selectors": ["mc_finish_weeks", "mc_items_done_for_weeks"] },
+        { "path": "backend/simulation_service.py", "kind": "python_ast", "selectors": ["_run_engine"] },
+        { "path": "frontend/src/utils/simulation.ts", "kind": "typescript_declarations", "selectors": ["simulateBacklogToWeeks", "simulateWeeksToItems", "simulateMonteCarloLocal"] }
+      ],
+      "required_proofs": ["reference-corpus", "deterministic-parity", "exact-replay", "distribution-evidence"],
+      "affected_data": ["backend_history", "local_history", "seeded_results"],
+      "default_drift_classification": "normative_result_change",
+      "releases": [{
+        "version": "1.0", "identity": "STD-STAT-001-simulation-modes", "semantic_fingerprint": "07aba8db3f98fdbdbaed887607077b1496fe1da6ada73eac1edf12086115ce01",
+        "decision": { "id": "PBI-2.20-baseline-simulation-modes", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "07aba8db3f98fdbdbaed887607077b1496fe1da6ada73eac1edf12086115ce01", "changed_surfaces": [], "rationale": "Initial mode and stopping-condition baseline adopted without formula changes.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["reference-corpus", "deterministic-parity", "exact-replay", "distribution-evidence"], "data_treatments": [{ "category": "backend_history", "treatment": "compatible_without_action", "rationale": "Backend history retains results produced by the unchanged current modes.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "local_history", "treatment": "compatible_without_action", "rationale": "Local history retains results produced by the unchanged current modes.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "seeded_results", "treatment": "compatible_without_action", "rationale": "Seeded results remain replayable under unchanged stopping conditions.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }] }
+      }]
+    },
+    {
+      "id": "censorship-and-percentiles",
+      "current_version": "1.0",
+      "surfaces": ["censorship", "percentiles_p50_p70_p90"],
+      "consumers": ["both engines", "Risk Score", "API", "history", "reports"],
+      "dependencies": [{ "component": "simulation-modes", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-020", "STAT-PAR-021", "STAT-PAR-022", "STAT-PAR-023", "STAT-PAR-024", "STAT-PAR-025"] },
+        { "path": "backend/mc_core.py", "kind": "python_ast", "selectors": ["FinishWeeksSimulation", "mc_finish_weeks", "percentiles"] },
+        { "path": "backend/simulation_service.py", "kind": "python_ast", "selectors": ["_resolve_result_population", "run_simulation_with_batch_size"] },
+        { "path": "frontend/src/utils/simulation.ts", "kind": "typescript_declarations", "selectors": ["discretePercentiles", "simulateBacklogToWeeks", "simulateMonteCarloLocal"] },
+        { "path": "frontend/src/domain/simulationValueObjects.ts", "kind": "typescript_declarations", "selectors": ["PERCENTILE_KEYS", "createSimulationPercentiles", "createCompletionSummary"] }
+      ],
+      "required_proofs": ["reference-corpus", "deterministic-parity", "exact-replay", "distribution-evidence"],
+      "affected_data": ["backend_history", "local_history", "reports_and_exports", "seeded_results"],
+      "default_drift_classification": "normative_result_change",
+      "releases": [{
+        "version": "1.0", "identity": "STD-STAT-001-censorship-percentiles", "semantic_fingerprint": "46507c89144f90b8f3a342e5c044acee94ac6383bad0bb3dca9297b86d931828",
+        "decision": { "id": "PBI-2.20-baseline-censorship-percentiles", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "46507c89144f90b8f3a342e5c044acee94ac6383bad0bb3dca9297b86d931828", "changed_surfaces": [], "rationale": "Initial censorship and P50/P70/P90 rules adopted without result changes.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["reference-corpus", "deterministic-parity", "exact-replay", "distribution-evidence"], "data_treatments": [{ "category": "backend_history", "treatment": "compatible_without_action", "rationale": "Stored backend percentiles keep their current normative interpretation.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "local_history", "treatment": "compatible_without_action", "rationale": "Stored local percentiles keep their current normative interpretation.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "reports_and_exports", "treatment": "compatible_without_action", "rationale": "Existing reports retain the same percentile and censorship semantics.", "evidence": ["reports/statistical-parity-report.json"] }, { "category": "seeded_results", "treatment": "compatible_without_action", "rationale": "No percentile rank or censorship rule changed for seeded results.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }] }
+      }]
+    },
+    {
+      "id": "risk-score",
+      "current_version": "1.0",
+      "surfaces": ["risk_score"],
+      "consumers": ["both engines", "API", "history", "UI", "PDF"],
+      "dependencies": [{ "component": "censorship-and-percentiles", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-026", "STAT-PAR-027", "STAT-PAR-028", "STAT-PAR-029"] },
+        { "path": "backend/risk_score.py", "kind": "python_ast", "selectors": ["round_positive_ratio_half_up"] },
+        { "path": "backend/simulation_value_objects.py", "kind": "python_ast", "selectors": ["SimulationPercentiles"] },
+        { "path": "frontend/src/domain/simulationValueObjects.ts", "kind": "typescript_declarations", "selectors": ["roundHalfUp", "createSimulationPercentiles", "riskScoreFromPercentiles"] },
+        { "path": "frontend/src/domain/riskScore.ts", "kind": "typescript_declarations", "selectors": ["roundPositiveRatioHalfUp"] }
+      ],
+      "required_proofs": ["reference-corpus", "deterministic-parity", "exact-replay", "distribution-evidence"],
+      "affected_data": ["backend_history", "local_history", "reports_and_exports"],
+      "default_drift_classification": "normative_result_change",
+      "releases": [{
+        "version": "1.0", "identity": "STD-STAT-001-risk-score", "semantic_fingerprint": "ddd785a52312b21b060f977e43d5e92bf6d043fd22052055b09f90a2525168bc",
+        "decision": { "id": "PBI-2.20-baseline-risk-score", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "ddd785a52312b21b060f977e43d5e92bf6d043fd22052055b09f90a2525168bc", "changed_surfaces": [], "rationale": "Initial Risk Score formula, absence guards, and rounding baseline adopted.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["reference-corpus", "deterministic-parity", "exact-replay", "distribution-evidence"], "data_treatments": [{ "category": "backend_history", "treatment": "compatible_without_action", "rationale": "Persisted backend scores already follow the adopted authority formula.", "evidence": ["reports/statistical-parity-report.json"] }, { "category": "local_history", "treatment": "compatible_without_action", "rationale": "Persisted local scores already follow the adopted authority formula.", "evidence": ["reports/statistical-parity-report.json"] }, { "category": "reports_and_exports", "treatment": "compatible_without_action", "rationale": "Reports consume the unchanged authoritative score without recalculation.", "evidence": ["reports/statistical-parity-report.json"] }] }
+      }]
+    },
+    {
+      "id": "throughput-reliability",
+      "current_version": "1.0",
+      "surfaces": ["reliability_metrics_and_labels"],
+      "consumers": ["both engines", "API", "history", "UI", "reports"],
+      "dependencies": [{ "component": "input-contract", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-030", "STAT-PAR-031", "STAT-PAR-032", "STAT-PAR-033", "STAT-PAR-034", "STAT-PAR-035"] },
+        { "path": "backend/throughput_reliability.py", "kind": "python_ast", "selectors": ["_linear_quantile", "_strict_samples", "calculate_throughput_reliability"] },
+        { "path": "backend/simulation_value_objects.py", "kind": "python_ast", "selectors": ["_categorize_reliability", "ThroughputReliability"] },
+        { "path": "frontend/src/domain/throughputReliability.ts", "kind": "typescript_declarations", "selectors": ["linearQuantile", "computeThroughputReliability"] },
+        { "path": "frontend/src/domain/simulationValueObjects.ts", "kind": "typescript_declarations", "selectors": ["RELIABILITY_LABELS", "categorizeReliability", "createThroughputReliability"] }
+      ],
+      "required_proofs": ["reference-corpus", "deterministic-parity", "exact-replay", "distribution-evidence"],
+      "affected_data": ["backend_history", "local_history", "reports_and_exports"],
+      "default_drift_classification": "normative_result_change",
+      "releases": [{
+        "version": "1.0", "identity": "STD-STAT-001-throughput-reliability", "semantic_fingerprint": "dc0ea2296d642b9695f7fbb101145711339b9162e3573a9c9a92adc2e4e6565b",
+        "decision": { "id": "PBI-2.20-baseline-throughput-reliability", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "dc0ea2296d642b9695f7fbb101145711339b9162e3573a9c9a92adc2e4e6565b", "changed_surfaces": [], "rationale": "Initial reliability metrics, thresholds, and ordered labels baseline adopted.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["reference-corpus", "deterministic-parity", "exact-replay", "distribution-evidence"], "data_treatments": [{ "category": "backend_history", "treatment": "compatible_without_action", "rationale": "Backend reliability fields preserve the adopted current interpretation.", "evidence": ["reports/statistical-parity-report.json"] }, { "category": "local_history", "treatment": "compatible_without_action", "rationale": "Local reliability fields preserve the adopted current interpretation.", "evidence": ["reports/statistical-parity-report.json"] }, { "category": "reports_and_exports", "treatment": "compatible_without_action", "rationale": "Reports preserve unchanged reliability metrics and label meanings.", "evidence": ["reports/statistical-parity-report.json"] }] }
+      }]
+    },
+    {
+      "id": "histogram",
+      "current_version": "1.0",
+      "surfaces": ["histograms"],
+      "consumers": ["both engines", "API", "history", "charts", "reports"],
+      "dependencies": [{ "component": "simulation-modes", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-036", "STAT-PAR-037", "STAT-PAR-038", "STAT-PAR-039"] },
+        { "path": "backend/histogram.py", "kind": "python_ast", "selectors": ["HISTOGRAM_MAX_BUCKETS", "build_histogram"] },
+        { "path": "backend/simulation_value_objects.py", "kind": "python_ast", "selectors": ["HistogramBucket", "Histogram"] },
+        { "path": "frontend/src/domain/histogram.ts", "kind": "typescript_declarations", "selectors": ["HISTOGRAM_MAX_BUCKETS", "buildHistogram"] },
+        { "path": "frontend/src/domain/simulationValueObjects.ts", "kind": "typescript_declarations", "selectors": ["createHistogram"] }
+      ],
+      "required_proofs": ["reference-corpus", "deterministic-parity", "exact-replay", "distribution-evidence"],
+      "affected_data": ["backend_history", "local_history", "reports_and_exports", "runtime_caches"],
+      "default_drift_classification": "normative_result_change",
+      "releases": [{
+        "version": "1.0", "identity": "STD-STAT-001-histogram", "semantic_fingerprint": "b5a1c1f15ea8b931e558c9b398d642fa2feac76e072f4fd76819f0e7db8e9f7b",
+        "decision": { "id": "PBI-2.20-baseline-histogram", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "b5a1c1f15ea8b931e558c9b398d642fa2feac76e072f4fd76819f0e7db8e9f7b", "changed_surfaces": [], "rationale": "Initial exact and aggregated histogram construction baseline adopted.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["reference-corpus", "deterministic-parity", "exact-replay", "distribution-evidence"], "data_treatments": [{ "category": "backend_history", "treatment": "compatible_without_action", "rationale": "Backend histogram history already uses the adopted geometry.", "evidence": ["reports/statistical-parity-report.json"] }, { "category": "local_history", "treatment": "compatible_without_action", "rationale": "Local histogram history already uses the adopted geometry.", "evidence": ["reports/statistical-parity-report.json"] }, { "category": "reports_and_exports", "treatment": "compatible_without_action", "rationale": "Reports and exports preserve the unchanged histogram representation.", "evidence": ["reports/statistical-parity-report.json"] }, { "category": "runtime_caches", "treatment": "compatible_without_action", "rationale": "No cached histogram requires invalidation for baseline adoption.", "evidence": ["docs/statistical-compatibility.md"] }] }
+      }]
+    },
+    {
+      "id": "canonical-response",
+      "current_version": "1.0",
+      "surfaces": ["canonical_response_shape", "field_presence_and_absence"],
+      "consumers": ["API clients", "frontend mappers", "history", "reports", "corpus runners"],
+      "dependencies": [{ "component": "censorship-and-percentiles", "version": "1.0" }, { "component": "risk-score", "version": "1.0" }, { "component": "throughput-reliability", "version": "1.0" }, { "component": "histogram", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-040", "STAT-PAR-041", "STAT-PAR-042", "STAT-PAR-043"] },
+        { "path": "backend/simulation_models.py", "kind": "python_ast", "selectors": ["SimulationResult"] },
+        { "path": "backend/api_models.py", "kind": "python_ast", "selectors": ["DistributionBucket", "ResultPercentiles", "ThroughputReliability", "CompletionSummary", "SimulateResponse"] },
+        { "path": "backend/simulation_mappers.py", "kind": "python_ast", "selectors": ["result_to_response"] },
+        { "path": "frontend/src/domain/simulation.ts", "kind": "typescript_declarations", "selectors": ["SimulationResult", "ServerSimulationHistoryItem"] },
+        { "path": "frontend/src/api/simulationDtos.ts", "kind": "typescript_declarations", "selectors": ["SimulationPercentilesDto", "HistogramBucketDto", "CompletionSummaryDto", "ThroughputReliabilityDto", "SimulateResponseDto"] },
+        { "path": "frontend/src/api/simulationMappers.ts", "kind": "typescript_declarations", "selectors": ["simulateResponseDtoToResult"] },
+        { "path": "contracts/statistical-reference-corpus-v1.0.schema.json", "kind": "json_semantic", "selectors": ["/$defs/expectedResult", "/$defs/resultPercentiles", "/$defs/histogramBucket", "/$defs/completionSummary", "/$defs/throughputReliability"] }
+      ],
+      "required_proofs": ["reference-corpus", "validation-probes", "deterministic-parity", "exact-replay"],
+      "affected_data": ["backend_history", "local_history", "reports_and_exports", "replay_artifacts"],
+      "default_drift_classification": "serialized_shape_change",
+      "releases": [{
+        "version": "1.0", "identity": "STD-STAT-001-canonical-response", "semantic_fingerprint": "a6fa38902743fa093abdee874f2b764604baecb7091f0e4f684768263c781311",
+        "decision": { "id": "PBI-2.20-baseline-canonical-response", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "a6fa38902743fa093abdee874f2b764604baecb7091f0e4f684768263c781311", "changed_surfaces": [], "rationale": "Initial closed canonical response and omission semantics baseline adopted.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["reference-corpus", "validation-probes", "deterministic-parity", "exact-replay"], "data_treatments": [{ "category": "backend_history", "treatment": "compatible_without_action", "rationale": "Backend history uses the current unchanged canonical response fields.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "local_history", "treatment": "compatible_without_action", "rationale": "Local history uses the current unchanged canonical response fields.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "reports_and_exports", "treatment": "compatible_without_action", "rationale": "Reports and exports consume the unchanged canonical response.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "replay_artifacts", "treatment": "compatible_without_action", "rationale": "Field presence and primitive types are already exact in replay evidence.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }] }
+      }]
+    },
+    {
+      "id": "serialization-and-history",
+      "current_version": "2.0",
+      "surfaces": ["result_serialization", "persisted_results_and_history", "caches_exports_and_replay_artifacts"],
+      "consumers": ["MongoDB history", "localStorage history", "API history", "exports", "replay artifacts"],
+      "dependencies": [{ "component": "canonical-response", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-043", "STAT-PAR-047", "STAT-PAR-048"] },
+        { "path": "backend/simulation_store.py", "kind": "python_ast", "selectors": ["_simulation_document"] },
+        { "path": "backend/api_models.py", "kind": "python_ast", "selectors": ["SimulationHistoryItem"] },
+        { "path": "backend/simulation_mappers.py", "kind": "python_ast", "selectors": ["persistence_row_to_history_item"] },
+        { "path": "frontend/src/storage/simulationHistoryDtos.ts", "kind": "typescript_declarations", "selectors": ["StoredSimulationResultDto", "SimulationHistoryEntryDto"] },
+        { "path": "frontend/src/domain/simulationHistory.ts", "kind": "typescript_declarations", "selectors": ["SimulationHistoryEntry"] },
+        { "path": "frontend/src/storage/simulationHistoryMappers.ts", "kind": "typescript_declarations", "selectors": ["CURRENT_SIM_HISTORY_SCHEMA_VERSION", "storedRiskScore", "storedResultToModel", "simulationResultToStorageDto", "simulationHistoryDtoToModel", "simulationHistoryModelToDto", "parseSimulationHistory"] }
+      ],
+      "required_proofs": ["deterministic-parity", "exact-replay"],
+      "affected_data": ["backend_history", "local_history", "runtime_caches", "reports_and_exports", "generated_proofs", "seeded_results", "replay_artifacts"],
+      "default_drift_classification": "serialized_shape_change",
+      "releases": [{
+        "version": "2.0", "identity": "mca-simulation-history-v2", "semantic_fingerprint": "86fc879517cfa9432ace11a7df25f2622359a751ca0d9d2cb4145fad7791b187",
+        "decision": { "id": "PBI-2.20-baseline-history-v2", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "2.0", "from_fingerprint": null, "to_fingerprint": "86fc879517cfa9432ace11a7df25f2622359a751ca0d9d2cb4145fad7791b187", "changed_surfaces": [], "rationale": "Initial inventory adopts the existing local history schema version 2 without migration.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["deterministic-parity", "exact-replay"], "data_treatments": [{ "category": "backend_history", "treatment": "compatible_without_action", "rationale": "No backend document is rewritten by baseline adoption.", "evidence": ["docs/statistical-compatibility.md"] }, { "category": "local_history", "treatment": "compatible_without_action", "rationale": "Existing schemaVersion 2 entries remain unchanged and readable.", "evidence": ["docs/statistical-compatibility.md"] }, { "category": "runtime_caches", "treatment": "compatible_without_action", "rationale": "No cache invalidation is justified because semantics are unchanged.", "evidence": ["docs/statistical-compatibility.md"] }, { "category": "reports_and_exports", "treatment": "compatible_without_action", "rationale": "Existing exports retain their current interpretation without rewriting.", "evidence": ["docs/statistical-compatibility.md"] }, { "category": "generated_proofs", "treatment": "compatible_without_action", "rationale": "Generated proofs already identify their current statistical versions.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "seeded_results", "treatment": "compatible_without_action", "rationale": "Persisted seeds retain their current replay semantics.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "replay_artifacts", "treatment": "compatible_without_action", "rationale": "Replay artifacts require no migration for baseline adoption.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }] }
+      }]
+    },
+    {
+      "id": "reference-corpus-contract",
+      "current_version": "1.0",
+      "surfaces": ["corpus_schema", "corpus_expected_results", "validation_probes"],
+      "consumers": ["independent validator", "Python runner", "TypeScript runner", "exact replay", "distribution protocol"],
+      "dependencies": [{ "component": "input-contract", "version": "1.0" }, { "component": "prng", "version": "1.0" }, { "component": "canonical-response", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-047", "STAT-PAR-048", "STAT-PAR-049"] },
+        { "path": "contracts/statistical-reference-corpus-v1.0.schema.json", "kind": "json_semantic", "selectors": [""] },
+        { "path": "contracts/statistical-reference-corpus-v1.0.json", "kind": "json_semantic", "selectors": ["/schema_version", "/corpus_id", "/normative_contract", "/prng_contract", "/cases"], "ignored_keys": ["description"] },
+        { "path": "contracts/statistical-validation-probes-v1.0.schema.json", "kind": "json_semantic", "selectors": [""] },
+        { "path": "contracts/statistical-validation-probes-v1.0.json", "kind": "json_semantic", "selectors": ["/schema_version", "/normative_contract", "/cases"], "ignored_keys": ["description"] }
+      ],
+      "required_proofs": ["reference-corpus", "validation-probes", "deterministic-parity", "exact-replay", "distribution-evidence"],
+      "affected_data": ["generated_proofs", "replay_artifacts"],
+      "default_drift_classification": "corpus_or_proof_not_updated",
+      "releases": [{
+        "version": "1.0", "identity": "mca-statistical-reference-corpus", "semantic_fingerprint": "7cc1168b57e6e9d64400aaf02535ece5800fb87e41f850938b6ac72c8e5d0a16",
+        "decision": { "id": "PBI-2.20-baseline-reference-corpus", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "7cc1168b57e6e9d64400aaf02535ece5800fb87e41f850938b6ac72c8e5d0a16", "changed_surfaces": [], "rationale": "Initial schema, expected-result corpus, and validation-probe baseline adopted.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["reference-corpus", "validation-probes", "deterministic-parity", "exact-replay", "distribution-evidence"], "data_treatments": [{ "category": "generated_proofs", "treatment": "compatible_without_action", "rationale": "Current proofs already derive from corpus and probe version 1.0.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "replay_artifacts", "treatment": "compatible_without_action", "rationale": "Current replay artifacts already bind corpus version 1.0.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }] }
+      }]
+    },
+    {
+      "id": "exact-replay-proof",
+      "current_version": "1.0",
+      "surfaces": ["exact_replay_protocol"],
+      "consumers": ["local review", "compatibility control", "consolidated report"],
+      "dependencies": [{ "component": "reference-corpus-contract", "version": "1.0" }, { "component": "draw-order-and-batching", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-001", "STAT-PAR-002", "STAT-PAR-004", "STAT-PAR-005", "STAT-PAR-047"] },
+        { "path": "contracts/statistical-exact-replay-evidence-v1.0.schema.json", "kind": "json_semantic", "selectors": [""] },
+        { "path": "Scripts/statistical_exact_replay.py", "kind": "python_ast", "selectors": ["_build_case_report", "_report_summary", "_report_context", "build_exact_replay_report"] },
+        { "path": "Scripts/statistical_exact_replay_support.py", "kind": "python_ast", "selectors": ["REQUIRED_COVERAGE", "normative_comparison", "interlanguage_comparison", "normative_diagnostics", "interlanguage_diagnostics"] }
+      ],
+      "required_proofs": ["reference-corpus", "deterministic-parity", "exact-replay"],
+      "affected_data": ["generated_proofs", "replay_artifacts"],
+      "default_drift_classification": "replay_incompatibility",
+      "releases": [{
+        "version": "1.0", "identity": "exact_replay", "semantic_fingerprint": "62ed857f07933801df4e5b4d1f3a19766c8d540d2e3fccfc8a82cc78ce5a6bd5",
+        "decision": { "id": "PBI-2.20-baseline-exact-replay", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "62ed857f07933801df4e5b4d1f3a19766c8d540d2e3fccfc8a82cc78ce5a6bd5", "changed_surfaces": [], "rationale": "Initial exact replay protocol and canonical comparison baseline adopted.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["reference-corpus", "deterministic-parity", "exact-replay"], "data_treatments": [{ "category": "generated_proofs", "treatment": "compatible_without_action", "rationale": "The current exact proof already follows the adopted protocol.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }, { "category": "replay_artifacts", "treatment": "compatible_without_action", "rationale": "No replay artifact is changed by protocol baseline adoption.", "evidence": ["reports/statistical-exact-replay-evidence.json"] }] }
+      }]
+    },
+    {
+      "id": "distributional-proof",
+      "current_version": "1.0",
+      "surfaces": ["distributional_parity_protocol"],
+      "consumers": ["distribution runner", "calibration", "compatibility control", "consolidated report"],
+      "dependencies": [{ "component": "reference-corpus-contract", "version": "1.0" }, { "component": "prng", "version": "1.0" }],
+      "authorities": [
+        { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-005"] },
+        { "path": "contracts/statistical-distribution-protocol-v1.0.schema.json", "kind": "json_semantic", "selectors": [""] },
+        { "path": "contracts/statistical-distribution-protocol-v1.0.json", "kind": "json_semantic", "selectors": [""] },
+        { "path": "contracts/statistical-distribution-seeds-v1.0.schema.json", "kind": "json_semantic", "selectors": [""] },
+        { "path": "contracts/statistical-distribution-seeds-v1.0.json", "kind": "json_semantic", "selectors": [""] },
+        { "path": "contracts/statistical-distribution-calibration-v1.0.schema.json", "kind": "json_semantic", "selectors": [""] },
+        { "path": "contracts/statistical-distribution-evidence-v1.0.schema.json", "kind": "json_semantic", "selectors": [""] },
+        { "path": "Scripts/statistical_distribution_protocol.py", "kind": "python_ast", "selectors": ["generate_seed_population", "partitioned_seeds", "seed_semantic_issues", "protocol_semantic_issues", "validate_protocol_bundle"] },
+        { "path": "Scripts/statistical_distribution_statistics.py", "kind": "python_ast", "selectors": ["compare_count_blocks", "compare_rate_blocks", "holm_adjust", "aggregate_verdict"] },
+        { "path": "Scripts/statistical_distribution_runner.py", "kind": "python_ast", "selectors": ["build_execution_plan", "validate_engine_report", "build_distribution_evidence", "verify_artifact_fingerprint"] }
+      ],
+      "required_proofs": ["distribution-protocol", "distribution-seeds", "distribution-calibration", "distribution-evidence"],
+      "affected_data": ["generated_proofs"],
+      "default_drift_classification": "corpus_or_proof_not_updated",
+      "releases": [{
+        "version": "1.0", "identity": "mca-statistical-distributional-parity", "semantic_fingerprint": "b457e109eec5209bd59243042649d4421bbad4420a3fac23f7fe6ee430a72cc9",
+        "decision": { "id": "PBI-2.20-baseline-distributional-proof", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "b457e109eec5209bd59243042649d4421bbad4420a3fac23f7fe6ee430a72cc9", "changed_surfaces": [], "rationale": "Initial distribution protocol, population, calibration, and evidence baseline adopted.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["distribution-protocol", "distribution-seeds", "distribution-calibration", "distribution-evidence"], "data_treatments": [{ "category": "generated_proofs", "treatment": "compatible_without_action", "rationale": "Current distributional artifacts already bind one coherent protocol version.", "evidence": ["reports/statistical-distribution-evidence.json"] }] }
+      }]
+    }
+  ]
+}

@@ -94,6 +94,7 @@ l’unique autorité de réalisation.
 | [`standards/STD-STAT-001.md`](standards/STD-STAT-001.md) | Statistique, développement | Autorité normative du contrat statistique | Norme |
 | [`statistical-reference-corpus.md`](statistical-reference-corpus.md) | Statistique, développement | Guide du corpus ; les JSON liés sont les autorités machine | Contrat |
 | [`statistical-distribution-protocol.md`](statistical-distribution-protocol.md) | Statistique, développement | Protocole distributionnel, calibration, décisions et limites | Contrat |
+| [`statistical-compatibility.md`](statistical-compatibility.md) | Statistique, architecture, qualité | Surfaces, empreintes, décisions et traitements historiques de compatibilité | Contrat de preuve |
 | [`statistical-consolidated-report.md`](statistical-consolidated-report.md) | Reviewers, statistique, qualité | Sources, règle de verdict, déterminisme et limites du rapport consolidé | Contrat de preuve |
 | [`statistical-parity-audit.md`](statistical-parity-audit.md) | Reviewers, statistique | Relevé historique des divergences et décisions ouvertes | Preuve historique |
 | [`standards/STD-TEST-001.md`](standards/STD-TEST-001.md) | Qualité, développement | Autorité normative de la stratégie de test | Norme |
@@ -107,6 +108,7 @@ l’unique autorité de réalisation.
 | [`../reports/statistical-exact-replay-evidence.json`](../reports/statistical-exact-replay-evidence.json) | Reviewers, statistique | Preuve JSON régénérable du rejeu exact et de l’indépendance du batching | Preuve générée |
 | [`../reports/statistical-distribution-calibration.json`](../reports/statistical-distribution-calibration.json) | Reviewers, statistique | Calibration reproductible des faux positifs, tailles et écarts contrôlés | Preuve générée |
 | [`../reports/statistical-distribution-evidence.json`](../reports/statistical-distribution-evidence.json) | Reviewers, statistique | Preuve JSON multi-seeds et verdict distributionnel ciblé | Preuve générée |
+| [`../reports/statistical-compatibility-evidence.json`](../reports/statistical-compatibility-evidence.json) | Reviewers, statistique, qualité | Preuve canonique des versions, empreintes, décisions et traitements historiques | Preuve générée |
 | [`../reports/statistical-consolidated-report.json`](../reports/statistical-consolidated-report.json) et [`../reports/statistical-consolidated-report.md`](../reports/statistical-consolidated-report.md) | Reviewers, statistique, qualité | Autorité machine consolidée et projection Markdown issue du même modèle | Preuve générée |
 | [`../reports/test-strategy-report.md`](../reports/test-strategy-report.md) | Reviewers, qualité | Rendu généré de la stratégie de test ; le JSON associé est contractuel | Preuve générée |
 | [`../AGENTS.md`](../AGENTS.md) | Agents de contribution | Instructions locales contraignantes, hors documentation produit | Gouvernance |
@@ -155,6 +157,8 @@ l’unique autorité de réalisation.
 - [`statistical-reference-corpus.md`](statistical-reference-corpus.md) — corpus et dérivations ;
 - [`statistical-distribution-protocol.md`](statistical-distribution-protocol.md) — protocole multi-seeds,
   calibration et interprétation des verdicts ;
+- [`statistical-compatibility.md`](statistical-compatibility.md) — inventaire des surfaces normatives,
+  extraction sémantique, décisions et traitements des données antérieures ;
 - [`statistical-consolidated-report.md`](statistical-consolidated-report.md) — sources, verdicts, intégrité
   et limites de l’autorité consolidée ;
 - [`statistical-parity-audit.md`](statistical-parity-audit.md) — audit historique de parité ;
@@ -168,6 +172,8 @@ l’unique autorité de réalisation.
   [`../reports/statistical-exact-replay-evidence.json`](../reports/statistical-exact-replay-evidence.json),
   [`../reports/statistical-distribution-evidence.json`](../reports/statistical-distribution-evidence.json) —
   preuves statistiques générées ;
+- [`../reports/statistical-compatibility-evidence.json`](../reports/statistical-compatibility-evidence.json) —
+  état canonique de compatibilité ;
 - [`../reports/statistical-consolidated-report.json`](../reports/statistical-consolidated-report.json) et
   [`../reports/statistical-consolidated-report.md`](../reports/statistical-consolidated-report.md) — état
   consolidé machine et synthèse reviewer ;

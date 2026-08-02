@@ -119,12 +119,12 @@ Un PBI `L` peut relever de Sol Élevé lorsqu’il est volumineux mais prévisib
 
 Aucun PBI actuel ne relève de **Sol Minimal**, réservé aux corrections mécaniques telles que le formatage, le renommage évident ou la résolution d’une erreur de lint isolée.
 
-## Répartition actuelle des 111 PBI non réalisés
+## Répartition actuelle des 110 PBI non réalisés
 
 | Modèle Codex | Nombre de PBI |
 | --- | ---: |
 | Sol Medium | 15 |
 | Sol Élevé | 30 |
-| Sol Très élevé | 63 |
+| Sol Très élevé | 62 |
 | Sol Ultra | 3 |
-| **Total** | **111** |
+| **Total** | **110** |

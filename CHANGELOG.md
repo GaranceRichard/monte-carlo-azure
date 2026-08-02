@@ -2,6 +2,19 @@
 
 ## Recent
 
+### Gouvernance bloquante des dérives statistiques — PBI 2.20
+
+- ajout d’une autorité JSON fermée couvrant 23 surfaces dans 15 composants versionnés, avec dépendances,
+  consommateurs, preuves obligatoires et sept catégories de données historiques ou de cache
+- extraction sémantique déterministe des autorités Python, TypeScript, Markdown normatif et JSON, sans faux
+  positif sur commentaires ou descriptions, avec refus des autorités absentes, ambiguës ou illisibles
+- contrôle direct bloquant des versions, décisions append-only, identités PRNG, preuves régénérées et choix
+  de migration, lecture legacy, invalidation, purge, archivage ou rejet, sans migration de donnée réelle
+- publication d’une preuve canonique `1.0` consommée comme onzième source et sixième niveau du rapport
+  consolidé, sans ajout du contrôle au profil `main`
+- mutations contrôlées des règles, moteurs, tirages, résultats, contrats, preuves et traitements historiques,
+  avec diagnostics ciblés et protection contre les mises à jour coordonnées servant de faux oracle
+
 ### Rapport consolidé de conformité statistique — PBI 2.19
 
 - publication d’un JSON canonique fermé `1.0` et d’une synthèse Markdown issus du même modèle, avec dix

@@ -190,11 +190,11 @@ def test_nominal_sources_schema_counters_scopes_and_limits_are_consolidated() ->
     assert validate_report(report, SCHEMA) == []
     assert report["verdict"]["status"] == "match"
     assert report["summary"] == {
-        "source_count": 10,
-        "valid_source_count": 10,
+        "source_count": 11,
+        "valid_source_count": 11,
         "invalid_source_count": 0,
-        "proof_level_count": 5,
-        "matching_proof_level_count": 5,
+        "proof_level_count": 6,
+        "matching_proof_level_count": 6,
         "divergent_proof_level_count": 0,
         "inconclusive_proof_level_count": 0,
         "unavailable_proof_level_count": 0,
@@ -208,11 +208,13 @@ def test_nominal_sources_schema_counters_scopes_and_limits_are_consolidated() ->
     assert all(len(source["sha256"]) == 64 for source in report["sources"])
     assert len(report["scope_summary"]["normative_cases"]) == 16
     assert len(report["scope_summary"]["validation_probes"]) == 22
-    assert len(report["limits"]) == 5
+    assert len(report["limits"]) == 6
+    assert report["compatibility"]["status"] == "match"
+    assert report["compatibility"]["blocking_when_executed"] is True
+    assert report["compatibility"]["summary"]["matching_component_count"] == 15
     assert {item["id"] for item in report["not_evaluated"]} == {
         "azure_devops_empirical_backtesting",
         "universal_equivalence",
-        "future_version_compatibility",
         "blocking_main_enforcement",
     }
 
@@ -774,14 +776,15 @@ def test_documentation_and_backlog_preserve_scope_and_informational_enforcement(
 
     assert "ne recalcule aucun résultat statistique d’autorité" in consolidation_text
     assert "ne devient jamais une preuve exacte" in consolidation_text
-    assert "L’enforcement complet dans\n`main` appartient au PBI 2.21" in consolidation
+    assert "L’enforcement complet dans `main` appartient au PBI 2.21" in consolidation_text
     assert "Consolidation des preuves statistiques" in architecture
     assert "État consolidé vérifiable" in readme
     assert "statistical-consolidated-report.md" in documentation_map
     assert "reports/statistical-consolidated-report.json" in critical_paths
-    assert "Le rapport consolidé vérifie 10 sources" in risks
+    assert "Le rapport vérifie 11 sources" in risks
     assert "Rapport consolidé de conformité statistique — PBI 2.19" in changelog
-    assert "dix sources spécialisées" in expectations
+    assert "Gouvernance bloquante des dérives statistiques — PBI 2.20" in changelog
+    assert "onzième source" in expectations
     assert (
         "| 2.19 | Rapport consolidé de parité déterministe, exacte et distributionnelle "
         "disponible | M | Sol Très élevé | 01/08/2026 |"

@@ -182,3 +182,9 @@ premières appartiennent à une exécution statistiquement valide. Le contrôle 
 Le protocole ne consolide pas les autres preuves, ne décide aucune compatibilité future et n’ajoute aucun
 blocage au profil `main`. Le [rapport consolidé](statistical-consolidated-report.md) le consomme comme une
 source spécialisée sans modifier ses scénarios, métriques, calibrations, seuils ni limites.
+
+Le [contrôle de compatibilité](statistical-compatibility.md) surveille séparément le protocole, la population
+de seeds, la calibration et la preuve courante. Une évolution acceptée doit maintenir des versions cohérentes,
+renouveler les artefacts requis et décider du traitement des rapports et preuves antérieurs. Le contrôle
+distributionnel demeure une preuve spécialisée : ni sa régénération ni un verdict `match` ne suffisent à
+accepter une dérive normative.

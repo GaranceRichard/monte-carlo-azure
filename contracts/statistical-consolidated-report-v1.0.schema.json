@@ -104,11 +104,39 @@
     "compatibility": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "scope", "declarations"],
+      "required": ["status", "scope", "source", "blocking_when_executed", "authority", "summary", "declarations"],
       "properties": {
-        "status": { "enum": ["match", "version_incompatibility", "not_evaluated"] },
+        "status": { "enum": ["match", "blocked", "control_error", "version_incompatibility", "not_evaluated"] },
         "scope": { "type": "string" },
+        "source": { "const": "compatibility_evidence" },
+        "blocking_when_executed": { "const": true },
+        "authority": { "$ref": "#/$defs/compatibility_authority" },
+        "summary": { "$ref": "#/$defs/compatibility_summary" },
         "declarations": { "type": "array", "items": { "$ref": "#/$defs/compatibility_declaration" } }
+      }
+    },
+    "compatibility_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "schema_version", "semantic_fingerprint"],
+      "properties": {
+        "id": { "const": "mca-statistical-compatibility-authority" },
+        "version": { "const": "1.0" },
+        "schema_version": { "const": "1.0" },
+        "semantic_fingerprint": { "$ref": "#/$defs/sha" }
+      }
+    },
+    "compatibility_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component_count", "matching_component_count", "blocked_component_count", "proof_count", "matching_proof_count", "diagnostic_count"],
+      "properties": {
+        "component_count": { "type": "integer", "minimum": 0 },
+        "matching_component_count": { "type": "integer", "minimum": 0 },
+        "blocked_component_count": { "type": "integer", "minimum": 0 },
+        "proof_count": { "type": "integer", "minimum": 0 },
+        "matching_proof_count": { "type": "integer", "minimum": 0 },
+        "diagnostic_count": { "type": "integer", "minimum": 0 }
       }
     },
     "classification": {

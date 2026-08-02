@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/statistical-compatibility-authority/1.0",
+  "title": "Statistical compatibility authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["authority_id", "authority_version", "schema_version", "extraction_method", "classifications", "historical_treatments", "historical_data_categories", "normative_surfaces", "proof_artifacts", "components"],
+  "properties": {
+    "authority_id": { "const": "mca-statistical-compatibility-authority" },
+    "authority_version": { "const": "1.0" },
+    "schema_version": { "const": "1.0" },
+    "extraction_method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "documentation"],
+      "properties": {
+        "id": { "const": "mca-semantic-authority-extraction" },
+        "version": { "const": "1.0" },
+        "documentation": { "const": "docs/statistical-compatibility.md" }
+      }
+    },
+    "classifications": { "type": "array", "minItems": 13, "maxItems": 13, "uniqueItems": true, "items": { "$ref": "#/$defs/classification" } },
+    "historical_treatments": { "type": "array", "minItems": 7, "maxItems": 7, "uniqueItems": true, "items": { "$ref": "#/$defs/treatment" } },
+    "historical_data_categories": { "type": "array", "minItems": 7, "maxItems": 7, "uniqueItems": true, "items": { "$ref": "#/$defs/data_category" } },
+    "normative_surfaces": { "type": "array", "minItems": 23, "maxItems": 23, "uniqueItems": true, "items": { "$ref": "#/$defs/surface" } },
+    "proof_artifacts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/proof" } },
+    "components": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/component" } }
+  },
+  "$defs": {
+    "sha": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "version": { "type": "string", "pattern": "^[0-9]+(?:\\.[0-9]+)+$" },
+    "path": { "type": "string", "not": { "pattern": "^(?:[A-Za-z]:|/|\\\\)" } },
+    "classification": { "enum": ["no_normative_impact", "compatible_without_historical_result_change", "compatible_contract_extension", "normative_result_change", "replay_incompatibility", "pseudo_random_stream_change", "serialized_shape_change", "migration_required", "invalidation_required", "decision_missing", "version_not_incremented", "corpus_or_proof_not_updated", "compatibility_control_error"] },
+    "treatment": { "enum": ["compatible_without_action", "deterministic_migration", "legacy_read_only_without_replay", "invalidation", "purge", "archival_with_previous_version", "explicit_rejection"] },
+    "data_category": { "enum": ["backend_history", "local_history", "runtime_caches", "reports_and_exports", "generated_proofs", "seeded_results", "replay_artifacts"] },
+    "surface": { "enum": ["input_validation_and_normalization", "resolved_defaults", "seed_domain_and_resolution", "prng_algorithm", "draw_to_index_conversion", "logical_draw_order", "batching_behavior", "simulation_modes_and_stop_conditions", "censorship", "percentiles_p50_p70_p90", "risk_score", "reliability_metrics_and_labels", "histograms", "canonical_response_shape", "field_presence_and_absence", "result_serialization", "corpus_schema", "corpus_expected_results", "validation_probes", "exact_replay_protocol", "distributional_parity_protocol", "persisted_results_and_history", "caches_exports_and_replay_artifacts"] },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pointer", "expected"],
+      "properties": { "pointer": { "type": "string", "pattern": "^/" }, "expected": {} }
+    },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "schema_path", "version", "semantic_fingerprint", "version_bindings"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "path": { "$ref": "#/$defs/path" },
+        "schema_path": { "$ref": "#/$defs/path" },
+        "version": { "$ref": "#/$defs/version" },
+        "semantic_fingerprint": { "$ref": "#/$defs/sha" },
+        "version_bindings": { "type": "array", "items": { "$ref": "#/$defs/binding" } }
+      }
+    },
+    "authority_part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "selectors"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "kind": { "enum": ["python_ast", "typescript_declarations", "markdown_rules", "json_semantic"] },
+        "selectors": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+        "ignored_keys": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component", "version"],
+      "properties": { "component": { "type": "string" }, "version": { "$ref": "#/$defs/version" } }
+    },
+    "data_treatment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "treatment", "rationale", "evidence"],
+      "properties": {
+        "category": { "$ref": "#/$defs/data_category" },
+        "treatment": { "$ref": "#/$defs/treatment" },
+        "rationale": { "type": "string", "minLength": 12 },
+        "evidence": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/path" } }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "classification", "from_version", "to_version", "from_fingerprint", "to_fingerprint", "changed_surfaces", "rationale", "traceability", "proof_artifacts", "data_treatments"],
+      "properties": {
+        "id": { "type": "string", "minLength": 3 },
+        "status": { "const": "accepted" },
+        "classification": { "$ref": "#/$defs/classification" },
+        "from_version": { "anyOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }] },
+        "to_version": { "$ref": "#/$defs/version" },
+        "from_fingerprint": { "anyOf": [{ "$ref": "#/$defs/sha" }, { "type": "null" }] },
+        "to_fingerprint": { "$ref": "#/$defs/sha" },
+        "changed_surfaces": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/surface" } },
+        "rationale": { "type": "string", "minLength": 20 },
+        "traceability": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/path" } },
+        "proof_artifacts": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+        "data_treatments": { "type": "array", "items": { "$ref": "#/$defs/data_treatment" } }
+      }
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "identity", "semantic_fingerprint", "decision"],
+      "properties": {
+        "version": { "$ref": "#/$defs/version" },
+        "identity": { "type": "string", "minLength": 1 },
+        "semantic_fingerprint": { "$ref": "#/$defs/sha" },
+        "decision": { "$ref": "#/$defs/decision" }
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "current_version", "surfaces", "consumers", "dependencies", "authorities", "required_proofs", "affected_data", "default_drift_classification", "releases"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "current_version": { "$ref": "#/$defs/version" },
+        "surfaces": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/surface" } },
+        "consumers": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+        "dependencies": { "type": "array", "items": { "$ref": "#/$defs/dependency" } },
+        "authorities": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/authority_part" } },
+        "required_proofs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+        "affected_data": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/data_category" } },
+        "default_drift_classification": { "$ref": "#/$defs/classification" },
+        "releases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/release" } }
+      }
+    }
+  }
+}
