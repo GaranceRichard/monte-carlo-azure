@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from Scripts.test_execution_profiles_dependencies import active_dependencies
+
 PROFILES = ("pr", "main", "nightly", "release")
 
 
@@ -52,10 +54,9 @@ def topological_node_ids(contract: dict[str, Any], profile: str) -> tuple[str, .
     indegree = {identifier: 0 for identifier in nodes}
     outgoing = {identifier: [] for identifier in nodes}
     for identifier, node in nodes.items():
-        for dependency in node.get("needs", []):
-            if dependency in nodes:
-                indegree[identifier] += 1
-                outgoing[dependency].append(identifier)
+        for dependency in active_dependencies(node, nodes):
+            indegree[identifier] += 1
+            outgoing[dependency].append(identifier)
     ready = sorted(
         (identifier for identifier, degree in indegree.items() if degree == 0),
         key=lambda item: (nodes[item].get("order", 0), item),
@@ -76,13 +77,13 @@ def topological_node_ids(contract: dict[str, Any], profile: str) -> tuple[str, .
 
 def _ancestors(identifier: str, nodes: dict[str, dict[str, Any]]) -> set[str]:
     found: set[str] = set()
-    pending = list(nodes[identifier].get("needs", []))
+    pending = list(active_dependencies(nodes[identifier], nodes))
     while pending:
         current = pending.pop()
         if current in found or current not in nodes:
             continue
         found.add(current)
-        pending.extend(nodes[current].get("needs", []))
+        pending.extend(active_dependencies(nodes[current], nodes))
     return found
 
 
@@ -97,6 +98,11 @@ def dependency_errors(contract: dict[str, Any]) -> list[str]:
                     errors.append(f"{profile}:{identifier} needs missing node {dependency}")
                 elif dependency not in nodes:
                     errors.append(f"{profile}:{identifier} needs inactive node {dependency}")
+            for dependency in node.get("conditionalNeeds", []):
+                if dependency not in all_nodes:
+                    errors.append(
+                        f"{profile}:{identifier} conditionally needs missing node {dependency}"
+                    )
         try:
             topological_node_ids(contract, profile)
         except ValueError as exc:
@@ -116,33 +122,6 @@ def reachability_errors(contract: dict[str, Any]) -> list[str]:
         unreachable = sorted(set(nodes) - _ancestors(aggregator, nodes) - {aggregator})
         if unreachable:
             errors.append(f"{profile} has unreachable nodes: {', '.join(unreachable)}")
-        if any(aggregator in node.get("needs", []) for node in nodes.values()):
+        if any(aggregator in active_dependencies(node, nodes) for node in nodes.values()):
             errors.append(f"{profile} aggregator must be final")
-    return errors
-
-
-def parallel_conflict_errors(contract: dict[str, Any]) -> list[str]:
-    errors: list[str] = []
-    for profile in PROFILES:
-        nodes = active_nodes(contract, profile)
-        ancestors = {identifier: _ancestors(identifier, nodes) for identifier in nodes}
-        ordered = sorted(nodes, key=lambda item: (nodes[item].get("order", 0), item))
-        for index, left in enumerate(ordered):
-            for right in ordered[index + 1 :]:
-                if left in ancestors[right] or right in ancestors[left]:
-                    continue
-                writes = set(nodes[left].get("writes", [])) & set(nodes[right].get("writes", []))
-                resources = set(nodes[left].get("resources", [])) & set(
-                    nodes[right].get("resources", [])
-                )
-                if writes:
-                    errors.append(
-                        f"{profile} parallel write conflict {left}/{right}: "
-                        f"{', '.join(sorted(writes))}"
-                    )
-                if resources:
-                    errors.append(
-                        f"{profile} parallel exclusive-resource conflict {left}/{right}: "
-                        f"{', '.join(sorted(resources))}"
-                    )
     return errors

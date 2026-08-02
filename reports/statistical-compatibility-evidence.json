@@ -737,8 +737,8 @@
   "diagnostics": [],
   "enforcement": {
     "direct_execution": "blocking",
-    "main_integration_scope": "PBI 2.21",
-    "main_profile": "not_integrated"
+    "main_integration_scope": "config/statistical-main-enforcement-v1.0.json",
+    "main_profile": "blocking"
   },
   "evidence_version": "1.0",
   "proof_artifacts": [
@@ -801,7 +801,7 @@
   ],
   "proof_kind": "statistical_compatibility",
   "stability": {
-    "artifact_fingerprint": "e9214dee975b0448e97fd65c30ccfda66646a23fd02ea32cf46e24c110c6a5c5",
+    "artifact_fingerprint": "b557524634319a7fd398698aa86a1e1905e77682f1799a025819c5904138ab33",
     "deterministic": true,
     "method": "sha256-canonical-json-without-artifact-fingerprint"
   },

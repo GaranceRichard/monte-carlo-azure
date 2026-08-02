@@ -28,6 +28,7 @@
       "id": "preflight",
       "order": 10,
       "needs": [],
+      "conditionalNeeds": [],
       "commands": [
         "Repository hygiene (README, encoding, secrets and DoD)",
         "Test classification compliance",
@@ -45,6 +46,7 @@
       "id": "backend-static",
       "order": 20,
       "needs": ["preflight"],
+      "conditionalNeeds": [],
       "commands": ["Backend lint (Ruff)"],
       "profiles": ["pr", "main", "nightly", "release"],
       "reads": ["backend", "Scripts", "tests", "pyproject.toml"],
@@ -53,9 +55,112 @@
       "aggregator": false
     },
     {
+      "id": "statistical-authorities",
+      "order": 25,
+      "needs": ["preflight"],
+      "conditionalNeeds": [],
+      "commands": [
+        "Statistical authority and enforcement policy validation",
+        "Statistical corpus and probes validation",
+        "Statistical distribution protocol validation"
+      ],
+      "profiles": ["main", "nightly", "release"],
+      "reads": ["config", "contracts", "docs/standards", "reports/statistical-distribution-calibration.json"],
+      "writes": ["reports/test-execution-artifacts/{profile}/statistical-authorities"],
+      "resources": [],
+      "aggregator": false
+    },
+    {
+      "id": "statistical-deterministic-parity",
+      "order": 32,
+      "needs": ["statistical-authorities"],
+      "conditionalNeeds": [],
+      "commands": [
+        "Generate deterministic statistical parity evidence",
+        "Blocking deterministic statistical parity"
+      ],
+      "profiles": ["main", "nightly", "release"],
+      "reads": ["backend", "frontend/src", "frontend/scripts", "contracts"],
+      "writes": ["reports/test-execution-artifacts/{profile}/statistical-deterministic-parity"],
+      "resources": [],
+      "aggregator": false
+    },
+    {
+      "id": "statistical-exact-replay",
+      "order": 34,
+      "needs": ["statistical-authorities"],
+      "conditionalNeeds": [],
+      "commands": [
+        "Generate exact replay and batching evidence",
+        "Blocking exact interlanguage replay",
+        "Blocking statistical batching independence"
+      ],
+      "profiles": ["main", "nightly", "release"],
+      "reads": ["backend", "frontend/src", "frontend/scripts", "contracts"],
+      "writes": ["reports/test-execution-artifacts/{profile}/statistical-exact-replay"],
+      "resources": [],
+      "aggregator": false
+    },
+    {
+      "id": "statistical-distributional-parity",
+      "order": 36,
+      "needs": ["statistical-authorities"],
+      "conditionalNeeds": [],
+      "commands": [
+        "Generate distributional statistical parity evidence",
+        "Blocking distributional statistical parity"
+      ],
+      "profiles": ["main", "nightly", "release"],
+      "reads": ["backend", "frontend/src", "frontend/scripts", "contracts", "reports/statistical-distribution-calibration.json"],
+      "writes": ["reports/test-execution-artifacts/{profile}/statistical-distributional-parity"],
+      "resources": [],
+      "aggregator": false
+    },
+    {
+      "id": "statistical-compatibility",
+      "order": 72,
+      "needs": [
+        "statistical-deterministic-parity",
+        "statistical-exact-replay",
+        "statistical-distributional-parity"
+      ],
+      "conditionalNeeds": [],
+      "commands": [
+        "Generate blocking statistical compatibility evidence",
+        "Blocking statistical version compatibility"
+      ],
+      "profiles": ["main", "nightly", "release"],
+      "reads": ["backend", "frontend/src", "Scripts", "contracts", "reports/test-execution-artifacts/{profile}"],
+      "writes": ["reports/test-execution-artifacts/{profile}/statistical-compatibility"],
+      "resources": [],
+      "aggregator": false
+    },
+    {
+      "id": "statistical-consolidated-report",
+      "order": 80,
+      "needs": [
+        "statistical-deterministic-parity",
+        "statistical-exact-replay",
+        "statistical-distributional-parity",
+        "statistical-compatibility"
+      ],
+      "conditionalNeeds": [],
+      "commands": [
+        "Generate current-run consolidated statistical report",
+        "Independently validate current-run consolidated statistical report",
+        "Blocking consolidated statistical verdict"
+      ],
+      "profiles": ["main", "nightly", "release"],
+      "reads": ["contracts", "docs/standards", "reports/test-execution-artifacts/{profile}"],
+      "writes": ["reports/test-execution-artifacts/{profile}/statistical-consolidated-report"],
+      "resources": [],
+      "aggregator": false
+    },
+    {
       "id": "frontend-static",
       "order": 30,
       "needs": ["preflight"],
+      "conditionalNeeds": [],
       "commands": [
         "Frontend lint (ESLint, zero warning)",
         "Frontend typecheck (TypeScript)",
@@ -74,6 +179,7 @@
       "id": "backend-tests",
       "order": 40,
       "needs": ["preflight"],
+      "conditionalNeeds": [],
       "commands": [
         "Prepare backend test selection",
         "Selected backend tests",
@@ -95,6 +201,7 @@
       "id": "frontend-tests",
       "order": 50,
       "needs": ["preflight"],
+      "conditionalNeeds": [],
       "commands": [
         "Selected frontend unit tests (Vitest)",
         "Frontend unit tests (Vitest)",
@@ -113,6 +220,7 @@
       "id": "e2e",
       "order": 60,
       "needs": ["preflight"],
+      "conditionalNeeds": [],
       "commands": ["End-to-end tests (Playwright)"],
       "profiles": ["pr", "main", "nightly", "release"],
       "reads": ["frontend/src", "backend", "reports/test-classification-inventory.json"],
@@ -127,6 +235,7 @@
       "id": "release-or-container-checks",
       "order": 70,
       "needs": ["preflight"],
+      "conditionalNeeds": [],
       "commands": ["Release or container checks"],
       "profiles": ["pr", "main", "nightly", "release"],
       "reads": ["Dockerfile", "docker-compose.yml", ".env"],
@@ -145,6 +254,7 @@
         "e2e",
         "release-or-container-checks"
       ],
+      "conditionalNeeds": ["statistical-consolidated-report"],
       "commands": [
         "Verify global execution count reference",
         "Vitals coverage report",

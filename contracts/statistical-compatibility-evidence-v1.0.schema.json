@@ -30,7 +30,7 @@
     "enforcement": {
       "type": "object", "additionalProperties": false,
       "required": ["direct_execution", "main_profile", "main_integration_scope"],
-      "properties": { "direct_execution": { "const": "blocking" }, "main_profile": { "const": "not_integrated" }, "main_integration_scope": { "const": "PBI 2.21" } }
+      "properties": { "direct_execution": { "const": "blocking" }, "main_profile": { "const": "blocking" }, "main_integration_scope": { "const": "config/statistical-main-enforcement-v1.0.json" } }
     },
     "data_treatment": {
       "type": "object", "additionalProperties": false,

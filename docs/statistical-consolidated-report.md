@@ -79,12 +79,12 @@ classification et conséquence sur la consolidation.
 partie canonique ne contient de chemin absolu, d’horodatage mural, d’identifiant temporaire ou de donnée
 dépendante de la machine. À sources identiques, JSON, Markdown et empreintes sont identiques.
 
-Le rapport est `informational` et n’ajoute aucun blocage de parité au profil `main`. La commande retourne
-toutefois un code non nul lorsqu’une source obligatoire ou son schéma est absent, invalide ou corrompu,
-lorsqu’une empreinte est fausse, lorsque les métadonnées sont incohérentes ou incompatibles, ou lorsqu’une
-erreur de protocole, moteur ou infrastructure rend la preuve inexploitable. Une divergence fonctionnelle
-ou un résultat statistiquement non concluant reste visible sans transformer ce PBI en enforcement complet.
-Le validateur spécialisé de compatibilité demeure, lui, bloquant lorsqu’il est exécuté directement.
+Le rapport versionné constitue l’autorité de référence. Dans `main`, le générateur reçoit les quatre preuves
+run-scoped validées, sans les relancer, et écrit JSON et Markdown dans le répertoire isolé du nœud. Le
+validateur indépendant reconstruit ensuite le modèle attendu depuis les mêmes chemins, vérifie schéma,
+projection, compteurs, verdict, empreintes et fraîcheur, puis applique la politique bloquante. Une source
+absente, un schéma ou une empreinte invalide, une incompatibilité, une divergence, une non-conclusion ou une
+erreur de protocole, moteur ou infrastructure bloque donc le nœud et empêche `aggregate`.
 
 ```powershell
 .venv\Scripts\python.exe Scripts\generate_statistical_consolidated_report.py
@@ -96,5 +96,6 @@ Le validateur spécialisé de compatibilité demeure, lui, bloquant lorsqu’il 
 Le rejeu exact ne prouve que le corpus et les versions déclarées. La preuve distributionnelle ne porte que
 sur ses scénarios, cohorts, métriques, marges et puissance documentés et ne devient jamais une preuve
 exacte. Le rapport ne constitue ni un backtesting empirique Azure DevOps, ni une équivalence universelle,
-ni une décision de migration à la place de l’autorité de compatibilité. L’enforcement complet dans `main`
-appartient au PBI 2.21.
+ni une décision de migration à la place de l’autorité de compatibilité. Le plan d’enforcement et ses
+attestations sont documentés dans
+[`statistical-main-enforcement.md`](statistical-main-enforcement.md).

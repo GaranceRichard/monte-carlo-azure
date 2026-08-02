@@ -215,7 +215,6 @@ def test_nominal_sources_schema_counters_scopes_and_limits_are_consolidated() ->
     assert {item["id"] for item in report["not_evaluated"]} == {
         "azure_devops_empirical_backtesting",
         "universal_equivalence",
-        "blocking_main_enforcement",
     }
 
 
@@ -232,7 +231,7 @@ def test_json_markdown_and_sha_are_byte_stable_and_machine_independent() -> None
     markdown = render_markdown(first)
     assert "ne devient jamais une preuve exacte" in markdown
     assert "backtesting empirique Azure DevOps" in markdown
-    assert "PBI 2.21" in markdown
+    assert "validated run-scoped proof is blocking" in markdown
 
 
 def test_closed_report_schema_and_independent_validator_reject_drift() -> None:
@@ -760,7 +759,7 @@ def test_generator_rejects_a_non_object_report_schema(tmp_path: Path) -> None:
     assert "must be an object" in issues[0]
 
 
-def test_documentation_and_backlog_preserve_scope_and_informational_enforcement() -> None:
+def test_documentation_and_backlog_preserve_scope_and_blocking_enforcement() -> None:
     consolidation = (ROOT / "docs/statistical-consolidated-report.md").read_text(encoding="utf-8")
     architecture = (ROOT / "ARCHITECTURE.md").read_text(encoding="utf-8")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -776,7 +775,8 @@ def test_documentation_and_backlog_preserve_scope_and_informational_enforcement(
 
     assert "ne recalcule aucun résultat statistique d’autorité" in consolidation_text
     assert "ne devient jamais une preuve exacte" in consolidation_text
-    assert "L’enforcement complet dans `main` appartient au PBI 2.21" in consolidation_text
+    assert "Une source absente" in consolidation_text
+    assert "empêche `aggregate`" in consolidation_text
     assert "Consolidation des preuves statistiques" in architecture
     assert "État consolidé vérifiable" in readme
     assert "statistical-consolidated-report.md" in documentation_map
@@ -784,8 +784,11 @@ def test_documentation_and_backlog_preserve_scope_and_informational_enforcement(
     assert "Le rapport vérifie 11 sources" in risks
     assert "Rapport consolidé de conformité statistique — PBI 2.19" in changelog
     assert "Gouvernance bloquante des dérives statistiques — PBI 2.20" in changelog
+    assert "Enforcement statistique complet du profil `main` — PBI 2.21" in changelog
     assert "onzième source" in expectations
     assert (
         "| 2.19 | Rapport consolidé de parité déterministe, exacte et distributionnelle "
         "disponible | M | Sol Très élevé | 01/08/2026 |"
     ) in backlog
+    assert "Dernière Feature terminée :** Feature 2" in backlog
+    assert "21/21 PBI réalisés (100 %)" in backlog

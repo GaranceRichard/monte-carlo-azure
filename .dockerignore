@@ -1,0 +1,6 @@
+.env
+.git
+frontend/coverage
+frontend/node_modules
+frontend/test-results
+reports/test-execution-artifacts

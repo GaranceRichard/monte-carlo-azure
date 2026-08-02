@@ -39,6 +39,12 @@ La modification du README doit être pertinente et refléter le changement livr�
 
 ## Gestion des statuts et des dates
 
+La synthèse générée distingue une Feature partiellement réalisée d’un état de transition où la dernière
+Feature est close et où la suivante n’est pas encore engagée. Cet état ne choisit ni ne démarre
+automatiquement un nouveau PBI : la prochaine priorité reste une décision de gouvernance explicite. Cette
+évolution du contrôle est nécessaire à la clôture atomique d’une Feature et ne relâche ni les dates, ni les
+comptages, ni la cohérence entre registre et synthèses générées.
+
 La colonne `Réalisé le` constitue l’autorité de statut du registre :
 
 - une cellule vide désigne un PBI non réalisé ;
@@ -119,12 +125,12 @@ Un PBI `L` peut relever de Sol Élevé lorsqu’il est volumineux mais prévisib
 
 Aucun PBI actuel ne relève de **Sol Minimal**, réservé aux corrections mécaniques telles que le formatage, le renommage évident ou la résolution d’une erreur de lint isolée.
 
-## Répartition actuelle des 110 PBI non réalisés
+## Répartition actuelle des 109 PBI non réalisés
 
 | Modèle Codex | Nombre de PBI |
 | --- | ---: |
 | Sol Medium | 15 |
 | Sol Élevé | 30 |
-| Sol Très élevé | 62 |
+| Sol Très élevé | 61 |
 | Sol Ultra | 3 |
-| **Total** | **110** |
+| **Total** | **109** |

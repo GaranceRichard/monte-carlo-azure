@@ -92,8 +92,8 @@ def build_evidence(
         },
         "enforcement": {
             "direct_execution": "blocking",
-            "main_profile": "not_integrated",
-            "main_integration_scope": "PBI 2.21",
+            "main_profile": "blocking",
+            "main_integration_scope": "config/statistical-main-enforcement-v1.0.json",
         },
         "status": status,
         "classification": classification,

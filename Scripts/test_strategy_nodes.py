@@ -75,9 +75,15 @@ def _load_node(
     )
 
 
-def _required_node(identifier: str, profile: str, frameworks: set[Any]) -> bool:
+def _required_node(
+    identifier: str,
+    profile: str,
+    frameworks: set[Any],
+    active_profiles: list[Any],
+) -> bool:
     return (
-        identifier != "aggregate"
+        profile in active_profiles
+        and identifier != "aggregate"
         and not (identifier == "e2e" and "playwright" not in frameworks)
         and not (identifier == "release-or-container-checks" and profile == "pr")
     )
@@ -114,7 +120,12 @@ def node_evidence(
     violations: list[dict[str, Any]] = []
     for contract_node in contract.get("nodes", []):
         identifier = contract_node.get("id", "unknown")
-        if not _required_node(identifier, profile, frameworks):
+        if not _required_node(
+            identifier,
+            profile,
+            frameworks,
+            contract_node.get("profiles", []),
+        ):
             nodes.append(_not_applicable_node(identifier))
             continue
         relative = f"reports/test-execution-artifacts/{profile}/{identifier}/result.json"

@@ -167,8 +167,8 @@ doivent être byte à byte égales.
 
 Les classifications sont séparées : `distributional_divergence`, `statistically_inconclusive`,
 `version_incompatibility`, `engine_error`, `protocol_error` et `infrastructure_error`. Seules les deux
-premières appartiennent à une exécution statistiquement valide. Le contrôle reste informatif pour
-`match`, `divergence` ou `inconclusive`, mais retourne un code non nul pour `invalid`.
+premières appartiennent à une exécution statistiquement valide. La commande spécialisée conserve sa
+sémantique historique ; dans `main`, `divergence`, `inconclusive`, `invalid` et toute erreur sont bloquants.
 
 ```powershell
 .venv\Scripts\python.exe Scripts\validate_statistical_reference_corpus.py
@@ -179,8 +179,10 @@ premières appartiennent à une exécution statistiquement valide. Le contrôle 
 .venv\Scripts\python.exe Scripts\validate_statistical_distribution_evidence.py
 ```
 
-Le protocole ne consolide pas les autres preuves, ne décide aucune compatibilité future et n’ajoute aucun
-blocage au profil `main`. Le [rapport consolidé](statistical-consolidated-report.md) le consomme comme une
+Le protocole ne consolide pas les autres preuves et ne décide aucune compatibilité future. Le profil `main`
+valide son autorité avant le runner et applique ensuite la
+[politique bloquante](statistical-main-enforcement.md). Le
+[rapport consolidé](statistical-consolidated-report.md) le consomme comme une
 source spécialisée sans modifier ses scénarios, métriques, calibrations, seuils ni limites.
 
 Le [contrôle de compatibilité](statistical-compatibility.md) surveille séparément le protocole, la population

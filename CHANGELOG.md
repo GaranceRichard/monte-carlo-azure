@@ -2,6 +2,22 @@
 
 ## Recent
 
+### Enforcement statistique complet du profil `main` — PBI 2.21
+
+- ajout d’une politique fermée et versionnée qui associe les statuts statistiques aux décisions bloquantes,
+  informatives, non applicables ou interdites, sans modifier les règles ni les seuils de `STD-STAT-001` ;
+- intégration explicite des neuf contrôles obligatoires dans un sous-DAG : autorités, corpus et sondes,
+  parités déterministe, exacte, de batching et distributionnelle, compatibilité, consolidation et validation
+  indépendante, chaque preuve étant calculée une fois puis partagée ;
+- attestation déterministe des empreintes de sources, contrats, preuves, dépendances et snapshot contrôlé, avec
+  rejet des artefacts absents, périmés, mélangés entre snapshots ou issus d’un chemin hors du snapshot ;
+- exécution locale complète depuis un snapshot isolé, avec une unique exposition des dépendances frontend et
+  nettoyage après succès, échec ou interruption ;
+- alignement du workflow GitHub Actions sur le même plan d’autorité et le SHA publié, avec agrégation rouge
+  si un contrôle obligatoire échoue ou est sauté hors du profil `pr` ;
+- mutations de l’ensemble des statuts bloquants, des dépendances du DAG, de la fraîcheur, du nettoyage et de
+  l’absence de contournement silencieux, sans changement des autres profils légers.
+
 ### Gouvernance bloquante des dérives statistiques — PBI 2.20
 
 - ajout d’une autorité JSON fermée couvrant 23 surfaces dans 15 composants versionnés, avec dépendances,

@@ -885,7 +885,7 @@ def test_documentation_traces_pbi_210_and_pbi_211_derivations_and_reserved_scope
             "docs/standards/STD-STAT-001.md",
             "docs/statistical-reference-corpus.md",
             "les seize cas du corpus statistique courant concordent exactement",
-            "parité reste toutefois informatif",
+                "gate vérifie cette conformité déclarée",
         ],
         "ARCHITECTURE.md": [
             "statistical-reference-corpus-v1.0.json",

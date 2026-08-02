@@ -241,6 +241,20 @@ Le contrôle de classification est exécuté une seule fois par plan `fast`, `pu
 via `Scripts/quality_gate.py`, avec respectivement l'index Git, le commit détaché et le workspace comme source.
 La task `Validation : profil main` l'exécute directement avec `ci --profile main`.
 
+Le profil `main` possède en plus six nœuds statistiques explicites. Ils ne reclassifient aucun cas logique et
+ne rendent pas `fast`, `pr` ou un `push` ciblé équivalents à la gate complète. Les tests d’enforcement sont
+classifiés selon les mêmes règles que le reste du patrimoine ; leurs mutations couvrent les statuts fermés,
+la fraîcheur, les dépendances, l’isolation et le refus des contournements. Le plan complet, les commandes
+isolées et la mesure de coût sont documentés dans
+[`statistical-main-enforcement.md`](statistical-main-enforcement.md).
+
+Trois contrôles statiques auparavant réservés à `nightly` ou `release` appartiennent désormais à `main` :
+déterminisme et dépendances du plan, alignement du workflow GitHub Actions et vérification du SHA publié.
+Ce déplacement couvre le risque de divergence de l’autorité `main` avec un coût de lecture locale
+négligeable ; il n’ajoute aucun moteur, navigateur ni suite spécialisée aux profils `fast`, `pr` ou `push`
+ciblé. Il permet aussi au nœud backend `main` de produire l’inventaire Pytest global complet sans fusionner
+des artefacts issus de révisions différentes.
+
 ## Gouvernance distincte des états d'exécution
 
 [`config/test-governance.json`](../config/test-governance.json) est un contrat versionné séparé de la

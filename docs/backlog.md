@@ -63,7 +63,7 @@ déterministe, des preuves exactes et distributionnelles et des références par
 | 2.18 | Protocole de parité distributionnelle versionné et testable | M | Sol Très élevé | 01/08/2026 |
 | 2.19 | Rapport consolidé de parité déterministe, exacte et distributionnelle disponible | M | Sol Très élevé | 01/08/2026 |
 | 2.20 | Dérives de version et décisions de compatibilité statistique bloquées | M | Sol Très élevé | 01/08/2026 |
-| 2.21 | Contrôles complets de parité et de compatibilité bloquants dans le profil `main` | M | Sol Très élevé | |
+| 2.21 | Contrôles complets de parité et de compatibilité bloquants dans le profil `main` | M | Sol Très élevé | 01/08/2026 |
 
 ## Feature 3 — Disposer d’un moteur statistique Python réutilisable et distribuable
 
@@ -322,15 +322,15 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 
 # Synthèse du backlog
 
-**Feature en cours :** Feature 2 — Garantir la fiabilité du cœur statistique — 20/21 PBI réalisés (95,24 %).
-**Prochain PBI :** `2.21` — Contrôles complets de parité et de compatibilité bloquants dans le profil `main` — non commencé.
-**Reliquats de la Feature 2 :** `2.21`.
-**Progression globale :** 31/141 PBI réalisés (21,99 %) ; 110 restants.
+**Feature en cours :** aucune Feature partiellement réalisée.
+**Prochain PBI :** à prioriser selon la gouvernance du backlog.
+**Dernière Feature terminée :** Feature 2 — Garantir la fiabilité du cœur statistique — 21/21 PBI réalisés (100 %).
+**Progression globale :** 32/141 PBI réalisés (22,7 %) ; 109 restants.
 
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
 | 1 — Disposer d’un système de preuve qualité gouverné | 11 | 11 | 0 |
-| 2 — Garantir la fiabilité du cœur statistique | 21 | 20 | 1 |
+| 2 — Garantir la fiabilité du cœur statistique | 21 | 21 | 0 |
 | 3 — Disposer d’un moteur statistique Python réutilisable et distribuable | 12 | 0 | 12 |
 | 4 — Disposer d’une mise en production personnelle sécurisée | 6 | 0 | 6 |
 | 5 — Démontrer la valeur d’usage du mode portefeuille | 4 | 0 | 4 |
@@ -343,7 +343,7 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 | 12 — Soutenir le pilotage de programme avec des relations opérationnelles explicites | 7 | 0 | 7 |
 | 13 — Disposer d’une gouvernance technique rationalisée | 10 | 0 | 10 |
 | 14 — Disposer d’une stratégie de diffusion claire et d’une adoption simplifiée | 9 | 0 | 9 |
-| **Total** | **141** | **31** | **110** |
+| **Total** | **141** | **32** | **109** |
 
 Aucun PBI n’est classé XL.
 

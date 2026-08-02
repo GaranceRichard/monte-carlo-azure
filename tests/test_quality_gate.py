@@ -1065,8 +1065,6 @@ def test_pre_push_two_references_with_distinct_terminal_shas_validate_both(
 def test_pre_push_invalid_stdin_and_unresolvable_sha_are_rejected(
     monkeypatch, capsys
 ) -> None:
-    with pytest.raises(ValueError, match="no reference updates"):
-        quality_gate.parse_pre_push_updates("")
     with pytest.raises(ValueError, match="expected 4 fields"):
         quality_gate.parse_pre_push_updates("refs/heads/main too-few-fields\n")
     with pytest.raises(ValueError, match="not a full OID"):
@@ -1098,6 +1096,23 @@ def test_pre_push_invalid_stdin_and_unresolvable_sha_are_rejected(
 
     assert code == 2
     assert "Unable to resolve pushed SHA" in capsys.readouterr().err
+
+
+def test_pre_push_empty_input_is_neutral_and_does_not_build_a_plan(
+    monkeypatch, capsys
+) -> None:
+    assert quality_gate.parse_pre_push_updates("") == ()
+    assert quality_gate.parse_pre_push_updates("\n\r\n") == ()
+    monkeypatch.setattr(
+        quality_gate,
+        "build_push_validation_plan",
+        lambda *_args, **_kwargs: pytest.fail("An empty push must not build a gate plan."),
+    )
+
+    assert quality_gate.run_pre_push_gate("", remote_name="") == 0
+    output = capsys.readouterr()
+    assert "no reference updates" in output.out
+    assert output.err == ""
 
 
 def test_pre_push_executes_once_per_terminal_sha_with_aggregated_context(
@@ -1323,6 +1338,83 @@ def test_staged_snapshot_ignores_workspace_edits_and_reflects_deletes_and_rename
         indexed_repository / "README.md"
     ) == 1
     assert check_naming_convention.collect_naming_violations(indexed_repository)
+
+
+def test_pr_plan_uses_a_real_staged_snapshot_without_reading_worktree_sources(
+    indexed_repository: Path, monkeypatch
+) -> None:
+    _put_index_blob(indexed_repository, "README.md", "# Staged snapshot\n")
+    _put_index_blob(indexed_repository, "backend/api.py", "SOURCE = 'staged-backend'\n")
+    _put_index_blob(
+        indexed_repository,
+        "frontend/src/utils/math.ts",
+        "export const source = 'staged-frontend'\n",
+    )
+    (indexed_repository / "backend").mkdir()
+    (indexed_repository / "frontend/src/utils").mkdir(parents=True)
+    (indexed_repository / "backend/api.py").write_text(
+        "SOURCE = 'workspace-backend'\n", encoding="utf-8"
+    )
+    (indexed_repository / "frontend/src/utils/math.ts").write_text(
+        "export const source = 'workspace-frontend'\n", encoding="utf-8"
+    )
+    original_snapshot = quality_gate.staged_index_snapshot
+    snapshot_path: Path | None = None
+    index_environment_calls = 0
+    steps: list[str] = []
+
+    @contextmanager
+    def staged_snapshot():
+        nonlocal snapshot_path
+        with original_snapshot(indexed_repository) as snapshot:
+            snapshot_path = snapshot
+            assert not (snapshot / ".git").exists()
+            yield snapshot
+
+    @contextmanager
+    def frontend_dependencies(validation_root: Path):
+        dependencies = validation_root / "frontend/node_modules"
+        dependencies.mkdir(parents=True)
+        try:
+            yield dependencies
+        finally:
+            shutil.rmtree(dependencies)
+
+    def run_from_snapshot(
+        command: quality_gate.GateCommand, *, validation_root: Path, **_kwargs: object
+    ) -> int:
+        steps.append(command.step)
+        assert validation_root == snapshot_path
+        assert "staged-backend" in (validation_root / "backend/api.py").read_text(
+            encoding="utf-8"
+        )
+        assert "staged-frontend" in (
+            validation_root / "frontend/src/utils/math.ts"
+        ).read_text(encoding="utf-8")
+        return 0
+
+    def index_environment() -> dict[str, str]:
+        nonlocal index_environment_calls
+        index_environment_calls += 1
+        return quality_gate.index_git_environment(indexed_repository)
+
+    monkeypatch.setattr(quality_gate, "ROOT", indexed_repository)
+    monkeypatch.setattr(quality_gate, "staged_index_snapshot", staged_snapshot)
+    monkeypatch.setattr(quality_gate, "_index_git_environment", index_environment)
+    monkeypatch.setattr(quality_gate, "_ensure_frontend_dependencies", lambda: 0)
+    monkeypatch.setattr(
+        quality_gate, "exposed_frontend_dependencies", frontend_dependencies
+    )
+    monkeypatch.setattr(quality_gate, "_run_command", run_from_snapshot)
+
+    assert quality_gate.run_gate(
+        "fast", paths=["backend/api.py", "frontend/src/utils/math.ts"]
+    ) == 0
+    assert "Selected backend tests" in steps
+    assert "Selected frontend unit tests (Vitest)" in steps
+    assert all("statistical" not in step.casefold() for step in steps)
+    assert index_environment_calls == 1
+    assert snapshot_path is not None and not snapshot_path.parent.exists()
 
 
 def test_invalid_staged_readme_and_code_are_blocked_even_if_workspace_is_valid(
@@ -1803,7 +1895,29 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
         quality_gate.build_change_context("push", ["Scripts/quality_gate.py"])
     )
 
-    assert [command.argv for command in plan.commands] == [
+    statistical_steps = [
+        "Statistical authority and enforcement policy validation",
+        "Statistical corpus and probes validation",
+        "Statistical distribution protocol validation",
+        "Generate deterministic statistical parity evidence",
+        "Blocking deterministic statistical parity",
+        "Generate exact replay and batching evidence",
+        "Blocking exact interlanguage replay",
+        "Blocking statistical batching independence",
+        "Generate distributional statistical parity evidence",
+        "Blocking distributional statistical parity",
+        "Generate blocking statistical compatibility evidence",
+        "Blocking statistical version compatibility",
+        "Generate current-run consolidated statistical report",
+        "Independently validate current-run consolidated statistical report",
+    ]
+    assert [
+        command.step for command in plan.commands if command.step in statistical_steps
+    ] == statistical_steps
+    non_statistical = [
+        command for command in plan.commands if command.step not in statistical_steps
+    ]
+    assert [command.argv for command in non_statistical] == [
         (sys.executable, "Scripts/pre_commit_guard.py"),
         (sys.executable, "Scripts/check_test_classification.py"),
         (sys.executable, "Scripts/check_identity_boundary.py"),
@@ -2406,12 +2520,31 @@ def test_first_failed_command_exit_code_is_propagated(monkeypatch) -> None:
     assert calls == ["Repository hygiene (README, encoding, secrets and DoD)"]
 
 
-def test_push_never_runs_docker_but_ci_runs_the_docker_smoke(monkeypatch) -> None:
+def test_push_never_runs_docker_but_ci_runs_the_docker_smoke(
+    tmp_path: Path, monkeypatch
+) -> None:
+    import Scripts.quality_gate_dag as quality_gate_dag
+
+    contract = tmp_path / "config/test-execution-profiles.json"
+    contract.parent.mkdir(parents=True)
+    shutil.copy2(ROOT / "config/test-execution-profiles.json", contract)
     monkeypatch.setattr(quality_gate, "_run_command", lambda _command, **_kwargs: 0)
     monkeypatch.setattr(quality_gate, "_ensure_frontend_dependencies", lambda: 0)
+    monkeypatch.setattr(quality_gate_dag, "_prepare_aggregate_inputs", lambda *_args: None)
     docker_called = False
 
-    def run_docker_smoke() -> int:
+    @contextmanager
+    def injected_isolation(**_kwargs: object):
+        assert not (tmp_path / ".git").exists()
+        yield tmp_path, False, None
+
+    monkeypatch.setattr(
+        quality_gate.workspace_isolation,
+        "validation_snapshot",
+        injected_isolation,
+    )
+
+    def run_docker_smoke(_root: Path | None = None) -> int:
         nonlocal docker_called
         docker_called = True
         return 0
@@ -2424,6 +2557,19 @@ def test_push_never_runs_docker_but_ci_runs_the_docker_smoke(monkeypatch) -> Non
         "ci", paths=["backend/api.py"], execution_profile="main"
     ) == 0
     assert docker_called
+
+
+def test_real_main_gate_without_a_git_repository_fails_closed(
+    monkeypatch,
+) -> None:
+    with tempfile.TemporaryDirectory(prefix="quality-gate-no-git-") as directory:
+        root = Path(directory)
+        monkeypatch.setattr(quality_gate, "ROOT", root)
+
+        with pytest.raises(RuntimeError, match="Unable to resolve the active Git index"):
+            quality_gate.run_gate(
+                "ci", paths=["backend/api.py"], execution_profile="main"
+            )
 
 
 def test_real_docker_smoke_is_blocked_without_env(
@@ -2487,7 +2633,9 @@ def test_hooks_and_ci_delegate_to_the_central_command() -> None:
 def test_ci_mode_statically_keeps_the_docker_smoke() -> None:
     gate = (ROOT / "Scripts" / "quality_gate_dag.py").read_text(encoding="utf-8")
     plan = (ROOT / "Scripts" / "quality_gate_plan.py").read_text(encoding="utf-8")
-    docker = (ROOT / "Scripts" / "quality_gate.py").read_text(encoding="utf-8")
+    docker = (ROOT / "Scripts" / "quality_gate_docker_runtime.py").read_text(
+        encoding="utf-8"
+    )
 
     assert 'context.mode in {"ci", "nightly", "release"}' in plan
     assert 'plan.docker_smoke and node == "release-or-container-checks"' in gate
@@ -2544,6 +2692,7 @@ def test_main_validation_preserves_each_historical_control_once_in_the_dag() -> 
         "e2e",
         "release-or-container-checks",
     }
+    assert aggregate["conditionalNeeds"] == ["statistical-consolidated-report"]
 
 
 def test_workspace_pytest_temporaries_are_git_ignored() -> None:
@@ -2973,7 +3122,9 @@ def test_docker_rate_limit_failures_and_smoke_orchestration(tmp_path: Path, monk
 
     (tmp_path / ".env").write_text("ok", encoding="utf-8")
     assert quality_gate._validate_docker_smoke_configuration(tmp_path)
-    monkeypatch.setattr(quality_gate, "_validate_docker_smoke_configuration", lambda: True)
+    monkeypatch.setattr(
+        quality_gate, "_validate_docker_smoke_configuration", lambda _root=None: True
+    )
     commands = []
     monkeypatch.setattr(
         quality_gate,
@@ -2985,7 +3136,9 @@ def test_docker_rate_limit_failures_and_smoke_orchestration(tmp_path: Path, monk
         "_run_docker_http_smoke",
         lambda: (_ for _ in ()).throw(RuntimeError("smoke")),
     )
-    monkeypatch.setattr(quality_gate, "_docker_logs", lambda: commands.append("logs"))
+    monkeypatch.setattr(
+        quality_gate, "_docker_logs", lambda _root=None: commands.append("logs")
+    )
     assert quality_gate._run_docker_smoke() == 1
     assert commands == ["Docker build", "Docker start", "logs", "Docker cleanup"]
 
@@ -3021,14 +3174,17 @@ def test_execute_plan_dependency_error_pre_push_interrupt_and_main_dispatch(
     assert quality_gate.run_pre_push_gate("bad", remote_name="origin") == 2
     target = quality_gate.PushValidationTarget("a" * 40, (), ())
     validation = quality_gate.PushValidationPlan((), (), (target,))
-    monkeypatch.setattr(quality_gate, "parse_pre_push_updates", lambda _text: ())
+    update = quality_gate.PrePushRefUpdate(
+        "refs/heads/main", "a" * 40, "refs/heads/main", "b" * 40
+    )
+    monkeypatch.setattr(quality_gate, "parse_pre_push_updates", lambda _text: (update,))
     monkeypatch.setattr(quality_gate, "build_push_validation_plan", lambda *_a, **_k: validation)
     monkeypatch.setattr(
         quality_gate,
         "detached_commit_worktree",
         lambda *_a, **_k: (_ for _ in ()).throw(KeyboardInterrupt()),
     )
-    assert quality_gate.run_pre_push_gate("", remote_name="origin") == 1
+    assert quality_gate.run_pre_push_gate("updates", remote_name="origin") == 1
 
     monkeypatch.setattr(quality_gate, "run_pre_push_gate", lambda *a, **k: 4)
     monkeypatch.setattr(quality_gate.sys, "stdin", io.StringIO("updates"))
@@ -3135,7 +3291,9 @@ def test_link_rethrow_unexpected_exposure_and_cleanup_propagation(
 
 
 def test_docker_smoke_success_and_pre_push_reference_output(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setattr(quality_gate, "_validate_docker_smoke_configuration", lambda: True)
+    monkeypatch.setattr(
+        quality_gate, "_validate_docker_smoke_configuration", lambda _root=None: True
+    )
     commands: list[str] = []
     monkeypatch.setattr(
         quality_gate,

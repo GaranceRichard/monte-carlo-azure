@@ -30,6 +30,11 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Confirm checked-out SHA
+        run: test "$(git rev-parse HEAD)" = "${{ github.sha }}"
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -55,6 +60,7 @@ jobs:
           --profile ${{ steps.profile.outputs.value }}
           --node preflight
       - name: Upload preflight evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: preflight-${{ steps.profile.outputs.value }}
@@ -66,6 +72,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -76,6 +84,7 @@ jobs:
           --profile ${{ needs.preflight.outputs.profile }}
           --node backend-static
       - name: Upload backend static evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: backend-static-${{ needs.preflight.outputs.profile }}
@@ -87,6 +96,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -102,6 +113,7 @@ jobs:
           --profile ${{ needs.preflight.outputs.profile }}
           --node frontend-static
       - name: Upload frontend static evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: frontend-static-${{ needs.preflight.outputs.profile }}
@@ -118,6 +130,8 @@ jobs:
           - 27017:27017
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -135,6 +149,7 @@ jobs:
           --profile ${{ needs.preflight.outputs.profile }}
           --node backend-tests
       - name: Upload backend evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: backend-tests-${{ needs.preflight.outputs.profile }}
@@ -146,6 +161,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
@@ -158,6 +175,7 @@ jobs:
           --profile ${{ needs.preflight.outputs.profile }}
           --node frontend-tests
       - name: Upload frontend evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: frontend-tests-${{ needs.preflight.outputs.profile }}
@@ -169,6 +187,8 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -187,6 +207,7 @@ jobs:
           --profile ${{ needs.preflight.outputs.profile }}
           --node e2e
       - name: Upload browser evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: e2e-${{ needs.preflight.outputs.profile }}
@@ -198,6 +219,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -209,9 +232,213 @@ jobs:
           --profile ${{ needs.preflight.outputs.profile }}
           --node release-or-container-checks
       - name: Upload release evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: release-checks-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+
+  statistical_authorities:
+    needs: preflight
+    if: needs.preflight.outputs.profile != 'pr'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Validate statistical authorities
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node statistical-authorities
+      - name: Upload statistical authority evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: statistical-authorities-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+
+  statistical_deterministic_parity:
+    needs: [preflight, statistical_authorities]
+    if: needs.preflight.outputs.profile != 'pr'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: |
+          pip install -r requirements.txt
+          npm --prefix frontend ci
+      - uses: actions/download-artifact@v8
+        with:
+          name: statistical-authorities-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+      - name: Run deterministic parity node
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node statistical-deterministic-parity
+      - name: Upload deterministic parity evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: statistical-deterministic-parity-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+
+  statistical_exact_replay:
+    needs: [preflight, statistical_authorities]
+    if: needs.preflight.outputs.profile != 'pr'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: |
+          pip install -r requirements.txt
+          npm --prefix frontend ci
+      - uses: actions/download-artifact@v8
+        with:
+          name: statistical-authorities-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+      - name: Run exact replay and batching node
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node statistical-exact-replay
+      - name: Upload exact replay evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: statistical-exact-replay-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+
+  statistical_distributional_parity:
+    needs: [preflight, statistical_authorities]
+    if: needs.preflight.outputs.profile != 'pr'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: |
+          pip install -r requirements.txt
+          npm --prefix frontend ci
+      - uses: actions/download-artifact@v8
+        with:
+          name: statistical-authorities-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+      - name: Run distributional parity node
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node statistical-distributional-parity
+      - name: Upload distributional parity evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: statistical-distributional-parity-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+
+  statistical_compatibility:
+    needs:
+      - preflight
+      - statistical_authorities
+      - statistical_deterministic_parity
+      - statistical_exact_replay
+      - statistical_distributional_parity
+    if: needs.preflight.outputs.profile != 'pr'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: statistical-*-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+          merge-multiple: true
+      - name: Run statistical compatibility node
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node statistical-compatibility
+      - name: Upload statistical compatibility evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: statistical-compatibility-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+
+  statistical_consolidated_report:
+    needs:
+      - preflight
+      - statistical_deterministic_parity
+      - statistical_exact_replay
+      - statistical_distributional_parity
+      - statistical_compatibility
+    if: needs.preflight.outputs.profile != 'pr'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: statistical-*-${{ needs.preflight.outputs.profile }}
+          path: reports/test-execution-artifacts
+          merge-multiple: true
+      - name: Generate and validate consolidated statistical report
+        run: >-
+          python Scripts/quality_gate.py ci
+          --profile ${{ needs.preflight.outputs.profile }}
+          --node statistical-consolidated-report
+      - name: Upload consolidated statistical evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: statistical-consolidated-report-${{ needs.preflight.outputs.profile }}
           path: reports/test-execution-artifacts
 
   aggregate:
@@ -223,10 +450,44 @@ jobs:
       - frontend-tests
       - e2e
       - release-or-container-checks
+      - statistical_authorities
+      - statistical_deterministic_parity
+      - statistical_exact_replay
+      - statistical_distributional_parity
+      - statistical_compatibility
+      - statistical_consolidated_report
+    if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Require every mandatory node
+        shell: bash
+        run: |
+          test "${{ needs.preflight.result }}" = success
+          test "${{ needs.backend-static.result }}" = success
+          test "${{ needs.frontend-static.result }}" = success
+          test "${{ needs.backend-tests.result }}" = success
+          test "${{ needs.frontend-tests.result }}" = success
+          test "${{ needs.e2e.result }}" = success
+          test "${{ needs.release-or-container-checks.result }}" = success
+          if test "${{ needs.preflight.outputs.profile }}" = pr; then
+            test "${{ needs.statistical_authorities.result }}" = skipped
+            test "${{ needs.statistical_deterministic_parity.result }}" = skipped
+            test "${{ needs.statistical_exact_replay.result }}" = skipped
+            test "${{ needs.statistical_distributional_parity.result }}" = skipped
+            test "${{ needs.statistical_compatibility.result }}" = skipped
+            test "${{ needs.statistical_consolidated_report.result }}" = skipped
+          else
+            test "${{ needs.statistical_authorities.result }}" = success
+            test "${{ needs.statistical_deterministic_parity.result }}" = success
+            test "${{ needs.statistical_exact_replay.result }}" = success
+            test "${{ needs.statistical_distributional_parity.result }}" = success
+            test "${{ needs.statistical_compatibility.result }}" = success
+            test "${{ needs.statistical_consolidated_report.result }}" = success
+          fi
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -248,6 +509,7 @@ jobs:
           --profile ${{ needs.preflight.outputs.profile }}
           --node aggregate
       - name: Upload consolidated test-strategy reports
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: test-strategy-${{ needs.preflight.outputs.profile }}
@@ -265,6 +527,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Confirm published SHA
+        run: test "$(git rev-parse HEAD)" = "${{ github.sha }}"
 
       - name: Compute image name (lowercase)
         id: image

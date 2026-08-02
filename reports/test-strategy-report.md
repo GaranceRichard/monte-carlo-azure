@@ -6,14 +6,14 @@ strategyEvidenceStatus: `incomplete`
 
 ## Global reference
 
-Known logical cases: 1372
+Known logical cases: 1398
 
 ## Profile execution
 
-Selected logical cases: 1369
-Collected instances: 1723
-Executed instances: 1723
-Attempts: 1723
+Selected logical cases: 1398
+Collected instances: 1752
+Executed instances: 1752
+Attempts: 1752
 Retries: 0
 
 ## Evidence manifest
@@ -38,6 +38,12 @@ Retries: 0
 | `node-frontend-tests` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/frontend-tests/result.json` |
 | `node-preflight` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/preflight/result.json` |
 | `node-release-or-container-checks` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/release-or-container-checks/result.json` |
+| `node-statistical-authorities` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/statistical-authorities/result.json` |
+| `node-statistical-compatibility` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/statistical-compatibility/result.json` |
+| `node-statistical-consolidated-report` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/statistical-consolidated-report/result.json` |
+| `node-statistical-deterministic-parity` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/statistical-deterministic-parity/result.json` |
+| `node-statistical-distributional-parity` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/statistical-distributional-parity/result.json` |
+| `node-statistical-exact-replay` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/statistical-exact-replay/result.json` |
 | `runtime-playwright` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/e2e/playwright.json` |
 | `runtime-pytest` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/backend-tests/pytest.json` |
 | `runtime-vitest` | `profileExecution` | yes | `valid` | `reports/test-execution-artifacts/main/frontend-tests/vitest.json` |

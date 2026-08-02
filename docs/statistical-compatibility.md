@@ -14,8 +14,8 @@ Le contrôle s’exécute directement avec :
 ```
 
 La première commande est bloquante : toute dérive, décision incohérente, preuve périmée ou autorité
-illisible retourne un code non nul. Elle n’est volontairement pas encore une étape du profil `main` ; cette
-promotion appartient au PBI 2.21.
+illisible retourne un code non nul. Dans le profil `main`, elle reçoit explicitement les preuves du run déjà
+validées ; l’attestation de compatibilité les lie au même snapshot et à la politique fermée.
 
 ## Inventaire des surfaces, autorités, consommateurs et preuves
 
@@ -119,5 +119,6 @@ d’autorité, empreintes, classification, décision attendue et déclarée, pre
 et action corrective.
 
 Le [rapport consolidé](statistical-consolidated-report.md) consomme cette preuve comme source spécialisée et
-expose un sixième niveau `statistical_compatibility`. Il demeure informatif dans son ensemble ; seul le
-validateur de compatibilité appelé directement est bloquant avant le PBI 2.21.
+expose un sixième niveau `statistical_compatibility`. Dans `main`, la compatibilité précède obligatoirement
+la génération du rapport et son échec empêche le consommateur de produire un faux succès. Le détail de cette
+chaîne est dans [`statistical-main-enforcement.md`](statistical-main-enforcement.md).

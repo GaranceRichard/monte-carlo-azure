@@ -25,6 +25,8 @@ DOCKER_SMOKE_PORT = 18080
 sys.path.insert(0, str(ROOT))
 
 from Scripts import quality_gate_change_policy as change_policy  # noqa: E402
+from Scripts import quality_gate_docker_runtime as docker_runtime  # noqa: E402
+from Scripts import quality_gate_workspace_snapshot as workspace_isolation  # noqa: E402
 from Scripts.git_staging import (  # noqa: E402
     GitStagingError,
     StagedChange,
@@ -280,7 +282,7 @@ def is_zero_oid(value: str) -> bool:
 
 
 def parse_pre_push_updates(stdin_text: str) -> tuple[PrePushRefUpdate, ...]:
-    """Parse the four-column records supplied to a Git pre-push hook."""
+    """Parse zero or more four-column records supplied to a Git pre-push hook."""
     updates: list[PrePushRefUpdate] = []
     for line_number, raw_line in enumerate(stdin_text.splitlines(), start=1):
         if not raw_line.strip():
@@ -304,8 +306,6 @@ def parse_pre_push_updates(stdin_text: str) -> tuple[PrePushRefUpdate, ...]:
                 remote_sha=remote_sha.lower(),
             )
         )
-    if not updates:
-        raise ValueError("Invalid pre-push input: no reference updates were provided.")
     return tuple(updates)
 
 
@@ -1149,6 +1149,32 @@ def staged_index_snapshot(repository_root: Path | None = None) -> Iterator[Path]
         yield snapshot_root
 
 
+def _workspace_snapshot_paths(repository_root: Path) -> tuple[str, ...]:
+    return workspace_isolation.workspace_snapshot_paths(
+        repository_root, isolated_git_environment()
+    )
+
+
+@contextmanager
+def workspace_snapshot(repository_root: Path | None = None) -> Iterator[Path]:
+    """Copy the controlled workspace once so a full local profile remains read-only."""
+    root = repository_root or ROOT
+    git_environment = _index_git_environment(root)
+    with workspace_isolation.workspace_snapshot(
+        root,
+        _workspace_snapshot_paths(root),
+        Path(git_environment["GIT_DIR"]),
+    ) as snapshot_root:
+        yield snapshot_root
+
+
+def _workspace_snapshot_git_environment(snapshot_root: Path) -> dict[str, str]:
+    return workspace_isolation.snapshot_git_environment(
+        snapshot_root,
+        _index_git_environment(ROOT),
+    )
+
+
 def _run_worktree_command(
     args: list[str],
     *,
@@ -1255,9 +1281,11 @@ def _request(
         return exc.code, exc.read().decode("utf-8", errors="replace")
 
 
-def _docker_logs() -> None:
+def _docker_logs(repository_root: Path = ROOT) -> None:
     subprocess.run(
-        ["docker", "compose", "logs", "backend", "mongo", "redis"], cwd=ROOT, check=False
+        ["docker", "compose", "logs", "backend", "mongo", "redis"],
+        cwd=repository_root,
+        check=False,
     )
 
 
@@ -1332,53 +1360,20 @@ def _run_docker_http_smoke() -> None:
         )
 
 
-def _run_docker_smoke() -> int:
-    if not _validate_docker_smoke_configuration():
-        return 1
-
-    started = False
-    compose_env = {"APP_PORT": str(DOCKER_SMOKE_PORT)}
-    try:
-        for command in (
-            GateCommand(
-                "Docker build",
-                ("docker", "compose", "build"),
-                "Install and start Docker Desktop, then ensure `docker compose version` succeeds.",
-            ),
-            GateCommand(
-                "Docker start",
-                ("docker", "compose", "up", "-d"),
-                "Install and start Docker Desktop, then correct the Docker startup error.",
-            ),
-        ):
-            code = _run_command(command, extra_env=compose_env)
-            if code:
-                return code
-            started = True
-
-        _run_docker_http_smoke()
-    except (RuntimeError, urllib.error.URLError, OSError) as exc:
-        print("ERROR: step failed: Docker smoke test", file=sys.stderr)
-        print("Failed command: HTTP Docker smoke checks", file=sys.stderr)
-        print(f"Detail: {exc}", file=sys.stderr)
-        print(
-            "Expected correction: inspect Docker logs and correct the health, persistence, or "
-            "rate-limit failure.",
-            file=sys.stderr,
-        )
-        _docker_logs()
-        return 1
-    finally:
-        if started:
-            _run_command(
-                GateCommand(
-                    "Docker cleanup",
-                    ("docker", "compose", "down", "-v"),
-                    "Stop the Docker services manually after resolving the failure.",
-                ),
-                extra_env=compose_env,
-            )
-    return 0
+def _run_docker_smoke(repository_root: Path | None = None) -> int:
+    root = repository_root or ROOT
+    configured = _validate_docker_smoke_configuration if repository_root is None else (
+        lambda: _validate_docker_smoke_configuration(root)
+    )
+    return docker_runtime.run_docker_smoke(
+        root=root,
+        port=DOCKER_SMOKE_PORT,
+        configured=configured,
+        command_type=GateCommand,
+        run_command=_run_command,
+        http_smoke=_run_docker_http_smoke,
+        logs=_docker_logs,
+    )
 
 
 def _command_environment(
@@ -1509,14 +1504,20 @@ def run_gate(
         print("Documentation-only change detected: expensive code checks are skipped.")
     _print_plan_selection(plan)
 
-    snapshot_manager = staged_index_snapshot() if mode == "fast" else nullcontext(ROOT)
-    with snapshot_manager as validation_root:
-        isolated_validation = mode == "fast"
+    with workspace_isolation.validation_snapshot(
+        mode=mode,
+        profile=plan.execution_profile,
+        selected_node=selected_node,
+        repository_root=ROOT,
+        staged_snapshot=staged_index_snapshot,
+        full_snapshot=workspace_snapshot,
+        index_environment=_index_git_environment,
+        full_environment=_workspace_snapshot_git_environment,
+    ) as (validation_root, isolated_validation, command_env):
         runtime_temp_root = _runtime_temp_root(
             validation_root,
             isolated_validation=isolated_validation,
         )
-        command_env = _index_git_environment() if mode == "fast" else None
         code = _execute_gate_plan(
             plan,
             validation_root=validation_root,
@@ -1535,6 +1536,23 @@ def run_gate(
     return 0
 
 
+def _print_push_validation(
+    validation: PushValidationPlan, remote_name: str, remote_url: str
+) -> None:
+    print(f"Pre-push remote: {remote_name} {remote_url}".rstrip())
+    for commit_range in validation.ranges:
+        update = commit_range.update
+        if update.is_deletion:
+            print(f"Reference deletion: {update.remote_ref}")
+            continue
+        revision = " ".join(commit_range.revision_args)
+        print(
+            f"Reference update: {update.local_ref} -> {update.remote_ref} "
+            f"({revision}; commits={len(commit_range.commit_shas)}; "
+            f"files={len(commit_range.changed_paths)})"
+        )
+
+
 def run_pre_push_gate(
     stdin_text: str,
     *,
@@ -1545,23 +1563,15 @@ def run_pre_push_gate(
     """Validate each distinct terminal commit while preserving introduced diffs."""
     try:
         updates = parse_pre_push_updates(stdin_text)
+        if not updates:
+            print("Pre-push: no reference updates; nothing to validate.")
+            return 0
         validation = build_push_validation_plan(updates, remote_name, repository_root)
     except (RuntimeError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
 
-    print(f"Pre-push remote: {remote_name} {remote_url}".rstrip())
-    for commit_range in validation.ranges:
-        update = commit_range.update
-        if update.is_deletion:
-            print(f"Reference deletion: {update.remote_ref}")
-        else:
-            revision = " ".join(commit_range.revision_args)
-            print(
-                f"Reference update: {update.local_ref} -> {update.remote_ref} "
-                f"({revision}; commits={len(commit_range.commit_shas)}; "
-                f"files={len(commit_range.changed_paths)})"
-            )
+    _print_push_validation(validation, remote_name, remote_url)
 
     for target in validation.targets:
         print(f"\nValidating pushed terminal commit: {target.terminal_sha}")

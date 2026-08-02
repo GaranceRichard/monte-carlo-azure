@@ -658,6 +658,16 @@ Chaque test DOIT pouvoir être exécuté :
 * en parallèle, lorsque prévu ;
 * sans dépendre d’un résultat d’un test précédent.
 
+Lorsqu’un profil d’exécution complet compose plusieurs preuves, son DAG DOIT distinguer les prérequis, les
+nœuds indépendants et les consommateurs. Une preuve valide PEUT être partagée dans le même run, mais NE DOIT
+PAS être recalculée silencieusement par plusieurs consommateurs. Un prérequis en échec DOIT empêcher tout faux
+succès de ses consommateurs.
+
+Dans ce projet, le profil `main` est l’autorité locale et CI de conformité statistique. Ses règles de statut,
+de fraîcheur, de snapshot et de diagnostic sont définies dans
+[`docs/statistical-main-enforcement.md`](../statistical-main-enforcement.md). Les profils plus légers ne
+portent pas implicitement cette garantie complète.
+
 ## 11.6 Données de test
 
 Les données de test doivent être :

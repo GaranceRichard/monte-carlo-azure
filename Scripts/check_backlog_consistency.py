@@ -108,39 +108,52 @@ def _percentage(completed: int, total: int) -> str:
     return value.replace(".", ",")
 
 
-def _current_feature(features: tuple[Feature, ...]) -> Feature:
-    current = next(
+def _current_feature(features: tuple[Feature, ...]) -> Feature | None:
+    return next(
         (feature for feature in features if 0 < feature.completed_count < len(feature.pbis)),
         None,
     )
-    if current is None:
-        raise ValueError("The backlog has no Feature in progress.")
-    return current
 
 
-def render_backlog_summary(features: tuple[Feature, ...]) -> str:
+def _status_rows(features: tuple[Feature, ...]) -> list[str]:
     current = _current_feature(features)
+    if current is None:
+        completed = [
+            feature for feature in features if feature.completed_count == len(feature.pbis)
+        ]
+        latest = max(completed, key=lambda feature: feature.number)
+        return [
+            "**Feature en cours :** aucune Feature partiellement réalisée.",
+            "**Prochain PBI :** à prioriser selon la gouvernance du backlog.",
+            (
+                f"**Dernière Feature terminée :** Feature {latest.number} — {latest.title} — "
+                f"{len(latest.pbis)}/{len(latest.pbis)} PBI réalisés (100 %)."
+            ),
+        ]
     open_current = tuple(pbi for pbi in current.pbis if not pbi.completed)
     next_pbi = open_current[0]
-    total = sum(len(feature.pbis) for feature in features)
-    completed = sum(feature.completed_count for feature in features)
-    rows = [
-        BACKLOG_SUMMARY_MARKER,
-        "",
+    return [
         (
             f"**Feature en cours :** Feature {current.number} — {current.title} — "
             f"{current.completed_count}/{len(current.pbis)} PBI réalisés "
             f"({_percentage(current.completed_count, len(current.pbis))} %)."
         ),
-        (
-            f"**Prochain PBI :** `{next_pbi.identifier}` — {next_pbi.title} — "
-            "non commencé."
-        ),
+        f"**Prochain PBI :** `{next_pbi.identifier}` — {next_pbi.title} — non commencé.",
         (
             f"**Reliquats de la Feature {current.number} :** "
             + ", ".join(f"`{pbi.identifier}`" for pbi in open_current)
             + "."
         ),
+    ]
+
+
+def render_backlog_summary(features: tuple[Feature, ...]) -> str:
+    total = sum(len(feature.pbis) for feature in features)
+    completed = sum(feature.completed_count for feature in features)
+    rows = [
+        BACKLOG_SUMMARY_MARKER,
+        "",
+        *_status_rows(features),
         (
             f"**Progression globale :** {completed}/{total} PBI réalisés "
             f"({_percentage(completed, total)} %) ; {total - completed} restants."

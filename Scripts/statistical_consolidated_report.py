@@ -96,10 +96,6 @@ def _not_evaluated() -> list[dict[str, str]]:
                 "No equivalence is claimed outside recorded corpus cases and protocol scenarios."
             ),
         },
-        {
-            "id": "blocking_main_enforcement",
-            "statement": "Complete blocking enforcement in main remains outside this report.",
-        },
     ]
 
 
@@ -142,18 +138,21 @@ def _conclusions(
             "all_diagnostics_preserved": True,
         },
         "enforcement": {
-            "level": "informational",
-            "blocking": False,
+            "level": "blocking_in_main",
+            "blocking": True,
             "generator_failure_classifications": list(VERDICT_PRIORITY[:5]),
-            "full_main_enforcement_scope": "PBI 2.21",
+            "full_main_enforcement_scope": "config/statistical-main-enforcement-v1.0.json",
         },
         "limits": [{"proof_level": level["id"], "statements": level["limits"]} for level in levels],
         "not_evaluated": _not_evaluated(),
     }
 
 
-def build_consolidated_report(root: Path = ROOT) -> dict[str, Any]:
-    records, diagnostics = load_sources(root)
+def build_consolidated_report(
+    root: Path = ROOT,
+    source_paths: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    records, diagnostics = load_sources(root, source_paths)
     diagnostics.extend(validate_sources(records))
     diagnostics.extend(parity_diagnostics(records["deterministic_parity"]))
     diagnostics.extend(exact_diagnostics(records["exact_replay"]))

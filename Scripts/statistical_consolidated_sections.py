@@ -214,8 +214,8 @@ def _compatibility_proof(record: SourceRecord, diagnostics: list[dict[str, Any]]
             diagnostics=summary.get("diagnostic_count", 0),
         ),
         "limits": [
-            "The control blocks when called directly; complete main-profile "
-            "integration is PBI 2.21."
+            "In main, this validated run-scoped proof is blocking; its scope remains "
+            "the declared authorities, versions, decisions, and evidence."
         ],
     }
 

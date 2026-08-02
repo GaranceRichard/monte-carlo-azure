@@ -69,6 +69,16 @@ def _case_summary(records: Iterable[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _validate_plan_inputs(
+    contract: dict[str, Any], inventory: list[dict[str, Any]], change_level: str | None
+) -> None:
+    errors = validate_contract(contract) + validate_inventory(inventory)
+    if errors:
+        raise ValueError("; ".join(errors))
+    if change_level is not None and change_level not in CHANGE_LEVELS:
+        raise ValueError(f"Unknown change level: {change_level}")
+
+
 def build_profile_plan(
     contract: dict[str, Any],
     inventory: list[dict[str, Any]],
@@ -76,11 +86,7 @@ def build_profile_plan(
     *,
     change_level: str | None = None,
 ) -> dict[str, Any]:
-    errors = validate_contract(contract) + validate_inventory(inventory)
-    if errors:
-        raise ValueError("; ".join(errors))
-    if change_level is not None and change_level not in CHANGE_LEVELS:
-        raise ValueError(f"Unknown change level: {change_level}")
+    _validate_plan_inputs(contract, inventory, change_level)
     included = included_profiles(contract, profile)
     selected = [item for item in inventory if item["executionProfile"] in included]
     records_by_node: dict[str, list[dict[str, Any]]] = {
@@ -93,6 +99,11 @@ def build_profile_plan(
         {
             "id": identifier,
             "needs": list(nodes[identifier]["needs"]),
+            "conditionalNeeds": [
+                dependency
+                for dependency in nodes[identifier]["conditionalNeeds"]
+                if dependency in nodes
+            ],
             "commands": list(nodes[identifier]["commands"]),
             "reads": list(nodes[identifier]["reads"]),
             "writes": list(nodes[identifier]["writes"]),

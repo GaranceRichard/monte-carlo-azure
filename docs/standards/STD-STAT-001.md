@@ -323,6 +323,15 @@ réimplémentées en Python uniquement pour créer une parité artificielle.
 Les responsabilités frontend-only **DOIVENT** consommer les résultats normatifs sans les altérer. Le Cycle
 Time **DOIT** rester explicitement hors du contrat de parité Monte Carlo.
 
+### Contrôle opérationnel du standard
+
+Le profil `main` applique ce standard sans en étendre la portée. Il valide les autorités et exécute les
+preuves déterministe, exacte, de batching, distributionnelle et de compatibilité avant de produire puis
+valider leur rapport consolidé. `match` n’est accepté qu’avec des sources présentes, cohérentes, actuelles et
+liées au même snapshot. La politique d’exécution et ses statuts sont définis dans
+[`statistical-main-enforcement.md`](../statistical-main-enforcement.md) ; elle ne modifie aucune règle
+`STAT-PAR`, aucun seuil, corpus, scénario ou protocole.
+
 ## 12. Versionnement et compatibilité
 
 ### Matérialisation du corpus version `1.0`

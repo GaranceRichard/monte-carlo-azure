@@ -454,8 +454,9 @@ comme oracle ; son artefact est recalculé exactement par un validateur indépen
 
 Les preuves `reports/statistical-distribution-calibration.json` et
 `reports/statistical-distribution-evidence.json` sont déterministes et portent leur empreinte canonique.
-Le contrôle reste informatif et extérieur au profil `main`; il ne consolide pas la preuve exacte, ne décide
-pas la compatibilité d’une future version et ne constitue pas un backtesting sur données Azure DevOps.
+La preuve spécialisée conserve son statut propre ; le profil `main` l’exécute désormais puis applique la
+politique bloquante sans modifier ses seuils. Elle ne consolide pas la preuve exacte, ne décide pas la
+compatibilité d’une future version et ne constitue pas un backtesting sur données Azure DevOps.
 La méthode, les autorités statistiques et les limites sont détaillées dans
 [`docs/statistical-distribution-protocol.md`](docs/statistical-distribution-protocol.md).
 
@@ -479,9 +480,10 @@ canonique `reports/statistical-consolidated-report.json` et le Markdown associé
 Leur identité logique dépend uniquement des sources ; l’empreinte exclut son propre champ et aucun chemin
 absolu, timestamp mural ou identifiant machine n’entre dans la partie canonique.
 
-Le rapport reste `informational`. Les preuves absentes, invalides ou inexécutables font échouer le
-générateur et restent visibles dans le rapport, mais aucune dérive future n’est gouvernée et aucun contrôle
-de parité n’est ajouté au DAG `main`. Ces limites et les règles de lecture sont détaillées dans
+Le rapport versionné reste une autorité de référence. Dans `main`, une copie run-scoped est générée depuis
+les preuves courantes, validée indépendamment et soumise au verdict bloquant. Les preuves absentes,
+invalides ou inexécutables font échouer leur contrôle spécialisé avant la consolidation. Ces limites et les
+règles de lecture sont détaillées dans
 [`docs/statistical-consolidated-report.md`](docs/statistical-consolidated-report.md).
 
 ### Autorité et contrôle de compatibilité statistique
@@ -498,7 +500,7 @@ chaque historique ou cache concerné.
 TypeScript sous forme de tokens sans commentaires, les règles `STAT-PAR` et les fragments JSON normatifs.
 Il refuse toute autorité absente, ambiguë ou non analysable, compare la lignée déjà acceptée dans Git quand
 elle existe, valide les preuves et produit `reports/statistical-compatibility-evidence.json`. Le contrôle
-est bloquant lorsqu’il est appelé directement. Il n’est pas encore une étape du profil `main`.
+est bloquant directement et dans le profil `main`, où il consomme les preuves run-scoped déjà validées.
 
 Le rapport consolidé consomme cette preuve comme onzième source et conserve un sixième niveau
 `statistical_compatibility`. Cette intégration expose l’état sans relancer les moteurs, sans modifier les
@@ -818,6 +820,15 @@ sont isolés sous `reports/test-execution-artifacts/<profil>/<nœud>/`. Les prod
 `_promote_artifacts()` retrouve ainsi l’arborescence par profil et nœud avant consolidation.
 Le smoke Docker utilise le port hôte isolé `18080`, distinct des ports `8000/4173` de la branche E2E.
 
+Le profil `main` ajoute un sous-DAG statistique explicite : validation des autorités, puis branches
+déterministe, exacte/batching et distributionnelle parallèles, compatibilité, consolidation et validation
+indépendante, avant `aggregate`. Chaque succès porte une attestation de snapshot, politique, contrôles et
+artefacts. La validation locale complète copie le workspace une fois dans un snapshot temporaire ; seuls le
+`GIT_DIR` en lecture et l’outillage `frontend/node_modules` hôte sont exposés. Les sources restent dans le
+snapshot et tout lien ou répertoire temporaire est nettoyé. Le plan, les statuts et les commandes sont
+détaillés dans
+[`docs/statistical-main-enforcement.md`](docs/statistical-main-enforcement.md).
+
 La sélection des contrôles est centralisée dans `Scripts/quality_gate.py` :
 
 - `targeted` exécute les contrôles généraux et les tests directs identifiables ;
@@ -840,6 +851,16 @@ Le hook `.githooks/pre-commit` délègue à `Scripts/quality_gate.py fast`, dont
 contenir `README.md` racine avec un statut ajouté ou modifié. Un README imbriqué, supprimé, renommé ou modifié
 seulement dans le worktree est refusé. L'index vide reste accepté afin que les validations de conformité sans
 intention de commit puissent s'exécuter.
+
+Le snapshot `fast` matérialise le contenu de l'index sans embarquer de répertoire `.git`; il est déjà la
+frontière isolée du pré-commit. Les tests unitaires qui vérifient uniquement l'orchestration injectent
+explicitement cette frontière, tandis que les tests du comportement Git construisent un dépôt et un index
+temporaires. Le snapshot complet de `main` reste distinct : une exécution réelle doit résoudre l'index et le
+`GIT_DIR` du dépôt contrôlé et échoue explicitement si cette autorité Git manque.
+
+Une invocation pré-push sans mise à jour de référence est un no-op réussi et ne construit aucun plan. Dès
+qu'une ligne non vide est fournie, sa forme à quatre champs et ses OID complets restent validés de manière
+bloquante avant toute sélection de commit.
 
 Pour toute validation isolée, l’environnement de commande commun fixe explicitement
 `MONTECARLO_E2E_PYTHON` sur l’interpréteur Python hôte. Cette règle est appliquée de façon identique à la

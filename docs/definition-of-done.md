@@ -17,7 +17,9 @@ restent applicables.
 - **Validation massive** : plan complet déclenché par un changement transverse, structurel, central,
   inconnu ou ambigu. Toute résolution incertaine se replie vers `massive`.
 - **Validation complète** : task VS Code `Validation : profil main`, avec conformité de classification, lint,
-  typecheck, couvertures Python et frontend, build, E2E, Vitals et convention de nommage.
+  typecheck, couvertures Python et frontend, build, E2E, Vitals, convention de nommage et sous-DAG
+  statistique bloquant décrit dans
+  [`statistical-main-enforcement.md`](statistical-main-enforcement.md).
 - **Conformité DoD** : validation complète verte, seuils respectés, documentation normative cohérente,
   sécurité et traçabilité vérifiées.
 - **Publiabilité** : conformité DoD, worktree Git valide, branche courante identifiée et remote GitHub
@@ -32,7 +34,11 @@ restent applicables.
   du README racine ne satisfait pas cette condition. Un index vide reste accepté par ce contrôle.
 - Le pré-push lit les références transmises par Git, calcule les commits introduits et valide chaque SHA
   terminal distinct dans un worktree détaché temporaire. Il n’utilise aucun stash et ignore le workspace
-  courant.
+  courant. Une entrée totalement vide réussit sans lancer la gate ; toute ligne non vide malformée reste
+  bloquante.
+- Le snapshot du pré-commit matérialise l’index sans `.git`. Les tests qui ne portent pas sur Git injectent
+  explicitement cette frontière déjà isolée ; les tests du snapshot Git utilisent exclusivement un dépôt et
+  un index temporaires. Le snapshot complet de `main` continue d’exiger un dépôt et un index valides.
 - Toute validation isolée transmet `MONTECARLO_E2E_PYTHON` avec l’interpréteur Python hôte à chaque chemin
   d’exécution : séquence, branches parallèles du DAG et nœud sélectionné. Le serveur Playwright du worktree
   réutilise ainsi explicitement les dépendances Python hôte.
@@ -44,6 +50,14 @@ restent applicables.
 - La CI résout explicitement `pr`, `main`, `nightly` ou `release`, puis exécute
   `python Scripts/quality_gate.py ci --profile <profil> --node <nœud>` dans plusieurs jobs. `preflight`
   précède les branches indépendantes et `aggregate` dépend de toutes les branches.
+- La validation locale complète de `main`, `nightly` ou `release` s’exécute dans une copie temporaire des
+  fichiers suivis et non ignorés. Les sorties ne modifient pas les preuves versionnées du workspace ; le
+  snapshot, l’exposition unique de `frontend/node_modules` et les temporaires sont nettoyés après succès,
+  échec ou interruption.
+- Dans `main`, corpus et sondes, parité déterministe, rejeu exact, indépendance du batching, protocole et
+  parité distributionnels, compatibilité, génération et validation du rapport consolidé sont obligatoires.
+  Les trois preuves indépendantes précèdent la compatibilité ; le rapport consomme leurs artefacts validés
+  du run et `aggregate` refuse tout nœud statistique échoué ou sauté.
 - La hiérarchie obligatoire est `pr = pr`, `main = pr + main`,
   `nightly = pr + main + nightly` et `release = pr + main + release`.
 - Les niveaux `targeted`, `impacted` et `massive` restent des portées de changement et ne remplacent jamais
@@ -67,6 +81,9 @@ restent applicables.
 - Frontend : `npm --prefix frontend run lint -- --max-warnings 0` passe sans erreur ni avertissement.
 - TypeScript : `npm --prefix frontend run typecheck` passe sans erreur.
 - Python : la suite Pytest sélectionnée ou complète passe sans erreur pour le backend et l’outillage.
+- Statistique : la politique fermée n’accepte que `match`; toute divergence, non-conclusion, source ou
+  décision absente, schéma, empreinte ou fraîcheur invalide, ou erreur moteur, protocole ou infrastructure
+  bloque la validation complète.
 - Frontend unitaire : la suite Vitest sélectionnée ou complète passe sans erreur.
 - E2E : `npm --prefix frontend run test:e2e` passe sur les parcours critiques.
 - Build : `npm --prefix frontend run build` passe sans erreur.

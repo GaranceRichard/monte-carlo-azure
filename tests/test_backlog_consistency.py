@@ -43,14 +43,10 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     features = check_backlog_consistency.parse_registry(backlog)
 
     assert sum(len(feature.pbis) for feature in features) == 141
-    assert sum(feature.completed_count for feature in features) == 31
+    assert sum(feature.completed_count for feature in features) == 32
     feature_two = next(feature for feature in features if feature.number == 2)
-    assert feature_two.completed_count == 20
-    assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == [
-        # PBI 2.20 completed on 01/08/2026 with direct compatibility enforcement.
-        # Only promotion to the main profile remains open.
-        "2.21",
-    ]
+    assert feature_two.completed_count == 21
+    assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == []
     assert check_backlog_consistency.expected_documents(backlog, governance) == (
         backlog,
         governance,
@@ -118,7 +114,7 @@ def test_generation_rejects_missing_governance_marker() -> None:
         check_backlog_consistency.expected_documents(_source_backlog(), "# Gouvernance\n")
 
 
-def test_generation_requires_one_feature_in_progress() -> None:
+def test_generation_accepts_a_transition_without_feature_in_progress() -> None:
     completed = (
         _source_backlog()
         .replace(
@@ -132,8 +128,9 @@ def test_generation_requires_one_feature_in_progress() -> None:
     )
     features = check_backlog_consistency.parse_registry(completed)
 
-    with pytest.raises(ValueError, match="no Feature in progress"):
-        check_backlog_consistency.render_backlog_summary(features)
+    summary = check_backlog_consistency.render_backlog_summary(features)
+    assert "Feature en cours :** aucune Feature partiellement réalisée" in summary
+    assert "Dernière Feature terminée :** Feature 2 — Courante" in summary
 
 
 def test_cli_reports_unreadable_input(tmp_path: Path, capsys) -> None:

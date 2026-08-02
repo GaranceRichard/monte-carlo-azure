@@ -531,12 +531,30 @@ def test_missing_node_result_is_not_inferred_from_ci_dependency(tmp_path: Path) 
 
 
 def test_pr_has_no_required_e2e_and_aggregate_does_not_require_itself(tmp_path: Path) -> None:
-    model = reporting.build_report_model(_repository(tmp_path), "pr", now=NOW)
+    root = _repository(tmp_path)
+    contract_path = root / "config/test-execution-profiles.json"
+    contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    backend_static = next(item for item in contract["nodes"] if item["id"] == "backend-static")
+    backend_static["profiles"] = ["main"]
+    _write_json(root, "config/test-execution-profiles.json", contract)
+    (root / "reports/test-execution-artifacts/pr/backend-static/result.json").unlink()
+
+    model = reporting.build_report_model(root, "pr", now=NOW)
     nodes = {item["id"]: item for item in model["profileExecution"]["nodes"]}
 
     assert nodes["e2e"]["status"] == "not_applicable"
     assert nodes["aggregate"]["status"] == "not_applicable"
     assert nodes["aggregate"]["required"] is False
+    assert nodes["backend-static"]["status"] == "not_applicable"
+    assert not any(item["id"] == "node-backend-static" for item in model["evidenceManifest"])
+
+    main_nodes, main_evidence, _violations = reporting.node_evidence(
+        root, "main", contract, []
+    )
+    main_backend_static = next(item for item in main_nodes if item["id"] == "backend-static")
+    assert main_backend_static["required"] is True
+    assert main_backend_static["status"] == "missing"
+    assert any(item["id"] == "node-backend-static" for item in main_evidence)
 
 
 def test_governance_zeroes_are_explicit_and_violation_is_non_compliant(tmp_path: Path) -> None:

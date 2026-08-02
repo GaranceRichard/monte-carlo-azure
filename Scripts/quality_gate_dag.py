@@ -18,6 +18,7 @@ from Scripts.test_execution_profiles import (
     topological_node_ids,
     write_report,
 )
+from Scripts.test_execution_profiles_graph import active_dependencies
 
 
 def _contract(root: Path) -> dict[str, Any]:
@@ -119,7 +120,7 @@ def _run_node(
         if code:
             break
     if not code and plan.docker_smoke and node == "release-or-container-checks":
-        code = q._run_docker_smoke()
+        code = q._run_docker_smoke(validation_root)
     duration = time.perf_counter() - started
     _write_result(validation_root, plan.execution_profile, node, code, duration)
     return code, duration
@@ -132,7 +133,7 @@ def _ready_nodes(
         (
             identifier
             for identifier in pending
-            if set(nodes[identifier].get("needs", [])) <= completed
+            if active_dependencies(nodes[identifier], nodes) <= completed
         ),
         key=lambda item: (nodes[item].get("order", 0), item),
     )
@@ -246,7 +247,10 @@ def _aggregate(validation_root: Path, plan: Any, durations: dict[str, float]) ->
     nodes = active_nodes(contract, plan.execution_profile)
     longest: dict[str, float] = {}
     for identifier in topological_node_ids(contract, plan.execution_profile):
-        dependencies = [longest.get(item, 0.0) for item in nodes[identifier]["needs"]]
+        dependencies = [
+            longest.get(item, 0.0)
+            for item in active_dependencies(nodes[identifier], nodes)
+        ]
         longest[identifier] = durations.get(identifier, 0.0) + max(dependencies, default=0.0)
     wall = max(longest.values(), default=sequential)
     _write_result(validation_root, plan.execution_profile, "aggregate", 0, wall)

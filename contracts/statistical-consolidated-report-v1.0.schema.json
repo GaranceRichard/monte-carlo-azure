@@ -251,10 +251,10 @@
       "additionalProperties": false,
       "required": ["level", "blocking", "generator_failure_classifications", "full_main_enforcement_scope"],
       "properties": {
-        "level": { "const": "informational" },
-        "blocking": { "const": false },
+        "level": { "const": "blocking_in_main" },
+        "blocking": { "const": true },
         "generator_failure_classifications": { "type": "array", "items": { "$ref": "#/$defs/classification" } },
-        "full_main_enforcement_scope": { "const": "PBI 2.21" }
+        "full_main_enforcement_scope": { "const": "config/statistical-main-enforcement-v1.0.json" }
       }
     },
     "limit": {

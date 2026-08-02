@@ -89,8 +89,7 @@ def _compatibility_lines(report: dict[str, Any]) -> list[str]:
         f"- Statut : `{compatibility['status']}`.",
         f"- Autorité : `{compatibility['authority']['id']}` "
         f"version `{compatibility['authority']['version']}`.",
-        "- Exécution directe : bloquante ; intégration obligatoire au profil "
-        "`main` réservée au PBI 2.21.",
+        "- Exécution directe et intégration au profil `main` : bloquantes.",
         f"- Composants conformes : {summary['matching_component_count']}/"
         f"{summary['component_count']}.",
         f"- Preuves conformes : {summary['matching_proof_count']}/{summary['proof_count']}.",
@@ -179,7 +178,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         "# État consolidé des garanties statistiques",
         "",
         f"- Verdict consolidé : `{report['verdict']['status']}`",
-        "- Enforcement courant : `informational` ; ce rapport n’est pas un contrôle bloquant.",
+        "- Enforcement courant : `blocking_in_main` par la politique versionnée.",
         "- Contrat normatif : `STD-STAT-001` version `1.0`.",
         "- Corpus : `mca-statistical-reference-corpus` version `1.0`.",
         "- Protocole distributionnel : `mca-statistical-distributional-parity` version `1.0`.",
@@ -214,7 +213,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         "",
         "Ces preuves ne constituent pas un backtesting empirique Azure DevOps. Les dérives de "
         "version et décisions de compatibilité sont contrôlées par la preuve spécialisée ; "
-        "l’enforcement complet dans le profil `main` appartient au PBI 2.21.",
+        "le profil `main` bloque toute preuve obligatoire absente, invalide ou non conforme.",
     ]
     return "\n".join(lines) + "\n"
 

@@ -1,12 +1,12 @@
 # État consolidé des garanties statistiques
 
 - Verdict consolidé : `match`
-- Enforcement courant : `informational` ; ce rapport n’est pas un contrôle bloquant.
+- Enforcement courant : `blocking_in_main` par la politique versionnée.
 - Contrat normatif : `STD-STAT-001` version `1.0`.
 - Corpus : `mca-statistical-reference-corpus` version `1.0`.
 - Protocole distributionnel : `mca-statistical-distributional-parity` version `1.0`.
-- Empreinte du contenu : `f26eb671fa5f9a8390897d68b5ec9b0d2beb476c44aea52478b3785651f454d9`.
-- Empreinte des sources : `59262cf646ad88c5aeff7fe43f186661c8485db75716692cba8d638a41004366`.
+- Empreinte du contenu : `d8780d61b48186b5efd1f2d78d3877d64ff133e1a1f329ca759bf4c1e8968059`.
+- Empreinte des sources : `67a2d1c493fc24699ae1e619050687f783def7281a00f78285c2f59d0768804d`.
 
 Le verdict applique la priorité documentée sans fusionner les niveaux de preuve. Un rejeu exact conforme n’annule donc ni un résultat distributionnel non concluant, ni une divergence ou une preuve invalide.
 
@@ -25,7 +25,7 @@ Le verdict applique la priorité documentée sans fusionner les niveaux de preuv
 
 - Statut : `match`.
 - Autorité : `mca-statistical-compatibility-authority` version `1.0`.
-- Exécution directe : bloquante ; intégration obligatoire au profil `main` réservée au PBI 2.21.
+- Exécution directe et intégration au profil `main` : bloquantes.
 - Composants conformes : 15/15.
 - Preuves conformes : 8/8.
 - Diagnostics : 0.
@@ -34,7 +34,7 @@ Le verdict applique la priorité documentée sans fusionner les niveaux de preuv
 
 | Source | Version déclarée | Validation | SHA-256 | Empreinte canonique |
 | --- | --- | --- | --- | --- |
-| `normative_standard` | `1.0` | `valid` | `f12470f710096606674c0f46ded53c35045e0fc9052f3279ba6c53e54efab9ee` | `non fournie` |
+| `normative_standard` | `1.0` | `valid` | `a22852843085f0a073ef42bebc7d3ab63e0cc009e342ecd177e2493e5bbcd6eb` | `non fournie` |
 | `prng_vectors` | `1.0` | `valid` | `fd405aab04b04ba34e3372a2a581f504bfa501cca925055e20f655f1fda29826` | `non fournie` |
 | `reference_corpus` | `1.0` | `valid` | `c81c699319faef4ded0cb9fe974fad76d22ecd9a661ce807d581cb3acc04c49d` | `non fournie` |
 | `validation_probes` | `1.0` | `valid` | `1dbdd37dbd4bd068bb18372ba7292eef01f3fbaba9f12cfb798d359aa9ef1e3c` | `non fournie` |
@@ -44,7 +44,7 @@ Le verdict applique la priorité documentée sans fusionner les niveaux de preuv
 | `distribution_seed_population` | `1.0` | `valid` | `e9a350d7eabafe682b34e97817573e2dbbe52403565af830afeefd57092098cf` | `889e757eab13c3766225989e5df3660affccd90dddc91d9314e7b0e3e4a621e9` |
 | `distribution_calibration` | `1.0` | `valid` | `d11ea89dbe4514b229d57cc11f52a745823430892619609e638d189603521f58` | `6a86b14a6ab9d6cc40b6b357220126a038a6f47b37619e10653ff03be988d7be` |
 | `distribution_evidence` | `1.0` | `valid` | `b6cb2d7754e1a63afa11db1731d89606a77abcfc8dc5e9f217e5ef42a755fd54` | `f464e271f8c1eaa44aa1cb859ebefa0179de7196be5ff37073efb858b02aa756` |
-| `compatibility_evidence` | `1.0` | `valid` | `5fc9763f274a48d1511b8b2198cf943fb04a4966759fe920b46911107ea40011` | `e9214dee975b0448e97fd65c30ccfda66646a23fd02ea32cf46e24c110c6a5c5` |
+| `compatibility_evidence` | `1.0` | `valid` | `b238b7c1b44da510b668299d7443231ff99754194eae74331063a54c17bf477d` | `b557524634319a7fd398698aa86a1e1905e77682f1799a025819c5904138ab33` |
 
 ## Cas normatifs et rejeu exact
 
@@ -88,13 +88,12 @@ Aucun diagnostic spécialisé ou d’intégrité.
 - `exact_interlanguage_replay` — Exact replay applies only to the corpus and declared versions.
 - `batching_independence` — Independence is not extrapolated beyond the recorded batch geometries.
 - `distributional_parity` — Distributional evidence is not exact replay and is bounded by documented power.
-- `statistical_compatibility` — The control blocks when called directly; complete main-profile integration is PBI 2.21.
+- `statistical_compatibility` — In main, this validated run-scoped proof is blocking; its scope remains the declared authorities, versions, decisions, and evidence.
 - `azure_devops_empirical_backtesting` — No empirical Azure DevOps backtesting is evaluated.
 - `universal_equivalence` — No equivalence is claimed outside recorded corpus cases and protocol scenarios.
-- `blocking_main_enforcement` — Complete blocking enforcement in main remains outside this report.
 
 ## Interprétation
 
 Le rejeu exact porte uniquement sur le corpus et les versions déclarées. La preuve distributionnelle porte uniquement sur ses scénarios, cohorts, métriques, marges et puissance documentés ; elle ne devient jamais une preuve exacte. L’absence de divergence ne démontre pas une équivalence universelle.
 
-Ces preuves ne constituent pas un backtesting empirique Azure DevOps. Les dérives de version et décisions de compatibilité sont contrôlées par la preuve spécialisée ; l’enforcement complet dans le profil `main` appartient au PBI 2.21.
+Ces preuves ne constituent pas un backtesting empirique Azure DevOps. Les dérives de version et décisions de compatibilité sont contrôlées par la preuve spécialisée ; le profil `main` bloque toute preuve obligatoire absente, invalide ou non conforme.

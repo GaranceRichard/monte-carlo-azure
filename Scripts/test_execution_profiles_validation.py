@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from Scripts.test_execution_profiles_concurrency import parallel_conflict_errors
 from Scripts.test_execution_profiles_graph import (
     PROFILES,
     dependency_errors,
-    parallel_conflict_errors,
     reachability_errors,
 )
 
@@ -71,7 +71,15 @@ def _one_node_errors(node: Any, label: str) -> list[str]:
         errors.append(f"{label}.id must be a non-empty string")
     if type(node.get("order")) is not int or node["order"] < 0:
         errors.append(f"{label}.order must be a non-negative integer")
-    for field in ("needs", "commands", "profiles", "reads", "writes", "resources"):
+    for field in (
+        "needs",
+        "conditionalNeeds",
+        "commands",
+        "profiles",
+        "reads",
+        "writes",
+        "resources",
+    ):
         errors.extend(_array_errors(node, label, field))
     if not isinstance(node.get("aggregator"), bool):
         errors.append(f"{label}.aggregator must be boolean")

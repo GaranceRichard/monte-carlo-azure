@@ -2142,6 +2142,21 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_generation_accepts_a_transition_without_feature_in_progress",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_consistency.py",
+    "selector": "test_generation_accepts_a_transition_without_feature_in_progress",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "user_interface"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_generation_rejects_missing_governance_marker",
     "framework": "pytest",
     "sourcePath": "tests/test_backlog_consistency.py",
@@ -2151,21 +2166,6 @@
     "nature": "unit",
     "purposes": [
       "functional"
-    ]
-  },
-  {
-    "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_generation_requires_one_feature_in_progress",
-    "framework": "pytest",
-    "sourcePath": "tests/test_backlog_consistency.py",
-    "selector": "test_generation_requires_one_feature_in_progress",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "integration",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "user_interface"
     ]
   },
   {
@@ -5710,6 +5710,36 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_pr_plan_uses_a_real_staged_snapshot_without_reading_worktree_sources",
+    "framework": "pytest",
+    "sourcePath": "tests/test_quality_gate.py",
+    "selector": "test_pr_plan_uses_a_real_staged_snapshot_without_reading_worktree_sources",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_pre_push_empty_input_is_neutral_and_does_not_build_a_plan",
+    "framework": "pytest",
+    "sourcePath": "tests/test_quality_gate.py",
+    "selector": "test_pre_push_empty_input_is_neutral_and_does_not_build_a_plan",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_quality_gate.py::test_pre_push_executes_once_per_terminal_sha_with_aggregated_context",
     "framework": "pytest",
     "sourcePath": "tests/test_quality_gate.py",
@@ -5858,8 +5888,8 @@
     "sourcePath": "tests/test_quality_gate.py",
     "selector": "test_push_never_runs_docker_but_ci_runs_the_docker_smoke",
     "status": "classified",
-    "executionProfile": "pr",
-    "nature": "component",
+    "executionProfile": "main",
+    "nature": "integration",
     "purposes": [
       "functional"
     ],
@@ -6074,6 +6104,29 @@
       "deployment",
       "quality_chain"
     ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_real_main_gate_without_a_git_repository_fails_closed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_quality_gate.py",
+    "selector": "test_real_main_gate_without_a_git_repository_fails_closed",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional",
+      "resilience"
+    ],
+    "domains": [
+      "quality_chain"
+    ],
+    "risks": [
+      "RISK-020"
+    ],
+    "criticalPaths": [
+      "CP-008"
+    ],
+    "criticality": "critical"
   },
   {
     "logicalCaseId": "pytest:tests/test_quality_gate.py::test_remaining_classification_and_command_paths",
@@ -6308,7 +6361,7 @@
     "sourcePath": "tests/test_repo_compliance.py",
     "selector": "test_ci_enforces_required_checks",
     "status": "classified",
-    "executionProfile": "release",
+    "executionProfile": "main",
     "nature": "unit",
     "purposes": [
       "functional"
@@ -8244,10 +8297,10 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_documentation_and_backlog_preserve_scope_and_informational_enforcement",
+    "logicalCaseId": "pytest:tests/test_statistical_consolidated_report.py::test_documentation_and_backlog_preserve_scope_and_blocking_enforcement",
     "framework": "pytest",
     "sourcePath": "tests/test_statistical_consolidated_report.py",
-    "selector": "test_documentation_and_backlog_preserve_scope_and_informational_enforcement",
+    "selector": "test_documentation_and_backlog_preserve_scope_and_blocking_enforcement",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "integration",
@@ -9135,6 +9188,345 @@
     "domains": [
       "history",
       "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement.py::test_attestations_reject_missing_stale_cross_snapshot_and_incoherent_dependencies",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement.py",
+    "selector": "test_attestations_reject_missing_stale_cross_snapshot_and_incoherent_dependencies",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement.py::test_authority_corpus_probe_and_protocol_mutations_are_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement.py",
+    "selector": "test_authority_corpus_probe_and_protocol_mutations_are_rejected",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement.py::test_cli_writes_nominal_attestations_and_reports_actionable_failures",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement.py",
+    "selector": "test_cli_writes_nominal_attestations_and_reports_actionable_failures",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement.py::test_closed_policy_blocks_every_mandatory_final_status",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement.py",
+    "selector": "test_closed_policy_blocks_every_mandatory_final_status",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement.py::test_main_plan_runs_each_logical_control_once_and_keeps_light_feedback_light",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement.py",
+    "selector": "test_main_plan_runs_each_logical_control_once_and_keeps_light_feedback_light",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement.py::test_nominal_evidence_enforcement_and_mutated_artifacts_block",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement.py",
+    "selector": "test_nominal_evidence_enforcement_and_mutated_artifacts_block",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement.py::test_specialized_status_mutations_map_to_blocking_policy",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement.py",
+    "selector": "test_specialized_status_mutations_map_to_blocking_policy",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement.py::test_workspace_snapshot_is_read_only_and_cleans_after_interruption",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement.py",
+    "selector": "test_workspace_snapshot_is_read_only_and_cleans_after_interruption",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement_edges.py::test_attestation_validation_rejects_every_integrity_bypass",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement_edges.py",
+    "selector": "test_attestation_validation_rejects_every_integrity_bypass",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement_edges.py::test_cli_enforce_and_consolidated_validation_are_single_blocking_controls",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement_edges.py",
+    "selector": "test_cli_enforce_and_consolidated_validation_are_single_blocking_controls",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement_edges.py::test_consolidated_validation_rejects_a_report_after_a_source_change",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement_edges.py",
+    "selector": "test_consolidated_validation_rejects_a_report_after_a_source_change",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement_edges.py::test_consolidated_validation_rejects_a_report_from_another_snapshot",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement_edges.py",
+    "selector": "test_consolidated_validation_rejects_a_report_from_another_snapshot",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement_edges.py::test_enforcement_invocation_and_missing_artifact_fail_closed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement_edges.py",
+    "selector": "test_enforcement_invocation_and_missing_artifact_fail_closed",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement_edges.py::test_policy_defence_in_depth_and_json_schema_errors",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement_edges.py",
+    "selector": "test_policy_defence_in_depth_and_json_schema_errors",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement_edges.py::test_pr_statistical_plan_is_empty_and_script_entrypoint_is_executable",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement_edges.py",
+    "selector": "test_pr_statistical_plan_is_empty_and_script_entrypoint_is_executable",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement_edges.py::test_schema_authority_and_corpus_load_failures_are_explicit",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement_edges.py",
+    "selector": "test_schema_authority_and_corpus_load_failures_are_explicit",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_enforcement_edges.py::test_specialized_semantic_and_freshness_edge_diagnostics",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_enforcement_edges.py",
+    "selector": "test_specialized_semantic_and_freshness_edge_diagnostics",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_runtime_edges.py::test_consolidated_clis_reject_invalid_run_scoped_source_syntax",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_runtime_edges.py",
+    "selector": "test_consolidated_clis_reject_invalid_run_scoped_source_syntax",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_runtime_edges.py::test_execution_dag_rejects_a_missing_conditional_dependency",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_runtime_edges.py",
+    "selector": "test_execution_dag_rejects_a_missing_conditional_dependency",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_runtime_edges.py::test_independent_consolidated_validator_rejects_a_current_but_stale_model",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_runtime_edges.py",
+    "selector": "test_independent_consolidated_validator_rejects_a_current_but_stale_model",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_runtime_edges.py::test_run_scoped_path_parsers_accept_closed_valid_mappings_and_reject_invalid",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_runtime_edges.py",
+    "selector": "test_run_scoped_path_parsers_accept_closed_valid_mappings_and_reject_invalid",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_runtime_edges.py::test_snapshot_git_environment_requires_an_explicit_git_directory",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_runtime_edges.py",
+    "selector": "test_snapshot_git_environment_requires_an_explicit_git_directory",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_runtime_edges.py::test_workspace_copy_rejects_non_regular_and_escaping_sources",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_runtime_edges.py",
+    "selector": "test_workspace_copy_rejects_non_regular_and_escaping_sources",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_runtime_edges.py::test_workspace_enumeration_fails_closed_and_preserves_unique_paths",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_runtime_edges.py",
+    "selector": "test_workspace_enumeration_fails_closed_and_preserves_unique_paths",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security",
+      "resilience"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_statistical_main_runtime_edges.py::test_workspace_snapshot_exposes_only_a_discoverable_git_pointer",
+    "framework": "pytest",
+    "sourcePath": "tests/test_statistical_main_runtime_edges.py",
+    "selector": "test_workspace_snapshot_exposes_only_a_discoverable_git_pointer",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
     ]
   },
   {
@@ -10423,7 +10815,7 @@
     "sourcePath": "tests/test_test_execution_profiles.py",
     "selector": "test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate",
     "status": "classified",
-    "executionProfile": "release",
+    "executionProfile": "main",
     "nature": "integration",
     "purposes": [
       "functional"
@@ -10460,7 +10852,7 @@
     "sourcePath": "tests/test_test_execution_profiles.py",
     "selector": "test_plans_are_deterministic_and_dependencies_are_stable",
     "status": "classified",
-    "executionProfile": "nightly",
+    "executionProfile": "main",
     "nature": "unit",
     "purposes": [
       "functional"
@@ -10479,10 +10871,10 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_test_execution_profiles.py::test_real_contract_and_all_four_profile_attributions_are_valid",
+    "logicalCaseId": "pytest:tests/test_test_execution_profiles.py::test_real_contract_and_main_authority_attributions_are_valid",
     "framework": "pytest",
     "sourcePath": "tests/test_test_execution_profiles.py",
-    "selector": "test_real_contract_and_all_four_profile_attributions_are_valid",
+    "selector": "test_real_contract_and_main_authority_attributions_are_valid",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",

@@ -121,10 +121,13 @@ def _source_entry(definition: SourceDefinition) -> dict[str, Any]:
 
 
 def _read(
-    root: Path, definition: SourceDefinition, entry: dict[str, Any]
+    root: Path,
+    definition: SourceDefinition,
+    entry: dict[str, Any],
+    source_path: str,
 ) -> tuple[bytes | None, list[dict[str, Any]]]:
     try:
-        raw = (root / definition.path).read_bytes()
+        raw = (root / source_path).read_bytes()
     except FileNotFoundError:
         entry["validation_status"] = "missing"
         return None, [
@@ -288,13 +291,17 @@ def _load_standard(raw: bytes, record: SourceRecord) -> list[dict[str, Any]]:
     ]
 
 
-def load_sources(root: Path = ROOT) -> tuple[dict[str, SourceRecord], list[dict[str, Any]]]:
+def load_sources(
+    root: Path = ROOT,
+    source_paths: dict[str, str] | None = None,
+) -> tuple[dict[str, SourceRecord], list[dict[str, Any]]]:
     records: dict[str, SourceRecord] = {}
     diagnostics: list[dict[str, Any]] = []
     for definition in SOURCE_DEFINITIONS:
         record = SourceRecord(definition, _source_entry(definition))
         records[definition.source_id] = record
-        raw, read_diagnostics = _read(root, definition, record.entry)
+        source_path = (source_paths or {}).get(definition.source_id, definition.path)
+        raw, read_diagnostics = _read(root, definition, record.entry, source_path)
         diagnostics.extend(read_diagnostics)
         if raw is None:
             continue

@@ -129,3 +129,28 @@ SOURCE_DEFINITIONS = (
         True,
     ),
 )
+
+DYNAMIC_SOURCE_IDS = frozenset(
+    {
+        "deterministic_parity",
+        "exact_replay",
+        "distribution_evidence",
+        "compatibility_evidence",
+    }
+)
+
+
+def parse_source_paths(values: list[str]) -> dict[str, str]:
+    """Parse explicit run-scoped evidence paths without overriding static authorities."""
+    paths: dict[str, str] = {}
+    for value in values:
+        source_id, separator, path = value.partition("=")
+        if (
+            not separator
+            or source_id not in DYNAMIC_SOURCE_IDS
+            or not path
+            or source_id in paths
+        ):
+            raise ValueError(f"Invalid or duplicate --source-path value: {value}")
+        paths[source_id] = path
+    return paths

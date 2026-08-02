@@ -34,6 +34,13 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--evidence-schema", type=Path, default=DEFAULT_EVIDENCE_SCHEMA)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--print-fingerprints", action="store_true")
+    parser.add_argument(
+        "--proof-path",
+        action="append",
+        default=[],
+        metavar="PROOF_ID=PATH",
+        help="Read one generated proof from a run-scoped path instead of its repository path.",
+    )
     return parser
 
 
@@ -41,9 +48,20 @@ def _at(root: Path, path: Path) -> Path:
     return path if path.is_absolute() else root / path
 
 
+def parse_proof_paths(values: list[str]) -> dict[str, str]:
+    overrides: dict[str, str] = {}
+    for value in values:
+        proof_id, separator, path = value.partition("=")
+        if not separator or not proof_id or not path or proof_id in overrides:
+            raise ValueError(f"Invalid or duplicate --proof-path value: {value}")
+        overrides[proof_id] = path
+    return overrides
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
+        proof_paths = parse_proof_paths(args.proof_path)
         authority = load_json(_at(args.root, args.authority))
         authority_schema = load_json(_at(args.root, args.authority_schema))
         evidence_schema = load_json(_at(args.root, args.evidence_schema))
@@ -58,6 +76,7 @@ def main(argv: list[str] | None = None) -> int:
         authority,
         authority_schema,
         load_committed_authority(args.root, args.authority.as_posix()),
+        proof_paths,
     )
     if args.print_fingerprints:
         for state in states:

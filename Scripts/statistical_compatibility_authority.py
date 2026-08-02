@@ -116,9 +116,11 @@ def _dependency_diagnostics(authority: dict[str, Any]) -> list[CompatibilityDiag
 
 
 def validate_proof_catalog(
-    root: Path, authority: dict[str, Any]
+    root: Path,
+    authority: dict[str, Any],
+    path_overrides: dict[str, str] | None = None,
 ) -> tuple[dict[str, str], list[CompatibilityDiagnostic]]:
-    return _validate_proof_catalog(root, authority, _diagnostic)
+    return _validate_proof_catalog(root, authority, _diagnostic, path_overrides)
 
 
 def semantic_diagnostics(authority: dict[str, Any]) -> list[CompatibilityDiagnostic]:

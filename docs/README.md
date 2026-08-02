@@ -19,6 +19,7 @@ les règles, les preuves ou l’historique.
 | Forme, dérivation et exécution du corpus statistique | Développeurs du moteur et reviewers | [`statistical-reference-corpus.md`](statistical-reference-corpus.md) | Contrat opératoire et preuves dérivées | Contrat |
 | Protocole, calibration et preuve de parité distributionnelle | Statisticiens, développeurs et reviewers | [`statistical-distribution-protocol.md`](statistical-distribution-protocol.md) | Contrat d’inférence multi-seeds et limites | Contrat |
 | Lecture consolidée des preuves statistiques | Reviewers, statisticiens et qualité | [`statistical-consolidated-report.md`](statistical-consolidated-report.md) et [`../reports/statistical-consolidated-report.json`](../reports/statistical-consolidated-report.json) | Modèle de consolidation puis autorité machine générée | Preuve |
+| Enforcement statistique du profil `main` | Développeurs, reviewers et qualité | [`statistical-main-enforcement.md`](statistical-main-enforcement.md) et [`../config/statistical-main-enforcement-v1.0.json`](../config/statistical-main-enforcement-v1.0.json) | Politique fermée, DAG, fraîcheur et alignement local/CI | Gouvernance |
 | Classification et stratégie des tests | Développeurs et qualité | [`STD-TEST-001.md`](standards/STD-TEST-001.md) et [`test-classification.md`](test-classification.md) | Norme puis application au dépôt | Norme |
 | Validation, couverture et publiabilité | Contributeurs | [`definition-of-done.md`](definition-of-done.md) | Procédure normative du dépôt | Gouvernance |
 | Risques, chemins critiques et preuves Vitals | Qualité, sécurité et reviewers | [`risk-control-matrix.md`](risk-control-matrix.md), [`critical-paths.md`](critical-paths.md) et [`vitals-traceability.md`](vitals-traceability.md) | État de maîtrise et traçabilité | Preuve |
@@ -96,6 +97,7 @@ l’unique autorité de réalisation.
 | [`statistical-distribution-protocol.md`](statistical-distribution-protocol.md) | Statistique, développement | Protocole distributionnel, calibration, décisions et limites | Contrat |
 | [`statistical-compatibility.md`](statistical-compatibility.md) | Statistique, architecture, qualité | Surfaces, empreintes, décisions et traitements historiques de compatibilité | Contrat de preuve |
 | [`statistical-consolidated-report.md`](statistical-consolidated-report.md) | Reviewers, statistique, qualité | Sources, règle de verdict, déterminisme et limites du rapport consolidé | Contrat de preuve |
+| [`statistical-main-enforcement.md`](statistical-main-enforcement.md) | Développement, statistique, qualité | Autorité opératoire du sous-DAG statistique bloquant de `main` | Gouvernance |
 | [`statistical-parity-audit.md`](statistical-parity-audit.md) | Reviewers, statistique | Relevé historique des divergences et décisions ouvertes | Preuve historique |
 | [`standards/STD-TEST-001.md`](standards/STD-TEST-001.md) | Qualité, développement | Autorité normative de la stratégie de test | Norme |
 | [`test-classification.md`](test-classification.md) | Qualité, développement | Application opératoire du modèle de classification | Contrat |
@@ -161,6 +163,8 @@ l’unique autorité de réalisation.
   extraction sémantique, décisions et traitements des données antérieures ;
 - [`statistical-consolidated-report.md`](statistical-consolidated-report.md) — sources, verdicts, intégrité
   et limites de l’autorité consolidée ;
+- [`statistical-main-enforcement.md`](statistical-main-enforcement.md) — politique fermée, attestations,
+  DAG, isolation, diagnostics et alignement local/CI ;
 - [`statistical-parity-audit.md`](statistical-parity-audit.md) — audit historique de parité ;
 - [`standards/STD-TEST-001.md`](standards/STD-TEST-001.md) — norme de test ;
 - [`test-classification.md`](test-classification.md) — application de la classification ;

@@ -16,6 +16,7 @@ from Scripts.run_statistical_compatibility import (  # noqa: E402
     DEFAULT_AUTHORITY_SCHEMA,
     DEFAULT_EVIDENCE_SCHEMA,
     DEFAULT_OUTPUT,
+    parse_proof_paths,
 )
 from Scripts.statistical_compatibility_common import load_json  # noqa: E402
 from Scripts.statistical_compatibility_control import validate_authority_and_evaluate  # noqa: E402
@@ -30,8 +31,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--evidence", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--proof-path", action="append", default=[])
     args = parser.parse_args(argv)
     try:
+        proof_paths = parse_proof_paths(args.proof_path)
         authority = load_json(args.root / DEFAULT_AUTHORITY)
         authority_schema = load_json(args.root / DEFAULT_AUTHORITY_SCHEMA)
         evidence_schema = load_json(args.root / DEFAULT_EVIDENCE_SCHEMA)
@@ -45,6 +48,7 @@ def main(argv: list[str] | None = None) -> int:
         authority,
         authority_schema,
         load_committed_authority(args.root, DEFAULT_AUTHORITY.as_posix()),
+        proof_paths,
     )
     expected = build_evidence(authority, states, proofs, diagnostics)
     if evidence != expected:

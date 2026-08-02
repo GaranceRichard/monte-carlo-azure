@@ -148,13 +148,16 @@ def validate_authority_and_evaluate(
     authority: Any,
     schema: Any,
     previous_authority: dict[str, Any] | None = None,
+    proof_path_overrides: dict[str, str] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, str], list[CompatibilityDiagnostic]]:
     diagnostics = structural_diagnostics(authority, schema)
     if diagnostics or not isinstance(authority, dict):
         return [], {}, diagnostics
     diagnostics.extend(semantic_diagnostics(authority))
     diagnostics.extend(evolution_diagnostics(authority, previous_authority))
-    proof_fingerprints, proof_diagnostics = validate_proof_catalog(root, authority)
+    proof_fingerprints, proof_diagnostics = validate_proof_catalog(
+        root, authority, proof_path_overrides
+    )
     diagnostics.extend(proof_diagnostics)
     states, component_diagnostics = evaluate_components(root, authority, proof_fingerprints)
     diagnostics.extend(component_diagnostics)

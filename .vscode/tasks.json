@@ -141,6 +141,7 @@
     },
     {
       "label": "Validation : profil main",
+      "detail": "Gate complète incluant les preuves statistiques versionnées et bloquantes du profil main.",
       "type": "process",
       "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
       "args": [

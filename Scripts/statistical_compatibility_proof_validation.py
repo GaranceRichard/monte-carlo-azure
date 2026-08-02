@@ -87,21 +87,23 @@ def validate_proof_catalog(
     root: Path,
     authority: dict[str, Any],
     diagnostic: DiagnosticFactory,
+    path_overrides: dict[str, str] | None = None,
 ) -> tuple[dict[str, str], list[CompatibilityDiagnostic]]:
     fingerprints: dict[str, str] = {}
     diagnostics: list[CompatibilityDiagnostic] = []
     for proof in authority["proof_artifacts"]:
+        proof_path = (path_overrides or {}).get(proof["id"], proof["path"])
         try:
-            document = load_json(root / proof["path"])
+            document = load_json(root / proof_path)
             schema = load_json(root / proof["schema_path"])
             Draft202012Validator.check_schema(schema)
-            actual = json_document_fingerprint(root, proof["path"])
+            actual = json_document_fingerprint(root, proof_path)
         except (OSError, UnicodeError, ValueError, ExtractionError, SchemaError) as exc:
             diagnostics.append(
                 diagnostic(
                     "proof_unavailable",
                     f"Restore and regenerate proof {proof['id']}: {exc}",
-                    authority=proof["path"],
+                    authority=proof_path,
                     classification="corpus_or_proof_not_updated",
                 )
             )

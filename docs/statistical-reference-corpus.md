@@ -454,12 +454,13 @@ comparaisons exactes, les diagnostics positifs et négatifs, le refus avant mote
 corpus dans les deux langages.
 
 Cette preuve porte `proof_kind = exact_replay`,
-`distributional_equivalence = not_evaluated` et `enforcement = informational`. Elle démontre une égalité
+`distributional_equivalence = not_evaluated` et conserve son statut spécialisé `informational`. Elle démontre une égalité
 exacte seed par seed ; elle ne mesure ni ne revendique une équivalence distributionnelle sur plusieurs
 seeds. Une divergence fonctionnelle reste visible sans rendre ce contrôle bloquant, tandis qu’un schéma ou
 corpus invalide, un plan de batch invalide, une erreur d’infrastructure ou un moteur inexécutable rendent
-la commande inexécutable avec un code non nul. La consolidation générale des rapports, l’intégration au
-profil `main` et les décisions de compatibilité restent des responsabilités distinctes. Le
+la commande inexécutable avec un code non nul. Dans le profil `main`, l’adaptateur d’enforcement rend cette
+preuve et l’indépendance du batching bloquantes sans changer leur contenu. La consolidation générale et les
+décisions de compatibilité restent des responsabilités distinctes. Le
 [contrôle de compatibilité](statistical-compatibility.md) vérifie séparément l’empreinte du protocole, le
 corpus, les sondes et cette preuve : leur mise à jour coordonnée ne peut donc pas masquer une dérive d’un
 moteur, de l’ordre des tirages ou d’une règle statistique.
@@ -489,7 +490,8 @@ une autre sentinelle. La complétion n’est autorisée que pour `backlog_to_wee
 
 Le rapport expose `validation_alignment`: les 22 sondes concordent entre Python et TypeScript, sans
 divergence ni erreur. Les seize cas statistiques concordent aussi exactement avec la norme et entre les
-deux moteurs. Ces sondes ne modifient aucune formule statistique et `enforcement` demeure `informational`.
+deux moteurs. Ces sondes ne modifient aucune formule statistique ; leur artefact spécialisé demeure
+informatif, tandis que leur validation est un prérequis bloquant de `main`.
 
 ## Preuves des censures, percentiles et Risk Score
 

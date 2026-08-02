@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/statistical-main-attestation/1.0",
+  "title": "Run-scoped statistical control attestation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "control_ids", "snapshot", "policy", "artifacts"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "control_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" }
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "sha256", "file_count"],
+      "properties": {
+        "method": { "const": "sha256-controlled-snapshot-v1" },
+        "sha256": { "$ref": "#/$defs/sha" },
+        "file_count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "sha256"],
+      "properties": {
+        "id": { "const": "mca-statistical-main-enforcement" },
+        "version": { "const": "1.0" },
+        "sha256": { "$ref": "#/$defs/sha" }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "sha256": { "$ref": "#/$defs/sha" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

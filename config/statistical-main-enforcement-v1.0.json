@@ -1,0 +1,101 @@
+{
+  "policy_id": "mca-statistical-main-enforcement",
+  "version": "1.0",
+  "profile": "main",
+  "scope": {
+    "guarantee": "Blocking conformance to the declared statistical authorities, versions, corpus cases, validation probes and distributional protocol scenarios.",
+    "limitation": "This policy does not claim universal correctness or future accuracy for arbitrary Azure DevOps data."
+  },
+  "required_controls": [
+    {
+      "id": "corpus_and_probes",
+      "node": "statistical-authorities",
+      "needs": [],
+      "reproduce": "python Scripts/validate_statistical_reference_corpus.py"
+    },
+    {
+      "id": "deterministic_parity",
+      "node": "statistical-deterministic-parity",
+      "needs": ["corpus_and_probes"],
+      "reproduce": "python Scripts/run_statistical_reference_corpus.py"
+    },
+    {
+      "id": "exact_replay",
+      "node": "statistical-exact-replay",
+      "needs": ["corpus_and_probes"],
+      "reproduce": "python Scripts/run_statistical_exact_replay.py"
+    },
+    {
+      "id": "batching_independence",
+      "node": "statistical-exact-replay",
+      "needs": ["exact_replay"],
+      "reproduce": "python Scripts/run_statistical_exact_replay.py"
+    },
+    {
+      "id": "distribution_protocol",
+      "node": "statistical-authorities",
+      "needs": ["corpus_and_probes"],
+      "reproduce": "python Scripts/validate_statistical_distribution_protocol.py"
+    },
+    {
+      "id": "distributional_parity",
+      "node": "statistical-distributional-parity",
+      "needs": ["distribution_protocol"],
+      "reproduce": "python Scripts/run_statistical_distribution.py"
+    },
+    {
+      "id": "statistical_compatibility",
+      "node": "statistical-compatibility",
+      "needs": ["deterministic_parity", "exact_replay", "batching_independence", "distributional_parity"],
+      "reproduce": "python Scripts/run_statistical_compatibility.py"
+    },
+    {
+      "id": "consolidated_report_generation",
+      "node": "statistical-consolidated-report",
+      "needs": ["deterministic_parity", "exact_replay", "batching_independence", "distributional_parity", "statistical_compatibility"],
+      "reproduce": "python Scripts/generate_statistical_consolidated_report.py"
+    },
+    {
+      "id": "consolidated_report_validation",
+      "node": "statistical-consolidated-report",
+      "needs": ["consolidated_report_generation"],
+      "reproduce": "python Scripts/validate_statistical_consolidated_report.py"
+    }
+  ],
+  "statuses": [
+    { "id": "match", "disposition": "accepted", "final_allowed": true },
+    { "id": "no_normative_impact", "disposition": "informative", "final_allowed": false },
+    { "id": "not_applicable", "disposition": "not_applicable", "final_allowed": false },
+    { "id": "not_evaluated", "disposition": "forbidden_final", "final_allowed": false },
+    { "id": "not_compared", "disposition": "forbidden_final", "final_allowed": false },
+    { "id": "divergence", "disposition": "forbidden_final", "final_allowed": false },
+    { "id": "invalid", "disposition": "forbidden_final", "final_allowed": false },
+    { "id": "inconclusive", "disposition": "forbidden_final", "final_allowed": false },
+    { "id": "normative_divergence", "disposition": "blocking", "final_allowed": false },
+    { "id": "interlanguage_divergence", "disposition": "blocking", "final_allowed": false },
+    { "id": "validation_probe_divergence", "disposition": "blocking", "final_allowed": false },
+    { "id": "batching_divergence", "disposition": "blocking", "final_allowed": false },
+    { "id": "distributional_divergence", "disposition": "blocking", "final_allowed": false },
+    { "id": "statistically_inconclusive", "disposition": "blocking", "final_allowed": false },
+    { "id": "version_incompatibility", "disposition": "blocking", "final_allowed": false },
+    { "id": "invalid_evidence", "disposition": "blocking", "final_allowed": false },
+    { "id": "engine_error", "disposition": "blocking", "final_allowed": false },
+    { "id": "protocol_error", "disposition": "blocking", "final_allowed": false },
+    { "id": "infrastructure_error", "disposition": "blocking", "final_allowed": false },
+    { "id": "source_missing", "disposition": "blocking", "final_allowed": false },
+    { "id": "schema_invalid", "disposition": "blocking", "final_allowed": false },
+    { "id": "fingerprint_invalid", "disposition": "blocking", "final_allowed": false },
+    { "id": "stale_evidence", "disposition": "blocking", "final_allowed": false },
+    { "id": "decision_missing", "disposition": "blocking", "final_allowed": false },
+    { "id": "decision_incoherent", "disposition": "blocking", "final_allowed": false },
+    { "id": "migration_required", "disposition": "blocking", "final_allowed": false },
+    { "id": "invalidation_required", "disposition": "blocking", "final_allowed": false },
+    { "id": "version_not_incremented", "disposition": "blocking", "final_allowed": false },
+    { "id": "corpus_or_proof_not_updated", "disposition": "blocking", "final_allowed": false },
+    { "id": "compatibility_control_error", "disposition": "blocking", "final_allowed": false },
+    { "id": "blocked", "disposition": "blocking", "final_allowed": false },
+    { "id": "control_error", "disposition": "blocking", "final_allowed": false },
+    { "id": "invalid_corpus", "disposition": "blocking", "final_allowed": false },
+    { "id": "invalid_configuration", "disposition": "blocking", "final_allowed": false }
+  ]
+}

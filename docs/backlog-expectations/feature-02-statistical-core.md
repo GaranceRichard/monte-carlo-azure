@@ -164,8 +164,8 @@ Implémentation retenue :
 - `Scripts/statistical_parity_report.py` qualifie séparément `schema_invalid`/`corpus_invalid`,
   `engine_error`, `normative_divergence` et `engine_divergence`, avec JSON Pointer, valeurs exactes et
   résultats canoniques complets dans le rapport JSON ;
-- les rapports déterministes `reports/statistical-parity-report.json` et `.md` sont informatifs et ne sont
-  pas inclus dans le profil `main`; leur promotion en gate relève toujours du PBI 2.21 ;
+- à ce stade, les rapports déterministes `reports/statistical-parity-report.json` et `.md` étaient
+  informatifs ; leur promotion bloquante dans la gate est réalisée par le PBI 2.21 ;
 - treize cas sont conformes dans les deux moteurs. Les deux cas d’histogramme agrégé exposent les écarts
   historiques attendus : Python `100` buckets contre TypeScript `51` centres impairs sur `0..100`, puis
   `50/9951` contre `51/10050` sur la plage discontinue, la norme demandant `50/9999` ;
@@ -195,7 +195,7 @@ Implémentation retenue :
 - `contracts/statistical-validation-probes-v1.0.json` contient 22 sondes positives et négatives exécutées
   par les deux runners ; le rapport constate 22 verdicts identiques ;
 - aucune formule de censure, percentile, Risk Score, fiabilité ou histogramme n’est modifiée. Les deux
-  divergences d’histogrammes restent visibles et la parité reste informative jusqu’au PBI 2.21.
+  divergences d’histogrammes restaient visibles et informatives avant leur résolution et l’enforcement 2.21.
 
 ### 2.14 — Censures, percentiles et Risk Score alignés
 
@@ -248,8 +248,8 @@ Implémentation retenue :
 - les tests métier de la frontière HTTP refusent un Risk Score négatif et ceux de la commande résolue
   couvrent sa fermeture et sa construction commune ; les anciennes lignes rouges correspondantes ne
   subsistent plus dans le rapport de couverture ;
-- les seize cas donnent quatorze conformités. Les deux seules divergences restent les histogrammes agrégés
-  du PBI 2.16 ; le rejeu exact du PBI 2.17 et l’enforcement informatif avant 2.21 sont inchangés.
+- les seize cas donnaient alors quatorze conformités. Les deux divergences restantes relevaient des
+  histogrammes agrégés du PBI 2.16 ; le rejeu exact et l’enforcement ont ensuite été livrés.
 
 ### 2.16 — Construction des histogrammes alignée
 
@@ -275,9 +275,8 @@ Implémentation retenue :
 - les sorties historiques Python à 100 buckets ou `50/9951`, et TypeScript aux centres impairs ou
   `51/10050`, restent documentées mais sont invalidées comme références courantes ; aucun historique
   persistant n’est migré et aucune frontière primitive ni version de contrat n’est modifiée ;
-- les seize cas concordent exactement avec la norme et entre moteurs. Le rapport reste
-  `informational` jusqu’au PBI 2.21 ; le rejeu exact et la gouvernance de version restent réservés aux
-  PBI 2.17 et 2.20.
+- les seize cas concordent exactement avec la norme et entre moteurs. Le rapport restait `informational`
+  avant le PBI 2.21 ; le rejeu exact et la gouvernance de version ont été livrés par les PBI 2.17 et 2.20.
 
 ### 2.17 — Rejeu exact interlangage démontré sur le corpus versionné
 
@@ -311,9 +310,8 @@ Implémentation retenue :
   `interlanguage_divergence` ; un corpus ou un plan de batch invalide et un moteur inexécutable produisent
   un échec non nul ;
 - `proof_kind = exact_replay` et `distributional_equivalence = not_evaluated` séparent explicitement le
-  rejeu exact de l’équivalence distributionnelle. L’enforcement reste `informational` sans protocole
-  distributionnel du PBI 2.18, consolidation générale du PBI 2.19, décision de compatibilité du PBI 2.20
-  ni intégration au profil `main` du PBI 2.21.
+  rejeu exact de l’équivalence distributionnelle. Cette preuve était informative avant les couches
+  distributionnelle, consolidée, de compatibilité et d’enforcement livrées par les PBI 2.18 à 2.21.
 
 ## Phase D — Gouvernance de la parité : PBI 2.18 à 2.21
 
@@ -389,7 +387,7 @@ Implémentation retenue :
   `informational` exploitable ;
 - le rapport rappelle que l’exact vaut pour le corpus et les versions déclarées, que le distributionnel
   vaut pour son design documenté et qu’aucune preuve ne constitue un backtesting Azure DevOps. La décision
-  de compatibilité future et l’enforcement bloquant complet restent réservés aux PBI 2.20 et 2.21.
+  de compatibilité et l’enforcement bloquant complet ont ensuite été livrés par les PBI 2.20 et 2.21.
 
 ### 2.20 — Dérives de version et décisions de compatibilité statistique bloquées
 
@@ -414,7 +412,7 @@ Implémentation retenue :
   histogramme, réponse, version, corpus, preuve et migration, tandis que commentaires et descriptions ne
   créent pas de dérive ;
 - la preuve canonique `reports/statistical-compatibility-evidence.json` devient la onzième source et le
-  sixième niveau du rapport consolidé. Le contrôle reste absent du profil `main` jusqu’au PBI 2.21.
+  sixième niveau du rapport consolidé. Son intégration bloquante à `main` est réalisée par le PBI 2.21.
 
 ### 2.21 — Contrôles complets de parité et de compatibilité bloquants dans le profil `main`
 
@@ -422,3 +420,24 @@ Implémentation retenue :
 - bloquer toute divergence normative, distributionnelle ou de version non acceptée ;
 - conserver un diagnostic local actionnable ;
 - interdire skip, retry, quarantaine ou exemption silencieuse.
+
+Implémentation retenue :
+
+- une politique JSON fermée `1.0` définit neuf contrôles logiques, leurs dépendances et la disposition de
+  chaque statut final, sans redéfinir les seuils, protocoles ou décisions des preuves spécialisées ;
+- le sous-DAG `main` valide d’abord les autorités, exécute en parallèle les preuves déterministe, exacte et
+  distributionnelle, joint leurs artefacts pour la compatibilité, puis génère et valide indépendamment le
+  rapport consolidé avant l’agrégation finale ;
+- les artefacts du run sont partagés sans rejeu implicite, attestés par empreinte de contenu, identité de
+  snapshot, version de politique et dépendances, puis rejetés s’ils sont absents, invalides, périmés ou issus
+  d’un autre snapshot ;
+- l’exécution locale complète utilise un snapshot isolé de la révision contrôlée et une seule exposition des
+  dépendances frontend, nettoyée après succès, échec ou interruption ;
+- GitHub Actions sélectionne les mêmes nœuds et le même plan d’autorité pour le SHA publié ; l’agrégateur
+  exige tous les contrôles statistiques hors profil `pr` avant toute publication dépendante ;
+- les mutations couvrent divergences, erreurs, non-conclusion, incompatibilités, preuves et décisions
+  manquantes, schémas, empreintes, fraîcheur, dépendances, absence frontend et contournements silencieux ;
+- la garantie obtenue reste limitée aux autorités, versions, corpus, scénarios et protocoles déclarés. Elle
+  ne constitue ni une promesse universelle sur de futures données Azure DevOps ni un backtesting réel.
+
+La Feature 2 est close : ses 21 PBI sont réalisés et sa garantie finale est portée par le profil `main`.

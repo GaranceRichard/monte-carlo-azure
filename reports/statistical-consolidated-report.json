@@ -107,8 +107,8 @@
   },
   "diagnostics": [],
   "enforcement": {
-    "blocking": false,
-    "full_main_enforcement_scope": "PBI 2.21",
+    "blocking": true,
+    "full_main_enforcement_scope": "config/statistical-main-enforcement-v1.0.json",
     "generator_failure_classifications": [
       "infrastructure_error",
       "protocol_error",
@@ -116,15 +116,15 @@
       "version_incompatibility",
       "engine_error"
     ],
-    "level": "informational"
+    "level": "blocking_in_main"
   },
   "format_version": "1.0",
   "generation": {
     "kind": "deterministic_source_snapshot",
-    "source_set_sha256": "59262cf646ad88c5aeff7fe43f186661c8485db75716692cba8d638a41004366"
+    "source_set_sha256": "67a2d1c493fc24699ae1e619050687f783def7281a00f78285c2f59d0768804d"
   },
   "integrity": {
-    "content_sha256": "f26eb671fa5f9a8390897d68b5ec9b0d2beb476c44aea52478b3785651f454d9",
+    "content_sha256": "d8780d61b48186b5efd1f2d78d3877d64ff133e1a1f329ca759bf4c1e8968059",
     "method": "sha256-canonical-json-without-content-sha256"
   },
   "limits": [
@@ -161,7 +161,7 @@
     {
       "proof_level": "statistical_compatibility",
       "statements": [
-        "The control blocks when called directly; complete main-profile integration is PBI 2.21."
+        "In main, this validated run-scoped proof is blocking; its scope remains the declared authorities, versions, decisions, and evidence."
       ]
     }
   ],
@@ -173,10 +173,6 @@
     {
       "id": "universal_equivalence",
       "statement": "No equivalence is claimed outside recorded corpus cases and protocol scenarios."
-    },
-    {
-      "id": "blocking_main_enforcement",
-      "statement": "Complete blocking enforcement in main remains outside this report."
     }
   ],
   "proof_levels": [
@@ -344,7 +340,7 @@
       ],
       "id": "statistical_compatibility",
       "limits": [
-        "The control blocks when called directly; complete main-profile integration is PBI 2.21."
+        "In main, this validated run-scoped proof is blocking; its scope remains the declared authorities, versions, decisions, and evidence."
       ],
       "scope": "Versioned semantic authorities, decisions, proofs, and historical-data treatments.",
       "source": "compatibility_evidence",
@@ -665,7 +661,7 @@
         "sha256": null,
         "version": "1.0"
       },
-      "sha256": "f12470f710096606674c0f46ded53c35045e0fc9052f3279ba6c53e54efab9ee",
+      "sha256": "a22852843085f0a073ef42bebc7d3ab63e0cc009e342ecd177e2493e5bbcd6eb",
       "validation_status": "valid"
     },
     {
@@ -849,7 +845,7 @@
       "validation_status": "valid"
     },
     {
-      "canonical_fingerprint": "e9214dee975b0448e97fd65c30ccfda66646a23fd02ea32cf46e24c110c6a5c5",
+      "canonical_fingerprint": "b557524634319a7fd398698aa86a1e1905e77682f1799a025819c5904138ab33",
       "declared": {
         "id": "statistical_compatibility",
         "version": "1.0"
@@ -862,10 +858,10 @@
       "schema": {
         "id": "https://montecarlo.local/schemas/statistical-compatibility-evidence/1.0",
         "path": "contracts/statistical-compatibility-evidence-v1.0.schema.json",
-        "sha256": "b521c5ac04320716b12943baf66708f516ef3a3aa77572447b483da5ed23977b",
+        "sha256": "1cd06fbbef19310463056ee511329c8e9221f0c25c70e523393d14db368a5555",
         "version": "1.0"
       },
-      "sha256": "5fc9763f274a48d1511b8b2198cf943fb04a4966759fe920b46911107ea40011",
+      "sha256": "b238b7c1b44da510b668299d7443231ff99754194eae74331063a54c17bf477d",
       "validation_status": "valid"
     }
   ],

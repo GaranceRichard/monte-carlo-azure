@@ -2,66 +2,64 @@
   "schemaVersion": "1.0.0",
   "schema": "config/test-strategy-report.schema.json",
   "profile": "main",
-  "evidenceBundleId": "bb566c56b22ec3c14eb71c0655b39f49ef86c46275996f91b4ac759bf1e42369",
+  "evidenceBundleId": "e41cc26dadaaff8a9a14df6ca2640c3d660f25bf0bea3d38ece245cd20e80f6e",
   "evidenceBundleIdentityDisclaimer": "This identifier names the exact evidence bundle; it does not prove that every source came from the same physical execution.",
   "globalReference": {
     "inventory": {
       "path": "reports/test-classification-inventory.json",
-      "sha256": "f58d7c452164572c6a4b24f72a0cc469e6a7f17f56266f2ca64771103196d082",
-      "logicalCases": 1372
+      "sha256": "0b8d44534732852c7b5cdff2b850ff606e0b97de00ebb90e1211dc628cc1e0f8",
+      "logicalCases": 1398
     },
     "classification": {
       "breakdowns": {
         "status": {
-          "classified": 1372
+          "classified": 1398
         },
         "framework": {
           "playwright": 32,
-          "pytest": 650,
+          "pytest": 676,
           "vitest": 690
         },
         "nature": {
-          "component": 410,
+          "component": 412,
           "contract": 46,
           "e2e": 32,
-          "integration": 249,
-          "unit": 635
+          "integration": 267,
+          "unit": 641
         },
         "purpose": {
           "accessibility": 107,
           "compatibility": 108,
           "data_quality": 142,
-          "functional": 1372,
+          "functional": 1398,
           "migration_recovery": 23,
-          "observability": 265,
+          "observability": 269,
           "performance": 16,
-          "resilience": 143,
-          "security": 129
+          "resilience": 148,
+          "security": 132
         },
         "primaryProfile": {
-          "main": 248,
-          "nightly": 1,
-          "pr": 1121,
-          "release": 2
+          "main": 268,
+          "pr": 1130
         },
         "domain": {
           "api": 128,
-          "azure_devops": 266,
+          "azure_devops": 268,
           "data": 134,
-          "deployment": 48,
+          "deployment": 49,
           "history": 111,
-          "identity": 97,
+          "identity": 99,
           "persistence": 84,
           "portfolio": 145,
-          "quality_chain": 241,
-          "reporting": 259,
+          "quality_chain": 244,
+          "reporting": 260,
           "statistical_engine": 509,
-          "user_interface": 320
+          "user_interface": 321
         },
         "criticality": {
-          "critical": 202,
+          "critical": 203,
           "high": 20,
-          "unassigned": 1150
+          "unassigned": 1175
         }
       },
       "riskAssociations": {
@@ -81,7 +79,7 @@
         "RISK-017": 33,
         "RISK-018": 106,
         "RISK-019": 106,
-        "RISK-020": 32
+        "RISK-020": 33
       },
       "criticalPathAssociations": {
         "CP-001": 11,
@@ -90,7 +88,7 @@
         "CP-004": 6,
         "CP-005": 100,
         "CP-007": 20,
-        "CP-008": 32
+        "CP-008": 33
       },
       "associationDisclaimer": "An association identifies relevant evidence; it does not by itself demonstrate complete control of a risk or critical path.",
       "unresolvedCases": [],
@@ -99,16 +97,16 @@
     "executionCounts": {
       "path": "reports/test-execution-counts.json",
       "schemaVersion": "1.0.0",
-      "inventorySha256": "f58d7c452164572c6a4b24f72a0cc469e6a7f17f56266f2ca64771103196d082",
+      "inventorySha256": "0b8d44534732852c7b5cdff2b850ff606e0b97de00ebb90e1211dc628cc1e0f8",
       "totals": {
-        "logicalCases": 1372,
-        "collectedInstances": 1726,
-        "executedInstances": 1726,
+        "logicalCases": 1398,
+        "collectedInstances": 1752,
+        "executedInstances": 1752,
         "skippedInstances": 0,
-        "attempts": 1726,
+        "attempts": 1752,
         "retries": 0,
         "results": {
-          "passed": 1726,
+          "passed": 1752,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -122,15 +120,15 @@
         "includedProfiles": [
           "pr"
         ],
-        "logicalCases": 1121,
+        "logicalCases": 1130,
         "frameworks": {
-          "pytest": 431,
+          "pytest": 440,
           "vitest": 690
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 431,
+          "backend-tests": 440,
           "e2e": 0,
           "frontend-static": 0,
           "frontend-tests": 690,
@@ -144,21 +142,27 @@
           "pr",
           "main"
         ],
-        "logicalCases": 1369,
+        "logicalCases": 1398,
         "frameworks": {
           "playwright": 32,
-          "pytest": 647,
+          "pytest": 676,
           "vitest": 690
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 647,
+          "backend-tests": 676,
           "e2e": 32,
           "frontend-static": 0,
           "frontend-tests": 690,
           "preflight": 0,
-          "release-or-container-checks": 0
+          "release-or-container-checks": 0,
+          "statistical-authorities": 0,
+          "statistical-compatibility": 0,
+          "statistical-consolidated-report": 0,
+          "statistical-deterministic-parity": 0,
+          "statistical-distributional-parity": 0,
+          "statistical-exact-replay": 0
         }
       },
       {
@@ -168,21 +172,27 @@
           "main",
           "nightly"
         ],
-        "logicalCases": 1370,
+        "logicalCases": 1398,
         "frameworks": {
           "playwright": 32,
-          "pytest": 648,
+          "pytest": 676,
           "vitest": 690
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 648,
+          "backend-tests": 676,
           "e2e": 32,
           "frontend-static": 0,
           "frontend-tests": 690,
           "preflight": 0,
-          "release-or-container-checks": 0
+          "release-or-container-checks": 0,
+          "statistical-authorities": 0,
+          "statistical-compatibility": 0,
+          "statistical-consolidated-report": 0,
+          "statistical-deterministic-parity": 0,
+          "statistical-distributional-parity": 0,
+          "statistical-exact-replay": 0
         }
       },
       {
@@ -192,21 +202,27 @@
           "main",
           "release"
         ],
-        "logicalCases": 1371,
+        "logicalCases": 1398,
         "frameworks": {
           "playwright": 32,
-          "pytest": 649,
+          "pytest": 676,
           "vitest": 690
         },
         "nodes": {
           "aggregate": 0,
           "backend-static": 0,
-          "backend-tests": 649,
+          "backend-tests": 676,
           "e2e": 32,
           "frontend-static": 0,
           "frontend-tests": 690,
           "preflight": 0,
-          "release-or-container-checks": 0
+          "release-or-container-checks": 0,
+          "statistical-authorities": 0,
+          "statistical-compatibility": 0,
+          "statistical-consolidated-report": 0,
+          "statistical-deterministic-parity": 0,
+          "statistical-distributional-parity": 0,
+          "statistical-exact-replay": 0
         }
       }
     ]
@@ -217,7 +233,7 @@
       "pr",
       "main"
     ],
-    "selectedLogicalCases": 1369,
+    "selectedLogicalCases": 1398,
     "logicalCaseIds": [
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2775:3]",
       "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2829:3]",
@@ -319,8 +335,8 @@
       "pytest:tests/test_api_static.py::test_mount_frontend_serves_index_when_dist_exists",
       "pytest:tests/test_backlog_consistency.py::test_cli_detects_drift_regenerates_both_sections_and_then_passes",
       "pytest:tests/test_backlog_consistency.py::test_cli_reports_unreadable_input",
+      "pytest:tests/test_backlog_consistency.py::test_generation_accepts_a_transition_without_feature_in_progress",
       "pytest:tests/test_backlog_consistency.py::test_generation_rejects_missing_governance_marker",
-      "pytest:tests/test_backlog_consistency.py::test_generation_requires_one_feature_in_progress",
       "pytest:tests/test_backlog_consistency.py::test_registry_rejects_invalid_sources",
       "pytest:tests/test_backlog_consistency.py::test_repository_backlog_status_and_generated_sections_are_exact",
       "pytest:tests/test_check_no_secrets.py::test_ado_scanner_ignores_comments_and_placeholders",
@@ -522,6 +538,8 @@
       "pytest:tests/test_quality_gate.py::test_mixed_impacted_plan_keeps_lint_typecheck_tests_order_without_repetition",
       "pytest:tests/test_quality_gate.py::test_naming_convention_runs_once_in_the_main_plan",
       "pytest:tests/test_quality_gate.py::test_plan_selection_output_explains_level_triggers_and_commands",
+      "pytest:tests/test_quality_gate.py::test_pr_plan_uses_a_real_staged_snapshot_without_reading_worktree_sources",
+      "pytest:tests/test_quality_gate.py::test_pre_push_empty_input_is_neutral_and_does_not_build_a_plan",
       "pytest:tests/test_quality_gate.py::test_pre_push_executes_once_per_terminal_sha_with_aggregated_context",
       "pytest:tests/test_quality_gate.py::test_pre_push_invalid_stdin_and_unresolvable_sha_are_rejected",
       "pytest:tests/test_quality_gate.py::test_pre_push_multiple_commits_keep_range_but_validate_only_terminal_sha",
@@ -544,6 +562,7 @@
       "pytest:tests/test_quality_gate.py::test_pytest_basetemp_is_cleaned_after_success_and_failure",
       "pytest:tests/test_quality_gate.py::test_pytest_command_uses_unique_workspace_basetemps_without_global_temp_access",
       "pytest:tests/test_quality_gate.py::test_real_docker_smoke_is_blocked_without_env",
+      "pytest:tests/test_quality_gate.py::test_real_main_gate_without_a_git_repository_fails_closed",
       "pytest:tests/test_quality_gate.py::test_remaining_classification_and_command_paths",
       "pytest:tests/test_quality_gate.py::test_remaining_quality_gate_success_and_cleanup_paths",
       "pytest:tests/test_quality_gate.py::test_request_success_http_error_and_docker_log_command",
@@ -557,6 +576,7 @@
       "pytest:tests/test_quality_gate.py::test_vscode_main_validation_task_is_unique_and_uses_the_shared_dag",
       "pytest:tests/test_quality_gate.py::test_windows_link_failure_and_worktree_cleanup_errors",
       "pytest:tests/test_quality_gate.py::test_workspace_pytest_temporaries_are_git_ignored",
+      "pytest:tests/test_repo_compliance.py::test_ci_enforces_required_checks",
       "pytest:tests/test_repo_compliance.py::test_coverage_tasks_separate_repo_compliance_and_python_full",
       "pytest:tests/test_repo_compliance.py::test_dod_contains_required_sections",
       "pytest:tests/test_repo_compliance.py::test_dod_docs_exist_and_are_linked_from_readme",
@@ -677,7 +697,7 @@
       "pytest:tests/test_statistical_consolidated_report.py::test_all_semantic_inconsistency_guards_are_actionable",
       "pytest:tests/test_statistical_consolidated_report.py::test_closed_report_schema_and_independent_validator_reject_drift",
       "pytest:tests/test_statistical_consolidated_report.py::test_distributional_divergence_and_inconclusive_never_become_exact_match",
-      "pytest:tests/test_statistical_consolidated_report.py::test_documentation_and_backlog_preserve_scope_and_informational_enforcement",
+      "pytest:tests/test_statistical_consolidated_report.py::test_documentation_and_backlog_preserve_scope_and_blocking_enforcement",
       "pytest:tests/test_statistical_consolidated_report.py::test_exact_specialized_outcomes_remain_localized",
       "pytest:tests/test_statistical_consolidated_report.py::test_generator_rejects_a_non_object_report_schema",
       "pytest:tests/test_statistical_consolidated_report.py::test_generator_validator_and_entrypoints_publish_both_views_from_one_model",
@@ -738,6 +758,29 @@
       "pytest:tests/test_statistical_exact_replay.py::test_normative_diagnostics_preserve_types_values_presence_and_array_order",
       "pytest:tests/test_statistical_exact_replay.py::test_real_versioned_corpus_control_executes_completely_as_informational_evidence",
       "pytest:tests/test_statistical_exact_replay.py::test_versioned_corpus_covers_every_exact_replay_dimension_and_reports_a_gap",
+      "pytest:tests/test_statistical_main_enforcement.py::test_attestations_reject_missing_stale_cross_snapshot_and_incoherent_dependencies",
+      "pytest:tests/test_statistical_main_enforcement.py::test_authority_corpus_probe_and_protocol_mutations_are_rejected",
+      "pytest:tests/test_statistical_main_enforcement.py::test_cli_writes_nominal_attestations_and_reports_actionable_failures",
+      "pytest:tests/test_statistical_main_enforcement.py::test_closed_policy_blocks_every_mandatory_final_status",
+      "pytest:tests/test_statistical_main_enforcement.py::test_main_plan_runs_each_logical_control_once_and_keeps_light_feedback_light",
+      "pytest:tests/test_statistical_main_enforcement.py::test_nominal_evidence_enforcement_and_mutated_artifacts_block",
+      "pytest:tests/test_statistical_main_enforcement.py::test_specialized_status_mutations_map_to_blocking_policy",
+      "pytest:tests/test_statistical_main_enforcement.py::test_workspace_snapshot_is_read_only_and_cleans_after_interruption",
+      "pytest:tests/test_statistical_main_enforcement_edges.py::test_attestation_validation_rejects_every_integrity_bypass",
+      "pytest:tests/test_statistical_main_enforcement_edges.py::test_cli_enforce_and_consolidated_validation_are_single_blocking_controls",
+      "pytest:tests/test_statistical_main_enforcement_edges.py::test_enforcement_invocation_and_missing_artifact_fail_closed",
+      "pytest:tests/test_statistical_main_enforcement_edges.py::test_policy_defence_in_depth_and_json_schema_errors",
+      "pytest:tests/test_statistical_main_enforcement_edges.py::test_pr_statistical_plan_is_empty_and_script_entrypoint_is_executable",
+      "pytest:tests/test_statistical_main_enforcement_edges.py::test_schema_authority_and_corpus_load_failures_are_explicit",
+      "pytest:tests/test_statistical_main_enforcement_edges.py::test_specialized_semantic_and_freshness_edge_diagnostics",
+      "pytest:tests/test_statistical_main_runtime_edges.py::test_consolidated_clis_reject_invalid_run_scoped_source_syntax",
+      "pytest:tests/test_statistical_main_runtime_edges.py::test_execution_dag_rejects_a_missing_conditional_dependency",
+      "pytest:tests/test_statistical_main_runtime_edges.py::test_independent_consolidated_validator_rejects_a_current_but_stale_model",
+      "pytest:tests/test_statistical_main_runtime_edges.py::test_run_scoped_path_parsers_accept_closed_valid_mappings_and_reject_invalid",
+      "pytest:tests/test_statistical_main_runtime_edges.py::test_snapshot_git_environment_requires_an_explicit_git_directory",
+      "pytest:tests/test_statistical_main_runtime_edges.py::test_workspace_copy_rejects_non_regular_and_escaping_sources",
+      "pytest:tests/test_statistical_main_runtime_edges.py::test_workspace_enumeration_fails_closed_and_preserves_unique_paths",
+      "pytest:tests/test_statistical_main_runtime_edges.py::test_workspace_snapshot_exposes_only_a_discoverable_git_pointer",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_backlog_mode_requires_only_backlog_input_and_completion_result",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_bundled_control_accepts_minimal_contract_and_rejects_negative_example",
       "pytest:tests/test_statistical_reference_corpus_contract.py::test_cli_reports_invalid_custom_instance_and_parse_failures",
@@ -829,10 +872,12 @@
       "pytest:tests/test_test_execution_profiles.py::test_exact_case_selection_by_profile_and_node",
       "pytest:tests/test_test_execution_profiles.py::test_exactly_one_final_aggregator_is_required",
       "pytest:tests/test_test_execution_profiles.py::test_fast_push_ci_nightly_and_release_resolve_expected_profiles",
+      "pytest:tests/test_test_execution_profiles.py::test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate",
       "pytest:tests/test_test_execution_profiles.py::test_missing_dependency_cycle_and_inaccessible_node_are_rejected",
       "pytest:tests/test_test_execution_profiles.py::test_parallel_write_and_exclusive_resource_conflicts_are_rejected",
+      "pytest:tests/test_test_execution_profiles.py::test_plans_are_deterministic_and_dependencies_are_stable",
       "pytest:tests/test_test_execution_profiles.py::test_profile_inclusions_and_change_levels_are_orthogonal",
-      "pytest:tests/test_test_execution_profiles.py::test_real_contract_and_all_four_profile_attributions_are_valid",
+      "pytest:tests/test_test_execution_profiles.py::test_real_contract_and_main_authority_attributions_are_valid",
       "pytest:tests/test_test_execution_profiles.py::test_strict_json_report_and_cli_paths",
       "pytest:tests/test_test_governance.py::test_attempt_history_contract_accepts_visible_nonexecution_and_rejects_bad_types",
       "pytest:tests/test_test_governance.py::test_check_repository_and_cli_success_failure_and_input_error",
@@ -1606,14 +1651,14 @@
         }
       },
       "pytest": {
-        "logicalCases": 647,
-        "collectedInstances": 894,
-        "executedInstances": 894,
+        "logicalCases": 676,
+        "collectedInstances": 923,
+        "executedInstances": 923,
         "skippedInstances": 0,
-        "attempts": 894,
+        "attempts": 923,
         "retries": 0,
         "results": {
-          "passed": 894,
+          "passed": 923,
           "failed": 0,
           "skipped": 0,
           "todo": 0,
@@ -1643,7 +1688,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/preflight/result.json",
         "exitCode": 0,
-        "durationSeconds": 9.68,
+        "durationSeconds": 0.0,
         "reasons": []
       },
       {
@@ -1652,7 +1697,61 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 0.101,
+        "durationSeconds": 0.0,
+        "reasons": []
+      },
+      {
+        "id": "statistical-authorities",
+        "required": true,
+        "status": "valid",
+        "evidencePath": "reports/test-execution-artifacts/main/statistical-authorities/result.json",
+        "exitCode": 0,
+        "durationSeconds": 1.676,
+        "reasons": []
+      },
+      {
+        "id": "statistical-deterministic-parity",
+        "required": true,
+        "status": "valid",
+        "evidencePath": "reports/test-execution-artifacts/main/statistical-deterministic-parity/result.json",
+        "exitCode": 0,
+        "durationSeconds": 2.368,
+        "reasons": []
+      },
+      {
+        "id": "statistical-exact-replay",
+        "required": true,
+        "status": "valid",
+        "evidencePath": "reports/test-execution-artifacts/main/statistical-exact-replay/result.json",
+        "exitCode": 0,
+        "durationSeconds": 2.763,
+        "reasons": []
+      },
+      {
+        "id": "statistical-distributional-parity",
+        "required": true,
+        "status": "valid",
+        "evidencePath": "reports/test-execution-artifacts/main/statistical-distributional-parity/result.json",
+        "exitCode": 0,
+        "durationSeconds": 10.541,
+        "reasons": []
+      },
+      {
+        "id": "statistical-compatibility",
+        "required": true,
+        "status": "valid",
+        "evidencePath": "reports/test-execution-artifacts/main/statistical-compatibility/result.json",
+        "exitCode": 0,
+        "durationSeconds": 1.515,
+        "reasons": []
+      },
+      {
+        "id": "statistical-consolidated-report",
+        "required": true,
+        "status": "valid",
+        "evidencePath": "reports/test-execution-artifacts/main/statistical-consolidated-report/result.json",
+        "exitCode": 0,
+        "durationSeconds": 1.395,
         "reasons": []
       },
       {
@@ -1661,7 +1760,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-static/result.json",
         "exitCode": 0,
-        "durationSeconds": 36.308,
+        "durationSeconds": 0.0,
         "reasons": []
       },
       {
@@ -1670,7 +1769,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/backend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 216.327,
+        "durationSeconds": 0.0,
         "reasons": []
       },
       {
@@ -1679,7 +1778,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/frontend-tests/result.json",
         "exitCode": 0,
-        "durationSeconds": 110.995,
+        "durationSeconds": 104.722,
         "reasons": []
       },
       {
@@ -1688,7 +1787,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/e2e/result.json",
         "exitCode": 0,
-        "durationSeconds": 50.05,
+        "durationSeconds": 37.663,
         "reasons": []
       },
       {
@@ -1697,7 +1796,7 @@
         "status": "valid",
         "evidencePath": "reports/test-execution-artifacts/main/release-or-container-checks/result.json",
         "exitCode": 0,
-        "durationSeconds": 61.589,
+        "durationSeconds": 0.0,
         "reasons": []
       },
       {
@@ -1710,20 +1809,20 @@
         "reasons": []
       }
     ],
-    "collectedInstances": 1723,
-    "executedInstances": 1723,
+    "collectedInstances": 1752,
+    "executedInstances": 1752,
     "skippedInstances": 0,
-    "attempts": 1723,
+    "attempts": 1752,
     "retries": 0,
     "initialResults": {
-      "passed": 1723,
+      "passed": 1752,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
       "infrastructureError": 0
     },
     "finalResults": {
-      "passed": 1723,
+      "passed": 1752,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -1741,14 +1840,14 @@
       "instabilities": 0,
       "instabilityRatePercent": 0.0,
       "initialResults": {
-        "passed": 1723,
+        "passed": 1752,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
         "infrastructureError": 0
       },
       "finalResults": {
-        "passed": 1723,
+        "passed": 1752,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -1764,14 +1863,14 @@
         "thresholdSource": ".coveragerc",
         "metrics": {
           "lines": {
-            "total": 10305,
-            "covered": 10305,
+            "total": 10967,
+            "covered": 10967,
             "pct": 100.0
           },
           "branches": {
-            "total": 3380,
-            "covered": 3331,
-            "pct": 98.55
+            "total": 3570,
+            "covered": 3521,
+            "pct": 98.63
           }
         },
         "thresholds": {
@@ -1825,23 +1924,23 @@
         "metrics": {
           "statements": {
             "total": 12555,
-            "covered": 11466,
-            "pct": 91.32
+            "covered": 11464,
+            "pct": 91.31
           },
           "branches": {
-            "total": 2720,
-            "covered": 2245,
-            "pct": 82.53
+            "total": 2717,
+            "covered": 2243,
+            "pct": 82.55
           },
           "functions": {
             "total": 451,
-            "covered": 417,
-            "pct": 92.46
+            "covered": 416,
+            "pct": 92.23
           },
           "lines": {
             "total": 12354,
-            "covered": 11296,
-            "pct": 91.43
+            "covered": 11294,
+            "pct": 91.41
           }
         },
         "thresholds": {
@@ -2430,7 +2529,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "f58d7c452164572c6a4b24f72a0cc469e6a7f17f56266f2ca64771103196d082",
+      "fingerprint": "0b8d44534732852c7b5cdff2b850ff606e0b97de00ebb90e1211dc628cc1e0f8",
       "schemaVersion": null,
       "status": "valid",
       "reasons": []
@@ -2462,7 +2561,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "427db8a7c481739e003cb472aee4052a72dc7c9c24ef5d6925e8640abbec7f52",
+      "fingerprint": "8b003f661e48d925e3c1999b55c296e953dd5d834faa22ea1999c725b1aabb1e",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2478,7 +2577,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "a262630d6ffc47cc180e8c5ab27f16a76ddeceb73eda3775abb07bad174a9fed",
+      "fingerprint": "3b205502f06aaaf6a986a2f2ded0ad508c06c08cf633e178ed532c9dd6280bb4",
       "schemaVersion": 3,
       "status": "valid",
       "reasons": []
@@ -2494,7 +2593,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "439de626740a37fc0d73dee703c6af7e1a361610787928e62c80cac0b38d17f6",
+      "fingerprint": "2d4647b636554ab2cd192087a0c77ef4da8b77bf4feaf7797cdd8133340e1fac",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2510,7 +2609,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "e2061784074b56f99a4de833750e7a4bfad862bc87bba6a244eba93236985860",
+      "fingerprint": "17ab326d5bbeab19b060e30ce433e3a1af4d83eaaeb191afe742c007e102f7cf",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2526,7 +2625,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "f21e57a0219adc6ce5156237591e094b8fcc3968c40283bbb75db2c8f8bfa4f8",
+      "fingerprint": "868a800932aee594ee284f7f3dea336906d8e786a25e139f29386f6ce442db96",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2542,7 +2641,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "681b592426531dbed1675ae223620bdd2de85d95224354bd0e9a270950247dfd",
+      "fingerprint": "9de9ea587673f46fbf7f4a61147998380caa798cea4c96b12647e8427b493b1a",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2558,7 +2657,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "badaaddd9989dc0fb8f0b938dd300b3093867a7b9b60b800eb125c4457da2c57",
+      "fingerprint": "17449b8e5922750930b98b7c0051cba2226281e44efb8b91c7000cc256db5877",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2574,7 +2673,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "5c9f965faf29ea2ab7eee1c53a89253a862473d9e2826e14512cac83d67d7200",
+      "fingerprint": "ec24e6cd460163a7e289ad475748191ff7e48116e770052e8d14e4ee1f88f606",
       "schemaVersion": "1.0.0",
       "status": "valid",
       "reasons": []
@@ -2590,7 +2689,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "aa3ed5b4810da70c9251847a779be8f0f4066293afae562521871608f4ad9980",
+      "fingerprint": "91f00bdb82f1acae2a282c1ad06b20df0aebe734f473e00792620402f28f806d",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2606,7 +2705,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "5102bc8e4e2289e2a991e7ac4937053b96737786c2944274e6adfd6577f726ef",
+      "fingerprint": "2ee0e12340924edfc3483f34b537f4bcdd12ed515ab7230c7db32558fb810eec",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2622,7 +2721,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "37e23ba9386b3d15d39e88087a75b2cc145d26bd1ed22e1b739dff65e8eb9b20",
+      "fingerprint": "bacd7192687bda03a35b7a5a888bf0d75fec66be61e1636f91ac3405107a87cd",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2638,7 +2737,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "fd10d853f652f26810f05690ccc36b15ed53567c627db82ff263b52ec5190535",
+      "fingerprint": "2efc61b5b169d5a4865320da41d530e7a1ef8dbdfde70a173793844009e82e58",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2654,7 +2753,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "f8b468516163ef7f88649e4ace96f4d6b8be6f3f3718c77f7ed559ba2eb60afe",
+      "fingerprint": "ffa17528804529d4a782f92aa4ad4a37e22c33dee146e18fa59717a5e9ee17a5",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2670,7 +2769,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "8337cc67569e973b60244487470854af2980e3e53ed013388cfbf5214ab58287",
+      "fingerprint": "aa39263ff8aa4cddcb6f3b1ee992e704bf77b820d578821a6f55a6bde8a7733f",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2686,7 +2785,103 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "bdc3c7110fa26e02f62a047e2ec8a5feba8639464b5e24aad362717b973bdbea",
+      "fingerprint": "8d97a92312c8a0fbec5771cf76d256c78a2a995e00cc3ac4a4f0c6bde7ae203f",
+      "schemaVersion": 1,
+      "status": "valid",
+      "reasons": []
+    },
+    {
+      "id": "node-statistical-authorities",
+      "path": "reports/test-execution-artifacts/main/statistical-authorities/result.json",
+      "producer": "Scripts/quality_gate_dag.py",
+      "scope": "profileExecution",
+      "requirement": "required",
+      "required": true,
+      "presence": "present",
+      "validity": "valid",
+      "freshness": "not_measurable",
+      "consistency": "consistent",
+      "fingerprint": "afad1d6dceda75d7ca7d7abf75eb742b2fdb43fd7bf885559f452a3fbfb985b6",
+      "schemaVersion": 1,
+      "status": "valid",
+      "reasons": []
+    },
+    {
+      "id": "node-statistical-compatibility",
+      "path": "reports/test-execution-artifacts/main/statistical-compatibility/result.json",
+      "producer": "Scripts/quality_gate_dag.py",
+      "scope": "profileExecution",
+      "requirement": "required",
+      "required": true,
+      "presence": "present",
+      "validity": "valid",
+      "freshness": "not_measurable",
+      "consistency": "consistent",
+      "fingerprint": "411e7c0d1ed0d0578071a5adca11fa4e3452f80a3b058faebb56759575a5e4e9",
+      "schemaVersion": 1,
+      "status": "valid",
+      "reasons": []
+    },
+    {
+      "id": "node-statistical-consolidated-report",
+      "path": "reports/test-execution-artifacts/main/statistical-consolidated-report/result.json",
+      "producer": "Scripts/quality_gate_dag.py",
+      "scope": "profileExecution",
+      "requirement": "required",
+      "required": true,
+      "presence": "present",
+      "validity": "valid",
+      "freshness": "not_measurable",
+      "consistency": "consistent",
+      "fingerprint": "4998d44641c0c3caccde4686192799262f1d324cbd944a0b1ea151c4624c8ceb",
+      "schemaVersion": 1,
+      "status": "valid",
+      "reasons": []
+    },
+    {
+      "id": "node-statistical-deterministic-parity",
+      "path": "reports/test-execution-artifacts/main/statistical-deterministic-parity/result.json",
+      "producer": "Scripts/quality_gate_dag.py",
+      "scope": "profileExecution",
+      "requirement": "required",
+      "required": true,
+      "presence": "present",
+      "validity": "valid",
+      "freshness": "not_measurable",
+      "consistency": "consistent",
+      "fingerprint": "0c5935275325373531c035b6fd0792533e8c59aded21da10f5c722d0a1815e69",
+      "schemaVersion": 1,
+      "status": "valid",
+      "reasons": []
+    },
+    {
+      "id": "node-statistical-distributional-parity",
+      "path": "reports/test-execution-artifacts/main/statistical-distributional-parity/result.json",
+      "producer": "Scripts/quality_gate_dag.py",
+      "scope": "profileExecution",
+      "requirement": "required",
+      "required": true,
+      "presence": "present",
+      "validity": "valid",
+      "freshness": "not_measurable",
+      "consistency": "consistent",
+      "fingerprint": "f9c01c5b038b60c1586b017a8c76d59fef3c547e02cab38d1087e7e883b52ce1",
+      "schemaVersion": 1,
+      "status": "valid",
+      "reasons": []
+    },
+    {
+      "id": "node-statistical-exact-replay",
+      "path": "reports/test-execution-artifacts/main/statistical-exact-replay/result.json",
+      "producer": "Scripts/quality_gate_dag.py",
+      "scope": "profileExecution",
+      "requirement": "required",
+      "required": true,
+      "presence": "present",
+      "validity": "valid",
+      "freshness": "not_measurable",
+      "consistency": "consistent",
+      "fingerprint": "128e5d7b7e0662d1d428f84d608827264417202797f9d342aa260b905408e19d",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []
@@ -2718,7 +2913,7 @@
       "validity": "valid",
       "freshness": "not_measurable",
       "consistency": "consistent",
-      "fingerprint": "159ae48bf8c7b67e7f2ff7c427a44356c1028ac7083c59042f436131b209087a",
+      "fingerprint": "70834c6db46f8690864521fab704f4df54deed656930d18540354aec032e50d7",
       "schemaVersion": 1,
       "status": "valid",
       "reasons": []

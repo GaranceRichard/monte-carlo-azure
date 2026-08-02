@@ -99,9 +99,13 @@ une connexion Azure DevOps réelle.
 - **Validation distributionnelle distincte.** Des cohorts reproductibles de seeds différentes comparent
   aussi les lois de sortie, les censures et la disponibilité des indicateurs ; cette preuve statistique
   symétrique complète le rejeu exact sans le remplacer et reste distincte du backtesting sur données réelles.
-- **État consolidé vérifiable.** Un [rapport consolidé](reports/statistical-consolidated-report.md) réunit
-  les garanties normatives, exactes, de batching et distributionnelles tout en conservant leurs périmètres,
-  limites, versions et niveau d’enforcement informatif.
+- **État consolidé vérifiable et bloquant.** Un [rapport consolidé](reports/statistical-consolidated-report.md)
+  réunit les garanties normatives, exactes, de batching et distributionnelles tout en conservant leurs
+  périmètres, limites et versions. Le profil `main` le génère à partir des preuves du snapshot courant,
+  puis le valide indépendamment avec leurs empreintes. L’identité du snapshot porte uniquement sur les
+  sources et configurations autoritaires ; les rapports, couvertures, builds, caches, attestations et
+  calibrations générés pendant la validation en sont exclus. Un rapport issu d’un autre contenu, d’un autre
+  snapshot ou de preuves devenues périmées bloque la publication.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 
@@ -121,8 +125,8 @@ du [standard statistique](docs/standards/STD-STAT-001.md), du
   substituabilité des équipes, ni validité future ;
 - lorsque les preuves sont insuffisantes, l’absence de scénario recommandé est un résultat valide ;
 - les seize cas du corpus statistique courant concordent exactement et le protocole multi-seeds conclut à
-  la parité distributionnelle sur ses scénarios ; le contrôle de parité reste toutefois informatif et
-  n’est pas encore bloquant dans le profil `main` ;
+  la parité distributionnelle sur ses scénarios ; la gate vérifie cette conformité déclarée, sans garantir
+  l’exactitude future sur toute donnée Azure DevOps ;
 - les preuves existantes ne remplacent pas un backtesting empirique, des tests sur de vrais tenants Azure
   DevOps, une matrice multi-navigateurs ou une baseline de charge.
 

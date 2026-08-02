@@ -105,8 +105,8 @@ Ce document référence les points vitaux du produit qui exigent une couverture 
   actuellement `match`, sans utiliser les attendus exacts comme oracle. Le rapport consolidé vérifie et
   localise ces garanties, les 22 sondes, leurs versions, empreintes et limites dans une autorité unique. Le
   contrôle de compatibilité bloque directement toute dérive non décidée et exige les traitements historiques
-  associés. Ces preuves ne sont pas encore intégrées à la gate `main` : il n’existe toujours ni gate complète
-  de parité et compatibilité, ni test de charge, ni preuve
+  associés. La gate `main` exécute désormais ces preuves dans un snapshot commun, bloque leurs statuts non
+  conformes et valide leur rapport consolidé avant agrégation. Il ne subsiste ni test de charge, ni preuve
   d'annulation du thread après timeout, ni politique de proxy de confiance.
 
 ### CP-004 — Flux onboarding critique
@@ -178,7 +178,8 @@ Important pour `RISK-020`, ce parcours orchestre couvertures, fraîcheur des art
 inclut maintenant classification, dénombrement, gouvernance des skips, quarantaines et retries, ainsi qu'un
 reporting stratégique consolidé qui distingue conformité opérationnelle et complétude des preuves. Le chemin
 statistique dispose aussi d’une preuve canonique de compatibilité et de mutations contrôlées, consommée par
-le rapport consolidé sans être encore raccordée au profil `main`. Le chemin
+le rapport consolidé dans le sous-DAG bloquant du profil `main`. Les attestations refusent les preuves
+périmées, d’un autre snapshot ou liées à une dépendance incohérente. Le chemin
 de commit impose aussi, via `Scripts/pre_commit_guard.py`, un `README.md` racine ajouté ou modifié dans tout
 index non vide ; `tests/test_pre_commit_guard.py` couvre les statuts et les cas de refus sans muter l'index
 réel. Le parcours reste partiellement couvert : le rapport rend le mutation testing et la démonstration

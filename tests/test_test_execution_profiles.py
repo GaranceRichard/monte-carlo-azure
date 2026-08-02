@@ -84,7 +84,7 @@ def _case(framework: str, source_path: str, selector: str, **evidence: object) -
     return LogicalCase(framework, source_path, selector, observed)
 
 
-def test_real_contract_and_all_four_profile_attributions_are_valid() -> None:
+def test_real_contract_and_main_authority_attributions_are_valid() -> None:
     contract = _contract()
     rules = classify_tests.load_json(ROOT / "config/test-classification-rules.json")
     overrides = classify_tests.load_json(ROOT / "config/test-classification-overrides.json")
@@ -114,7 +114,7 @@ def test_real_contract_and_all_four_profile_attributions_are_valid() -> None:
     assert profiles.validate_contract(contract) == []
     assert [
         classify_case(case, rules, overrides, catalog)["executionProfile"] for case in cases
-    ] == ["pr", "main", "nightly", "release"]
+    ] == ["pr", "main", "main", "main"]
 
 
 def test_profile_inclusions_and_change_levels_are_orthogonal() -> None:
@@ -199,6 +199,10 @@ def test_plans_are_deterministic_and_dependencies_are_stable() -> None:
             "e2e",
             "release-or-container-checks",
         }
+        expected_conditional = (
+            ["statistical-consolidated-report"] if plan["profile"] != "pr" else []
+        )
+        assert aggregate["conditionalNeeds"] == expected_conditional
 
 
 def test_missing_dependency_cycle_and_inaccessible_node_are_rejected() -> None:
@@ -222,15 +226,17 @@ def test_missing_dependency_cycle_and_inaccessible_node_are_rejected() -> None:
 
 def test_parallel_write_and_exclusive_resource_conflicts_are_rejected() -> None:
     write_conflict = _contract()
-    write_conflict["nodes"][1]["writes"] = list(write_conflict["nodes"][2]["writes"])
+    nodes = {node["id"]: node for node in write_conflict["nodes"]}
+    nodes["backend-static"]["writes"] = list(nodes["frontend-static"]["writes"])
     errors = profiles.validate_contract(write_conflict)
     assert any(
         "parallel write conflict backend-static/frontend-static" in error for error in errors
     )
 
     resource_conflict = _contract()
-    resource_conflict["nodes"][1]["resources"] = ["exclusive"]
-    resource_conflict["nodes"][2]["resources"] = ["exclusive"]
+    nodes = {node["id"]: node for node in resource_conflict["nodes"]}
+    nodes["backend-static"]["resources"] = ["exclusive"]
+    nodes["frontend-static"]["resources"] = ["exclusive"]
     errors = profiles.validate_contract(resource_conflict)
     assert any("parallel exclusive-resource conflict" in error for error in errors)
 
@@ -554,7 +560,7 @@ def test_dag_parallel_sequential_docker_and_dependency_failures(
     release = quality_gate.GateCommand(
         "Release or container checks", ("python", "-V"), "fix"
     )
-    monkeypatch.setattr(quality_gate, "_run_docker_smoke", lambda: 9)
+    monkeypatch.setattr(quality_gate, "_run_docker_smoke", lambda _root=None: 9)
     assert quality_gate_dag.execute_gate_plan(
         quality_gate,
         _dag_plan(release, docker=True),
@@ -571,6 +577,33 @@ def test_dag_parallel_sequential_docker_and_dependency_failures(
         isolated_validation=False,
         parallel=True,
     ) == 9
+
+    authority = quality_gate.GateCommand(
+        "Statistical authority and enforcement policy validation",
+        ("python", "authority"),
+        "fix",
+    )
+    parity = quality_gate.GateCommand(
+        "Generate deterministic statistical parity evidence",
+        ("python", "parity"),
+        "fix",
+    )
+    executed: list[str] = []
+
+    def fail_authority(command, **_kwargs):
+        executed.append(command.step)
+        return 8 if command is authority else 0
+
+    monkeypatch.setattr(quality_gate, "_run_command", fail_authority)
+    assert quality_gate_dag.execute_gate_plan(
+        quality_gate,
+        _dag_plan(authority, parity),
+        validation_root=root,
+        runtime_temp_root=runtime,
+        isolated_validation=False,
+        parallel=True,
+    ) == 8
+    assert executed == ["Statistical authority and enforcement policy validation"]
 
     frontend = quality_gate.GateCommand(
         "Frontend lint (ESLint, zero warning)",
@@ -645,7 +678,7 @@ def test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate() -> 
     ):
         assert f"  {job}:" in workflow
         job_tail = workflow.split(f"  {job}:\n", maxsplit=1)[1]
-        next_job = re.search(r"(?m)^  [a-z][a-z0-9-]*:\s*$", job_tail)
+        next_job = re.search(r"(?m)^  [a-z][a-z0-9_-]*:\s*$", job_tail)
         block = job_tail[: next_job.start()] if next_job else job_tail
         branch_blocks[job] = block
         assert "needs: preflight" in block
@@ -688,13 +721,36 @@ def test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate() -> 
         assert block.count("actions/upload-artifact@v7") == 1
         assert block.count("path: reports/test-execution-artifacts") == 1
 
+    statistical_jobs = {
+        "statistical_authorities": "statistical-authorities",
+        "statistical_deterministic_parity": "statistical-deterministic-parity",
+        "statistical_exact_replay": "statistical-exact-replay",
+        "statistical_distributional_parity": "statistical-distributional-parity",
+        "statistical_compatibility": "statistical-compatibility",
+        "statistical_consolidated_report": "statistical-consolidated-report",
+    }
+    for job, node in statistical_jobs.items():
+        job_tail = workflow.split(f"  {job}:\n", maxsplit=1)[1]
+        next_job = re.search(r"(?m)^  [a-z][a-z0-9_-]*:\s*$", job_tail)
+        block = job_tail[: next_job.start()] if next_job else job_tail
+        assert "needs.preflight.outputs.profile != 'pr'" in block
+        assert f"--node {node}" in block
+        assert "ref: ${{ github.sha }}" in block
+        assert block.count("actions/upload-artifact@v7") == 1
+        assert "if: always()" in block
+
     aggregate_tail = workflow.split("  aggregate:\n", maxsplit=1)[1]
-    next_job = re.search(r"(?m)^  [a-z][a-z0-9-]*:\s*$", aggregate_tail)
+    next_job = re.search(r"(?m)^  [a-z][a-z0-9_-]*:\s*$", aggregate_tail)
     aggregate = aggregate_tail[: next_job.start()] if next_job else aggregate_tail
     assert aggregate.count("actions/download-artifact@v8") == 1
     assert aggregate.count("path: reports/test-execution-artifacts") == 1
     assert "merge-multiple: true" in aggregate
     assert aggregate.count("actions/upload-artifact@v7") == 1
+    assert "- statistical_consolidated_report" in aggregate
+    assert "if: always()" in aggregate
+    assert "Require every mandatory node" in aggregate
+    assert "needs.statistical_compatibility.result" in aggregate
+    assert "needs.statistical_consolidated_report.result" in aggregate
     assert "reports/test-strategy-report.json" in aggregate
     assert "reports/test-strategy-report.md" in aggregate
     assert "actions/setup-node@v6" in aggregate
@@ -713,3 +769,5 @@ def test_github_workflow_has_parallel_jobs_and_publish_waits_for_aggregate() -> 
     assert "release:" in workflow
     publish = workflow.split("  publish:", maxsplit=1)[1]
     assert "needs: [aggregate]" in publish
+    assert "Confirm published SHA" in publish
+    assert '${{ steps.image.outputs.name }}:${{ github.sha }}' in publish

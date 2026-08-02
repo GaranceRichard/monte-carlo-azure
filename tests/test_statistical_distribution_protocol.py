@@ -714,4 +714,8 @@ def test_distributional_authorities_are_documented_without_product_chronology() 
         "| M | Sol Très élevé | 01/08/2026 |"
     )
     assert completed_line in backlog
-    assert "**Prochain PBI :** `2.21`" in backlog
+    assert "Dernière Feature terminée :** Feature 2" in backlog
+    assert (
+        "| 2.21 | Contrôles complets de parité et de compatibilité bloquants dans le "
+        "profil `main` | M | Sol Très élevé | 01/08/2026 |"
+    ) in backlog

@@ -6,6 +6,7 @@ import sys
 from typing import Any
 
 from Scripts.quality_gate_change_policy import classification_gate_command
+from Scripts.quality_gate_statistical_plan import statistical_commands
 
 
 def execution_profile_for_mode(mode: str, explicit_profile: str | None = None) -> str:
@@ -338,12 +339,12 @@ def build_execution_plan(context: Any, q: Any) -> Any:
     commands.extend(_frontend_commands(q, inputs))
     test_commands, has_release_checks = _full_test_commands(q, profile, inputs)
     commands.extend(test_commands)
+    commands.extend(statistical_commands(q, profile, inputs))
     commands.extend(_aggregate_commands(q, inputs, profile, require_runtime=True))
     docker_smoke = has_release_checks and context.mode in {"ci", "nightly", "release"}
     return q.GateExecutionPlan(context, tuple(commands), docker_smoke, resolution, profile)
 
 
 def execution_plan(mode: str, documentation_only: bool, q: Any) -> list[Any]:
-    """Return the compatibility list interface used by hooks and tests."""
     context = q.build_change_context(mode, ["README.md"] if documentation_only else [])
     return list(build_execution_plan(context, q).commands)
