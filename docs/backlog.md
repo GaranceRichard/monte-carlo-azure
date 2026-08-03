@@ -80,10 +80,10 @@ d’utiliser une API publique stable sans dépendre d’Azure DevOps, FastAPI, M
 | 3.2 | Frontière, nom et dépendances du package définis | M | Sol Élevé | |
 | 3.3 | API publique, erreurs et politique de compatibilité définies | M | Sol Très élevé | |
 | 3.4 | Package installable avec métadonnées valides | M | Sol Élevé | |
-| 3.5 | Contrats métier et Value Objects centralisés dans le package | L | Sol Très élevé | |
-| 3.6 | Moteur statistique interne centralisé dans le package | L | Sol Très élevé | |
-| 3.7 | Cas d’usage public disponible et backend consommateur du package | L | Sol Très élevé | |
-| 3.8 | Dépendances interdites et contournements de l’API publique bloqués | M | Sol Très élevé | |
+| 3.5 | Contrats métier internes exposés par l’API publique du package | M | Sol Très élevé | |
+| 3.6 | Moteur interne inclus derrière l’API publique du package | M | Sol Très élevé | |
+| 3.7 | Façade publique de simulation disponible dans le package | M | Sol Très élevé | |
+| 3.8 | Isolation du package démontrée par un consommateur externe | M | Sol Très élevé | |
 | 3.9 | Distributions `wheel` et `sdist` reproductibles | M | Sol Élevé | |
 | 3.10 | Installation isolée et usage par un consommateur externe démontrés | M | Sol Très élevé | |
 | 3.11 | Artefacts versionnés du package produits dans la CI | M | Sol Très élevé | |
@@ -143,30 +143,96 @@ performances observables complètent la mesure de couverture structurelle.
 | 6.7 | Observabilité et qualité des données couvertes par des tests renforcés | L | Sol Élevé | |
 | 6.8 | Baseline de performance reproductible établie | L | Sol Très élevé | |
 
-## Feature 7 — Disposer d’une architecture applicative évolutive et vérifiable
+## Feature 7 — Réduire le coût de changement par une architecture explicite et modulaire
 
-**Résultat observable :** une architecture hexagonale modulaire sans cycles isole les cas d’usage des
-technologies d’accès aux données, de calcul, de persistance et de restitution.
+**Résultat observable :** une architecture hexagonale pragmatique, guidée par la séparation des
+préoccupations et contrôlée automatiquement, isole les responsabilités métier, applicatives, techniques, de
+présentation et de qualité. Les futures capacités évoluent par modifications locales, publiables et
+démontrables sans travaux transversaux disproportionnés.
 
-**Flux de valeur :** permettre l’évolution du produit sans accroître le couplage, les responsabilités concentrées, les régressions ou le coût de chaque modification, grâce à des modules cohésifs communiquant par des contrats explicites.
+**Flux de valeur :** permettre l’évolution du produit sans reproduire le coût, l’étendue et l’instabilité
+rencontrés sur le PBI 2.21, grâce à des frontières explicites, des modules cohésifs et des changements
+atomiques.
 
 **Attendus détaillés :** [`backlog-expectations/feature-07-evolvable-architecture.md`](backlog-expectations/feature-07-evolvable-architecture.md)
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
-| 7.1 | Modèle cible des dépendances internes formalisé | M | Sol Très élevé | |
-| 7.2 | Directions de dépendance contrôlées automatiquement | M | Sol Très élevé | |
-| 7.3 | Cycles de dépendances existants supprimés | L | Sol Ultra | |
-| 7.4 | Port d’accès aux données de delivery défini | M | Sol Élevé | |
-| 7.5 | Port du moteur de prévision défini | M | Sol Élevé | |
-| 7.6 | Cas d’usage de lancement d’une prévision isolé | L | Sol Très élevé | |
-| 7.7 | Port de persistance des simulations défini | M | Sol Élevé | |
-| 7.8 | FastAPI découplé de la persistance MongoDB | L | Sol Très élevé | |
-| 7.9 | Frontière d’identité structurelle et contractuelle | L | Sol Très élevé | |
-| 7.10 | Contrats de communication inter-modules définis | M | Sol Très élevé | |
-| 7.11 | Composition root et injection explicite des adaptateurs opérationnels | M | Sol Très élevé | |
-| 7.12 | Contrats des ports et adaptateurs démontrés | L | Sol Très élevé | |
-| 7.13 | Horloge et générateurs d’identifiants techniques injectables | M | Sol Élevé | |
+| 7.1 | Les responsabilités frontend et leurs flux de données sont cartographiés | S | Sol Élevé | |
+| 7.2 | Les responsabilités backend et le cycle de vie des données sont cartographiés | S | Sol Élevé | |
+| 7.3 | Les responsabilités de l’infrastructure qualité sont cartographiées | S | Sol Élevé | |
+| 7.4 | Les dépendances, cycles et contournements réels sont établis | S | Sol Très élevé | |
+| 7.5 | Le coût de changement et ses hotspots disposent d’une baseline | S | Sol Medium | |
+| 7.6 | Chaque donnée structurante possède une autorité explicite | XS | Sol Très élevé | |
+| 7.7 | Les directions de dépendance cibles sont décidées | S | Sol Très élevé | |
+| 7.8 | L’architecture cible possède des frontières acceptées | M | Sol Ultra | |
+| 7.9 | La migration architecturale suit une séquence acyclique | S | Sol Très élevé | |
+| 7.10 | L’autorité des dépendances est lisible et diagnostiquable automatiquement | S | Sol Très élevé | |
+| 7.11 | Le domaine reste indépendant des technologies | S | Sol Très élevé | |
+| 7.12 | Les API publiques empêchent les imports profonds | S | Sol Très élevé | |
+| 7.13 | Les cycles de dépendance sont empêchés | S | Sol Très élevé | |
+| 7.14 | Les adaptateurs restent indépendants entre eux | S | Sol Très élevé | |
+| 7.15 | Les DTO techniques restent confinés à leurs adaptateurs | S | Sol Très élevé | |
+| 7.16 | Les modules partagés respectent une direction de dépendance explicite | S | Sol Très élevé | |
+| 7.17 | Le contrôle architectural protège les profils locaux et main | S | Sol Très élevé | |
+| 7.18 | Les diagnostics architecturaux sont exploitables par les contributeurs | XS | Sol Élevé | |
+| 7.19 | La prévision frontend dépend d’un contrat indépendant de React | M | Sol Ultra | |
+| 7.20 | La configuration portefeuille dépend d’un contrat indépendant du hook applicatif | S | Sol Très élevé | |
+| 7.21 | L’événement de delivery porte un fait métier normalisé | S | Sol Très élevé | |
+| 7.22 | La fenêtre historique appartient au domaine delivery | S | Sol Très élevé | |
+| 7.23 | La semaine et le fuseau horaire suivent une politique métier unique | S | Sol Très élevé | |
+| 7.24 | Les périodes partielles sont explicites dans le domaine delivery | XS | Sol Très élevé | |
+| 7.25 | Les calculs de throughput appartiennent au domaine delivery | S | Sol Très élevé | |
+| 7.26 | Les calculs de Cycle Time appartiennent au domaine delivery | S | Sol Très élevé | |
+| 7.27 | La complétude de l’historique est un invariant delivery | S | Sol Très élevé | |
+| 7.28 | Les discontinuités de l’historique sont un invariant delivery | S | Sol Très élevé | |
+| 7.29 | La cohérence chronologique est un invariant delivery | S | Sol Très élevé | |
+| 7.30 | Les diagnostics delivery traversent la frontière applicative sans perte | S | Sol Très élevé | |
+| 7.31 | Le temps frontend est injectable et déterministe | S | Sol Très élevé | |
+| 7.32 | Le temps backend est injectable et déterministe | S | Sol Très élevé | |
+| 7.33 | L’identité des historiques est injectable | S | Sol Très élevé | |
+| 7.34 | L’identité du client frontend est injectable | S | Sol Très élevé | |
+| 7.35 | La connexion Azure DevOps confine le PAT derrière un contrat opaque | S | Sol Très élevé | |
+| 7.36 | La découverte Azure DevOps dépend d’un port applicatif | S | Sol Très élevé | |
+| 7.37 | Les requêtes WIQL dépendent d’un port applicatif | S | Sol Très élevé | |
+| 7.38 | La lecture des work items dépend d’un port applicatif | S | Sol Très élevé | |
+| 7.39 | La lecture des révisions dépend d’un port applicatif | S | Sol Très élevé | |
+| 7.40 | Les DTO Azure DevOps restent confinés dans les adaptateurs | S | Sol Très élevé | |
+| 7.41 | La connexion Cloud respecte le contrat Azure DevOps commun | S | Sol Très élevé | |
+| 7.42 | La connexion Server/TFS respecte le contrat Azure DevOps commun | S | Sol Très élevé | |
+| 7.43 | L’onboarding dépend des ports Azure DevOps plutôt que de la façade historique | S | Sol Très élevé | |
+| 7.44 | Les accès Azure DevOps directs sont empêchés hors adaptateurs | S | Sol Très élevé | |
+| 7.45 | Le moteur Python est accessible par un port sans type NumPy | S | Sol Très élevé | |
+| 7.46 | Le moteur TypeScript local est accessible par un port applicatif | S | Sol Très élevé | |
+| 7.47 | Le moteur TypeScript HTTP est accessible par un port applicatif | S | Sol Très élevé | |
+| 7.48 | La persistance des simulations dépend d’un port applicatif | S | Sol Très élevé | |
+| 7.49 | MongoDB implémente le port de persistance des simulations | S | Sol Très élevé | |
+| 7.50 | La mémoire implémente le port de persistance des simulations | XS | Sol Très élevé | |
+| 7.51 | L’historique d’équipe est exposé par un cas d’usage applicatif | S | Sol Très élevé | |
+| 7.52 | La prévision d’équipe est exposée par un cas d’usage applicatif | S | Sol Très élevé | |
+| 7.53 | La prévision portefeuille est exposée par un cas d’usage applicatif | S | Sol Très élevé | |
+| 7.54 | La composition frontend assemble uniquement des ports applicatifs | S | Sol Très élevé | |
+| 7.55 | La composition backend assemble uniquement des ports applicatifs | S | Sol Très élevé | |
+| 7.56 | La frontière d’identité backend expose le minimum nécessaire | XS | Sol Très élevé | |
+| 7.57 | Le limiteur de simulation est observable hors de la route HTTP | S | Sol Très élevé | |
+| 7.58 | Le cycle de persistance des simulations est orchestré hors de la route HTTP | S | Sol Très élevé | |
+| 7.59 | L’orchestration des prévisions est indépendante des hooks React | S | Sol Très élevé | |
+| 7.60 | Le résultat équipe possède un modèle de présentation indépendant | S | Sol Très élevé | |
+| 7.61 | Le résultat portefeuille possède un modèle de présentation indépendant | S | Sol Très élevé | |
+| 7.62 | React ne contient aucun calcul métier de restitution | S | Sol Très élevé | |
+| 7.63 | Les rapports ne contiennent aucun calcul métier | S | Sol Très élevé | |
+| 7.64 | Les adaptateurs UI et rapport évoluent indépendamment | S | Sol Très élevé | |
+| 7.65 | La génération des rapports ne dépend pas du DOM | XS | Sol Très élevé | |
+| 7.66 | Les modèles de présentation sont accessibles par une API publique stable | XS | Sol Très élevé | |
+| 7.67 | Le graphe produit reste indépendant de l’infrastructure qualité | S | Sol Très élevé | |
+| 7.68 | Le runner statistique reste indépendant des adaptateurs backend | S | Sol Très élevé | |
+| 7.69 | La preuve statistique possède un producteur et un vérificateur indépendants du produit | S | Sol Très élevé | |
+| 7.70 | L’orchestration qualité délègue ses chemins d’exécution à des composants explicites | S | Sol Très élevé | |
+| 7.71 | L’architecture est vérifiée dans le workspace | S | Sol Très élevé | |
+| 7.72 | L’architecture est vérifiée dans un worktree détaché | S | Sol Très élevé | |
+| 7.73 | L’architecture est vérifiée dans la CI | S | Sol Très élevé | |
+| 7.74 | La réduction du coût de changement est mesurée | M | Sol Très élevé | |
+| 7.75 | L’engageabilité de la Feature 8 est démontrée par un historique d’équipe | S | Sol Ultra | |
 
 ## Feature 8 — Disposer de données Azure DevOps fiables et contextualisées par sprint
 
@@ -179,16 +245,16 @@ replacées dans le contexte réel des itérations Cloud et Server/TFS au travers
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
-| 8.1 | Contrats d’accès aux données Azure DevOps définis | M | Sol Très élevé | |
-| 8.2 | Authentification et connexion Azure DevOps isolées | M | Sol Très élevé | |
-| 8.3 | Découverte des organisations, projets et équipes isolée | L | Sol Élevé | |
-| 8.4 | Requêtes WIQL et récupération des révisions isolées | L | Sol Très élevé | |
-| 8.5 | Transformations de throughput et de Cycle Time isolées | L | Sol Très élevé | |
-| 8.6 | Adaptateurs Azure DevOps Cloud et Server séparés | L | Sol Très élevé | |
-| 8.7 | Qualité et complétude des données collectées modélisées | M | Sol Très élevé | |
+| 8.1 | Pagination complète des données de delivery démontrée | M | Sol Très élevé | |
+| 8.2 | Lots partiels de collecte signalés sans perte silencieuse | M | Sol Très élevé | |
+| 8.3 | Provenance des données de delivery visible | M | Sol Élevé | |
+| 8.4 | Types et états de work items appliqués à la collecte | M | Sol Très élevé | |
+| 8.5 | Périmètre d’équipe appliqué à la collecte | M | Sol Très élevé | |
+| 8.6 | Compatibilité fonctionnelle des collectes Cloud et Server/TFS démontrée | L | Sol Très élevé | |
+| 8.7 | Qualité et complétude des données collectées qualifiées | M | Sol Très élevé | |
 | 8.8 | Périodes partielles et historiques manquants détectés | L | Sol Élevé | |
 | 8.9 | Qualité des données visible dans l’interface et les rapports | M | Sol Élevé | |
-| 8.10 | Fenêtres et unités temporelles cohérentes | L | Sol Très élevé | |
+| 8.10 | Jeu de données présenté sur une fenêtre temporelle cohérente | L | Sol Très élevé | |
 | 8.11 | Itérations Azure DevOps Cloud collectées | L | Sol Élevé | |
 | 8.12 | Itérations Azure DevOps Server/TFS collectées | L | Sol Très élevé | |
 | 8.13 | Limites de sprint visibles dans les graphiques et rapports | L | Sol Élevé | |
@@ -231,12 +297,12 @@ restitutions UI, PDF et export restent cohérents avec un cache local et un éta
 | 10.2 | Lancement et progression visible orchestrés | L | Sol Très élevé | |
 | 10.3 | Cache, historique local et migrations isolés | L | Sol Très élevé | |
 | 10.4 | Invalidation, rechargement, comparaison et rejeu par seed sécurisés | M | Sol Très élevé | |
-| 10.5 | Modèle commun des restitutions UI, PDF et export défini | M | Sol Élevé | |
-| 10.6 | Diagnostics, graphiques et mise en page des restitutions séparés | L | Sol Élevé | |
-| 10.7 | Pagination, rendu PDF, export et téléchargement séparés | L | Sol Élevé | |
+| 10.5 | Résultats et diagnostics de simulation lisibles dans l’interface | M | Sol Élevé | |
+| 10.6 | Contenu PDF compréhensible sans lecture de l’interface | M | Sol Élevé | |
+| 10.7 | Pagination PDF fiable sur les rapports réels | L | Sol Élevé | |
 | 10.8 | Artefacts et échecs partiels de restitution sécurisés | M | Sol Très élevé | |
-| 10.9 | Formulations et conventions visuelles UI/PDF harmonisées | M | Sol Medium | |
-| 10.10 | Composants frontend à responsabilités multiples audités et découpés | L | Sol Très élevé | |
+| 10.9 | Formulations et repères visuels compréhensibles dans chaque restitution | M | Sol Medium | |
+| 10.10 | Téléchargements de restitution compréhensibles et accessibles | M | Sol Élevé | |
 
 ## Feature 11 — Rendre les traitements coûteux exécutables à l’échelle
 
@@ -253,7 +319,7 @@ justifié par la charge mesurée, avec des jobs, workers, progressions, reprises
 | 11.2 | Performances interactives et asynchrones comparées par benchmark | L | Sol Très élevé | |
 | 11.3 | Seuil interactif ou asynchrone justifié par les mesures | L | Sol Très élevé | |
 | 11.4 | Jobs et résultats agrégés persistés de façon minimisée | M | Sol Très élevé | |
-| 11.5 | Jobs, progression, annulation et reprise maîtrisés | L | Sol Très élevé | |
+| 11.5 | États de jobs, annulation et reprise maîtrisés | L | Sol Très élevé | |
 | 11.6 | Workers distribuables avec ressources maîtrisées | L | Sol Ultra | |
 | 11.7 | Traitements, ressources et coûts observables | L | Sol Très élevé | |
 | 11.8 | Charge nominale, pointe, endurance et reprise validées | L | Sol Très élevé | |
@@ -288,16 +354,15 @@ recouvrements et une maintenance maîtrisés, sans affaiblir les protections cri
 
 | Numéro | Titre | Complexité | Modèle Codex | Réalisé le |
 | ---: | --- | :---: | :---: | :---: |
-| 13.1 | Inventaire des contrôles, scripts, preuves et dépendances de gouvernance disponible | M | Sol Élevé | |
-| 13.2 | Coût d’exécution et de maintenance de chaque contrôle mesuré | M | Sol Élevé | |
-| 13.3 | Chaque contrôle relié à un risque produit ou opérationnel explicite | M | Sol Medium | |
-| 13.4 | Contrôles redondants, indirects ou sans valeur démontrée identifiés | L | Sol Très élevé | |
-| 13.5 | Contrôles simplifiés et fusionnés sans réduire la couverture des risques | L | Sol Ultra | |
-| 13.6 | Temps de feedback local, PR et `main` réduit | L | Sol Très élevé | |
-| 13.7 | Maintenance et diagnostic du système de qualité documentés | M | Sol Medium | |
-| 13.8 | Évolution du coût de changement mesurée après rationalisation | M | Sol Medium | |
-| 13.9 | Reprise du produit par un nouveau contributeur démontrée | M | Sol Medium | |
-| 13.10 | Approvisionnement des images de services CI indépendant et immuable | M | Sol Élevé | |
+| 13.1 | Coût d’exécution et de maintenance de chaque contrôle mesuré | M | Sol Élevé | |
+| 13.2 | Chaque contrôle relié à un risque produit ou opérationnel explicite | M | Sol Medium | |
+| 13.3 | Contrôles redondants, indirects ou sans valeur démontrée identifiés | L | Sol Très élevé | |
+| 13.4 | Contrôles simplifiés et fusionnés sans réduire la couverture des risques | L | Sol Ultra | |
+| 13.5 | Temps de feedback local, PR et `main` réduit | L | Sol Très élevé | |
+| 13.6 | Maintenance et diagnostic du système de qualité documentés | M | Sol Medium | |
+| 13.7 | Évolution du coût de changement mesurée après rationalisation | M | Sol Medium | |
+| 13.8 | Reprise du produit par un nouveau contributeur démontrée | M | Sol Medium | |
+| 13.9 | Approvisionnement des images de services CI indépendant et immuable | M | Sol Élevé | |
 
 ## Feature 14 — Disposer d’une stratégie de diffusion claire et d’une adoption simplifiée
 
@@ -322,10 +387,10 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 
 # Synthèse du backlog
 
-**Feature en cours :** aucune Feature partiellement réalisée.
-**Prochain PBI :** à prioriser selon la gouvernance du backlog.
+**Feature en cours :** Feature 7 — Réduire le coût de changement par une architecture explicite et modulaire — 0/75 PBI réalisés (0 %).
+**Prochain PBI :** 7.1 — Les responsabilités frontend et leurs flux de données sont cartographiés — non commencé.
 **Dernière Feature terminée :** Feature 2 — Garantir la fiabilité du cœur statistique — 21/21 PBI réalisés (100 %).
-**Progression globale :** 32/141 PBI réalisés (22,7 %) ; 109 restants.
+**Progression globale :** 32/202 PBI réalisés (15,84 %) ; 170 restants.
 
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
@@ -335,15 +400,15 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 | 4 — Disposer d’une mise en production personnelle sécurisée | 6 | 0 | 6 |
 | 5 — Démontrer la valeur d’usage du mode portefeuille | 4 | 0 | 4 |
 | 6 — Rendre mesurables la qualité réelle et les limites opérationnelles | 8 | 0 | 8 |
-| 7 — Disposer d’une architecture applicative évolutive et vérifiable | 13 | 0 | 13 |
+| 7 — Réduire le coût de changement par une architecture explicite et modulaire | 75 | 0 | 75 |
 | 8 — Disposer de données Azure DevOps fiables et contextualisées par sprint | 14 | 0 | 14 |
 | 9 — Disposer de prévisions rejouables dans le temps et calibrées | 8 | 0 | 8 |
 | 10 — Disposer d’une expérience de simulation cohérente et de restitutions fiables | 10 | 0 | 10 |
 | 11 — Rendre les traitements coûteux exécutables à l’échelle | 8 | 0 | 8 |
 | 12 — Soutenir le pilotage de programme avec des relations opérationnelles explicites | 7 | 0 | 7 |
-| 13 — Disposer d’une gouvernance technique rationalisée | 10 | 0 | 10 |
+| 13 — Disposer d’une gouvernance technique rationalisée | 9 | 0 | 9 |
 | 14 — Disposer d’une stratégie de diffusion claire et d’une adoption simplifiée | 9 | 0 | 9 |
-| **Total** | **141** | **32** | **109** |
+| **Total** | **202** | **32** | **170** |
 
 Aucun PBI n’est classé XL.
 

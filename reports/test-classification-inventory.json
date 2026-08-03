@@ -2114,6 +2114,305 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_cli_reports_success_violations_and_unreadable_input",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_cli_reports_success_violations_and_unreadable_input",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_cohesive_implementation_operations_and_conjunctions_are_accepted",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_cohesive_implementation_operations_and_conjunctions_are_accepted",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_compliant_outcome_accepts_each_engageable_size",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_compliant_outcome_accepts_each_engageable_size",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_direct_and_indirect_cycles_are_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_direct_and_indirect_cycles_are_rejected",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_empty_registry_and_malformed_readiness_authorities_are_diagnosed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_empty_registry_and_malformed_readiness_authorities_are_diagnosed",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "resilience",
+      "data_quality"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_engageable_feature_rejects_l_and_xl",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_engageable_feature_rejects_l_and_xl",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_explicit_multiple_primary_values_are_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_explicit_multiple_primary_values_are_rejected",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_feature_seven_does_not_trust_written_audit_values",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_feature_seven_does_not_trust_written_audit_values",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_feature_seven_recalculates_summary_graph_and_human_audit",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_feature_seven_recalculates_summary_graph_and_human_audit",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_feature_seven_rejects_duplicate_and_orphan_audit_rows",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_feature_seven_rejects_duplicate_and_orphan_audit_rows",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_feature_seven_requires_review_under_55_and_refuses_more_than_90",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_feature_seven_requires_review_under_55_and_refuses_more_than_90",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_independent_domains_behaviours_proofs_and_hotspots_are_refused",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_independent_domains_behaviours_proofs_and_hotspots_are_refused",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_large_surface_is_accepted_after_explicit_cohesion_review",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_large_surface_is_accepted_after_explicit_cohesion_review",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_m_requires_a_specific_non_copied_justification",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_m_requires_a_specific_non_copied_justification",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_missing_orphan_duplicate_and_misfiled_sections_are_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_missing_orphan_duplicate_and_misfiled_sections_are_rejected",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_missing_repeated_wrong_level_and_mismatched_fields_are_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_missing_repeated_wrong_level_and_mismatched_fields_are_rejected",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_missing_surface_and_single_mismatched_size_are_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_missing_surface_and_single_mismatched_size_are_rejected",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_operational_title_can_be_accepted_with_an_explicit_autonomy_review",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_operational_title_can_be_accepted_with_an_explicit_autonomy_review",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_priority_readiness_legacy_features_dates_and_registry_are_checked",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_priority_readiness_legacy_features_dates_and_registry_are_checked",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "compatibility",
+      "migration_recovery"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_purely_operational_titles_require_an_autonomy_review",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_purely_operational_titles_require_an_autonomy_review",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_readiness_and_markdown_parsers_cover_missing_short_and_duplicate_rows",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_readiness_and_markdown_parsers_cover_missing_short_and_duplicate_rows",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_repository_feature_seven_is_entirely_compliant",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_repository_feature_seven_is_entirely_compliant",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_surface_format_consistency_and_review_signal_are_checked",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_surface_format_consistency_and_review_signal_are_checked",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_unknown_duplicate_and_future_predecessors_are_actionable",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_unknown_duplicate_and_future_predecessors_are_actionable",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_cli_detects_drift_regenerates_both_sections_and_then_passes",
     "framework": "pytest",
     "sourcePath": "tests/test_backlog_consistency.py",
@@ -2157,10 +2456,52 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_generation_displays_a_zero_progress_official_priority",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_consistency.py",
+    "selector": "test_generation_displays_a_zero_progress_official_priority",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_generation_displays_an_official_priority_before_its_first_pbi",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_consistency.py",
+    "selector": "test_generation_displays_an_official_priority_before_its_first_pbi",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "user_interface"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_generation_rejects_missing_governance_marker",
     "framework": "pytest",
     "sourcePath": "tests/test_backlog_consistency.py",
     "selector": "test_generation_rejects_missing_governance_marker",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backlog_consistency.py::test_priority_authority_is_unique_and_references_the_registry",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_consistency.py",
+    "selector": "test_priority_authority_is_unique_and_references_the_registry",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",

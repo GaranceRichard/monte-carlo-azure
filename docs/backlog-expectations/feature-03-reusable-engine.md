@@ -7,7 +7,7 @@ Le résultat observable, le flux de valeur et le statut de la Feature sont défi
 
 - `14.1` et `14.2` confirment le package comme trajectoire soutenue et identifient les intégrateurs ;
 - `2.20` stabilise le contrat statistique versionné ;
-- `7.1` valide le modèle cible des dépendances internes.
+- `7.71` démontre dans le workspace que les frontières internes sont publiées et contrôlées avant leur distribution.
 
 ## Attendus
 
@@ -26,7 +26,7 @@ Le résultat observable, le flux de valeur et le statut de la Feature sont défi
 - définir dépendances runtime autorisées ;
 - exclure FastAPI, Pydantic, MongoDB, Redis, Azure DevOps et frontend ;
 - décider explicitement de la place de NumPy ;
-- attribuer la propriété des modèles, limites, erreurs et règles statistiques.
+- consommer les propriétés et frontières internes décidées par la Feature 7 sans les redéfinir.
 
 ### 3.3 — API publique, erreurs et politique de compatibilité définies
 
@@ -44,34 +44,33 @@ Le résultat observable, le flux de valeur et le statut de la Feature sont défi
 - prouver l’import ;
 - ne pas déplacer tout le moteur.
 
-### 3.5 — Contrats métier et Value Objects centralisés dans le package
+### 3.5 — Contrats métier internes exposés par l’API publique du package
 
-- déplacer limites, Value Objects, commandes, résultats et erreurs métier ;
-- migrer les consommateurs vers une autorité unique ;
-- interdire les copies durables ;
-- préserver la sémantique et les contrats externes.
+- exposer les contrats internes préparés par la Feature 7 sans en créer une seconde autorité ;
+- choisir uniquement les commandes, résultats, erreurs et Value Objects soutenus publiquement ;
+- préserver la sémantique et les versions statistiques ;
+- ne migrer aucun consommateur applicatif dans ce PBI.
 
-### 3.6 — Moteur statistique interne centralisé dans le package
+### 3.6 — Moteur interne inclus derrière l’API publique du package
 
-- déplacer les deux modes de simulation ;
-- déplacer tirages, batching, censures, percentiles, fiabilité et histogrammes ;
-- conserver le calcul comme détail interne ;
-- ne pas l’exposer directement comme API publique.
+- inclure le moteur préparé par la Feature 7 dans la distribution ;
+- conserver tirages, batching, censures, percentiles, fiabilité et histogrammes comme détails internes ;
+- ne pas déplacer ni redécouper ces responsabilités dans la Feature 3 ;
+- ne pas exposer le moteur directement comme API publique.
 
-### 3.7 — Cas d’usage public disponible et backend consommateur du package
+### 3.7 — Façade publique de simulation disponible dans le package
 
-- déplacer l’orchestration du cas d’usage ;
 - exposer la façade publique ;
-- migrer le backend vers cette façade ;
-- empêcher les appels directs aux détails internes ;
-- préserver HTTP et MongoDB.
+- stabiliser sa commande, son résultat et ses erreurs ;
+- préserver les contrats externes soutenus ;
+- laisser les migrations de consommateurs internes à la Feature 7.
 
-### 3.8 — Dépendances interdites et contournements de l’API publique bloqués
+### 3.8 — Isolation du package démontrée par un consommateur externe
 
-- bloquer les dépendances vers l’application et ses frameworks ;
-- bloquer les imports profonds contournant l’API ;
-- empêcher cycles et duplications ;
-- intégrer les contrôles à la gate avec diagnostic actionnable.
+- appliquer l’autorité de dépendances livrée par la Feature 7 au périmètre distribué ;
+- démontrer depuis un consommateur externe l’absence de dépendance à FastAPI, MongoDB et au frontend ;
+- refuser les imports profonds propres au package ;
+- ne pas recréer un second moteur de contrôle architectural.
 
 ### 3.9 — Distributions `wheel` et `sdist` reproductibles
 

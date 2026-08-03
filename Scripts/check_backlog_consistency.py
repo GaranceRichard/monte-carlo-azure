@@ -17,6 +17,7 @@ DEFAULT_GOVERNANCE = ROOT / "docs" / "backlog-governance.md"
 BACKLOG_SUMMARY_MARKER = "# Synthèse du backlog"
 GOVERNANCE_DISTRIBUTION_MARKER = "## Répartition actuelle des"
 FEATURE_RE = re.compile(r"^## Feature (?P<number>\d+) — (?P<title>.+)$")
+FEATURE_PRIORITY_RE = re.compile(r"^Feature prioritaire : (?P<number>\d+)$", re.MULTILINE)
 PBI_RE = re.compile(
     r"^\| (?P<identifier>\d+\.\d+) \| (?P<title>.+?) \| "
     r"(?P<complexity>[SMLX]+) \| (?P<model>.+?) \|(?P<completed>.*?)\|$"
@@ -108,52 +109,84 @@ def _percentage(completed: int, total: int) -> str:
     return value.replace(".", ",")
 
 
-def _current_feature(features: tuple[Feature, ...]) -> Feature | None:
-    return next(
+def _current_feature(
+    features: tuple[Feature, ...], priority_number: int | None = None
+) -> Feature | None:
+    partial = next(
         (feature for feature in features if 0 < feature.completed_count < len(feature.pbis)),
+        None,
+    )
+    if partial is not None:
+        return partial
+    if priority_number is None:
+        return None
+    return next(
+        (
+            feature
+            for feature in features
+            if feature.number == priority_number and feature.completed_count < len(feature.pbis)
+        ),
         None,
     )
 
 
-def _status_rows(features: tuple[Feature, ...]) -> list[str]:
-    current = _current_feature(features)
+def feature_priority(governance: str, features: tuple[Feature, ...]) -> int:
+    matches = tuple(FEATURE_PRIORITY_RE.finditer(governance))
+    if len(matches) != 1:
+        raise ValueError("Governance must declare exactly one 'Feature prioritaire : N' authority.")
+    number = int(matches[0].group("number"))
+    if all(feature.number != number for feature in features):
+        raise ValueError(f"Priority references an unknown Feature: {number}")
+    return number
+
+
+def _status_rows(
+    features: tuple[Feature, ...], priority_number: int | None = None
+) -> list[str]:
+    current = _current_feature(features, priority_number)
+    completed = [
+        feature for feature in features if feature.completed_count == len(feature.pbis)
+    ]
+    latest = max(completed, key=lambda feature: feature.number)
+    latest_row = (
+        f"**Dernière Feature terminée :** Feature {latest.number} — {latest.title} — "
+        f"{len(latest.pbis)}/{len(latest.pbis)} PBI réalisés (100 %)."
+    )
     if current is None:
-        completed = [
-            feature for feature in features if feature.completed_count == len(feature.pbis)
-        ]
-        latest = max(completed, key=lambda feature: feature.number)
         return [
             "**Feature en cours :** aucune Feature partiellement réalisée.",
             "**Prochain PBI :** à prioriser selon la gouvernance du backlog.",
-            (
-                f"**Dernière Feature terminée :** Feature {latest.number} — {latest.title} — "
-                f"{len(latest.pbis)}/{len(latest.pbis)} PBI réalisés (100 %)."
-            ),
+            latest_row,
         ]
     open_current = tuple(pbi for pbi in current.pbis if not pbi.completed)
     next_pbi = open_current[0]
-    return [
+    rows = [
         (
             f"**Feature en cours :** Feature {current.number} — {current.title} — "
             f"{current.completed_count}/{len(current.pbis)} PBI réalisés "
             f"({_percentage(current.completed_count, len(current.pbis))} %)."
         ),
-        f"**Prochain PBI :** `{next_pbi.identifier}` — {next_pbi.title} — non commencé.",
-        (
+        f"**Prochain PBI :** {next_pbi.identifier} — {next_pbi.title} — non commencé.",
+        latest_row,
+    ]
+    if current.completed_count:
+        rows.append(
             f"**Reliquats de la Feature {current.number} :** "
             + ", ".join(f"`{pbi.identifier}`" for pbi in open_current)
             + "."
-        ),
-    ]
+        )
+    return rows
 
 
-def render_backlog_summary(features: tuple[Feature, ...]) -> str:
+def render_backlog_summary(
+    features: tuple[Feature, ...], priority_number: int | None = None
+) -> str:
     total = sum(len(feature.pbis) for feature in features)
     completed = sum(feature.completed_count for feature in features)
     rows = [
         BACKLOG_SUMMARY_MARKER,
         "",
-        *_status_rows(features),
+        *_status_rows(features, priority_number),
         (
             f"**Progression globale :** {completed}/{total} PBI réalisés "
             f"({_percentage(completed, total)} %) ; {total - completed} restants."
@@ -201,8 +234,13 @@ def _replace_suffix(content: str, marker: str, generated: str) -> str:
 
 def expected_documents(backlog: str, governance: str) -> tuple[str, str]:
     features = parse_registry(backlog)
+    priority_number = feature_priority(governance, features)
     return (
-        _replace_suffix(backlog, BACKLOG_SUMMARY_MARKER, render_backlog_summary(features)),
+        _replace_suffix(
+            backlog,
+            BACKLOG_SUMMARY_MARKER,
+            render_backlog_summary(features, priority_number),
+        ),
         _replace_suffix(
             governance,
             GOVERNANCE_DISTRIBUTION_MARKER,

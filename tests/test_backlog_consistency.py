@@ -32,6 +32,8 @@ stale
 def _source_governance() -> str:
     return """# Gouvernance
 
+Feature prioritaire : 2
+
 ## Répartition actuelle des 99 PBI non réalisés
 stale
 """
@@ -42,11 +44,19 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     governance = (ROOT / "docs" / "backlog-governance.md").read_text(encoding="utf-8")
     features = check_backlog_consistency.parse_registry(backlog)
 
-    assert sum(len(feature.pbis) for feature in features) == 141
+    assert sum(len(feature.pbis) for feature in features) == 202
     assert sum(feature.completed_count for feature in features) == 32
     feature_two = next(feature for feature in features if feature.number == 2)
     assert feature_two.completed_count == 21
     assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == []
+    feature_seven = next(feature for feature in features if feature.number == 7)
+    assert len(feature_seven.pbis) == 75
+    assert feature_seven.completed_count == 0
+    assert check_backlog_consistency.feature_priority(governance, features) == 7
+    assert (
+        "Dernière Feature terminée :** Feature 2 — "
+        "Garantir la fiabilité du cœur statistique"
+    ) in backlog
     assert check_backlog_consistency.expected_documents(backlog, governance) == (
         backlog,
         governance,
@@ -68,7 +78,7 @@ def test_cli_detects_drift_regenerates_both_sections_and_then_passes(
     assert "summaries regenerated" in capsys.readouterr().out
     assert check_backlog_consistency.main(args) == 0
     assert "check passed" in capsys.readouterr().out
-    assert "**Prochain PBI :** `2.2` — Ensuite — non commencé." in backlog_path.read_text(
+    assert "**Prochain PBI :** 2.2 — Ensuite — non commencé." in backlog_path.read_text(
         encoding="utf-8"
     )
     governance = governance_path.read_text(encoding="utf-8")
@@ -111,7 +121,9 @@ def test_registry_rejects_invalid_sources(backlog: str, message: str) -> None:
 
 def test_generation_rejects_missing_governance_marker() -> None:
     with pytest.raises(ValueError, match="generated-section marker"):
-        check_backlog_consistency.expected_documents(_source_backlog(), "# Gouvernance\n")
+        check_backlog_consistency.expected_documents(
+            _source_backlog(), "# Gouvernance\n\nFeature prioritaire : 2\n"
+        )
 
 
 def test_generation_accepts_a_transition_without_feature_in_progress() -> None:
@@ -128,9 +140,57 @@ def test_generation_accepts_a_transition_without_feature_in_progress() -> None:
     )
     features = check_backlog_consistency.parse_registry(completed)
 
-    summary = check_backlog_consistency.render_backlog_summary(features)
+    summary = check_backlog_consistency.render_backlog_summary(features, priority_number=2)
     assert "Feature en cours :** aucune Feature partiellement réalisée" in summary
     assert "Dernière Feature terminée :** Feature 2 — Courante" in summary
+    assert "Feature en cours :** aucune Feature partiellement réalisée" in (
+        check_backlog_consistency.render_backlog_summary(features)
+    )
+
+
+def test_generation_displays_an_official_priority_before_its_first_pbi() -> None:
+    features = check_backlog_consistency.parse_registry(_source_backlog())
+
+    summary = check_backlog_consistency.render_backlog_summary(features, priority_number=2)
+
+    assert "Feature en cours :** Feature 2 — Courante — 1/3" in summary
+    assert "Prochain PBI :** 2.2 — Ensuite" in summary
+    assert "Dernière Feature terminée :** Feature 1 — Première" in summary
+
+
+def test_generation_displays_a_zero_progress_official_priority() -> None:
+    backlog = _source_backlog().replace(
+        "| 2.1 | Fini aussi | M | Sol Élevé | 28/07/2026 |",
+        "| 2.1 | Fini aussi | M | Sol Élevé | |",
+    )
+    features = check_backlog_consistency.parse_registry(backlog)
+
+    summary = check_backlog_consistency.render_backlog_summary(features, priority_number=2)
+
+    assert "Feature en cours :** Feature 2 — Courante — 0/3 PBI réalisés (0 %)" in summary
+    assert "Prochain PBI :** 2.1 — Fini aussi" in summary
+    assert "Dernière Feature terminée :** Feature 1 — Première" in summary
+    assert "Reliquats" not in summary
+
+
+@pytest.mark.parametrize(
+    ("governance", "message"),
+    [
+        ("# Gouvernance\n", "exactly one"),
+        (
+            "Feature prioritaire : 1\nFeature prioritaire : 2\n",
+            "exactly one",
+        ),
+        ("Feature prioritaire : 99\n", "unknown Feature"),
+    ],
+)
+def test_priority_authority_is_unique_and_references_the_registry(
+    governance: str, message: str
+) -> None:
+    features = check_backlog_consistency.parse_registry(_source_backlog())
+
+    with pytest.raises(ValueError, match=message):
+        check_backlog_consistency.feature_priority(governance, features)
 
 
 def test_cli_reports_unreadable_input(tmp_path: Path, capsys) -> None:

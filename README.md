@@ -106,6 +106,10 @@ une connexion Azure DevOps réelle.
   sources et configurations autoritaires ; les rapports, couvertures, builds, caches, attestations et
   calibrations générés pendant la validation en sont exclus. Un rapport issu d’un autre contenu, d’un autre
   snapshot ou de preuves devenues périmées bloque la publication.
+- **Évolution par outcomes.** Les garanties statistiques bloquantes étant établies, la priorité suivante est
+  de réduire le coût de changement. Chaque unité de backlog livre un état architectural cohérent et publiable,
+  avec les migrations, tests et retraits locaux nécessaires, vers des frontières métier, applicatives,
+  techniques, de présentation et de qualité explicites.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 

@@ -31,6 +31,8 @@
       "conditionalNeeds": [],
       "commands": [
         "Repository hygiene (README, encoding, secrets and DoD)",
+        "Backlog consistency",
+        "Backlog atomicity",
         "Test classification compliance",
         "Identity boundary",
         "Naming convention",

@@ -90,6 +90,18 @@ def _base_commands(q: Any, command_input: tuple[Any, ...]) -> list[Any]:
             "Correct the reported README, encoding, secret, or DoD issue and stage the fix.",
             input_sources=command_input,
         ),
+        q.GateCommand(
+            "Backlog consistency",
+            (sys.executable, "Scripts/check_backlog_consistency.py"),
+            "Regenerate the backlog summaries and correct registry inconsistencies.",
+            input_sources=command_input,
+        ),
+        q.GateCommand(
+            "Backlog atomicity",
+            (sys.executable, "Scripts/check_backlog_atomicity.py"),
+            "Refine the reported PBI contract, readiness status, audit, or precedence graph.",
+            input_sources=command_input,
+        ),
         classification_gate_command(q.GateCommand, sys.executable, command_input),
         q.GateCommand(
             "Identity boundary",

@@ -19,8 +19,15 @@ Chaque contrôle doit être évalué selon :
 
 Les contrôles de sécurité, de contrat, de parité statistique et de protection des parcours critiques restent prioritaires.
 
+Statut : À raffiner avant engagement.
 
-## 13.10 — Approvisionnement des images de services CI indépendant et immuable
+La cartographie structurelle des scripts, dépendances, producteurs et vérificateurs est livrée par la Feature
+7. La Feature 13 la consomme pour rationaliser les contrôles, réduire le temps de feedback, mesurer leur coût
+de maintenance, gouverner les images CI et démontrer la reprise par un contributeur ; elle ne duplique pas les
+frontières architecturales.
+
+
+## 13.9 — Approvisionnement des images de services CI indépendant et immuable
 
 - supprimer la dépendance directe de la CI à Docker Hub pour les images de services critiques ;
 - répliquer l’image MongoDB approuvée dans GitHub Container Registry ;

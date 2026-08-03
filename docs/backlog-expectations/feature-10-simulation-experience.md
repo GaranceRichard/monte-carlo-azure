@@ -16,6 +16,14 @@ La Feature 10 porte :
 Elle ne porte ni le protocole de backtesting et de calibration de la Feature 9, ni l'infrastructure de jobs,
 workers, annulation et reprise de la Feature 11.
 
+Statut : À raffiner avant engagement.
+
+Les modèles de présentation, leurs API, la séparation UI-rapports et les contrôles interdisant les calculs
+métier dans les rendus sont des fondations livrées par la Feature 7. La Feature 10 conserve l’expérience
+utilisateur, le contenu et la pagination PDF, les téléchargements, l’accessibilité, les formulations, la
+cohérence visuelle et les comportements fonctionnels des exports. Elle devra raffiner ces ancres avant
+engagement sans redécouper les frontières architecturales.
+
 ## Cache local
 
 Pour l'audit rétrospectif futur, la clé conceptuelle du cache est :
@@ -34,18 +42,11 @@ L'expérience devra rendre lisibles les points de rejeu, la trajectoire de créd
 résultat réel, les diagnostics temporels et la calibration sans les présenter comme une surveillance en
 temps réel. Une progression UI n'implique pas à elle seule une exécution asynchrone.
 
-## 10.10 — Composants frontend à responsabilités multiples audités et découpés
+## 10.10 — Téléchargements de restitution compréhensibles et accessibles
 
-L’audit et le découpage frontend doivent :
+Les parcours de téléchargement doivent :
 
-- inventorier les composants, hooks et services cumulant plusieurs responsabilités ;
-- mesurer leur complexité, leurs dépendances et leurs motifs de modification ;
-- découper le frontend par capacité métier et responsabilité cohésive ;
-- distinguer conteneurs, sections métier et composants de présentation ;
-- attribuer explicitement la propriété de l’état ;
-- exposer une API publique par Feature frontend ;
-- interdire les imports de fichiers internes entre Features ;
-- préserver les comportements, l’accessibilité, les contrats UI/PDF et la couverture de tests ;
-- éviter toute limite arbitraire de lignes ou tout micro-découpage sans valeur démontrée.
-
-Un éventuel socle UI partagé ne doit être engagé qu’après preuve de duplication significative et ne doit contenir aucune règle métier.
+- annoncer clairement le format et le contenu produit ;
+- rendre l’action accessible au clavier et aux technologies d’assistance ;
+- conserver un diagnostic utile lorsque la restitution échoue ;
+- ne pas dupliquer les mappers ou les moteurs de rendu de la Feature 7.

@@ -66,3 +66,6 @@ test-results/
 frontend/*.tsbuildinfo
 reports/test-execution-native/
 reports/test-execution-artifacts/
+
+# ---- Codex runtime ----
+.codex-runtime/

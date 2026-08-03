@@ -73,10 +73,10 @@ Sont exclus :
 Les identifiants techniques indispensables sont pseudonymisés. La minimisation et la pseudonymisation ne
 doivent pas être qualifiées d'anonymisation sans preuve dédiée.
 
-### 11.5 — Jobs, progression, annulation et reprise maîtrisés
+### 11.5 — États de jobs, annulation et reprise maîtrisés
 
 - définir les états et transitions de job ;
-- exposer une progression cohérente aux consommateurs de la Feature 10 ;
+- exposer ces états à travers la progression applicative livrée par le PBI 7.53 ;
 - permettre l'annulation coopérative et libérer les ressources ;
 - définir reprise, nouvelle tentative, idempotence et résultat partiel ;
 - distinguer interruption utilisateur, erreur transitoire et échec définitif.

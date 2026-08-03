@@ -512,6 +512,8 @@ def test_documentation_only_selects_only_general_mandatory_controls() -> None:
     assert plan.resolution.level == quality_gate.ChangeLevel.TARGETED
     assert [command.step for command in plan.commands] == [
         "Repository hygiene (README, encoding, secrets and DoD)",
+        "Backlog consistency",
+        "Backlog atomicity",
         "Test classification compliance",
         "Identity boundary",
         "Naming convention",
@@ -589,6 +591,8 @@ def test_shared_frontend_utility_adds_domain_controls_and_nearby_tests() -> None
     )
     assert [command.step for command in plan.commands] == [
         "Repository hygiene (README, encoding, secrets and DoD)",
+        "Backlog consistency",
+        "Backlog atomicity",
         "Test classification compliance",
         "Identity boundary",
         "Naming convention",
@@ -617,6 +621,8 @@ def test_combined_backend_and_frontend_change_aggregates_without_cross_domain_su
     )
     assert [command.step for command in plan.commands] == [
         "Repository hygiene (README, encoding, secrets and DoD)",
+        "Backlog consistency",
+        "Backlog atomicity",
         "Test classification compliance",
         "Identity boundary",
         "Naming convention",
@@ -695,6 +701,8 @@ def test_impacted_backend_plan_is_ordered_and_contains_no_duplicate_commands() -
 
     assert [command.step for command in plan.commands] == [
         "Repository hygiene (README, encoding, secrets and DoD)",
+        "Backlog consistency",
+        "Backlog atomicity",
         "Test classification compliance",
         "Identity boundary",
         "Naming convention",
@@ -714,6 +722,8 @@ def test_impacted_frontend_plan_is_ordered_and_contains_no_duplicate_commands() 
 
     assert [command.step for command in plan.commands] == [
         "Repository hygiene (README, encoding, secrets and DoD)",
+        "Backlog consistency",
+        "Backlog atomicity",
         "Test classification compliance",
         "Identity boundary",
         "Naming convention",
@@ -737,6 +747,8 @@ def test_mixed_impacted_plan_keeps_lint_typecheck_tests_order_without_repetition
 
     assert [command.step for command in plan.commands] == [
         "Repository hygiene (README, encoding, secrets and DoD)",
+        "Backlog consistency",
+        "Backlog atomicity",
         "Test classification compliance",
         "Identity boundary",
         "Naming convention",
@@ -1547,6 +1559,8 @@ def test_fast_executes_composite_dod_identity_and_naming_from_snapshot(
     assert quality_gate.run_gate("fast", paths=["README.md"]) == 0
     assert [step for step, _root, _temp, _isolated, _env in calls] == [
         "Repository hygiene (README, encoding, secrets and DoD)",
+        "Backlog consistency",
+        "Backlog atomicity",
         "Test classification compliance",
         "Identity boundary",
         "Naming convention",
@@ -1919,6 +1933,8 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
     ]
     assert [command.argv for command in non_statistical] == [
         (sys.executable, "Scripts/pre_commit_guard.py"),
+        (sys.executable, "Scripts/check_backlog_consistency.py"),
+        (sys.executable, "Scripts/check_backlog_atomicity.py"),
         (sys.executable, "Scripts/check_test_classification.py"),
         (sys.executable, "Scripts/check_identity_boundary.py"),
         (sys.executable, "Scripts/check_naming_convention.py"),
@@ -2000,7 +2016,10 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
             "main",
         ),
     ]
-    assert plan.commands[1].requires_frontend_dependencies
+    classification = next(
+        command for command in plan.commands if command.step == "Test classification compliance"
+    )
+    assert classification.requires_frontend_dependencies
     assert plan.commands[0].input_sources == (quality_gate.InputSource.HEAD,)
     assert all(
         command.input_sources == (quality_gate.InputSource.HEAD,)
@@ -2092,6 +2111,8 @@ def test_documentation_only_fast_path_skips_expensive_checks() -> None:
     steps = [command.step for command in quality_gate.execution_plan("fast", True)]
     assert steps == [
         "Repository hygiene (README, encoding, secrets and DoD)",
+        "Backlog consistency",
+        "Backlog atomicity",
         "Test classification compliance",
         "Identity boundary",
         "Naming convention",
@@ -2565,6 +2586,8 @@ def test_real_main_gate_without_a_git_repository_fails_closed(
     with tempfile.TemporaryDirectory(prefix="quality-gate-no-git-") as directory:
         root = Path(directory)
         monkeypatch.setattr(quality_gate, "ROOT", root)
+        monkeypatch.delenv("GIT_DIR", raising=False)
+        monkeypatch.delenv("GIT_WORK_TREE", raising=False)
 
         with pytest.raises(RuntimeError, match="Unable to resolve the active Git index"):
             quality_gate.run_gate(

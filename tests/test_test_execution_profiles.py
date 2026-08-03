@@ -271,6 +271,8 @@ def test_command_mapping_and_batches_preserve_parallel_branches() -> None:
             "main",
             [
                 "Repository hygiene (README, encoding, secrets and DoD)",
+                "Backlog consistency",
+                "Backlog atomicity",
                 "Backend lint (Ruff)",
                 "Frontend lint (ESLint, zero warning)",
                 "Backend tests",

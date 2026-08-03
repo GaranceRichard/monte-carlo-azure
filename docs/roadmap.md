@@ -31,7 +31,20 @@ elle ne constitue pas un backlog technique ni une promesse de calendrier.
 
 ---
 
-## Maintenant — Consolider la confiance dans les données et les prévisions
+## Maintenant — Maîtriser le coût de changement avant les prochaines capacités
+
+**Architecture explicite et coût de changement maîtrisé**
+
+Faire évoluer incrémentalement le produit vers une architecture hexagonale pragmatique qui sépare les
+préoccupations métier, applicatives, techniques, de présentation et de qualité. Des outcomes cohérents, des
+frontières explicites et des contrôles automatiques guideront la réduction progressive des hotspots et les
+migrations locales, sans réécriture globale. Cette priorité applique le retour d’expérience du PBI 2.21 :
+les garanties statistiques sont désormais bloquantes, mais leur évolution doit pouvoir rester locale,
+publiable et démontrable. Le premier résultat attendu est un socle assez clair pour engager ensuite les
+capacités de données et de contexte d’itération de la Feature 8.
+
+*Valeur : préserver les garanties statistiques déjà acquises tout en réduisant l’étendue, le risque et le
+temps nécessaires à chaque évolution future.*
 
 **Fiabilité des données Azure DevOps**
 
@@ -67,18 +80,6 @@ distribution en preuve ni sélectionner automatiquement un scénario.
 *Valeur : prévoir une livraison puis vérifier rétrospectivement si la crédibilité affichée soutenait
 réellement la décision.*
 
-**Socle de maintenabilité vérifiable**
-
-Établir une baseline de maintenabilité et de complexité, puis protéger progressivement le produit contre
-de nouvelles concentrations de responsabilités. La séparation des responsabilités métier, applicatives,
-d’infrastructure et de présentation, la cohérence des contrats entre Python et TypeScript ainsi que les
-règles statistiques et décisionnelles partagées doivent rester vérifiables et démontrables. Cette démarche
-vise d’abord les nouvelles dérives et les risques prioritaires, sans imposer la résorption immédiate de
-toute la dette existante.
-
-*Valeur : préserver la confiance dans les résultats et réduire le risque de régression à mesure que le
-produit évolue.*
-
 **Performance mesurable**
 
 Établir une baseline reproductible pour la collecte Azure DevOps, les simulations, la génération des
@@ -88,17 +89,7 @@ rapports et les parcours utilisateur associés avant de prioriser les optimisati
 
 ---
 
-## Ensuite — Faire évoluer le socle et les restitutions
-
-**Architecture évolutive**
-
-Réduire progressivement les concentrations de responsabilités et faire évoluer les frontières de la
-collecte Azure DevOps, de l’orchestration des simulations, des rapports et exports, du backend et de
-l’infrastructure qualité. Cette évolution doit préserver la frontière d’identité Azure DevOps ; ses choix
-restent à valider à partir des besoins et des mesures, sans imposer de réécriture ni de modèle
-d’architecture prédéterminé.
-
-*Valeur : faire évoluer le produit sans dégrader la cohérence des résultats ni ses invariants de sécurité.*
+## Ensuite — Étendre les restitutions
 
 **Exports pour le reporting programme**
 
