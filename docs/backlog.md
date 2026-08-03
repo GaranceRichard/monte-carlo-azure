@@ -63,7 +63,7 @@ déterministe, des preuves exactes et distributionnelles et des références par
 | 2.18 | Protocole de parité distributionnelle versionné et testable | M | Sol Très élevé | 01/08/2026 |
 | 2.19 | Rapport consolidé de parité déterministe, exacte et distributionnelle disponible | M | Sol Très élevé | 01/08/2026 |
 | 2.20 | Dérives de version et décisions de compatibilité statistique bloquées | M | Sol Très élevé | 01/08/2026 |
-| 2.21 | Contrôles complets de parité et de compatibilité bloquants dans le profil `main` | M | Sol Très élevé | 01/08/2026 |
+| 2.21 | Contrôles complets de parité et de compatibilité bloquants dans le profil `main` | M | Sol Très élevé | 02/08/2026 |
 
 ## Feature 3 — Disposer d’un moteur statistique Python réutilisable et distribuable
 

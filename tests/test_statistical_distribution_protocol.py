@@ -717,5 +717,5 @@ def test_distributional_authorities_are_documented_without_product_chronology() 
     assert "Dernière Feature terminée :** Feature 2" in backlog
     assert (
         "| 2.21 | Contrôles complets de parité et de compatibilité bloquants dans le "
-        "profil `main` | M | Sol Très élevé | 01/08/2026 |"
+        "profil `main` | M | Sol Très élevé | 02/08/2026 |"
     ) in backlog

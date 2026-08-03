@@ -258,8 +258,9 @@ publiabilité restent définies dans [`docs/definition-of-done.md`](docs/definit
 - [Gouvernance du backlog](docs/backlog-governance.md)
 - [Attendus détaillés](docs/backlog-expectations/README.md)
 
-Le backlog décrit des résultats futurs observables. Sa colonne `Réalisé le` est l’autorité de statut ; le
-README ne reproduit ni le prochain item, ni les dates, ni les compteurs.
+Le backlog recense les résultats observables et distingue ceux réalisés de ceux à venir. Sa colonne
+`Réalisé le` est l’autorité de statut ; le README ne reproduit ni le prochain item, ni les dates, ni les
+compteurs.
 
 ### Lire l’historique et les preuves
 
