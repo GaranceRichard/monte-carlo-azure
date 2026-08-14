@@ -15,6 +15,7 @@ les règles, les preuves ou l’historique.
 | Règles de statut, priorité, dépendance, raffinement et génération du backlog | Pilotage et contributeurs | [`backlog-governance.md`](backlog-governance.md) | Gouvernance transverse | Gouvernance |
 | Périmètres, hors-périmètres et preuves attendues des outcomes futurs | Product owner et réalisateurs | [`backlog-expectations/`](backlog-expectations/README.md) | Détail des attentes, sans autorité de statut | Chantier |
 | Frontières, composants, flux, API et sécurité structurelle | Développeurs et exploitants | [`ARCHITECTURE.md`](../ARCHITECTURE.md) | Architecture et contrats applicatifs | Technique |
+| Responsabilités et flux frontend observés | Développeurs frontend et architectes | [`frontend-responsibilities-map.md`](frontend-responsibilities-map.md) | Baseline factuelle de l’existant, sans architecture cible | Technique |
 | Règles statistiques normatives | Développeurs du moteur et reviewers | [`STD-STAT-001.md`](standards/STD-STAT-001.md) | Standard normatif | Norme |
 | Forme, dérivation et exécution du corpus statistique | Développeurs du moteur et reviewers | [`statistical-reference-corpus.md`](statistical-reference-corpus.md) | Contrat opératoire et preuves dérivées | Contrat |
 | Protocole, calibration et preuve de parité distributionnelle | Statisticiens, développeurs et reviewers | [`statistical-distribution-protocol.md`](statistical-distribution-protocol.md) | Contrat d’inférence multi-seeds et limites | Contrat |
@@ -71,6 +72,7 @@ l’unique autorité de réalisation.
 | [`../PRODUCT.md`](../PRODUCT.md) | Décideurs, sponsors, utilisateurs | Autorité de vision, positionnement, cas d’usage et valeur | Produit |
 | [`roadmap.md`](roadmap.md) | Décideurs produit | Autorité des horizons de valeur, sans calendrier | Produit |
 | [`../ARCHITECTURE.md`](../ARCHITECTURE.md) | Développeurs, exploitants | Autorité des frontières, composants, flux et contrats applicatifs | Technique |
+| [`frontend-responsibilities-map.md`](frontend-responsibilities-map.md) | Développeurs frontend, architectes | Cartographie vérifiable des propriétaires, transformations, stockages, flux et couplages frontend actuels | Technique |
 | [`../frontend/README.md`](../frontend/README.md) | Développeurs frontend | Guide de démarrage et frontières frontend | Technique |
 | [`deployment.md`](deployment.md) | Exploitants | Procédure de déploiement et d’exploitation | Technique |
 | [`maintainability.md`](maintainability.md) | Mainteneurs | Procédure et règles du ratchet | Gouvernance |
@@ -149,6 +151,8 @@ l’unique autorité de réalisation.
 ### Comprendre et exploiter le système
 
 - [`../ARCHITECTURE.md`](../ARCHITECTURE.md) — architecture, sécurité, flux, API et contrats de persistance ;
+- [`frontend-responsibilities-map.md`](frontend-responsibilities-map.md) — responsabilités, flux, stockages,
+  transformations et couplages observés dans le frontend actuel ;
 - [`../frontend/README.md`](../frontend/README.md) — démarrage et frontières propres au frontend ;
 - [`deployment.md`](deployment.md) — déploiement et exploitation ;
 - [`maintainability.md`](maintainability.md) — ratchet de maintenabilité.
