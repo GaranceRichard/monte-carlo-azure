@@ -273,6 +273,8 @@ publiabilité restent définies dans [`docs/definition-of-done.md`](docs/definit
 Le backlog recense les résultats observables et distingue ceux réalisés de ceux à venir. Sa colonne
 `Réalisé le` est l’autorité de statut ; le README ne reproduit ni le prochain item, ni les dates, ni les
 compteurs.
+Une Feature conforme se réalise progressivement : seuls ses éléments achevés sont datés, après leurs prédécesseurs ;
+aucune date n’est admise tant que la Feature reste à raffiner.
 
 ### Lire l’historique et les preuves
 

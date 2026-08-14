@@ -1,15 +1,15 @@
 {
   "schemaVersion": "1.0.0",
-  "classificationInventorySha256": "3fedb94c5a86261f79477acd5dc97e8fe943ba105a38cf9b999c54e9fd2a9d09",
+  "classificationInventorySha256": "0e5a21e0384f1f0eb59d8f0c2f1ccbe9000218f158923b9433102b430b0f9dc9",
   "totals": {
-    "logicalCases": 1427,
-    "collectedInstances": 1812,
-    "executedInstances": 1812,
+    "logicalCases": 1428,
+    "collectedInstances": 1813,
+    "executedInstances": 1813,
     "skippedInstances": 0,
-    "attempts": 1812,
+    "attempts": 1813,
     "retries": 0,
     "results": {
-      "passed": 1812,
+      "passed": 1813,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -33,14 +33,14 @@
       }
     },
     "pytest": {
-      "logicalCases": 705,
-      "collectedInstances": 983,
-      "executedInstances": 983,
+      "logicalCases": 706,
+      "collectedInstances": 984,
+      "executedInstances": 984,
       "skippedInstances": 0,
-      "attempts": 983,
+      "attempts": 984,
       "retries": 0,
       "results": {
-        "passed": 983,
+        "passed": 984,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -65,14 +65,14 @@
   },
   "classificationStatuses": {
     "classified": {
-      "logicalCases": 1427,
-      "collectedInstances": 1812,
-      "executedInstances": 1812,
+      "logicalCases": 1428,
+      "collectedInstances": 1813,
+      "executedInstances": 1813,
       "skippedInstances": 0,
-      "attempts": 1812,
+      "attempts": 1813,
       "retries": 0,
       "results": {
-        "passed": 1812,
+        "passed": 1813,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -142,14 +142,14 @@
       }
     },
     "unit": {
-      "logicalCases": 660,
-      "collectedInstances": 956,
-      "executedInstances": 956,
+      "logicalCases": 661,
+      "collectedInstances": 957,
+      "executedInstances": 957,
       "skippedInstances": 0,
-      "attempts": 956,
+      "attempts": 957,
       "retries": 0,
       "results": {
-        "passed": 956,
+        "passed": 957,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -159,14 +159,14 @@
   },
   "executionProfiles": {
     "pr": {
-      "logicalCases": 1156,
-      "collectedInstances": 1500,
-      "executedInstances": 1500,
+      "logicalCases": 1157,
+      "collectedInstances": 1501,
+      "executedInstances": 1501,
       "skippedInstances": 0,
-      "attempts": 1500,
+      "attempts": 1501,
       "retries": 0,
       "results": {
-        "passed": 1500,
+        "passed": 1501,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -2421,6 +2421,28 @@
       }
     },
     {
+      "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_completed_pbi_requires_all_declared_predecessors_to_be_completed",
+      "framework": "pytest",
+      "sourcePath": "tests/test_backlog_atomicity.py",
+      "selector": "test_completed_pbi_requires_all_declared_predecessors_to_be_completed",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
       "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_compliant_outcome_accepts_each_engageable_size",
       "framework": "pytest",
       "sourcePath": "tests/test_backlog_atomicity.py",
@@ -2773,10 +2795,10 @@
       }
     },
     {
-      "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_priority_readiness_legacy_features_dates_and_registry_are_checked",
+      "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_priority_readiness_progressive_completion_and_registry_are_checked",
       "framework": "pytest",
       "sourcePath": "tests/test_backlog_atomicity.py",
-      "selector": "test_priority_readiness_legacy_features_dates_and_registry_are_checked",
+      "selector": "test_priority_readiness_progressive_completion_and_registry_are_checked",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",

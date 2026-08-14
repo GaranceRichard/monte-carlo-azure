@@ -2,6 +2,16 @@
 
 ## Recent
 
+### Réalisation progressive des PBI d’une Feature ouverte
+
+- alignement du contrôle d’atomicité sur l’autorité `Réalisé le` : une Feature conforme peut désormais être
+  réalisée progressivement, tandis qu’une Feature encore à raffiner reste non engageable ;
+- maintien de la précédence au niveau de la réalisation : un PBI daté est refusé si l’un de ses prédécesseurs
+  déclarés ne l’est pas encore, en complément des contrôles d’existence, d’ordre et d’acyclicité ;
+- datation des PBI 7.1 à 7.4 au 13/08/2026 et régénération des synthèses depuis l’autorité existante ;
+- rattachement des attendus 7.1, 7.3 et 7.4 à leurs preuves livrées, et ajout de la carte backend à l’inventaire
+  documentaire exhaustif.
+
 ### Responsabilités backend et cycle de vie des données cartographiés — PBI 7.2
 
 - publication d'une carte vérifiable depuis les entrées FastAPI jusqu'aux commandes et résultats de domaine,

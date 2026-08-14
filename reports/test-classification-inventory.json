@@ -2142,6 +2142,18 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_completed_pbi_requires_all_declared_predecessors_to_be_completed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backlog_atomicity.py",
+    "selector": "test_completed_pbi_requires_all_declared_predecessors_to_be_completed",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_compliant_outcome_accepts_each_engageable_size",
     "framework": "pytest",
     "sourcePath": "tests/test_backlog_atomicity.py",
@@ -2336,20 +2348,15 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_priority_readiness_legacy_features_dates_and_registry_are_checked",
+    "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_priority_readiness_progressive_completion_and_registry_are_checked",
     "framework": "pytest",
     "sourcePath": "tests/test_backlog_atomicity.py",
-    "selector": "test_priority_readiness_legacy_features_dates_and_registry_are_checked",
+    "selector": "test_priority_readiness_progressive_completion_and_registry_are_checked",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
     "purposes": [
-      "functional",
-      "compatibility",
-      "migration_recovery"
-    ],
-    "domains": [
-      "history"
+      "functional"
     ]
   },
   {

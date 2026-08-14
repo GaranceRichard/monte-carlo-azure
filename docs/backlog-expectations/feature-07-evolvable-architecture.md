@@ -59,7 +59,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Décider où placer les évolutions frontend sans reproduire les couplages actuels.
 - **Frontière principale :** Frontend.
 - **Famille d’invariants :** Propriété des responsabilités frontend.
-- **Preuve principale :** Revue de la carte contre les imports et les points d’entrée réels.
+- **Preuve principale :** Revue de la [carte frontend livrée](../frontend-responsibilities-map.md) contre les imports et les points d’entrée réels.
 - **Éléments de réalisation inclus :** Inventaire des hooks, services, modèles et vues ; flux entrants et sortants ; documentation durable.
 - **Hors périmètre :** Migration du code et expérience fonctionnelle des écrans.
 - **Surface prévisionnelle :** 0 fichiers de production ; 4 fichiers versionnés
@@ -87,7 +87,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Empêcher le système qualité de dépendre implicitement du graphe produit.
 - **Frontière principale :** Infrastructure qualité.
 - **Famille d’invariants :** Propriété des responsabilités qualité.
-- **Preuve principale :** Revue de la carte contre les scripts et profils de validation réels.
+- **Preuve principale :** Revue de la [carte de l’infrastructure qualité livrée](../quality-infrastructure-responsibilities-map.md) contre les scripts et profils de validation réels.
 - **Éléments de réalisation inclus :** Inventaire des générateurs, validateurs, runners et chemins d’exécution ; documentation durable.
 - **Hors périmètre :** Rationalisation du coût des contrôles relevant de la Feature 13.
 - **Surface prévisionnelle :** 0 fichiers de production ; 4 fichiers versionnés
@@ -101,7 +101,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Fonder la migration sur le graphe exécuté plutôt que sur une architecture supposée.
 - **Frontière principale :** Graphe de dépendances du dépôt.
 - **Famille d’invariants :** Direction et acyclicité des dépendances.
-- **Preuve principale :** Comparaison automatisée du graphe avec les imports et points d’entrée réels.
+- **Preuve principale :** Comparaison du [graphe factuel livré](../dependency-graph.md) et de sa [preuve machine](../../reports/dependency-graph.json) avec les imports et points d’entrée réels.
 - **Éléments de réalisation inclus :** Extraction du graphe ; inventaire des cycles ; inventaire des imports profonds ; restitution actionnable.
 - **Hors périmètre :** Correction des dépendances recensées.
 - **Surface prévisionnelle :** 1 fichier de production ; 6 fichiers versionnés

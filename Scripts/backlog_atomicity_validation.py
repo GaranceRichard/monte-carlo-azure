@@ -60,18 +60,19 @@ def _readiness_errors(features: dict[int, Feature], statuses: dict[int, str]) ->
                     f"déclarer `{COMPLIANT}` ou `{TO_REFINE}`",
                 )
             )
-        errors.extend(
-            diagnostic(
-                feature.number,
-                pbi.identifier,
-                "Réalisé le",
-                pbi.completed_on,
-                "date dans une Feature non réalisée",
-                "laisser toutes les dates vides jusqu’à la réalisation de la Feature",
+        if status != COMPLIANT:
+            errors.extend(
+                diagnostic(
+                    feature.number,
+                    pbi.identifier,
+                    "Réalisé le",
+                    pbi.completed_on,
+                    "date dans une Feature non préparée",
+                    f"dater les PBI uniquement après déclaration `{COMPLIANT}`",
+                )
+                for pbi in feature.pbis
+                if pbi.completed_on
             )
-            for pbi in feature.pbis
-            if pbi.completed_on
-        )
     return errors
 
 

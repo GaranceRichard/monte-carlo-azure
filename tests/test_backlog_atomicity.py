@@ -320,15 +320,18 @@ def test_missing_orphan_duplicate_and_misfiled_sections_are_rejected() -> None:
     assert "section orpheline ou rangée sous la mauvaise Feature" in rules
 
 
-def test_priority_readiness_legacy_features_dates_and_registry_are_checked() -> None:
+def test_priority_readiness_progressive_completion_and_registry_are_checked() -> None:
     rows = {
         1: [("1.1", "Réalisé", "XL", "02/08/2026")],
-        3: [("3.1", "Résultat", "S", "")],
+        3: [
+            ("3.1", "Résultat", "S", "02/08/2026"),
+            ("3.2", "Résultat suivant", "S", ""),
+        ],
         4: [("4.1", "À raffiner", "XL", "")],
     }
     valid = _validate(
         rows,
-        {3: [_contract("3.1", "S")]},
+        {3: [_contract("3.1", "S"), _contract("3.2", "S", "3.1")]},
         {3: COMPLIANT, 4: "À raffiner avant engagement"},
     )
     assert valid == ()
@@ -375,6 +378,20 @@ def test_priority_readiness_legacy_features_dates_and_registry_are_checked() -> 
         issue.feature == "Feature 4" and issue.field == "Statut de préparation"
         for issue in missing_status
     )
+
+
+def test_completed_pbi_requires_all_declared_predecessors_to_be_completed() -> None:
+    issues = _validate(
+        {
+            3: [
+                ("3.1", "Résultat", "S", ""),
+                ("3.2", "Résultat suivant", "S", "02/08/2026"),
+            ]
+        },
+        {3: [_contract("3.1", "S"), _contract("3.2", "S", "3.1")]},
+    )
+
+    assert any(issue.rule == "PBI réalisé avant son prédécesseur" for issue in issues)
 
 
 def _feature_seven_document(

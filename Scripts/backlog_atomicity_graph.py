@@ -13,6 +13,19 @@ def predecessors(value: str) -> tuple[str, ...]:
     return tuple(re.findall(r"\d+\.\d+", value))
 
 
+def _completion_precedence_error(pbi: Pbi, predecessor: Pbi) -> Diagnostic | None:
+    if not pbi.completed_on or predecessor.completed_on:
+        return None
+    return diagnostic(
+        pbi.feature,
+        pbi.identifier,
+        "Prédécesseurs",
+        predecessor.identifier,
+        "PBI réalisé avant son prédécesseur",
+        "dater chaque prédécesseur avant le PBI qui en dépend",
+    )
+
+
 def _one_pbi_errors(
     pbi: Pbi,
     declared: tuple[str, ...],
@@ -54,6 +67,10 @@ def _one_pbi_errors(
                     "référencer uniquement un PBI antérieur",
                 )
             )
+        else:
+            completion_issue = _completion_precedence_error(pbi, all_pbis[predecessor])
+            if completion_issue:
+                errors.append(completion_issue)
     return errors
 
 

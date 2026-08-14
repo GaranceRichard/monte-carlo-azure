@@ -157,8 +157,8 @@ Le contrôle spécialisé vérifie les éléments structurels :
 - identifiants uniques, tailles reconnues et absence de `L` ou `XL` dans une Feature engageable ;
 - justification spécifique des PBI `M` ;
 - présence et unicité des champs obligatoires ;
-- cohérence entre registre, attendus et statut de préparation ;
-- prédécesseurs existants, antérieurs, non dupliqués et graphe acyclique ;
+- cohérence entre registre, attendus, dates et statut de préparation ;
+- prédécesseurs existants, antérieurs, non dupliqués, réalisés avant leurs dépendants et graphe acyclique ;
 - absence de sections ou de lignes d’audit orphelines ;
 - audit complet de la Feature prioritaire ;
 - traitement explicite des titres ressemblant à de simples opérations.
@@ -213,7 +213,10 @@ modifié dans le worktree. Une modification artificielle ne satisfait pas cette 
 ## Gestion des statuts, dates et compteurs
 
 La colonne `Réalisé le` est l’autorité de statut : vide signifie non réalisé, une date `JJ/MM/AAAA` signifie
-réalisé. Une priorité peut apparaître à `0/N` sans date inventée.
+réalisé. Une Feature déclarée `Conforme au standard de granularité` est réalisée progressivement : elle peut
+donc rester ouverte avec certains PBI datés et les suivants encore vides. Une date reste interdite tant que la
+Feature est `À raffiner avant engagement`, et un PBI daté exige que tous ses prédécesseurs le soient déjà.
+Une priorité peut apparaître à `0/N` sans date inventée.
 
 `python Scripts/check_backlog_consistency.py --write` régénère les compteurs, pourcentages, Feature en cours,
 prochain PBI et répartition des modèles. Sans `--write`, toute divergence est bloquante.
@@ -227,12 +230,12 @@ prochain PBI et répartition des modèles. Sans `--write`, toute divergence est 
 
 Le modèle estime la profondeur de raisonnement ; la taille estime l’ampleur de l’outcome après découpage.
 
-## Répartition actuelle des 170 PBI non réalisés
+## Répartition actuelle des 166 PBI non réalisés
 
 | Modèle Codex | Nombre de PBI |
 | --- | ---: |
 | Sol Medium | 16 |
-| Sol Élevé | 30 |
-| Sol Très élevé | 119 |
+| Sol Élevé | 27 |
+| Sol Très élevé | 118 |
 | Sol Ultra | 5 |
-| **Total** | **170** |
+| **Total** | **166** |
