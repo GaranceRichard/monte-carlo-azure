@@ -73,7 +73,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Localiser les changements backend et les transitions de données.
 - **Frontière principale :** Backend.
 - **Famille d’invariants :** Propriété du cycle de vie backend.
-- **Preuve principale :** Revue de la carte contre les routes, services, moteurs et stores réels.
+- **Preuve principale :** Revue de la [carte backend livrée](../backend-responsibilities-map.md) contre les routes, services, moteurs et stores réels.
 - **Éléments de réalisation inclus :** Inventaire des entrées HTTP, transformations, appels moteur et opérations de persistance ; documentation durable.
 - **Hors périmètre :** Extraction des ports et modification des comportements fonctionnels.
 - **Surface prévisionnelle :** 0 fichiers de production ; 4 fichiers versionnés

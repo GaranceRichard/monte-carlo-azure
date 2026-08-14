@@ -227,6 +227,7 @@ Le backend écoute par défaut sur `http://127.0.0.1:8000` et le frontend sur
 
 - [Architecture, sécurité et API](ARCHITECTURE.md)
 - [Cartographie factuelle des responsabilités et flux frontend](docs/frontend-responsibilities-map.md)
+- [Cartographie factuelle des responsabilités backend et du cycle de vie des données](docs/backend-responsibilities-map.md)
 - [Standard statistique](docs/standards/STD-STAT-001.md)
 - [Corpus de référence statistique](docs/statistical-reference-corpus.md)
 - [Matrice risques–contrôles](docs/risk-control-matrix.md)

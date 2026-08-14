@@ -2,6 +2,17 @@
 
 ## Recent
 
+### Responsabilités backend et cycle de vie des données cartographiés — PBI 7.2
+
+- publication d'une carte vérifiable depuis les entrées FastAPI jusqu'aux commandes et résultats de domaine,
+  au service, aux moteurs Monte Carlo, au PRNG, aux agrégats et aux DTO de sortie ;
+- attribution de chaque transition du chemin `POST /simulate`, de la lecture d'historique et des routes de
+  santé à leurs appels et imports réels, avec chemins d'échec et sorties visibles ;
+- description du rate limit mémoire/Redis, de la persistance Mongo, de la rétention TTL, de la purge et du
+  scrub d'identité, y compris les accès directs et chemins opératoires hors `SimulationStore` ;
+- inventaire factuel des responsabilités ambiguës, validations recouvrantes et couplages observés, sans
+  refactoring ni modification des comportements et garanties statistiques.
+
 ### Enforcement statistique complet du profil `main` — PBI 2.21
 
 - ajout d’une politique fermée et versionnée qui associe les statuts statistiques aux décisions bloquantes,
