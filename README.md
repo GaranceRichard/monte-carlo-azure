@@ -235,6 +235,7 @@ Le backend écoute par défaut sur `http://127.0.0.1:8000` et le frontend sur
 ### Contribuer et valider
 
 - [Carte complète de la documentation](docs/README.md)
+- [Cartographie des responsabilités de l’infrastructure qualité](docs/quality-infrastructure-responsibilities-map.md)
 - [Definition of Done](docs/definition-of-done.md)
 - [Chemins critiques](docs/critical-paths.md)
 - [Traçabilité Vitals](docs/vitals-traceability.md)

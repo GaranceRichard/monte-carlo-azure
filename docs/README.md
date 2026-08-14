@@ -23,6 +23,7 @@ les règles, les preuves ou l’historique.
 | Enforcement statistique du profil `main` | Développeurs, reviewers et qualité | [`statistical-main-enforcement.md`](statistical-main-enforcement.md) et [`../config/statistical-main-enforcement-v1.0.json`](../config/statistical-main-enforcement-v1.0.json) | Politique fermée, DAG, fraîcheur et alignement local/CI | Gouvernance |
 | Classification et stratégie des tests | Développeurs et qualité | [`STD-TEST-001.md`](standards/STD-TEST-001.md) et [`test-classification.md`](test-classification.md) | Norme puis application au dépôt | Norme |
 | Validation, couverture et publiabilité | Contributeurs | [`definition-of-done.md`](definition-of-done.md) | Procédure normative du dépôt | Gouvernance |
+| Responsabilités de preuve, d’orchestration et d’exécution qualité | Développeurs, reviewers et qualité | [`quality-infrastructure-responsibilities-map.md`](quality-infrastructure-responsibilities-map.md) | Cartographie factuelle des profils, scripts, artefacts, chemins et couplages observés | Technique |
 | Risques, chemins critiques et preuves Vitals | Qualité, sécurité et reviewers | [`risk-control-matrix.md`](risk-control-matrix.md), [`critical-paths.md`](critical-paths.md) et [`vitals-traceability.md`](vitals-traceability.md) | État de maîtrise et traçabilité | Preuve |
 | Maintenabilité et exploitation | Mainteneurs et exploitants | [`maintainability.md`](maintainability.md) et [`deployment.md`](deployment.md) | Procédures spécialisées | Technique |
 | Historique des changements | Utilisateurs et mainteneurs | [`CHANGELOG.md`](../CHANGELOG.md) | Chronologie des évolutions | Historique |
@@ -104,6 +105,7 @@ l’unique autorité de réalisation.
 | [`standards/STD-TEST-001.md`](standards/STD-TEST-001.md) | Qualité, développement | Autorité normative de la stratégie de test | Norme |
 | [`test-classification.md`](test-classification.md) | Qualité, développement | Application opératoire du modèle de classification | Contrat |
 | [`definition-of-done.md`](definition-of-done.md) | Contributeurs | Autorité des gates, de la DoD et de la publiabilité | Gouvernance |
+| [`quality-infrastructure-responsibilities-map.md`](quality-infrastructure-responsibilities-map.md) | Développeurs, reviewers, qualité | Carte factuelle des responsabilités, chemins d’exécution, preuves et couplages de l’infrastructure qualité | Technique |
 | [`risk-control-matrix.md`](risk-control-matrix.md) | Qualité, sécurité | Autorité de l’état de maîtrise des risques à sa date d’observation | Preuve |
 | [`critical-paths.md`](critical-paths.md) | Qualité, produit | Autorité de la liste des parcours vitaux et candidats | Gouvernance |
 | [`vitals-traceability.md`](vitals-traceability.md) | Qualité | Autorité de la traçabilité humaine des preuves Vitals | Preuve |
@@ -173,6 +175,8 @@ l’unique autorité de réalisation.
 - [`standards/STD-TEST-001.md`](standards/STD-TEST-001.md) — norme de test ;
 - [`test-classification.md`](test-classification.md) — application de la classification ;
 - [`definition-of-done.md`](definition-of-done.md) — gate complète et DoD ;
+- [`quality-infrastructure-responsibilities-map.md`](quality-infrastructure-responsibilities-map.md) —
+  responsabilités de preuve, d’orchestration et d’exécution des contrôles qualité ;
 - [`risk-control-matrix.md`](risk-control-matrix.md) — état des risques ;
 - [`critical-paths.md`](critical-paths.md) — parcours vitaux ;
 - [`vitals-traceability.md`](vitals-traceability.md) — preuves de couverture ;
