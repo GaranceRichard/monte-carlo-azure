@@ -16,6 +16,7 @@ les règles, les preuves ou l’historique.
 | Périmètres, hors-périmètres et preuves attendues des outcomes futurs | Product owner et réalisateurs | [`backlog-expectations/`](backlog-expectations/README.md) | Détail des attentes, sans autorité de statut | Chantier |
 | Frontières, composants, flux, API et sécurité structurelle | Développeurs et exploitants | [`ARCHITECTURE.md`](../ARCHITECTURE.md) | Architecture et contrats applicatifs | Technique |
 | Responsabilités et flux frontend observés | Développeurs frontend et architectes | [`frontend-responsibilities-map.md`](frontend-responsibilities-map.md) | Baseline factuelle de l’existant, sans architecture cible | Technique |
+| Imports, directions, points d’entrée, cycles et contournements conventionnels observés | Développeurs et architectes | [`dependency-graph.md`](dependency-graph.md) et [`../reports/dependency-graph.json`](../reports/dependency-graph.json) | Restitution humaine générée puis graphe machine reproductible | Preuve |
 | Règles statistiques normatives | Développeurs du moteur et reviewers | [`STD-STAT-001.md`](standards/STD-STAT-001.md) | Standard normatif | Norme |
 | Forme, dérivation et exécution du corpus statistique | Développeurs du moteur et reviewers | [`statistical-reference-corpus.md`](statistical-reference-corpus.md) | Contrat opératoire et preuves dérivées | Contrat |
 | Protocole, calibration et preuve de parité distributionnelle | Statisticiens, développeurs et reviewers | [`statistical-distribution-protocol.md`](statistical-distribution-protocol.md) | Contrat d’inférence multi-seeds et limites | Contrat |
@@ -74,6 +75,7 @@ l’unique autorité de réalisation.
 | [`roadmap.md`](roadmap.md) | Décideurs produit | Autorité des horizons de valeur, sans calendrier | Produit |
 | [`../ARCHITECTURE.md`](../ARCHITECTURE.md) | Développeurs, exploitants | Autorité des frontières, composants, flux et contrats applicatifs | Technique |
 | [`frontend-responsibilities-map.md`](frontend-responsibilities-map.md) | Développeurs frontend, architectes | Cartographie vérifiable des propriétaires, transformations, stockages, flux et couplages frontend actuels | Technique |
+| [`dependency-graph.md`](dependency-graph.md) | Développeurs, architectes | Projection générée du graphe observé ; aucune autorité sur l’architecture cible | Preuve générée |
 | [`../frontend/README.md`](../frontend/README.md) | Développeurs frontend | Guide de démarrage et frontières frontend | Technique |
 | [`deployment.md`](deployment.md) | Exploitants | Procédure de déploiement et d’exploitation | Technique |
 | [`maintainability.md`](maintainability.md) | Mainteneurs | Procédure et règles du ratchet | Gouvernance |
@@ -155,6 +157,7 @@ l’unique autorité de réalisation.
 - [`../ARCHITECTURE.md`](../ARCHITECTURE.md) — architecture, sécurité, flux, API et contrats de persistance ;
 - [`frontend-responsibilities-map.md`](frontend-responsibilities-map.md) — responsabilités, flux, stockages,
   transformations et couplages observés dans le frontend actuel ;
+- [`dependency-graph.md`](dependency-graph.md) — directions, cycles, imports profonds et points d’entrée observés ;
 - [`../frontend/README.md`](../frontend/README.md) — démarrage et frontières propres au frontend ;
 - [`deployment.md`](deployment.md) — déploiement et exploitation ;
 - [`maintainability.md`](maintainability.md) — ratchet de maintenabilité.

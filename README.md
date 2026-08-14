@@ -110,6 +110,10 @@ une connexion Azure DevOps réelle.
   de réduire le coût de changement. Chaque unité de backlog livre un état architectural cohérent et publiable,
   avec les migrations, tests et retraits locaux nécessaires, vers des frontières métier, applicatives,
   techniques, de présentation et de qualité explicites.
+- **Dépendances observables.** Le [graphe factuel](docs/dependency-graph.md) sépare les imports runtime et de
+  type, localise les cycles et inventorie les imports profonds sans les corriger. Son
+  [rapport JSON](reports/dependency-graph.json) est régénérable depuis les imports et points d’entrée visibles
+  par Git ; les conventions de façade y restent explicitement distinctes des observations.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 
@@ -228,6 +232,7 @@ Le backend écoute par défaut sur `http://127.0.0.1:8000` et le frontend sur
 - [Architecture, sécurité et API](ARCHITECTURE.md)
 - [Cartographie factuelle des responsabilités et flux frontend](docs/frontend-responsibilities-map.md)
 - [Cartographie factuelle des responsabilités backend et du cycle de vie des données](docs/backend-responsibilities-map.md)
+- [Graphe factuel des dépendances](docs/dependency-graph.md)
 - [Standard statistique](docs/standards/STD-STAT-001.md)
 - [Corpus de référence statistique](docs/statistical-reference-corpus.md)
 - [Matrice risques–contrôles](docs/risk-control-matrix.md)

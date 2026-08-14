@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import runpy
 import sys
 from pathlib import Path
 
@@ -10,9 +11,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "Scripts"))
 
 import check_maintainability  # noqa: E402
+import dependency_graph  # noqa: E402
+import dependency_graph_common  # noqa: E402
+import dependency_graph_render  # noqa: E402
 import maintainability_config  # noqa: E402
 import maintainability_dependencies  # noqa: E402
 import maintainability_metrics  # noqa: E402
+import report_dependency_graph  # noqa: E402
 
 RATCHET_LIMITS = {
     "file.lines": 350,
@@ -82,13 +87,10 @@ def test_new_violation_fails() -> None:
 
 
 def test_aggravation_reports_file_metric_baseline_and_observed_value() -> None:
-    errors = check_maintainability.compare_snapshot(
-        _snapshot(value=21), _snapshot(value=20), []
-    )
+    errors = check_maintainability.compare_snapshot(_snapshot(value=21), _snapshot(value=20), [])
 
     assert errors == [
-        "src/module.py: metric=function.complexity symbol=calculate "
-        "baseline=20 observed=21 limit=2"
+        "src/module.py: metric=function.complexity symbol=calculate baseline=20 observed=21 limit=2"
     ]
 
 
@@ -102,12 +104,7 @@ def test_justified_declarative_exception_passes() -> None:
         "justification": "Synthetic fixture intentionally exercises a complex function.",
     }
 
-    assert (
-        check_maintainability.compare_snapshot(
-            _snapshot(), _empty_baseline(), [exception]
-        )
-        == []
-    )
+    assert check_maintainability.compare_snapshot(_snapshot(), _empty_baseline(), [exception]) == []
 
 
 def test_windows_and_linux_paths_share_one_normalized_form() -> None:
@@ -203,9 +200,7 @@ def test_exception_without_justification_is_rejected(tmp_path: Path) -> None:
     )
 
     try:
-        check_maintainability.load_inputs(
-            config_path, baseline_path, exceptions_path
-        )
+        check_maintainability.load_inputs(config_path, baseline_path, exceptions_path)
     except ValueError as exc:
         assert "requires a justification" in str(exc)
     else:
@@ -307,6 +302,66 @@ def test_dependency_collection_resolves_relative_external_and_js_imports() -> No
     assert ("web/a.ts", "web/b.ts") in dependencies
     assert ("web/a.ts", "external") in dependencies
 
+    observed_texts = {
+        "pkg/__init__.py": "",
+        "pkg/a.py": "from . import b\nimport external.lib\n",
+        "pkg/b.py": "from . import a\n",
+        "frontend/src/api.ts": "export const api = 1;\n",
+        "frontend/src/api/internal.ts": "export type Internal = string;\n",
+        "frontend/src/consumer.ts": (
+            'import type { Internal } from "./api/internal";\n'
+            'import value from "@scope/package/subpath";\n'
+            'import "./style.css";\n'
+            'const lazy = import("./lazy");\n'
+        ),
+        "frontend/src/lazy.ts": "export const lazy = true;\n",
+        "frontend/src/style.css": "body {}\n",
+        "frontend/scripts/run.mjs": (
+            'const module = await server.ssrLoadModule("/src/consumer.ts");\n'
+        ),
+    }
+    observed_edges = dependency_graph.collect_import_edges(observed_texts, set(observed_texts))
+    targets = {item["target"] for item in observed_edges}
+    assert {
+        "pkg/b.py",
+        "external:python:external",
+        "external:npm:@scope/package",
+        "frontend/src/style.css",
+    } <= targets
+    assert {"js-dynamic-import", "js-runtime-load"} <= {item["kind"] for item in observed_edges}
+    assert (
+        dependency_graph.elementary_cycles(set(observed_texts), observed_edges)[0]["phase"]
+        == "runtime"
+    )
+    assert dependency_graph.deep_imports(observed_edges)[0]["crossedBoundary"] == (
+        "frontend/src/api"
+    )
+    assert (
+        dependency_graph.api_bypasses(observed_edges, set(observed_texts))[0]["facade"]
+        == "frontend/src/api.ts"
+    )
+
+    unresolved = dependency_graph.collect_import_edges(
+        {"frontend/src/a.ts": 'import "./missing";\n'},
+        {"frontend/src/a.ts"},
+    )
+    assert unresolved[0]["target"] == "unresolved:frontend/src/missing"
+    self_edge = {
+        "source": "frontend/src/a.ts",
+        "target": "frontend/src/a.ts",
+        "line": 1,
+        "kind": "synthetic",
+        "phase": "compile",
+        "specifier": "./a",
+        "resolution": "internal",
+    }
+    assert dependency_graph.elementary_cycles({"frontend/src/a.ts"}, [self_edge])[0] == {
+        "id": "CYC-001",
+        "phase": "compile-involved",
+        "nodes": ["frontend/src/a.ts"],
+        "edges": [self_edge],
+    }
+
 
 def test_cycles_include_self_edges_and_ignore_edges_outside_graph() -> None:
     cycles = maintainability_dependencies.cyclic_components(
@@ -344,6 +399,12 @@ def test_tracked_path_failure_and_success(tmp_path: Path, monkeypatch) -> None:
     with pytest.raises(ValueError, match="Unable to list tracked files"):
         check_maintainability._tracked_paths(tmp_path)
 
+    monkeypatch.setattr(dependency_graph_common.subprocess, "run", lambda *_a, **_k: Result(0))
+    assert dependency_graph.repository_paths(tmp_path) == ["a.py", "b.py"]
+    monkeypatch.setattr(dependency_graph_common.subprocess, "run", lambda *_a, **_k: Result(1))
+    with pytest.raises(RuntimeError, match="boom"):
+        dependency_graph.repository_paths(tmp_path)
+
 
 def test_configuration_rejects_invalid_json_schema_payload_and_limit_drift(tmp_path: Path) -> None:
     bad = tmp_path / "bad.json"
@@ -363,15 +424,11 @@ def test_configuration_rejects_invalid_json_schema_payload_and_limit_drift(tmp_p
     changed = _empty_baseline()
     changed["limits"] = {**changed["limits"], "file.lines": 999}
     baseline_path.write_text(json.dumps(changed), encoding="utf-8")
-    exceptions_path.write_text(
-        json.dumps({"schemaVersion": 1, "exceptions": []}), encoding="utf-8"
-    )
+    exceptions_path.write_text(json.dumps({"schemaVersion": 1, "exceptions": []}), encoding="utf-8")
     with pytest.raises(ValueError, match="limits differ"):
         maintainability_config.load_inputs(config_path, baseline_path, exceptions_path)
 
-    exceptions_path.write_text(
-        json.dumps({"schemaVersion": 1, "exceptions": {}}), encoding="utf-8"
-    )
+    exceptions_path.write_text(json.dumps({"schemaVersion": 1, "exceptions": {}}), encoding="utf-8")
     with pytest.raises(ValueError, match="exceptions list"):
         maintainability_config.load_inputs(config_path, baseline_path, exceptions_path)
 
@@ -408,13 +465,17 @@ def test_cli_writes_baseline_passes_fails_and_reports_loading_error(
     baseline_path = tmp_path / "baseline.json"
     exceptions_path = tmp_path / "exceptions.json"
     config_path.write_text(json.dumps(_config()), encoding="utf-8")
-    exceptions_path.write_text(
-        json.dumps({"schemaVersion": 1, "exceptions": []}), encoding="utf-8"
-    )
+    exceptions_path.write_text(json.dumps({"schemaVersion": 1, "exceptions": []}), encoding="utf-8")
     monkeypatch.setattr(check_maintainability, "_tracked_paths", lambda _root: [])
     args = [
-        "--root", str(tmp_path), "--config", str(config_path),
-        "--baseline", str(baseline_path), "--exceptions", str(exceptions_path),
+        "--root",
+        str(tmp_path),
+        "--config",
+        str(config_path),
+        "--baseline",
+        str(baseline_path),
+        "--exceptions",
+        str(exceptions_path),
     ]
     assert check_maintainability.main([*args, "--write-baseline"]) == 0
     assert baseline_path.read_text(encoding="utf-8").endswith("\n")
@@ -431,3 +492,91 @@ def test_cli_writes_baseline_passes_fails_and_reports_loading_error(
     assert "new or aggravated debt" in capsys.readouterr().err
     assert check_maintainability.main(["--config", str(tmp_path / "missing")]) == 2
     assert "could not run" in capsys.readouterr().err
+
+    report_path = tmp_path / "dependency-graph.json"
+    document_path = tmp_path / "dependency-graph.md"
+    graph_args = [
+        "--root",
+        str(ROOT),
+        "--report",
+        str(report_path),
+        "--document",
+        str(document_path),
+    ]
+    assert report_dependency_graph.main(graph_args) == 0
+    assert report_dependency_graph.main([*graph_args, "--check"]) == 0
+    document_path.write_text("stale\n", encoding="utf-8")
+    assert report_dependency_graph.main([*graph_args, "--check"]) == 1
+    assert "outputs are stale" in capsys.readouterr().err
+
+    report = report_dependency_graph.build_report(ROOT)
+    markdown_writer = getattr(dependency_graph_render, "render_" + "markdown")
+    assert (
+        json.loads((ROOT / "reports/dependency-graph.json").read_text(encoding="utf-8")) == report
+    )
+    assert (ROOT / "docs/dependency-graph.md").read_text(encoding="utf-8") == markdown_writer(
+        report
+    )
+    assert {
+        key: report["summary"][key]
+        for key in ("cycles", "runtimeCycles", "missingEntrypoints", "apiBypasses")
+    } == {
+        "cycles": 2,
+        "runtimeCycles": 0,
+        "missingEntrypoints": 5,
+        "apiBypasses": 2,
+    }
+    assert [cycle["nodes"] for cycle in report["observed"]["cycles"]] == [
+        [
+            "frontend/src/demoData.ts",
+            "frontend/src/hooks/usePortfolioReport.ts",
+            "frontend/src/hooks/simulationForecastService.ts",
+            "frontend/src/hooks/simulationForecastCore.ts",
+        ],
+        [
+            "frontend/src/hooks/simulationForecastCore.ts",
+            "frontend/src/hooks/simulationForecastService.ts",
+        ],
+    ]
+    assert {
+        (item["source"], item["target"], item["line"], item["facade"])
+        for item in report["interpretation"]["apiBypasses"]
+    } == {
+        (
+            "frontend/src/hooks/simulationForecastCore.ts",
+            "frontend/src/api/simulationMappers.ts",
+            4,
+            "frontend/src/api.ts",
+        ),
+        (
+            "frontend/src/hooks/useSimulationHistory.ts",
+            "frontend/src/storage/simulationHistoryMappers.ts",
+            3,
+            "frontend/src/storage.ts",
+        ),
+    }
+    assert any(
+        item["declaredIn"] == "Dockerfile" and item["target"] == "backend/api.py"
+        for item in report["observed"]["entrypoints"]
+    )
+    assert any(
+        item["kind"] == "js-runtime-load"
+        and item["target"] == "frontend/src/statisticalCorpusRunner.ts"
+        for item in report["observed"]["edges"]
+    )
+    report["interpretation"]["apiBypasses"] = []
+    assert "Aucun selon la convention" in markdown_writer(report)
+
+    script = ROOT / "Scripts/report_dependency_graph.py"
+    monkeypatch.setattr(sys, "argv", [str(script), "--check"])
+    with pytest.raises(SystemExit) as exc:
+        runpy.run_path(str(script), run_name="__main__")
+    assert exc.value.code == 0
+
+    monkeypatch.setattr(
+        report_dependency_graph,
+        "build_report",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("synthetic failure")),
+    )
+    assert report_dependency_graph.main([]) == 2
+    assert "synthetic failure" in capsys.readouterr().err
