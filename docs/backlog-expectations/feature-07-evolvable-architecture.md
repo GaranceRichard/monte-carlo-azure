@@ -129,7 +129,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Éviter les définitions concurrentes d’une même donnée entre couches.
 - **Frontière principale :** Propriété des données.
 - **Famille d’invariants :** Autorité et transformation des données.
-- **Preuve principale :** Revue croisée des autorités déclarées et des producteurs réels.
+- **Preuve principale :** Revue croisée du [registre des autorités livré](../structured-data-authority-registry.md) et des producteurs réels.
 - **Éléments de réalisation inclus :** Registre des autorités ; règles de transformation ; traitement des ambiguïtés ; documentation durable.
 - **Hors périmètre :** Migration des producteurs et consommateurs.
 - **Surface prévisionnelle :** 0 fichiers de production ; 4 fichiers versionnés

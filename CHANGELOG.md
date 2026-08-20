@@ -2,6 +2,16 @@
 
 ## Recent
 
+### Autorités des données structurantes explicites — PBI 7.6
+
+- publication d'un registre vérifié de 23 familles de données structurantes avec, pour chacune, une autorité
+  actuelle unique, ses producteurs et consommateurs exécutés et sa transformation de frontière ;
+- confrontation des autorités aux modèles, imports, routes HTTP, stockages navigateur et MongoDB, moteurs et
+  flux de restitution recensés par les cartes frontend 7.1 et backend 7.2 ;
+- conservation explicite des alias, miroirs DTO, validations recouvrantes, politiques de rétention et autres
+  définitions concurrentes observées, sans migration, refactoring ni décision d'architecture cible ;
+- maintien strict du standard, des contrats et des garanties statistiques existants.
+
 ### Réalisation progressive des PBI d’une Feature ouverte
 
 - alignement du contrôle d’atomicité sur l’autorité `Réalisé le` : une Feature conforme peut désormais être

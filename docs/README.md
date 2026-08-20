@@ -17,6 +17,7 @@ les règles, les preuves ou l’historique.
 | Frontières, composants, flux, API et sécurité structurelle | Développeurs et exploitants | [`ARCHITECTURE.md`](../ARCHITECTURE.md) | Architecture et contrats applicatifs | Technique |
 | Responsabilités et flux frontend observés | Développeurs frontend et architectes | [`frontend-responsibilities-map.md`](frontend-responsibilities-map.md) | Baseline factuelle de l’existant, sans architecture cible | Technique |
 | Responsabilités et cycle de vie des données backend observés | Développeurs backend et architectes | [`backend-responsibilities-map.md`](backend-responsibilities-map.md) | Baseline factuelle des routes, transformations, moteurs et persistances | Technique |
+| Autorités, producteurs, consommateurs et transformations des données structurantes | Développeurs et architectes | [`structured-data-authority-registry.md`](structured-data-authority-registry.md) | Registre factuel des propriétaires actuels uniques et des ambiguïtés observées, sans architecture cible | Preuve |
 | Imports, directions, points d’entrée, cycles et contournements conventionnels observés | Développeurs et architectes | [`dependency-graph.md`](dependency-graph.md) et [`../reports/dependency-graph.json`](../reports/dependency-graph.json) | Restitution humaine générée puis graphe machine reproductible | Preuve |
 | Règles statistiques normatives | Développeurs du moteur et reviewers | [`STD-STAT-001.md`](standards/STD-STAT-001.md) | Standard normatif | Norme |
 | Forme, dérivation et exécution du corpus statistique | Développeurs du moteur et reviewers | [`statistical-reference-corpus.md`](statistical-reference-corpus.md) | Contrat opératoire et preuves dérivées | Contrat |
@@ -77,6 +78,7 @@ l’unique autorité de réalisation.
 | [`../ARCHITECTURE.md`](../ARCHITECTURE.md) | Développeurs, exploitants | Autorité des frontières, composants, flux et contrats applicatifs | Technique |
 | [`frontend-responsibilities-map.md`](frontend-responsibilities-map.md) | Développeurs frontend, architectes | Cartographie vérifiable des propriétaires, transformations, stockages, flux et couplages frontend actuels | Technique |
 | [`backend-responsibilities-map.md`](backend-responsibilities-map.md) | Développeurs backend, architectes | Cartographie vérifiable des routes, transformations, moteurs, persistances et couplages backend actuels | Technique |
+| [`structured-data-authority-registry.md`](structured-data-authority-registry.md) | Développeurs, architectes | Registre vérifié des autorités actuelles uniques, flux, transformations et définitions concurrentes des données structurantes | Preuve |
 | [`dependency-graph.md`](dependency-graph.md) | Développeurs, architectes | Projection générée du graphe observé ; aucune autorité sur l’architecture cible | Preuve générée |
 | [`../frontend/README.md`](../frontend/README.md) | Développeurs frontend | Guide de démarrage et frontières frontend | Technique |
 | [`deployment.md`](deployment.md) | Exploitants | Procédure de déploiement et d’exploitation | Technique |
