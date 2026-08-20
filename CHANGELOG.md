@@ -2,6 +2,18 @@
 
 ## Recent
 
+### Architecture cible et frontières acceptées — PBI 7.8
+
+- publication d’une architecture cible unique séparant domaine delivery et simulation, application, ports,
+  adaptateurs, présentations, composition et infrastructure qualité dans les runtimes TypeScript et Python ;
+- attribution des frontières physiques, responsabilités, ports entrants et sortants, composition roots,
+  contrats frontend/backend et protocoles publics de preuve, avec propriétaires cibles des 23 données
+  structurantes ;
+- revue des trois scénarios de coût de changement contre des chaînes cibles localisées et des contrats de
+  convergence permettant des chantiers frontend, backend, adaptateurs, restitutions et qualité indépendants ;
+- décision publiée sans migration, implémentation de port ni refonte fonctionnelle, dans le respect strict des
+  directions acceptées et avec toutes les garanties statistiques existantes inchangées.
+
 ### Directions de dépendance cibles décidées — PBI 7.7
 
 - publication d’une décision normative couvrant domaine, application, ports, adaptateurs, présentation et

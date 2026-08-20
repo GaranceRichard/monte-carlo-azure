@@ -165,7 +165,7 @@ atomiques.
 | 7.5 | Le coût de changement et ses hotspots disposent d’une baseline | S | Sol Medium | 20/08/2026 |
 | 7.6 | Chaque donnée structurante possède une autorité explicite | XS | Sol Très élevé | 20/08/2026 |
 | 7.7 | Les directions de dépendance cibles sont décidées | S | Sol Très élevé | 20/08/2026 |
-| 7.8 | L’architecture cible possède des frontières acceptées | M | Sol Ultra | |
+| 7.8 | L’architecture cible possède des frontières acceptées | M | Sol Ultra | 20/08/2026 |
 | 7.9 | La migration architecturale suit une séquence acyclique | S | Sol Très élevé | |
 | 7.10 | L’autorité des dépendances est lisible et diagnostiquable automatiquement | S | Sol Très élevé | |
 | 7.11 | Le domaine reste indépendant des technologies | S | Sol Très élevé | |
@@ -387,11 +387,11 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 
 # Synthèse du backlog
 
-**Feature en cours :** Feature 7 — Réduire le coût de changement par une architecture explicite et modulaire — 7/75 PBI réalisés (9,33 %).
-**Prochain PBI :** 7.8 — L’architecture cible possède des frontières acceptées — non commencé.
+**Feature en cours :** Feature 7 — Réduire le coût de changement par une architecture explicite et modulaire — 8/75 PBI réalisés (10,67 %).
+**Prochain PBI :** 7.9 — La migration architecturale suit une séquence acyclique — non commencé.
 **Dernière Feature terminée :** Feature 2 — Garantir la fiabilité du cœur statistique — 21/21 PBI réalisés (100 %).
-**Reliquats de la Feature 7 :** `7.8`, `7.9`, `7.10`, `7.11`, `7.12`, `7.13`, `7.14`, `7.15`, `7.16`, `7.17`, `7.18`, `7.19`, `7.20`, `7.21`, `7.22`, `7.23`, `7.24`, `7.25`, `7.26`, `7.27`, `7.28`, `7.29`, `7.30`, `7.31`, `7.32`, `7.33`, `7.34`, `7.35`, `7.36`, `7.37`, `7.38`, `7.39`, `7.40`, `7.41`, `7.42`, `7.43`, `7.44`, `7.45`, `7.46`, `7.47`, `7.48`, `7.49`, `7.50`, `7.51`, `7.52`, `7.53`, `7.54`, `7.55`, `7.56`, `7.57`, `7.58`, `7.59`, `7.60`, `7.61`, `7.62`, `7.63`, `7.64`, `7.65`, `7.66`, `7.67`, `7.68`, `7.69`, `7.70`, `7.71`, `7.72`, `7.73`, `7.74`, `7.75`.
-**Progression globale :** 39/202 PBI réalisés (19,31 %) ; 163 restants.
+**Reliquats de la Feature 7 :** `7.9`, `7.10`, `7.11`, `7.12`, `7.13`, `7.14`, `7.15`, `7.16`, `7.17`, `7.18`, `7.19`, `7.20`, `7.21`, `7.22`, `7.23`, `7.24`, `7.25`, `7.26`, `7.27`, `7.28`, `7.29`, `7.30`, `7.31`, `7.32`, `7.33`, `7.34`, `7.35`, `7.36`, `7.37`, `7.38`, `7.39`, `7.40`, `7.41`, `7.42`, `7.43`, `7.44`, `7.45`, `7.46`, `7.47`, `7.48`, `7.49`, `7.50`, `7.51`, `7.52`, `7.53`, `7.54`, `7.55`, `7.56`, `7.57`, `7.58`, `7.59`, `7.60`, `7.61`, `7.62`, `7.63`, `7.64`, `7.65`, `7.66`, `7.67`, `7.68`, `7.69`, `7.70`, `7.71`, `7.72`, `7.73`, `7.74`, `7.75`.
+**Progression globale :** 40/202 PBI réalisés (19,8 %) ; 162 restants.
 
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
@@ -401,7 +401,7 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 | 4 — Disposer d’une mise en production personnelle sécurisée | 6 | 0 | 6 |
 | 5 — Démontrer la valeur d’usage du mode portefeuille | 4 | 0 | 4 |
 | 6 — Rendre mesurables la qualité réelle et les limites opérationnelles | 8 | 0 | 8 |
-| 7 — Réduire le coût de changement par une architecture explicite et modulaire | 75 | 7 | 68 |
+| 7 — Réduire le coût de changement par une architecture explicite et modulaire | 75 | 8 | 67 |
 | 8 — Disposer de données Azure DevOps fiables et contextualisées par sprint | 14 | 0 | 14 |
 | 9 — Disposer de prévisions rejouables dans le temps et calibrées | 8 | 0 | 8 |
 | 10 — Disposer d’une expérience de simulation cohérente et de restitutions fiables | 10 | 0 | 10 |
@@ -409,7 +409,7 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 | 12 — Soutenir le pilotage de programme avec des relations opérationnelles explicites | 7 | 0 | 7 |
 | 13 — Disposer d’une gouvernance technique rationalisée | 9 | 0 | 9 |
 | 14 — Disposer d’une stratégie de diffusion claire et d’une adoption simplifiée | 9 | 0 | 9 |
-| **Total** | **202** | **39** | **163** |
+| **Total** | **202** | **40** | **162** |
 
 Aucun PBI n’est classé XL.
 

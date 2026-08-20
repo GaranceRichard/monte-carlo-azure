@@ -122,6 +122,10 @@ une connexion Azure DevOps réelle.
   fixe les relations permises entre domaine, application, ports, adaptateurs, présentation et composition.
   Les imports de type suivent les mêmes règles que le runtime ; le graphe actuel reste une baseline de
   migration sans exception implicite et les garanties statistiques demeurent inchangées.
+- **Frontières cibles acceptées.** L’[architecture cible](docs/target-architecture.md) attribue les domaines,
+  cas d’usage, ports, adaptateurs, présentations et composition roots du frontend, du backend et de la
+  qualité. Les contrats inter-runtime y sont versionnés, les trois scénarios de coût de changement sont
+  localisés et les autorités actuelles restent en vigueur jusqu’à leurs migrations dédiées.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 
@@ -243,6 +247,7 @@ Le backend écoute par défaut sur `http://127.0.0.1:8000` et le frontend sur
 - [Registre vérifié des autorités des données structurantes](docs/structured-data-authority-registry.md)
 - [Graphe factuel des dépendances](docs/dependency-graph.md)
 - [Décision sur les directions de dépendance cibles](docs/target-dependency-directions.md)
+- [Architecture cible et frontières acceptées](docs/target-architecture.md)
 - [Standard statistique](docs/standards/STD-STAT-001.md)
 - [Corpus de référence statistique](docs/statistical-reference-corpus.md)
 - [Matrice risques–contrôles](docs/risk-control-matrix.md)

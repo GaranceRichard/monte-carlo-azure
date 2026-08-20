@@ -157,7 +157,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Aligner les migrations sur un état cible cohérent à l’échelle du dépôt.
 - **Frontière principale :** Architecture cible du produit.
 - **Famille d’invariants :** Cohérence des frontières et responsabilités.
-- **Preuve principale :** Revue architecturale des scénarios de changement contre l’état cible.
+- **Preuve principale :** Revue de l’[architecture cible acceptée](../target-architecture.md) contre les scénarios de changement de la baseline.
 - **Éléments de réalisation inclus :** Vue cible ; responsabilités ; ports attendus ; règles de composition ; décisions durables.
 - **Hors périmètre :** Implémentation des frontières et capacités fonctionnelles futures.
 - **Surface prévisionnelle :** 0 fichiers de production ; 8 fichiers versionnés

@@ -14,12 +14,13 @@ les règles, les preuves ou l’historique.
 | Features, PBI, résultats attendus, complexités, modèles, statuts et dates | Pilotage produit | [`backlog.md`](backlog.md) | Registre faisant autorité | Gouvernance |
 | Règles de statut, priorité, dépendance, raffinement et génération du backlog | Pilotage et contributeurs | [`backlog-governance.md`](backlog-governance.md) | Gouvernance transverse | Gouvernance |
 | Périmètres, hors-périmètres et preuves attendues des outcomes futurs | Product owner et réalisateurs | [`backlog-expectations/`](backlog-expectations/README.md) | Détail des attentes, sans autorité de statut | Chantier |
-| Frontières, composants, flux, API et sécurité structurelle | Développeurs et exploitants | [`ARCHITECTURE.md`](../ARCHITECTURE.md) | Architecture et contrats applicatifs | Technique |
+| Frontières, composants, flux, API et sécurité structurelle exécutés | Développeurs et exploitants | [`ARCHITECTURE.md`](../ARCHITECTURE.md) | Architecture opérationnelle actuelle, distincte de la cible acceptée | Technique |
 | Responsabilités et flux frontend observés | Développeurs frontend et architectes | [`frontend-responsibilities-map.md`](frontend-responsibilities-map.md) | Baseline factuelle de l’existant, sans architecture cible | Technique |
 | Responsabilités et cycle de vie des données backend observés | Développeurs backend et architectes | [`backend-responsibilities-map.md`](backend-responsibilities-map.md) | Baseline factuelle des routes, transformations, moteurs et persistances | Technique |
 | Autorités, producteurs, consommateurs et transformations des données structurantes | Développeurs et architectes | [`structured-data-authority-registry.md`](structured-data-authority-registry.md) | Registre factuel des propriétaires actuels uniques et des ambiguïtés observées, sans architecture cible | Preuve |
 | Imports, directions, points d’entrée, cycles et contournements conventionnels observés | Développeurs et architectes | [`dependency-graph.md`](dependency-graph.md) et [`../reports/dependency-graph.json`](../reports/dependency-graph.json) | Restitution humaine générée puis graphe machine reproductible | Preuve |
 | Directions permises entre domaine, application, ports, adaptateurs, présentation et composition | Développeurs et architectes | [`target-dependency-directions.md`](target-dependency-directions.md) | Décision normative guidant les frontières et migrations cibles | Architecture |
+| Architecture cible, frontières physiques, ports, composition et contrats inter-runtime | Développeurs et architectes | [`target-architecture.md`](target-architecture.md) | Décision normative attribuant les responsabilités cibles sans réaliser leur migration | Architecture |
 | Règles statistiques normatives | Développeurs du moteur et reviewers | [`STD-STAT-001.md`](standards/STD-STAT-001.md) | Standard normatif | Norme |
 | Forme, dérivation et exécution du corpus statistique | Développeurs du moteur et reviewers | [`statistical-reference-corpus.md`](statistical-reference-corpus.md) | Contrat opératoire et preuves dérivées | Contrat |
 | Protocole, calibration et preuve de parité distributionnelle | Statisticiens, développeurs et reviewers | [`statistical-distribution-protocol.md`](statistical-distribution-protocol.md) | Contrat d’inférence multi-seeds et limites | Contrat |
@@ -76,12 +77,13 @@ l’unique autorité de réalisation.
 | [`../README.md`](../README.md) | Découverte, utilisateurs, contributeurs | Synthèse d’entrée ; aucune autorité de formule, statut ou historique | Produit |
 | [`../PRODUCT.md`](../PRODUCT.md) | Décideurs, sponsors, utilisateurs | Autorité de vision, positionnement, cas d’usage et valeur | Produit |
 | [`roadmap.md`](roadmap.md) | Décideurs produit | Autorité des horizons de valeur, sans calendrier | Produit |
-| [`../ARCHITECTURE.md`](../ARCHITECTURE.md) | Développeurs, exploitants | Autorité des frontières, composants, flux et contrats applicatifs | Technique |
+| [`../ARCHITECTURE.md`](../ARCHITECTURE.md) | Développeurs, exploitants | Description autoritaire de l’architecture opérationnelle et des invariants de sécurité actuellement exécutés | Technique |
 | [`frontend-responsibilities-map.md`](frontend-responsibilities-map.md) | Développeurs frontend, architectes | Cartographie vérifiable des propriétaires, transformations, stockages, flux et couplages frontend actuels | Technique |
 | [`backend-responsibilities-map.md`](backend-responsibilities-map.md) | Développeurs backend, architectes | Cartographie vérifiable des routes, transformations, moteurs, persistances et couplages backend actuels | Technique |
 | [`structured-data-authority-registry.md`](structured-data-authority-registry.md) | Développeurs, architectes | Registre vérifié des autorités actuelles uniques, flux, transformations et définitions concurrentes des données structurantes | Preuve |
 | [`dependency-graph.md`](dependency-graph.md) | Développeurs, architectes | Projection générée du graphe observé ; aucune autorité sur l’architecture cible | Preuve générée |
 | [`target-dependency-directions.md`](target-dependency-directions.md) | Développeurs, architectes | Autorité normative des directions de dépendance cibles ; aucune migration ni frontière physique détaillée | Architecture |
+| [`target-architecture.md`](target-architecture.md) | Développeurs, architectes | Autorité normative des responsabilités, frontières, ports, compositions et contrats inter-runtime cibles | Architecture |
 | [`../frontend/README.md`](../frontend/README.md) | Développeurs frontend | Guide de démarrage et frontières frontend | Technique |
 | [`deployment.md`](deployment.md) | Exploitants | Procédure de déploiement et d’exploitation | Technique |
 | [`maintainability.md`](maintainability.md) | Mainteneurs | Procédure et règles du ratchet | Gouvernance |
@@ -160,7 +162,7 @@ l’unique autorité de réalisation.
 
 ### Comprendre et exploiter le système
 
-- [`../ARCHITECTURE.md`](../ARCHITECTURE.md) — architecture, sécurité, flux, API et contrats de persistance ;
+- [`../ARCHITECTURE.md`](../ARCHITECTURE.md) — architecture opérationnelle actuelle, sécurité, flux, API et contrats de persistance ;
 - [`frontend-responsibilities-map.md`](frontend-responsibilities-map.md) — responsabilités, flux, stockages,
   transformations et couplages observés dans le frontend actuel ;
 - [`backend-responsibilities-map.md`](backend-responsibilities-map.md) — responsabilités, transformations,
@@ -168,6 +170,8 @@ l’unique autorité de réalisation.
 - [`dependency-graph.md`](dependency-graph.md) — directions, cycles, imports profonds et points d’entrée observés ;
 - [`target-dependency-directions.md`](target-dependency-directions.md) — directions cibles, interdictions,
   cas limites et exemples guidant les futures frontières ;
+- [`target-architecture.md`](target-architecture.md) — architecture cible unique, frontières physiques,
+  responsabilités, ports, contrats inter-runtime et règles de composition ;
 - [`../frontend/README.md`](../frontend/README.md) — démarrage et frontières propres au frontend ;
 - [`deployment.md`](deployment.md) — déploiement et exploitation ;
 - [`maintainability.md`](maintainability.md) — ratchet de maintenabilité.
