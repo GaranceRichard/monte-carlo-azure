@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "Scripts/report_change_cost_baseline.py",
+  "basis": {
+    "dependencyGraphSchemaVersion": 1,
+    "scenarioCount": 3,
+    "uniqueFileCount": 40,
+    "hotspotRule": "At least two of repeatedTraversal, highCoupling, largeFile.",
+    "thresholds": {
+      "repeatedTraversalMinimum": 2,
+      "dependencyDegreeP75": 6,
+      "traversedFileLinesP75": 394
+    }
+  },
+  "scenarios": [
+    {
+      "id": "statistical-contract-evolution",
+      "title": "Faire évoluer le contrat statistique de simulation",
+      "justification": "Le contrat POST /simulate traverse réellement transport, domaine et moteurs Python/TypeScript; sa preuve doit préserver les garanties statistiques interlangages.",
+      "evidence": [
+        "docs/frontend-responsibilities-map.md#simulation-déquipe",
+        "docs/backend-responsibilities-map.md#flux-complet-de-post-simulate",
+        "docs/statistical-compatibility.md"
+      ],
+      "files": [
+        "Scripts/statistical_corpus_runner.py",
+        "backend/api_models.py",
+        "backend/mc_core.py",
+        "backend/simulation_mappers.py",
+        "backend/simulation_models.py",
+        "backend/simulation_service.py",
+        "backend/simulation_value_objects.py",
+        "frontend/src/api/simulationDtos.ts",
+        "frontend/src/api/simulationMappers.test.ts",
+        "frontend/src/api/simulationMappers.ts",
+        "frontend/src/domain/simulation.ts",
+        "frontend/src/domain/simulationValueObjects.test.ts",
+        "frontend/src/domain/simulationValueObjects.ts",
+        "frontend/src/hooks/simulationForecastCore.ts",
+        "frontend/src/utils/simulation.ts",
+        "tests/test_api_models.py",
+        "tests/test_mc_core.py",
+        "tests/test_simulation_mappers.py",
+        "tests/test_simulation_service.py",
+        "tests/test_statistical_compatibility.py",
+        "tests/test_statistical_corpus_runner.py"
+      ],
+      "metrics": {
+        "fileCount": 21,
+        "productionFileCount": 13,
+        "testFileCount": 8,
+        "lineCount": 5996,
+        "layerCount": 9,
+        "internalDependencyEdges": 27,
+        "boundaryDependencyEdges": 73,
+        "confirmedHotspotCount": 3
+      },
+      "layers": [
+        "backend-domain",
+        "backend-engine",
+        "backend-transport",
+        "frontend-application",
+        "frontend-delivery-or-engine",
+        "frontend-domain",
+        "frontend-transport",
+        "proof-tests",
+        "quality-statistical-proof"
+      ],
+      "confirmedHotspots": [
+        "frontend/src/hooks/simulationForecastCore.ts",
+        "frontend/src/domain/simulationValueObjects.ts",
+        "backend/simulation_value_objects.py"
+      ]
+    },
+    {
+      "id": "delivery-collection-policy",
+      "title": "Faire évoluer une règle de collecte et de calendrier delivery",
+      "justification": "La collecte observée va de la cible Azure DevOps aux semaines et Cycle Time, puis aux hooks de simulation; elle représente un changement métier alimenté par un adaptateur externe.",
+      "evidence": [
+        "docs/frontend-responsibilities-map.md#collecte-et-transformations-delivery",
+        "docs/dependency-graph.md"
+      ],
+      "files": [
+        "frontend/src/adoClient.test.ts",
+        "frontend/src/adoClient.ts",
+        "frontend/src/adoPlatform.test.ts",
+        "frontend/src/adoPlatform.ts",
+        "frontend/src/date.test.ts",
+        "frontend/src/date.ts",
+        "frontend/src/hooks/simulationForecastCore.ts",
+        "frontend/src/hooks/useSimulation.ts",
+        "frontend/src/types.ts",
+        "frontend/src/utils/cycleTime.test.ts",
+        "frontend/src/utils/cycleTime.ts"
+      ],
+      "metrics": {
+        "fileCount": 11,
+        "productionFileCount": 7,
+        "testFileCount": 4,
+        "lineCount": 2698,
+        "layerCount": 4,
+        "internalDependencyEdges": 8,
+        "boundaryDependencyEdges": 59,
+        "confirmedHotspotCount": 3
+      },
+      "layers": [
+        "frontend-application",
+        "frontend-azure-adapter",
+        "frontend-delivery-or-engine",
+        "proof-tests"
+      ],
+      "confirmedHotspots": [
+        "frontend/src/hooks/simulationForecastCore.ts",
+        "frontend/src/hooks/useSimulation.ts",
+        "frontend/src/adoClient.ts"
+      ]
+    },
+    {
+      "id": "main-validation-profile",
+      "title": "Faire évoluer le profil de validation main sans réduire ses garanties",
+      "justification": "La carte qualité montre que profil, planification, exécution et preuves sont séparés mais coordonnés par le même DAG; ce scénario mesure ce coût sans rationaliser la gate.",
+      "evidence": [
+        "docs/quality-infrastructure-responsibilities-map.md#quality-gates-modes-et-profils",
+        "config/test-execution-profiles.json"
+      ],
+      "files": [
+        "Scripts/quality_gate.py",
+        "Scripts/quality_gate_dag.py",
+        "Scripts/quality_gate_plan.py",
+        "Scripts/test_execution_profiles.py",
+        "Scripts/test_execution_profiles_graph.py",
+        "Scripts/test_execution_profiles_validation.py",
+        "config/test-execution-profiles.json",
+        "tests/test_quality_gate.py",
+        "tests/test_test_execution_profiles.py"
+      ],
+      "metrics": {
+        "fileCount": 9,
+        "productionFileCount": 6,
+        "testFileCount": 2,
+        "lineCount": 7268,
+        "layerCount": 3,
+        "internalDependencyEdges": 7,
+        "boundaryDependencyEdges": 13,
+        "confirmedHotspotCount": 1
+      },
+      "layers": [
+        "proof-tests",
+        "quality-contract",
+        "quality-orchestration"
+      ],
+      "confirmedHotspots": [
+        "Scripts/quality_gate.py"
+      ]
+    }
+  ],
+  "confirmedHotspots": [
+    {
+      "path": "frontend/src/hooks/simulationForecastCore.ts",
+      "scenarioCount": 2,
+      "dependencyDegree": 14,
+      "lineCount": 255,
+      "signals": {
+        "repeatedTraversal": true,
+        "highCoupling": true,
+        "largeFile": false
+      }
+    },
+    {
+      "path": "frontend/src/hooks/useSimulation.ts",
+      "scenarioCount": 1,
+      "dependencyDegree": 18,
+      "lineCount": 492,
+      "signals": {
+        "repeatedTraversal": false,
+        "highCoupling": true,
+        "largeFile": true
+      }
+    },
+    {
+      "path": "frontend/src/domain/simulationValueObjects.ts",
+      "scenarioCount": 1,
+      "dependencyDegree": 17,
+      "lineCount": 394,
+      "signals": {
+        "repeatedTraversal": false,
+        "highCoupling": true,
+        "largeFile": true
+      }
+    },
+    {
+      "path": "backend/simulation_value_objects.py",
+      "scenarioCount": 1,
+      "dependencyDegree": 12,
+      "lineCount": 429,
+      "signals": {
+        "repeatedTraversal": false,
+        "highCoupling": true,
+        "largeFile": true
+      }
+    },
+    {
+      "path": "frontend/src/adoClient.ts",
+      "scenarioCount": 1,
+      "dependencyDegree": 9,
+      "lineCount": 681,
+      "signals": {
+        "repeatedTraversal": false,
+        "highCoupling": true,
+        "largeFile": true
+      }
+    },
+    {
+      "path": "Scripts/quality_gate.py",
+      "scenarioCount": 1,
+      "dependencyDegree": 6,
+      "lineCount": 1637,
+      "signals": {
+        "repeatedTraversal": false,
+        "highCoupling": true,
+        "largeFile": true
+      }
+    }
+  ],
+  "assumptionsAndLimits": [
+    "Les surfaces sont des hypothèses de changement revues à partir des cartes 7.1-7.4, pas des estimations issues de l'historique Git.",
+    "Les lignes physiques et fichiers sont des proxys de portée; ils n'estiment ni le temps écoulé ni la difficulté cognitive.",
+    "Les dépendances viennent du graphe statique, qui exclut les tests; les liens dynamiques ou portés uniquement par les données peuvent manquer.",
+    "Un hotspot est relatif à ce dépôt et à ce protocole; il ne constitue pas à lui seul un défaut architectural.",
+    "Après migration, conserver intention et règles; ne changer un chemin que si sa responsabilité bouge et expliciter la correspondance."
+  ]
+}

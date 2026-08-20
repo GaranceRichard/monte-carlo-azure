@@ -15,7 +15,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 244 | 1280 | 82 | 5 | 2 | 0 | 119 | 2 |
+| 246 | 1293 | 83 | 5 | 2 | 0 | 119 | 2 |
 
 ### Directions observées
 
@@ -101,6 +101,7 @@ frontend/src/hooks/simulationForecastCore.ts → frontend/src/hooks/simulationFo
 | Scripts/pre_commit_guard.py | 293 | python-main-guard | Scripts/pre_commit_guard.py | internal |
 | Scripts/purge_inactive_clients.py | 47 | python-main-guard | Scripts/purge_inactive_clients.py | internal |
 | Scripts/quality_gate.py | 1634 | python-main-guard | Scripts/quality_gate.py | internal |
+| Scripts/report_change_cost_baseline.py | 286 | python-main-guard | Scripts/report_change_cost_baseline.py | internal |
 | Scripts/report_dependency_graph.py | 276 | python-main-guard | Scripts/report_dependency_graph.py | internal |
 | Scripts/report_test_execution_counts.py | 359 | python-main-guard | Scripts/report_test_execution_counts.py | internal |
 | Scripts/report_test_strategy.py | 502 | python-main-guard | Scripts/report_test_strategy.py | internal |

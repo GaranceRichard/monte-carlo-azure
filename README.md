@@ -114,6 +114,10 @@ une connexion Azure DevOps réelle.
   type, localise les cycles et inventorie les imports profonds sans les corriger. Son
   [rapport JSON](reports/dependency-graph.json) est régénérable depuis les imports et points d’entrée visibles
   par Git ; les conventions de façade y restent explicitement distinctes des observations.
+- **Coût de changement mesurable.** Une [baseline reproductible](docs/change-cost-baseline.md) relie trois
+  évolutions représentatives à leurs fichiers, couches et dépendances. Les hotspots ne sont retenus qu’après
+  combinaison de signaux mesurés de traversée, couplage et taille ; la preuve JSON reste descriptive et
+  n’autorise ni migration ni réduction des garanties statistiques ou qualité.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 

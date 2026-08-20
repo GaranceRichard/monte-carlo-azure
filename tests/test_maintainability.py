@@ -10,6 +10,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "Scripts"))
 
+import change_cost_baseline_render  # noqa: E402
 import check_maintainability  # noqa: E402
 import dependency_graph  # noqa: E402
 import dependency_graph_common  # noqa: E402
@@ -17,6 +18,7 @@ import dependency_graph_render  # noqa: E402
 import maintainability_config  # noqa: E402
 import maintainability_dependencies  # noqa: E402
 import maintainability_metrics  # noqa: E402
+import report_change_cost_baseline  # noqa: E402
 import report_dependency_graph  # noqa: E402
 
 RATCHET_LIMITS = {
@@ -567,6 +569,104 @@ def test_cli_writes_baseline_passes_fails_and_reports_loading_error(
     report["interpretation"]["apiBypasses"] = []
     assert "Aucun selon la convention" in markdown_writer(report)
 
+    change_report = report_change_cost_baseline.build_report(ROOT)
+    change_markdown_writer = getattr(change_cost_baseline_render, "render_" + "markdown")
+    assert (
+        json.loads((ROOT / "reports/change-cost-baseline.json").read_text(encoding="utf-8"))
+        == change_report
+    )
+    assert (ROOT / "docs/change-cost-baseline.md").read_text(
+        encoding="utf-8"
+    ) == change_markdown_writer(change_report)
+    assert len(change_report["scenarios"]) == 3
+    assert all(
+        scenario["metrics"]["confirmedHotspotCount"] >= 1 for scenario in change_report["scenarios"]
+    )
+    without_hotspots = {**change_report, "confirmedHotspots": []}
+    assert "Aucun fichier" in change_markdown_writer(without_hotspots)
+
+    change_report_path = tmp_path / "change-cost.json"
+    change_document_path = tmp_path / "change-cost.md"
+    change_args = [
+        "--root",
+        str(ROOT),
+        "--report",
+        str(change_report_path),
+        "--document",
+        str(change_document_path),
+    ]
+    assert report_change_cost_baseline.main(change_args) == 0
+    assert report_change_cost_baseline.main([*change_args, "--check"]) == 0
+    change_document_path.write_text("stale\n", encoding="utf-8")
+    assert report_change_cost_baseline.main([*change_args, "--check"]) == 1
+    assert "outputs are stale" in capsys.readouterr().err
+
+    synthetic_root = tmp_path / "synthetic-change-cost"
+    synthetic_paths = {
+        "backend/api_models.py": "one\n",
+        "frontend/src/hooks/simulationForecastCore.ts": "one\ntwo\nthree\n",
+        "config/test-execution-profiles.json": "{}\n",
+    }
+    for relative, content in synthetic_paths.items():
+        target = synthetic_root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(content, encoding="utf-8")
+    synthetic_scenarios = (
+        {
+            "id": "one",
+            "title": "one",
+            "justification": "fact",
+            "evidence": [],
+            "files": ["backend/api_models.py", "frontend/src/hooks/simulationForecastCore.ts"],
+        },
+        {
+            "id": "two",
+            "title": "two",
+            "justification": "fact",
+            "evidence": [],
+            "files": [
+                "frontend/src/hooks/simulationForecastCore.ts",
+                "config/test-execution-profiles.json",
+            ],
+        },
+    )
+    synthetic_graph = {
+        "schemaVersion": 1,
+        "observed": {
+            "nodes": [{"path": path} for path in synthetic_paths],
+            "edges": [
+                {
+                    "source": "frontend/src/hooks/simulationForecastCore.ts",
+                    "target": "backend/api_models.py",
+                    "resolution": "internal",
+                },
+                {
+                    "source": "config/test-execution-profiles.json",
+                    "target": "frontend/src/hooks/simulationForecastCore.ts",
+                    "resolution": "internal",
+                },
+            ],
+        },
+    }
+    measured = report_change_cost_baseline.calculate_baseline(
+        synthetic_root, synthetic_graph, synthetic_scenarios
+    )
+    assert [item["path"] for item in measured["confirmedHotspots"]] == [
+        "frontend/src/hooks/simulationForecastCore.ts"
+    ]
+    with pytest.raises(ValueError, match="Scenario files are missing"):
+        report_change_cost_baseline.calculate_baseline(
+            synthetic_root, synthetic_graph, ({"files": ["backend/missing.py"]},)
+        )
+    with pytest.raises(ValueError, match="No layer attribution"):
+        report_change_cost_baseline._layer("unknown/file.txt")
+
+    change_script = ROOT / "Scripts/report_change_cost_baseline.py"
+    monkeypatch.setattr(sys, "argv", [str(change_script), "--check"])
+    with pytest.raises(SystemExit) as exc:
+        runpy.run_path(str(change_script), run_name="__main__")
+    assert exc.value.code == 0
+
     script = ROOT / "Scripts/report_dependency_graph.py"
     monkeypatch.setattr(sys, "argv", [str(script), "--check"])
     with pytest.raises(SystemExit) as exc:
@@ -579,4 +679,12 @@ def test_cli_writes_baseline_passes_fails_and_reports_loading_error(
         lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("synthetic failure")),
     )
     assert report_dependency_graph.main([]) == 2
+    assert "synthetic failure" in capsys.readouterr().err
+
+    monkeypatch.setattr(
+        report_change_cost_baseline,
+        "build_report",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("synthetic failure")),
+    )
+    assert report_change_cost_baseline.main([]) == 2
     assert "synthetic failure" in capsys.readouterr().err
