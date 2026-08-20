@@ -249,6 +249,12 @@ Le backend écoute par défaut sur `http://127.0.0.1:8000` et le frontend sur
 - [Modèle de classification des tests](docs/test-classification.md)
 - [Standard de test](docs/standards/STD-TEST-001.md)
 
+Les worktrees de développement sont créés hors du dépôt principal et doivent rester entièrement supprimables
+par `git worktree remove`. Aucun reparse point Windows — notamment junction ou lien symbolique — n’est admis
+dans un worktree : `.venv`, `frontend/node_modules` et les autres dépendances y sont installés physiquement si
+nécessaire, ou les outils partagés sont invoqués directement sans lien filesystem. Avant publication, vérifier
+l’absence de reparse point et de résidu temporaire bloquant conformément à [`AGENTS.md`](AGENTS.md).
+
 La validation complète est la tâche VS Code `Validation : profil main`, qui exécute :
 
 ```powershell

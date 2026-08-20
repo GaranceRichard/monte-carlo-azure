@@ -13,6 +13,24 @@
    * the current branch is identified;
    * `git remote -v` confirms the GitHub remote is present.
 
+## Windows worktree hygiene
+
+These rules apply to every worktree created for development, including PBI worktrees:
+
+1. Create the worktree outside the main repository directory. A sibling directory or a user-owned temporary
+   root is acceptable; a child of the main repository is not.
+2. Never create a junction, symbolic link, mount point, or any other reparse point anywhere inside a worktree.
+3. Never link `.venv`, `frontend/node_modules`, or any other file or directory from a worktree to `main` or to
+   another checkout.
+4. Install required dependencies physically inside the worktree. Shared tools may instead be invoked directly
+   from their external installed path, without adding a filesystem link inside the worktree.
+5. Create temporary directories only in locations that the current user can remove normally. Keep their paths
+   scoped to the task and do not place them under protected, shared, or system-owned directories.
+6. Before publication, recursively verify that the worktree contains no reparse point and that no temporary
+   residue can block cleanup.
+7. A worktree that cannot be removed normally with `git worktree remove <path>` is invalid. Do not publish from
+   it or treat manual filesystem cleanup as an acceptable completion step.
+
 ## Validation environments
 
 ### HOST_ONLY validation
