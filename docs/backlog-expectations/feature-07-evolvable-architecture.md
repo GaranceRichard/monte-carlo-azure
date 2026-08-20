@@ -143,7 +143,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Donner une règle commune aux migrations locales.
 - **Frontière principale :** Architecture hexagonale cible.
 - **Famille d’invariants :** Direction des dépendances entre couches.
-- **Preuve principale :** Revue des décisions contre les cas limites issus du graphe réel.
+- **Preuve principale :** Revue de la [décision livrée](../target-dependency-directions.md) contre les cas limites issus du graphe réel.
 - **Éléments de réalisation inclus :** Règles de direction ; exceptions interdites ; exemples conformes et non conformes ; décision durable.
 - **Hors périmètre :** Choix détaillé de chaque port et migration du code.
 - **Surface prévisionnelle :** 0 fichiers de production ; 5 fichiers versionnés

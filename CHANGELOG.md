@@ -2,6 +2,18 @@
 
 ## Recent
 
+### Directions de dépendance cibles décidées — PBI 7.7
+
+- publication d’une décision normative couvrant domaine, application, ports, adaptateurs, présentation et
+  composition, avec une matrice complète des relations permises et interdites ;
+- confrontation de la cible aux deux cycles, aux deux contournements conventionnels, aux arêtes
+  qualité-produit du graphe réel et aux ambiguïtés du registre des 23 autorités structurantes ;
+- qualification explicite des imports de type, DTO techniques, protocoles interprocessus, composition roots,
+  scripts opératoires et implémentations statistiques Python/TypeScript, avec exemples conformes et non
+  conformes ;
+- décision publiée sans migration, définition détaillée de port ni refonte fonctionnelle, et maintien strict
+  des garanties statistiques existantes.
+
 ### Autorités des données structurantes explicites — PBI 7.6
 
 - publication d'un registre vérifié de 23 familles de données structurantes avec, pour chacune, une autorité

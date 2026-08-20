@@ -19,6 +19,7 @@ les règles, les preuves ou l’historique.
 | Responsabilités et cycle de vie des données backend observés | Développeurs backend et architectes | [`backend-responsibilities-map.md`](backend-responsibilities-map.md) | Baseline factuelle des routes, transformations, moteurs et persistances | Technique |
 | Autorités, producteurs, consommateurs et transformations des données structurantes | Développeurs et architectes | [`structured-data-authority-registry.md`](structured-data-authority-registry.md) | Registre factuel des propriétaires actuels uniques et des ambiguïtés observées, sans architecture cible | Preuve |
 | Imports, directions, points d’entrée, cycles et contournements conventionnels observés | Développeurs et architectes | [`dependency-graph.md`](dependency-graph.md) et [`../reports/dependency-graph.json`](../reports/dependency-graph.json) | Restitution humaine générée puis graphe machine reproductible | Preuve |
+| Directions permises entre domaine, application, ports, adaptateurs, présentation et composition | Développeurs et architectes | [`target-dependency-directions.md`](target-dependency-directions.md) | Décision normative guidant les frontières et migrations cibles | Architecture |
 | Règles statistiques normatives | Développeurs du moteur et reviewers | [`STD-STAT-001.md`](standards/STD-STAT-001.md) | Standard normatif | Norme |
 | Forme, dérivation et exécution du corpus statistique | Développeurs du moteur et reviewers | [`statistical-reference-corpus.md`](statistical-reference-corpus.md) | Contrat opératoire et preuves dérivées | Contrat |
 | Protocole, calibration et preuve de parité distributionnelle | Statisticiens, développeurs et reviewers | [`statistical-distribution-protocol.md`](statistical-distribution-protocol.md) | Contrat d’inférence multi-seeds et limites | Contrat |
@@ -80,6 +81,7 @@ l’unique autorité de réalisation.
 | [`backend-responsibilities-map.md`](backend-responsibilities-map.md) | Développeurs backend, architectes | Cartographie vérifiable des routes, transformations, moteurs, persistances et couplages backend actuels | Technique |
 | [`structured-data-authority-registry.md`](structured-data-authority-registry.md) | Développeurs, architectes | Registre vérifié des autorités actuelles uniques, flux, transformations et définitions concurrentes des données structurantes | Preuve |
 | [`dependency-graph.md`](dependency-graph.md) | Développeurs, architectes | Projection générée du graphe observé ; aucune autorité sur l’architecture cible | Preuve générée |
+| [`target-dependency-directions.md`](target-dependency-directions.md) | Développeurs, architectes | Autorité normative des directions de dépendance cibles ; aucune migration ni frontière physique détaillée | Architecture |
 | [`../frontend/README.md`](../frontend/README.md) | Développeurs frontend | Guide de démarrage et frontières frontend | Technique |
 | [`deployment.md`](deployment.md) | Exploitants | Procédure de déploiement et d’exploitation | Technique |
 | [`maintainability.md`](maintainability.md) | Mainteneurs | Procédure et règles du ratchet | Gouvernance |
@@ -164,6 +166,8 @@ l’unique autorité de réalisation.
 - [`backend-responsibilities-map.md`](backend-responsibilities-map.md) — responsabilités, transformations,
   moteurs, persistances et couplages observés dans le backend actuel ;
 - [`dependency-graph.md`](dependency-graph.md) — directions, cycles, imports profonds et points d’entrée observés ;
+- [`target-dependency-directions.md`](target-dependency-directions.md) — directions cibles, interdictions,
+  cas limites et exemples guidant les futures frontières ;
 - [`../frontend/README.md`](../frontend/README.md) — démarrage et frontières propres au frontend ;
 - [`deployment.md`](deployment.md) — déploiement et exploitation ;
 - [`maintainability.md`](maintainability.md) — ratchet de maintenabilité.

@@ -45,13 +45,13 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     features = check_backlog_consistency.parse_registry(backlog)
 
     assert sum(len(feature.pbis) for feature in features) == 202
-    assert sum(feature.completed_count for feature in features) == 38
+    assert sum(feature.completed_count for feature in features) == 39
     feature_two = next(feature for feature in features if feature.number == 2)
     assert feature_two.completed_count == 21
     assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == []
     feature_seven = next(feature for feature in features if feature.number == 7)
     assert len(feature_seven.pbis) == 75
-    assert feature_seven.completed_count == 6
+    assert feature_seven.completed_count == 7
     assert [
         (pbi.identifier, pbi.completed_on)
         for pbi in feature_seven.pbis
@@ -63,13 +63,14 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
         ("7.4", "13/08/2026"),
         ("7.5", "20/08/2026"),
         ("7.6", "20/08/2026"),
+        ("7.7", "20/08/2026"),
     ]
     assert check_backlog_consistency.feature_priority(governance, features) == 7
     assert "Feature en cours :** Feature 7" in backlog
-    assert "6/75 PBI réalisés (8 %)" in backlog
-    assert "Prochain PBI :** 7.7 — Les directions de dépendance cibles" in backlog
-    assert "Progression globale :** 38/202 PBI réalisés (18,81 %) ; 164 restants" in backlog
-    assert "Répartition actuelle des 164 PBI non réalisés" in governance
+    assert "7/75 PBI réalisés (9,33 %)" in backlog
+    assert "Prochain PBI :** 7.8 — L’architecture cible possède des frontières acceptées" in backlog
+    assert "Progression globale :** 39/202 PBI réalisés (19,31 %) ; 163 restants" in backlog
+    assert "Répartition actuelle des 163 PBI non réalisés" in governance
     assert (
         "Dernière Feature terminée :** Feature 2 — "
         "Garantir la fiabilité du cœur statistique"

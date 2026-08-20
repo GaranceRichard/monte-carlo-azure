@@ -118,6 +118,10 @@ une connexion Azure DevOps réelle.
   évolutions représentatives à leurs fichiers, couches et dépendances. Les hotspots ne sont retenus qu’après
   combinaison de signaux mesurés de traversée, couplage et taille ; la preuve JSON reste descriptive et
   n’autorise ni migration ni réduction des garanties statistiques ou qualité.
+- **Directions de dépendance décidées.** La [décision d’architecture](docs/target-dependency-directions.md)
+  fixe les relations permises entre domaine, application, ports, adaptateurs, présentation et composition.
+  Les imports de type suivent les mêmes règles que le runtime ; le graphe actuel reste une baseline de
+  migration sans exception implicite et les garanties statistiques demeurent inchangées.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 
@@ -238,6 +242,7 @@ Le backend écoute par défaut sur `http://127.0.0.1:8000` et le frontend sur
 - [Cartographie factuelle des responsabilités backend et du cycle de vie des données](docs/backend-responsibilities-map.md)
 - [Registre vérifié des autorités des données structurantes](docs/structured-data-authority-registry.md)
 - [Graphe factuel des dépendances](docs/dependency-graph.md)
+- [Décision sur les directions de dépendance cibles](docs/target-dependency-directions.md)
 - [Standard statistique](docs/standards/STD-STAT-001.md)
 - [Corpus de référence statistique](docs/statistical-reference-corpus.md)
 - [Matrice risques–contrôles](docs/risk-control-matrix.md)
