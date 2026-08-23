@@ -12,6 +12,11 @@ ne définit pas la signature détaillée des futurs ports et ne change aucun com
 statistique. Le [graphe factuel](dependency-graph.md) reste l’autorité de ce qui existe ; le présent document
 est l’autorité de la direction recherchée.
 
+Sa [projection machine versionnée](../config/dependency-authority-v1.0.json) matérialise exactement la matrice
+et le vocabulaire ci-dessous pour les contrôles automatiques. Elle cite cette décision et son empreinte, et la
+[documentation du format](dependency-authority.md) impose une évolution conjointe : le JSON est la projection
+exécutable de la décision, jamais une décision concurrente ni une allowlist autonome.
+
 Les règles s’appliquent aux dépendances runtime, aux imports de type, aux imports dynamiques, à l’héritage, à
 l’instanciation et à toute exposition de type technique. Un flux de données peut aller du domaine jusqu’à
 l’interface sans inverser la dépendance de code : l’extérieur appelle un port et reçoit une valeur définie par

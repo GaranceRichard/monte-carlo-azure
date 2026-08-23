@@ -2,6 +2,18 @@
 
 ## Recent
 
+### Autorité des dépendances lisible et diagnostiquable — PBI 7.10
+
+- publication d’un manifeste JSON fermé et versionné projetant les décisions normatives 7.7/7.8, avec six
+  couches, matrice complète de 36 directions, trois runtimes et frontières cibles frontend, backend et
+  qualité ;
+- ajout d’un schéma Draft 2020-12, d’un parseur UTF-8 et de validations structurelles et sémantiques couvrant
+  versions, sources et empreintes normatives, références, complétude, propriétaires et chemins ;
+- diagnostics déterministes localisés par pointeur JSON ou ligne/colonne, accompagnés d’un code stable et
+  d’une correction attendue, plus preuve de validation régénérable et tests positifs/négatifs ;
+- livraison sans inspection des imports, familles de règles 7.11–7.16, intégration aux gates, migration du
+  code produit ni modification des garanties statistiques.
+
 ### Architecture cible et frontières acceptées — PBI 7.8
 
 - publication d’une architecture cible unique séparant domaine delivery et simulation, application, ports,

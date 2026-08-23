@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://montecarlo.local/schemas/dependency-authority/1.0.0",
+  "title": "Projection machine des décisions de dépendance 7.7 et 7.8",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "schema",
+    "authorityId",
+    "projectionRole",
+    "normativeSources",
+    "layers",
+    "directions",
+    "runtimes"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "schema": {
+      "const": "config/dependency-authority-v1.0.schema.json"
+    },
+    "authorityId": {
+      "const": "target-dependency-authority"
+    },
+    "projectionRole": {
+      "const": "executable-projection-of-normative-decisions"
+    },
+    "normativeSources": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "$ref": "#/$defs/normativeSource"
+      }
+    },
+    "layers": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "$ref": "#/$defs/layer"
+      }
+    },
+    "directions": {
+      "type": "array",
+      "minItems": 36,
+      "maxItems": 36,
+      "items": {
+        "$ref": "#/$defs/direction"
+      }
+    },
+    "runtimes": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/runtime"
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "nonEmptyText": {
+      "type": "string",
+      "minLength": 1
+    },
+    "normativeSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pbi", "path", "role", "sha256"],
+      "properties": {
+        "pbi": {
+          "enum": ["7.7", "7.8"]
+        },
+        "path": {
+          "enum": [
+            "docs/target-dependency-directions.md",
+            "docs/target-architecture.md"
+          ]
+        },
+        "role": {
+          "enum": ["dependency-directions", "target-boundaries"]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "responsibility"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "name": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "responsibility": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    },
+    "direction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "policy"],
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/identifier"
+        },
+        "to": {
+          "$ref": "#/$defs/identifier"
+        },
+        "policy": {
+          "enum": ["allowed", "internal-only", "forbidden"]
+        }
+      }
+    },
+    "moduleName": {
+      "type": "string",
+      "pattern": "^(?:\\*|[a-z0-9][a-z0-9-]*(?:/[a-z0-9][a-z0-9-]*)*)$"
+    },
+    "boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "pathPattern", "modules"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "pathPattern": {
+          "type": "string",
+          "pattern": "^[^\\\\]+\\{module\\}[^\\\\]*/$"
+        },
+        "modules": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/moduleName"
+          }
+        },
+        "layer": {
+          "$ref": "#/$defs/identifier"
+        },
+        "role": {
+          "$ref": "#/$defs/identifier"
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "root", "kind", "boundaries"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "root": {
+          "type": "string",
+          "pattern": "^[^/\\\\][^\\\\]*/$"
+        },
+        "kind": {
+          "enum": ["layered-product", "external-proof-system"]
+        },
+        "boundaries": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/boundary"
+          }
+        }
+      }
+    }
+  }
+}

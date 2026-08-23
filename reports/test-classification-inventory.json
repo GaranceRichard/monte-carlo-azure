@@ -2678,6 +2678,191 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_changed_normative_decision_hash_is_localized",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_cli_reports_invalid_missing_and_stale_evidence",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_cli_reports_invalid_missing_and_stale_evidence",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_committed_authority_parses_and_exposes_the_normative_matrix",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_committed_authority_parses_and_exposes_the_normative_matrix",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_committed_evidence_is_a_fresh_deterministic_projection",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_committed_evidence_is_a_fresh_deterministic_projection",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_duplicate_direction_also_reports_the_missing_matrix_cell",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_duplicate_direction_also_reports_the_missing_matrix_cell",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_duplicate_json_key_is_rejected_before_validation",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_duplicate_json_key_is_rejected_before_validation",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_internal_only_is_rejected_outside_the_matrix_diagonal",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_internal_only_is_rejected_outside_the_matrix_diagonal",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_invalid_json_reports_line_column_and_correction",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_invalid_json_reports_line_column_and_correction",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_loader_localizes_read_schema_and_semantic_failures",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_loader_localizes_read_schema_and_semantic_failures",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_missing_required_property_has_a_json_pointer",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_missing_required_property_has_a_json_pointer",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_product_boundary_must_stay_under_its_runtime_root",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_product_boundary_must_stay_under_its_runtime_root",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_quality_boundary_cannot_claim_a_product_layer",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_quality_boundary_cannot_claim_a_product_layer",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_semantic_relationship_defects_are_diagnosed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_semantic_relationship_defects_are_diagnosed",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_unsupported_format_version_requires_an_explicit_migration",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_unsupported_format_version_requires_an_explicit_migration",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "migration_recovery"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_e2e_coverage.py::test_all_four_e2e_thresholds_are_enforced_and_pass_at_threshold",
     "framework": "pytest",
     "sourcePath": "tests/test_e2e_coverage.py",

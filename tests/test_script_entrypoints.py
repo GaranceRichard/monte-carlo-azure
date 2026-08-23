@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
     "relative_path",
     [
         "Scripts/check_backlog_consistency.py",
+        "Scripts/check_dependency_authority.py",
         "Scripts/check_e2e_coverage.py",
         "Scripts/check_maintainability.py",
         "Scripts/check_python_coverage.py",

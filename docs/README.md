@@ -84,6 +84,8 @@ l’unique autorité de réalisation.
 | [`dependency-graph.md`](dependency-graph.md) | Développeurs, architectes | Projection générée du graphe observé ; aucune autorité sur l’architecture cible | Preuve générée |
 | [`target-dependency-directions.md`](target-dependency-directions.md) | Développeurs, architectes | Autorité normative des directions de dépendance cibles ; aucune migration ni frontière physique détaillée | Architecture |
 | [`target-architecture.md`](target-architecture.md) | Développeurs, architectes | Autorité normative des responsabilités, frontières, ports, compositions et contrats inter-runtime cibles | Architecture |
+| [`dependency-authority.md`](dependency-authority.md) | Développeurs, architectes, qualité | Format, chaîne d’autorité, diagnostics et usage de la projection machine des décisions 7.7/7.8 | Contrat |
+| [`../config/dependency-authority-v1.0.json`](../config/dependency-authority-v1.0.json) | Contrôles architecturaux | Projection exécutable versionnée des décisions normatives de dépendance et de frontières | Contrat machine |
 | [`../frontend/README.md`](../frontend/README.md) | Développeurs frontend | Guide de démarrage et frontières frontend | Technique |
 | [`deployment.md`](deployment.md) | Exploitants | Procédure de déploiement et d’exploitation | Technique |
 | [`maintainability.md`](maintainability.md) | Mainteneurs | Procédure et règles du ratchet | Gouvernance |
@@ -172,6 +174,8 @@ l’unique autorité de réalisation.
   cas limites et exemples guidant les futures frontières ;
 - [`target-architecture.md`](target-architecture.md) — architecture cible unique, frontières physiques,
   responsabilités, ports, contrats inter-runtime et règles de composition ;
+- [`dependency-authority.md`](dependency-authority.md) — format versionné, liaison aux décisions 7.7/7.8,
+  validations et diagnostics de leur projection machine ;
 - [`../frontend/README.md`](../frontend/README.md) — démarrage et frontières propres au frontend ;
 - [`deployment.md`](deployment.md) — déploiement et exploitation ;
 - [`maintainability.md`](maintainability.md) — ratchet de maintenabilité.
@@ -191,6 +195,9 @@ l’unique autorité de réalisation.
 - [`statistical-parity-audit.md`](statistical-parity-audit.md) — audit historique de parité ;
 - [`standards/STD-TEST-001.md`](standards/STD-TEST-001.md) — norme de test ;
 - [`test-classification.md`](test-classification.md) — application de la classification ;
+- [`../config/dependency-authority-v1.0.json`](../config/dependency-authority-v1.0.json) et
+  [`../reports/dependency-authority-validation.json`](../reports/dependency-authority-validation.json) —
+  autorité machine des dépendances cibles et preuve déterministe de sa validité ;
 - [`definition-of-done.md`](definition-of-done.md) — gate complète et DoD ;
 - [`quality-infrastructure-responsibilities-map.md`](quality-infrastructure-responsibilities-map.md) —
   responsabilités de preuve, d’orchestration et d’exécution des contrôles qualité ;

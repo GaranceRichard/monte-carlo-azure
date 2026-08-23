@@ -1,0 +1,254 @@
+{
+  "schemaVersion": "1.0.0",
+  "schema": "config/dependency-authority-v1.0.schema.json",
+  "authorityId": "target-dependency-authority",
+  "projectionRole": "executable-projection-of-normative-decisions",
+  "normativeSources": [
+    {
+      "pbi": "7.7",
+      "path": "docs/target-dependency-directions.md",
+      "role": "dependency-directions",
+      "sha256": "d9e008f085c09c3fb326391fb4f9e27bc06a83a3388add6252e951c871025dc9"
+    },
+    {
+      "pbi": "7.8",
+      "path": "docs/target-architecture.md",
+      "role": "target-boundaries",
+      "sha256": "cc676f2553032c4cdd3ad850d1d3e8fdf5abc0b2cd58a0f1990cf2ab3c8f06ee"
+    }
+  ],
+  "layers": [
+    {
+      "id": "domain",
+      "name": "Domaine",
+      "responsibility": "Signification métier, invariants et transformations pures."
+    },
+    {
+      "id": "application",
+      "name": "Application",
+      "responsibility": "Orchestration des cas d’usage sans choix technologique."
+    },
+    {
+      "id": "ports",
+      "name": "Ports",
+      "responsibility": "Contrats publics entrants et sortants possédés par le besoin intérieur."
+    },
+    {
+      "id": "adapters",
+      "name": "Adaptateurs",
+      "responsibility": "Traduction entre les ports et les technologies ou moteurs concrets."
+    },
+    {
+      "id": "presentation",
+      "name": "Présentation",
+      "responsibility": "Interaction avec un support et traduction des résultats en information restituable."
+    },
+    {
+      "id": "composition",
+      "name": "Composition",
+      "responsibility": "Choix et assemblage des implémentations aux points d’entrée."
+    }
+  ],
+  "directions": [
+    { "from": "domain", "to": "domain", "policy": "internal-only" },
+    { "from": "domain", "to": "application", "policy": "forbidden" },
+    { "from": "domain", "to": "ports", "policy": "forbidden" },
+    { "from": "domain", "to": "adapters", "policy": "forbidden" },
+    { "from": "domain", "to": "presentation", "policy": "forbidden" },
+    { "from": "domain", "to": "composition", "policy": "forbidden" },
+    { "from": "application", "to": "domain", "policy": "allowed" },
+    { "from": "application", "to": "application", "policy": "internal-only" },
+    { "from": "application", "to": "ports", "policy": "allowed" },
+    { "from": "application", "to": "adapters", "policy": "forbidden" },
+    { "from": "application", "to": "presentation", "policy": "forbidden" },
+    { "from": "application", "to": "composition", "policy": "forbidden" },
+    { "from": "ports", "to": "domain", "policy": "allowed" },
+    { "from": "ports", "to": "application", "policy": "forbidden" },
+    { "from": "ports", "to": "ports", "policy": "internal-only" },
+    { "from": "ports", "to": "adapters", "policy": "forbidden" },
+    { "from": "ports", "to": "presentation", "policy": "forbidden" },
+    { "from": "ports", "to": "composition", "policy": "forbidden" },
+    { "from": "adapters", "to": "domain", "policy": "allowed" },
+    { "from": "adapters", "to": "application", "policy": "forbidden" },
+    { "from": "adapters", "to": "ports", "policy": "allowed" },
+    { "from": "adapters", "to": "adapters", "policy": "internal-only" },
+    { "from": "adapters", "to": "presentation", "policy": "forbidden" },
+    { "from": "adapters", "to": "composition", "policy": "forbidden" },
+    { "from": "presentation", "to": "domain", "policy": "forbidden" },
+    { "from": "presentation", "to": "application", "policy": "forbidden" },
+    { "from": "presentation", "to": "ports", "policy": "allowed" },
+    { "from": "presentation", "to": "adapters", "policy": "forbidden" },
+    { "from": "presentation", "to": "presentation", "policy": "internal-only" },
+    { "from": "presentation", "to": "composition", "policy": "forbidden" },
+    { "from": "composition", "to": "domain", "policy": "allowed" },
+    { "from": "composition", "to": "application", "policy": "allowed" },
+    { "from": "composition", "to": "ports", "policy": "allowed" },
+    { "from": "composition", "to": "adapters", "policy": "allowed" },
+    { "from": "composition", "to": "presentation", "policy": "allowed" },
+    { "from": "composition", "to": "composition", "policy": "internal-only" }
+  ],
+  "runtimes": [
+    {
+      "id": "frontend",
+      "root": "frontend/src/",
+      "kind": "layered-product",
+      "boundaries": [
+        {
+          "id": "frontend-domain",
+          "pathPattern": "frontend/src/domain/{module}/",
+          "modules": ["delivery", "simulation"],
+          "layer": "domain"
+        },
+        {
+          "id": "frontend-application",
+          "pathPattern": "frontend/src/application/{module}/",
+          "modules": [
+            "onboarding",
+            "team-history",
+            "team-forecast",
+            "portfolio-forecast",
+            "simulation-history",
+            "preferences",
+            "theme-preferences",
+            "client-session",
+            "statistical-proof"
+          ],
+          "layer": "application"
+        },
+        {
+          "id": "frontend-ports",
+          "pathPattern": "frontend/src/ports/{module}/",
+          "modules": ["*"],
+          "layer": "ports"
+        },
+        {
+          "id": "frontend-adapters",
+          "pathPattern": "frontend/src/adapters/{module}/",
+          "modules": [
+            "azure-devops/cloud",
+            "azure-devops/server",
+            "simulation/local",
+            "simulation/http",
+            "browser/storage",
+            "browser/theme-storage",
+            "browser/clock",
+            "browser/seed",
+            "browser/history-id",
+            "browser/client-id",
+            "demo/discovery",
+            "demo/delivery",
+            "demo/simulation"
+          ],
+          "layer": "adapters"
+        },
+        {
+          "id": "frontend-presentation",
+          "pathPattern": "frontend/src/presentation/{module}/",
+          "modules": ["models", "react", "reports/pdf", "reports/csv", "proof"],
+          "layer": "presentation"
+        },
+        {
+          "id": "frontend-composition",
+          "pathPattern": "frontend/src/composition/{module}/",
+          "modules": ["browser", "proof", "instrumentation"],
+          "layer": "composition"
+        }
+      ]
+    },
+    {
+      "id": "backend",
+      "root": "backend/",
+      "kind": "layered-product",
+      "boundaries": [
+        {
+          "id": "backend-domain",
+          "pathPattern": "backend/domain/{module}/",
+          "modules": ["simulation", "history"],
+          "layer": "domain"
+        },
+        {
+          "id": "backend-application",
+          "pathPattern": "backend/application/{module}/",
+          "modules": ["simulation", "history", "operations", "statistical-proof"],
+          "layer": "application"
+        },
+        {
+          "id": "backend-ports",
+          "pathPattern": "backend/ports/{module}/",
+          "modules": ["*"],
+          "layer": "ports"
+        },
+        {
+          "id": "backend-adapters",
+          "pathPattern": "backend/adapters/{module}/",
+          "modules": [
+            "engine/numpy",
+            "engine/mca-prng",
+            "persistence/mongodb",
+            "persistence/memory",
+            "persistence/disabled",
+            "system/clock",
+            "system/seed",
+            "system/rate-limit"
+          ],
+          "layer": "adapters"
+        },
+        {
+          "id": "backend-presentation",
+          "pathPattern": "backend/presentation/{module}/",
+          "modules": ["http", "proof", "static"],
+          "layer": "presentation"
+        },
+        {
+          "id": "backend-composition",
+          "pathPattern": "backend/composition/{module}/",
+          "modules": ["api", "proof", "operations"],
+          "layer": "composition"
+        }
+      ]
+    },
+    {
+      "id": "quality",
+      "root": "Scripts/quality/",
+      "kind": "external-proof-system",
+      "boundaries": [
+        {
+          "id": "quality-contracts",
+          "pathPattern": "Scripts/quality/{module}/",
+          "modules": ["contracts"],
+          "role": "contracts"
+        },
+        {
+          "id": "quality-application",
+          "pathPattern": "Scripts/quality/{module}/",
+          "modules": ["application"],
+          "role": "application"
+        },
+        {
+          "id": "quality-ports",
+          "pathPattern": "Scripts/quality/{module}/",
+          "modules": ["ports"],
+          "role": "ports"
+        },
+        {
+          "id": "quality-adapters",
+          "pathPattern": "Scripts/quality/{module}/",
+          "modules": ["adapters"],
+          "role": "adapters"
+        },
+        {
+          "id": "quality-evidence",
+          "pathPattern": "Scripts/quality/{module}/",
+          "modules": ["evidence"],
+          "role": "evidence"
+        },
+        {
+          "id": "quality-composition",
+          "pathPattern": "Scripts/quality/{module}/",
+          "modules": ["composition"],
+          "role": "composition"
+        }
+      ]
+    }
+  ]
+}

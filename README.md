@@ -126,6 +126,10 @@ une connexion Azure DevOps réelle.
   cas d’usage, ports, adaptateurs, présentations et composition roots du frontend, du backend et de la
   qualité. Les contrats inter-runtime y sont versionnés, les trois scénarios de coût de changement sont
   localisés et les autorités actuelles restent en vigueur jusqu’à leurs migrations dédiées.
+- **Autorité de dépendance diagnostiquable.** La projection JSON [versionnée et documentée](docs/dependency-authority.md)
+  relie explicitement les décisions 7.7/7.8, décrit les six couches, leur matrice complète et les frontières
+  cibles des trois runtimes. Son schéma et son parseur refusent les défauts de syntaxe, structure, version,
+  liaison normative et cohérence avec des diagnostics localisés, sans encore contrôler les imports produit.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 

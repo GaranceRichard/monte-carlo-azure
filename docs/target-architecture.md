@@ -20,6 +20,11 @@ actuelle avant la migration atomique de ses producteurs et consommateurs.
 sécurité actuels. Il ne constitue pas une seconde cible et reste factuel jusqu’à ce que chaque migration
 publiée y reporte le nouvel état exécuté.
 
+Les racines, couches et familles de frontières acceptées sont projetées dans
+l’[autorité machine versionnée](../config/dependency-authority-v1.0.json). Cette projection lie la présente
+décision et son empreinte, tandis que son [format documenté](dependency-authority.md) interdit de la faire
+évoluer indépendamment des décisions 7.7/7.8. Elle rend la cible parsable sans créer une seconde architecture.
+
 La décision couvre le navigateur TypeScript, le backend Python et l’infrastructure qualité. Elle ne déplace
 aucun fichier, n’implémente aucun port, ne modifie aucun flux fonctionnel et ne décide pas l’ordre des
 migrations. Une relation qui ne peut pas respecter cette cible exige une décision d’architecture qui amende

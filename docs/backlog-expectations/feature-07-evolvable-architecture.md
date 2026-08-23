@@ -186,7 +186,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Transformer les décisions architecturales en règles vérifiables.
 - **Frontière principale :** Contrôle des dépendances.
 - **Famille d’invariants :** Intégrité de l’autorité architecturale.
-- **Preuve principale :** Tests du format, du parseur et des diagnostics invalides.
+- **Preuve principale :** [Tests du format, du parseur et des diagnostics invalides](../../tests/test_dependency_authority.py), complétés par la [preuve de validation déterministe](../../reports/dependency-authority-validation.json).
 - **Éléments de réalisation inclus :** Format d’autorité ; parseur ; validation ; diagnostics ; documentation du format.
 - **Hors périmètre :** Familles de règles architecturales particulières.
 - **Surface prévisionnelle :** 4 fichiers de production ; 8 fichiers versionnés
