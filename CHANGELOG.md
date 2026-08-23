@@ -13,6 +13,16 @@
   d’une correction attendue, plus preuve de validation régénérable et tests positifs/négatifs ;
 - livraison sans inspection des imports, familles de règles 7.11–7.16, intégration aux gates, migration du
   code produit ni modification des garanties statistiques.
+### Séquence de migration architecturale acyclique — PBI 7.9
+
+- publication du graphe exhaustif des outcomes 7.10 à 7.75, de leurs précédences obligatoires et de
+  17 vagues topologiques minimales qui n’imposent aucun lot d’intégration ;
+- identification de neuf chemins parallèles, de leurs points de convergence et de chaque état intermédiaire
+  comme ensemble publié fermé vers ses prédécesseurs ;
+- définition d’un rollback en ordre topologique inverse, conservant les basculements d’autorité atomiques et
+  toutes les garanties statistiques ;
+- ajout d’une projection machine et d’un contrôle automatisé de l’acyclicité, des précédences, du parallélisme
+  maximal, des chemins et des six outcomes immédiatement disponibles après 7.9, sans réaliser de migration.
 
 ### Architecture cible et frontières acceptées — PBI 7.8
 

@@ -15,7 +15,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 251 | 1321 | 84 | 5 | 2 | 0 | 119 | 2 |
+| 255 | 1346 | 85 | 5 | 2 | 0 | 119 | 2 |
 
 ### Directions observées
 
@@ -27,7 +27,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 | launcher | backend | runtime | 1 |
 | quality | backend | runtime | 5 |
 | quality | frontend | runtime | 3 |
-| quality | quality | runtime | 238 |
+| quality | quality | runtime | 246 |
 
 ### Cycles localisés
 
@@ -84,6 +84,7 @@ frontend/src/hooks/simulationForecastCore.ts → frontend/src/hooks/simulationFo
 | Dockerfile | 25 | python-module-entrypoint | backend/api.py | internal |
 | MonteCarloADO.spec | 5 | executable-reference | run_app.py | internal |
 | Scripts/calibrate_statistical_distribution.py | 63 | python-main-guard | Scripts/calibrate_statistical_distribution.py | internal |
+| Scripts/check_architecture_migration_sequence.py | 84 | python-main-guard | Scripts/check_architecture_migration_sequence.py | internal |
 | Scripts/check_backlog_atomicity.py | 61 | python-main-guard | Scripts/check_backlog_atomicity.py | internal |
 | Scripts/check_backlog_consistency.py | 284 | python-main-guard | Scripts/check_backlog_consistency.py | internal |
 | Scripts/check_dependency_authority.py | 89 | python-main-guard | Scripts/check_dependency_authority.py | internal |

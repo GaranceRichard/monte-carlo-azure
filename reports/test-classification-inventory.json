@@ -2114,6 +2114,146 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_architecture_migration_sequence.py::test_a_future_wave_cannot_hide_available_parallelism",
+    "framework": "pytest",
+    "sourcePath": "tests/test_architecture_migration_sequence.py",
+    "selector": "test_a_future_wave_cannot_hide_available_parallelism",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_architecture_migration_sequence.py::test_a_published_state_must_include_every_predecessor",
+    "framework": "pytest",
+    "sourcePath": "tests/test_architecture_migration_sequence.py",
+    "selector": "test_a_published_state_must_include_every_predecessor",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_architecture_migration_sequence.py::test_cli_reports_success_validation_errors_and_unreadable_inputs",
+    "framework": "pytest",
+    "sourcePath": "tests/test_architecture_migration_sequence.py",
+    "selector": "test_cli_reports_success_validation_errors_and_unreadable_inputs",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_architecture_migration_sequence.py::test_cycle_is_rejected_with_its_closed_chain",
+    "framework": "pytest",
+    "sourcePath": "tests/test_architecture_migration_sequence.py",
+    "selector": "test_cycle_is_rejected_with_its_closed_chain",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_architecture_migration_sequence.py::test_documented_precedence_drift_reports_missing_and_extra_outcomes",
+    "framework": "pytest",
+    "sourcePath": "tests/test_architecture_migration_sequence.py",
+    "selector": "test_documented_precedence_drift_reports_missing_and_extra_outcomes",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_architecture_migration_sequence.py::test_duplicate_detection_returns_every_repeated_value",
+    "framework": "pytest",
+    "sourcePath": "tests/test_architecture_migration_sequence.py",
+    "selector": "test_duplicate_detection_returns_every_repeated_value",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_architecture_migration_sequence.py::test_every_outcome_belongs_to_one_parallel_lane",
+    "framework": "pytest",
+    "sourcePath": "tests/test_architecture_migration_sequence.py",
+    "selector": "test_every_outcome_belongs_to_one_parallel_lane",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_architecture_migration_sequence.py::test_input_readers_reject_ambiguous_or_invalid_authorities",
+    "framework": "pytest",
+    "sourcePath": "tests/test_architecture_migration_sequence.py",
+    "selector": "test_input_readers_reject_ambiguous_or_invalid_authorities",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_architecture_migration_sequence.py::test_plan_metadata_lanes_and_convergences_are_strictly_validated",
+    "framework": "pytest",
+    "sourcePath": "tests/test_architecture_migration_sequence.py",
+    "selector": "test_plan_metadata_lanes_and_convergences_are_strictly_validated",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_architecture_migration_sequence.py::test_repository_sequence_is_acyclic_complete_and_maximally_parallel",
+    "framework": "pytest",
+    "sourcePath": "tests/test_architecture_migration_sequence.py",
+    "selector": "test_repository_sequence_is_acyclic_complete_and_maximally_parallel",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_architecture_migration_sequence.py::test_unresolved_graph_and_all_graph_diagnostics_are_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_architecture_migration_sequence.py",
+    "selector": "test_unresolved_graph_and_all_graph_diagnostics_are_rejected",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_cli_reports_success_violations_and_unreadable_input",
     "framework": "pytest",
     "sourcePath": "tests/test_backlog_atomicity.py",

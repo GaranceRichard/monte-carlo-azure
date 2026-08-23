@@ -12,9 +12,9 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 251,
-    "importEdges": 1321,
-    "entrypoints": 84,
+    "sourceModules": 255,
+    "importEdges": 1346,
+    "entrypoints": 85,
     "missingEntrypoints": 5,
     "cycles": 2,
     "runtimeCycles": 0,
@@ -25,6 +25,21 @@
     "nodes": [
       {
         "path": "Scripts/__init__.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/architecture_migration_sequence_graph.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/architecture_migration_sequence_plan.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/architecture_migration_sequence_validation.py",
         "area": "quality",
         "language": "python"
       },
@@ -65,6 +80,11 @@
       },
       {
         "path": "Scripts/change_cost_baseline_render.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/check_architecture_migration_sequence.py",
         "area": "quality",
         "language": "python"
       },
@@ -1281,6 +1301,159 @@
     ],
     "edges": [
       {
+        "source": "Scripts/architecture_migration_sequence_graph.py",
+        "target": "Scripts/backlog_atomicity_graph.py",
+        "line": 11,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.backlog_atomicity_graph.predecessors",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_graph.py",
+        "target": "Scripts/backlog_atomicity_parsing.py",
+        "line": 12,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.backlog_atomicity_parsing.parse_registry",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_graph.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_graph.py",
+        "target": "external:python:collections",
+        "line": 7,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "collections.abc",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_graph.py",
+        "target": "external:python:json",
+        "line": 5,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "json",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_graph.py",
+        "target": "external:python:pathlib",
+        "line": 8,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "pathlib",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_graph.py",
+        "target": "external:python:re",
+        "line": 6,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "re",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_graph.py",
+        "target": "external:python:typing",
+        "line": 9,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "typing",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_plan.py",
+        "target": "Scripts/architecture_migration_sequence_graph.py",
+        "line": 8,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.architecture_migration_sequence_graph.pbi_key",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_plan.py",
+        "target": "Scripts/architecture_migration_sequence_validation.py",
+        "line": 14,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.architecture_migration_sequence_validation.validate_waves",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_plan.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_plan.py",
+        "target": "external:python:collections",
+        "line": 5,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "collections.abc",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_plan.py",
+        "target": "external:python:typing",
+        "line": 6,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "typing",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_validation.py",
+        "target": "Scripts/architecture_migration_sequence_graph.py",
+        "line": 8,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.architecture_migration_sequence_graph.pbi_key",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_validation.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_validation.py",
+        "target": "external:python:collections",
+        "line": 5,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "collections.abc",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/architecture_migration_sequence_validation.py",
+        "target": "external:python:typing",
+        "line": 6,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "typing",
+        "resolution": "external"
+      },
+      {
         "source": "Scripts/backlog_atomicity_contract.py",
         "target": "Scripts/backlog_atomicity_model.py",
         "line": 5,
@@ -1557,6 +1730,78 @@
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "typing",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/check_architecture_migration_sequence.py",
+        "target": "Scripts/architecture_migration_sequence_graph.py",
+        "line": 14,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.architecture_migration_sequence_graph.load_plan",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/check_architecture_migration_sequence.py",
+        "target": "Scripts/architecture_migration_sequence_plan.py",
+        "line": 28,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.architecture_migration_sequence_plan.validate_sequence",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/check_architecture_migration_sequence.py",
+        "target": "Scripts/architecture_migration_sequence_validation.py",
+        "line": 29,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.architecture_migration_sequence_validation.validate_published_state",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/check_architecture_migration_sequence.py",
+        "target": "external:python:__future__",
+        "line": 4,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/check_architecture_migration_sequence.py",
+        "target": "external:python:argparse",
+        "line": 6,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "argparse",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/check_architecture_migration_sequence.py",
+        "target": "external:python:json",
+        "line": 7,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "json",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/check_architecture_migration_sequence.py",
+        "target": "external:python:pathlib",
+        "line": 9,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "pathlib",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/check_architecture_migration_sequence.py",
+        "target": "external:python:sys",
+        "line": 8,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "sys",
         "resolution": "external"
       },
       {
@@ -13375,6 +13620,13 @@
         "resolution": "internal"
       },
       {
+        "declaredIn": "Scripts/check_architecture_migration_sequence.py",
+        "line": 84,
+        "kind": "python-main-guard",
+        "target": "Scripts/check_architecture_migration_sequence.py",
+        "resolution": "internal"
+      },
+      {
         "declaredIn": "Scripts/check_backlog_atomicity.py",
         "line": 61,
         "kind": "python-main-guard",
@@ -13892,7 +14144,7 @@
         "sourceArea": "quality",
         "targetArea": "quality",
         "phase": "runtime",
-        "count": 238
+        "count": 246
       }
     ]
   },

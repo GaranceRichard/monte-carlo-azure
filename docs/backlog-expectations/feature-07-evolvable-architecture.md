@@ -172,7 +172,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Permettre des livraisons incrémentales sûres.
 - **Frontière principale :** Plan de migration architecturale.
 - **Famille d’invariants :** Publication incrémentale et acyclicité.
-- **Preuve principale :** Validation automatisée du graphe de précédence proposé.
+- **Preuve principale :** Validation automatisée de la [séquence de migration acyclique](../architecture-migration-sequence.md) et de sa projection machine.
 - **Éléments de réalisation inclus :** Graphe des outcomes ; chemins parallèles ; points de convergence ; stratégie de retour arrière.
 - **Hors périmètre :** Réalisation des outcomes ordonnés.
 - **Surface prévisionnelle :** 0 fichiers de production ; 5 fichiers versionnés

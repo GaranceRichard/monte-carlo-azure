@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "1.0.0",
+  "pbi": "7.9",
+  "source": "docs/backlog-expectations/feature-07-evolvable-architecture.md",
+  "publicationModel": "downward-closed-outcome-set",
+  "rollbackModel": "reverse-topological",
+  "foundations": ["7.1", "7.2", "7.3", "7.4", "7.5", "7.6", "7.7", "7.8", "7.9"],
+  "immediatelyParallelizable": ["7.10", "7.21", "7.31", "7.32", "7.33", "7.34"],
+  "waves": [
+    {
+      "wave": 1,
+      "outcomes": ["7.10", "7.21", "7.31", "7.32", "7.33", "7.34"]
+    },
+    {
+      "wave": 2,
+      "outcomes": ["7.11", "7.12", "7.13", "7.14", "7.15", "7.16", "7.22", "7.23"]
+    },
+    {
+      "wave": 3,
+      "outcomes": [
+        "7.17", "7.19", "7.20", "7.24", "7.28", "7.29", "7.35", "7.36",
+        "7.37", "7.38", "7.39", "7.45", "7.46", "7.48", "7.67"
+      ]
+    },
+    {
+      "wave": 4,
+      "outcomes": [
+        "7.18", "7.25", "7.26", "7.27", "7.40", "7.41", "7.42", "7.47",
+        "7.49", "7.50", "7.68"
+      ]
+    },
+    {
+      "wave": 5,
+      "outcomes": ["7.30", "7.43", "7.69"]
+    },
+    {
+      "wave": 6,
+      "outcomes": ["7.44", "7.51", "7.70"]
+    },
+    {
+      "wave": 7,
+      "outcomes": ["7.52", "7.55"]
+    },
+    {
+      "wave": 8,
+      "outcomes": ["7.53", "7.56", "7.57", "7.60"]
+    },
+    {
+      "wave": 9,
+      "outcomes": ["7.54", "7.58", "7.61"]
+    },
+    {
+      "wave": 10,
+      "outcomes": ["7.59", "7.62", "7.63"]
+    },
+    {
+      "wave": 11,
+      "outcomes": ["7.64"]
+    },
+    {
+      "wave": 12,
+      "outcomes": ["7.65"]
+    },
+    {
+      "wave": 13,
+      "outcomes": ["7.66"]
+    },
+    {
+      "wave": 14,
+      "outcomes": ["7.71"]
+    },
+    {
+      "wave": 15,
+      "outcomes": ["7.72", "7.73"]
+    },
+    {
+      "wave": 16,
+      "outcomes": ["7.74"]
+    },
+    {
+      "wave": 17,
+      "outcomes": ["7.75"]
+    }
+  ],
+  "lanes": [
+    {
+      "id": "architecture-guardrails",
+      "outcomes": ["7.10", "7.11", "7.12", "7.13", "7.14", "7.15", "7.16", "7.17", "7.18"]
+    },
+    {
+      "id": "frontend-application-contracts",
+      "outcomes": ["7.19", "7.20"]
+    },
+    {
+      "id": "delivery-domain",
+      "outcomes": ["7.21", "7.22", "7.23", "7.24", "7.25", "7.26", "7.27", "7.28", "7.29", "7.30"]
+    },
+    {
+      "id": "time-and-identity",
+      "outcomes": ["7.31", "7.32", "7.33", "7.34"]
+    },
+    {
+      "id": "azure-devops",
+      "outcomes": ["7.35", "7.36", "7.37", "7.38", "7.39", "7.40", "7.41", "7.42", "7.43", "7.44"]
+    },
+    {
+      "id": "simulation-application-and-persistence",
+      "outcomes": [
+        "7.45", "7.46", "7.47", "7.48", "7.49", "7.50", "7.51", "7.52",
+        "7.53", "7.54", "7.55", "7.56", "7.57", "7.58", "7.59"
+      ]
+    },
+    {
+      "id": "presentation",
+      "outcomes": ["7.60", "7.61", "7.62", "7.63", "7.64", "7.65", "7.66"]
+    },
+    {
+      "id": "quality-infrastructure",
+      "outcomes": ["7.67", "7.68", "7.69", "7.70", "7.71", "7.72", "7.73"]
+    },
+    {
+      "id": "feature-exit",
+      "outcomes": ["7.74", "7.75"]
+    }
+  ],
+  "convergencePoints": [
+    {"outcome": "7.17", "role": "Réunit les six familles de règles dans les profils locaux et main."},
+    {"outcome": "7.30", "role": "Réunit les invariants et diagnostics du domaine delivery."},
+    {"outcome": "7.44", "role": "Ferme tous les accès Azure DevOps directs après migration des ports."},
+    {"outcome": "7.51", "role": "Réunit delivery, Azure DevOps et persistance dans TeamHistory."},
+    {"outcome": "7.52", "role": "Réunit historique, calculs delivery et moteurs dans TeamForecast."},
+    {"outcome": "7.53", "role": "Réunit contrat portefeuille, temps, identité et TeamForecast."},
+    {"outcome": "7.54", "role": "Assemble les ports et cas d’usage frontend sans concrétions internes."},
+    {"outcome": "7.55", "role": "Assemble moteur, temps, identité et repositories backend."},
+    {"outcome": "7.58", "role": "Réunit composition backend, persistance et limitation hors route."},
+    {"outcome": "7.66", "role": "Stabilise l’API publique commune aux restitutions indépendantes."},
+    {"outcome": "7.70", "role": "Réunit les frontières qualité et la preuve statistique publique."},
+    {"outcome": "7.71", "role": "Agrège les frontières exécutées dans la preuve workspace."},
+    {"outcome": "7.74", "role": "Réunit les preuves workspace, worktree et CI pour la remesure."},
+    {"outcome": "7.75", "role": "Réunit la migration et ses preuves dans la sortie Feature 7."}
+  ]
+}

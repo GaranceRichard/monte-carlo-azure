@@ -21,6 +21,7 @@ les règles, les preuves ou l’historique.
 | Imports, directions, points d’entrée, cycles et contournements conventionnels observés | Développeurs et architectes | [`dependency-graph.md`](dependency-graph.md) et [`../reports/dependency-graph.json`](../reports/dependency-graph.json) | Restitution humaine générée puis graphe machine reproductible | Preuve |
 | Directions permises entre domaine, application, ports, adaptateurs, présentation et composition | Développeurs et architectes | [`target-dependency-directions.md`](target-dependency-directions.md) | Décision normative guidant les frontières et migrations cibles | Architecture |
 | Architecture cible, frontières physiques, ports, composition et contrats inter-runtime | Développeurs et architectes | [`target-architecture.md`](target-architecture.md) | Décision normative attribuant les responsabilités cibles sans réaliser leur migration | Architecture |
+| Ordre incrémental, précédences, parallélisme, convergences et rollback des migrations | Développeurs et architectes | [`architecture-migration-sequence.md`](architecture-migration-sequence.md) et [`../reports/architecture-migration-sequence.json`](../reports/architecture-migration-sequence.json) | Décision humaine et projection machine d’un graphe acyclique publiable par outcome | Architecture |
 | Règles statistiques normatives | Développeurs du moteur et reviewers | [`STD-STAT-001.md`](standards/STD-STAT-001.md) | Standard normatif | Norme |
 | Forme, dérivation et exécution du corpus statistique | Développeurs du moteur et reviewers | [`statistical-reference-corpus.md`](statistical-reference-corpus.md) | Contrat opératoire et preuves dérivées | Contrat |
 | Protocole, calibration et preuve de parité distributionnelle | Statisticiens, développeurs et reviewers | [`statistical-distribution-protocol.md`](statistical-distribution-protocol.md) | Contrat d’inférence multi-seeds et limites | Contrat |
@@ -86,6 +87,7 @@ l’unique autorité de réalisation.
 | [`target-architecture.md`](target-architecture.md) | Développeurs, architectes | Autorité normative des responsabilités, frontières, ports, compositions et contrats inter-runtime cibles | Architecture |
 | [`dependency-authority.md`](dependency-authority.md) | Développeurs, architectes, qualité | Format, chaîne d’autorité, diagnostics et usage de la projection machine des décisions 7.7/7.8 | Contrat |
 | [`../config/dependency-authority-v1.0.json`](../config/dependency-authority-v1.0.json) | Contrôles architecturaux | Projection exécutable versionnée des décisions normatives de dépendance et de frontières | Contrat machine |
+| [`architecture-migration-sequence.md`](architecture-migration-sequence.md) | Développeurs, architectes | Séquence acyclique, états publiables, chemins parallèles, convergences et stratégie de rollback sans réaliser les migrations | Architecture |
 | [`../frontend/README.md`](../frontend/README.md) | Développeurs frontend | Guide de démarrage et frontières frontend | Technique |
 | [`deployment.md`](deployment.md) | Exploitants | Procédure de déploiement et d’exploitation | Technique |
 | [`maintainability.md`](maintainability.md) | Mainteneurs | Procédure et règles du ratchet | Gouvernance |
@@ -176,6 +178,8 @@ l’unique autorité de réalisation.
   responsabilités, ports, contrats inter-runtime et règles de composition ;
 - [`dependency-authority.md`](dependency-authority.md) — format versionné, liaison aux décisions 7.7/7.8,
   validations et diagnostics de leur projection machine ;
+- [`architecture-migration-sequence.md`](architecture-migration-sequence.md) — graphe de précédence,
+  parallélisme maximal, états publiables, convergences et rollback des migrations ;
 - [`../frontend/README.md`](../frontend/README.md) — démarrage et frontières propres au frontend ;
 - [`deployment.md`](deployment.md) — déploiement et exploitation ;
 - [`maintainability.md`](maintainability.md) — ratchet de maintenabilité.

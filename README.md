@@ -130,6 +130,10 @@ une connexion Azure DevOps réelle.
   relie explicitement les décisions 7.7/7.8, décrit les six couches, leur matrice complète et les frontières
   cibles des trois runtimes. Son schéma et son parseur refusent les défauts de syntaxe, structure, version,
   liaison normative et cohérence avec des diagnostics localisés, sans encore contrôler les imports produit.
+- **Migration ordonnée sans lot bloquant.** La [séquence architecturale](docs/architecture-migration-sequence.md)
+  fixe un graphe acyclique de publications autonomes, calcule les vagues de disponibilité les plus précoces
+  et protège automatiquement les précédences. Après sa publication, six outcomes indépendants peuvent
+  démarrer immédiatement sans réaliser ni anticiper une migration future.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 
@@ -252,6 +256,7 @@ Le backend écoute par défaut sur `http://127.0.0.1:8000` et le frontend sur
 - [Graphe factuel des dépendances](docs/dependency-graph.md)
 - [Décision sur les directions de dépendance cibles](docs/target-dependency-directions.md)
 - [Architecture cible et frontières acceptées](docs/target-architecture.md)
+- [Séquence de migration architecturale acyclique](docs/architecture-migration-sequence.md)
 - [Standard statistique](docs/standards/STD-STAT-001.md)
 - [Corpus de référence statistique](docs/statistical-reference-corpus.md)
 - [Matrice risques–contrôles](docs/risk-control-matrix.md)

@@ -45,13 +45,13 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     features = check_backlog_consistency.parse_registry(backlog)
 
     assert sum(len(feature.pbis) for feature in features) == 202
-    assert sum(feature.completed_count for feature in features) == 41
+    assert sum(feature.completed_count for feature in features) == 42
     feature_two = next(feature for feature in features if feature.number == 2)
     assert feature_two.completed_count == 21
     assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == []
     feature_seven = next(feature for feature in features if feature.number == 7)
     assert len(feature_seven.pbis) == 75
-    assert feature_seven.completed_count == 9
+    assert feature_seven.completed_count == 10
     assert [
         (pbi.identifier, pbi.completed_on)
         for pbi in feature_seven.pbis
@@ -65,17 +65,19 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
         ("7.6", "20/08/2026"),
         ("7.7", "20/08/2026"),
         ("7.8", "20/08/2026"),
+        ("7.9", "22/08/2026"),
         ("7.10", "22/08/2026"),
     ]
     assert check_backlog_consistency.feature_priority(governance, features) == 7
     assert "Feature en cours :** Feature 7" in backlog
-    assert "9/75 PBI réalisés (12 %)" in backlog
+    assert "10/75 PBI réalisés (13,33 %)" in backlog
     assert (
-        "Prochain PBI :** 7.9 — La migration architecturale suit une séquence acyclique"
+        "Prochain PBI :** 7.11 — "
+        "Le domaine reste indépendant des technologies"
         in backlog
     )
-    assert "Progression globale :** 41/202 PBI réalisés (20,3 %) ; 161 restants" in backlog
-    assert "Répartition actuelle des 161 PBI non réalisés" in governance
+    assert "Progression globale :** 42/202 PBI réalisés (20,79 %) ; 160 restants" in backlog
+    assert "Répartition actuelle des 160 PBI non réalisés" in governance
     assert (
         "Dernière Feature terminée :** Feature 2 — "
         "Garantir la fiabilité du cœur statistique"
