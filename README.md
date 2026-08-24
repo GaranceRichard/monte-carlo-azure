@@ -134,7 +134,8 @@ une connexion Azure DevOps réelle.
   cibles des trois runtimes. Son contrôle refuse les défauts d’autorité ainsi que toute dépendance du domaine
   vers un adaptateur, un package externe ou une ressource technique, avec fichier et ligne, y compris dans
   le snapshot staged isolé utilisé par les hooks ; une source produit illisible ou non analysable échoue de
-  façon fermée avec un diagnostic localisé.
+  façon fermée avec un diagnostic localisé. Le rendu du chemin suit le séparateur natif de la plateforme et
+  sa portabilité reste couverte explicitement pour les représentations POSIX et Windows.
 - **Migration ordonnée sans lot bloquant.** La [séquence architecturale](docs/architecture-migration-sequence.md)
   fixe un graphe acyclique de publications autonomes, calcule les vagues de disponibilité les plus précoces
   et protège automatiquement les précédences. Après sa publication, six outcomes indépendants peuvent

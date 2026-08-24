@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import json
 from collections.abc import Callable
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
 import pytest
@@ -50,6 +50,10 @@ def _assert_actionable(diagnostics: list[Any], code: str, location: str) -> None
     matches = [item for item in diagnostics if item.code == code and item.location == location]
     assert matches, [item.render(DEFAULT_AUTHORITY) for item in diagnostics]
     assert all(item.message and item.hint for item in matches)
+
+
+def _format_located_diagnostic(diagnostic: LocatedDiagnostic, root: Any) -> str:
+    return diagnostic.render(root)
 
 
 def test_committed_authority_parses_and_exposes_the_normative_matrix() -> None:
@@ -270,7 +274,21 @@ def test_repository_inspection_uses_authority_roots_without_git(
     )
     assert check_authority([]) == 1
     rendered = capsys.readouterr().err
-    assert "frontend\\src\\domain\\delivery\\event.ts:line 3" in rendered
+    expected_path = ROOT.joinpath("frontend", "src", "domain", "delivery", "event.ts")
+    assert f"{expected_path}:line 3: [DEP-DOMAIN-TECHNOLOGY]" in rendered
+
+    for repository_root in (
+        PurePosixPath("/repository"),
+        PureWindowsPath("C:/repository"),
+    ):
+        expected_path = repository_root.joinpath(
+            "frontend", "src", "domain", "delivery", "event.ts"
+        )
+        portable_rendered = _format_located_diagnostic(violation, repository_root)
+        assert portable_rendered == (
+            f"{expected_path}:line 3: [DEP-DOMAIN-TECHNOLOGY] interdit "
+            "Correction: corriger"
+        )
 
     monkeypatch.setattr(
         domain_control,
