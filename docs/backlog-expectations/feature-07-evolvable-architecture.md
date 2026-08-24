@@ -495,7 +495,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Rendre le cycle de persistance backend testable et rejouable.
 - **Frontière principale :** Temps backend.
 - **Famille d’invariants :** Déterminisme de l’horloge backend.
-- **Preuve principale :** Tests avec horloge contrôlée et adaptateur UTC.
+- **Preuve principale :** [Tests du port, de la composition UTC](../../tests/test_backend_clock.py) et du [cycle de persistance avec horloge contrôlée](../../tests/test_simulation_store.py).
 - **Éléments de réalisation inclus :** Port d’horloge ; adaptateur principal ; migration des usages cohésifs ; retrait des accès directs ; documentation.
 - **Hors périmètre :** Horloge frontend et politique de rétention des données.
 - **Surface prévisionnelle :** 6 fichiers de production ; 10 fichiers versionnés

@@ -7,6 +7,10 @@ Cette carte décrit l'état exécuté du backend au 13 août 2026, sur le commit
 réellement construits, puis attribue les calculs, sorties et états persistés aux modules qui les portent.
 Elle ne prescrit ni architecture cible, ni extraction de port, ni correction.
 
+Depuis le PBI 7.32, la seule évolution de ce périmètre factuel est explicitée ci-dessous : les timestamps de
+persistance passent par `BackendClock`, son adaptateur `SystemUtcClock` et la composition API, sans modifier
+le cycle MongoDB ni sa politique de rétention.
+
 Les conclusions ont été recoupées contre :
 
 - les décorateurs de routes et l'enregistrement FastAPI dans `backend/api.py`,
@@ -24,7 +28,7 @@ le moteur Python ; leur orchestration qualité relève du PBI 7.3.
 
 | Entrée | Composition et propriétaire exécuté | Effet ou sortie |
 | --- | --- | --- |
-| Image conteneur | `Dockerfile` lance `uvicorn backend.api:app` avec deux workers ; chaque processus importe sa propre configuration, son limiteur et son `SimulationStore` globaux. | API sur le port 8000 et frontend compilé copié sous `frontend/dist`. |
+| Image conteneur | `Dockerfile` lance `uvicorn backend.api:app` avec deux workers ; chaque processus importe sa propre configuration, son limiteur et son `SimulationStore` globaux. Le point de composition actuel dans `api_routes_simulate` injecte `SystemUtcClock` au store. | API sur le port 8000 et frontend compilé copié sous `frontend/dist`. |
 | Lanceur local | `run_app.py:main` importe `backend.api:app`, vérifie le port, ouvre éventuellement le navigateur et lance Uvicorn avec un worker. | Même application FastAPI, avec logs d'accès désactivés par le lanceur. |
 | Cycle FastAPI | `backend.api:lifespan` appelle `simulation_store.connect()`, `limiter.check_storage()`, puis `simulation_store.close()` à l'arrêt. | Connexion et index Mongo initialisés si Mongo est activé ; disponibilité initiale du stockage de rate limit observée. |
 | `GET /health` | `backend.api:health` ne consulte aucun service. | `200 {"status":"ok"}`. |
@@ -78,7 +82,7 @@ JSON + headers + cookie
 | B-10 | Agrégats | `SimulationResult.__post_init__` vérifie types, effectifs, mode, masse d'histogramme et présence de complétion ; `risk_score` est dérivé des percentiles par `SimulationPercentiles`. | Résultat de domaine cohérent ou erreur. |
 | B-11 | Résultat | `simulation_mappers.result_to_response` convertit les Value Objects en primitives ; `SimulateResponse` revalide forme, effectifs et Risk Score ; FastAPI omet les valeurs `None`. | JSON HTTP public. |
 | B-12 | Cookie + commande + résultat | Après construction de la réponse, la route lit le cookie configuré. Si sa valeur est non vide et Mongo activé, elle ajoute `_persist_simulation` aux `BackgroundTasks`. | Réponse non bloquée par l'écriture ; aucune écriture sans cookie ou Mongo. |
-| B-13 | Tâche de fond | `_persist_simulation` appelle le store et absorbe toute erreur dans un log `warning`. | Document sauvegardé, ou résultat déjà calculé rendu sans entrée d'historique. |
+| B-13 | Tâche de fond | `_persist_simulation` appelle le store et absorbe toute erreur dans un log `warning`. Le store lit une fois son `BackendClock` injecté et réutilise l’instant sur la tentative Mongo éventuelle. | Document sauvegardé avec `created_at` et `last_seen` identiques, ou résultat déjà calculé rendu sans entrée d'historique. |
 
 Le timeout borne l'attente HTTP, pas le calcul métier lui-même : la fonction synchrone a déjà été confiée au
 threadpool. Le chemin de timeout ne construit donc ni réponse de résultat ni tâche de persistance, même si le
@@ -97,6 +101,7 @@ travail du thread ne dispose pas ici d'un mécanisme d'annulation coopérative.
 | Sortie moteur items | `numpy.ndarray` | Sommes par simulation pour l'horizon demandé. | Agrégation du service. |
 | Document Mongo | Dictionnaire dans `simulation_store._simulation_document` | Conversion directe de `SimulationCommand` et `SimulationResult`; les échantillons bruts et le contexte Azure DevOps ne sont pas persistés. | Collection Mongo configurée. |
 | Ligne d'historique | Dictionnaire projeté par `SimulationStore.list_recent` | Exclusion de `_id`, `mc_client_id` et champs sensibles ; dates converties en ISO UTC. | `persistence_row_to_history_item`, puis `SimulationHistoryItem`. |
+| Instant de persistance | Port `backend/ports/clock:BackendClock` | `SystemUtcClock` lit `datetime.now(timezone.utc)` uniquement dans l’adaptateur système ; `DeterministicBackendClock` fournit l’instant contrôlé des tests. | `SimulationStore.save_simulation`. |
 
 Les limites numériques sont centralisées dans `backend/simulation_limits.py`. Le Risk Score est calculé dans
 `SimulationPercentiles.risk_score` en utilisant `backend/risk_score.py`. La catégorisation de fiabilité est
@@ -132,17 +137,19 @@ requêtes jusqu'au rétablissement. Aucun cache backend de résultat de simulati
 `SimulationStore` possède le client, la collection, le verrou de connexion, les index, la reconnexion et les
 conversions documentaires. Son cycle réel est :
 
-1. création globale depuis `ApiConfig` à l'import de `api_routes_simulate` ;
+1. composition de `SystemUtcClock`, puis création globale du store depuis `ApiConfig` et le port horloge à
+   l'import de `api_routes_simulate` ;
 2. connexion au lifespan si `APP_MONGO_URL` n'est pas vide ;
 3. création d'un index `(mc_client_id, created_at desc)` et d'un TTL de 30 jours sur `last_seen` ;
-4. pour une sauvegarde, insertion d'un document puis mise à jour de `last_seen` sur tous les documents du
-   même client ;
+4. pour une sauvegarde, lecture unique de l’horloge injectée, insertion d'un document puis mise à jour de
+   `last_seen` sur tous les documents du même client avec ce même instant ;
 5. pour une lecture, filtre sur `mc_client_id`, tri décroissant par `created_at`, projection minimisée et
    limite configurable (10 par défaut) ;
 6. sur `PyMongoError`, remise à zéro du client et une seconde tentative de l'opération complète ;
 7. fermeture du client à l'arrêt du processus.
 
-Le TTL est donc glissant au niveau du client : chaque sauvegarde réussie rafraîchit tous ses documents. La
+Le TTL est donc glissant au niveau du client : chaque sauvegarde réussie rafraîchit tous ses documents. Le
+PBI 7.32 ne modifie ni sa durée de 30 jours ni la politique de purge. La
 purge opératoire applique également une suppression au niveau du client. Le volume Docker
 `montecarlo-mongo-data` rend les documents persistants au-delà du cycle du conteneur.
 

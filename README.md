@@ -89,6 +89,9 @@ une connexion Azure DevOps réelle.
 - **Fiabilité explicable.** La dispersion, les quartiles et la tendance du throughput suivent les mêmes
   formules dans les deux moteurs ; les seuils utilisent les métriques arrondies avant d’attribuer les labels
   `non fiable`, `fragile`, `incertain` ou `fiable`.
+- **Temps backend contrôlable.** Les timestamps `created_at` et `last_seen` proviennent du port
+  `BackendClock`. L’API compose l’adaptateur UTC système, tandis que les tests injectent une horloge fixe et
+  prouvent qu’une sauvegarde conserve le même instant lors d’une reconnexion MongoDB.
 - **Rejeu exact vérifié.** À entrée normalisée, seed, version de contrat et configuration identiques, les
   moteurs Python et TypeScript produisent exactement la même réponse canonique. Le résultat backend reste
   indépendant du découpage en lots pour les configurations couvertes par la

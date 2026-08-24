@@ -662,6 +662,14 @@ Le backend persiste aussi la simulation dans MongoDB (collection `simulations`) 
 - `include_zero_weeks`
 - `seed`
 
+Le store reçoit le port sortant `BackendClock` défini sous `backend/ports/clock/`; il ne lit plus directement
+le temps système. Le point de composition actuellement exécuté dans `api_routes_simulate` construit
+`SystemUtcClock` depuis `backend/adapters/system/clock/` et l’injecte dans `SimulationStore`; son déplacement
+vers la composition backend cible reste une migration dédiée ultérieure. Une sauvegarde acquiert exactement un
+instant UTC avant son opération MongoDB et réutilise ce même instant pour `created_at`, `last_seen` et une
+éventuelle tentative après reconnexion. Les tests substituent `DeterministicBackendClock`; la politique TTL
+et la purge restent inchangées.
+
 ### Historique client `GET /simulations/history`
 
 - le cookie `IDMontecarlo` est lu côté backend ;

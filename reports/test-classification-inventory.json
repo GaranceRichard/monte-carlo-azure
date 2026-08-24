@@ -2254,6 +2254,30 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_backend_clock.py::test_backend_api_composes_the_real_utc_clock",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backend_clock.py",
+    "selector": "test_backend_api_composes_the_real_utc_clock",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_backend_clock.py::test_system_utc_clock_reads_datetime_in_utc",
+    "framework": "pytest",
+    "sourcePath": "tests/test_backend_clock.py",
+    "selector": "test_system_utc_clock_reads_datetime_in_utc",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_backlog_atomicity.py::test_cli_reports_success_violations_and_unreadable_input",
     "framework": "pytest",
     "sourcePath": "tests/test_backlog_atomicity.py",

@@ -9,6 +9,7 @@ from pymongo.collection import Collection
 from pymongo.errors import OperationFailure, PyMongoError
 
 from .api_config import ApiConfig
+from .ports.clock import BackendClock
 from .simulation_models import SimulationCommand, SimulationResult
 
 SENSITIVE_HISTORY_FIELDS = {
@@ -78,7 +79,7 @@ class SimulationStore:
     _LAST_SEEN_INDEX_NAME = "last_seen_1"
     _LAST_SEEN_TTL_SECONDS = 30 * 24 * 3600
 
-    def __init__(self, cfg: ApiConfig) -> None:
+    def __init__(self, cfg: ApiConfig, clock: BackendClock) -> None:
         self._mongo_url = cfg.mongo_url
         self._mongo_db = cfg.mongo_db
         self._collection_name = cfg.mongo_collection_simulations
@@ -89,6 +90,7 @@ class SimulationStore:
         self._mongo_connect_timeout_ms = cfg.mongo_connect_timeout_ms
         self._mongo_socket_timeout_ms = cfg.mongo_socket_timeout_ms
         self._mongo_max_idle_time_ms = cfg.mongo_max_idle_time_ms
+        self._clock = clock
         self._client: MongoClient[Any] | None = None
         self._collection: Collection[Any] | None = None
         self._lock = threading.Lock()
@@ -199,9 +201,10 @@ class SimulationStore:
         if not self.enabled or not mc_client_id:
             return
 
+        now = self._clock.now()
+
         def _op() -> None:
             coll = self._ensure_collection()
-            now = datetime.now(timezone.utc)
             doc = _simulation_document(mc_client_id, command, result, now)
             coll.insert_one(doc)
             coll.update_many({"mc_client_id": mc_client_id}, {"$set": {"last_seen": now}})

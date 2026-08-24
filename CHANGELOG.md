@@ -2,6 +2,17 @@
 
 ## Recent
 
+### Temps backend injectable et déterministe — PBI 7.32
+
+- ajout du port sortant `BackendClock`, de l’adaptateur réel `SystemUtcClock` et de leur composition API dans
+  les frontières physiques prévues par l’architecture cible ;
+- injection obligatoire de l’horloge dans `SimulationStore`, avec une seule lecture par sauvegarde et le même
+  instant pour `created_at`, `last_seen` et une éventuelle reconnexion MongoDB ;
+- retrait de l’accès direct au temps système du cycle de persistance et ajout d’un double déterministe, de
+  tests d’horodatage exact, de non-consommation et de composition UTC réelle ;
+- horloge frontend, semaine/fuseau métier, TTL, purge, politiques de rétention et garanties statistiques
+  laissés inchangés.
+
 ### Autorité des dépendances lisible et diagnostiquable — PBI 7.10
 
 - publication d’un manifeste JSON fermé et versionné projetant les décisions normatives 7.7/7.8, avec six

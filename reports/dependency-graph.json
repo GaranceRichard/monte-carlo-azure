@@ -12,13 +12,13 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 255,
-    "importEdges": 1346,
+    "sourceModules": 257,
+    "importEdges": 1353,
     "entrypoints": 85,
     "missingEntrypoints": 5,
     "cycles": 2,
     "runtimeCycles": 0,
-    "deepImports": 119,
+    "deepImports": 121,
     "apiBypasses": 2
   },
   "observed": {
@@ -739,6 +739,11 @@
         "language": "python"
       },
       {
+        "path": "backend/adapters/system/clock/__init__.py",
+        "area": "backend",
+        "language": "python"
+      },
+      {
         "path": "backend/api.py",
         "area": "backend",
         "language": "python"
@@ -780,6 +785,11 @@
       },
       {
         "path": "backend/numpy_sample_index_draw_port.py",
+        "area": "backend",
+        "language": "python"
+      },
+      {
+        "path": "backend/ports/clock/__init__.py",
         "area": "backend",
         "language": "python"
       },
@@ -9617,6 +9627,24 @@
         "resolution": "external"
       },
       {
+        "source": "backend/adapters/system/clock/__init__.py",
+        "target": "external:python:__future__",
+        "line": 1,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "backend/adapters/system/clock/__init__.py",
+        "target": "external:python:datetime",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "datetime",
+        "resolution": "external"
+      },
+      {
         "source": "backend/api.py",
         "target": "backend/api_config.py",
         "line": 9,
@@ -9780,8 +9808,17 @@
       },
       {
         "source": "backend/api_routes_simulate.py",
-        "target": "backend/api_config.py",
+        "target": "backend/adapters/system/clock/__init__.py",
         "line": 11,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.adapters.system.clock.SystemUtcClock",
+        "resolution": "internal"
+      },
+      {
+        "source": "backend/api_routes_simulate.py",
+        "target": "backend/api_config.py",
+        "line": 12,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "backend.api_config.get_api_config",
@@ -9790,7 +9827,7 @@
       {
         "source": "backend/api_routes_simulate.py",
         "target": "backend/api_models.py",
-        "line": 12,
+        "line": 13,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "backend.api_models.SimulationHistoryItem",
@@ -9799,7 +9836,7 @@
       {
         "source": "backend/api_routes_simulate.py",
         "target": "backend/simulation_mappers.py",
-        "line": 17,
+        "line": 18,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "backend.simulation_mappers.result_to_response",
@@ -9808,7 +9845,7 @@
       {
         "source": "backend/api_routes_simulate.py",
         "target": "backend/simulation_models.py",
-        "line": 22,
+        "line": 23,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "backend.simulation_models.SimulationResult",
@@ -9817,7 +9854,7 @@
       {
         "source": "backend/api_routes_simulate.py",
         "target": "backend/simulation_seed.py",
-        "line": 23,
+        "line": 24,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "backend.simulation_seed.resolve_simulation_seed",
@@ -9826,7 +9863,7 @@
       {
         "source": "backend/api_routes_simulate.py",
         "target": "backend/simulation_service.py",
-        "line": 24,
+        "line": 25,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "backend.simulation_service.run_simulation",
@@ -9835,7 +9872,7 @@
       {
         "source": "backend/api_routes_simulate.py",
         "target": "backend/simulation_store.py",
-        "line": 25,
+        "line": 26,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "backend.simulation_store.SimulationStore",
@@ -9844,7 +9881,7 @@
       {
         "source": "backend/api_routes_simulate.py",
         "target": "backend/simulation_value_objects.py",
-        "line": 26,
+        "line": 27,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "backend.simulation_value_objects.StatisticalValueError",
@@ -10082,6 +10119,33 @@
         "kind": "python-import",
         "phase": "runtime",
         "specifier": "numpy",
+        "resolution": "external"
+      },
+      {
+        "source": "backend/ports/clock/__init__.py",
+        "target": "external:python:__future__",
+        "line": 1,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "backend/ports/clock/__init__.py",
+        "target": "external:python:datetime",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "datetime",
+        "resolution": "external"
+      },
+      {
+        "source": "backend/ports/clock/__init__.py",
+        "target": "external:python:typing",
+        "line": 4,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "typing",
         "resolution": "external"
       },
       {
@@ -10329,8 +10393,17 @@
       },
       {
         "source": "backend/simulation_store.py",
-        "target": "backend/simulation_models.py",
+        "target": "backend/ports/clock/__init__.py",
         "line": 12,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.ports.clock.BackendClock",
+        "resolution": "internal"
+      },
+      {
+        "source": "backend/simulation_store.py",
+        "target": "backend/simulation_models.py",
+        "line": 13,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "backend.simulation_models.SimulationResult",
@@ -14108,7 +14181,7 @@
         "sourceArea": "backend",
         "targetArea": "backend",
         "phase": "runtime",
-        "count": 37
+        "count": 39
       },
       {
         "sourceArea": "frontend",
@@ -14150,6 +14223,26 @@
   },
   "interpretation": {
     "deepImports": [
+      {
+        "source": "backend/api_routes_simulate.py",
+        "target": "backend/adapters/system/clock/__init__.py",
+        "line": 11,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.adapters.system.clock.SystemUtcClock",
+        "resolution": "internal",
+        "crossedBoundary": "backend/adapters"
+      },
+      {
+        "source": "backend/simulation_store.py",
+        "target": "backend/ports/clock/__init__.py",
+        "line": 12,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.ports.clock.BackendClock",
+        "resolution": "internal",
+        "crossedBoundary": "backend/ports"
+      },
       {
         "source": "frontend/src/App.tsx",
         "target": "frontend/src/components/AppHeader.tsx",

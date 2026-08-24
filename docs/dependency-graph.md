@@ -15,13 +15,13 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 255 | 1346 | 85 | 5 | 2 | 0 | 119 | 2 |
+| 257 | 1353 | 85 | 5 | 2 | 0 | 121 | 2 |
 
 ### Directions observées
 
 | Source | Cible | Phase | Arêtes |
 | --- | --- | --- | --- |
-| backend | backend | runtime | 37 |
+| backend | backend | runtime | 39 |
 | frontend | frontend | compile | 85 |
 | frontend | frontend | runtime | 146 |
 | launcher | backend | runtime | 1 |
@@ -158,6 +158,8 @@ Ces listes signalent des surfaces à examiner ; elles ne déclarent ni dépendan
 
 | Source | Cible | Ligne | Phase | Frontière traversée |
 | --- | --- | --- | --- | --- |
+| backend/api_routes_simulate.py | backend/adapters/system/clock/__init__.py | 11 | runtime | backend/adapters |
+| backend/simulation_store.py | backend/ports/clock/__init__.py | 12 | runtime | backend/ports |
 | frontend/src/App.tsx | frontend/src/components/AppHeader.tsx | 2 | runtime | frontend/src/components |
 | frontend/src/App.tsx | frontend/src/hooks/useOnboarding.ts | 4 | runtime | frontend/src/hooks |
 | frontend/src/App.tsx | frontend/src/hooks/useSimulation.ts | 5 | runtime | frontend/src/hooks |

@@ -23,6 +23,9 @@ from backend.simulation_value_objects import (
     SimulationSeed,
     ThroughputReliability,
 )
+from tests.deterministic_backend_clock import DeterministicBackendClock
+
+TEST_NOW = datetime(2026, 8, 23, 14, 30, 45, 123456, tzinfo=timezone.utc)
 
 
 class _FakeAdmin:
@@ -129,6 +132,10 @@ def _cfg(mongo_url: str) -> ApiConfig:
     )
 
 
+def _store(mongo_url: str) -> SimulationStore:
+    return SimulationStore(_cfg(mongo_url), DeterministicBackendClock(TEST_NOW))
+
+
 def _req_resp():
     req = SimulationCommand.create(
         throughput_samples=(1, 2, 3, 4, 5, 6),
@@ -168,17 +175,17 @@ def _req_resp():
 
 
 def test_enabled_false_when_mongo_url_empty():
-    store = SimulationStore(_cfg(""))
+    store = _store("")
     assert store.enabled is False
 
 
 def test_ping_returns_false_when_disabled():
-    store = SimulationStore(_cfg(""))
+    store = _store("")
     assert store.ping() is False
 
 
 def test_connect_returns_early_when_disabled(monkeypatch):
-    store = SimulationStore(_cfg(""))
+    store = _store("")
     build_calls = []
     monkeypatch.setattr(store, "_build_client", lambda: build_calls.append("called"))
 
@@ -188,7 +195,7 @@ def test_connect_returns_early_when_disabled(monkeypatch):
 
 
 def test_ping_calls_admin_ping_when_enabled(monkeypatch):
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     fake_coll = _FakeCollection()
     fake_client = _FakeMongoClient(fake_coll)
     monkeypatch.setattr("backend.simulation_store.MongoClient", lambda *_a, **_kw: fake_client)
@@ -199,7 +206,7 @@ def test_ping_calls_admin_ping_when_enabled(monkeypatch):
 
 
 def test_connect_initializes_indexes_and_pool(monkeypatch):
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     fake_coll = _FakeCollection()
     fake_client = _FakeMongoClient(fake_coll)
     mongo_calls = []
@@ -220,7 +227,7 @@ def test_connect_initializes_indexes_and_pool(monkeypatch):
 
 
 def test_connect_returns_early_when_collection_is_already_initialized(monkeypatch):
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     fake_coll = _FakeCollection()
     store._collection = fake_coll
     build_calls = []
@@ -232,7 +239,7 @@ def test_connect_returns_early_when_collection_is_already_initialized(monkeypatc
 
 
 def test_connect_returns_early_when_collection_is_initialized_inside_lock(monkeypatch):
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     fake_coll = _FakeCollection()
 
     class _LockThatInitializes:
@@ -253,7 +260,7 @@ def test_connect_returns_early_when_collection_is_initialized_inside_lock(monkey
 
 
 def test_connect_repairs_conflicting_last_seen_ttl_index(monkeypatch):
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     fake_coll = _FakeCollection()
     fake_coll.raise_on_ttl_create = True
     fake_client = _FakeMongoClient(fake_coll)
@@ -267,7 +274,7 @@ def test_connect_repairs_conflicting_last_seen_ttl_index(monkeypatch):
 
 
 def test_connect_closes_client_and_reraises_when_ping_fails(monkeypatch):
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     fake_coll = _FakeCollection()
     fake_client = _FakeMongoClient(fake_coll)
 
@@ -286,7 +293,7 @@ def test_connect_closes_client_and_reraises_when_ping_fails(monkeypatch):
 
 
 def test_ensure_indexes_reraises_non_conflicting_operation_failure():
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     fake_coll = _FakeCollection()
 
     def _raise_unexpected(spec, **kwargs):
@@ -312,22 +319,26 @@ def test_save_simulation_reconnects_once_after_pymongo_error(monkeypatch):
 
     monkeypatch.setattr("backend.simulation_store.MongoClient", _mongo_factory)
 
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    clock = DeterministicBackendClock(TEST_NOW)
+    store = SimulationStore(_cfg("mongodb://localhost:27017"), clock)
     store.save_simulation("c1", req, resp)
 
     assert second_coll.inserted[0]["mc_client_id"] == "c1"
+    assert second_coll.inserted[0]["created_at"] == TEST_NOW
+    assert second_coll.updated[0][1] == {"$set": {"last_seen": TEST_NOW}}
+    assert clock.calls == 1
 
 
 def test_save_simulation_noop_when_disabled_or_empty_client():
     req, resp = _req_resp()
-    store = SimulationStore(_cfg(""))
+    clock = DeterministicBackendClock(TEST_NOW)
+    store = SimulationStore(_cfg(""), clock)
     store.save_simulation("", req, resp)
-    # no exception == noop
-    assert True
+    assert clock.calls == 0
 
 
 def test_close_resets_client_and_collection():
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     fake_client = _FakeMongoClient(_FakeCollection())
     store._client = fake_client
     store._collection = _FakeCollection()
@@ -341,7 +352,7 @@ def test_close_resets_client_and_collection():
 
 def test_save_simulation_inserts_and_updates(monkeypatch):
     req, resp = _req_resp()
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     fake_coll = _FakeCollection()
     fake_client = _FakeMongoClient(fake_coll)
     monkeypatch.setattr("backend.simulation_store.MongoClient", lambda *_a, **_kw: fake_client)
@@ -357,12 +368,15 @@ def test_save_simulation_inserts_and_updates(monkeypatch):
     assert fake_coll.inserted[0]["distribution"] == [{"x": 8, "count": 2000}]
     assert fake_coll.inserted[0]["risk_score"] == 0.4
     assert fake_coll.inserted[0]["backlog_size"] == 20
+    assert fake_coll.inserted[0]["created_at"] == TEST_NOW
+    assert fake_coll.inserted[0]["last_seen"] == TEST_NOW
     assert "target_weeks" not in fake_coll.inserted[0]
     assert "completion_summary" in fake_coll.inserted[0]
     assert "selected_org" not in fake_coll.inserted[0]
     assert "client_context" not in fake_coll.inserted[0]
     assert len(fake_coll.updated) == 1
     assert fake_coll.updated[0][0] == {"mc_client_id": "c1"}
+    assert fake_coll.updated[0][1] == {"$set": {"last_seen": TEST_NOW}}
 
 
 def test_save_items_omits_unavailable_mode_and_completion_fields(monkeypatch):
@@ -396,7 +410,7 @@ def test_save_items_omits_unavailable_mode_and_completion_fields(monkeypatch):
         ),
         seed=SimulationSeed(7),
     )
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     fake_coll = _FakeCollection()
     fake_client = _FakeMongoClient(fake_coll)
     monkeypatch.setattr(
@@ -414,14 +428,14 @@ def test_save_items_omits_unavailable_mode_and_completion_fields(monkeypatch):
 
 
 def test_list_recent_returns_empty_when_disabled_or_empty_client():
-    store_disabled = SimulationStore(_cfg(""))
+    store_disabled = _store("")
     assert store_disabled.list_recent("c1") == []
-    store_enabled = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store_enabled = _store("mongodb://localhost:27017")
     assert store_enabled.list_recent("") == []
 
 
 def test_ensure_collection_raises_when_disabled():
-    store = SimulationStore(_cfg(""))
+    store = _store("")
 
     with pytest.raises(RuntimeError, match="Mongo persistence is disabled"):
         store._ensure_collection()
@@ -448,7 +462,7 @@ def test_list_recent_converts_datetimes_to_iso(monkeypatch):
     fake_client = _FakeMongoClient(fake_coll)
     monkeypatch.setattr("backend.simulation_store.MongoClient", lambda *_a, **_kw: fake_client)
 
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     out = store.list_recent("c1")
 
     assert len(out) == 2
@@ -463,7 +477,7 @@ def test_list_recent_converts_datetimes_to_iso(monkeypatch):
 
 
 def test_run_with_reconnect_reraises_after_second_pymongo_error():
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     calls = []
 
     def _always_fail():
@@ -477,7 +491,7 @@ def test_run_with_reconnect_reraises_after_second_pymongo_error():
 
 
 def test_run_with_reconnect_raises_runtime_error_on_unexpected_empty_retry_loop(monkeypatch):
-    store = SimulationStore(_cfg("mongodb://localhost:27017"))
+    store = _store("mongodb://localhost:27017")
     monkeypatch.setattr(simulation_store_module, "range", lambda _count: [], raising=False)
 
     with pytest.raises(RuntimeError, match="unexpectedly"):
@@ -507,7 +521,7 @@ def test_save_and_list_recent_with_real_mongo():
         mongo_socket_timeout_ms=5000,
         mongo_max_idle_time_ms=60000,
     )
-    store = SimulationStore(cfg)
+    store = SimulationStore(cfg, DeterministicBackendClock(TEST_NOW))
     req, resp = _req_resp()
     client = MongoClient(mongo_url, serverSelectionTimeoutMS=1200)
     mongo_available = False

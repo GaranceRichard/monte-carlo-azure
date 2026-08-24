@@ -8,6 +8,7 @@ from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from starlette.concurrency import run_in_threadpool
 
+from .adapters.system.clock import SystemUtcClock
 from .api_config import get_api_config
 from .api_models import (
     SimulateRequest,
@@ -27,7 +28,7 @@ from .simulation_value_objects import StatisticalValueError
 
 router = APIRouter()
 cfg = get_api_config()
-simulation_store = SimulationStore(cfg)
+simulation_store = SimulationStore(cfg, SystemUtcClock())
 logger = logging.getLogger(__name__)
 RATE_LIMIT_STORAGE_WARNING_INTERVAL_SECONDS = 5.0
 
