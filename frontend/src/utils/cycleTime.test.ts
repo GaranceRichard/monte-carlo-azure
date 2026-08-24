@@ -1,76 +1,46 @@
 import { describe, expect, it } from "vitest";
+import {
+  createDeliveryEvent,
+  type DeliveryEvent,
+  type DeliveryEventKind,
+} from "../domain/delivery";
 import { buildCycleTimeTrendData, calculateCycleTimeData, summarizeCycleTime } from "./cycleTime";
 
+function event(
+  itemId: string,
+  kind: DeliveryEventKind,
+  occurredAt: string,
+): DeliveryEvent {
+  return createDeliveryEvent({ itemId, kind, occurredAt });
+}
+
 describe("calculateCycleTimeData", () => {
-  it("returns an empty array when no done state is selected", () => {
-    expect(
-      calculateCycleTimeData(
-        [
-          {
-            revisions: [
-              { changedDate: "2026-01-06T09:00:00Z", state: "New" },
-              { changedDate: "2026-01-08T09:00:00Z", state: "Active" },
-              { changedDate: "2026-01-15T09:00:00Z", state: "Done" },
-            ],
-          },
-        ],
-        [],
-      ),
-    ).toEqual([]);
+  it("returns an empty array when no lifecycle event is available", () => {
+    expect(calculateCycleTimeData([])).toEqual([]);
+    expect(calculateCycleTimeData([
+      event("1", "item_delivered", "2026-01-15T09:00:00Z"),
+    ])).toEqual([]);
   });
 
   it("calculates nominal cycle time points and aggregates identical coordinates", () => {
     const result = calculateCycleTimeData(
       [
-        {
-          revisions: [
-            { changedDate: "2026-01-06T09:00:00Z", state: "New" },
-            { changedDate: "2026-01-08T09:00:00Z", state: "Active" },
-            { changedDate: "2026-01-15T09:00:00Z", state: "Done" },
-          ],
-        },
-        {
-          revisions: [
-            { changedDate: "2026-01-07T09:00:00Z", state: "New" },
-            { changedDate: "2026-01-09T09:00:00Z", state: "Committed" },
-            { changedDate: "2026-01-16T09:00:00Z", state: "Done" },
-          ],
-        },
+        event("1", "work_started", "2026-01-08T09:00:00Z"),
+        event("1", "work_completed", "2026-01-15T09:00:00Z"),
+        event("2", "work_started", "2026-01-09T09:00:00Z"),
+        event("2", "work_completed", "2026-01-16T09:00:00Z"),
       ],
-      ["Done"],
     );
 
     expect(result).toEqual([{ week: "2026-01-12", cycleTimeDays: 7, count: 2 }]);
   });
 
-  it("excludes items that never left new", () => {
+  it("excludes items with an incomplete lifecycle", () => {
     const result = calculateCycleTimeData(
       [
-        {
-          revisions: [
-            { changedDate: "2026-01-06T09:00:00Z", state: "New" },
-            { changedDate: "2026-01-15T09:00:00Z", state: "New" },
-          ],
-        },
+        event("1", "work_started", "2026-01-08T09:00:00Z"),
+        event("2", "work_completed", "2026-01-16T09:00:00Z"),
       ],
-      ["Done"],
-    );
-
-    expect(result).toEqual([]);
-  });
-
-  it("excludes items without a closing date in selected done states", () => {
-    const result = calculateCycleTimeData(
-      [
-        {
-          revisions: [
-            { changedDate: "2026-01-06T09:00:00Z", state: "New" },
-            { changedDate: "2026-01-08T09:00:00Z", state: "Active" },
-            { changedDate: "2026-01-15T09:00:00Z", state: "Resolved" },
-          ],
-        },
-      ],
-      ["Done"],
     );
 
     expect(result).toEqual([]);
@@ -79,22 +49,11 @@ describe("calculateCycleTimeData", () => {
   it("sorts points by week then by cycle time within the same week", () => {
     const result = calculateCycleTimeData(
       [
-        {
-          revisions: [
-            { changedDate: "2026-01-05T09:00:00Z", state: "New" },
-            { changedDate: "2026-01-09T09:00:00Z", state: "Active" },
-            { changedDate: "2026-01-17T09:00:00Z", state: "Done" },
-          ],
-        },
-        {
-          revisions: [
-            { changedDate: "2026-01-05T09:00:00Z", state: "New" },
-            { changedDate: "2026-01-06T09:00:00Z", state: "Active" },
-            { changedDate: "2026-01-17T09:00:00Z", state: "Done" },
-          ],
-        },
+        event("1", "work_started", "2026-01-09T09:00:00Z"),
+        event("1", "work_completed", "2026-01-17T09:00:00Z"),
+        event("2", "work_started", "2026-01-06T09:00:00Z"),
+        event("2", "work_completed", "2026-01-17T09:00:00Z"),
       ],
-      ["Done"],
     );
 
     expect(result).toEqual([
@@ -103,42 +62,28 @@ describe("calculateCycleTimeData", () => {
     ].sort((left, right) => left.cycleTimeDays - right.cycleTimeDays));
   });
 
-  it("sorts points across weeks and skips invalid revision dates", () => {
+  it("sorts points across weeks regardless of input order", () => {
     const result = calculateCycleTimeData(
       [
-        {
-          revisions: [
-            { changedDate: "2026-01-10T09:00:00Z", state: "New" },
-            { changedDate: "2026-01-12T09:00:00Z", state: "Active" },
-            { changedDate: "invalid-date", state: "Done" },
-          ],
-        },
-        {
-          revisions: [
-            { changedDate: "2026-01-01T09:00:00Z", state: "New" },
-            { changedDate: "2026-01-03T09:00:00Z", state: "Active" },
-            { changedDate: "2026-01-12T09:00:00Z", state: "Done" },
-          ],
-        },
+        event("2", "work_completed", "2026-01-19T09:00:00Z"),
+        event("1", "work_completed", "2026-01-12T09:00:00Z"),
+        event("2", "work_started", "2026-01-17T09:00:00Z"),
+        event("1", "work_started", "2026-01-03T09:00:00Z"),
       ],
-      ["Done"],
     );
 
-    expect(result).toEqual([{ week: "2026-01-12", cycleTimeDays: 9, count: 1 }]);
+    expect(result).toEqual([
+      { week: "2026-01-12", cycleTimeDays: 9, count: 1 },
+      { week: "2026-01-19", cycleTimeDays: 2, count: 1 },
+    ]);
   });
 
-  it("ignores items whose done transition happens before activation", () => {
+  it("ignores items whose completion happens before activation", () => {
     const result = calculateCycleTimeData(
       [
-        {
-          revisions: [
-            { changedDate: "2026-01-10T09:00:00Z", state: "Done" },
-            { changedDate: "2026-01-12T09:00:00Z", state: "Done" },
-            { changedDate: "2026-01-15T09:00:00Z", state: "Active" },
-          ],
-        },
+        event("1", "work_completed", "2026-01-10T09:00:00Z"),
+        event("1", "work_started", "2026-01-15T09:00:00Z"),
       ],
-      ["Done"],
     );
 
     expect(result).toEqual([]);

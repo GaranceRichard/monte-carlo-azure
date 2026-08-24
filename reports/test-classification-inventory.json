@@ -1,9 +1,9 @@
 [
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2775:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2784:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: app demo mode [2775:3]",
+    "selector": "e2e istanbul coverage > coverage: app demo mode [2784:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -18,47 +18,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2829:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2838:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: app editable backspace and team validation [2829:3]",
-    "status": "classified",
-    "executionProfile": "main",
-    "nature": "e2e",
-    "purposes": [
-      "functional",
-      "accessibility",
-      "observability"
-    ],
-    "domains": [
-      "azure_devops",
-      "user_interface",
-      "quality_chain"
-    ]
-  },
-  {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app global org backspace [2760:3]",
-    "framework": "playwright",
-    "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: app global org backspace [2760:3]",
-    "status": "classified",
-    "executionProfile": "main",
-    "nature": "e2e",
-    "purposes": [
-      "functional",
-      "accessibility",
-      "observability"
-    ],
-    "domains": [
-      "user_interface",
-      "quality_chain"
-    ]
-  },
-  {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app project and team backspace [2801:3]",
-    "framework": "playwright",
-    "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: app project and team backspace [2801:3]",
+    "selector": "e2e istanbul coverage > coverage: app editable backspace and team validation [2838:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -74,10 +37,47 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches ado client direct [1077:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app global org backspace [2769:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches ado client direct [1077:3]",
+    "selector": "e2e istanbul coverage > coverage: app global org backspace [2769:3]",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "e2e",
+    "purposes": [
+      "functional",
+      "accessibility",
+      "observability"
+    ],
+    "domains": [
+      "user_interface",
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app project and team backspace [2810:3]",
+    "framework": "playwright",
+    "sourcePath": "frontend/tests/e2e/coverage.spec.js",
+    "selector": "e2e istanbul coverage > coverage: app project and team backspace [2810:3]",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "e2e",
+    "purposes": [
+      "functional",
+      "accessibility",
+      "observability"
+    ],
+    "domains": [
+      "azure_devops",
+      "user_interface",
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches ado client direct [1078:3]",
+    "framework": "playwright",
+    "sourcePath": "frontend/tests/e2e/coverage.spec.js",
+    "selector": "e2e istanbul coverage > coverage: branches ado client direct [1078:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -93,10 +93,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches ado platform [1029:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches ado platform [1030:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches ado platform [1029:3]",
+    "selector": "e2e istanbul coverage > coverage: branches ado platform [1030:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -113,10 +113,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches print and pdf direct [2388:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches print and pdf direct [2393:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches print and pdf direct [2388:3]",
+    "selector": "e2e istanbul coverage > coverage: branches print and pdf direct [2393:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -131,10 +131,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches team sort et simulation history [803:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches team sort et simulation history [804:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches team sort et simulation history [803:3]",
+    "selector": "e2e istanbul coverage > coverage: branches team sort et simulation history [804:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -152,10 +152,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolio direct [1625:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolio direct [1630:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches usePortfolio direct [1625:3]",
+    "selector": "e2e istanbul coverage > coverage: branches usePortfolio direct [1630:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -171,10 +171,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolioReport direct [1435:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolioReport direct [1436:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches usePortfolioReport direct [1435:3]",
+    "selector": "e2e istanbul coverage > coverage: branches usePortfolioReport direct [1436:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -191,10 +191,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: cycle time utility direct branches [1389:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: cycle time utility direct branches [1390:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: cycle time utility direct branches [1389:3]",
+    "selector": "e2e istanbul coverage > coverage: cycle time utility direct branches [1390:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -209,10 +209,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: entry and portfolio components direct [2074:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: entry and portfolio components direct [2079:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: entry and portfolio components direct [2074:3]",
+    "selector": "e2e istanbul coverage > coverage: entry and portfolio components direct [2079:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -248,10 +248,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: onboarding hook direct [1804:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: onboarding hook direct [1809:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: onboarding hook direct [1804:3]",
+    "selector": "e2e istanbul coverage > coverage: onboarding hook direct [1809:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -266,10 +266,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: org listee + stepper retour [763:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: org listee + stepper retour [764:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: org listee + stepper retour [763:3]",
+    "selector": "e2e istanbul coverage > coverage: org listee + stepper retour [764:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -284,10 +284,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3483:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3492:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3483:3]",
+    "selector": "e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3492:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -320,10 +320,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation context direct [3039:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation context direct [3048:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: simulation context direct [3039:3]",
+    "selector": "e2e istanbul coverage > coverage: simulation context direct [3048:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -338,10 +338,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation prefs direct [3362:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation prefs direct [3371:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: simulation prefs direct [3362:3]",
+    "selector": "e2e istanbul coverage > coverage: simulation prefs direct [3371:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -356,10 +356,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation utils direct [2868:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation utils direct [2877:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: simulation utils direct [2868:3]",
+    "selector": "e2e istanbul coverage > coverage: simulation utils direct [2877:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -374,10 +374,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: sla identite direct [2490:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: sla identite direct [2495:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: sla identite direct [2490:3]",
+    "selector": "e2e istanbul coverage > coverage: sla identite direct [2495:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -392,10 +392,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: useTeamOptions direct [3103:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: useTeamOptions direct [3112:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: useTeamOptions direct [3103:3]",
+    "selector": "e2e istanbul coverage > coverage: useTeamOptions direct [3112:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -13068,6 +13068,112 @@
     ]
   },
   {
+    "logicalCaseId": "vitest:frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts::Azure DevOps delivery event mappers > keeps only the start fact when no done state is selected [67:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts",
+    "selector": "Azure DevOps delivery event mappers > keeps only the start fact when no done state is selected [67:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts::Azure DevOps delivery event mappers > maps a closed work item DTO to the normalized delivered fact [8:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts",
+    "selector": "Azure DevOps delivery event mappers > maps a closed work item DTO to the normalized delivered fact [8:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts::Azure DevOps delivery event mappers > maps state revisions to one started and one completed business fact [44:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts",
+    "selector": "Azure DevOps delivery event mappers > maps state revisions to one started and one completed business fact [44:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts::Azure DevOps delivery event mappers > orders revisions by their normalized absolute instant [56:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts",
+    "selector": "Azure DevOps delivery event mappers > orders revisions by their normalized absolute instant [56:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts::Azure DevOps delivery event mappers > rejects an incomplete work item DTO without leaking it [40:4]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts",
+    "selector": "Azure DevOps delivery event mappers > rejects an incomplete work item DTO without leaking it [40:4]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts::Azure DevOps delivery event mappers > rejects invalid revision boundaries [80:4]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts",
+    "selector": "Azure DevOps delivery event mappers > rejects invalid revision boundaries [80:4]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts::Azure DevOps delivery event mappers > uses the resolved date when no closed date is present [22:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts",
+    "selector": "Azure DevOps delivery event mappers > uses the resolved date when no closed date is present [22:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "azure_devops"
+    ]
+  },
+  {
     "logicalCaseId": "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adapters/seededSampleIndexDrawPort.test.ts",
@@ -19479,6 +19585,74 @@
     ]
   },
   {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > creates immutable events [21:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/deliveryEvent.test.ts",
+    "selector": "DeliveryEvent > creates immutable events [21:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > normalizes an opaque item identity and an absolute instant [9:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/deliveryEvent.test.ts",
+    "selector": "DeliveryEvent > normalizes an opaque item identity and an absolute instant [9:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/deliveryEvent.test.ts",
+    "selector": "DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects an invalid item identity: %s [29:43]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/deliveryEvent.test.ts",
+    "selector": "DeliveryEvent > rejects an invalid item identity: %s [29:43]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects facts outside the delivery vocabulary [46:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/deliveryEvent.test.ts",
+    "selector": "DeliveryEvent > rejects facts outside the delivery vocabulary [46:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationHistogram.test.ts",
@@ -23312,10 +23486,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > calculates nominal cycle time points and aggregates identical coordinates [22:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > calculates nominal cycle time points and aggregates identical coordinates [25:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/cycleTime.test.ts",
-    "selector": "calculateCycleTimeData > calculates nominal cycle time points and aggregates identical coordinates [22:3]",
+    "selector": "calculateCycleTimeData > calculates nominal cycle time points and aggregates identical coordinates [25:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -23327,10 +23501,26 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > excludes items that never left new [46:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > excludes items with an incomplete lifecycle [38:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/cycleTime.test.ts",
-    "selector": "calculateCycleTimeData > excludes items that never left new [46:3]",
+    "selector": "calculateCycleTimeData > excludes items with an incomplete lifecycle [38:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "data"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > ignores items whose completion happens before activation [81:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/utils/cycleTime.test.ts",
+    "selector": "calculateCycleTimeData > ignores items whose completion happens before activation [81:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -23342,10 +23532,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > excludes items without a closing date in selected done states [62:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > returns an empty array when no lifecycle event is available [18:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/cycleTime.test.ts",
-    "selector": "calculateCycleTimeData > excludes items without a closing date in selected done states [62:3]",
+    "selector": "calculateCycleTimeData > returns an empty array when no lifecycle event is available [18:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -23357,10 +23547,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > ignores items whose done transition happens before activation [130:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > sorts points across weeks regardless of input order [65:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/cycleTime.test.ts",
-    "selector": "calculateCycleTimeData > ignores items whose done transition happens before activation [130:3]",
+    "selector": "calculateCycleTimeData > sorts points across weeks regardless of input order [65:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -23372,10 +23562,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > returns an empty array when no done state is selected [5:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > sorts points by week then by cycle time within the same week [49:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/cycleTime.test.ts",
-    "selector": "calculateCycleTimeData > returns an empty array when no done state is selected [5:3]",
+    "selector": "calculateCycleTimeData > sorts points by week then by cycle time within the same week [49:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -23387,10 +23577,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > sorts points across weeks and skips invalid revision dates [106:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > builds rolling averages and std-dev bands from aggregated data [98:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/cycleTime.test.ts",
-    "selector": "calculateCycleTimeData > sorts points across weeks and skips invalid revision dates [106:3]",
+    "selector": "cycle time chart helpers > builds rolling averages and std-dev bands from aggregated data [98:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -23402,10 +23592,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > sorts points by week then by cycle time within the same week [79:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > falls back to zeroed trend values when a week contains no usable item count [125:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/cycleTime.test.ts",
-    "selector": "calculateCycleTimeData > sorts points by week then by cycle time within the same week [79:3]",
+    "selector": "cycle time chart helpers > falls back to zeroed trend values when a week contains no usable item count [125:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -23417,10 +23607,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > builds rolling averages and std-dev bands from aggregated data [153:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > groups several points for the same week into the same rolling window [112:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/cycleTime.test.ts",
-    "selector": "cycle time chart helpers > builds rolling averages and std-dev bands from aggregated data [153:3]",
+    "selector": "cycle time chart helpers > groups several points for the same week into the same rolling window [112:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -23432,10 +23622,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > falls back to zeroed trend values when a week contains no usable item count [180:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > returns an empty trend when there is no cycle time data [94:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/cycleTime.test.ts",
-    "selector": "cycle time chart helpers > falls back to zeroed trend values when a week contains no usable item count [180:3]",
+    "selector": "cycle time chart helpers > returns an empty trend when there is no cycle time data [94:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -23447,40 +23637,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > groups several points for the same week into the same rolling window [167:3]",
+    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > summarizes weighted count and average and detects insufficient data [131:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/utils/cycleTime.test.ts",
-    "selector": "cycle time chart helpers > groups several points for the same week into the same rolling window [167:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "data"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > returns an empty trend when there is no cycle time data [149:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/utils/cycleTime.test.ts",
-    "selector": "cycle time chart helpers > returns an empty trend when there is no cycle time data [149:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "data"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > summarizes weighted count and average and detects insufficient data [186:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/utils/cycleTime.test.ts",
-    "selector": "cycle time chart helpers > summarizes weighted count and average and detects insufficient data [186:3]",
+    "selector": "cycle time chart helpers > summarizes weighted count and average and detects insufficient data [131:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",

@@ -341,7 +341,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Donner une autorité stable aux transformations temporelles.
 - **Frontière principale :** Domaine delivery.
 - **Famille d’invariants :** Normalisation des événements de delivery.
-- **Preuve principale :** Tests du modèle et des conversions aux limites de la frontière.
+- **Preuve principale :** [Tests du modèle](../../frontend/src/domain/delivery/deliveryEvent.test.ts) et des [conversions Azure DevOps](../../frontend/src/adapters/azure-devops/deliveryEventMappers.test.ts) aux limites de la frontière.
 - **Éléments de réalisation inclus :** Modèle métier ; invariants ; conversions locales ; migration des consommateurs cohésifs ; retrait des représentations concurrentes.
 - **Hors périmètre :** Collecte fonctionnelle Azure DevOps et affichage des événements.
 - **Surface prévisionnelle :** 5 fichiers de production ; 9 fichiers versionnés

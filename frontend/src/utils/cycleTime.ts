@@ -1,22 +1,10 @@
 import { formatDateLocal } from "../date";
+import type { DeliveryEvent } from "../domain/delivery";
 import type { CycleTimePoint } from "../types";
 import type { CycleTimeSummary, CycleTimeTrendPoint } from "../hooks/simulationTypes";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
-
-export type WorkItemRevisionSnapshot = {
-  changedDate: string;
-  state: string;
-};
-
-export type WorkItemCycleTimeSource = {
-  revisions: WorkItemRevisionSnapshot[];
-};
-
-function normalizeState(value: string): string {
-  return value.trim().toLowerCase();
-}
 
 function getWeekKey(date: Date): string {
   const monday = new Date(date);
@@ -26,11 +14,6 @@ function getWeekKey(date: Date): string {
 
 function toRoundedCalendarDays(start: Date, end: Date): number {
   return Number(((end.getTime() - start.getTime()) / DAY_MS).toFixed(2));
-}
-
-function toValidDate(value: string): Date | null {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
 }
 
 function aggregateCycleTimePoint(
@@ -48,46 +31,38 @@ function aggregateCycleTimePoint(
 }
 
 export function calculateCycleTimeData(
-  workItems: WorkItemCycleTimeSource[],
-  doneStates: string[],
+  events: readonly DeliveryEvent[],
 ): CycleTimePoint[] {
-  if (!workItems.length || !doneStates.length) return [];
+  if (!events.length) return [];
 
-  const doneStateSet = new Set(doneStates.map(normalizeState));
+  const eventPairs = new Map<
+    string,
+    { startedAt?: Date; completedAt?: Date }
+  >();
+  [...events]
+    .sort((left, right) => left.occurredAt.localeCompare(right.occurredAt))
+    .forEach((event) => {
+      if (event.kind === "item_delivered") return;
+      const pair = eventPairs.get(event.itemId) ?? {};
+      const occurredAt = new Date(event.occurredAt);
+      if (event.kind === "work_started" && !pair.startedAt) {
+        pair.startedAt = occurredAt;
+      }
+      if (event.kind === "work_completed" && !pair.completedAt) {
+        pair.completedAt = occurredAt;
+      }
+      eventPairs.set(event.itemId, pair);
+    });
+
   const buckets = new Map<string, CycleTimePoint>();
 
-  workItems.forEach((item) => {
-    const revisions = [...(item.revisions ?? [])]
-      .map((revision) => ({
-        state: String(revision.state ?? "").trim(),
-        changedDate: String(revision.changedDate ?? "").trim(),
-      }))
-      .filter((revision) => revision.state && revision.changedDate)
-      .sort((left, right) => left.changedDate.localeCompare(right.changedDate));
-    if (revisions.length < 2) return;
-
-    let activatedDate: Date | null = null;
-    let doneDate: Date | null = null;
-
-    for (let index = 1; index < revisions.length; index += 1) {
-      const previousState = normalizeState(revisions[index - 1]?.state ?? "");
-      const currentState = normalizeState(revisions[index]?.state ?? "");
-      const transitionDate = toValidDate(revisions[index]?.changedDate ?? "");
-      if (!transitionDate) continue;
-
-      if (!activatedDate && previousState === "new" && currentState && currentState !== "new") {
-        activatedDate = transitionDate;
-      }
-
-      if (!doneDate && doneStateSet.has(currentState) && currentState !== previousState) {
-        doneDate = transitionDate;
-      }
-
-      if (activatedDate && doneDate) break;
-    }
-
-    if (!activatedDate || !doneDate || doneDate < activatedDate) return;
-    aggregateCycleTimePoint(buckets, getWeekKey(doneDate), toRoundedCalendarDays(activatedDate, doneDate));
+  eventPairs.forEach(({ startedAt, completedAt }) => {
+    if (!startedAt || !completedAt || completedAt < startedAt) return;
+    aggregateCycleTimePoint(
+      buckets,
+      getWeekKey(completedAt),
+      toRoundedCalendarDays(startedAt, completedAt),
+    );
   });
 
   return Array.from(buckets.values()).sort((left, right) => {

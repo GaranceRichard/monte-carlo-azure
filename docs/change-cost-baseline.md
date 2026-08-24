@@ -13,7 +13,7 @@ Le premier appel recalcule la preuve JSON et cette projection depuis les fichier
 
 ## Règle de mesure
 
-La baseline couvre 3 scénarios et 40 fichiers uniques. Un hotspot n'est confirmé que par au moins deux signaux : présence dans au moins 2 scénarios, degré de dépendance supérieur ou égal au P75 (5) ou taille supérieure ou égale au P75 des fichiers traversés (394 lignes).
+La baseline couvre 3 scénarios et 40 fichiers uniques. Un hotspot n'est confirmé que par au moins deux signaux : présence dans au moins 2 scénarios, degré de dépendance supérieur ou égal au P75 (6) ou taille supérieure ou égale au P75 des fichiers traversés (394 lignes).
 
 Les métriques sont : fichiers et lignes physiques traversés (portée), fichiers de production et de test (nature du coût), couches distinctes (frontières), arêtes internes (cohésion statique), arêtes entrant ou sortant de la surface (couplage externe) et hotspots confirmés.
 
@@ -41,7 +41,7 @@ Sources : `docs/frontend-responsibilities-map.md#collecte-et-transformations-del
 
 | Fichiers | Production | Tests | Lignes | Couches | Arêtes internes | Arêtes de frontière | Hotspots |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 11 | 7 | 4 | 2698 | 4 | 8 | 59 | 3 |
+| 11 | 7 | 4 | 2616 | 4 | 8 | 62 | 3 |
 
 Couches : `frontend-application`, `frontend-azure-adapter`, `frontend-delivery-or-engine`, `proof-tests`.
 
@@ -69,7 +69,7 @@ Fichiers : `Scripts/quality_gate.py`, `Scripts/quality_gate_dag.py`, `Scripts/qu
 | `frontend/src/hooks/useSimulation.ts` | 1 | 18 | 492 | highCoupling, largeFile |
 | `frontend/src/domain/simulationValueObjects.ts` | 1 | 17 | 394 | highCoupling, largeFile |
 | `backend/simulation_value_objects.py` | 1 | 12 | 429 | highCoupling, largeFile |
-| `frontend/src/adoClient.ts` | 1 | 9 | 681 | highCoupling, largeFile |
+| `frontend/src/adoClient.ts` | 1 | 11 | 679 | highCoupling, largeFile |
 | `Scripts/quality_gate.py` | 1 | 6 | 1637 | highCoupling, largeFile |
 
 ## Hypothèses et limites

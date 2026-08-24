@@ -2,6 +2,19 @@
 
 ## Recent
 
+### Événement de delivery métier normalisé — PBI 7.21
+
+- ajout d’une API publique du domaine delivery portant une identité d’item opaque, un fait fermé
+  `item_delivered`/`work_started`/`work_completed` et un instant absolu normalisé, avec invariants et
+  immutabilité vérifiés ;
+- conversion explicite des DTO work items et révisions Azure DevOps vers ces événements à la frontière de
+  l’adaptateur, sans exposer noms de champs, états techniques ni formes de restitution au domaine ;
+- migration atomique des agrégations de throughput et du calcul de Cycle Time vers les événements, avec
+  retrait des anciennes sources `WorkItemRevisionSnapshot`/`WorkItemCycleTimeSource` et du type throughput
+  concurrent dans `adoClient.ts` ;
+- maintien de la collecte Azure DevOps, de l’affichage, des formes persistées et de toutes les garanties
+  statistiques, les transformations delivery 7.22+ restant hors périmètre.
+
 ### Temps backend injectable et déterministe — PBI 7.32
 
 - ajout du port sortant `BackendClock`, de l’adaptateur réel `SystemUtcClock` et de leur composition API dans

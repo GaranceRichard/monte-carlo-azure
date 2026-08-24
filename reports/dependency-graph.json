@@ -12,13 +12,13 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 260,
-    "importEdges": 1372,
+    "sourceModules": 263,
+    "importEdges": 1378,
     "entrypoints": 85,
     "missingEntrypoints": 5,
     "cycles": 2,
     "runtimeCycles": 0,
-    "deepImports": 121,
+    "deepImports": 125,
     "apiBypasses": 2
   },
   "observed": {
@@ -914,6 +914,11 @@
         "language": "javascript"
       },
       {
+        "path": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
         "path": "frontend/src/adapters/seededSampleIndexDrawPort.ts",
         "area": "frontend",
         "language": "javascript"
@@ -1090,6 +1095,16 @@
       },
       {
         "path": "frontend/src/demoData.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/domain/delivery/deliveryEvent.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/domain/delivery/index.ts",
         "area": "frontend",
         "language": "javascript"
       },
@@ -11352,6 +11367,15 @@
         "resolution": "internal"
       },
       {
+        "source": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../domain/delivery",
+        "resolution": "internal"
+      },
+      {
         "source": "frontend/src/adapters/seededSampleIndexDrawPort.ts",
         "target": "frontend/src/domain/sampleIndexDrawPort.ts",
         "line": 1,
@@ -11371,8 +11395,17 @@
       },
       {
         "source": "frontend/src/adoClient.ts",
+        "target": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
+        "line": 4,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./adapters/azure-devops/deliveryEventMappers",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adoErrors.ts",
-        "line": 3,
+        "line": 8,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adoErrors",
@@ -11381,7 +11414,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adoPlatform.ts",
-        "line": 9,
+        "line": 14,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adoPlatform",
@@ -11398,6 +11431,15 @@
       },
       {
         "source": "frontend/src/adoClient.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 3,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "./domain/delivery",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/types.ts",
         "line": 2,
         "kind": "js-import",
@@ -11408,7 +11450,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/utils/cycleTime.ts",
-        "line": 16,
+        "line": 21,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./utils/cycleTime",
@@ -12195,6 +12237,24 @@
         "kind": "js-import",
         "phase": "compile",
         "specifier": "./types",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/index.ts",
+        "target": "frontend/src/domain/delivery/deliveryEvent.ts",
+        "line": 1,
+        "kind": "js-export",
+        "phase": "runtime",
+        "specifier": "./deliveryEvent",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/index.ts",
+        "target": "frontend/src/domain/delivery/deliveryEvent.ts",
+        "line": 8,
+        "kind": "js-export",
+        "phase": "compile",
+        "specifier": "./deliveryEvent",
         "resolution": "internal"
       },
       {
@@ -13378,8 +13438,17 @@
       },
       {
         "source": "frontend/src/utils/cycleTime.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 2,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../domain/delivery",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/utils/cycleTime.ts",
         "target": "frontend/src/hooks/simulationTypes.ts",
-        "line": 3,
+        "line": 4,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../hooks/simulationTypes",
@@ -13388,7 +13457,7 @@
       {
         "source": "frontend/src/utils/cycleTime.ts",
         "target": "frontend/src/types.ts",
-        "line": 2,
+        "line": 3,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../types",
@@ -14373,13 +14442,13 @@
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "compile",
-        "count": 85
+        "count": 88
       },
       {
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "runtime",
-        "count": 146
+        "count": 149
       },
       {
         "sourceArea": "launcher",
@@ -14540,6 +14609,16 @@
         "crossedBoundary": "frontend/src/hooks"
       },
       {
+        "source": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../domain/delivery",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
         "source": "frontend/src/adapters/seededSampleIndexDrawPort.ts",
         "target": "frontend/src/domain/sampleIndexDrawPort.ts",
         "line": 1,
@@ -14561,8 +14640,28 @@
       },
       {
         "source": "frontend/src/adoClient.ts",
+        "target": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
+        "line": 4,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./adapters/azure-devops/deliveryEventMappers",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/adapters"
+      },
+      {
+        "source": "frontend/src/adoClient.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 3,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "./domain/delivery",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/utils/cycleTime.ts",
-        "line": 16,
+        "line": 21,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./utils/cycleTime",
@@ -15491,8 +15590,18 @@
       },
       {
         "source": "frontend/src/utils/cycleTime.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 2,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../domain/delivery",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/utils/cycleTime.ts",
         "target": "frontend/src/hooks/simulationTypes.ts",
-        "line": 3,
+        "line": 4,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../hooks/simulationTypes",

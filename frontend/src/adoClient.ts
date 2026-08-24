@@ -1,5 +1,10 @@
 import { formatDateLocal, getCompleteWeekRange, parseLocalIsoDate, startOfIsoWeek } from "./date";
-import type { CycleTimePoint } from "./types";
+import type { CycleTimePoint, WeeklyThroughputRow } from "./types";
+import type { DeliveryEvent } from "./domain/delivery";
+import {
+  azureRevisionDtosToDeliveryEvents,
+  azureWorkItemDtoToDeliveryEvent,
+} from "./adapters/azure-devops/deliveryEventMappers";
 import {
   formatAdoHttpErrorMessage,
   toAdoHttpError,
@@ -33,7 +38,6 @@ type AdoProject = { id: string; name: string };
 type AdoTeam = { id: string; name: string };
 type TeamFieldValue = { value?: string; includeChildren?: boolean };
 type ProfileMe = { id?: string; publicAlias?: string; displayName?: string };
-type WeeklyThroughputRow = { week: string; throughput: number };
 type WeeklyThroughputResponse = WeeklyThroughputRow[] | { weeklyThroughput: WeeklyThroughputRow[]; warning?: string };
 type TeamDeliveryDataResponse = { weeklyThroughput: WeeklyThroughputRow[]; cycleTimeDaysData: CycleTimePoint[]; warning?: string };
 type ResolvedPatProfile = {
@@ -530,8 +534,7 @@ export async function getTeamDeliveryDataDirect(
 
   const wiqlData = await wiqlResp.json();
   const items: { id: number }[] = wiqlData.workItems ?? [];
-  const allItems: { completionDate: string }[] = [];
-  const cycleTimeItems: Array<{ revisions: Array<{ changedDate: string; state: string }> }> = [];
+  const deliveryEvents: DeliveryEvent[] = [];
   const batchFailures: { status: number | null; statusText: string }[] = [];
   const cycleTimeFailures: { status: number | null; statusText: string }[] = [];
   const ids = items.map((i) => i.id);
@@ -569,10 +572,8 @@ export async function getTeamDeliveryDataDirect(
         const d = await r.json();
         await Promise.all(
           (d.value ?? []).map(async (item: { id?: number; fields?: Record<string, string> }) => {
-            const completionDate =
-              item.fields?.["Microsoft.VSTS.Common.ClosedDate"] ||
-              item.fields?.["Microsoft.VSTS.Common.ResolvedDate"];
-            if (completionDate) allItems.push({ completionDate });
+            const delivered = azureWorkItemDtoToDeliveryEvent(item);
+            if (delivered) deliveryEvents.push(delivered);
             if (!item.id) return;
 
             const revisionContext: AdoErrorContext = {
@@ -601,12 +602,8 @@ export async function getTeamDeliveryDataDirect(
             }
 
             const revisionData = await revisionResponse.json();
-            cycleTimeItems.push({
-              revisions: (revisionData.value ?? []).map((revision: { fields?: Record<string, string> }) => ({
-                changedDate: revision.fields?.["System.ChangedDate"] ?? "",
-                state: revision.fields?.["System.State"] ?? "",
-              })),
-            });
+            const revisionEvents = azureRevisionDtosToDeliveryEvents(item.id, revisionData.value, doneStates);
+            deliveryEvents.push(...revisionEvents);
           }),
         );
       }),
@@ -614,8 +611,9 @@ export async function getTeamDeliveryDataDirect(
   }
 
   const weekMap = new Map<string, number>();
-  allItems.forEach(({ completionDate }) => {
-    const key = toWeekKey(completionDate);
+  deliveryEvents.forEach((event) => {
+    if (event.kind !== "item_delivered") return;
+    const key = toWeekKey(event.occurredAt);
     if (!key) return;
     weekMap.set(key, (weekMap.get(key) ?? 0) + 1);
   });
@@ -675,7 +673,7 @@ export async function getTeamDeliveryDataDirect(
 
   return {
     weeklyThroughput: result,
-    cycleTimeDaysData: calculateCycleTimeData(cycleTimeItems, doneStates),
+    cycleTimeDaysData: calculateCycleTimeData(deliveryEvents),
     warning: warnings.length ? warnings.join(" ") : undefined,
   };
 }

@@ -8,7 +8,7 @@
     "hotspotRule": "At least two of repeatedTraversal, highCoupling, largeFile.",
     "thresholds": {
       "repeatedTraversalMinimum": 2,
-      "dependencyDegreeP75": 5,
+      "dependencyDegreeP75": 6,
       "traversedFileLinesP75": 394
     }
   },
@@ -97,10 +97,10 @@
         "fileCount": 11,
         "productionFileCount": 7,
         "testFileCount": 4,
-        "lineCount": 2698,
+        "lineCount": 2616,
         "layerCount": 4,
         "internalDependencyEdges": 8,
-        "boundaryDependencyEdges": 59,
+        "boundaryDependencyEdges": 62,
         "confirmedHotspotCount": 3
       },
       "layers": [
@@ -202,8 +202,8 @@
     {
       "path": "frontend/src/adoClient.ts",
       "scenarioCount": 1,
-      "dependencyDegree": 9,
-      "lineCount": 681,
+      "dependencyDegree": 11,
+      "lineCount": 679,
       "signals": {
         "repeatedTraversal": false,
         "highCoupling": true,

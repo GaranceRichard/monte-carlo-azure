@@ -137,11 +137,16 @@ frontend/
     adoClient.ts        # appels directs Azure DevOps
     api.ts              # adaptateur HTTP /simulate et historique serveur
     adapters/
+      azure-devops/
+        deliveryEventMappers.ts # DTO work items/révisions -> faits delivery normalisés
       seededSampleIndexDrawPort.ts # implémentation TypeScript de mca-prng-v1
     api/
       simulationDtos.ts    # contrats JSON HTTP en snake_case
       simulationMappers.ts # conversions explicites HTTP <-> domaine
     domain/
+      delivery/
+        index.ts            # API publique des événements delivery
+        deliveryEvent.ts    # identité opaque, faits fermés et instant absolu immuable
       sampleIndexDrawPort.ts # port minimal de tirage injecté dans les moteurs
       simulation.ts        # commande et résultat statistiques métier en camelCase
       simulationValueObjects.ts # Value Objects statistiques immuables et validés
@@ -932,10 +937,12 @@ Frontend :
 - façade API allégée via `src/apiHelpers.ts` pour conserver des périmètres Vitals plus stables
 - logique forecast scindée entre façade `src/hooks/simulationForecastService.ts` et cœur
   `src/hooks/simulationForecastCore.ts`
+- événements delivery possédés par `src/domain/delivery/` : les DTO Azure DevOps sont convertis localement en
+  faits `item_delivered`, `work_started` et `work_completed` avant toute transformation temporelle
 - moteur Monte Carlo frontend et scénarios portefeuille désormais pilotés par une `seed`
   explicite unique par exécution logique, sans `Math.random()` dans les calculs de simulation
-- calcul du cycle time extrait dans `src/utils/cycleTime.ts` avec couverture unitaire ciblée,
-  en jours calendaires pour les restitutions frontend
+- calcul du Cycle Time dans `src/utils/cycleTime.ts` à partir des seuls événements normalisés, avec couverture
+  unitaire ciblée et sortie inchangée en jours calendaires pour les restitutions frontend
 - quick filters persistants par scope `org::project::team`
 - mode portefeuille avec rapport PDF multi-scénarios
 - diagnostic comparatif portefeuille pur : qualité historique, stabilité simulée et crédibilité des hypothèses

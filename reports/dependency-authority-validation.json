@@ -30,8 +30,8 @@
     "directions": 36,
     "runtimes": 3,
     "boundaries": 18,
-    "domainFiles": 7,
-    "domainDependencies": 8,
+    "domainFiles": 9,
+    "domainDependencies": 10,
     "domainTechnologyViolations": 0
   },
   "diagnostics": [],

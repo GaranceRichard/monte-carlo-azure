@@ -139,6 +139,11 @@ une connexion Azure DevOps réelle.
   fixe un graphe acyclique de publications autonomes, calcule les vagues de disponibilité les plus précoces
   et protège automatiquement les précédences. Après sa publication, six outcomes indépendants peuvent
   démarrer immédiatement sans réaliser ni anticiper une migration future.
+- **Faits delivery normalisés.** L’API publique `frontend/src/domain/delivery/` représente chaque livraison,
+  début et fin de travail par une identité opaque, un fait métier fermé et un instant absolu immuable normalisé
+  en UTC. Le mapper Azure DevOps normalise et ordonne les instants avant de convertir ses DTO à cette frontière ;
+  les agrégations hebdomadaires et le Cycle Time ne consomment plus de champs Azure DevOps, sans changement de
+  collecte, d’UI ou de garantie statistique.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 

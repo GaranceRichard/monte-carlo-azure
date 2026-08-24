@@ -655,6 +655,7 @@ test.describe("e2e istanbul coverage", () => {
             return new Response(
               JSON.stringify({
                 value: ids.map((id) => ({
+                  id,
                   fields: {
                     "Microsoft.VSTS.Common.ClosedDate": new Date(
                       Date.UTC(2026, 0, 1 + ((id - 1) % 10) * 7, 12, 0, 0, 0),
@@ -1391,31 +1392,31 @@ test.describe("e2e istanbul coverage", () => {
 
     const results = await page.evaluate(async () => {
       const cycleTime = await import("/src/utils/cycleTime.ts");
+      const delivery = await import("/src/domain/delivery/index.ts");
 
       return {
         noDoneStates: cycleTime.calculateCycleTimeData(
           [
-            {
-              revisions: [
-                { changedDate: "2026-01-06T09:00:00Z", state: "New" },
-                { changedDate: "2026-01-08T09:00:00Z", state: "Active" },
-                { changedDate: "2026-01-15T09:00:00Z", state: "Done" },
-              ],
-            },
+            delivery.createDeliveryEvent({
+              itemId: "1",
+              kind: "item_delivered",
+              occurredAt: "2026-01-15T09:00:00Z",
+            }),
           ],
-          [],
         ),
         invalidOrdering: cycleTime.calculateCycleTimeData(
           [
-            {
-              revisions: [
-                { changedDate: "2026-01-10T09:00:00Z", state: "Done" },
-                { changedDate: "2026-01-12T09:00:00Z", state: "Done" },
-                { changedDate: "2026-01-15T09:00:00Z", state: "Active" },
-              ],
-            },
+            delivery.createDeliveryEvent({
+              itemId: "1",
+              kind: "work_completed",
+              occurredAt: "2026-01-10T09:00:00Z",
+            }),
+            delivery.createDeliveryEvent({
+              itemId: "1",
+              kind: "work_started",
+              occurredAt: "2026-01-15T09:00:00Z",
+            }),
           ],
-          ["Done"],
         ),
         zeroLowerBoundTrend: cycleTime.buildCycleTimeTrendData(
           [
@@ -1484,6 +1485,7 @@ test.describe("e2e istanbul coverage", () => {
           const ids = new URL(url).searchParams.get("ids").split(",").map((id) => Number(id));
           return jsonResponse({
             value: ids.map((id) => ({
+              id,
               fields: {
                 "Microsoft.VSTS.Common.ClosedDate": new Date(
                   Date.UTC(2026, 0, 1 + ((id - 1) % 6) * 7, 12, 0, 0, 0),
@@ -1491,6 +1493,9 @@ test.describe("e2e istanbul coverage", () => {
               },
             })),
           });
+        }
+        if (url.includes("/revisions?fields=System.State,System.ChangedDate")) {
+          return jsonResponse({ value: [] });
         }
         if (url.includes("/simulate")) {
           if (portfolioMode === "phase2-fail") {
@@ -2591,6 +2596,7 @@ test.describe("e2e istanbul coverage", () => {
             }
             return jsonResponse({
               value: [0, 1, 2, 3, 4, 5].map((index) => ({
+                id: index + 1,
                 fields: {
                   "Microsoft.VSTS.Common.ClosedDate": new Date(
                     Date.UTC(2026, 0, 1 + index * 7, 12, 0, 0, 0),
@@ -2598,6 +2604,9 @@ test.describe("e2e istanbul coverage", () => {
                 },
               })),
             });
+          }
+          if (url.includes("/revisions?fields=System.State,System.ChangedDate")) {
+            return jsonResponse({ value: [] });
           }
           if (url.includes("/teamfieldvalues")) {
             return jsonResponse({
@@ -3706,8 +3715,6 @@ test.describe("e2e istanbul coverage", () => {
     expect(results.renderedHtml).toContain("Simulation Portefeuille - Equipe Alpha");
   });
 });
-
-
 
 
 
