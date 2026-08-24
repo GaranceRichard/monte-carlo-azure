@@ -13,6 +13,17 @@
 - horloge frontend, semaine/fuseau métier, TTL, purge, politiques de rétention et garanties statistiques
   laissés inchangés.
 
+### Domaine indépendant des technologies — PBI 7.11
+
+- intégration au contrôle architectural 7.10 d’une inspection des imports statiques, de type et dynamiques
+  dans les frontières de domaine TypeScript et Python déclarées par l’autorité ;
+- refus localisé par fichier et ligne des adaptateurs, packages externes et ressources techniques, avec
+  bibliothèque standard Python et code intérieur pur autorisés sans allowlist cachée ;
+- couverture positive, négative et des cas limites : types, `TYPE_CHECKING`, `import()`, `require()`, tests
+  colocalisés, commentaires, chaînes, chemins non résolus et erreurs de parsing ;
+- preuve enrichie, documentation et compteurs régénérés, sans imports profonds, cycles, contrôle entre
+  adaptateurs, migration fonctionnelle ni modification des garanties statistiques.
+
 ### Autorité des dépendances lisible et diagnostiquable — PBI 7.10
 
 - publication d’un manifeste JSON fermé et versionné projetant les décisions normatives 7.7/7.8, avec six

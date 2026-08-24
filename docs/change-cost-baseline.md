@@ -13,7 +13,7 @@ Le premier appel recalcule la preuve JSON et cette projection depuis les fichier
 
 ## Règle de mesure
 
-La baseline couvre 3 scénarios et 40 fichiers uniques. Un hotspot n'est confirmé que par au moins deux signaux : présence dans au moins 2 scénarios, degré de dépendance supérieur ou égal au P75 (6) ou taille supérieure ou égale au P75 des fichiers traversés (394 lignes).
+La baseline couvre 3 scénarios et 40 fichiers uniques. Un hotspot n'est confirmé que par au moins deux signaux : présence dans au moins 2 scénarios, degré de dépendance supérieur ou égal au P75 (5) ou taille supérieure ou égale au P75 des fichiers traversés (394 lignes).
 
 Les métriques sont : fichiers et lignes physiques traversés (portée), fichiers de production et de test (nature du coût), couches distinctes (frontières), arêtes internes (cohésion statique), arêtes entrant ou sortant de la surface (couplage externe) et hotspots confirmés.
 

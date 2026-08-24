@@ -28,8 +28,9 @@ config/dependency-authority-v1.0.json
 ```
 
 La [preuve versionnée](../reports/dependency-authority-validation.json) contient les empreintes du manifeste
-et du schéma, les sources normatives vérifiées, les comptes structuraux et un verdict sans diagnostic. Elle
-est régénérable ; elle n’est ni une décision ni une seconde autorité.
+et du schéma, les sources normatives vérifiées, les comptes structuraux ainsi que les nombres de fichiers et
+de dépendances de domaine inspectés. Un verdict valide porte zéro diagnostic et zéro dépendance technologique
+du domaine. La preuve est régénérable ; elle n’est ni une décision ni une seconde autorité.
 
 ## Format 1.0.0
 
@@ -84,6 +85,40 @@ Exemples de localisations : `/directions/12/to`, `/runtimes/1/boundaries/3/pathP
 frontières et fraîcheur de la preuve. Le diagnostic désigne la valeur à corriger et ne masque pas les autres
 erreurs sémantiques qui peuvent être calculées sans risque.
 
+## Règle 7.11 — indépendance technologique du domaine
+
+Le même contrôle développe les préfixes des frontières `domain` et `adapters` depuis le manifeste, puis
+inspecte les sources de production TypeScript/JavaScript et Python sous les familles de domaine frontend et
+backend. Les fichiers de test colocalisés (`*.test.*`, `*.spec.*`, `test/`, `tests/`, `__tests__/`) relèvent de
+la qualité et ne sont pas classés comme code produit. Les imports TypeScript statiques, réexports, imports de
+type, `import()` et `require()` sont examinés ; Python est analysé par son AST, y compris les imports placés
+sous `TYPE_CHECKING`.
+
+| Dépendance observée depuis le domaine | Verdict de la règle 7.11 |
+| --- | --- |
+| Primitive du langage ou module de la bibliothèque standard Python | Autorisée |
+| Source projet non technique et hors famille `adapters` | Non refusée par 7.11 ; les directions inter-modules relèvent des contrôles dédiés ultérieurs |
+| Chemin résolu sous une famille `adapters`, ou spécificateur visant explicitement `adapters` | Interdite, y compris pour un type ou un chargement dynamique |
+| Package npm ou Python externe | Interdit par défaut comme choix technologique |
+| Ressource importée `.css`, `.json`, `.svg`, `.html`, `.xml`, `.yaml`, `.yml`, `.csv` ou `.pdf` | Interdite comme format ou support technique |
+| Import relatif non résolu | Non déclaré conforme ; laissé aux contrôles d’encapsulation et de résolution hors 7.11 |
+
+Une bibliothèque algorithmique tierce ne reçoit pas d’exception locale : son éventuelle pureté doit être
+revue et projetée dans une évolution versionnée de l’autorité avant de pouvoir être acceptée. Il n’existe ni
+commentaire d’ignorance, ni allowlist cachée dans le scanner.
+
+Une violation est localisée au fichier et à la ligne :
+
+```text
+frontend/src/domain/simulation/forecast.ts:line 2: [DEP-DOMAIN-ADAPTER] ... Correction: ...
+backend/domain/simulation/value.py:line 1: [DEP-DOMAIN-TECHNOLOGY] ... Correction: ...
+```
+
+`DEP-DOMAIN-ADAPTER` demande d’inverser la dépendance par une abstraction pure et une injection depuis la
+composition. `DEP-DOMAIN-TECHNOLOGY` demande de déplacer package ou ressource vers un adaptateur.
+`DEP-DOMAIN-PARSE` et `DEP-DOMAIN-SCAN` ferment le contrôle si une source ou le dépôt ne peut pas être
+inspecté de façon fiable.
+
 ## Utilisation
 
 Depuis la racine du dépôt :
@@ -100,13 +135,14 @@ python Scripts/check_dependency_authority.py --write-evidence
 python Scripts/check_dependency_authority.py
 ```
 
-Le parseur est aussi importable par les futures familles de règles via `load_dependency_authority()` et
-`direction_policy(source, target)`. Aucune de ces familles n’est encore implémentée ici : le contrôle ne lit
-pas les imports du produit, ne classe pas le code actuel, ne bloque aucune dépendance produit et n’est pas
-encore intégré aux profils de gate. Ces responsabilités appartiennent aux PBI 7.11 à 7.17.
+Le parseur reste importable par les familles de règles via `load_dependency_authority()` et
+`direction_policy(source, target)`. Depuis 7.11, le contrôle lit les imports du domaine et bloque ses
+dépendances vers les technologies et adaptateurs. Il n’est pas encore intégré aux profils de gate : cette
+responsabilité appartient au PBI 7.17.
 
 ## Limites préservées
 
-Cette livraison ne déplace ni ne renomme aucun module produit, ne crée aucun port, ne corrige aucun cycle et
-ne modifie aucun comportement frontend ou backend. Les formules, seuils, corpus, protocoles, preuves et gates
-statistiques restent strictement inchangés.
+Cette livraison ne traite ni imports profonds (7.12), ni cycles (7.13), ni dépendances entre adaptateurs
+(7.14). Elle ne déplace ou renomme aucun module produit, ne crée aucun port et ne réalise aucune migration
+fonctionnelle. Les formules, seuils, corpus, protocoles, preuves et gates statistiques restent strictement
+inchangés.

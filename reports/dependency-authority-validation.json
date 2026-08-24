@@ -22,13 +22,17 @@
   "checks": {
     "jsonSyntax": "valid",
     "structure": "valid",
-    "semantics": "valid"
+    "semantics": "valid",
+    "domainIndependence": "valid"
   },
   "counts": {
     "layers": 6,
     "directions": 36,
     "runtimes": 3,
-    "boundaries": 18
+    "boundaries": 18,
+    "domainFiles": 7,
+    "domainDependencies": 8,
+    "domainTechnologyViolations": 0
   },
   "diagnostics": [],
   "status": "valid"

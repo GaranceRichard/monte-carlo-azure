@@ -12,8 +12,8 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 257,
-    "importEdges": 1353,
+    "sourceModules": 260,
+    "importEdges": 1372,
     "entrypoints": 85,
     "missingEntrypoints": 5,
     "cycles": 2,
@@ -175,6 +175,21 @@
       },
       {
         "path": "Scripts/dependency_authority_contract.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/dependency_authority_domain.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/dependency_authority_imports.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/dependency_authority_javascript.py",
         "area": "quality",
         "language": "python"
       },
@@ -1960,6 +1975,24 @@
       },
       {
         "source": "Scripts/check_dependency_authority.py",
+        "target": "Scripts/dependency_authority_contract.py",
+        "line": 22,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_contract.Diagnostic",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/check_dependency_authority.py",
+        "target": "Scripts/dependency_authority_domain.py",
+        "line": 23,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_domain.inspect_repository_domain",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/check_dependency_authority.py",
         "target": "external:python:__future__",
         "line": 4,
         "kind": "python-from",
@@ -2973,6 +3006,159 @@
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "pathlib",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_domain.py",
+        "target": "Scripts/dependency_authority.py",
+        "line": 9,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority.DependencyAuthority",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_domain.py",
+        "target": "Scripts/dependency_authority_contract.py",
+        "line": 10,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_contract.Diagnostic",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_domain.py",
+        "target": "Scripts/dependency_authority_imports.py",
+        "line": 11,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_imports.repository_paths",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_domain.py",
+        "target": "Scripts/dependency_authority_javascript.py",
+        "line": 21,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_javascript.javascript_dependencies",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_domain.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_domain.py",
+        "target": "external:python:dataclasses",
+        "line": 6,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "dataclasses",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_domain.py",
+        "target": "external:python:pathlib",
+        "line": 7,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "pathlib",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_domain.py",
+        "target": "external:python:sys",
+        "line": 5,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "sys",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_imports.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_imports.py",
+        "target": "external:python:ast",
+        "line": 5,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "ast",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_imports.py",
+        "target": "external:python:dataclasses",
+        "line": 7,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "dataclasses",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_imports.py",
+        "target": "external:python:pathlib",
+        "line": 8,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "pathlib",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_imports.py",
+        "target": "external:python:re",
+        "line": 6,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "re",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_javascript.py",
+        "target": "Scripts/dependency_authority_imports.py",
+        "line": 8,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_imports.normalize_path",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_javascript.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_javascript.py",
+        "target": "external:python:posixpath",
+        "line": 5,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "posixpath",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_javascript.py",
+        "target": "external:python:re",
+        "line": 6,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "re",
         "resolution": "external"
       },
       {
@@ -13715,7 +13901,7 @@
       },
       {
         "declaredIn": "Scripts/check_dependency_authority.py",
-        "line": 89,
+        "line": 135,
         "kind": "python-main-guard",
         "target": "Scripts/check_dependency_authority.py",
         "resolution": "internal"
@@ -14217,7 +14403,7 @@
         "sourceArea": "quality",
         "targetArea": "quality",
         "phase": "runtime",
-        "count": 246
+        "count": 253
       }
     ]
   },

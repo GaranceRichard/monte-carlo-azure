@@ -8,6 +8,9 @@ from typing import Any
 
 import pytest
 
+from Scripts import check_dependency_authority as authority_cli
+from Scripts import dependency_authority_domain as domain_control
+from Scripts import dependency_authority_imports as imports_control
 from Scripts.check_dependency_authority import main as check_authority
 from Scripts.dependency_authority import (
     DEFAULT_AUTHORITY,
@@ -15,6 +18,14 @@ from Scripts.dependency_authority import (
     AuthorityValidationError,
     authority_evidence,
     load_dependency_authority,
+)
+from Scripts.dependency_authority_contract import Diagnostic
+from Scripts.dependency_authority_domain import (
+    DomainIndependenceResult,
+    DomainInspectionError,
+    LocatedDiagnostic,
+    inspect_repository_domain,
+    validate_domain_independence,
 )
 from Scripts.dependency_authority_validation import validate_authority_document
 
@@ -54,11 +65,241 @@ def test_committed_authority_parses_and_exposes_the_normative_matrix() -> None:
 
 def test_committed_evidence_is_a_fresh_deterministic_projection(capsys) -> None:
     authority = load_dependency_authority()
+    domain_result = inspect_repository_domain(authority)
     committed = _json(ROOT / "reports" / "dependency-authority-validation.json")
 
-    assert committed == authority_evidence(authority)
+    assert not domain_result.diagnostics
+    assert committed == authority_evidence(
+        authority,
+        domain_files=domain_result.files,
+        domain_dependencies=domain_result.dependencies,
+    )
     assert check_authority([]) == 0
     assert "36 directions" in capsys.readouterr().out
+
+
+def test_domain_accepts_internal_code_and_python_standard_library() -> None:
+    authority = load_dependency_authority()
+    texts = {
+        "frontend/src/domain/simulation/value.ts": (
+            'import type { Risk } from "./risk";\n'
+            'import type { AbsoluteRisk } from "/src/domain/simulation/risk";\n'
+            'export { compute } from "./compute";\n'
+        ),
+        "frontend/src/domain/simulation/risk.ts": "export type Risk = number;\n",
+        "frontend/src/domain/simulation/compute.ts": "export const compute = () => 1;\n",
+        "backend/domain/history/entry.py": (
+            "from dataclasses import dataclass\n"
+            "from .identity import HistoryIdentity\n"
+        ),
+        "backend/domain/history/identity.py": "HistoryIdentity = str\n",
+    }
+
+    result = validate_domain_independence(authority, texts, set(texts))
+
+    assert result.files == 5
+    assert result.dependencies == 5
+    assert result.diagnostics == ()
+
+
+def test_domain_rejects_static_type_and_dynamic_adapter_imports_with_paths() -> None:
+    authority = load_dependency_authority()
+    texts = {
+        "frontend/src/domain/simulation/forecast.ts": (
+            "export type Forecast = number;\n"
+            'import type { HttpDto } from "../../adapters/simulation/http/client";\n'
+            'const load = () => import("../../adapters/simulation/local/engine");\n'
+        ),
+        "frontend/src/adapters/simulation/http/client.ts": "export type HttpDto = {};\n",
+        "frontend/src/adapters/simulation/local/engine.ts": "export const run = () => 1;\n",
+    }
+
+    result = validate_domain_independence(authority, texts, set(texts))
+
+    assert result.violations == 2
+    assert [item.code for item in result.diagnostics] == [
+        "DEP-DOMAIN-ADAPTER",
+        "DEP-DOMAIN-ADAPTER",
+    ]
+    assert [item.location for item in result.diagnostics] == ["line 2", "line 3"]
+    rendered = "\n".join(item.render() for item in result.diagnostics)
+    assert "frontend/src/domain/simulation/forecast.ts:line 2" in rendered
+    assert "frontend/src/adapters/simulation/http/client.ts" in rendered
+
+
+def test_python_domain_rejects_an_adapter_even_for_an_imported_type() -> None:
+    authority = load_dependency_authority()
+    texts = {
+        "backend/domain/history/entry.py": (
+            "from typing import TYPE_CHECKING\n"
+            "if TYPE_CHECKING:\n"
+            "    from backend.adapters.persistence.mongodb.document import MongoDocument\n"
+        ),
+        "backend/adapters/persistence/mongodb/document.py": "MongoDocument = dict[str, object]\n",
+    }
+
+    result = validate_domain_independence(authority, texts, set(texts))
+
+    assert len(result.diagnostics) == 1
+    assert result.diagnostics[0].code == "DEP-DOMAIN-ADAPTER"
+    assert result.diagnostics[0].location == "line 3"
+
+
+@pytest.mark.parametrize(
+    ("path", "source", "technology"),
+    [
+        (
+            "frontend/src/domain/delivery/event.ts",
+            'import type { ComponentType } from "react";\n',
+            "external:npm:react",
+        ),
+        (
+            "frontend/src/domain/simulation/random.ts",
+            'const crypto = require("node:crypto");\n',
+            "external:npm:node:crypto",
+        ),
+        (
+            "backend/domain/simulation/value.py",
+            "import numpy as np\n",
+            "external:python:numpy",
+        ),
+        (
+            "backend/domain/history/value.py",
+            "from pydantic import BaseModel\n",
+            "external:python:pydantic",
+        ),
+    ],
+)
+def test_domain_rejects_external_technologies(
+    path: str, source: str, technology: str
+) -> None:
+    authority = load_dependency_authority()
+
+    result = validate_domain_independence(authority, {path: source}, {path})
+
+    assert len(result.diagnostics) == 1
+    diagnostic = result.diagnostics[0]
+    assert diagnostic.code == "DEP-DOMAIN-TECHNOLOGY"
+    assert diagnostic.location == "line 1"
+    assert technology in diagnostic.render()
+
+
+def test_domain_rejects_imported_technical_resources() -> None:
+    authority = load_dependency_authority()
+    texts = {
+        "frontend/src/domain/delivery/calendar.ts": 'import labels from "./labels.json";\n',
+        "frontend/src/domain/delivery/labels.json": '{"week": "Week"}\n',
+    }
+
+    result = validate_domain_independence(authority, texts, set(texts))
+
+    assert len(result.diagnostics) == 1
+    assert result.diagnostics[0].code == "DEP-DOMAIN-TECHNOLOGY"
+    assert "labels.json" in result.diagnostics[0].render()
+
+
+def test_comments_strings_tests_and_unresolved_internal_paths_do_not_create_violations() -> None:
+    authority = load_dependency_authority()
+    texts = {
+        "frontend/src/domain/delivery/event.ts": (
+            '// import "react";\n'
+            'const documentation = \'import("pydantic")\';\n'
+            'const escaped = "import(\\\"react\\\")";\n'
+            '/*\n import "vitest";\n*/\n'
+            'import type { LegacyValue } from "../../legacy/value";\n'
+        ),
+        "frontend/src/domain/delivery/event.test.ts": 'import { it } from "vitest";\n',
+    }
+
+    result = validate_domain_independence(authority, texts, set(texts))
+
+    assert result.files == 1
+    assert result.dependencies == 1
+    assert result.diagnostics == ()
+
+
+def test_invalid_python_domain_source_fails_closed_at_its_line() -> None:
+    authority = load_dependency_authority()
+    path = "backend/domain/history/entry.py"
+
+    result = validate_domain_independence(authority, {path: "from typing import\n"}, {path})
+
+    assert len(result.diagnostics) == 1
+    assert result.diagnostics[0].code == "DEP-DOMAIN-PARSE"
+    assert result.diagnostics[0].location == "line 1"
+
+
+def test_repository_inspection_uses_authority_roots_without_git(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    authority = load_dependency_authority()
+    domain = tmp_path / "frontend" / "src" / "domain" / "simulation"
+    adapter = tmp_path / "frontend" / "src" / "adapters" / "simulation" / "http"
+    domain.mkdir(parents=True)
+    adapter.mkdir(parents=True)
+    (domain / "forecast.ts").write_text(
+        'import { run } from "../../adapters/simulation/http/client";\n',
+        encoding="utf-8",
+    )
+    (adapter / "client.ts").write_text("export const run = () => 1;\n", encoding="utf-8")
+
+    result = inspect_repository_domain(authority, tmp_path)
+
+    assert result.files == 1
+    assert result.dependencies == 1
+    assert len(result.diagnostics) == 1
+    assert result.diagnostics[0].code == "DEP-DOMAIN-ADAPTER"
+
+    def fail_scan(*_args: object) -> DomainIndependenceResult:
+        raise DomainInspectionError("scan unavailable")
+
+    monkeypatch.setattr(authority_cli, "inspect_repository_domain", fail_scan)
+    assert check_authority([]) == 1
+    assert "DEP-DOMAIN-SCAN" in capsys.readouterr().err
+
+    violation = LocatedDiagnostic(
+        "frontend/src/domain/delivery/event.ts",
+        Diagnostic("DEP-DOMAIN-TECHNOLOGY", "line 3", "interdit", "corriger"),
+    )
+    monkeypatch.setattr(
+        authority_cli,
+        "inspect_repository_domain",
+        lambda *_args: DomainIndependenceResult(1, 1, (violation,)),
+    )
+    assert check_authority([]) == 1
+    rendered = capsys.readouterr().err
+    assert "frontend\\src\\domain\\delivery\\event.ts:line 3" in rendered
+
+    monkeypatch.setattr(
+        domain_control,
+        "repository_paths",
+        lambda *_args: ["backend/domain/history/disappeared.py"],
+    )
+    result = inspect_repository_domain(authority, tmp_path)
+    assert result.files == 0
+
+    unreadable = tmp_path / "backend" / "domain" / "history" / "unreadable.py"
+    unreadable.parent.mkdir(parents=True)
+    unreadable.write_bytes(b"\xff")
+    monkeypatch.setattr(
+        domain_control,
+        "repository_paths",
+        lambda *_args: ["backend/domain/history/unreadable.py"],
+    )
+    with pytest.raises(DomainInspectionError, match="unreadable.py"):
+        inspect_repository_domain(authority, tmp_path)
+
+    product_root = tmp_path / "frontend" / "src"
+    product_root.mkdir(parents=True, exist_ok=True)
+
+    def fail_enumeration(_path: Path, _pattern: str) -> object:
+        raise OSError("enumeration unavailable")
+
+    monkeypatch.setattr(Path, "rglob", fail_enumeration)
+    with pytest.raises(DomainInspectionError, match="sources produit"):
+        imports_control.repository_paths(tmp_path, ("frontend/src",))
 
 
 def test_invalid_json_reports_line_column_and_correction(tmp_path: Path) -> None:

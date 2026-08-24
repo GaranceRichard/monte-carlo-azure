@@ -200,7 +200,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Préserver la stabilité du métier face aux choix techniques.
 - **Frontière principale :** Domaine.
 - **Famille d’invariants :** Indépendance technologique du domaine.
-- **Preuve principale :** Tests positifs et négatifs de dépendances du domaine.
+- **Preuve principale :** [Tests positifs, négatifs et cas limites des dépendances du domaine](../../tests/test_dependency_authority.py), complétés par la [preuve du contrôle intégré](../../reports/dependency-authority-validation.json).
 - **Éléments de réalisation inclus :** Règle ; diagnostic ; cas limites ; intégration mécanique au contrôle ; documentation ciblée.
 - **Hors périmètre :** Imports profonds et dépendances entre adaptateurs.
 - **Surface prévisionnelle :** 3 fichiers de production ; 7 fichiers versionnés

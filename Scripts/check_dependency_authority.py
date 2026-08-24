@@ -15,8 +15,15 @@ from Scripts.dependency_authority import (  # noqa: E402
     DEFAULT_AUTHORITY,
     DEFAULT_SCHEMA,
     AuthorityValidationError,
+    DependencyAuthority,
     authority_evidence,
     load_dependency_authority,
+)
+from Scripts.dependency_authority_contract import Diagnostic  # noqa: E402
+from Scripts.dependency_authority_domain import (  # noqa: E402
+    DomainIndependenceResult,
+    DomainInspectionError,
+    inspect_repository_domain,
 )
 
 DEFAULT_EVIDENCE = ROOT / "reports" / "dependency-authority-validation.json"
@@ -28,6 +35,40 @@ def _resolved(root: Path, path: Path) -> Path:
 
 def _render_evidence(evidence: dict[str, object]) -> str:
     return json.dumps(evidence, ensure_ascii=False, indent=2) + "\n"
+
+
+def _validated_domain(
+    authority: DependencyAuthority, root: Path
+) -> DomainIndependenceResult | None:
+    try:
+        domain_result = inspect_repository_domain(authority, root)
+    except DomainInspectionError as exc:
+        diagnostic = Diagnostic(
+            "DEP-DOMAIN-SCAN",
+            "/",
+            f"Impossible d'inspecter les dépendances du domaine: {exc}",
+            "Rétablir des racines produit et des sources UTF-8 lisibles avant de "
+            "relancer le contrôle.",
+        )
+        print(diagnostic.render(root), file=sys.stderr)
+        return None
+    if domain_result.diagnostics:
+        for diagnostic in domain_result.diagnostics:
+            print(diagnostic.render(root), file=sys.stderr)
+        return None
+    return domain_result
+
+
+def _validated_evidence(
+    authority: DependencyAuthority, domain_result: DomainIndependenceResult
+) -> str:
+    return _render_evidence(
+        authority_evidence(
+            authority,
+            domain_files=domain_result.files,
+            domain_dependencies=domain_result.dependencies,
+        )
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -56,7 +97,10 @@ def main(argv: list[str] | None = None) -> int:
         for diagnostic in exc.diagnostics:
             print(diagnostic.render(exc.source), file=sys.stderr)
         return 1
-    rendered = _render_evidence(authority_evidence(authority))
+    domain_result = _validated_domain(authority, root)
+    if domain_result is None:
+        return 1
+    rendered = _validated_evidence(authority, domain_result)
     if args.write_evidence:
         evidence_path.parent.mkdir(parents=True, exist_ok=True)
         evidence_path.write_text(rendered, encoding="utf-8", newline="\n")
@@ -83,7 +127,9 @@ def main(argv: list[str] | None = None) -> int:
         "Dependency authority valid: "
         f"{len(authority.document['layers'])} layers, "
         f"{len(authority.document['directions'])} directions, "
-        f"{len(authority.document['runtimes'])} runtimes."
+        f"{len(authority.document['runtimes'])} runtimes; "
+        f"domain independent across {domain_result.files} files and "
+        f"{domain_result.dependencies} dependencies."
     )
     return 0
 

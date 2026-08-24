@@ -131,8 +131,10 @@ une connexion Azure DevOps réelle.
   localisés et les autorités actuelles restent en vigueur jusqu’à leurs migrations dédiées.
 - **Autorité de dépendance diagnostiquable.** La projection JSON [versionnée et documentée](docs/dependency-authority.md)
   relie explicitement les décisions 7.7/7.8, décrit les six couches, leur matrice complète et les frontières
-  cibles des trois runtimes. Son schéma et son parseur refusent les défauts de syntaxe, structure, version,
-  liaison normative et cohérence avec des diagnostics localisés, sans encore contrôler les imports produit.
+  cibles des trois runtimes. Son contrôle refuse les défauts d’autorité ainsi que toute dépendance du domaine
+  vers un adaptateur, un package externe ou une ressource technique, avec fichier et ligne, y compris dans
+  le snapshot staged isolé utilisé par les hooks ; une source produit illisible ou non analysable échoue de
+  façon fermée avec un diagnostic localisé.
 - **Migration ordonnée sans lot bloquant.** La [séquence architecturale](docs/architecture-migration-sequence.md)
   fixe un graphe acyclique de publications autonomes, calcule les vagues de disponibilité les plus précoces
   et protège automatiquement les précédences. Après sa publication, six outcomes indépendants peuvent

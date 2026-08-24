@@ -2870,6 +2870,23 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_comments_strings_tests_and_unresolved_internal_paths_do_not_create_violations",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_comments_strings_tests_and_unresolved_internal_paths_do_not_create_violations",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_committed_authority_parses_and_exposes_the_normative_matrix",
     "framework": "pytest",
     "sourcePath": "tests/test_dependency_authority.py",
@@ -2894,6 +2911,67 @@
     ],
     "domains": [
       "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_domain_accepts_internal_code_and_python_standard_library",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_domain_accepts_internal_code_and_python_standard_library",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_domain_rejects_external_technologies",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_domain_rejects_external_technologies",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_domain_rejects_imported_technical_resources",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_domain_rejects_imported_technical_resources",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_domain_rejects_static_type_and_dynamic_adapter_imports_with_paths",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_domain_rejects_static_type_and_dynamic_adapter_imports_with_paths",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops",
+      "user_interface"
     ]
   },
   {
@@ -2953,6 +3031,19 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_invalid_python_domain_source_fails_closed_at_its_line",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_invalid_python_domain_source_fails_closed_at_its_line",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_loader_localizes_read_schema_and_semantic_failures",
     "framework": "pytest",
     "sourcePath": "tests/test_dependency_authority.py",
@@ -2990,6 +3081,18 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_python_domain_rejects_an_adapter_even_for_an_imported_type",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_python_domain_rejects_an_adapter_even_for_an_imported_type",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_quality_boundary_cannot_claim_a_product_layer",
     "framework": "pytest",
     "sourcePath": "tests/test_dependency_authority.py",
@@ -2997,6 +3100,18 @@
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_repository_inspection_uses_authority_roots_without_git",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_repository_inspection_uses_authority_roots_without_git",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
     "purposes": [
       "functional"
     ]

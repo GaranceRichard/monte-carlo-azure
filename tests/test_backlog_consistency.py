@@ -45,13 +45,13 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     features = check_backlog_consistency.parse_registry(backlog)
 
     assert sum(len(feature.pbis) for feature in features) == 202
-    assert sum(feature.completed_count for feature in features) == 43
+    assert sum(feature.completed_count for feature in features) == 44
     feature_two = next(feature for feature in features if feature.number == 2)
     assert feature_two.completed_count == 21
     assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == []
     feature_seven = next(feature for feature in features if feature.number == 7)
     assert len(feature_seven.pbis) == 75
-    assert feature_seven.completed_count == 11
+    assert feature_seven.completed_count == 12
     assert [
         (pbi.identifier, pbi.completed_on)
         for pbi in feature_seven.pbis
@@ -67,18 +67,19 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
         ("7.8", "20/08/2026"),
         ("7.9", "22/08/2026"),
         ("7.10", "22/08/2026"),
+        ("7.11", "23/08/2026"),
         ("7.32", "23/08/2026"),
     ]
     assert check_backlog_consistency.feature_priority(governance, features) == 7
     assert "Feature en cours :** Feature 7" in backlog
-    assert "11/75 PBI réalisés (14,67 %)" in backlog
+    assert "12/75 PBI réalisés (16 %)" in backlog
     assert (
-        "Prochain PBI :** 7.11 — "
-        "Le domaine reste indépendant des technologies"
+        "Prochain PBI :** 7.12 — "
+        "Les API publiques empêchent les imports profonds"
         in backlog
     )
-    assert "Progression globale :** 43/202 PBI réalisés (21,29 %) ; 159 restants" in backlog
-    assert "Répartition actuelle des 159 PBI non réalisés" in governance
+    assert "Progression globale :** 44/202 PBI réalisés (21,78 %) ; 158 restants" in backlog
+    assert "Répartition actuelle des 158 PBI non réalisés" in governance
     assert (
         "Dernière Feature terminée :** Feature 2 — "
         "Garantir la fiabilité du cœur statistique"

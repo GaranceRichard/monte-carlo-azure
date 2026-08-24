@@ -8,7 +8,7 @@
     "hotspotRule": "At least two of repeatedTraversal, highCoupling, largeFile.",
     "thresholds": {
       "repeatedTraversalMinimum": 2,
-      "dependencyDegreeP75": 6,
+      "dependencyDegreeP75": 5,
       "traversedFileLinesP75": 394
     }
   },

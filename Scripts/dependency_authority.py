@@ -133,8 +133,13 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def authority_evidence(authority: DependencyAuthority) -> dict[str, Any]:
-    """Build a deterministic proof that the committed authority parsed successfully."""
+def authority_evidence(
+    authority: DependencyAuthority,
+    *,
+    domain_files: int,
+    domain_dependencies: int,
+) -> dict[str, Any]:
+    """Build the deterministic proof for authority and domain independence."""
     document = authority.document
     return {
         "evidenceVersion": "1.0.0",
@@ -148,12 +153,16 @@ def authority_evidence(authority: DependencyAuthority) -> dict[str, Any]:
             "jsonSyntax": "valid",
             "structure": "valid",
             "semantics": "valid",
+            "domainIndependence": "valid",
         },
         "counts": {
             "layers": len(document["layers"]),
             "directions": len(document["directions"]),
             "runtimes": len(document["runtimes"]),
             "boundaries": sum(len(runtime["boundaries"]) for runtime in document["runtimes"]),
+            "domainFiles": domain_files,
+            "domainDependencies": domain_dependencies,
+            "domainTechnologyViolations": 0,
         },
         "diagnostics": [],
         "status": "valid",
