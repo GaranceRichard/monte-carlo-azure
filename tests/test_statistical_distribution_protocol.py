@@ -188,6 +188,24 @@ def test_protocol_semantics_report_every_non_structural_fault() -> None:
 def test_seed_collision_guard_and_population_fingerprint_diagnostics(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    class Digest:
+        def __init__(self, material: bytes) -> None:
+            self.counter = int(material.rsplit(b":", 1)[1])
+
+        def digest(self) -> bytes:
+            candidate = 1 if self.counter < 2 else 2
+            return candidate.to_bytes(4, "big") + bytes(28)
+
+    with monkeypatch.context() as collision:
+        collision.setattr(
+            protocol_validation.hashlib,
+            "sha256",
+            lambda material: Digest(material),
+        )
+        assert protocol_validation.generate_seed_population(
+            {"construction": {"namespace": "collision", "size": 2}}
+        ) == [1, 2]
+
     _protocol, seeds, _corpus = _bundle()
     duplicate = deepcopy(seeds)
     monkeypatch.setattr(
@@ -632,40 +650,63 @@ def test_cli_commands_and_entrypoints_report_success_and_failure(
     monkeypatch.setattr(distribution_control, "run_control", lambda **_kwargs: matching)
     assert distribution_control.main([]) == 0
 
-    for module, cli_file in (
-        (protocol_cli, protocol_cli.__file__),
-        (calibration_cli, calibration_cli.__file__),
-        (calibration_validator_cli, calibration_validator_cli.__file__),
-        (evidence_cli, evidence_cli.__file__),
-        (distribution_control, distribution_control.__file__),
-    ):
-        monkeypatch.setattr(module, "main", lambda _argv=None: 0)
-        monkeypatch.setattr(sys, "argv", [str(cli_file)])
+    entrypoints = (
+        (protocol_cli.__file__, [], 0),
+        (
+            calibration_cli.__file__,
+            ["--output", str(tmp_path / "entrypoint-calibration.json")],
+            0,
+        ),
+        (
+            calibration_validator_cli.__file__,
+            ["--report", str(tmp_path / "missing-entrypoint-calibration.json")],
+            1,
+        ),
+        (
+            evidence_cli.__file__,
+            [str(tmp_path / "missing-entrypoint-evidence.json")],
+            1,
+        ),
+        (
+            distribution_control.__file__,
+            [
+                "--protocol",
+                str(tmp_path / "missing-entrypoint-protocol.json"),
+                "--evidence",
+                str(tmp_path / "entrypoint-evidence.json"),
+            ],
+            1,
+        ),
+    )
+    for cli_file, arguments, expected_code in entrypoints:
+        monkeypatch.setattr(sys, "argv", [str(cli_file), *arguments])
         with pytest.raises(SystemExit) as stopped:
             runpy.run_path(str(cli_file), run_name="__main__")
-        assert stopped.value.code == 0
+        assert stopped.value.code == expected_code
 
 
 def test_real_distributional_runner_is_informative_complete_and_stable(tmp_path: Path) -> None:
-    first_path = tmp_path / "first.json"
-    second_path = tmp_path / "second.json"
+    evidence_path = tmp_path / "evidence.json"
 
-    first = distribution_control.run_control(evidence_path=first_path)
-    second = distribution_control.run_control(evidence_path=second_path)
+    report = distribution_control.run_control(evidence_path=evidence_path)
+    versioned_path = runner.ROOT / "reports/statistical-distribution-evidence.json"
+    versioned = json.loads(versioned_path.read_text(encoding="utf-8"))
 
-    assert first["status"] == "match"
-    assert first["proof_kind"] == "distributional_parity"
-    assert first["enforcement"] == "informational"
-    assert first["summary"] == {
+    assert report["status"] == "match"
+    assert report["proof_kind"] == "distributional_parity"
+    assert report["enforcement"] == "informational"
+    assert report["summary"] == {
         "scenario_count": 5,
         "metric_count": 49,
         "matches": 49,
         "divergences": 0,
         "inconclusive": 0,
     }
-    assert first == second
-    assert first_path.read_bytes() == second_path.read_bytes()
-    assert runner.verify_artifact_fingerprint(first)
+    assert report == versioned
+    assert evidence_path.read_text(encoding="utf-8") == versioned_path.read_text(
+        encoding="utf-8"
+    )
+    assert runner.verify_artifact_fingerprint(report)
 
 
 def test_distributional_authorities_are_documented_without_product_chronology() -> None:

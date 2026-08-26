@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import runpy
 import sys
 from copy import deepcopy
@@ -629,8 +630,21 @@ def test_control_reports_fatal_engine_errors_and_cli_statuses(
 def test_control_script_entrypoint(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(corpus_control, "main", lambda _argv=None: 0)
-    monkeypatch.setattr(sys, "argv", [str(corpus_control.__file__)])
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            str(corpus_control.__file__),
+            "--schema",
+            "missing-entrypoint-schema.json",
+            "--corpus",
+            "missing-entrypoint-corpus.json",
+            "--json-report",
+            os.devnull,
+            "--markdown-report",
+            os.devnull,
+        ],
+    )
     with pytest.raises(SystemExit) as stopped:
         runpy.run_path(str(corpus_control.__file__), run_name="__main__")
-    assert stopped.value.code == 0
+    assert stopped.value.code == 1

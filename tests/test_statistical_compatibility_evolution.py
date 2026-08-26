@@ -71,6 +71,16 @@ def test_accepted_release_history_and_new_proof_lineage_cannot_be_rewritten() ->
     diagnostics = evolution_diagnostics(versioned, previous)
     assert any(item.code == "release_proofs_not_regenerated" for item in diagnostics)
 
+    regenerated = deepcopy(previous)
+    released = _append_release(regenerated, "risk-score", "normative_result_change")
+    required = set(released["required_proofs"])
+    for proof in regenerated["proof_artifacts"]:
+        if proof["id"] in required:
+            proof["version"] = "1.1"
+            proof["semantic_fingerprint"] = "f" * 64
+    diagnostics = evolution_diagnostics(regenerated, previous)
+    assert not any(item.code == "release_proofs_not_regenerated" for item in diagnostics)
+
 
 def test_evolution_rejects_removed_authorities_and_untraced_manifest_edits() -> None:
     previous = _authority()

@@ -27,7 +27,7 @@ Sources : `docs/frontend-responsibilities-map.md#simulation-déquipe`, `docs/bac
 
 | Fichiers | Production | Tests | Lignes | Couches | Arêtes internes | Arêtes de frontière | Hotspots |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 21 | 13 | 8 | 5996 | 9 | 27 | 73 | 3 |
+| 21 | 13 | 8 | 6013 | 9 | 27 | 73 | 3 |
 
 Couches : `backend-domain`, `backend-engine`, `backend-transport`, `frontend-application`, `frontend-delivery-or-engine`, `frontend-domain`, `frontend-transport`, `proof-tests`, `quality-statistical-proof`.
 

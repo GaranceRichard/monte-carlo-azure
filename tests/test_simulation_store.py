@@ -426,6 +426,21 @@ def test_save_items_omits_unavailable_mode_and_completion_fields(monkeypatch):
     assert "completion_summary" not in document
     assert document["risk_score"] == 0.4444
 
+    result_without_risk = SimulationResult(
+        result_kind="items",
+        result_percentiles=SimulationPercentiles.create(
+            "weeks_to_items",
+            {"P70": 7},
+        ),
+        result_distribution=result.result_distribution,
+        completion_summary=None,
+        samples_count=result.samples_count,
+        throughput_reliability=result.throughput_reliability,
+        seed=result.seed,
+    )
+    store.save_simulation("c3", command, result_without_risk)
+    assert "risk_score" not in fake_coll.inserted[1]
+
 
 def test_list_recent_returns_empty_when_disabled_or_empty_client():
     store_disabled = _store("")

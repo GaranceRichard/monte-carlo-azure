@@ -1233,7 +1233,7 @@
     "selector": "test_simulate_response_rejects_a_non_authoritative_risk_score",
     "status": "classified",
     "executionProfile": "pr",
-    "nature": "unit",
+    "nature": "contract",
     "purposes": [
       "functional"
     ],

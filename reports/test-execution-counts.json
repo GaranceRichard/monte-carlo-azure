@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "classificationInventorySha256": "ba118a5b94dffe80cefe968773759417311a423cc6f63f7f6e5c8342ccef849c",
+  "classificationInventorySha256": "ba096850350fdf1254fd4f9937ad9944bd606b154e68ae2fd700cb2c9656a2b7",
   "totals": {
     "logicalCases": 1474,
     "collectedInstances": 1889,
@@ -97,14 +97,14 @@
       }
     },
     "contract": {
-      "logicalCases": 46,
-      "collectedInstances": 66,
-      "executedInstances": 66,
+      "logicalCases": 47,
+      "collectedInstances": 67,
+      "executedInstances": 67,
       "skippedInstances": 0,
-      "attempts": 66,
+      "attempts": 67,
       "retries": 0,
       "results": {
-        "passed": 66,
+        "passed": 67,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -142,14 +142,14 @@
       }
     },
     "unit": {
-      "logicalCases": 698,
-      "collectedInstances": 1010,
-      "executedInstances": 1010,
+      "logicalCases": 697,
+      "collectedInstances": 1009,
+      "executedInstances": 1009,
       "skippedInstances": 0,
-      "attempts": 1010,
+      "attempts": 1009,
       "retries": 0,
       "results": {
-        "passed": 1010,
+        "passed": 1009,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -1437,7 +1437,7 @@
       "selector": "test_simulate_response_rejects_a_non_authoritative_risk_score",
       "classificationStatus": "classified",
       "executionProfile": "pr",
-      "nature": "unit",
+      "nature": "contract",
       "logicalCases": 1,
       "collectedInstances": 1,
       "executedInstances": 1,

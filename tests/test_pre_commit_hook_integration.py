@@ -136,15 +136,14 @@ def _put_index_blob(
 
 
 def _index_fixture(repository: Path, index_file: str) -> None:
-    for path in sorted(repository.rglob("*")):
-        if not path.is_file() or ".git" in path.relative_to(repository).parts:
-            continue
-        _put_index_blob(
-            repository,
-            index_file,
-            path.relative_to(repository).as_posix(),
-            path.read_bytes(),
-        )
+    _git(
+        repository,
+        "add",
+        "--all",
+        "--",
+        ".",
+        environment=_git_environment(GIT_INDEX_FILE=index_file),
+    )
 
 
 def _create_head(repository: Path, index_file: str) -> str:

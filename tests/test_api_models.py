@@ -5,6 +5,9 @@ from backend.api_models import SimulateResponse, SimulationHistoryItem
 
 
 def test_simulate_response_rejects_a_non_authoritative_risk_score() -> None:
+    with pytest.raises(ValidationError):
+        SimulateResponse.model_validate("not-a-response")
+
     with pytest.raises(ValidationError, match="valeur d'autorite"):
         SimulateResponse(
             result_kind="items",

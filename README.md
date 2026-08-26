@@ -296,6 +296,12 @@ La validation complète est la tâche VS Code `Validation : profil main`, qui ex
 .\.venv\Scripts\python.exe Scripts/quality_gate.py ci --profile main
 ```
 
+Pour profiler la suite backend sans modifier sa sélection, utiliser `pytest -q --durations=30` pour la
+suite complète, puis mesurer le nœud canonique avec
+`Scripts/quality_gate.py ci --profile main --node backend-tests`. Les tests de points d’entrée statistiques
+exécutent leurs vrais guards avec des sorties isolées, et les preuves coûteuses restent comparées aux
+artefacts versionnés plutôt que recalculées plusieurs fois dans un même cas.
+
 Le profil rapide valide exclusivement le snapshot construit depuis l’index Git. Lorsqu’un contrôle déclaré
 dépend de l’outillage frontend, la gate expose temporairement le seul `frontend/node_modules` de
 l’installation hôte dans ce snapshot, y compris si aucune suite frontend n’est sélectionnée. Les sources
