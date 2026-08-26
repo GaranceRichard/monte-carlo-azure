@@ -85,7 +85,7 @@ l’unique autorité de réalisation.
 | [`dependency-graph.md`](dependency-graph.md) | Développeurs, architectes | Projection générée du graphe observé ; aucune autorité sur l’architecture cible | Preuve générée |
 | [`target-dependency-directions.md`](target-dependency-directions.md) | Développeurs, architectes | Autorité normative des directions de dépendance cibles ; aucune migration ni frontière physique détaillée | Architecture |
 | [`target-architecture.md`](target-architecture.md) | Développeurs, architectes | Autorité normative des responsabilités, frontières, ports, compositions et contrats inter-runtime cibles | Architecture |
-| [`dependency-authority.md`](dependency-authority.md) | Développeurs, architectes, qualité | Format, chaîne d’autorité, diagnostics et règle d’indépendance technologique du domaine | Contrat |
+| [`dependency-authority.md`](dependency-authority.md) | Développeurs, architectes, qualité | Format, diagnostics, indépendance technologique du domaine et encapsulation par API publique | Contrat |
 | [`../config/dependency-authority-v1.0.json`](../config/dependency-authority-v1.0.json) | Contrôles architecturaux | Projection exécutable versionnée des décisions normatives de dépendance et de frontières | Contrat machine |
 | [`architecture-migration-sequence.md`](architecture-migration-sequence.md) | Développeurs, architectes | Séquence acyclique, états publiables, chemins parallèles, convergences et stratégie de rollback sans réaliser les migrations | Architecture |
 | [`../frontend/README.md`](../frontend/README.md) | Développeurs frontend | Guide de démarrage et frontières frontend | Technique |
@@ -177,7 +177,7 @@ l’unique autorité de réalisation.
 - [`target-architecture.md`](target-architecture.md) — architecture cible unique, frontières physiques,
   responsabilités, ports, contrats inter-runtime et règles de composition ;
 - [`dependency-authority.md`](dependency-authority.md) — format versionné, liaison aux décisions 7.7/7.8,
-  validations de leur projection machine et refus localisé des technologies dans le domaine ;
+  refus localisé des technologies dans le domaine et des imports profonds hors API publique ;
 - [`architecture-migration-sequence.md`](architecture-migration-sequence.md) — graphe de précédence,
   parallélisme maximal, états publiables, convergences et rollback des migrations ;
 - [`../frontend/README.md`](../frontend/README.md) — démarrage et frontières propres au frontend ;

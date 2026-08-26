@@ -10,6 +10,7 @@
     "authorityId",
     "projectionRole",
     "normativeSources",
+    "moduleEncapsulation",
     "layers",
     "directions",
     "runtimes"
@@ -35,6 +36,9 @@
       "items": {
         "$ref": "#/$defs/normativeSource"
       }
+    },
+    "moduleEncapsulation": {
+      "$ref": "#/$defs/moduleEncapsulation"
     },
     "layers": {
       "type": "array",
@@ -92,6 +96,72 @@
           "pattern": "^[0-9a-f]{64}$"
         }
       }
+    },
+    "moduleEncapsulation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "javascriptPublicEntrypoints",
+        "pythonPublicEntrypoints",
+        "deepImportExceptions"
+      ],
+      "properties": {
+        "javascriptPublicEntrypoints": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "index.js",
+              "index.jsx",
+              "index.mjs",
+              "index.cjs",
+              "index.ts",
+              "index.tsx",
+              "index.mts",
+              "index.cts"
+            ]
+          }
+        },
+        "pythonPublicEntrypoints": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "const": "__init__.py"
+          }
+        },
+        "deepImportExceptions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/deepImportException"
+          }
+        }
+      }
+    },
+    "deepImportException": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "target", "authorization", "reason"],
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "target": {
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "authorization": {
+          "$ref": "#/$defs/nonEmptyText"
+        },
+        "reason": {
+          "$ref": "#/$defs/nonEmptyText"
+        }
+      }
+    },
+    "repositoryPath": {
+      "type": "string",
+      "pattern": "^[^/\\\\][^\\\\]*$"
     },
     "layer": {
       "type": "object",

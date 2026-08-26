@@ -25,6 +25,11 @@ from Scripts.dependency_authority_domain import (  # noqa: E402
     DomainInspectionError,
     inspect_repository_domain,
 )
+from Scripts.dependency_authority_public_api import (  # noqa: E402
+    PublicApiInspectionError,
+    PublicApiResult,
+    inspect_repository_public_apis,
+)
 
 DEFAULT_EVIDENCE = ROOT / "reports" / "dependency-authority-validation.json"
 
@@ -59,15 +64,62 @@ def _validated_domain(
     return domain_result
 
 
+def _validated_public_apis(
+    authority: DependencyAuthority, root: Path
+) -> PublicApiResult | None:
+    try:
+        result = inspect_repository_public_apis(authority, root)
+    except PublicApiInspectionError as exc:
+        diagnostic = Diagnostic(
+            "DEP-PUBLIC-API-SCAN",
+            "/",
+            f"Impossible d'inspecter les API publiques: {exc}",
+            "Rétablir des racines gouvernées et des sources UTF-8 lisibles avant de "
+            "relancer le contrôle.",
+        )
+        print(diagnostic.render(root), file=sys.stderr)
+        return None
+    if result.diagnostics:
+        for diagnostic in result.diagnostics:
+            print(diagnostic.render(root), file=sys.stderr)
+        return None
+    return result
+
+
 def _validated_evidence(
-    authority: DependencyAuthority, domain_result: DomainIndependenceResult
+    authority: DependencyAuthority,
+    domain_result: DomainIndependenceResult,
+    public_api_result: PublicApiResult,
 ) -> str:
     return _render_evidence(
         authority_evidence(
             authority,
             domain_files=domain_result.files,
             domain_dependencies=domain_result.dependencies,
+            module_files=public_api_result.files,
+            module_dependencies=public_api_result.dependencies,
+            governed_modules=public_api_result.modules,
+            public_api_entrypoints=public_api_result.public_entrypoints,
+            deep_import_exceptions=public_api_result.exceptions,
         )
+    )
+
+
+def _success_message(
+    authority: DependencyAuthority,
+    domain_result: DomainIndependenceResult,
+    public_api_result: PublicApiResult,
+) -> str:
+    return (
+        "Dependency authority valid: "
+        f"{len(authority.document['layers'])} layers, "
+        f"{len(authority.document['directions'])} directions, "
+        f"{len(authority.document['runtimes'])} runtimes; "
+        f"domain independent across {domain_result.files} files and "
+        f"{domain_result.dependencies} dependencies; "
+        f"{public_api_result.modules} governed modules expose "
+        f"{public_api_result.public_entrypoints} public entrypoints across "
+        f"{public_api_result.dependencies} inspected imports."
     )
 
 
@@ -98,9 +150,10 @@ def main(argv: list[str] | None = None) -> int:
             print(diagnostic.render(exc.source), file=sys.stderr)
         return 1
     domain_result = _validated_domain(authority, root)
-    if domain_result is None:
+    public_api_result = _validated_public_apis(authority, root)
+    if domain_result is None or public_api_result is None:
         return 1
-    rendered = _validated_evidence(authority, domain_result)
+    rendered = _validated_evidence(authority, domain_result, public_api_result)
     if args.write_evidence:
         evidence_path.parent.mkdir(parents=True, exist_ok=True)
         evidence_path.write_text(rendered, encoding="utf-8", newline="\n")
@@ -123,14 +176,7 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 1
-    print(
-        "Dependency authority valid: "
-        f"{len(authority.document['layers'])} layers, "
-        f"{len(authority.document['directions'])} directions, "
-        f"{len(authority.document['runtimes'])} runtimes; "
-        f"domain independent across {domain_result.files} files and "
-        f"{domain_result.dependencies} dependencies."
-    )
+    print(_success_message(authority, domain_result, public_api_result))
     return 0
 
 

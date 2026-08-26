@@ -12,8 +12,8 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 264,
-    "importEdges": 1381,
+    "sourceModules": 265,
+    "importEdges": 1390,
     "entrypoints": 85,
     "missingEntrypoints": 5,
     "cycles": 2,
@@ -190,6 +190,11 @@
       },
       {
         "path": "Scripts/dependency_authority_javascript.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/dependency_authority_public_api.py",
         "area": "quality",
         "language": "python"
       },
@@ -2013,6 +2018,15 @@
       },
       {
         "source": "Scripts/check_dependency_authority.py",
+        "target": "Scripts/dependency_authority_public_api.py",
+        "line": 28,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_public_api.inspect_repository_public_apis",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/check_dependency_authority.py",
         "target": "external:python:__future__",
         "line": 4,
         "kind": "python-from",
@@ -3179,6 +3193,78 @@
         "kind": "python-import",
         "phase": "runtime",
         "specifier": "re",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_public_api.py",
+        "target": "Scripts/dependency_authority.py",
+        "line": 8,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority.DependencyAuthority",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_public_api.py",
+        "target": "Scripts/dependency_authority_contract.py",
+        "line": 9,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_contract.Diagnostic",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_public_api.py",
+        "target": "Scripts/dependency_authority_domain.py",
+        "line": 10,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_domain.LocatedDiagnostic",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_public_api.py",
+        "target": "Scripts/dependency_authority_imports.py",
+        "line": 11,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_imports.repository_source_texts",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_public_api.py",
+        "target": "Scripts/dependency_authority_javascript.py",
+        "line": 20,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_javascript.javascript_dependencies",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_public_api.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_public_api.py",
+        "target": "external:python:dataclasses",
+        "line": 5,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "dataclasses",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_public_api.py",
+        "target": "external:python:pathlib",
+        "line": 6,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "pathlib",
         "resolution": "external"
       },
       {
@@ -14002,7 +14088,7 @@
       },
       {
         "declaredIn": "Scripts/check_dependency_authority.py",
-        "line": 135,
+        "line": 181,
         "kind": "python-main-guard",
         "target": "Scripts/check_dependency_authority.py",
         "resolution": "internal"
@@ -14504,7 +14590,7 @@
         "sourceArea": "quality",
         "targetArea": "quality",
         "phase": "runtime",
-        "count": 253
+        "count": 259
       }
     ]
   },

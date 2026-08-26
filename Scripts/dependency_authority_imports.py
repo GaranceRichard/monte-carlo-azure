@@ -47,6 +47,27 @@ def repository_paths(root: Path, source_roots: tuple[str, ...]) -> list[str]:
     return sorted(paths)
 
 
+def repository_source_texts(
+    root: Path,
+    source_roots: tuple[str, ...],
+    inspection_error: type[RuntimeError] = DomainInspectionError,
+) -> tuple[dict[str, str], list[str]]:
+    """Read governed source files and fail closed with the requested error type."""
+    try:
+        paths = repository_paths(root, source_roots)
+    except DomainInspectionError as exc:
+        raise inspection_error(str(exc)) from exc
+    texts: dict[str, str] = {}
+    for path in paths:
+        if Path(path).suffix not in SOURCE_SUFFIXES:
+            continue
+        try:
+            texts[path] = (root / path).read_text(encoding="utf-8-sig")
+        except (OSError, UnicodeError) as exc:
+            raise inspection_error(f"Impossible de lire {path}: {exc}") from exc
+    return texts, paths
+
+
 def python_modules(paths: set[str]) -> dict[str, str]:
     modules: dict[str, str] = {}
     for path in sorted(item for item in paths if item.endswith(".py")):

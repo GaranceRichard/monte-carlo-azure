@@ -138,11 +138,16 @@ def authority_evidence(
     *,
     domain_files: int,
     domain_dependencies: int,
+    module_files: int,
+    module_dependencies: int,
+    governed_modules: int,
+    public_api_entrypoints: int,
+    deep_import_exceptions: int,
 ) -> dict[str, Any]:
-    """Build the deterministic proof for authority and domain independence."""
+    """Build the deterministic proof for integrated dependency rules."""
     document = authority.document
     return {
-        "evidenceVersion": "1.0.0",
+        "evidenceVersion": "1.1.0",
         "authority": authority.path.relative_to(authority.repository_root).as_posix(),
         "authoritySha256": _sha256(authority.path),
         "schema": authority.schema_path.relative_to(authority.repository_root).as_posix(),
@@ -154,6 +159,7 @@ def authority_evidence(
             "structure": "valid",
             "semantics": "valid",
             "domainIndependence": "valid",
+            "moduleEncapsulation": "valid",
         },
         "counts": {
             "layers": len(document["layers"]),
@@ -163,6 +169,12 @@ def authority_evidence(
             "domainFiles": domain_files,
             "domainDependencies": domain_dependencies,
             "domainTechnologyViolations": 0,
+            "moduleFiles": module_files,
+            "moduleDependencies": module_dependencies,
+            "governedModules": governed_modules,
+            "publicApiEntrypoints": public_api_entrypoints,
+            "deepImportExceptions": deep_import_exceptions,
+            "deepImportViolations": 0,
         },
         "diagnostics": [],
         "status": "valid",

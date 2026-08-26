@@ -15,7 +15,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 264 | 1381 | 85 | 5 | 2 | 0 | 125 | 2 |
+| 265 | 1390 | 85 | 5 | 2 | 0 | 125 | 2 |
 
 ### Directions observées
 
@@ -27,7 +27,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 | launcher | backend | runtime | 1 |
 | quality | backend | runtime | 5 |
 | quality | frontend | runtime | 3 |
-| quality | quality | runtime | 253 |
+| quality | quality | runtime | 259 |
 
 ### Cycles localisés
 
@@ -87,7 +87,7 @@ frontend/src/hooks/simulationForecastCore.ts → frontend/src/hooks/simulationFo
 | Scripts/check_architecture_migration_sequence.py | 84 | python-main-guard | Scripts/check_architecture_migration_sequence.py | internal |
 | Scripts/check_backlog_atomicity.py | 61 | python-main-guard | Scripts/check_backlog_atomicity.py | internal |
 | Scripts/check_backlog_consistency.py | 284 | python-main-guard | Scripts/check_backlog_consistency.py | internal |
-| Scripts/check_dependency_authority.py | 135 | python-main-guard | Scripts/check_dependency_authority.py | internal |
+| Scripts/check_dependency_authority.py | 181 | python-main-guard | Scripts/check_dependency_authority.py | internal |
 | Scripts/check_dod_compliance.py | 404 | python-main-guard | Scripts/check_dod_compliance.py | internal |
 | Scripts/check_e2e_coverage.py | 367 | python-main-guard | Scripts/check_e2e_coverage.py | internal |
 | Scripts/check_identity_boundary.py | 505 | python-main-guard | Scripts/check_identity_boundary.py | internal |

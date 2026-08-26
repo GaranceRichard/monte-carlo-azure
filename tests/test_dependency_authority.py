@@ -27,6 +27,7 @@ from Scripts.dependency_authority_domain import (
     inspect_repository_domain,
     validate_domain_independence,
 )
+from Scripts.dependency_authority_public_api import inspect_repository_public_apis
 from Scripts.dependency_authority_validation import validate_authority_document
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,13 +71,20 @@ def test_committed_authority_parses_and_exposes_the_normative_matrix() -> None:
 def test_committed_evidence_is_a_fresh_deterministic_projection(capsys) -> None:
     authority = load_dependency_authority()
     domain_result = inspect_repository_domain(authority)
+    public_api_result = inspect_repository_public_apis(authority)
     committed = _json(ROOT / "reports" / "dependency-authority-validation.json")
 
     assert not domain_result.diagnostics
+    assert not public_api_result.diagnostics
     assert committed == authority_evidence(
         authority,
         domain_files=domain_result.files,
         domain_dependencies=domain_result.dependencies,
+        module_files=public_api_result.files,
+        module_dependencies=public_api_result.dependencies,
+        governed_modules=public_api_result.modules,
+        public_api_entrypoints=public_api_result.public_entrypoints,
+        deep_import_exceptions=public_api_result.exceptions,
     )
     assert check_authority([]) == 0
     assert "36 directions" in capsys.readouterr().out
@@ -393,6 +401,25 @@ def test_missing_required_property_has_a_json_pointer() -> None:
     diagnostics = _diagnostics(lambda document: document.pop("layers"))
 
     _assert_actionable(diagnostics, "DEP-AUTH-STRUCTURE", "/layers")
+
+
+def test_deep_import_exception_requires_explicit_authorization() -> None:
+    def mutate(document: dict[str, Any]) -> None:
+        document["moduleEncapsulation"]["deepImportExceptions"].append(
+            {
+                "source": "frontend/src/application/client.ts",
+                "target": "frontend/src/domain/delivery/event.ts",
+                "reason": "Transition temporaire.",
+            }
+        )
+
+    diagnostics = _diagnostics(mutate)
+
+    _assert_actionable(
+        diagnostics,
+        "DEP-AUTH-STRUCTURE",
+        "/moduleEncapsulation/deepImportExceptions/0/authorization",
+    )
 
 
 def test_unsupported_format_version_requires_an_explicit_migration() -> None:

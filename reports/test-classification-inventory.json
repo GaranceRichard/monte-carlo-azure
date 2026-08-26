@@ -2914,6 +2914,18 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_deep_import_exception_requires_explicit_authorization",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_authority.py",
+    "selector": "test_deep_import_exception_requires_explicit_authorization",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_domain_accepts_internal_code_and_python_standard_library",
     "framework": "pytest",
     "sourcePath": "tests/test_dependency_authority.py",
@@ -3139,6 +3151,100 @@
     "purposes": [
       "functional",
       "migration_recovery"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_public_api.py::test_comments_strings_and_unrelated_imports_are_ignored",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_public_api.py",
+    "selector": "test_comments_strings_and_unrelated_imports_are_ignored",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_public_api.py::test_exact_authorized_exception_does_not_cover_neighbors",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_public_api.py",
+    "selector": "test_exact_authorized_exception_does_not_cover_neighbors",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_public_api.py::test_javascript_deep_imports_are_localized_for_every_import_form",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_public_api.py",
+    "selector": "test_javascript_deep_imports_are_localized_for_every_import_form",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_public_api.py::test_missing_api_and_unresolved_deep_path_fail_closed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_public_api.py",
+    "selector": "test_missing_api_and_unresolved_deep_path_fail_closed",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "security",
+      "resilience"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_public_api.py::test_public_root_imports_and_module_internals_are_allowed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_public_api.py",
+    "selector": "test_public_root_imports_and_module_internals_are_allowed",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_public_api.py::test_python_deep_import_is_rejected_even_under_type_checking",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_public_api.py",
+    "selector": "test_python_deep_import_is_rejected_even_under_type_checking",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_public_api.py::test_repository_rule_is_integrated_and_scan_failures_are_actionable",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_public_api.py",
+    "selector": "test_repository_rule_is_integrated_and_scan_failures_are_actionable",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
     ]
   },
   {

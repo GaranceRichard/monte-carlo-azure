@@ -49,6 +49,7 @@ qu’une migration de format n’est pas implémentée.
 | `directions` | Matrice fermée de 36 couples ordonnés avec `allowed`, `forbidden` ou `internal-only` |
 | `runtimes` | Déclare les racines frontend, backend et qualité acceptées par 7.8 |
 | `boundaries` | Développe les patrons `{module}`, modules cibles et couche produit ou rôle qualité |
+| `moduleEncapsulation` | Déclare les points d'entrée publics par langage et les seules exceptions exactes aux imports profonds |
 
 `internal-only` s’applique uniquement à une couche vers elle-même. Il autorise la coopération dans un module
 cohésif, sans autoriser les cycles ni transformer deux modules distincts en un seul. Le module `*` des ports
@@ -119,6 +120,34 @@ composition. `DEP-DOMAIN-TECHNOLOGY` demande de déplacer package ou ressource v
 `DEP-DOMAIN-PARSE` et `DEP-DOMAIN-SCAN` ferment le contrôle si une source ou le dépôt ne peut pas être
 inspecté de façon fiable.
 
+## Règle 7.12 — encapsulation par les API publiques
+
+Chaque répertoire de module développé depuis les frontières du manifeste est gouverné dès qu'il contient
+une source de production. Une API TypeScript/JavaScript est exposée par un point d'entrée `index.*` à la
+racine du module ; une API Python est exposée par `__init__.py`. Un import depuis le module lui-même peut
+atteindre ses internes. Tout autre consommateur doit cibler ce point d'entrée racine.
+
+Le contrôle réutilise la même extraction que 7.11 pour les imports statiques, les réexports, les imports de
+type, `import()`, `require()` et l'AST Python, y compris sous `TYPE_CHECKING`. Les chemins relatifs non
+résolus qui visent quand même l'intérieur d'une frontière échouent fermés. Les commentaires et chaînes ne
+créent aucune dépendance. Un test colocalisé dans le module peut exercer ses internes parce qu'il reste dans
+la même frontière ; un consommateur extérieur gouverné utilise l'API publique.
+
+Une violation produit un diagnostic actionnable :
+
+```text
+frontend/src/application/client.ts:line 4: [DEP-PUBLIC-API-DEEP-IMPORT] ... Correction: importer depuis la frontière attendue 'frontend/src/domain/delivery/' (...)
+```
+
+`DEP-PUBLIC-API-MISSING` localise aussi le premier fichier de production d'un module qui ne publie aucun
+point d'entrée. `DEP-PUBLIC-API-PARSE` et `DEP-PUBLIC-API-SCAN` ferment le contrôle si les imports ne peuvent
+pas être inspectés de façon fiable.
+
+Les exceptions ne sont ni des globs ni des commentaires d'ignorance. Chaque entrée de
+`moduleEncapsulation.deepImportExceptions` nomme un fichier source et un fichier cible exacts, une
+`authorization` revue et une raison. Elle n'autorise aucun voisin, autre consommateur ou autre interne.
+L'autorité livrée ne déclare actuellement aucune exception.
+
 ## Utilisation
 
 Depuis la racine du dépôt :
@@ -136,13 +165,13 @@ python Scripts/check_dependency_authority.py
 ```
 
 Le parseur reste importable par les familles de règles via `load_dependency_authority()` et
-`direction_policy(source, target)`. Depuis 7.11, le contrôle lit les imports du domaine et bloque ses
-dépendances vers les technologies et adaptateurs. Il n’est pas encore intégré aux profils de gate : cette
-responsabilité appartient au PBI 7.17.
+`direction_policy(source, target)`. Depuis 7.11 et 7.12, le contrôle bloque à la fois les technologies dans
+le domaine et les contournements des API publiques des modules gouvernés. Il n’est pas encore intégré aux
+profils de gate : cette responsabilité appartient au PBI 7.17.
 
 ## Limites préservées
 
-Cette livraison ne traite ni imports profonds (7.12), ni cycles (7.13), ni dépendances entre adaptateurs
-(7.14). Elle ne déplace ou renomme aucun module produit, ne crée aucun port et ne réalise aucune migration
-fonctionnelle. Les formules, seuils, corpus, protocoles, preuves et gates statistiques restent strictement
-inchangés.
+Cette livraison ne traite ni cycles (7.13), ni dépendances entre adaptateurs (7.14). Elle ne modifie pas le
+contenu fonctionnel des API, ne déplace ou renomme aucun module produit, ne crée aucun port et ne réalise
+aucune migration générale. Les formules, seuils, corpus, protocoles, preuves et gates statistiques restent
+strictement inchangés.

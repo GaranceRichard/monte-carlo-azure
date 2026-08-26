@@ -2,6 +2,17 @@
 
 ## Recent
 
+### Encapsulation des modules par API publique — PBI 7.12
+
+- extension de l'autorité 7.10 avec les points d'entrée racine `index.*` et `__init__.py`, plus une liste
+  fermée d'exceptions source/cible exactes exigeant autorisation et justification ;
+- intégration au contrôle architectural existant de la détection TypeScript/JavaScript et Python des imports
+  profonds, y compris types, réexports, chargements dynamiques, `require()` et `TYPE_CHECKING` ;
+- diagnostics actionnables avec fichier, ligne et frontière publique attendue, couverture positive, négative
+  et des cas limites, preuve et documentation ciblées ;
+- contenu fonctionnel des API, cycles, dépendances entre adaptateurs, migration générale et garanties
+  statistiques laissés inchangés.
+
 ### Fenêtre historique du domaine delivery — PBI 7.22
 
 - ajout du Value Object `DeliveryHistoryWindow` avec instants absolus immuables, début inclus, fin exclue,

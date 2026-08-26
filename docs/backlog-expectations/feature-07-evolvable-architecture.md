@@ -214,7 +214,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Rendre l’intérieur des modules modifiable sans effet transversal.
 - **Frontière principale :** API publiques des modules.
 - **Famille d’invariants :** Encapsulation des modules.
-- **Preuve principale :** Tests des imports autorisés et des contournements refusés.
+- **Preuve principale :** [Tests positifs, négatifs et cas limites des API publiques](../../tests/test_dependency_public_api.py), complétés par la [preuve du contrôle intégré](../../reports/dependency-authority-validation.json).
 - **Éléments de réalisation inclus :** Règle ; diagnostic ; exceptions explicites ; intégration mécanique ; documentation ciblée.
 - **Hors périmètre :** Contenu fonctionnel des API et cycles entre modules.
 - **Surface prévisionnelle :** 3 fichiers de production ; 7 fichiers versionnés

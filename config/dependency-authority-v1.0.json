@@ -17,6 +17,20 @@
       "sha256": "cc676f2553032c4cdd3ad850d1d3e8fdf5abc0b2cd58a0f1990cf2ab3c8f06ee"
     }
   ],
+  "moduleEncapsulation": {
+    "javascriptPublicEntrypoints": [
+      "index.js",
+      "index.jsx",
+      "index.mjs",
+      "index.cjs",
+      "index.ts",
+      "index.tsx",
+      "index.mts",
+      "index.cts"
+    ],
+    "pythonPublicEntrypoints": ["__init__.py"],
+    "deepImportExceptions": []
+  },
   "layers": [
     {
       "id": "domain",
