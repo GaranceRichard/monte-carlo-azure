@@ -2,6 +2,16 @@
 
 ## Recent
 
+### Fenêtre historique du domaine delivery — PBI 7.22
+
+- ajout du Value Object `DeliveryHistoryWindow` avec instants absolus immuables, début inclus, fin exclue,
+  rejet des bornes inversées et représentation vide lorsque les deux bornes coïncident ;
+- sélection métier unique des items portant un fait `item_delivered` dans la fenêtre, avec conservation de
+  leurs faits `work_started` et `work_completed` même lorsque le début du cycle précède la fenêtre ;
+- migration cohésive du throughput et du Cycle Time vers les événements ainsi sélectionnés ; la WIQL reste
+  une présélection technique et les consommations concurrentes des événements bruts sont retirées ;
+- profondeur choisie, semaine/fuseau, périodes partielles, UI et garanties statistiques laissés inchangés.
+
 ### Événement de delivery métier normalisé — PBI 7.21
 
 - ajout d’une API publique du domaine delivery portant une identité d’item opaque, un fait fermé

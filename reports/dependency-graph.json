@@ -12,8 +12,8 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 263,
-    "importEdges": 1378,
+    "sourceModules": 264,
+    "importEdges": 1381,
     "entrypoints": 85,
     "missingEntrypoints": 5,
     "cycles": 2,
@@ -1100,6 +1100,11 @@
       },
       {
         "path": "frontend/src/domain/delivery/deliveryEvent.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/domain/delivery/historicalWindow.ts",
         "area": "frontend",
         "language": "javascript"
       },
@@ -11434,7 +11439,7 @@
         "target": "frontend/src/domain/delivery/index.ts",
         "line": 3,
         "kind": "js-import",
-        "phase": "compile",
+        "phase": "runtime",
         "specifier": "./domain/delivery",
         "resolution": "internal"
       },
@@ -12240,6 +12245,15 @@
         "resolution": "internal"
       },
       {
+        "source": "frontend/src/domain/delivery/historicalWindow.ts",
+        "target": "frontend/src/domain/delivery/deliveryEvent.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./deliveryEvent",
+        "resolution": "internal"
+      },
+      {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/deliveryEvent.ts",
         "line": 1,
@@ -12251,10 +12265,28 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/deliveryEvent.ts",
-        "line": 8,
+        "line": 12,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./deliveryEvent",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/index.ts",
+        "target": "frontend/src/domain/delivery/historicalWindow.ts",
+        "line": 7,
+        "kind": "js-export",
+        "phase": "runtime",
+        "specifier": "./historicalWindow",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/index.ts",
+        "target": "frontend/src/domain/delivery/historicalWindow.ts",
+        "line": 19,
+        "kind": "js-export",
+        "phase": "compile",
+        "specifier": "./historicalWindow",
         "resolution": "internal"
       },
       {
@@ -14448,7 +14480,7 @@
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "runtime",
-        "count": 149
+        "count": 152
       },
       {
         "sourceArea": "launcher",
@@ -14653,7 +14685,7 @@
         "target": "frontend/src/domain/delivery/index.ts",
         "line": 3,
         "kind": "js-import",
-        "phase": "compile",
+        "phase": "runtime",
         "specifier": "./domain/delivery",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/domain"

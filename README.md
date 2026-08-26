@@ -145,6 +145,10 @@ une connexion Azure DevOps réelle.
   en UTC. Le mapper Azure DevOps normalise et ordonne les instants avant de convertir ses DTO à cette frontière ;
   les agrégations hebdomadaires et le Cycle Time ne consomment plus de champs Azure DevOps, sans changement de
   collecte, d’UI ou de garantie statistique.
+- **Fenêtre historique delivery.** Le même domaine porte une fenêtre absolue `[début inclus, fin exclue]` et
+  l’unique règle qui sélectionne les items sur leur fait `item_delivered`, tout en conservant leurs faits de
+  cycle de vie nécessaires au Cycle Time. Le filtre Azure DevOps reste une présélection de transport ; semaine,
+  fuseau, périodes partielles et profondeur choisie restent inchangés.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 

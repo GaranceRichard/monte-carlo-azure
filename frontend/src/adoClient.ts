@@ -1,6 +1,6 @@
 import { formatDateLocal, getCompleteWeekRange, parseLocalIsoDate, startOfIsoWeek } from "./date";
 import type { CycleTimePoint, WeeklyThroughputRow } from "./types";
-import type { DeliveryEvent } from "./domain/delivery";
+import { createDeliveryHistoryWindow, selectDeliveryHistoryEvents, type DeliveryEvent } from "./domain/delivery";
 import {
   azureRevisionDtosToDeliveryEvents,
   azureWorkItemDtoToDeliveryEvent,
@@ -80,10 +80,8 @@ function buildCompletionDateFilter(startDate: string, endDate: string): string {
     )`;
 }
 
-function toWeekKey(dateValue: string): string | null {
-  const date = new Date(dateValue);
-  if (Number.isNaN(date.getTime())) return null;
-  return formatDateLocal(startOfIsoWeek(date));
+function toWeekKey(dateValue: string): string {
+  return formatDateLocal(startOfIsoWeek(new Date(dateValue)));
 }
 
 function getAdoRuntimeContext(serverUrl?: string, collectionName?: string): AdoRuntimeContext {
@@ -493,8 +491,10 @@ export async function getTeamDeliveryDataDirect(
     };
   }
 
-  const alignedStartDate = completeWeekRange.startDate;
-  const alignedEndDate = completeWeekRange.endDate;
+  const { startDate: alignedStartDate, endDate: alignedEndDate } = completeWeekRange;
+  const start = parseLocalIsoDate(alignedStartDate);
+  const end = parseLocalIsoDate(alignedEndDate);
+  const historyWindow = createDeliveryHistoryWindow({ startInclusive: start.toISOString(), endExclusive: new Date(end.getFullYear(), end.getMonth(), end.getDate() + 1).toISOString() });
   const runtime = getAdoRuntimeContext(serverUrl, org);
   const api = getApiVersionQuery(runtime);
   const teamAreaFilter = await getTeamAreaPathFilterClause(org, project, team, pat, serverUrl);
@@ -610,17 +610,15 @@ export async function getTeamDeliveryDataDirect(
     );
   }
 
+  const selectedDeliveryEvents = selectDeliveryHistoryEvents(historyWindow, deliveryEvents);
   const weekMap = new Map<string, number>();
-  deliveryEvents.forEach((event) => {
+  selectedDeliveryEvents.forEach((event) => {
     if (event.kind !== "item_delivered") return;
     const key = toWeekKey(event.occurredAt);
-    if (!key) return;
     weekMap.set(key, (weekMap.get(key) ?? 0) + 1);
   });
 
   const result: WeeklyThroughputRow[] = [];
-  const start = parseLocalIsoDate(alignedStartDate);
-  const end = parseLocalIsoDate(alignedEndDate);
   const cursor = new Date(start);
   while (cursor <= end) {
     const key = formatDateLocal(cursor);
@@ -673,7 +671,7 @@ export async function getTeamDeliveryDataDirect(
 
   return {
     weeklyThroughput: result,
-    cycleTimeDaysData: calculateCycleTimeData(deliveryEvents),
+    cycleTimeDaysData: calculateCycleTimeData(selectedDeliveryEvents),
     warning: warnings.length ? warnings.join(" ") : undefined,
   };
 }

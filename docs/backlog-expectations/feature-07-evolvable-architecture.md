@@ -355,7 +355,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Éliminer les calculs de fenêtre dupliqués dans les couches techniques.
 - **Frontière principale :** Domaine delivery.
 - **Famille d’invariants :** Inclusion dans la fenêtre historique.
-- **Preuve principale :** Tests de bornes, fenêtres vides et migrations locales.
+- **Preuve principale :** [Tests métier de la fenêtre](../../frontend/src/domain/delivery/historicalWindow.test.ts) et [non-régression du consommateur Azure DevOps](../../frontend/src/adoClient.test.ts).
 - **Éléments de réalisation inclus :** Value Object ; règles de bornes ; migration du groupe consommateur ; retrait des anciens calculs ; contrôle de non-régression.
 - **Hors périmètre :** Choix fonctionnel de la profondeur d’historique par l’utilisateur.
 - **Surface prévisionnelle :** 6 fichiers de production ; 10 fichiers versionnés

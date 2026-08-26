@@ -128,7 +128,7 @@ describe("adoClient on-prem api-version", () => {
         new Response(JSON.stringify({
           value: [
             { id: 101, fields: { "Microsoft.VSTS.Common.ClosedDate": "2026-01-15T10:00:00Z" } },
-            { id: 102, fields: { "Microsoft.VSTS.Common.ClosedDate": "2026-01-16T10:00:00Z" } },
+            { id: 102, fields: { "Microsoft.VSTS.Common.ClosedDate": "2026-01-26T10:00:00Z", "Microsoft.VSTS.Common.ResolvedDate": "2026-01-16T10:00:00Z" } },
           ],
         }), {
           status: 200,
@@ -172,8 +172,8 @@ describe("adoClient on-prem api-version", () => {
       "https://devops700.itp.extra/700",
     );
 
-    expect(result.weeklyThroughput.some((row) => row.throughput > 0)).toBe(true);
-    expect(result.cycleTimeDaysData).toEqual([{ week: "2026-01-12", cycleTimeDays: 7, count: 2 }]);
+    expect(result.weeklyThroughput.reduce((sum, row) => sum + row.throughput, 0)).toBe(1);
+    expect(result.cycleTimeDaysData).toEqual([{ week: "2026-01-12", cycleTimeDays: 7, count: 1 }]);
   });
 
   it("includes a week when startDate is monday and endDate is a completed sunday", async () => {

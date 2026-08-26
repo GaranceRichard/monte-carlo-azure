@@ -19653,6 +19653,66 @@
     ]
   },
   {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > normalizes immutable absolute bounds [19:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historicalWindow.test.ts",
+    "selector": "DeliveryHistoryWindow > normalizes immutable absolute bounds [19:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historicalWindow.test.ts",
+    "selector": "DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historicalWindow.test.ts",
+    "selector": "DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historicalWindow.test.ts",
+    "selector": "DeliveryHistoryWindow > selects no event from an empty window [69:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
     "logicalCaseId": "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/simulationHistogram.test.ts",
