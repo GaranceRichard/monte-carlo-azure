@@ -6,6 +6,7 @@ import {
   SIMULATION_HORIZON_WEEKS_MAX,
   SIMULATION_THROUGHPUT_SAMPLES_MAX,
 } from "../simulationLimits";
+import { DeterministicFrontendClock } from "../test/deterministicFrontendClock";
 
 vi.mock("../adoClient", () => ({
   getTeamDeliveryDataDirect: vi.fn(),
@@ -52,8 +53,11 @@ const API_RESPONSE_ITEMS = {
   ],
 };
 
+const CONTROLLED_INSTANT = "2026-08-26T14:30:45.123Z";
+
 function baseParams(overrides: Partial<Parameters<typeof runSimulationForecast>[0]> = {}) {
   return {
+    clock: new DeterministicFrontendClock(CONTROLLED_INSTANT),
     selectedOrg: "org-a",
     selectedProject: "Projet A",
     selectedTeam: "Equipe Alpha",
@@ -474,11 +478,14 @@ describe("historyEntry", () => {
   });
 
   it("génère un id unique et une date ISO valide", async () => {
-    const { historyEntry: e1 } = await runSimulationForecast(baseParams());
-    const { historyEntry: e2 } = await runSimulationForecast(baseParams());
+    const clock = new DeterministicFrontendClock(CONTROLLED_INSTANT);
+    const { historyEntry: e1 } = await runSimulationForecast(baseParams({ clock }));
+    const { historyEntry: e2 } = await runSimulationForecast(baseParams({ clock }));
 
     expect(e1.id).not.toBe(e2.id);
-    expect(new Date(e1.createdAt).toISOString()).toBe(e1.createdAt);
+    expect(e1.createdAt).toBe(CONTROLLED_INSTANT);
+    expect(e2.createdAt).toBe(CONTROLLED_INSTANT);
+    expect(clock.calls).toBe(2);
   });
 
   it("applique toSafeNumber sur backlogSize, targetWeeks et nSims", async () => {
@@ -492,29 +499,21 @@ describe("historyEntry", () => {
     expect(typeof historyEntry.backlogSize).toBe("number");
   });
 
-    it("retombe sur un id date-seed quand crypto.randomUUID est indisponible", async () => {
+  it("retombe sur un id date-seed quand crypto.randomUUID est indisponible", async () => {
     const originalCrypto = globalThis.crypto;
-    const originalDateNow = Date.now;
+    const clock = new DeterministicFrontendClock(CONTROLLED_INSTANT);
     Object.defineProperty(globalThis, "crypto", {
       configurable: true,
       value: undefined,
     });
-    Object.defineProperty(Date, "now", {
-      configurable: true,
-      value: () => 1234567890,
-    });
-
     try {
-      const { historyEntry } = await runSimulationForecast(baseParams({ seed: 111 }));
-      expect(historyEntry.id).toBe("1234567890-111");
+      const { historyEntry } = await runSimulationForecast(baseParams({ seed: 111, clock }));
+      expect(historyEntry.id).toBe(`${CONTROLLED_INSTANT}-111`);
+      expect(clock.calls).toBe(1);
     } finally {
       Object.defineProperty(globalThis, "crypto", {
         configurable: true,
         value: originalCrypto,
-      });
-      Object.defineProperty(Date, "now", {
-        configurable: true,
-        value: originalDateNow,
       });
     }
   });

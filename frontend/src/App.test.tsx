@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import App from "./App";
+import MontecarloApp from "./App";
 import { useOnboarding } from "./hooks/useOnboarding";
 import { useSimulation } from "./hooks/useSimulation";
 import { resolveAppRuntime } from "./runtime";
@@ -88,6 +88,12 @@ function setStandardRuntime(overrides: Partial<ReturnType<typeof resolveAppRunti
     isConnectInfoMode: false,
     ...overrides,
   });
+}
+
+const frontendClock = { now: () => "2026-08-26T14:30:45.123Z" };
+
+function App() {
+  return <MontecarloApp clock={frontendClock} />;
 }
 
 function buildActions(goToSimulationReturn = true) {

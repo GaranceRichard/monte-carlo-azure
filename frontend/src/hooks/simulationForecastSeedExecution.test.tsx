@@ -6,6 +6,7 @@ import {
   runSimulationForecast,
   simulateForecastFromSamples,
 } from "./simulationForecastService";
+import { DeterministicFrontendClock } from "../test/deterministicFrontendClock";
 
 vi.mock("../adoClient", () => ({
   getTeamDeliveryDataDirect: vi.fn(),
@@ -73,6 +74,7 @@ const API_RESPONSE_ITEMS = {
 
 function baseParams() {
   return {
+    clock: new DeterministicFrontendClock("2026-08-26T14:30:45.123Z"),
     selectedOrg: "org-a",
     selectedProject: "Projet A",
     selectedTeam: "Equipe Alpha",

@@ -41,7 +41,7 @@ Sources : `docs/frontend-responsibilities-map.md#collecte-et-transformations-del
 
 | Fichiers | Production | Tests | Lignes | Couches | Arêtes internes | Arêtes de frontière | Hotspots |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 11 | 7 | 4 | 2614 | 4 | 8 | 62 | 3 |
+| 11 | 7 | 4 | 2614 | 4 | 8 | 63 | 3 |
 
 Couches : `frontend-application`, `frontend-azure-adapter`, `frontend-delivery-or-engine`, `proof-tests`.
 
@@ -66,7 +66,7 @@ Fichiers : `Scripts/quality_gate.py`, `Scripts/quality_gate_dag.py`, `Scripts/qu
 | Fichier | Scénarios | Degré | Lignes | Signaux |
 | --- | ---: | ---: | ---: | --- |
 | `frontend/src/hooks/simulationForecastCore.ts` | 2 | 14 | 255 | repeatedTraversal, highCoupling |
-| `frontend/src/hooks/useSimulation.ts` | 1 | 18 | 492 | highCoupling, largeFile |
+| `frontend/src/hooks/useSimulation.ts` | 1 | 19 | 492 | highCoupling, largeFile |
 | `frontend/src/domain/simulationValueObjects.ts` | 1 | 17 | 394 | highCoupling, largeFile |
 | `backend/simulation_value_objects.py` | 1 | 12 | 429 | highCoupling, largeFile |
 | `frontend/src/adoClient.ts` | 1 | 11 | 677 | highCoupling, largeFile |

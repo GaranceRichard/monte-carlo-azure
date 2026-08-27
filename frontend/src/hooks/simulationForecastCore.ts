@@ -184,7 +184,7 @@ export async function runSimulationForecastCore(
   params: RunSimulationForecastParams,
 ): Promise<RunSimulationForecastResult> {
   const {
-    demoMode = false,
+    demoMode = false, clock,
     selectedOrg,
     selectedProject,
     selectedTeam,
@@ -219,12 +219,12 @@ export async function runSimulationForecastCore(
     params,
     throughputData.throughputSamples,
   );
-
+  const createdAt = clock.now();
   const historyEntry: SimulationHistoryEntry = {
     schemaVersion: 2,
-    id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${String(adjusted.seed)}`,
+    id: globalThis.crypto?.randomUUID?.() ?? `${createdAt}-${String(adjusted.seed)}`,
     seed: adjusted.seed,
-    createdAt: new Date().toISOString(),
+    createdAt,
     selectedOrg,
     selectedProject,
     selectedTeam,

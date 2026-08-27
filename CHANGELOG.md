@@ -2,6 +2,16 @@
 
 ## Recent
 
+### Temps frontend injectable et déterministe — PBI 7.31
+
+- ajout du port sortant `FrontendClock`, de l’adaptateur réel `BrowserClock` et d’une composition dédiée au
+  bootstrap React ;
+- injection obligatoire de l’horloge dans le forecast, avec une seule lecture par exécution et réutilisation
+  du même instant pour `createdAt` et le fallback d’identité existant ;
+- ajout d’une horloge de test déterministe et de preuves ciblées couvrant le contrôle de l’instant, la
+  composition réelle et l’absence d’accès temporel direct dans le noyau migré ;
+- usages calendaires, semaine/fuseau, backend, rétention et garanties statistiques laissés inchangés.
+
 ### Encapsulation des modules par API publique — PBI 7.12
 
 - extension de l'autorité 7.10 avec les points d'entrée racine `index.*` et `__init__.py`, plus une liste

@@ -5,7 +5,9 @@ import { useSimulation } from "./useSimulation";
 import type { SimulationViewModel } from "./useSimulation";
 import type { SimulationHistoryEntry } from "../domain/simulationHistory";
 import { createSimulationSeed } from "../domain/simulationValueObjects";
+import { DeterministicFrontendClock } from "../test/deterministicFrontendClock";
 
+const frontendClock = new DeterministicFrontendClock("2026-08-26T14:30:45.123Z");
 const pushSimulationHistory = vi.fn();
 const clearSimulationHistory = vi.fn();
 const resetTeamOptions = vi.fn();
@@ -40,7 +42,7 @@ vi.mock("./useSimulationChartData", () => ({ useSimulationChartData: ({ weeklyTh
 }) }));
 
 function setup(overrides: Partial<Parameters<typeof useSimulation>[0]> = {}) {
-  return renderHook(() => useSimulation({ step: "simulation", selectedOrg: "Org", selectedProject: "Projet", selectedTeam: "Equipe", pat: "pat", serverUrl: "", ...overrides }));
+  return renderHook(() => useSimulation({ clock: frontendClock, step: "simulation", selectedOrg: "Org", selectedProject: "Projet", selectedTeam: "Equipe", pat: "pat", serverUrl: "", ...overrides }));
 }
 
 const forecast = {

@@ -481,7 +481,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Rendre les usages temporels frontend testables et rejouables.
 - **Frontière principale :** Temps frontend.
 - **Famille d’invariants :** Déterminisme de l’horloge frontend.
-- **Preuve principale :** Tests avec horloge contrôlée et adaptateur navigateur.
+- **Preuve principale :** [Tests du port, de l’adaptateur et de la composition](../../frontend/src/composition/browser/index.test.ts) et [cycle de forecast avec instant contrôlé](../../frontend/src/hooks/Simulationforecastservice.test.tsx).
 - **Éléments de réalisation inclus :** Port d’horloge ; adaptateur principal ; migration des usages cohésifs ; retrait des accès directs ; documentation.
 - **Hors périmètre :** Horloge backend et politique métier de semaine.
 - **Surface prévisionnelle :** 6 fichiers de production ; 10 fichiers versionnés

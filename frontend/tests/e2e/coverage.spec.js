@@ -732,6 +732,7 @@ test.describe("e2e istanbul coverage", () => {
 
         throughputMode = "warning";
         await forecastMod.runSimulationForecast({
+          clock: { now: () => "2026-08-26T14:30:45.123Z" },
           selectedOrg: "org-demo",
           selectedProject: "Projet A",
           selectedTeam: "Equipe Alpha",
@@ -2701,6 +2702,7 @@ test.describe("e2e istanbul coverage", () => {
         });
 
         const forecast = await forecastMod.runSimulationForecast({
+          clock: { now: () => "2026-08-26T14:30:45.123Z" },
           selectedOrg: "org-demo",
           selectedProject: "",
           selectedTeam: "Equipe Alpha",
@@ -3715,7 +3717,5 @@ test.describe("e2e istanbul coverage", () => {
     expect(results.renderedHtml).toContain("Simulation Portefeuille - Equipe Alpha");
   });
 });
-
-
 
 

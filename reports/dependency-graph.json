@@ -12,13 +12,13 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 265,
-    "importEdges": 1390,
+    "sourceModules": 268,
+    "importEdges": 1396,
     "entrypoints": 85,
     "missingEntrypoints": 5,
     "cycles": 2,
     "runtimeCycles": 0,
-    "deepImports": 125,
+    "deepImports": 132,
     "apiBypasses": 2
   },
   "observed": {
@@ -924,6 +924,11 @@
         "language": "javascript"
       },
       {
+        "path": "frontend/src/adapters/browser/clock/index.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
         "path": "frontend/src/adapters/seededSampleIndexDrawPort.ts",
         "area": "frontend",
         "language": "javascript"
@@ -1094,6 +1099,11 @@
         "language": "javascript"
       },
       {
+        "path": "frontend/src/composition/browser/index.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
         "path": "frontend/src/date.ts",
         "area": "frontend",
         "language": "javascript"
@@ -1235,6 +1245,11 @@
       },
       {
         "path": "frontend/src/main.tsx",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/ports/clock/index.ts",
         "area": "frontend",
         "language": "javascript"
       },
@@ -11271,7 +11286,7 @@
       {
         "source": "frontend/src/App.tsx",
         "target": "frontend/src/App.css",
-        "line": 17,
+        "line": 18,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./App.css",
@@ -11347,6 +11362,15 @@
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./hooks/useSimulation",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/App.tsx",
+        "target": "frontend/src/ports/clock/index.ts",
+        "line": 17,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "./ports/clock",
         "resolution": "internal"
       },
       {
@@ -11464,6 +11488,15 @@
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../../domain/delivery",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/adapters/browser/clock/index.ts",
+        "target": "frontend/src/ports/clock/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../../ports/clock",
         "resolution": "internal"
       },
       {
@@ -12304,6 +12337,24 @@
         "resolution": "external"
       },
       {
+        "source": "frontend/src/composition/browser/index.ts",
+        "target": "frontend/src/adapters/browser/clock/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../adapters/browser/clock",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/composition/browser/index.ts",
+        "target": "frontend/src/ports/clock/index.ts",
+        "line": 2,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../ports/clock",
+        "resolution": "internal"
+      },
+      {
         "source": "frontend/src/demoData.ts",
         "target": "frontend/src/date.ts",
         "line": 1,
@@ -12657,10 +12708,19 @@
       {
         "source": "frontend/src/hooks/simulationForecastService.ts",
         "target": "frontend/src/hooks/simulationForecastCore.ts",
-        "line": 3,
+        "line": 4,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./simulationForecastCore",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/hooks/simulationForecastService.ts",
+        "target": "frontend/src/ports/clock/index.ts",
+        "line": 3,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../ports/clock",
         "resolution": "internal"
       },
       {
@@ -13034,17 +13094,8 @@
       },
       {
         "source": "frontend/src/hooks/useSimulation.ts",
-        "target": "external:npm:react",
-        "line": 2,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "react",
-        "resolution": "external"
-      },
-      {
-        "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/demoData.ts",
-        "line": 24,
+        "line": 23,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../demoData",
@@ -13053,7 +13104,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/domain/simulation.ts",
-        "line": 8,
+        "line": 7,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../domain/simulation",
@@ -13062,7 +13113,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/domain/simulationHistory.ts",
-        "line": 9,
+        "line": 8,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../domain/simulationHistory",
@@ -13071,7 +13122,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/hooks/simulationForecastService.ts",
-        "line": 19,
+        "line": 18,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./simulationForecastService",
@@ -13080,7 +13131,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/hooks/simulationTypes.ts",
-        "line": 10,
+        "line": 9,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "./simulationTypes",
@@ -13089,7 +13140,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/hooks/useSimulationChartData.ts",
-        "line": 18,
+        "line": 17,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./useSimulationChartData",
@@ -13098,7 +13149,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/hooks/useSimulationHistory.ts",
-        "line": 20,
+        "line": 19,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./useSimulationHistory",
@@ -13107,7 +13158,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/hooks/useSimulationPrefs.ts",
-        "line": 21,
+        "line": 20,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./useSimulationPrefs",
@@ -13116,7 +13167,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/hooks/useSimulationQuickFilters.ts",
-        "line": 22,
+        "line": 21,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./useSimulationQuickFilters",
@@ -13125,7 +13176,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/hooks/useTeamOptions.ts",
-        "line": 23,
+        "line": 22,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./useTeamOptions",
@@ -13133,8 +13184,17 @@
       },
       {
         "source": "frontend/src/hooks/useSimulation.ts",
+        "target": "frontend/src/ports/clock/index.ts",
+        "line": 29,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../ports/clock",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/types.ts",
-        "line": 3,
+        "line": 2,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../types",
@@ -13143,7 +13203,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/utils/export.ts",
-        "line": 17,
+        "line": 16,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/export",
@@ -13152,7 +13212,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/utils/simulationSignature.ts",
-        "line": 25,
+        "line": 24,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/simulationSignature",
@@ -13161,7 +13221,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/utils/simulationSignature.ts",
-        "line": 29,
+        "line": 28,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../utils/simulationSignature",
@@ -13408,6 +13468,15 @@
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./App",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/main.tsx",
+        "target": "frontend/src/composition/browser/index.ts",
+        "line": 5,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./composition/browser",
         "resolution": "internal"
       },
       {
@@ -14503,7 +14572,7 @@
           {
             "source": "frontend/src/hooks/simulationForecastService.ts",
             "target": "frontend/src/hooks/simulationForecastCore.ts",
-            "line": 3,
+            "line": 4,
             "kind": "js-import",
             "phase": "runtime",
             "specifier": "./simulationForecastCore",
@@ -14540,7 +14609,7 @@
           {
             "source": "frontend/src/hooks/simulationForecastService.ts",
             "target": "frontend/src/hooks/simulationForecastCore.ts",
-            "line": 3,
+            "line": 4,
             "kind": "js-import",
             "phase": "runtime",
             "specifier": "./simulationForecastCore",
@@ -14560,13 +14629,13 @@
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "compile",
-        "count": 88
+        "count": 93
       },
       {
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "runtime",
-        "count": 152
+        "count": 154
       },
       {
         "sourceArea": "launcher",
@@ -14645,6 +14714,16 @@
         "specifier": "./hooks/useSimulation",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/hooks"
+      },
+      {
+        "source": "frontend/src/App.tsx",
+        "target": "frontend/src/ports/clock/index.ts",
+        "line": 17,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "./ports/clock",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/ports"
       },
       {
         "source": "frontend/src/AppFlowContent.tsx",
@@ -14735,6 +14814,16 @@
         "specifier": "../../domain/delivery",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/adapters/browser/clock/index.ts",
+        "target": "frontend/src/ports/clock/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../../ports/clock",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/ports"
       },
       {
         "source": "frontend/src/adapters/seededSampleIndexDrawPort.ts",
@@ -15197,6 +15286,26 @@
         "crossedBoundary": "frontend/src/utils"
       },
       {
+        "source": "frontend/src/composition/browser/index.ts",
+        "target": "frontend/src/adapters/browser/clock/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../adapters/browser/clock",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/adapters"
+      },
+      {
+        "source": "frontend/src/composition/browser/index.ts",
+        "target": "frontend/src/ports/clock/index.ts",
+        "line": 2,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../ports/clock",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/ports"
+      },
+      {
         "source": "frontend/src/demoData.ts",
         "target": "frontend/src/hooks/usePortfolioReport.ts",
         "line": 3,
@@ -15335,6 +15444,16 @@
         "specifier": "../domain/simulationHistory",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/hooks/simulationForecastService.ts",
+        "target": "frontend/src/ports/clock/index.ts",
+        "line": 3,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../ports/clock",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/ports"
       },
       {
         "source": "frontend/src/hooks/simulationSeedResolver.ts",
@@ -15499,7 +15618,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/domain/simulation.ts",
-        "line": 8,
+        "line": 7,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../domain/simulation",
@@ -15509,7 +15628,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/domain/simulationHistory.ts",
-        "line": 9,
+        "line": 8,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../domain/simulationHistory",
@@ -15518,8 +15637,18 @@
       },
       {
         "source": "frontend/src/hooks/useSimulation.ts",
+        "target": "frontend/src/ports/clock/index.ts",
+        "line": 29,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../ports/clock",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/ports"
+      },
+      {
+        "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/utils/export.ts",
-        "line": 17,
+        "line": 16,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/export",
@@ -15529,7 +15658,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/utils/simulationSignature.ts",
-        "line": 25,
+        "line": 24,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/simulationSignature",
@@ -15539,7 +15668,7 @@
       {
         "source": "frontend/src/hooks/useSimulation.ts",
         "target": "frontend/src/utils/simulationSignature.ts",
-        "line": 29,
+        "line": 28,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../utils/simulationSignature",
@@ -15595,6 +15724,16 @@
         "specifier": "../domain/simulation",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/main.tsx",
+        "target": "frontend/src/composition/browser/index.ts",
+        "line": 5,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./composition/browser",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/composition"
       },
       {
         "source": "frontend/src/simulationLimits.ts",

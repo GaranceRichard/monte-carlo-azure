@@ -45,13 +45,13 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     features = check_backlog_consistency.parse_registry(backlog)
 
     assert sum(len(feature.pbis) for feature in features) == 202
-    assert sum(feature.completed_count for feature in features) == 47
+    assert sum(feature.completed_count for feature in features) == 48
     feature_two = next(feature for feature in features if feature.number == 2)
     assert feature_two.completed_count == 21
     assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == []
     feature_seven = next(feature for feature in features if feature.number == 7)
     assert len(feature_seven.pbis) == 75
-    assert feature_seven.completed_count == 15
+    assert feature_seven.completed_count == 16
     assert [
         (pbi.identifier, pbi.completed_on)
         for pbi in feature_seven.pbis
@@ -71,18 +71,19 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
         ("7.12", "26/08/2026"),
         ("7.21", "23/08/2026"),
         ("7.22", "26/08/2026"),
+        ("7.31", "27/08/2026"),
         ("7.32", "23/08/2026"),
     ]
     assert check_backlog_consistency.feature_priority(governance, features) == 7
     assert "Feature en cours :** Feature 7" in backlog
-    assert "15/75 PBI réalisés (20 %)" in backlog
+    assert "16/75 PBI réalisés (21,33 %)" in backlog
     assert (
         "Prochain PBI :** 7.13 — "
         "Les cycles de dépendance sont empêchés"
         in backlog
     )
-    assert "Progression globale :** 47/202 PBI réalisés (23,27 %) ; 155 restants" in backlog
-    assert "Répartition actuelle des 155 PBI non réalisés" in governance
+    assert "Progression globale :** 48/202 PBI réalisés (23,76 %) ; 154 restants" in backlog
+    assert "Répartition actuelle des 154 PBI non réalisés" in governance
     assert (
         "Dernière Feature terminée :** Feature 2 — "
         "Garantir la fiabilité du cœur statistique"

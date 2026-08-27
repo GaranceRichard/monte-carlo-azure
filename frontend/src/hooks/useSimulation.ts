@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Dispatch, SetStateAction } from "react";
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   AppStep,
   CycleTimePoint,
@@ -27,6 +26,7 @@ import {
   findLatestReusableSimulation,
 } from "../utils/simulationSignature";
 import type { SimulationExecutionSnapshot } from "../utils/simulationSignature";
+import type { FrontendClock } from "../ports/clock";
 
 const TOOLTIP_BASE_PROPS: TooltipBaseProps = {
   cursor: false,
@@ -77,7 +77,7 @@ type SimulationReplayContext = {
 };
 
 export function useSimulation({
-  demoMode = false,
+  clock, demoMode = false,
   step,
   selectedOrg,
   selectedProject,
@@ -85,7 +85,7 @@ export function useSimulation({
   pat,
   serverUrl,
 }: {
-  demoMode?: boolean;
+  clock: FrontendClock; demoMode?: boolean;
   step: AppStep;
   selectedOrg: string;
   selectedProject: string;
@@ -327,7 +327,7 @@ export function useSimulation({
 
     try {
       const forecast = await runSimulationForecast({
-        demoMode,
+        clock, demoMode,
         seed: replayContext?.signature === currentSimulation.signature ? replayContext.seed : undefined,
         selectedOrg,
         selectedProject,
@@ -363,7 +363,7 @@ export function useSimulation({
   }, [
     backlogSize,
     clearComputedSimulationState,
-    currentSimulation,
+    clock, currentSimulation,
     doneStates,
     demoMode,
     endDate,

@@ -15,15 +15,15 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 265 | 1390 | 85 | 5 | 2 | 0 | 125 | 2 |
+| 268 | 1396 | 85 | 5 | 2 | 0 | 132 | 2 |
 
 ### Directions observées
 
 | Source | Cible | Phase | Arêtes |
 | --- | --- | --- | --- |
 | backend | backend | runtime | 39 |
-| frontend | frontend | compile | 88 |
-| frontend | frontend | runtime | 152 |
+| frontend | frontend | compile | 93 |
+| frontend | frontend | runtime | 154 |
 | launcher | backend | runtime | 1 |
 | quality | backend | runtime | 5 |
 | quality | frontend | runtime | 3 |
@@ -39,7 +39,7 @@ frontend/src/demoData.ts → frontend/src/hooks/usePortfolioReport.ts → fronte
 | --- | --- | --- | --- |
 | frontend/src/demoData.ts | frontend/src/hooks/usePortfolioReport.ts | 3 | compile |
 | frontend/src/hooks/usePortfolioReport.ts | frontend/src/hooks/simulationForecastService.ts | 7 | runtime |
-| frontend/src/hooks/simulationForecastService.ts | frontend/src/hooks/simulationForecastCore.ts | 3 | runtime |
+| frontend/src/hooks/simulationForecastService.ts | frontend/src/hooks/simulationForecastCore.ts | 4 | runtime |
 | frontend/src/hooks/simulationForecastCore.ts | frontend/src/demoData.ts | 8 | runtime |
 
 #### CYC-002 — compile-involved
@@ -49,7 +49,7 @@ frontend/src/hooks/simulationForecastCore.ts → frontend/src/hooks/simulationFo
 | Source | Cible | Ligne | Phase |
 | --- | --- | --- | --- |
 | frontend/src/hooks/simulationForecastCore.ts | frontend/src/hooks/simulationForecastService.ts | 19 | compile |
-| frontend/src/hooks/simulationForecastService.ts | frontend/src/hooks/simulationForecastCore.ts | 3 | runtime |
+| frontend/src/hooks/simulationForecastService.ts | frontend/src/hooks/simulationForecastCore.ts | 4 | runtime |
 
 ### Points d’entrée
 
@@ -163,6 +163,7 @@ Ces listes signalent des surfaces à examiner ; elles ne déclarent ni dépendan
 | frontend/src/App.tsx | frontend/src/components/AppHeader.tsx | 2 | runtime | frontend/src/components |
 | frontend/src/App.tsx | frontend/src/hooks/useOnboarding.ts | 4 | runtime | frontend/src/hooks |
 | frontend/src/App.tsx | frontend/src/hooks/useSimulation.ts | 5 | runtime | frontend/src/hooks |
+| frontend/src/App.tsx | frontend/src/ports/clock/index.ts | 17 | compile | frontend/src/ports |
 | frontend/src/AppFlowContent.tsx | frontend/src/components/steps/OrgStep.tsx | 2 | runtime | frontend/src/components |
 | frontend/src/AppFlowContent.tsx | frontend/src/components/steps/PatStep.tsx | 3 | runtime | frontend/src/components |
 | frontend/src/AppFlowContent.tsx | frontend/src/components/steps/PortfolioStep.tsx | 11 | runtime | frontend/src/components |
@@ -172,6 +173,7 @@ Ces listes signalent des surfaces à examiner ; elles ne déclarent ni dépendan
 | frontend/src/AppFlowContent.tsx | frontend/src/hooks/useOnboarding.ts | 6 | compile | frontend/src/hooks |
 | frontend/src/AppFlowContent.tsx | frontend/src/hooks/useSimulation.ts | 7 | compile | frontend/src/hooks |
 | frontend/src/adapters/azure-devops/deliveryEventMappers.ts | frontend/src/domain/delivery/index.ts | 1 | runtime | frontend/src/domain |
+| frontend/src/adapters/browser/clock/index.ts | frontend/src/ports/clock/index.ts | 1 | compile | frontend/src/ports |
 | frontend/src/adapters/seededSampleIndexDrawPort.ts | frontend/src/domain/sampleIndexDrawPort.ts | 1 | compile | frontend/src/domain |
 | frontend/src/adapters/seededSampleIndexDrawPort.ts | frontend/src/domain/simulationValueObjects.ts | 2 | compile | frontend/src/domain |
 | frontend/src/adoClient.ts | frontend/src/adapters/azure-devops/deliveryEventMappers.ts | 4 | runtime | frontend/src/adapters |
@@ -218,6 +220,8 @@ Ces listes signalent des surfaces à examiner ; elles ne déclarent ni dépendan
 | frontend/src/components/steps/simulationPrintReport.tsx | frontend/src/utils/decisionLanguage.ts | 19 | compile | frontend/src/utils |
 | frontend/src/components/steps/simulationPrintReport.tsx | frontend/src/utils/simulation.ts | 14 | runtime | frontend/src/utils |
 | frontend/src/components/steps/simulationPrintReport.tsx | frontend/src/utils/simulationDecisionDiagnostic.ts | 20 | runtime | frontend/src/utils |
+| frontend/src/composition/browser/index.ts | frontend/src/adapters/browser/clock/index.ts | 1 | runtime | frontend/src/adapters |
+| frontend/src/composition/browser/index.ts | frontend/src/ports/clock/index.ts | 2 | compile | frontend/src/ports |
 | frontend/src/demoData.ts | frontend/src/hooks/usePortfolioReport.ts | 3 | compile | frontend/src/hooks |
 | frontend/src/e2e/runtime.ts | frontend/src/hooks/useSimulationHistory.ts | 4 | runtime | frontend/src/hooks |
 | frontend/src/e2e/runtime.ts | frontend/src/utils/teamSort.ts | 3 | runtime | frontend/src/utils |
@@ -232,6 +236,7 @@ Ces listes signalent des surfaces à examiner ; elles ne déclarent ni dépendan
 | frontend/src/hooks/simulationForecastCore.ts | frontend/src/utils/simulation.ts | 15 | runtime | frontend/src/utils |
 | frontend/src/hooks/simulationForecastService.ts | frontend/src/domain/simulation.ts | 1 | compile | frontend/src/domain |
 | frontend/src/hooks/simulationForecastService.ts | frontend/src/domain/simulationHistory.ts | 2 | compile | frontend/src/domain |
+| frontend/src/hooks/simulationForecastService.ts | frontend/src/ports/clock/index.ts | 3 | compile | frontend/src/ports |
 | frontend/src/hooks/simulationSeedResolver.ts | frontend/src/domain/simulationValueObjects.ts | 1 | runtime | frontend/src/domain |
 | frontend/src/hooks/simulationSeedResolver.ts | frontend/src/domain/simulationValueObjects.ts | 4 | compile | frontend/src/domain |
 | frontend/src/hooks/simulationTypes.ts | frontend/src/domain/simulation.ts | 1 | compile | frontend/src/domain |
@@ -248,16 +253,18 @@ Ces listes signalent des surfaces à examiner ; elles ne déclarent ni dépendan
 | frontend/src/hooks/usePortfolioReport.ts | frontend/src/utils/portfolioComparisonPresentation.ts | 26 | compile | frontend/src/utils |
 | frontend/src/hooks/usePortfolioReport.ts | frontend/src/utils/simulation.ts | 12 | runtime | frontend/src/utils |
 | frontend/src/hooks/usePortfolioReport.ts | frontend/src/utils/simulationDecisionDiagnostic.ts | 20 | runtime | frontend/src/utils |
-| frontend/src/hooks/useSimulation.ts | frontend/src/domain/simulation.ts | 8 | compile | frontend/src/domain |
-| frontend/src/hooks/useSimulation.ts | frontend/src/domain/simulationHistory.ts | 9 | compile | frontend/src/domain |
-| frontend/src/hooks/useSimulation.ts | frontend/src/utils/export.ts | 17 | runtime | frontend/src/utils |
-| frontend/src/hooks/useSimulation.ts | frontend/src/utils/simulationSignature.ts | 25 | runtime | frontend/src/utils |
-| frontend/src/hooks/useSimulation.ts | frontend/src/utils/simulationSignature.ts | 29 | compile | frontend/src/utils |
+| frontend/src/hooks/useSimulation.ts | frontend/src/domain/simulation.ts | 7 | compile | frontend/src/domain |
+| frontend/src/hooks/useSimulation.ts | frontend/src/domain/simulationHistory.ts | 8 | compile | frontend/src/domain |
+| frontend/src/hooks/useSimulation.ts | frontend/src/ports/clock/index.ts | 29 | compile | frontend/src/ports |
+| frontend/src/hooks/useSimulation.ts | frontend/src/utils/export.ts | 16 | runtime | frontend/src/utils |
+| frontend/src/hooks/useSimulation.ts | frontend/src/utils/simulationSignature.ts | 24 | runtime | frontend/src/utils |
+| frontend/src/hooks/useSimulation.ts | frontend/src/utils/simulationSignature.ts | 28 | compile | frontend/src/utils |
 | frontend/src/hooks/useSimulationChartData.ts | frontend/src/domain/simulation.ts | 2 | compile | frontend/src/domain |
 | frontend/src/hooks/useSimulationChartData.ts | frontend/src/utils/cycleTime.ts | 6 | runtime | frontend/src/utils |
 | frontend/src/hooks/useSimulationHistory.ts | frontend/src/domain/simulationHistory.ts | 7 | compile | frontend/src/domain |
 | frontend/src/hooks/useSimulationHistory.ts | frontend/src/storage/simulationHistoryMappers.ts | 3 | runtime | frontend/src/storage |
 | frontend/src/hooks/useSimulationPrefs.ts | frontend/src/domain/simulation.ts | 2 | compile | frontend/src/domain |
+| frontend/src/main.tsx | frontend/src/composition/browser/index.ts | 5 | runtime | frontend/src/composition |
 | frontend/src/simulationLimits.ts | frontend/src/domain/simulation.ts | 1 | compile | frontend/src/domain |
 | frontend/src/simulationLimits.ts | frontend/src/domain/simulationValueObjects.ts | 2 | runtime | frontend/src/domain |
 | frontend/src/simulationLimits.ts | frontend/src/domain/simulationValueObjects.ts | 9 | runtime | frontend/src/domain |

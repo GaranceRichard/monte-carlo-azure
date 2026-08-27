@@ -14,13 +14,15 @@ import {
 } from "./appNavigation";
 import { applyTheme, persistTheme, resolveInitialTheme, type ThemeMode } from "./appTheme";
 import { OnboardingStepper, PublicModeGate } from "./appShellSections";
+import type { FrontendClock } from "./ports/clock";
 import "./App.css";
 
-export default function App() {
+export default function App({ clock }: { clock: FrontendClock }) {
   const runtime = resolveAppRuntime();
   const onboarding = useOnboarding({ demoMode: runtime.isDemoMode });
   const { state: onboardingState, actions: onboardingActions } = onboarding;
   const simulation = useSimulation({
+    clock,
     demoMode: runtime.isDemoMode,
     step: onboardingState.step,
     selectedOrg: onboardingState.selectedOrg,

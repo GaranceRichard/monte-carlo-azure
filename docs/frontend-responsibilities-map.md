@@ -6,6 +6,11 @@ Cette carte décrit le frontend observé le 13 août 2026 au commit
 `4bc9b01fce83682da3e7dbd79df898461a2437b4`. Elle constitue une baseline descriptive : les noms de couches
 ci-dessous servent à localiser les responsabilités actuelles, pas à prescrire une architecture cible.
 
+Depuis cette baseline, le PBI 7.31 a fait évoluer un périmètre cohésif : le timestamp de la nouvelle entrée
+d’historique de prévision passe par `FrontendClock`, `BrowserClock` porte l’accès réel et le bootstrap React
+les relie par `createBrowserComposition`. Les règles de semaine/fuseau et les autres usages calendaires ne
+sont pas migrés par cet outcome.
+
 L’analyse couvre les sources exécutables sous `frontend/src/`, le point d’entrée Vite, les scripts qui
 chargent le moteur TypeScript hors navigateur et les frontières navigateur, HTTP et stockage. Les tests ont
 servi à confirmer les points d’entrée et les usages, mais ne sont pas attribués à une couche produit. Les
@@ -24,7 +29,7 @@ rg -n "fetch|localStorage|document\.|window\.|globalThis\.crypto|new Date|Date\.
 
 | Point d’entrée | Chaîne réellement exécutée | Responsabilité actuelle |
 | --- | --- | --- |
-| Application navigateur | `index.html` → `src/main.tsx` → `App` | Vite charge `main.tsx`, qui crée la racine React en mode strict. `App` résout le runtime, instancie les hooks d’onboarding et de simulation, initialise thème et cookie, puis compose le shell. |
+| Application navigateur | `index.html` → `src/main.tsx` → composition navigateur → `App` | Vite charge `main.tsx`, qui compose l’horloge réelle puis crée la racine React en mode strict. `App` résout le runtime, instancie les hooks d’onboarding et de simulation, initialise thème et cookie, puis compose le shell. |
 | Routage d’écran interne | `App` → `AppFlowContent` → composant d’étape | Aucun routeur externe : la valeur `step` de `useOnboarding` sélectionne `PatStep`, `OrgStep`, `ProjectStep`, `TeamStep`, `SimulationStep` ou `PortfolioStep`. Les deux derniers sont chargés avec `React.lazy`. |
 | Simulation d’équipe | `App` → `useSimulation` → `simulationForecastService` → `simulationForecastCore` | `App` construit un grand view model puis `SimulationStep` le diffuse par `SimulationContext` aux contrôles, résultats et graphiques. |
 | Portefeuille | `AppFlowContent` → `PortfolioStep` → `usePortfolio` → `usePortfolioReport` | Le hook de vue détient les critères et équipes ; le hook de rapport collecte, simule, diagnostique et déclenche le téléchargement. |
@@ -45,7 +50,7 @@ préjugent pas de leur emplacement futur.
 
 | Zone observée | Fichiers propriétaires | Responsabilités et données détenues |
 | --- | --- | --- |
-| Composition et shell | `main.tsx`, `App.tsx`, `AppFlowContent.tsx`, `appNavigation.ts`, `appShellSections.tsx`, `runtime.ts` | Montage React, choix du mode public, enchaînement des étapes, retour clavier/stepper, déconnexion et passage des view models. |
+| Composition et shell | `main.tsx`, `composition/browser/index.ts`, `App.tsx`, `AppFlowContent.tsx`, `appNavigation.ts`, `appShellSections.tsx`, `runtime.ts` | Assemblage de l’horloge réelle, montage React, choix du mode public, enchaînement des étapes, retour clavier/stepper, déconnexion et passage des view models. |
 | Thème et identité navigateur | `appTheme.ts`, `clientId.ts` | Lecture/écriture du thème, application de l’attribut DOM, création et renouvellement du cookie pseudonyme `IDMontecarlo`. |
 | Vues d’onboarding | `AppHeader.tsx`, `PublicConnectNotice.tsx`, `PatStep.tsx`, `OrgStep.tsx`, `ProjectStep.tsx`, `TeamStep.tsx` | Saisie du PAT et de l’URL Server/TFS, sélection organisation/collection, projet et équipe, affichage des erreurs et navigation. `TeamStep` retrie aussi les équipes pour l’affichage. |
 | Vue simulation | `SimulationStep.tsx`, `SimulationControlPanel.tsx`, `SimulationHistoryRangeControls.tsx`, `SimulationModeAndParametersControls.tsx`, `SimulationFilterControls.tsx`, `SimulationResultsPanel.tsx`, `SimulationChartTabs.tsx`, `DecisionDiagnostic.tsx` | Édition des critères, lancement, affichage des percentiles/censures/diagnostics, sélection de l’historique, construction de données de graphiques supplémentaires et déclenchement CSV/PDF. |
@@ -56,7 +61,8 @@ préjugent pas de leur emplacement futur.
 | Hooks spécialisés simulation | `useTeamOptions.ts`, `useSimulationPrefs.ts`, `useSimulationHistory.ts`, `useSimulationQuickFilters.ts`, `useSimulationChartData.ts` | Chargement/fallback des types et états, persistance des préférences et historiques, persistance des filtres, dérivation des séries de graphiques et résumés Cycle Time. |
 | Contexte React | `hooks/SimulationContext.tsx` | Diffusion du `SimulationViewModel` complet et de l’équipe sélectionnée à tout le sous-arbre simulation. |
 | Orchestration portefeuille | `hooks/usePortfolio.ts`, `hooks/usePortfolioReport.ts` | État des critères et équipes, cache mémoire des options, préférences, collecte parallèle, simulation parallèle équipes/scénarios, tolérance aux échecs partiels, diagnostic comparatif et export. |
-| Façade/noyau de prévision | `hooks/simulationForecastService.ts`, `hooks/simulationForecastCore.ts`, `hooks/simulationSeedResolver.ts` | Contrats de paramètres, sélection données réelles/démo, construction de commande, choix moteur HTTP/local, traduction d’erreurs, seed, statistiques d’échantillon et création de l’entrée d’historique. |
+| Façade/noyau de prévision | `hooks/simulationForecastService.ts`, `hooks/simulationForecastCore.ts`, `hooks/simulationSeedResolver.ts` | Contrats de paramètres, sélection données réelles/démo, construction de commande, choix moteur HTTP/local, traduction d’erreurs, seed, statistiques d’échantillon et création de l’entrée d’historique avec un instant injecté. |
+| Temps de prévision | `ports/clock/index.ts`, `adapters/browser/clock/index.ts`, `composition/browser/index.ts` | Port minimal retournant l’instant ISO, lecture réelle de `Date` confinée à l’adaptateur et assemblage au bootstrap React. |
 | Accès Azure DevOps | `adoClient.ts`, `adoPlatform.ts`, `adoErrors.ts` | Détection Cloud/Server, en-têtes PAT, découverte profil/organisation/collection/projet/équipe, types/états, WIQL, lots de work items, révisions, erreurs contextualisées et avertissements de collecte partielle. |
 | Accès backend Monte Carlo | `api.ts`, `apiHelpers.ts`, `api/simulationDtos.ts`, `api/simulationMappers.ts` | `POST /simulate`, base d’API Vite, DTO `snake_case`, transformation commande/réponse et validation des invariants statistiques reçus. |
 | Domaine statistique explicite | `domain/simulation.ts`, `domain/simulationValueObjects.ts`, `domain/histogram.ts`, `domain/riskScore.ts`, `domain/throughputReliability.ts`, `domain/sampleIndexDrawPort.ts` | Commande discriminée, Value Objects et bornes, percentiles, censures, histogramme, Risk Score, fiabilité du throughput et port minimal de tirage. |
@@ -89,8 +95,9 @@ préjugent pas de leur emplacement futur.
 | `localStorage` | `mc_portfolio_prefs_v1` | `usePortfolio.ts`, `storage.ts` | Taux d’alignement, avec lecture compatible de l’ancienne propriété `arrimageRate`. |
 
 Tous les accès `localStorage` sont encapsulés dans `storageGetItem`, `storageSetItem` et
-`storageRemoveItem`, qui absorbent les erreurs. Le cookie, l’horloge, les UUID, le DOM et l’URL courante sont
-en revanche accédés directement par leurs consommateurs. Aucun usage de `sessionStorage` n’a été trouvé.
+`storageRemoveItem`, qui absorbent les erreurs. L’horodatage de l’entrée de prévision est injecté ; le cookie,
+les UUID, le DOM, l’URL courante et les usages calendaires hors de ce périmètre restent accédés directement
+par leurs consommateurs. Aucun usage de `sessionStorage` n’a été trouvé.
 
 ## Flux entrants et sortants
 
@@ -124,7 +131,8 @@ Contrôles React
         -> commande domaine normalisée + seed
         -> démo : moteur TypeScript local + PRNG
         -> connecté : DTO HTTP -> POST /simulate -> mapper de réponse
-        -> SimulationResult + SimulationHistoryEntry
+        -> FrontendClock (un instant)
+        -> SimulationResult + SimulationHistoryEntry horodatée
   -> état React + localStorage
   -> résultats, graphiques, diagnostic, CSV ou PDF
 ```
@@ -175,6 +183,7 @@ un JSON écrit sur la sortie standard ; ils n’utilisent ni React, ni Azure Dev
 | Entrée utilisateur | `simulationForecastCore.ts` puis `domain/*` | chaînes/nombres et échantillons → commande discriminée et Value Objects validés. |
 | Transport backend | `api/simulationMappers.ts` | commande `camelCase` → DTO `snake_case` ; réponse fermée → `SimulationResult` validé. |
 | Simulation locale | `utils/simulation.ts` | commande + port de tirage → échantillons simulés, percentiles, censures, histogramme, Risk Score et fiabilité. |
+| Horodatage de prévision | `simulationForecastCore.ts` + `FrontendClock` | instant injecté lu une fois → `createdAt` et fallback d’identité de la même entrée. |
 | Scénarios portefeuille | `utils/simulation.ts` | historiques de plusieurs équipes → échantillons indépendant, aligné, friction et agrégation par semaines communes. |
 | Historique local | `storage/simulationHistoryMappers.ts` | modèle interne ↔ DTO version 2 ; anciennes valeurs Cycle Time sans version → jours. |
 | Identité de configuration | `utils/simulationSignature.ts` | contexte et critères triés/canonisés → signature JSON ; historique → réutilisable ou non. |
@@ -187,20 +196,20 @@ un JSON écrit sur la sortie standard ; ils n’utilisent ni React, ni Azure Dev
 
 Les relations suivantes sont directement présentes dans les imports et points d’appel actuels :
 
-- `index.html` importe `/src/main.tsx`, qui importe `App` ; `App` importe directement `useOnboarding`,
-  `useSimulation`, le runtime, le stockage, le thème et l’identité client ;
+- `index.html` importe `/src/main.tsx`, qui importe la composition navigateur et `App` ; la composition
+  instancie `BrowserClock`, puis `App` transmet le port à `useSimulation` ;
 - `simulationForecastCore.ts` importe directement `adoClient`, `api`, les mappers HTTP, `demoData`,
   l’adaptateur PRNG et le moteur de `utils/simulation.ts` ;
 - `simulationForecastService.ts` importe le noyau, tandis que le noyau importe les types déclarés par la
-  façade avec `import type` ;
+  façade avec `import type` ; la façade déclare aussi `FrontendClock` comme dépendance obligatoire ;
 - `usePortfolioReport.ts` importe directement le service de prévision, le PRNG, les calculs de scénarios,
   les diagnostics et, dynamiquement, le rapport de présentation ;
 - `domain/simulationHistory.ts` importe les formes de `types.ts`, `utils/cycleTime.ts` importe des types de
   `hooks/simulationTypes.ts`, et `demoData.ts` importe `TeamPortfolioConfig` depuis un hook ;
 - les rapports importent `hooks/probability.ts` et `hooks/simulationTypes.ts`, puis
   `simulationPdfDownload.ts` relit leurs HTML par sélecteurs DOM ;
-- aucun fichier `index.ts` ou API publique de module ne concentre les imports : les consommateurs utilisent
-  les chemins de fichiers concrets.
+- les frontières d’horloge et de composition exposent des API publiques `index.ts`, conformément à
+  l’autorité de dépendances ; les modules non ciblés conservent leurs chemins actuels.
 
 ## Responsabilités ambiguës, chevauchements et couplages observés
 
@@ -208,7 +217,7 @@ Ces écarts sont des observations de la baseline. Cette carte ne décide ni corr
 
 | Identifiant | Constat factuel | Preuves dans le graphe actuel |
 | --- | --- | --- |
-| FE-01 | La composition technique est distribuée entre `App` et le noyau de prévision. | `App` instancie les hooks ; `simulationForecastCore` choisit lui-même données démo/réelles, moteur local/HTTP et adaptateur PRNG. Il n’existe pas de composition root frontend distinct. |
+| FE-01 | La composition technique reste distribuée entre `App` et le noyau de prévision. | Une composition frontend distincte assemble désormais l’horloge réelle, mais `App` instancie encore les hooks et `simulationForecastCore` choisit lui-même données démo/réelles, moteur local/HTTP et adaptateur PRNG. |
 | FE-02 | Les hooks cumulent état React et orchestration applicative. | `useOnboarding` valide le PAT et pilote la découverte ; `useSimulation` gère cache, invalidation, persistance et exécution ; `usePortfolioReport` collecte, simule, diagnostique et exporte. |
 | FE-03 | `adoClient.ts` concentre plusieurs raisons de changer. | Le même fichier contient authentification, découverte Cloud/Server, transport HTTP, construction WIQL, lots/révisions, politique d’erreur partielle, agrégation hebdomadaire et appel du calcul Cycle Time. |
 | FE-04 | La façade de prévision et son noyau se référencent dans les deux sens. | `simulationForecastService` importe les fonctions du noyau ; `simulationForecastCore` importe les types de paramètres/résultats depuis la façade. La dépendance retour est limitée aux types et effacée à l’exécution compilée, mais la relation reste bidirectionnelle dans le graphe source. |
@@ -218,7 +227,7 @@ Ces écarts sont des observations de la baseline. Cette carte ne décide ni corr
 | FE-08 | Les mêmes transformations de présentation sont exécutées à plusieurs endroits. | Diagnostic équipe construit dans le panneau, les graphiques et le portefeuille ; probabilité reconstruite dans le hook de graphiques et les deux rapports ; seuils de légende de risque présents dans `computeRiskLegend` et localement dans `SimulationResultsPanel`. |
 | FE-09 | Les rapports dépendent de leur propre structure HTML et de noms de classes. | Les builders créent HTML/SVG puis `simulationPdfDownload.ts` recherche `.meta-row`, `.decision-diagnostic`, `.summary-table`, `.hypothesis`, `.kpi` et `.chart-wrap svg` dans un DOM détaché. |
 | FE-10 | Les politiques de stockage sont partagées entre adaptateur et hooks. | `storage.ts` détient clés, sérialisation simple et compatibilité portefeuille ; les hooks choisissent limites, moments d’écriture, validation des filtres et migrations d’historique. |
-| FE-11 | Plusieurs dépendances navigateur ne sont pas injectées. | Accès directs à `window`, `document`, `localStorage`, `Date`, `crypto.randomUUID`, `crypto.getRandomValues`, `Math.random`, `Blob` et `URL.createObjectURL`. |
+| FE-11 | Plusieurs dépendances navigateur ne sont pas injectées. | L’heure de création de l’historique de prévision passe désormais par `FrontendClock`; les accès directs à `window`, `document`, `localStorage`, les autres usages de `Date`, `crypto.randomUUID`, `crypto.getRandomValues`, `Math.random`, `Blob` et `URL.createObjectURL` restent observés hors de ce périmètre. |
 | FE-12 | Les flux simulation et portefeuille dupliquent la sélection de filtres. | `useTeamOptions.ts` et `usePortfolio.ts` possèdent chacun leur validation types/états, lecture des raccourcis, fallback et mise à jour d’état. |
 | FE-13 | Le contexte de simulation expose une surface large. | `SimulationContext` transmet tout le `SimulationViewModel`; chaque sous-composant peut lire commandes, données, stockage, erreurs et actions sans contrat local plus étroit. |
 | FE-14 | Des surfaces exportées ne participent à aucun chemin produit observé. | `listOrgsDirect`, `getWeeklyThroughputDirect`, `simulationHistoryItemDtoToModel` et `validateSimulationInputContract` n’ont aucun consommateur hors de leur déclaration ou de leurs tests ; le chemin de mapping de l’historique backend associé n’est pas appelé par l’application. |

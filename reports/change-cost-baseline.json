@@ -100,7 +100,7 @@
         "lineCount": 2614,
         "layerCount": 4,
         "internalDependencyEdges": 8,
-        "boundaryDependencyEdges": 62,
+        "boundaryDependencyEdges": 63,
         "confirmedHotspotCount": 3
       },
       "layers": [
@@ -169,7 +169,7 @@
     {
       "path": "frontend/src/hooks/useSimulation.ts",
       "scenarioCount": 1,
-      "dependencyDegree": 18,
+      "dependencyDegree": 19,
       "lineCount": 492,
       "signals": {
         "repeatedTraversal": false,

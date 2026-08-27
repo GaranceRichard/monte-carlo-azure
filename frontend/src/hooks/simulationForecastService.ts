@@ -1,5 +1,6 @@
 import type { SimulationMode, SimulationResult } from "../domain/simulation";
 import type { SampleStats, SimulationHistoryEntry } from "../domain/simulationHistory";
+import type { FrontendClock } from "../ports/clock";
 import {
   fetchTeamThroughputCore,
   runSimulationForecastCore,
@@ -7,6 +8,7 @@ import {
 } from "./simulationForecastCore";
 
 export type RunSimulationForecastParams = {
+  clock: FrontendClock;
   demoMode?: boolean;
   seed?: number;
   selectedOrg: string;

@@ -142,6 +142,8 @@ frontend/
     adapters/
       azure-devops/
         deliveryEventMappers.ts # DTO work items/révisions -> faits delivery normalisés
+      browser/
+        clock/index.ts    # adaptateur réel du temps navigateur
       seededSampleIndexDrawPort.ts # implémentation TypeScript de mca-prng-v1
     api/
       simulationDtos.ts    # contrats JSON HTTP en snake_case
@@ -155,6 +157,10 @@ frontend/
       simulation.ts        # commande et résultat statistiques métier en camelCase
       simulationValueObjects.ts # Value Objects statistiques immuables et validés
       simulationHistory.ts # historique interne contenant un SimulationResult
+    composition/
+      browser/index.ts     # composition des adaptateurs réels du bootstrap React
+    ports/
+      clock/index.ts       # port sortant de l’horloge de prévision frontend
     storage/
       simulationHistoryDtos.ts    # schéma localStorage v2 inchangé
       simulationHistoryMappers.ts # conversions stockage/legacy <-> domaine
@@ -691,6 +697,10 @@ et la purge restent inchangées.
 - l’historique détaillé reste contextualisé par équipe dans le navigateur ;
 - le frontend ne recharge plus l’historique Mongo pour le mélanger à cet historique local ;
 - les entrées locales portent un `schemaVersion` explicite ;
+- la création d’une entrée par `simulationForecastCore` exige un `FrontendClock`, acquiert exactement un
+  instant après la simulation et réutilise sa chaîne ISO pour `createdAt` et le fallback d’identité ;
+- `main.tsx` construit `BrowserClock` par `createBrowserComposition`, tandis que les tests peuvent injecter
+  `DeterministicFrontendClock` sans horloge réelle cachée ;
 - les nouvelles entrées locales portent aussi la `seed` effectivement utilisée par l’exécution
   Monte Carlo frontend ou backend
 - un rejeu local réapplique cette même `seed` tant que les paramètres de simulation ne changent pas ;
@@ -699,7 +709,9 @@ et la purge restent inchangées.
 - les historiques legacy sans `seed` restent compatibles ; ils sont restaurés avec `seed = null` ;
 - la migration est idempotente : seules les entrées legacy sans version sont multipliées par `7` ;
 - cette migration ne modifie ni le throughput hebdomadaire, ni les modes Monte Carlo en semaines,
-  ni `target_weeks`
+  ni `target_weeks` ;
+- les politiques de semaine/fuseau, les autres usages calendaires, le backend et la rétention restent hors
+  du périmètre de cette horloge de prévision.
 
 `result_distribution` contient des buckets `{ x, count }` :
 
@@ -941,6 +953,8 @@ Frontend :
 - façade API allégée via `src/apiHelpers.ts` pour conserver des périmètres Vitals plus stables
 - logique forecast scindée entre façade `src/hooks/simulationForecastService.ts` et cœur
   `src/hooks/simulationForecastCore.ts`
+- port `src/ports/clock/` injecté dans le forecast, adaptateur `src/adapters/browser/clock/` et composition
+  réelle sous `src/composition/browser/`, avec double déterministe réservé aux tests
 - événements delivery possédés par `src/domain/delivery/` : les DTO Azure DevOps sont convertis localement en
   faits `item_delivered`, `work_started` et `work_completed` avant toute transformation temporelle
 - fenêtre historique possédée par le même domaine : bornes absolues semi-ouvertes, fenêtre vide explicite et

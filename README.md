@@ -89,6 +89,9 @@ une connexion Azure DevOps réelle.
 - **Fiabilité explicable.** La dispersion, les quartiles et la tendance du throughput suivent les mêmes
   formules dans les deux moteurs ; les seuils utilisent les métriques arrondies avant d’attribuer les labels
   `non fiable`, `fragile`, `incertain` ou `fiable`.
+- **Temps frontend contrôlable.** La création d’une entrée d’historique de prévision reçoit un
+  `FrontendClock`, lit exactement un instant et le réutilise pour son timestamp et son identité de repli.
+  Le bootstrap compose l’adaptateur navigateur réel, tandis que les tests injectent une horloge déterministe.
 - **Temps backend contrôlable.** Les timestamps `created_at` et `last_seen` proviennent du port
   `BackendClock`. L’API compose l’adaptateur UTC système, tandis que les tests injectent une horloge fixe et
   prouvent qu’une sauvegarde conserve le même instant lors d’une reconnexion MongoDB.
