@@ -12,8 +12,8 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 268,
-    "importEdges": 1396,
+    "sourceModules": 269,
+    "importEdges": 1398,
     "entrypoints": 85,
     "missingEntrypoints": 5,
     "cycles": 2,
@@ -290,6 +290,11 @@
       },
       {
         "path": "Scripts/quality_gate_plan.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/quality_gate_pytest_runtime.py",
         "area": "quality",
         "language": "python"
       },
@@ -3996,7 +4001,7 @@
       {
         "source": "Scripts/quality_gate.py",
         "target": "Scripts/quality_gate_dag.py",
-        "line": 1451,
+        "line": 1445,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "Scripts.quality_gate_dag.execute_gate_plan",
@@ -4014,10 +4019,19 @@
       {
         "source": "Scripts/quality_gate.py",
         "target": "Scripts/quality_gate_plan.py",
-        "line": 984,
+        "line": 978,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "Scripts.quality_gate_plan.build_execution_plan",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/quality_gate.py",
+        "target": "Scripts/quality_gate_pytest_runtime.py",
+        "line": 39,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.quality_gate_pytest_runtime.BACKEND_TEST_ENV",
         "resolution": "internal"
       },
       {
@@ -4387,6 +4401,15 @@
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "typing",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/quality_gate_pytest_runtime.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
         "resolution": "external"
       },
       {
@@ -14262,7 +14285,7 @@
       },
       {
         "declaredIn": "Scripts/quality_gate.py",
-        "line": 1634,
+        "line": 1628,
         "kind": "python-main-guard",
         "target": "Scripts/quality_gate.py",
         "resolution": "internal"
@@ -14659,7 +14682,7 @@
         "sourceArea": "quality",
         "targetArea": "quality",
         "phase": "runtime",
-        "count": 259
+        "count": 260
       }
     ]
   },

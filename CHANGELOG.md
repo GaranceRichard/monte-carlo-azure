@@ -2,6 +2,15 @@
 
 ## Recent
 
+### Validation backend CI parallélisée
+
+- distribution de la suite Pytest couverte sur deux workers afin de raccourcir le nœud critique
+  `backend-tests`, sans modifier la sélection gouvernée ni les seuils de couverture ;
+- fusion déterministe des preuves natives de chaque worker avec refus des doublons, absences, cas inconnus,
+  pertes de worker et redémarrages automatiques ;
+- conservation du contrôle de couverture branchée, de la conformité par fichier, de MongoDB réel et de
+  l’agrégation finale ; aucun PBI fonctionnel n’est clôturé.
+
 ### Temps frontend injectable et déterministe — PBI 7.31
 
 - ajout du port sortant `FrontendClock`, de l’adaptateur réel `BrowserClock` et d’une composition dédiée au

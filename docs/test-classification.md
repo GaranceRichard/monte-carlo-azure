@@ -168,6 +168,11 @@ Les jobs GitHub Actions étant isolés, chaque branche prépare les dépendances
 `npm --prefix frontend ci` avant la quality gate. Cette installation rend disponibles le moteur TypeScript
 utilisé par la classification et `@playwright/test`, importé par `frontend/playwright.config.js`. Aucun
 navigateur Playwright n’est installé dans ce nœud ; leur installation appartient exclusivement à `e2e`.
+La suite Pytest couverte est distribuée sur deux workers avec redémarrage automatique interdit. Chaque
+worker remet ses instances au processus contrôleur, qui refuse les doublons, workers sans preuve, cas
+logiques absents et cas inconnus avant de publier l’unique `pytest.json`. `pytest-cov` fusionne les données
+des deux workers avant le contrôle inchangé du périmètre, des branches et des seuils par fichier. Le bytecode
+Python n’est pas écrit pendant ce nœud afin que les workers ne partagent aucun cache mutable.
 
 ## Overrides auditables
 

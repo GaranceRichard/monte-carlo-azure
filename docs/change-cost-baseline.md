@@ -55,7 +55,7 @@ Sources : `docs/quality-infrastructure-responsibilities-map.md#quality-gates-mod
 
 | Fichiers | Production | Tests | Lignes | Couches | Arêtes internes | Arêtes de frontière | Hotspots |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 9 | 6 | 2 | 7268 | 3 | 7 | 13 | 1 |
+| 9 | 6 | 2 | 7274 | 3 | 7 | 14 | 1 |
 
 Couches : `proof-tests`, `quality-contract`, `quality-orchestration`.
 
@@ -70,7 +70,7 @@ Fichiers : `Scripts/quality_gate.py`, `Scripts/quality_gate_dag.py`, `Scripts/qu
 | `frontend/src/domain/simulationValueObjects.ts` | 1 | 17 | 394 | highCoupling, largeFile |
 | `backend/simulation_value_objects.py` | 1 | 12 | 429 | highCoupling, largeFile |
 | `frontend/src/adoClient.ts` | 1 | 11 | 677 | highCoupling, largeFile |
-| `Scripts/quality_gate.py` | 1 | 6 | 1637 | highCoupling, largeFile |
+| `Scripts/quality_gate.py` | 1 | 7 | 1631 | highCoupling, largeFile |
 
 ## Hypothèses et limites
 

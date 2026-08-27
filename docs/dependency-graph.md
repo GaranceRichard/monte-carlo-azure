@@ -15,7 +15,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 268 | 1396 | 85 | 5 | 2 | 0 | 132 | 2 |
+| 269 | 1398 | 85 | 5 | 2 | 0 | 132 | 2 |
 
 ### Directions observées
 
@@ -27,7 +27,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 | launcher | backend | runtime | 1 |
 | quality | backend | runtime | 5 |
 | quality | frontend | runtime | 3 |
-| quality | quality | runtime | 259 |
+| quality | quality | runtime | 260 |
 
 ### Cycles localisés
 
@@ -102,7 +102,7 @@ frontend/src/hooks/simulationForecastCore.ts → frontend/src/hooks/simulationFo
 | Scripts/generate_statistical_consolidated_report.py | 81 | python-main-guard | Scripts/generate_statistical_consolidated_report.py | internal |
 | Scripts/pre_commit_guard.py | 293 | python-main-guard | Scripts/pre_commit_guard.py | internal |
 | Scripts/purge_inactive_clients.py | 47 | python-main-guard | Scripts/purge_inactive_clients.py | internal |
-| Scripts/quality_gate.py | 1634 | python-main-guard | Scripts/quality_gate.py | internal |
+| Scripts/quality_gate.py | 1628 | python-main-guard | Scripts/quality_gate.py | internal |
 | Scripts/report_change_cost_baseline.py | 286 | python-main-guard | Scripts/report_change_cost_baseline.py | internal |
 | Scripts/report_dependency_graph.py | 276 | python-main-guard | Scripts/report_dependency_graph.py | internal |
 | Scripts/report_test_execution_counts.py | 359 | python-main-guard | Scripts/report_test_execution_counts.py | internal |

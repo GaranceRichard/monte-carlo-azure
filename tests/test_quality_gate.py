@@ -1971,6 +1971,10 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
             "--cov-report=json:reports/test-execution-artifacts/main/backend-tests/coverage.json",
             "--cov-report=term-missing",
             "-q",
+            "-n",
+            "2",
+            "--dist=worksteal",
+            "--max-worker-restart=0",
             "@reports/test-execution-artifacts/main/backend-tests/pytest-args.txt",
         ),
         (
@@ -2079,6 +2083,9 @@ def test_main_nightly_and_release_use_coverage_without_simple_test_duplicates() 
         assert len(pytest_commands) == 1
         assert "--cov" in pytest_commands[0].argv
         assert "--cov-config=.coveragerc" in pytest_commands[0].argv
+        assert pytest_commands[0].argv[pytest_commands[0].argv.index("-n") + 1] == "2"
+        assert "--dist=worksteal" in pytest_commands[0].argv
+        assert "--max-worker-restart=0" in pytest_commands[0].argv
         assert [command.argv[4] for command in frontend_unit_commands] == [
             "test:unit:coverage",
         ]
@@ -2133,6 +2140,7 @@ def test_pytest_command_uses_unique_workspace_basetemps_without_global_temp_acce
     def run(argv: tuple[str, ...], **_kwargs: object) -> subprocess.CompletedProcess[str]:
         basetemp = Path(argv[argv.index("--basetemp") + 1])
         assert basetemp.is_dir()
+        assert _kwargs["env"]["PYTHONDONTWRITEBYTECODE"] == "1"
         basetemps.append(basetemp)
         return subprocess.CompletedProcess(argv, 0)
 
@@ -2150,7 +2158,7 @@ def test_pytest_command_uses_unique_workspace_basetemps_without_global_temp_acce
 
     assert len(set(basetemps)) == 2
     assert all(path.parent == tmp_path / ".tmp" / "pytest" for path in basetemps)
-    assert all(path.name.startswith("selected-backend-tests-") for path in basetemps)
+    assert all(path.name.startswith("selected-") for path in basetemps)
     assert all(not path.exists() for path in basetemps)
 
 

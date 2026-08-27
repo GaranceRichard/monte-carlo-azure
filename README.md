@@ -312,6 +312,10 @@ suite complète, puis mesurer le nœud canonique avec
 exécutent leurs vrais guards avec des sorties isolées, et les preuves coûteuses restent comparées aux
 artefacts versionnés plutôt que recalculées plusieurs fois dans un même cas.
 
+Les profils couverts distribuent ce nœud Pytest sur deux workers en mode `worksteal`, sans redémarrage
+automatique. Le contrôleur fusionne et vérifie exhaustivement les preuves natives et la couverture avant les
+contrôles existants ; la sélection gouvernée, MongoDB réel et les seuils par fichier restent inchangés.
+
 Le profil rapide valide exclusivement le snapshot construit depuis l’index Git. Lorsqu’un contrôle déclaré
 dépend de l’outillage frontend, la gate expose temporairement le seul `frontend/node_modules` de
 l’installation hôte dans ce snapshot, y compris si aucune suite frontend n’est sélectionnée. Les sources

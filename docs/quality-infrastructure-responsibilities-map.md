@@ -76,7 +76,7 @@ E2E ou Vitals. Elles produisent une preuve partielle et ne traversent pas l’ag
 | `statistical-compatibility` | trois branches de preuve statistique | production de la compatibilité à partir des preuves courantes puis enforcement de version | `evidence.json`, `attestation.json` |
 | `statistical-consolidated-report` | preuves et compatibilité | génération JSON/Markdown puis validation indépendante de schéma, empreinte, fraîcheur et sources | `report.json`, `report.md`, `attestation.json` |
 | `frontend-static` | `preflight` | ESLint, typecheck et build Vite | `dist/`, `frontend-static/result.json` |
-| `backend-tests` | `preflight` | sélection du profil Pytest, exécution avec couverture, contrôle de périmètre et conformité par fichier | `pytest-args.txt`, `coverage.json`, `pytest.json` |
+| `backend-tests` | `preflight` | sélection du profil Pytest, distribution sur deux workers sans redémarrage, fusion exhaustive des instances et de la couverture, contrôle de périmètre et conformité par fichier | `pytest-args.txt`, `coverage.json`, `pytest.json` |
 | `frontend-tests` | `preflight` | Vitest avec couverture V8 et reporter d’exécution logique | `coverage/coverage-final.json`, `vitest.json` |
 | `e2e` | `preflight` | Playwright, serveurs backend/Vite, collecte Istanbul et reporter d’exécution logique | `e2e-coverage-summary.json`, `playwright.json` |
 | `release-or-container-checks` | `preflight` | validation du contrat de profils ; smoke Docker ajouté par l’exécuteur pour les plans complets `ci`, `nightly` et `release` | `release-or-container-checks/result.json`, logs Docker seulement en diagnostic |

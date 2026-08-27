@@ -138,10 +138,10 @@
         "fileCount": 9,
         "productionFileCount": 6,
         "testFileCount": 2,
-        "lineCount": 7268,
+        "lineCount": 7274,
         "layerCount": 3,
         "internalDependencyEdges": 7,
-        "boundaryDependencyEdges": 13,
+        "boundaryDependencyEdges": 14,
         "confirmedHotspotCount": 1
       },
       "layers": [
@@ -213,8 +213,8 @@
     {
       "path": "Scripts/quality_gate.py",
       "scenarioCount": 1,
-      "dependencyDegree": 6,
-      "lineCount": 1637,
+      "dependencyDegree": 7,
+      "lineCount": 1631,
       "signals": {
         "repeatedTraversal": false,
         "highCoupling": true,

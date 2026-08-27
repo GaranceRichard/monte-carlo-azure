@@ -36,16 +36,10 @@ from Scripts.git_staging import (  # noqa: E402
     isolated_git_environment,
     read_staged_changes,
 )
+from Scripts.quality_gate_pytest_runtime import BACKEND_TEST_ENV  # noqa: E402
 
 DOCUMENTATION_PATHS = {"README.md", "LICENSE", "NOTICE"}
 NPM_COMMAND = "npm.cmd" if os.name == "nt" else "npm"
-BACKEND_TEST_ENV = {
-    "ADO_PAT": "FAKE_PAT",
-    "ADO_ORG": "FAKE_ORG",
-    "ADO_PROJECT": "FAKE_PROJECT",
-    "APP_MONGO_URL": "mongodb://localhost:27017",
-    "APP_MONGO_DB": "montecarlo_test",
-}
 
 
 class InputSource(str, Enum):
@@ -790,7 +784,7 @@ def _is_direct_pytest_command(command: GateCommand) -> bool:
 
 def _pytest_basetemp_prefix(command: GateCommand) -> str:
     command_prefix = re.sub(r"[^a-z0-9]+", "-", command.step.lower()).strip("-")
-    return f"{command_prefix}-{os.getpid()}-"
+    return f"{command_prefix[:8]}-{os.getpid()}-"
 
 
 def _is_descendant(path: Path, parent: Path) -> bool:

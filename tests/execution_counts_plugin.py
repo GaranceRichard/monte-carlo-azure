@@ -8,6 +8,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+import pytest
+
+WORKER_OUTPUT_KEY = "montecarlo_execution_counts"
+
 
 @dataclass
 class _Run:
@@ -17,6 +21,7 @@ class _Run:
     instances: dict[str, dict[str, Any]] = field(default_factory=dict)
     reports: dict[str, list[Any]] = field(default_factory=dict)
     anomalies: list[str] = field(default_factory=list)
+    worker_payloads: list[tuple[str, dict[str, Any]]] = field(default_factory=list)
 
 
 _run = _Run()
@@ -161,11 +166,11 @@ def _attempt_results(reports: list[Any], executed: bool) -> list[str]:
     return results
 
 
-def pytest_sessionfinish(session: Any) -> None:
-    if _run.root is None:
-        return
+def _native_instances(*, reported_only: bool) -> list[dict[str, Any]]:
     native_instances: list[dict[str, Any]] = []
     for nodeid, instance in sorted(_run.instances.items()):
+        if reported_only and nodeid not in _run.reports:
+            continue
         reports = _run.reports.get(nodeid, [])
         calls = [report for report in reports if report.when == "call"]
         setup_or_teardown_failure = any(
@@ -192,16 +197,81 @@ def pytest_sessionfinish(session: Any) -> None:
                 "result": result,
             }
         )
+    return native_instances
+
+
+def _merged_worker_results() -> tuple[list[dict[str, Any]], list[str]]:
+    instances: dict[str, dict[str, Any]] = {}
+    anomalies = list(_run.anomalies)
+    for worker, payload in sorted(_run.worker_payloads):
+        worker_instances = payload.get("instances")
+        worker_anomalies = payload.get("anomalies")
+        if not isinstance(worker_instances, list) or not isinstance(worker_anomalies, list):
+            anomalies.append(f"pytest worker {worker} produced an invalid execution payload")
+            continue
+        anomalies.extend(str(item) for item in worker_anomalies)
+        for instance in worker_instances:
+            if not isinstance(instance, dict) or not isinstance(instance.get("instanceId"), str):
+                anomalies.append(f"pytest worker {worker} produced an invalid instance")
+                continue
+            instance_id = instance["instanceId"]
+            if instance_id in instances:
+                anomalies.append(f"pytest instance executed by multiple workers: {instance_id}")
+                continue
+            instances[instance_id] = instance
+    return [instances[item] for item in sorted(instances)], anomalies
+
+
+def _final_payload(
+    native_instances: list[dict[str, Any]], anomalies: list[str]
+) -> dict[str, Any]:
     matched_ids = {item["logicalCaseId"] for item in native_instances}
     missing = sorted(_run.inventory_ids - matched_ids)
-    complete = not _run.anomalies and not missing
-    payload = {
+    unexpected = sorted(matched_ids - _run.inventory_ids)
+    if missing:
+        anomalies.append(f"pytest logical cases absent from execution: {', '.join(missing)}")
+    if unexpected:
+        anomalies.append(
+            f"pytest execution contains unknown logical cases: {', '.join(unexpected)}"
+        )
+    return {
         "schemaVersion": 1,
         "framework": "pytest",
-        "complete": complete,
+        "complete": not anomalies,
         "instances": native_instances,
-        "anomalies": sorted(set(_run.anomalies)),
+        "anomalies": sorted(set(anomalies)),
     }
+
+
+@pytest.hookimpl(optionalhook=True)
+def pytest_testnodedown(node: Any, error: object | None) -> None:
+    worker = str(getattr(getattr(node, "gateway", None), "id", "unknown"))
+    payload = getattr(node, "workeroutput", {}).get(WORKER_OUTPUT_KEY)
+    if isinstance(payload, dict):
+        _run.worker_payloads.append((worker, payload))
+    else:
+        _run.anomalies.append(f"pytest worker {worker} produced no execution payload")
+    if error is not None:
+        _run.anomalies.append(f"pytest worker {worker} stopped unexpectedly: {error}")
+
+
+def pytest_sessionfinish(session: Any) -> None:
+    if _run.root is None:
+        return
+    config = session.config
+    if hasattr(config, "workerinput"):
+        config.workeroutput[WORKER_OUTPUT_KEY] = {
+            "instances": _native_instances(reported_only=True),
+            "anomalies": sorted(set(_run.anomalies)),
+        }
+        return
+    distributed = bool(getattr(config.option, "numprocesses", None))
+    if distributed:
+        native_instances, anomalies = _merged_worker_results()
+    else:
+        native_instances = _native_instances(reported_only=False)
+        anomalies = list(_run.anomalies)
+    payload = _final_payload(native_instances, anomalies)
     configured = os.environ.get("TEST_EXECUTION_NATIVE_DIR")
     report_root = Path(configured).resolve() if configured else (
         _run.root / "reports" / "test-execution-native"

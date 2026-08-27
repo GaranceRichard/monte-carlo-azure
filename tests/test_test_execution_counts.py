@@ -446,34 +446,50 @@ def test_setup_error(broken):
         "TEST_EXECUTION_PROFILE",
     ):
         environment.pop(name, None)
-    completed = subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "pytest",
-            "-q",
-            "-p",
-            "tests.execution_counts_plugin",
-            "--rootdir",
-            str(tmp_path),
-            str(source),
-        ],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-        env=environment,
-    )
-    assert completed.returncode == 1, completed.stdout + completed.stderr
-    native = json.loads((reports / "test-execution-native/pytest.json").read_text(encoding="utf-8"))
-    assert native["complete"] is True
-    assert native["anomalies"] == []
-    assert len(native["instances"]) == 6
-    by_id = {item["instanceId"]: item for item in native["instances"]}
-    assert by_id["tests/test_native.py::test_skip"]["executed"] is False
-    assert by_id["tests/test_native.py::test_xfail"]["executed"] is True
-    assert by_id["tests/test_native.py::test_setup_error"]["result"] == "infrastructureError"
-    assert all(item["attempts"] == int(item["executed"]) for item in native["instances"])
-    assert all(len(item["attemptResults"]) == item["attempts"] for item in native["instances"])
-    assert by_id["tests/test_native.py::test_xfail"]["initialResult"] == "skipped"
-    assert by_id["tests/test_native.py::test_setup_error"]["finalResult"] == ("infrastructureError")
+    modes = {
+        "sequential": (),
+        "distributed": ("-n", "2", "--dist=worksteal", "--max-worker-restart=0"),
+    }
+    for mode, xdist_args in modes.items():
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pytest",
+                "-q",
+                "-p",
+                "tests.execution_counts_plugin",
+                "--basetemp",
+                str(tmp_path / f"pytest-temp-{mode}"),
+                *xdist_args,
+                "--rootdir",
+                str(tmp_path),
+                str(source),
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+            env=environment,
+        )
+        assert completed.returncode == 1, completed.stdout + completed.stderr
+        native = json.loads(
+            (reports / "test-execution-native/pytest.json").read_text(encoding="utf-8")
+        )
+        assert native["complete"] is True
+        assert native["anomalies"] == []
+        assert len(native["instances"]) == 6
+        by_id = {item["instanceId"]: item for item in native["instances"]}
+        assert by_id["tests/test_native.py::test_skip"]["executed"] is False
+        assert by_id["tests/test_native.py::test_xfail"]["executed"] is True
+        assert by_id["tests/test_native.py::test_setup_error"]["result"] == (
+            "infrastructureError"
+        )
+        assert all(item["attempts"] == int(item["executed"]) for item in native["instances"])
+        assert all(
+            len(item["attemptResults"]) == item["attempts"] for item in native["instances"]
+        )
+        assert by_id["tests/test_native.py::test_xfail"]["initialResult"] == "skipped"
+        assert by_id["tests/test_native.py::test_setup_error"]["finalResult"] == (
+            "infrastructureError"
+        )
