@@ -20,6 +20,11 @@ from Scripts.dependency_authority import (  # noqa: E402
     load_dependency_authority,
 )
 from Scripts.dependency_authority_contract import Diagnostic  # noqa: E402
+from Scripts.dependency_authority_cycles import (  # noqa: E402
+    ModuleAcyclicityResult,
+    ModuleCycleInspectionError,
+    inspect_repository_module_cycles,
+)
 from Scripts.dependency_authority_domain import (  # noqa: E402
     DomainIndependenceResult,
     DomainInspectionError,
@@ -86,10 +91,33 @@ def _validated_public_apis(
     return result
 
 
+def _validated_module_cycles(
+    authority: DependencyAuthority, root: Path
+) -> ModuleAcyclicityResult | None:
+    try:
+        result = inspect_repository_module_cycles(authority, root)
+    except ModuleCycleInspectionError as exc:
+        diagnostic = Diagnostic(
+            "DEP-MODULE-CYCLE-SCAN",
+            "/",
+            f"Impossible d'inspecter le graphe des modules gouvernés: {exc}",
+            "Rétablir des racines gouvernées et des sources UTF-8 lisibles avant de "
+            "relancer le contrôle.",
+        )
+        print(diagnostic.render(root), file=sys.stderr)
+        return None
+    if result.diagnostics:
+        for diagnostic in result.diagnostics:
+            print(diagnostic.render(root), file=sys.stderr)
+        return None
+    return result
+
+
 def _validated_evidence(
     authority: DependencyAuthority,
     domain_result: DomainIndependenceResult,
     public_api_result: PublicApiResult,
+    cycle_result: ModuleAcyclicityResult,
 ) -> str:
     return _render_evidence(
         authority_evidence(
@@ -101,6 +129,8 @@ def _validated_evidence(
             governed_modules=public_api_result.modules,
             public_api_entrypoints=public_api_result.public_entrypoints,
             deep_import_exceptions=public_api_result.exceptions,
+            module_dependency_edges=len(cycle_result.module_edges),
+            module_cycles=len(cycle_result.cycles),
         )
     )
 
@@ -109,6 +139,7 @@ def _success_message(
     authority: DependencyAuthority,
     domain_result: DomainIndependenceResult,
     public_api_result: PublicApiResult,
+    cycle_result: ModuleAcyclicityResult,
 ) -> str:
     return (
         "Dependency authority valid: "
@@ -119,7 +150,9 @@ def _success_message(
         f"{domain_result.dependencies} dependencies; "
         f"{public_api_result.modules} governed modules expose "
         f"{public_api_result.public_entrypoints} public entrypoints across "
-        f"{public_api_result.dependencies} inspected imports."
+        f"{public_api_result.dependencies} inspected imports; "
+        f"their dependency graph is acyclic across "
+        f"{len(cycle_result.module_edges)} inter-module edges."
     )
 
 
@@ -151,9 +184,12 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     domain_result = _validated_domain(authority, root)
     public_api_result = _validated_public_apis(authority, root)
-    if domain_result is None or public_api_result is None:
+    cycle_result = _validated_module_cycles(authority, root)
+    if domain_result is None or public_api_result is None or cycle_result is None:
         return 1
-    rendered = _validated_evidence(authority, domain_result, public_api_result)
+    rendered = _validated_evidence(
+        authority, domain_result, public_api_result, cycle_result
+    )
     if args.write_evidence:
         evidence_path.parent.mkdir(parents=True, exist_ok=True)
         evidence_path.write_text(rendered, encoding="utf-8", newline="\n")
@@ -176,7 +212,7 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 1
-    print(_success_message(authority, domain_result, public_api_result))
+    print(_success_message(authority, domain_result, public_api_result, cycle_result))
     return 0
 
 

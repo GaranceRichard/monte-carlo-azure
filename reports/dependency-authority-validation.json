@@ -1,5 +1,5 @@
 {
-  "evidenceVersion": "1.1.0",
+  "evidenceVersion": "1.2.0",
   "authority": "config/dependency-authority-v1.0.json",
   "authoritySha256": "50a82acb655c52da97edb1185774f0eede624d149d637b4d4c43819f2cc2b73e",
   "schema": "config/dependency-authority-v1.0.schema.json",
@@ -24,7 +24,8 @@
     "structure": "valid",
     "semantics": "valid",
     "domainIndependence": "valid",
-    "moduleEncapsulation": "valid"
+    "moduleEncapsulation": "valid",
+    "moduleAcyclicity": "valid"
   },
   "counts": {
     "layers": 6,
@@ -39,7 +40,9 @@
     "governedModules": 6,
     "publicApiEntrypoints": 6,
     "deepImportExceptions": 0,
-    "deepImportViolations": 0
+    "deepImportViolations": 0,
+    "moduleDependencyEdges": 3,
+    "moduleCycles": 0
   },
   "diagnostics": [],
   "status": "valid"

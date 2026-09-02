@@ -28,9 +28,10 @@ config/dependency-authority-v1.0.json
 ```
 
 La [preuve versionnée](../reports/dependency-authority-validation.json) contient les empreintes du manifeste
-et du schéma, les sources normatives vérifiées, les comptes structuraux ainsi que les nombres de fichiers et
-de dépendances de domaine inspectés. Un verdict valide porte zéro diagnostic et zéro dépendance technologique
-du domaine. La preuve est régénérable ; elle n’est ni une décision ni une seconde autorité.
+et du schéma, les sources normatives vérifiées, les comptes structuraux, les inspections du domaine et des
+API publiques, ainsi que le nombre d’arêtes entre modules gouvernés. Un verdict valide porte zéro diagnostic,
+zéro dépendance technologique du domaine, zéro import profond et zéro cycle de module. La preuve est
+régénérable ; elle n’est ni une décision ni une seconde autorité.
 
 ## Format 1.0.0
 
@@ -148,6 +149,31 @@ Les exceptions ne sont ni des globs ni des commentaires d'ignorance. Chaque entr
 `authorization` revue et une raison. Elle n'autorise aucun voisin, autre consommateur ou autre interne.
 L'autorité livrée ne déclare actuellement aucune exception.
 
+## Règle 7.13 — acyclicité des modules gouvernés
+
+Le graphe d’acyclicité prend pour nœuds les frontières déclarées par `runtimes[].boundaries` qui contiennent
+réellement une source de production. Une arête relie deux nœuds lorsqu’une source de production du premier
+importe une source du second. Les imports internes au même module ne créent donc pas de boucle artificielle,
+et les fichiers de test ne créent aucune arête produit. Les imports statiques, réexports, imports de type,
+`import()`, `require()` et imports Python, y compris sous `TYPE_CHECKING`, participent tous au graphe.
+
+Le contrôle refuse les cycles directs `A -> B -> A` et indirects `A -> B -> ... -> A`. Le chemin est fermé,
+canonique et accompagné du fichier, de la ligne, du spécificateur et de la phase de chaque arête :
+
+```text
+frontend/src/domain/delivery/index.ts:line 1: [DEP-MODULE-CYCLE] Le graphe des modules gouvernés contient le cycle frontend/src/domain/delivery/ -> frontend/src/domain/simulation/ -> frontend/src/domain/delivery/. Dépendances: ... Correction: rompre une dépendance du chemin (...)
+```
+
+`DEP-MODULE-CYCLE-PARSE` et `DEP-MODULE-CYCLE-SCAN` ferment le contrôle lorsqu’une source Python ou une
+racine gouvernée ne peut pas être inspectée complètement. Il n’existe ni exception de cycle, ni commentaire
+d’ignorance, ni droit acquis pour un import de type.
+
+La preuve courante porte six modules gouvernés, trois arêtes inter-modules de production et zéro cycle. Les
+deux cycles frontend factuels `CYC-001` et `CYC-002` restent consignés dans le
+[graphe observé](dependency-graph.md#cycles-localisés), mais leurs fichiers legacy ne constituent pas des
+frontières de module déclarées par l’autorité. Le PBI 7.13 ne les masque par aucune baseline et ne les migre
+pas ; leur rupture cohésive relève du PBI 7.19.
+
 ## Utilisation
 
 Depuis la racine du dépôt :
@@ -156,8 +182,8 @@ Depuis la racine du dépôt :
 python Scripts/check_dependency_authority.py
 ```
 
-La commande valide le manifeste puis compare la preuve committée à un rendu déterministe. Après une évolution
-revue des décisions et du manifeste :
+La commande valide le manifeste et les trois familles de règles intégrées, puis compare la preuve committée
+à un rendu déterministe. Après une évolution revue du contrôle, des décisions ou du manifeste :
 
 ```powershell
 python Scripts/check_dependency_authority.py --write-evidence
@@ -165,13 +191,14 @@ python Scripts/check_dependency_authority.py
 ```
 
 Le parseur reste importable par les familles de règles via `load_dependency_authority()` et
-`direction_policy(source, target)`. Depuis 7.11 et 7.12, le contrôle bloque à la fois les technologies dans
-le domaine et les contournements des API publiques des modules gouvernés. Il n’est pas encore intégré aux
+`direction_policy(source, target)`. Depuis 7.11 à 7.13, le contrôle bloque les technologies dans le domaine,
+les contournements des API publiques et les cycles entre modules gouvernés. Il n’est pas encore intégré aux
 profils de gate : cette responsabilité appartient au PBI 7.17.
 
 ## Limites préservées
 
-Cette livraison ne traite ni cycles (7.13), ni dépendances entre adaptateurs (7.14). Elle ne modifie pas le
-contenu fonctionnel des API, ne déplace ou renomme aucun module produit, ne crée aucun port et ne réalise
-aucune migration générale. Les formules, seuils, corpus, protocoles, preuves et gates statistiques restent
+Cette livraison ne traite ni indépendance entre adaptateurs (7.14), ni confinement des DTO (7.15), ni
+direction des modules partagés (7.16), ni branchement du contrôle aux profils de gate (7.17). Elle ne modifie
+pas le contenu fonctionnel des API, ne déplace ou renomme aucun module produit, ne crée aucun port et ne migre
+aucun cycle frontend recensé. Les formules, seuils, corpus, protocoles, preuves et gates statistiques restent
 strictement inchangés.

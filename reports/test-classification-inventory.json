@@ -3154,6 +3154,126 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_dependency_cycles.py::test_branched_acyclic_graph_ignores_internal_test_and_legacy_edges",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_cycles.py",
+    "selector": "test_branched_acyclic_graph_ignores_internal_test_and_legacy_edges",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "compatibility",
+      "migration_recovery"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_cycles.py::test_cli_reports_cycles_and_scan_failures",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_cycles.py",
+    "selector": "test_cli_reports_cycles_and_scan_failures",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional",
+      "resilience",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_cycles.py::test_cycles_outside_governed_boundaries_remain_out_of_scope",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_cycles.py",
+    "selector": "test_cycles_outside_governed_boundaries_remain_out_of_scope",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_cycles.py::test_direct_cycle_including_a_type_import_is_rejected_with_its_edges",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_cycles.py",
+    "selector": "test_direct_cycle_including_a_type_import_is_rejected_with_its_edges",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_cycles.py::test_indirect_cycle_is_rejected_with_a_canonical_closed_path",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_cycles.py",
+    "selector": "test_indirect_cycle_is_rejected_with_a_canonical_closed_path",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops",
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_cycles.py::test_python_modules_are_checked_and_parse_errors_fail_closed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_cycles.py",
+    "selector": "test_python_modules_are_checked_and_parse_errors_fail_closed",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_and_keeps_only_three_production_edges",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_cycles.py",
+    "selector": "test_repository_graph_is_acyclic_and_keeps_only_three_production_edges",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_cycles.py::test_repository_scan_reports_unreadable_sources",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_cycles.py",
+    "selector": "test_repository_scan_reports_unreadable_sources",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ],
+    "domains": [
+      "reporting"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_dependency_public_api.py::test_comments_strings_and_unrelated_imports_are_ignored",
     "framework": "pytest",
     "sourcePath": "tests/test_dependency_public_api.py",

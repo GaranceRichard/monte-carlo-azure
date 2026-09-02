@@ -2,6 +2,17 @@
 
 ## Recent
 
+### Acyclicité des modules gouvernés — PBI 7.13
+
+- projection déterministe des imports de production en un graphe dont les nœuds sont exclusivement les
+  frontières de modules déclarées par l’autorité 7.10 ;
+- refus des cycles directs et indirects, y compris lorsqu’une arête est un import de type, avec chemin fermé
+  canonique et détail exploitable de chaque fichier, ligne, spécificateur et phase ;
+- couverture des cycles à deux et plusieurs modules, des graphes acycliques, des imports Python, des erreurs
+  d’analyse et de l’intégration à la preuve existante ;
+- conservation explicite des deux cycles frontend legacy recensés hors des frontières gouvernées, sans
+  migration, exception, baseline ni extension aux règles 7.14 et suivantes.
+
 ### Validation backend CI parallélisée
 
 - distribution de la suite Pytest couverte sur deux workers afin de raccourcir le nœud critique

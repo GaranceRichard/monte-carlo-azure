@@ -228,7 +228,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Empêcher la réapparition des boucles responsables de changements transversaux.
 - **Frontière principale :** Graphe des modules.
 - **Famille d’invariants :** Acyclicité des dépendances.
-- **Preuve principale :** Tests de cycles directs, indirects et graphes acycliques.
+- **Preuve principale :** [Tests des cycles directs, indirects et graphes acycliques](../../tests/test_dependency_cycles.py), complétés par la [preuve du contrôle intégré](../../reports/dependency-authority-validation.json).
 - **Éléments de réalisation inclus :** Détection ; diagnostic du chemin cyclique ; tests ; intégration mécanique ; documentation ciblée.
 - **Hors périmètre :** Migration du cycle frontend recensé.
 - **Surface prévisionnelle :** 3 fichiers de production ; 7 fichiers versionnés

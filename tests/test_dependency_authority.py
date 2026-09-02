@@ -20,6 +20,7 @@ from Scripts.dependency_authority import (
     load_dependency_authority,
 )
 from Scripts.dependency_authority_contract import Diagnostic
+from Scripts.dependency_authority_cycles import inspect_repository_module_cycles
 from Scripts.dependency_authority_domain import (
     DomainIndependenceResult,
     DomainInspectionError,
@@ -72,10 +73,12 @@ def test_committed_evidence_is_a_fresh_deterministic_projection(capsys) -> None:
     authority = load_dependency_authority()
     domain_result = inspect_repository_domain(authority)
     public_api_result = inspect_repository_public_apis(authority)
+    cycle_result = inspect_repository_module_cycles(authority)
     committed = _json(ROOT / "reports" / "dependency-authority-validation.json")
 
     assert not domain_result.diagnostics
     assert not public_api_result.diagnostics
+    assert not cycle_result.diagnostics
     assert committed == authority_evidence(
         authority,
         domain_files=domain_result.files,
@@ -85,6 +88,8 @@ def test_committed_evidence_is_a_fresh_deterministic_projection(capsys) -> None:
         governed_modules=public_api_result.modules,
         public_api_entrypoints=public_api_result.public_entrypoints,
         deep_import_exceptions=public_api_result.exceptions,
+        module_dependency_edges=len(cycle_result.module_edges),
+        module_cycles=len(cycle_result.cycles),
     )
     assert check_authority([]) == 0
     assert "36 directions" in capsys.readouterr().out

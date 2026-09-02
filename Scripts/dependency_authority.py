@@ -133,6 +133,17 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _valid_checks() -> dict[str, str]:
+    return {
+        "jsonSyntax": "valid",
+        "structure": "valid",
+        "semantics": "valid",
+        "domainIndependence": "valid",
+        "moduleEncapsulation": "valid",
+        "moduleAcyclicity": "valid",
+    }
+
+
 def authority_evidence(
     authority: DependencyAuthority,
     *,
@@ -143,24 +154,20 @@ def authority_evidence(
     governed_modules: int,
     public_api_entrypoints: int,
     deep_import_exceptions: int,
+    module_dependency_edges: int,
+    module_cycles: int,
 ) -> dict[str, Any]:
     """Build the deterministic proof for integrated dependency rules."""
     document = authority.document
     return {
-        "evidenceVersion": "1.1.0",
+        "evidenceVersion": "1.2.0",
         "authority": authority.path.relative_to(authority.repository_root).as_posix(),
         "authoritySha256": _sha256(authority.path),
         "schema": authority.schema_path.relative_to(authority.repository_root).as_posix(),
         "schemaSha256": _sha256(authority.schema_path),
         "schemaVersion": authority.schema_version,
         "normativeSources": document["normativeSources"],
-        "checks": {
-            "jsonSyntax": "valid",
-            "structure": "valid",
-            "semantics": "valid",
-            "domainIndependence": "valid",
-            "moduleEncapsulation": "valid",
-        },
+        "checks": _valid_checks(),
         "counts": {
             "layers": len(document["layers"]),
             "directions": len(document["directions"]),
@@ -175,6 +182,8 @@ def authority_evidence(
             "publicApiEntrypoints": public_api_entrypoints,
             "deepImportExceptions": deep_import_exceptions,
             "deepImportViolations": 0,
+            "moduleDependencyEdges": module_dependency_edges,
+            "moduleCycles": module_cycles,
         },
         "diagnostics": [],
         "status": "valid",

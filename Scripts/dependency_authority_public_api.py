@@ -45,11 +45,13 @@ class PublicApiInspectionError(RuntimeError):
     """Raised when governed imports cannot be inspected deterministically."""
 
 
-def _source_roots(authority: DependencyAuthority) -> tuple[str, ...]:
+def source_roots(authority: DependencyAuthority) -> tuple[str, ...]:
+    """Return every source root governed by the dependency authority."""
     return tuple(sorted(runtime["root"] for runtime in authority.document["runtimes"]))
 
 
-def _production_source(path: str) -> bool:
+def production_source(path: str) -> bool:
+    """Return whether a source belongs to the product graph rather than its tests."""
     return Path(path).suffix in SOURCE_SUFFIXES and not TEST_PATH.search(path)
 
 
@@ -89,13 +91,14 @@ def _entrypoint_names(authority: DependencyAuthority, sources: tuple[str, ...]) 
     return names
 
 
-def _governed_modules(
+def governed_modules(
     authority: DependencyAuthority, paths: set[str]
 ) -> tuple[GovernedModule, ...]:
+    """Expand the declared boundaries that contain production sources."""
     modules: list[GovernedModule] = []
     for boundary in sorted(_module_boundaries(authority, paths)):
         sources = tuple(
-            sorted(path for path in paths if path.startswith(boundary) and _production_source(path))
+            sorted(path for path in paths if path.startswith(boundary) and production_source(path))
         )
         if not sources:
             continue
@@ -128,7 +131,8 @@ def _dependency_path(dependency: ImportDependency) -> str | None:
     return None
 
 
-def _module_for(path: str, modules: tuple[GovernedModule, ...]) -> GovernedModule | None:
+def module_for(path: str, modules: tuple[GovernedModule, ...]) -> GovernedModule | None:
+    """Locate a path in the most specific governed module boundary."""
     matches = [
         module
         for module in modules
@@ -203,7 +207,7 @@ def validate_public_api_encapsulation(
         for path, text in normalized_texts.items()
         if Path(path).suffix in SOURCE_SUFFIXES
     }
-    modules = _governed_modules(authority, paths)
+    modules = governed_modules(authority, paths)
     dependencies, diagnostics = _dependencies(source_texts, paths)
     diagnostics.extend(
         diagnostic
@@ -212,8 +216,8 @@ def validate_public_api_encapsulation(
     )
     for dependency in dependencies:
         target = _dependency_path(dependency)
-        target_module = _module_for(target, modules) if target else None
-        source_module = _module_for(dependency.source, modules)
+        target_module = module_for(target, modules) if target else None
+        source_module = module_for(dependency.source, modules)
         if (
             target_module is None
             or source_module == target_module
@@ -241,6 +245,6 @@ def inspect_repository_public_apis(
 ) -> PublicApiResult:
     root = (repository_root or authority.repository_root).resolve()
     texts, paths = repository_source_texts(
-        root, _source_roots(authority), PublicApiInspectionError
+        root, source_roots(authority), PublicApiInspectionError
     )
     return validate_public_api_encapsulation(authority, texts, set(paths))

@@ -139,9 +139,12 @@ une connexion Azure DevOps réelle.
   le snapshot staged isolé utilisé par les hooks ; une source produit illisible ou non analysable échoue de
   façon fermée avec un diagnostic localisé. Il exige aussi un `index.*` ou `__init__.py` à la racine de chaque
   module gouverné et refuse les imports profonds avec fichier, ligne et frontière publique attendue ; les
-  seules exceptions possibles sont des couples source/cible exacts, justifiés dans le manifeste. Le rendu du
-  chemin suit le séparateur natif de la plateforme et sa portabilité reste couverte explicitement pour les
-  représentations POSIX et Windows.
+  seules exceptions possibles sont des couples source/cible exacts, justifiés dans le manifeste. Il projette
+  aussi les imports de production entre modules gouvernés et refuse tout cycle direct ou indirect, y compris
+  lorsqu’une arête est un import de type, avec le chemin fermé et chaque import localisé. Les deux cycles
+  frontend legacy recensés restent hors des frontières gouvernées et ne sont pas migrés par ce contrôle. Le
+  rendu du chemin suit le séparateur natif de la plateforme et sa portabilité reste couverte explicitement
+  pour les représentations POSIX et Windows.
 - **Migration ordonnée sans lot bloquant.** La [séquence architecturale](docs/architecture-migration-sequence.md)
   fixe un graphe acyclique de publications autonomes, calcule les vagues de disponibilité les plus précoces
   et protège automatiquement les précédences. Après sa publication, six outcomes indépendants peuvent
