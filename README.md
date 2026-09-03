@@ -182,6 +182,10 @@ du [standard statistique](docs/standards/STD-STAT-001.md), du
 - les scénarios portefeuille sont des hypothèses d’agrégation : ils ne prouvent ni causalité, ni
   substituabilité des équipes, ni validité future ;
 - lorsque les preuves sont insuffisantes, l’absence de scénario recommandé est un résultat valide ;
+- le backlog de la Feature 10 prévoit de rendre cette décision directement exploitable en nommant
+  l’engagement d’équipe ou le choix — éventuellement l’abstention — de scénario portefeuille, le niveau
+  d’appui non calibré, une alternative prudente et une justification comparative, sans assimiler un
+  percentile simulé à une probabilité de réussite réelle ;
 - les seize cas du corpus statistique courant concordent exactement et le protocole multi-seeds conclut à
   la parité distributionnelle sur ses scénarios ; la gate vérifie cette conformité déclarée, sans garantir
   l’exactitude future sur toute donnée Azure DevOps ;

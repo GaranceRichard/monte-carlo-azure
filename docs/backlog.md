@@ -284,10 +284,14 @@ empiriquement calibrée pour soutenir une décision.
 
 ## Feature 10 — Disposer d’une expérience de simulation cohérente et de restitutions fiables
 
-**Résultat observable :** la configuration, la progression, l’historique, la comparaison et les
-restitutions UI, PDF et export restent cohérents avec un cache local et un état d’expérience fiables.
+**Résultat observable :** après une simulation d’équipe ou de portefeuille, une recommandation exploitable
+nomme la décision principale, son niveau de confiance, une alternative prudente et les raisons qui la rendent
+préférable, tandis que la configuration, la progression, l’historique, la comparaison et les restitutions UI,
+PDF et export restent cohérents avec un cache local et un état d’expérience fiables.
 
-**Flux de valeur :** empêcher l’affichage ou l’export de résultats devenus incohérents et permettre au décideur de retrouver la même information dans l’interface et dans les rapports.
+**Flux de valeur :** réduire l’interprétation manuelle entre résultats et engagement sans masquer
+l’incertitude, empêcher l’affichage ou l’export de résultats devenus incohérents et permettre au décideur de
+retrouver la même recommandation dans l’interface et dans les rapports.
 
 **Attendus détaillés :** [`backlog-expectations/feature-10-simulation-experience.md`](backlog-expectations/feature-10-simulation-experience.md)
 
@@ -297,12 +301,14 @@ restitutions UI, PDF et export restent cohérents avec un cache local et un éta
 | 10.2 | Lancement et progression visible orchestrés | L | Sol Très élevé | |
 | 10.3 | Cache, historique local et migrations isolés | L | Sol Très élevé | |
 | 10.4 | Invalidation, rechargement, comparaison et rejeu par seed sécurisés | M | Sol Très élevé | |
-| 10.5 | Résultats et diagnostics de simulation lisibles dans l’interface | M | Sol Élevé | |
-| 10.6 | Contenu PDF compréhensible sans lecture de l’interface | M | Sol Élevé | |
-| 10.7 | Pagination PDF fiable sur les rapports réels | L | Sol Élevé | |
-| 10.8 | Artefacts et échecs partiels de restitution sécurisés | M | Sol Très élevé | |
-| 10.9 | Formulations et repères visuels compréhensibles dans chaque restitution | M | Sol Medium | |
-| 10.10 | Téléchargements de restitution compréhensibles et accessibles | M | Sol Élevé | |
+| 10.5 | Engagement d’équipe recommandé avec confiance et repli prudent | S | Sol Très élevé | |
+| 10.6 | Choix de scénario portefeuille explicite, prudent et justifié | S | Sol Très élevé | |
+| 10.7 | Résultats, diagnostics et recommandations lisibles dans l’interface | M | Sol Élevé | |
+| 10.8 | Contenu décisionnel PDF compréhensible sans lecture de l’interface | M | Sol Élevé | |
+| 10.9 | Pagination PDF fiable sur les rapports réels | L | Sol Élevé | |
+| 10.10 | Artefacts décisionnels et échecs partiels de restitution sécurisés | M | Sol Très élevé | |
+| 10.11 | Formulations et repères visuels compréhensibles dans chaque restitution | M | Sol Medium | |
+| 10.12 | Téléchargements de restitution compréhensibles et accessibles | M | Sol Élevé | |
 
 ## Feature 11 — Rendre les traitements coûteux exécutables à l’échelle
 
@@ -391,7 +397,7 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 **Prochain PBI :** 7.14 — Les adaptateurs restent indépendants entre eux — non commencé.
 **Dernière Feature terminée :** Feature 2 — Garantir la fiabilité du cœur statistique — 21/21 PBI réalisés (100 %).
 **Reliquats de la Feature 7 :** `7.14`, `7.15`, `7.16`, `7.17`, `7.18`, `7.20`, `7.23`, `7.24`, `7.25`, `7.26`, `7.27`, `7.28`, `7.29`, `7.30`, `7.33`, `7.34`, `7.35`, `7.36`, `7.37`, `7.38`, `7.39`, `7.40`, `7.41`, `7.42`, `7.43`, `7.44`, `7.45`, `7.46`, `7.47`, `7.48`, `7.49`, `7.50`, `7.51`, `7.52`, `7.53`, `7.54`, `7.55`, `7.56`, `7.57`, `7.58`, `7.59`, `7.60`, `7.61`, `7.62`, `7.63`, `7.64`, `7.65`, `7.66`, `7.67`, `7.68`, `7.69`, `7.70`, `7.71`, `7.72`, `7.73`, `7.74`, `7.75`.
-**Progression globale :** 50/202 PBI réalisés (24,75 %) ; 152 restants.
+**Progression globale :** 50/204 PBI réalisés (24,51 %) ; 154 restants.
 
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
@@ -404,12 +410,12 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 | 7 — Réduire le coût de changement par une architecture explicite et modulaire | 75 | 18 | 57 |
 | 8 — Disposer de données Azure DevOps fiables et contextualisées par sprint | 14 | 0 | 14 |
 | 9 — Disposer de prévisions rejouables dans le temps et calibrées | 8 | 0 | 8 |
-| 10 — Disposer d’une expérience de simulation cohérente et de restitutions fiables | 10 | 0 | 10 |
+| 10 — Disposer d’une expérience de simulation cohérente et de restitutions fiables | 12 | 0 | 12 |
 | 11 — Rendre les traitements coûteux exécutables à l’échelle | 8 | 0 | 8 |
 | 12 — Soutenir le pilotage de programme avec des relations opérationnelles explicites | 7 | 0 | 7 |
 | 13 — Disposer d’une gouvernance technique rationalisée | 9 | 0 | 9 |
 | 14 — Disposer d’une stratégie de diffusion claire et d’une adoption simplifiée | 9 | 0 | 9 |
-| **Total** | **202** | **50** | **152** |
+| **Total** | **204** | **50** | **154** |
 
 Aucun PBI n’est classé XL.
 

@@ -44,7 +44,7 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     governance = (ROOT / "docs" / "backlog-governance.md").read_text(encoding="utf-8")
     features = check_backlog_consistency.parse_registry(backlog)
 
-    assert sum(len(feature.pbis) for feature in features) == 202
+    assert sum(len(feature.pbis) for feature in features) == 204
     assert sum(feature.completed_count for feature in features) == 50
     feature_two = next(feature for feature in features if feature.number == 2)
     assert feature_two.completed_count == 21
@@ -84,8 +84,8 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
         "Les adaptateurs restent indépendants entre eux"
         in backlog
     )
-    assert "Progression globale :** 50/202 PBI réalisés (24,75 %) ; 152 restants" in backlog
-    assert "Répartition actuelle des 152 PBI non réalisés" in governance
+    assert "Progression globale :** 50/204 PBI réalisés (24,51 %) ; 154 restants" in backlog
+    assert "Répartition actuelle des 154 PBI non réalisés" in governance
     assert (
         "Dernière Feature terminée :** Feature 2 — "
         "Garantir la fiabilité du cœur statistique"
