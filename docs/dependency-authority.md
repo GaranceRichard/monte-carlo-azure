@@ -168,11 +168,12 @@ frontend/src/domain/delivery/index.ts:line 1: [DEP-MODULE-CYCLE] Le graphe des m
 racine gouvernée ne peut pas être inspectée complètement. Il n’existe ni exception de cycle, ni commentaire
 d’ignorance, ni droit acquis pour un import de type.
 
-La preuve courante porte six modules gouvernés, trois arêtes inter-modules de production et zéro cycle. Les
-deux cycles frontend factuels `CYC-001` et `CYC-002` restent consignés dans le
-[graphe observé](dependency-graph.md#cycles-localisés), mais leurs fichiers legacy ne constituent pas des
-frontières de module déclarées par l’autorité. Le PBI 7.13 ne les masque par aucune baseline et ne les migre
-pas ; leur rupture cohésive relève du PBI 7.19.
+La preuve courante porte sept modules gouvernés, quatre arêtes inter-modules de production et zéro cycle. Le
+module `frontend/src/application/team-forecast/` déclare `index.ts` comme API publique ; les hooks de simulation
+et de portefeuille le consomment par cette frontière. Les deux composantes cycliques factuelles `CYC-001` et
+`CYC-002` ont disparu du [graphe observé](dependency-graph.md#cycles-localisés) avec le retrait des anciennes
+façades `simulationForecastService.ts` et `simulationForecastCore.ts`. La baseline de maintenabilité ne
+conserve aucune dette cyclique : toute réintroduction devient une nouvelle dérive bloquante.
 
 ## Utilisation
 
@@ -197,8 +198,8 @@ profils de gate : cette responsabilité appartient au PBI 7.17.
 
 ## Limites préservées
 
-Cette livraison ne traite ni indépendance entre adaptateurs (7.14), ni confinement des DTO (7.15), ni
-direction des modules partagés (7.16), ni branchement du contrôle aux profils de gate (7.17). Elle ne modifie
-pas le contenu fonctionnel des API, ne déplace ou renomme aucun module produit, ne crée aucun port et ne migre
-aucun cycle frontend recensé. Les formules, seuils, corpus, protocoles, preuves et gates statistiques restent
-strictement inchangés.
+Le contrôle 7.13, pris isolément, ne traitait ni indépendance entre adaptateurs (7.14), ni confinement des DTO
+(7.15), ni direction des modules partagés (7.16), ni branchement du contrôle aux profils de gate (7.17). Le
+PBI 7.19 ajoute la frontière applicative de prévision et migre les deux cycles frontend recensés sans modifier
+le contenu fonctionnel des API ni les formules, seuils, corpus ou protocoles statistiques. L’autorité
+`resolved-defaults` est réattachée par une release compatible et ses preuves obligatoires sont régénérées.

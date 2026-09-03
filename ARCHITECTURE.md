@@ -69,8 +69,8 @@ Chemins surveillés par `Scripts/check_identity_boundary.py` :
 - `frontend/src/api.ts`
 - `frontend/src/api/simulationDtos.ts`
 - `frontend/src/api/simulationMappers.ts`
-- `frontend/src/hooks/simulationForecastCore.ts`
-- `frontend/src/hooks/simulationForecastService.ts`
+- `frontend/src/application/team-forecast/contract.ts`
+- `frontend/src/application/team-forecast/localTeamForecast.ts`
 - tout fichier `frontend/src/` qui construit un `SimulateRequestDto` ou appelle `postSimulate`
 - `backend/api_models.py`
 - `backend/api_routes_simulate.py`
@@ -157,6 +157,11 @@ frontend/
       simulation.ts        # commande et résultat statistiques métier en camelCase
       simulationValueObjects.ts # Value Objects statistiques immuables et validés
       simulationHistory.ts # historique interne contenant un SimulationResult
+    application/
+      team-forecast/
+        index.ts            # API publique de la prévision applicative
+        contract.ts         # contrat TeamForecast indépendant de React
+        localTeamForecast.ts # implémentation locale HTTP/démo du contrat
     composition/
       browser/index.ts     # composition des adaptateurs réels du bootstrap React
     ports/
@@ -179,9 +184,7 @@ frontend/
       useTeamOptions.ts            # chargement options équipe (types + états)
       usePortfolio.ts              # logique mode portefeuille
       usePortfolioReport.ts        # génération rapport portefeuille
-      simulationForecastService.ts # façade forecast exposée au reste du front
-      simulationForecastCore.ts    # logique forecast extraite et testée
-      simulationSeedResolver.ts    # résolution uint32 à la frontière d'orchestration
+      simulationSeedResolver.ts    # autorité pure de résolution uint32
     utils/
       cycleTime.ts        # calcul et tendances du cycle time en jours calendaires
       portfolioComparisonDiagnostic.ts # diagnostic métier comparatif des scénarios portefeuille
@@ -368,7 +371,7 @@ La composition appartient aux frontières d’exécution :
 
 - `backend/simulation_service.py` construit un adaptateur `mca-prng-v1` par commande puis transmet la même
   instance au moteur sélectionné ;
-- `frontend/src/hooks/simulationForecastCore.ts` construit l’adaptateur TypeScript uniquement pour le
+- `frontend/src/application/team-forecast/localTeamForecast.ts` construit l’adaptateur TypeScript uniquement pour le
   chemin démo/local ; le chemin HTTP transmet la seed au backend sans PRNG local ;
 - `frontend/src/hooks/usePortfolioReport.ts` construit l’adaptateur du bootstrap depuis la seed optimiste
   déjà résolue, sans modifier le nombre ni l’ordre des résolutions de seed.
@@ -697,7 +700,7 @@ et la purge restent inchangées.
 - l’historique détaillé reste contextualisé par équipe dans le navigateur ;
 - le frontend ne recharge plus l’historique Mongo pour le mélanger à cet historique local ;
 - les entrées locales portent un `schemaVersion` explicite ;
-- la création d’une entrée par `simulationForecastCore` exige un `FrontendClock`, acquiert exactement un
+- la création d’une entrée par `localTeamForecast` exige un `FrontendClock`, acquiert exactement un
   instant après la simulation et réutilise sa chaîne ISO pour `createdAt` et le fallback d’identité ;
 - `main.tsx` construit `BrowserClock` par `createBrowserComposition`, tandis que les tests peuvent injecter
   `DeterministicFrontendClock` sans horloge réelle cachée ;
@@ -951,8 +954,9 @@ Frontend :
 - orchestration App allégée via `src/AppFlowContent.tsx`, `src/appNavigation.ts`,
   `src/appShellSections.tsx` et `src/appTheme.ts`
 - façade API allégée via `src/apiHelpers.ts` pour conserver des périmètres Vitals plus stables
-- logique forecast scindée entre façade `src/hooks/simulationForecastService.ts` et cœur
-  `src/hooks/simulationForecastCore.ts`
+- contrat applicatif `TeamForecast` et implémentation `localTeamForecast` exposés par l’API publique
+  `src/application/team-forecast/index.ts`, sans import direct de React ni des hooks ; `useSimulation` et
+  `usePortfolioReport` sont des consommateurs et les anciennes façades cycliques ont été retirées
 - port `src/ports/clock/` injecté dans le forecast, adaptateur `src/adapters/browser/clock/` et composition
   réelle sous `src/composition/browser/`, avec double déterministe réservé aux tests
 - événements delivery possédés par `src/domain/delivery/` : les DTO Azure DevOps sont convertis localement en

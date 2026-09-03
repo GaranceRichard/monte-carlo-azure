@@ -2,7 +2,7 @@
   "authority": {
     "id": "mca-statistical-compatibility-authority",
     "schema_version": "1.0",
-    "semantic_fingerprint": "faa724ac5ab7aaadea64dfa0b6591e91f73cf85a51671d789278d0f5e5e35065",
+    "semantic_fingerprint": "f3a3d0be08953bea9eaa9859f9d78ec4d41657a3248755ea829cd8a9f49d9e22",
     "version": "1.0"
   },
   "classification": "no_normative_impact",
@@ -39,24 +39,24 @@
       ]
     },
     {
-      "actual_semantic_fingerprint": "4fd6c645e9bcef1a6ea9f80d59b6727ea533998e2378aedf2dfa915a169390fe",
+      "actual_semantic_fingerprint": "e74ba0c6f1cb39d30eda84e07a67f492e61fd08c77be1aab6ba99282b31628b5",
       "affected_data": [
         "seeded_results"
       ],
       "classification": "no_normative_impact",
-      "current_version": "1.0",
+      "current_version": "1.1",
       "data_treatments": [
         {
           "category": "seeded_results",
           "evidence": [
             "reports/statistical-parity-report.json"
           ],
-          "rationale": "No default changed while establishing this compatibility baseline.",
+          "rationale": "Existing seeded results retain identical default resolution and require no migration or invalidation.",
           "treatment": "compatible_without_action"
         }
       ],
-      "decision_id": "PBI-2.20-baseline-resolved-defaults",
-      "expected_semantic_fingerprint": "4fd6c645e9bcef1a6ea9f80d59b6727ea533998e2378aedf2dfa915a169390fe",
+      "decision_id": "PBI-7.19-team-forecast-contract",
+      "expected_semantic_fingerprint": "e74ba0c6f1cb39d30eda84e07a67f492e61fd08c77be1aab6ba99282b31628b5",
       "id": "resolved-defaults",
       "identity": "STD-STAT-001-resolved-defaults",
       "required_proofs": [
@@ -754,14 +754,14 @@
       "expected_semantic_fingerprint": "edaae666e21023b39eb5a3fd0de5c0d2932d996672b56a3b561172ddbdd3f542",
       "id": "validation-probes",
       "status": "match",
-      "version": "1.0"
+      "version": "1.1"
     },
     {
       "actual_semantic_fingerprint": "9c03522244da4eddae86beaa7e068db9af6220e1fa159b4dfcb00c8cee3afc04",
       "expected_semantic_fingerprint": "9c03522244da4eddae86beaa7e068db9af6220e1fa159b4dfcb00c8cee3afc04",
       "id": "deterministic-parity",
       "status": "match",
-      "version": "1.1"
+      "version": "1.2"
     },
     {
       "actual_semantic_fingerprint": "ad881e25fbce9a26be3954824dc18ce81a62bc4b8f0c15b03b4d32c85f66f060",
@@ -801,7 +801,7 @@
   ],
   "proof_kind": "statistical_compatibility",
   "stability": {
-    "artifact_fingerprint": "b557524634319a7fd398698aa86a1e1905e77682f1799a025819c5904138ab33",
+    "artifact_fingerprint": "85d3737cfe750094fbda2c0138ce3e12087bf552ce6f504fab301f40e5dc9a99",
     "deterministic": true,
     "method": "sha256-canonical-json-without-artifact-fingerprint"
   },

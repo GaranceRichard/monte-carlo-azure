@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fetchTeamThroughput, runSimulationForecast, simulateForecastFromSamples } from "./simulationForecastService";
+import { localTeamForecast } from "../application/team-forecast";
 import { getTeamDeliveryDataDirect } from "../adoClient";
 import { postSimulate } from "../api";
 import {
@@ -7,6 +7,8 @@ import {
   SIMULATION_THROUGHPUT_SAMPLES_MAX,
 } from "../simulationLimits";
 import { DeterministicFrontendClock } from "../test/deterministicFrontendClock";
+
+const { fetchTeamThroughput, runSimulationForecast, simulateForecastFromSamples } = localTeamForecast;
 
 vi.mock("../adoClient", () => ({
   getTeamDeliveryDataDirect: vi.fn(),

@@ -1,11 +1,6 @@
-import type { SimulationMode, SimulationResult } from "../domain/simulation";
-import type { SampleStats, SimulationHistoryEntry } from "../domain/simulationHistory";
-import type { FrontendClock } from "../ports/clock";
-import {
-  fetchTeamThroughputCore,
-  runSimulationForecastCore,
-  simulateForecastFromSamplesCore,
-} from "./simulationForecastCore";
+import type { SimulationMode, SimulationResult } from "../../domain/simulation";
+import type { SampleStats, SimulationHistoryEntry } from "../../domain/simulationHistory";
+import type { FrontendClock } from "../../ports/clock";
 
 export type RunSimulationForecastParams = {
   clock: FrontendClock;
@@ -69,14 +64,14 @@ export type SimulateFromSamplesParams = {
   nSims?: number | string;
 };
 
-export function fetchTeamThroughput(params: FetchTeamThroughputParams): Promise<FetchTeamThroughputResult> {
-  return fetchTeamThroughputCore(params);
-}
-
-export function simulateForecastFromSamples(params: SimulateFromSamplesParams): Promise<SimulationResult> {
-  return simulateForecastFromSamplesCore(params);
-}
-
-export function runSimulationForecast(params: RunSimulationForecastParams): Promise<RunSimulationForecastResult> {
-  return runSimulationForecastCore(params);
-}
+export type TeamForecast = Readonly<{
+  fetchTeamThroughput: (
+    params: FetchTeamThroughputParams,
+  ) => Promise<FetchTeamThroughputResult>;
+  simulateForecastFromSamples: (
+    params: SimulateFromSamplesParams,
+  ) => Promise<SimulationResult>;
+  runSimulationForecast: (
+    params: RunSimulationForecastParams,
+  ) => Promise<RunSimulationForecastResult>;
+}>;

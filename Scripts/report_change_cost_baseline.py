@@ -27,6 +27,7 @@ LAYER_PATTERNS = (
     (r"^backend/", "backend-engine"),
     (r"^frontend/src/api/", "frontend-transport"),
     (r"^frontend/src/domain/", "frontend-domain"),
+    (r"^frontend/src/application/", "frontend-application"),
     (r"^frontend/src/hooks/", "frontend-application"),
     (r"^frontend/src/ado", "frontend-azure-adapter"),
     (r"^frontend/src/", "frontend-delivery-or-engine"),
@@ -59,7 +60,7 @@ SCENARIOS = (
         backend/simulation_value_objects.py backend/simulation_service.py backend/mc_core.py
         frontend/src/api/simulationDtos.ts frontend/src/api/simulationMappers.ts
         frontend/src/domain/simulation.ts frontend/src/domain/simulationValueObjects.ts
-        frontend/src/hooks/simulationForecastCore.ts frontend/src/utils/simulation.ts
+        frontend/src/application/team-forecast/localTeamForecast.ts frontend/src/utils/simulation.ts
         Scripts/statistical_corpus_runner.py tests/test_api_models.py
         tests/test_simulation_mappers.py tests/test_simulation_service.py tests/test_mc_core.py
         tests/test_statistical_compatibility.py
@@ -74,11 +75,12 @@ SCENARIOS = (
         "simulation; elle représente un changement métier alimenté par un adaptateur externe.",
         "docs/frontend-responsibilities-map.md#collecte-et-transformations-delivery "
         "docs/dependency-graph.md",
-        """frontend/src/adoClient.ts frontend/src/adoPlatform.ts frontend/src/date.ts
-        frontend/src/utils/cycleTime.ts frontend/src/types.ts
-        frontend/src/hooks/simulationForecastCore.ts frontend/src/hooks/useSimulation.ts
-        frontend/src/adoClient.test.ts frontend/src/adoPlatform.test.ts
-        frontend/src/date.test.ts frontend/src/utils/cycleTime.test.ts""",
+        "frontend/src/adoClient.ts frontend/src/adoPlatform.ts frontend/src/date.ts "
+        "frontend/src/utils/cycleTime.ts frontend/src/types.ts "
+        "frontend/src/application/team-forecast/localTeamForecast.ts "
+        "frontend/src/hooks/useSimulation.ts frontend/src/adoClient.test.ts "
+        "frontend/src/adoPlatform.test.ts frontend/src/date.test.ts "
+        "frontend/src/utils/cycleTime.test.ts",
     ),
     _scenario(
         "main-validation-profile",

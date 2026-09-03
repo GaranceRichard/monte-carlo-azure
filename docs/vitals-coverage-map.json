@@ -4,12 +4,12 @@
       "title": "SLA Identite",
       "sources": {
         "frontend_unit": [
-          "frontend/src/hooks/simulationForecastService.ts",
-          "frontend/src/hooks/simulationForecastCore.ts"
+          "frontend/src/application/team-forecast/contract.ts",
+          "frontend/src/application/team-forecast/localTeamForecast.ts"
         ],
         "e2e": [
           "frontend/src/api.ts",
-          "frontend/src/hooks/simulationForecastService.ts"
+          "frontend/src/application/team-forecast/localTeamForecast.ts"
         ]
       }
     },

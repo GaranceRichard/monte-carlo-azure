@@ -169,6 +169,46 @@ def test_new_documented_dependency_direction_violation_is_detected(
     assert any("metric=dependency.direction" in error for error in errors)
 
 
+def test_team_forecast_contract_rejects_react_and_hook_dependencies(
+    tmp_path: Path,
+) -> None:
+    contract = tmp_path / "frontend/src/application/team-forecast/contract.ts"
+    hook = tmp_path / "frontend/src/hooks/useSimulation.ts"
+    contract.parent.mkdir(parents=True)
+    hook.parent.mkdir(parents=True)
+    contract.write_text(
+        'import type { FC } from "react";\n'
+        'import type { ViewModel } from "../../hooks/useSimulation";\n',
+        encoding="utf-8",
+    )
+    hook.write_text("export type ViewModel = {};\n", encoding="utf-8")
+    config = json.loads(
+        (ROOT / "config/maintainability.json").read_text(encoding="utf-8")
+    )
+
+    snapshot = check_maintainability.build_snapshot(
+        tmp_path,
+        config,
+        tracked_paths=[
+            "frontend/src/application/team-forecast/contract.ts",
+            "frontend/src/hooks/useSimulation.ts",
+        ],
+    )
+
+    assert snapshot["dependencyViolations"] == [
+        {
+            "rule": "team-forecast-must-remain-react-independent",
+            "source": "frontend/src/application/team-forecast/contract.ts",
+            "target": "frontend/src/hooks/useSimulation.ts",
+        },
+        {
+            "rule": "team-forecast-must-remain-react-independent",
+            "source": "frontend/src/application/team-forecast/contract.ts",
+            "target": "react",
+        },
+    ]
+
+
 def test_new_mojibake_is_detected_in_a_tracked_text_file(tmp_path: Path) -> None:
     (tmp_path / "notes.md").write_text("Fran\u00c3\u00a7ais cassé\n", encoding="utf-8")
 
@@ -513,6 +553,8 @@ def test_cli_writes_baseline_passes_fails_and_reports_loading_error(
 
     report = report_dependency_graph.build_report(ROOT)
     markdown_writer = getattr(dependency_graph_render, "render_" + "markdown")
+    assert not (ROOT / "frontend/src/hooks/simulationForecastCore.ts").exists()
+    assert not (ROOT / "frontend/src/hooks/simulationForecastService.ts").exists()
     assert (
         json.loads((ROOT / "reports/dependency-graph.json").read_text(encoding="utf-8")) == report
     )
@@ -523,29 +565,49 @@ def test_cli_writes_baseline_passes_fails_and_reports_loading_error(
         key: report["summary"][key]
         for key in ("cycles", "runtimeCycles", "missingEntrypoints", "apiBypasses")
     } == {
-        "cycles": 2,
+        "cycles": 0,
         "runtimeCycles": 0,
         "missingEntrypoints": 5,
         "apiBypasses": 2,
     }
-    assert [cycle["nodes"] for cycle in report["observed"]["cycles"]] == [
-        [
-            "frontend/src/demoData.ts",
-            "frontend/src/hooks/usePortfolioReport.ts",
-            "frontend/src/hooks/simulationForecastService.ts",
-            "frontend/src/hooks/simulationForecastCore.ts",
-        ],
-        [
-            "frontend/src/hooks/simulationForecastCore.ts",
-            "frontend/src/hooks/simulationForecastService.ts",
-        ],
-    ]
+    assert report["observed"]["cycles"] == []
+    report_with_cycle = {
+        **report,
+        "summary": {**report["summary"], "cycles": 1},
+        "observed": {
+            **report["observed"],
+            "cycles": [
+                {
+                    "id": "CYC-TEST",
+                    "phase": "compile",
+                    "nodes": ["frontend/src/a.ts", "frontend/src/b.ts"],
+                    "edges": [
+                        {
+                            "source": "frontend/src/a.ts",
+                            "target": "frontend/src/b.ts",
+                            "line": 1,
+                            "phase": "compile",
+                        },
+                        {
+                            "source": "frontend/src/b.ts",
+                            "target": "frontend/src/a.ts",
+                            "line": 2,
+                            "phase": "compile",
+                        },
+                    ],
+                }
+            ],
+        },
+    }
+    cycle_markdown = markdown_writer(report_with_cycle)
+    assert "#### CYC-TEST" in cycle_markdown
+    assert "frontend/src/a.ts → frontend/src/b.ts → frontend/src/a.ts" in cycle_markdown
     assert {
         (item["source"], item["target"], item["line"], item["facade"])
         for item in report["interpretation"]["apiBypasses"]
     } == {
         (
-            "frontend/src/hooks/simulationForecastCore.ts",
+            "frontend/src/application/team-forecast/localTeamForecast.ts",
             "frontend/src/api/simulationMappers.ts",
             4,
             "frontend/src/api.ts",
@@ -604,7 +666,7 @@ def test_cli_writes_baseline_passes_fails_and_reports_loading_error(
     synthetic_root = tmp_path / "synthetic-change-cost"
     synthetic_paths = {
         "backend/api_models.py": "one\n",
-        "frontend/src/hooks/simulationForecastCore.ts": "one\ntwo\nthree\n",
+        "frontend/src/application/team-forecast/localTeamForecast.ts": "one\ntwo\nthree\n",
         "config/test-execution-profiles.json": "{}\n",
     }
     for relative, content in synthetic_paths.items():
@@ -617,7 +679,10 @@ def test_cli_writes_baseline_passes_fails_and_reports_loading_error(
             "title": "one",
             "justification": "fact",
             "evidence": [],
-            "files": ["backend/api_models.py", "frontend/src/hooks/simulationForecastCore.ts"],
+            "files": [
+                "backend/api_models.py",
+                "frontend/src/application/team-forecast/localTeamForecast.ts",
+            ],
         },
         {
             "id": "two",
@@ -625,7 +690,7 @@ def test_cli_writes_baseline_passes_fails_and_reports_loading_error(
             "justification": "fact",
             "evidence": [],
             "files": [
-                "frontend/src/hooks/simulationForecastCore.ts",
+                "frontend/src/application/team-forecast/localTeamForecast.ts",
                 "config/test-execution-profiles.json",
             ],
         },
@@ -636,13 +701,13 @@ def test_cli_writes_baseline_passes_fails_and_reports_loading_error(
             "nodes": [{"path": path} for path in synthetic_paths],
             "edges": [
                 {
-                    "source": "frontend/src/hooks/simulationForecastCore.ts",
+                    "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
                     "target": "backend/api_models.py",
                     "resolution": "internal",
                 },
                 {
                     "source": "config/test-execution-profiles.json",
-                    "target": "frontend/src/hooks/simulationForecastCore.ts",
+                    "target": "frontend/src/application/team-forecast/localTeamForecast.ts",
                     "resolution": "internal",
                 },
             ],
@@ -652,7 +717,7 @@ def test_cli_writes_baseline_passes_fails_and_reports_loading_error(
         synthetic_root, synthetic_graph, synthetic_scenarios
     )
     assert [item["path"] for item in measured["confirmedHotspots"]] == [
-        "frontend/src/hooks/simulationForecastCore.ts"
+        "frontend/src/application/team-forecast/localTeamForecast.ts"
     ]
     with pytest.raises(ValueError, match="Scenario files are missing"):
         report_change_cost_baseline.calculate_baseline(

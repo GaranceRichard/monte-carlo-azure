@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { runSimulationForecast } from "./simulationForecastService";
+import { localTeamForecast } from "../application/team-forecast";
 import { useSimulation } from "./useSimulation";
 import type { SimulationViewModel } from "./useSimulation";
 import type { SimulationHistoryEntry } from "../domain/simulationHistory";
@@ -23,7 +23,10 @@ const teamOptions = vi.hoisted(() => ({
   resetTeamOptions: vi.fn(),
 }));
 
-vi.mock("./simulationForecastService", () => ({ runSimulationForecast: vi.fn() }));
+vi.mock("../application/team-forecast", () => ({
+  localTeamForecast: { runSimulationForecast: vi.fn() },
+}));
+const { runSimulationForecast } = localTeamForecast;
 vi.mock("../utils/export", () => ({ exportThroughputCsv: (...args: unknown[]) => exportThroughputCsv(...args) }));
 vi.mock("./useSimulationHistory", () => ({ useSimulationHistory: () => ({ simulationHistory: simulationHistoryState.entries, pushSimulationHistory, clearSimulationHistory }) }));
 vi.mock("./useTeamOptions", () => ({ useTeamOptions: (params: { onTeamOptionsReset: () => void }) => {

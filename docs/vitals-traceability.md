@@ -44,14 +44,16 @@ Finalités actuellement couvertes : fonctionnel, sécurité et confidentialité 
 Tests ciblés :
 
 - `tests/test_identity_boundary.py`
+- `frontend/src/application/team-forecast/contract.test.ts`
 - `frontend/src/hooks/Simulationforecastservice.test.tsx`
 - `frontend/tests/e2e/onboarding.spec.js`
 - `frontend/tests/e2e/coverage.spec.js`
 
-Sources de couverture configurées : `frontend/src/hooks/simulationForecastService.ts`,
-`frontend/src/hooks/simulationForecastCore.ts` et, pour l'E2E, `frontend/src/api.ts`. La référence antérieure à
-`frontend/src/hooks/simulationForecastCore.ts` dans la liste des tests était invalide comme preuve de test :
-c'est une source mesurée, désormais décrite comme telle.
+Sources de couverture configurées : `frontend/src/application/team-forecast/contract.ts` et
+`frontend/src/application/team-forecast/localTeamForecast.ts` en unitaire, puis cette implémentation et
+`frontend/src/api.ts` en E2E. Le test contractuel vérifie la surface publique et l’absence d’import vers React,
+les hooks et les anciennes façades ; les tests fonctionnels et E2E exercent la même implémentation par
+`application/team-forecast/index.ts`.
 
 ### Cookie `IDMontecarlo`
 

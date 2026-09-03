@@ -630,20 +630,6 @@
       "value": 500
     },
     {
-      "path": "frontend/src/hooks/simulationForecastCore.ts",
-      "metric": "function.lines",
-      "limit": 50,
-      "value": 58,
-      "symbol": "fetchTeamThroughputCore"
-    },
-    {
-      "path": "frontend/src/hooks/simulationForecastCore.ts",
-      "metric": "function.lines",
-      "limit": 50,
-      "value": 71,
-      "symbol": "runSimulationForecastCore"
-    },
-    {
       "path": "frontend/src/hooks/useOnboarding.test.tsx",
       "metric": "file.lines",
       "limit": 350,
@@ -791,38 +777,7 @@
       "symbol": "isReusableSimulationHistoryEntry"
     }
   ],
-  "cycles": [
-    {
-      "nodes": [
-        "frontend/src/demoData.ts",
-        "frontend/src/hooks/simulationForecastCore.ts",
-        "frontend/src/hooks/simulationForecastService.ts",
-        "frontend/src/hooks/usePortfolioReport.ts"
-      ],
-      "edges": [
-        [
-          "frontend/src/demoData.ts",
-          "frontend/src/hooks/usePortfolioReport.ts"
-        ],
-        [
-          "frontend/src/hooks/simulationForecastCore.ts",
-          "frontend/src/demoData.ts"
-        ],
-        [
-          "frontend/src/hooks/simulationForecastCore.ts",
-          "frontend/src/hooks/simulationForecastService.ts"
-        ],
-        [
-          "frontend/src/hooks/simulationForecastService.ts",
-          "frontend/src/hooks/simulationForecastCore.ts"
-        ],
-        [
-          "frontend/src/hooks/usePortfolioReport.ts",
-          "frontend/src/hooks/simulationForecastService.ts"
-        ]
-      ]
-    }
-  ],
+  "cycles": [],
   "dependencyViolations": [],
   "mojibake": [
     {

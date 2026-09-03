@@ -33,10 +33,10 @@
         "frontend/src/api/simulationDtos.ts",
         "frontend/src/api/simulationMappers.test.ts",
         "frontend/src/api/simulationMappers.ts",
+        "frontend/src/application/team-forecast/localTeamForecast.ts",
         "frontend/src/domain/simulation.ts",
         "frontend/src/domain/simulationValueObjects.test.ts",
         "frontend/src/domain/simulationValueObjects.ts",
-        "frontend/src/hooks/simulationForecastCore.ts",
         "frontend/src/utils/simulation.ts",
         "tests/test_api_models.py",
         "tests/test_mc_core.py",
@@ -49,7 +49,7 @@
         "fileCount": 21,
         "productionFileCount": 13,
         "testFileCount": 8,
-        "lineCount": 6013,
+        "lineCount": 5990,
         "layerCount": 9,
         "internalDependencyEdges": 27,
         "boundaryDependencyEdges": 73,
@@ -67,7 +67,7 @@
         "quality-statistical-proof"
       ],
       "confirmedHotspots": [
-        "frontend/src/hooks/simulationForecastCore.ts",
+        "frontend/src/application/team-forecast/localTeamForecast.ts",
         "frontend/src/domain/simulationValueObjects.ts",
         "backend/simulation_value_objects.py"
       ]
@@ -85,9 +85,9 @@
         "frontend/src/adoClient.ts",
         "frontend/src/adoPlatform.test.ts",
         "frontend/src/adoPlatform.ts",
+        "frontend/src/application/team-forecast/localTeamForecast.ts",
         "frontend/src/date.test.ts",
         "frontend/src/date.ts",
-        "frontend/src/hooks/simulationForecastCore.ts",
         "frontend/src/hooks/useSimulation.ts",
         "frontend/src/types.ts",
         "frontend/src/utils/cycleTime.test.ts",
@@ -97,7 +97,7 @@
         "fileCount": 11,
         "productionFileCount": 7,
         "testFileCount": 4,
-        "lineCount": 2614,
+        "lineCount": 2591,
         "layerCount": 4,
         "internalDependencyEdges": 8,
         "boundaryDependencyEdges": 63,
@@ -110,7 +110,7 @@
         "proof-tests"
       ],
       "confirmedHotspots": [
-        "frontend/src/hooks/simulationForecastCore.ts",
+        "frontend/src/application/team-forecast/localTeamForecast.ts",
         "frontend/src/hooks/useSimulation.ts",
         "frontend/src/adoClient.ts"
       ]
@@ -156,10 +156,10 @@
   ],
   "confirmedHotspots": [
     {
-      "path": "frontend/src/hooks/simulationForecastCore.ts",
+      "path": "frontend/src/application/team-forecast/localTeamForecast.ts",
       "scenarioCount": 2,
       "dependencyDegree": 14,
-      "lineCount": 255,
+      "lineCount": 232,
       "signals": {
         "repeatedTraversal": true,
         "highCoupling": true,

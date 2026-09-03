@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createSeededSampleIndexDrawPort } from "../adapters/seededSampleIndexDrawPort";
 import { postSimulate } from "../api";
-import { simulateForecastFromSamples } from "./simulationForecastService";
+import { localTeamForecast } from "../application/team-forecast";
+
+const { simulateForecastFromSamples } = localTeamForecast;
 
 vi.mock("../api", () => ({
   postSimulate: vi.fn(),

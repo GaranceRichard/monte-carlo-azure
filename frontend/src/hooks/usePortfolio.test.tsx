@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { usePortfolio } from "./usePortfolio";
 import { createSimulationSeed } from "../domain/simulationValueObjects";
 import { getTeamOptionsDirect } from "../adoClient";
-import { fetchTeamThroughput, simulateForecastFromSamples } from "./simulationForecastService";
+import { localTeamForecast } from "../application/team-forecast";
 import { exportPortfolioPrintReport } from "../components/steps/portfolioPrintReport";
 import { buildQuickFiltersScopeKey, readStoredPortfolioPrefs, writeStoredQuickFilters } from "../storage";
 
@@ -11,10 +11,10 @@ vi.mock("../adoClient", () => ({
   getTeamOptionsDirect: vi.fn(),
 }));
 
-vi.mock("./simulationForecastService", () => ({
-  fetchTeamThroughput: vi.fn(),
-  simulateForecastFromSamples: vi.fn(),
+vi.mock("../application/team-forecast", () => ({
+  localTeamForecast: { fetchTeamThroughput: vi.fn(), simulateForecastFromSamples: vi.fn() },
 }));
+const { fetchTeamThroughput, simulateForecastFromSamples } = localTeamForecast;
 
 vi.mock("../components/steps/portfolioPrintReport", () => ({
   exportPortfolioPrintReport: vi.fn(),

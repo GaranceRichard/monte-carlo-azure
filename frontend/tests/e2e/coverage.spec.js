@@ -626,7 +626,7 @@ test.describe("e2e istanbul coverage", () => {
           n_sims: 2000,
         }).catch(() => null);
 
-        const forecastMod = await import("/src/hooks/simulationForecastService.ts");
+        const forecastMod = await import("/src/application/team-forecast/index.ts");
         let throughputMode = "array";
         window.fetch = async (url, init) => {
           const asString = String(url);
@@ -718,7 +718,7 @@ test.describe("e2e istanbul coverage", () => {
         };
 
         throughputMode = "array";
-        await forecastMod.fetchTeamThroughput({
+        await forecastMod.localTeamForecast.fetchTeamThroughput({
           selectedOrg: "org-demo",
           selectedProject: "Projet A",
           selectedTeam: "Equipe Alpha",
@@ -731,7 +731,7 @@ test.describe("e2e istanbul coverage", () => {
         });
 
         throughputMode = "warning";
-        await forecastMod.runSimulationForecast({
+        await forecastMod.localTeamForecast.runSimulationForecast({
           clock: { now: () => "2026-08-26T14:30:45.123Z" },
           selectedOrg: "org-demo",
           selectedProject: "Projet A",
@@ -748,7 +748,7 @@ test.describe("e2e istanbul coverage", () => {
           nSims: 2000,
         });
 
-        await forecastMod.simulateForecastFromSamples({
+        await forecastMod.localTeamForecast.simulateForecastFromSamples({
           throughputSamples: [1, 2, 3, 4, 5, 6],
           includeZeroWeeks: true,
           simulationMode: "weeks_to_items",
@@ -2498,7 +2498,7 @@ test.describe("e2e istanbul coverage", () => {
 
     const results = await page.evaluate(async () => {
       const apiMod = await import("/src/api.ts");
-      const forecastMod = await import("/src/hooks/simulationForecastService.ts");
+      const forecastMod = await import("/src/application/team-forecast/index.ts");
       const originalFetch = window.fetch.bind(window);
       let apiMode = "success";
 
@@ -2617,7 +2617,7 @@ test.describe("e2e istanbul coverage", () => {
           return originalFetch(input, init);
         };
 
-        const objectThroughput = await forecastMod.fetchTeamThroughput({
+        const objectThroughput = await forecastMod.localTeamForecast.fetchTeamThroughput({
           selectedOrg: "org-demo",
           selectedProject: "Projet A",
           selectedTeam: "Equipe Alpha",
@@ -2630,7 +2630,7 @@ test.describe("e2e istanbul coverage", () => {
           includeZeroWeeks: true,
         });
 
-        const demoFilteredThroughput = await forecastMod.fetchTeamThroughput({
+        const demoFilteredThroughput = await forecastMod.localTeamForecast.fetchTeamThroughput({
           demoMode: true,
           selectedOrg: "Acme Corp",
           selectedProject: "Programme Titan",
@@ -2645,7 +2645,7 @@ test.describe("e2e istanbul coverage", () => {
         });
 
         apiMode = "partial-warning";
-        const warningThroughput = await forecastMod.fetchTeamThroughput({
+        const warningThroughput = await forecastMod.localTeamForecast.fetchTeamThroughput({
           selectedOrg: "org-demo",
           selectedProject: "Projet A",
           selectedTeam: "Equipe Alpha",
@@ -2659,7 +2659,7 @@ test.describe("e2e istanbul coverage", () => {
         });
         apiMode = "success";
 
-        const backlogResponse = await forecastMod.simulateForecastFromSamples({
+        const backlogResponse = await forecastMod.localTeamForecast.simulateForecastFromSamples({
           throughputSamples: [1, 2, 3, 4, 5, 6],
           includeZeroWeeks: true,
           simulationMode: "backlog_to_weeks",
@@ -2675,7 +2675,7 @@ test.describe("e2e istanbul coverage", () => {
           types: ["Bug"],
         });
 
-        const demoBacklogResponse = await forecastMod.simulateForecastFromSamples({
+        const demoBacklogResponse = await forecastMod.localTeamForecast.simulateForecastFromSamples({
           demoMode: true,
           throughputSamples: [1, 2, 3, 4, 5, 6],
           includeZeroWeeks: true,
@@ -2685,7 +2685,7 @@ test.describe("e2e istanbul coverage", () => {
           nSims: 2000,
         });
 
-        const itemsResponse = await forecastMod.simulateForecastFromSamples({
+        const itemsResponse = await forecastMod.localTeamForecast.simulateForecastFromSamples({
           throughputSamples: [1, 2, 3, 4, 5, 6],
           includeZeroWeeks: true,
           simulationMode: "weeks_to_items",
@@ -2701,7 +2701,7 @@ test.describe("e2e istanbul coverage", () => {
           types: ["Bug"],
         });
 
-        const forecast = await forecastMod.runSimulationForecast({
+        const forecast = await forecastMod.localTeamForecast.runSimulationForecast({
           clock: { now: () => "2026-08-26T14:30:45.123Z" },
           selectedOrg: "org-demo",
           selectedProject: "",
@@ -3717,5 +3717,4 @@ test.describe("e2e istanbul coverage", () => {
     expect(results.renderedHtml).toContain("Simulation Portefeuille - Equipe Alpha");
   });
 });
-
 

@@ -12,13 +12,13 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 270,
-    "importEdges": 1409,
+    "sourceModules": 272,
+    "importEdges": 1410,
     "entrypoints": 85,
     "missingEntrypoints": 5,
-    "cycles": 2,
+    "cycles": 0,
     "runtimeCycles": 0,
-    "deepImports": 132,
+    "deepImports": 134,
     "apiBypasses": 2
   },
   "observed": {
@@ -994,6 +994,21 @@
         "language": "javascript"
       },
       {
+        "path": "frontend/src/application/team-forecast/contract.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/application/team-forecast/index.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
         "path": "frontend/src/clientId.ts",
         "area": "frontend",
         "language": "javascript"
@@ -1189,16 +1204,6 @@
         "language": "javascript"
       },
       {
-        "path": "frontend/src/hooks/simulationForecastCore.ts",
-        "area": "frontend",
-        "language": "javascript"
-      },
-      {
-        "path": "frontend/src/hooks/simulationForecastService.ts",
-        "area": "frontend",
-        "language": "javascript"
-      },
-      {
         "path": "frontend/src/hooks/simulationSeedResolver.ts",
         "area": "frontend",
         "language": "javascript"
@@ -1270,6 +1275,11 @@
       },
       {
         "path": "frontend/src/simulationLimits.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/simulationSeedResolver.ts",
         "area": "frontend",
         "language": "javascript"
       },
@@ -11789,6 +11799,168 @@
         "resolution": "internal"
       },
       {
+        "source": "frontend/src/application/team-forecast/contract.ts",
+        "target": "frontend/src/domain/simulation.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../domain/simulation",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/contract.ts",
+        "target": "frontend/src/domain/simulationHistory.ts",
+        "line": 2,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../domain/simulationHistory",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/contract.ts",
+        "target": "frontend/src/ports/clock/index.ts",
+        "line": 3,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../ports/clock",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/index.ts",
+        "target": "frontend/src/application/team-forecast/contract.ts",
+        "line": 1,
+        "kind": "js-export",
+        "phase": "compile",
+        "specifier": "./contract",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/index.ts",
+        "target": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "line": 9,
+        "kind": "js-export",
+        "phase": "runtime",
+        "specifier": "./localTeamForecast",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/adapters/seededSampleIndexDrawPort.ts",
+        "line": 2,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../adapters/seededSampleIndexDrawPort",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/adoClient.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../adoClient",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/api.ts",
+        "line": 3,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../api",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/api/simulationMappers.ts",
+        "line": 4,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../api/simulationMappers",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/application/team-forecast/contract.ts",
+        "line": 16,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "./contract",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/demoData.ts",
+        "line": 8,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../demoData",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/domain/simulation.ts",
+        "line": 9,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../domain/simulation",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/domain/simulation.ts",
+        "line": 10,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../domain/simulation",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/domain/simulationHistory.ts",
+        "line": 11,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../domain/simulationHistory",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/domain/simulationValueObjects.ts",
+        "line": 12,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../domain/simulationValueObjects",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/simulationSeedResolver.ts",
+        "line": 15,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../simulationSeedResolver",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/utils/math.ts",
+        "line": 13,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../utils/math",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/utils/simulation.ts",
+        "line": 14,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../utils/simulation",
+        "resolution": "internal"
+      },
+      {
         "source": "frontend/src/components/steps/DecisionDiagnostic.tsx",
         "target": "external:npm:react",
         "line": 1,
@@ -12492,15 +12664,6 @@
       },
       {
         "source": "frontend/src/demoData.ts",
-        "target": "frontend/src/hooks/usePortfolioReport.ts",
-        "line": 3,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "./hooks/usePortfolioReport",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/demoData.ts",
         "target": "frontend/src/types.ts",
         "line": 2,
         "kind": "js-import",
@@ -12695,159 +12858,6 @@
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../domain/simulation",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/adapters/seededSampleIndexDrawPort.ts",
-        "line": 2,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../adapters/seededSampleIndexDrawPort",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/adoClient.ts",
-        "line": 1,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../adoClient",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/api.ts",
-        "line": 3,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../api",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/api/simulationMappers.ts",
-        "line": 4,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../api/simulationMappers",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/demoData.ts",
-        "line": 8,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../demoData",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/domain/simulation.ts",
-        "line": 9,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "../domain/simulation",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/domain/simulation.ts",
-        "line": 12,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../domain/simulation",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/domain/simulationHistory.ts",
-        "line": 26,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "../domain/simulationHistory",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/domain/simulationValueObjects.ts",
-        "line": 13,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../domain/simulationValueObjects",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/hooks/simulationForecastService.ts",
-        "line": 19,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "./simulationForecastService",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/hooks/simulationSeedResolver.ts",
-        "line": 18,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "./simulationSeedResolver",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/utils/math.ts",
-        "line": 14,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../utils/math",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/utils/simulation.ts",
-        "line": 15,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../utils/simulation",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastService.ts",
-        "target": "frontend/src/domain/simulation.ts",
-        "line": 1,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "../domain/simulation",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastService.ts",
-        "target": "frontend/src/domain/simulationHistory.ts",
-        "line": 2,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "../domain/simulationHistory",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastService.ts",
-        "target": "frontend/src/hooks/simulationForecastCore.ts",
-        "line": 4,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "./simulationForecastCore",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastService.ts",
-        "target": "frontend/src/ports/clock/index.ts",
-        "line": 3,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "../ports/clock",
         "resolution": "internal"
       },
       {
@@ -13113,8 +13123,17 @@
       },
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
+        "target": "frontend/src/application/team-forecast/index.ts",
+        "line": 7,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../application/team-forecast",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/components/steps/portfolioPrintReport.ts",
-        "line": 513,
+        "line": 515,
         "kind": "js-dynamic-import",
         "phase": "runtime",
         "specifier": "../components/steps/portfolioPrintReport",
@@ -13140,17 +13159,8 @@
       },
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
-        "target": "frontend/src/hooks/simulationForecastService.ts",
-        "line": 7,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "./simulationForecastService",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/hooks/simulationSeedResolver.ts",
-        "line": 19,
+        "line": 16,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./simulationSeedResolver",
@@ -13159,7 +13169,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/hooks/simulationTypes.ts",
-        "line": 11,
+        "line": 8,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "./simulationTypes",
@@ -13177,7 +13187,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/portfolioComparisonDiagnostic.ts",
-        "line": 21,
+        "line": 18,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/portfolioComparisonDiagnostic",
@@ -13186,7 +13196,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/portfolioComparisonPresentation.ts",
-        "line": 26,
+        "line": 23,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../utils/portfolioComparisonPresentation",
@@ -13195,7 +13205,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/simulation.ts",
-        "line": 12,
+        "line": 9,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/simulation",
@@ -13204,7 +13214,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/simulationDecisionDiagnostic.ts",
-        "line": 20,
+        "line": 17,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/simulationDecisionDiagnostic",
@@ -13218,6 +13228,15 @@
         "phase": "runtime",
         "specifier": "react",
         "resolution": "external"
+      },
+      {
+        "source": "frontend/src/hooks/useSimulation.ts",
+        "target": "frontend/src/application/team-forecast/index.ts",
+        "line": 18,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../application/team-forecast",
+        "resolution": "internal"
       },
       {
         "source": "frontend/src/hooks/useSimulation.ts",
@@ -13244,15 +13263,6 @@
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../domain/simulationHistory",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/hooks/useSimulation.ts",
-        "target": "frontend/src/hooks/simulationForecastService.ts",
-        "line": 18,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "./simulationForecastService",
         "resolution": "internal"
       },
       {
@@ -13640,6 +13650,15 @@
         "kind": "js-export",
         "phase": "runtime",
         "specifier": "./domain/simulationValueObjects",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/simulationSeedResolver.ts",
+        "target": "frontend/src/hooks/simulationSeedResolver.ts",
+        "line": 1,
+        "kind": "js-export",
+        "phase": "runtime",
+        "specifier": "./hooks/simulationSeedResolver",
         "resolution": "internal"
       },
       {
@@ -14396,7 +14415,7 @@
       },
       {
         "declaredIn": "Scripts/report_change_cost_baseline.py",
-        "line": 286,
+        "line": 288,
         "kind": "python-main-guard",
         "target": "Scripts/report_change_cost_baseline.py",
         "resolution": "internal"
@@ -14667,84 +14686,7 @@
         "resolution": "internal"
       }
     ],
-    "cycles": [
-      {
-        "id": "CYC-001",
-        "phase": "compile-involved",
-        "nodes": [
-          "frontend/src/demoData.ts",
-          "frontend/src/hooks/usePortfolioReport.ts",
-          "frontend/src/hooks/simulationForecastService.ts",
-          "frontend/src/hooks/simulationForecastCore.ts"
-        ],
-        "edges": [
-          {
-            "source": "frontend/src/demoData.ts",
-            "target": "frontend/src/hooks/usePortfolioReport.ts",
-            "line": 3,
-            "kind": "js-import",
-            "phase": "compile",
-            "specifier": "./hooks/usePortfolioReport",
-            "resolution": "internal"
-          },
-          {
-            "source": "frontend/src/hooks/usePortfolioReport.ts",
-            "target": "frontend/src/hooks/simulationForecastService.ts",
-            "line": 7,
-            "kind": "js-import",
-            "phase": "runtime",
-            "specifier": "./simulationForecastService",
-            "resolution": "internal"
-          },
-          {
-            "source": "frontend/src/hooks/simulationForecastService.ts",
-            "target": "frontend/src/hooks/simulationForecastCore.ts",
-            "line": 4,
-            "kind": "js-import",
-            "phase": "runtime",
-            "specifier": "./simulationForecastCore",
-            "resolution": "internal"
-          },
-          {
-            "source": "frontend/src/hooks/simulationForecastCore.ts",
-            "target": "frontend/src/demoData.ts",
-            "line": 8,
-            "kind": "js-import",
-            "phase": "runtime",
-            "specifier": "../demoData",
-            "resolution": "internal"
-          }
-        ]
-      },
-      {
-        "id": "CYC-002",
-        "phase": "compile-involved",
-        "nodes": [
-          "frontend/src/hooks/simulationForecastCore.ts",
-          "frontend/src/hooks/simulationForecastService.ts"
-        ],
-        "edges": [
-          {
-            "source": "frontend/src/hooks/simulationForecastCore.ts",
-            "target": "frontend/src/hooks/simulationForecastService.ts",
-            "line": 19,
-            "kind": "js-import",
-            "phase": "compile",
-            "specifier": "./simulationForecastService",
-            "resolution": "internal"
-          },
-          {
-            "source": "frontend/src/hooks/simulationForecastService.ts",
-            "target": "frontend/src/hooks/simulationForecastCore.ts",
-            "line": 4,
-            "kind": "js-import",
-            "phase": "runtime",
-            "specifier": "./simulationForecastCore",
-            "resolution": "internal"
-          }
-        ]
-      }
-    ],
+    "cycles": [],
     "directions": [
       {
         "sourceArea": "backend",
@@ -14762,7 +14704,7 @@
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "runtime",
-        "count": 154
+        "count": 155
       },
       {
         "sourceArea": "launcher",
@@ -15041,6 +14983,116 @@
         "specifier": "./components/PublicConnectNotice",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/components"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/contract.ts",
+        "target": "frontend/src/domain/simulation.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../domain/simulation",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/contract.ts",
+        "target": "frontend/src/domain/simulationHistory.ts",
+        "line": 2,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../domain/simulationHistory",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/contract.ts",
+        "target": "frontend/src/ports/clock/index.ts",
+        "line": 3,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../ports/clock",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/ports"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/adapters/seededSampleIndexDrawPort.ts",
+        "line": 2,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../adapters/seededSampleIndexDrawPort",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/adapters"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/api/simulationMappers.ts",
+        "line": 4,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../api/simulationMappers",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/api"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/domain/simulation.ts",
+        "line": 9,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../domain/simulation",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/domain/simulation.ts",
+        "line": 10,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../domain/simulation",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/domain/simulationHistory.ts",
+        "line": 11,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../domain/simulationHistory",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/domain/simulationValueObjects.ts",
+        "line": 12,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../domain/simulationValueObjects",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/utils/math.ts",
+        "line": 13,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../utils/math",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/utils"
+      },
+      {
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "target": "frontend/src/utils/simulation.ts",
+        "line": 14,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../utils/simulation",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/utils"
       },
       {
         "source": "frontend/src/components/steps/DecisionDiagnostic.tsx",
@@ -15433,16 +15485,6 @@
         "crossedBoundary": "frontend/src/ports"
       },
       {
-        "source": "frontend/src/demoData.ts",
-        "target": "frontend/src/hooks/usePortfolioReport.ts",
-        "line": 3,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "./hooks/usePortfolioReport",
-        "resolution": "internal",
-        "crossedBoundary": "frontend/src/hooks"
-      },
-      {
         "source": "frontend/src/e2e/runtime.ts",
         "target": "frontend/src/hooks/useSimulationHistory.ts",
         "line": 4,
@@ -15471,116 +15513,6 @@
         "specifier": "../domain/simulation",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/domain"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/adapters/seededSampleIndexDrawPort.ts",
-        "line": 2,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../adapters/seededSampleIndexDrawPort",
-        "resolution": "internal",
-        "crossedBoundary": "frontend/src/adapters"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/api/simulationMappers.ts",
-        "line": 4,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../api/simulationMappers",
-        "resolution": "internal",
-        "crossedBoundary": "frontend/src/api"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/domain/simulation.ts",
-        "line": 9,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "../domain/simulation",
-        "resolution": "internal",
-        "crossedBoundary": "frontend/src/domain"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/domain/simulation.ts",
-        "line": 12,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../domain/simulation",
-        "resolution": "internal",
-        "crossedBoundary": "frontend/src/domain"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/domain/simulationHistory.ts",
-        "line": 26,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "../domain/simulationHistory",
-        "resolution": "internal",
-        "crossedBoundary": "frontend/src/domain"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/domain/simulationValueObjects.ts",
-        "line": 13,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../domain/simulationValueObjects",
-        "resolution": "internal",
-        "crossedBoundary": "frontend/src/domain"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/utils/math.ts",
-        "line": 14,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../utils/math",
-        "resolution": "internal",
-        "crossedBoundary": "frontend/src/utils"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
-        "target": "frontend/src/utils/simulation.ts",
-        "line": 15,
-        "kind": "js-import",
-        "phase": "runtime",
-        "specifier": "../utils/simulation",
-        "resolution": "internal",
-        "crossedBoundary": "frontend/src/utils"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastService.ts",
-        "target": "frontend/src/domain/simulation.ts",
-        "line": 1,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "../domain/simulation",
-        "resolution": "internal",
-        "crossedBoundary": "frontend/src/domain"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastService.ts",
-        "target": "frontend/src/domain/simulationHistory.ts",
-        "line": 2,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "../domain/simulationHistory",
-        "resolution": "internal",
-        "crossedBoundary": "frontend/src/domain"
-      },
-      {
-        "source": "frontend/src/hooks/simulationForecastService.ts",
-        "target": "frontend/src/ports/clock/index.ts",
-        "line": 3,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "../ports/clock",
-        "resolution": "internal",
-        "crossedBoundary": "frontend/src/ports"
       },
       {
         "source": "frontend/src/hooks/simulationSeedResolver.ts",
@@ -15684,8 +15616,18 @@
       },
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
+        "target": "frontend/src/application/team-forecast/index.ts",
+        "line": 7,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../application/team-forecast",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/application"
+      },
+      {
+        "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/components/steps/portfolioPrintReport.ts",
-        "line": 513,
+        "line": 515,
         "kind": "js-dynamic-import",
         "phase": "runtime",
         "specifier": "../components/steps/portfolioPrintReport",
@@ -15705,7 +15647,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/portfolioComparisonDiagnostic.ts",
-        "line": 21,
+        "line": 18,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/portfolioComparisonDiagnostic",
@@ -15715,7 +15657,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/portfolioComparisonPresentation.ts",
-        "line": 26,
+        "line": 23,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../utils/portfolioComparisonPresentation",
@@ -15725,7 +15667,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/simulation.ts",
-        "line": 12,
+        "line": 9,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/simulation",
@@ -15735,12 +15677,22 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/simulationDecisionDiagnostic.ts",
-        "line": 20,
+        "line": 17,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/simulationDecisionDiagnostic",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/utils"
+      },
+      {
+        "source": "frontend/src/hooks/useSimulation.ts",
+        "target": "frontend/src/application/team-forecast/index.ts",
+        "line": 18,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../application/team-forecast",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/application"
       },
       {
         "source": "frontend/src/hooks/useSimulation.ts",
@@ -15891,6 +15843,16 @@
         "specifier": "./domain/simulationValueObjects",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/simulationSeedResolver.ts",
+        "target": "frontend/src/hooks/simulationSeedResolver.ts",
+        "line": 1,
+        "kind": "js-export",
+        "phase": "runtime",
+        "specifier": "./hooks/simulationSeedResolver",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/hooks"
       },
       {
         "source": "frontend/src/statisticalCorpusRunner.ts",
@@ -16115,12 +16077,12 @@
     ],
     "apiBypasses": [
       {
-        "source": "frontend/src/hooks/simulationForecastCore.ts",
+        "source": "frontend/src/application/team-forecast/localTeamForecast.ts",
         "target": "frontend/src/api/simulationMappers.ts",
         "line": 4,
         "kind": "js-import",
         "phase": "runtime",
-        "specifier": "../api/simulationMappers",
+        "specifier": "../../api/simulationMappers",
         "resolution": "internal",
         "facade": "frontend/src/api.ts",
         "surface": "frontend/src/api"

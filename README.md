@@ -141,10 +141,16 @@ une connexion Azure DevOps réelle.
   module gouverné et refuse les imports profonds avec fichier, ligne et frontière publique attendue ; les
   seules exceptions possibles sont des couples source/cible exacts, justifiés dans le manifeste. Il projette
   aussi les imports de production entre modules gouvernés et refuse tout cycle direct ou indirect, y compris
-  lorsqu’une arête est un import de type, avec le chemin fermé et chaque import localisé. Les deux cycles
-  frontend legacy recensés restent hors des frontières gouvernées et ne sont pas migrés par ce contrôle. Le
-  rendu du chemin suit le séparateur natif de la plateforme et sa portabilité reste couverte explicitement
-  pour les représentations POSIX et Windows.
+  lorsqu’une arête est un import de type, avec le chemin fermé et chaque import localisé. Le module gouverné
+  `frontend/src/application/team-forecast/` est exposé uniquement par son `index.ts` ; la preuve courante porte
+  sept modules, quatre arêtes inter-modules et zéro cycle. Le rendu du chemin suit le séparateur natif de la
+  plateforme et sa portabilité reste couverte explicitement pour les représentations POSIX et Windows.
+- **Prévision indépendante de React.** Le contrat applicatif `TeamForecast` porte les trois opérations de
+  collecte, simulation sur échantillons et prévision complète. `useSimulation` et `usePortfolioReport`
+  consomment l’implémentation locale par l’API publique du module ; ni le contrat ni son implémentation
+  n’importent React ou les hooks. Les anciennes façades cycliques `simulationForecastService.ts` et
+  `simulationForecastCore.ts` ont été retirées. Une règle de direction dédiée et la baseline globale à zéro
+  cycle empêchent le retour de cette dépendance inverse.
 - **Migration ordonnée sans lot bloquant.** La [séquence architecturale](docs/architecture-migration-sequence.md)
   fixe un graphe acyclique de publications autonomes, calcule les vagues de disponibilité les plus précoces
   et protège automatiquement les précédences. Après sa publication, six outcomes indépendants peuvent

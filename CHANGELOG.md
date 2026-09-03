@@ -2,6 +2,18 @@
 
 ## Recent
 
+### Contrat applicatif de prévision frontend — PBI 7.19
+
+- ajout du contrat `TeamForecast` indépendant de React et de son API publique
+  `frontend/src/application/team-forecast/index.ts`, avec une implémentation locale conservant les chemins
+  HTTP et démo existants ;
+- migration de `useSimulation` et `usePortfolioReport` vers cette frontière, sans changement des garanties
+  statistiques, des seeds, de l’horodatage ou des restitutions ;
+- retrait des anciennes façades `simulationForecastService.ts` et `simulationForecastCore.ts`, suppression
+  des deux composantes cycliques `CYC-001` et `CYC-002` et abaissement de la baseline à zéro cycle ;
+- règle de dépendance dédiée interdisant au module applicatif d’importer React, les hooks, les composants ou
+  la présentation React, complétée par les preuves contractuelles et le graphe acyclique.
+
 ### Acyclicité des modules gouvernés — PBI 7.13
 
 - projection déterministe des imports de production en un graphe dont les nœuds sont exclusivement les

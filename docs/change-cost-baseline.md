@@ -27,11 +27,11 @@ Sources : `docs/frontend-responsibilities-map.md#simulation-déquipe`, `docs/bac
 
 | Fichiers | Production | Tests | Lignes | Couches | Arêtes internes | Arêtes de frontière | Hotspots |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 21 | 13 | 8 | 6013 | 9 | 27 | 73 | 3 |
+| 21 | 13 | 8 | 5990 | 9 | 27 | 73 | 3 |
 
 Couches : `backend-domain`, `backend-engine`, `backend-transport`, `frontend-application`, `frontend-delivery-or-engine`, `frontend-domain`, `frontend-transport`, `proof-tests`, `quality-statistical-proof`.
 
-Fichiers : `Scripts/statistical_corpus_runner.py`, `backend/api_models.py`, `backend/mc_core.py`, `backend/simulation_mappers.py`, `backend/simulation_models.py`, `backend/simulation_service.py`, `backend/simulation_value_objects.py`, `frontend/src/api/simulationDtos.ts`, `frontend/src/api/simulationMappers.test.ts`, `frontend/src/api/simulationMappers.ts`, `frontend/src/domain/simulation.ts`, `frontend/src/domain/simulationValueObjects.test.ts`, `frontend/src/domain/simulationValueObjects.ts`, `frontend/src/hooks/simulationForecastCore.ts`, `frontend/src/utils/simulation.ts`, `tests/test_api_models.py`, `tests/test_mc_core.py`, `tests/test_simulation_mappers.py`, `tests/test_simulation_service.py`, `tests/test_statistical_compatibility.py`, `tests/test_statistical_corpus_runner.py`.
+Fichiers : `Scripts/statistical_corpus_runner.py`, `backend/api_models.py`, `backend/mc_core.py`, `backend/simulation_mappers.py`, `backend/simulation_models.py`, `backend/simulation_service.py`, `backend/simulation_value_objects.py`, `frontend/src/api/simulationDtos.ts`, `frontend/src/api/simulationMappers.test.ts`, `frontend/src/api/simulationMappers.ts`, `frontend/src/application/team-forecast/localTeamForecast.ts`, `frontend/src/domain/simulation.ts`, `frontend/src/domain/simulationValueObjects.test.ts`, `frontend/src/domain/simulationValueObjects.ts`, `frontend/src/utils/simulation.ts`, `tests/test_api_models.py`, `tests/test_mc_core.py`, `tests/test_simulation_mappers.py`, `tests/test_simulation_service.py`, `tests/test_statistical_compatibility.py`, `tests/test_statistical_corpus_runner.py`.
 
 ### Faire évoluer une règle de collecte et de calendrier delivery
 
@@ -41,11 +41,11 @@ Sources : `docs/frontend-responsibilities-map.md#collecte-et-transformations-del
 
 | Fichiers | Production | Tests | Lignes | Couches | Arêtes internes | Arêtes de frontière | Hotspots |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 11 | 7 | 4 | 2614 | 4 | 8 | 63 | 3 |
+| 11 | 7 | 4 | 2591 | 4 | 8 | 63 | 3 |
 
 Couches : `frontend-application`, `frontend-azure-adapter`, `frontend-delivery-or-engine`, `proof-tests`.
 
-Fichiers : `frontend/src/adoClient.test.ts`, `frontend/src/adoClient.ts`, `frontend/src/adoPlatform.test.ts`, `frontend/src/adoPlatform.ts`, `frontend/src/date.test.ts`, `frontend/src/date.ts`, `frontend/src/hooks/simulationForecastCore.ts`, `frontend/src/hooks/useSimulation.ts`, `frontend/src/types.ts`, `frontend/src/utils/cycleTime.test.ts`, `frontend/src/utils/cycleTime.ts`.
+Fichiers : `frontend/src/adoClient.test.ts`, `frontend/src/adoClient.ts`, `frontend/src/adoPlatform.test.ts`, `frontend/src/adoPlatform.ts`, `frontend/src/application/team-forecast/localTeamForecast.ts`, `frontend/src/date.test.ts`, `frontend/src/date.ts`, `frontend/src/hooks/useSimulation.ts`, `frontend/src/types.ts`, `frontend/src/utils/cycleTime.test.ts`, `frontend/src/utils/cycleTime.ts`.
 
 ### Faire évoluer le profil de validation main sans réduire ses garanties
 
@@ -65,7 +65,7 @@ Fichiers : `Scripts/quality_gate.py`, `Scripts/quality_gate_dag.py`, `Scripts/qu
 
 | Fichier | Scénarios | Degré | Lignes | Signaux |
 | --- | ---: | ---: | ---: | --- |
-| `frontend/src/hooks/simulationForecastCore.ts` | 2 | 14 | 255 | repeatedTraversal, highCoupling |
+| `frontend/src/application/team-forecast/localTeamForecast.ts` | 2 | 14 | 232 | repeatedTraversal, highCoupling |
 | `frontend/src/hooks/useSimulation.ts` | 1 | 19 | 492 | highCoupling, largeFile |
 | `frontend/src/domain/simulationValueObjects.ts` | 1 | 17 | 394 | highCoupling, largeFile |
 | `backend/simulation_value_objects.py` | 1 | 12 | 429 | highCoupling, largeFile |

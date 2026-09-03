@@ -134,11 +134,11 @@ def test_branched_acyclic_graph_ignores_internal_test_and_legacy_edges() -> None
 def test_cycles_outside_governed_boundaries_remain_out_of_scope() -> None:
     result = _validate(
         {
-            "frontend/src/hooks/simulationForecastCore.ts": (
-                'import type { Forecast } from "./simulationForecastService";\n'
+            "frontend/src/legacy/first.ts": (
+                'import type { Second } from "./second";\n'
             ),
-            "frontend/src/hooks/simulationForecastService.ts": (
-                'import { core } from "./simulationForecastCore";\n'
+            "frontend/src/legacy/second.ts": (
+                'import { first } from "./first";\n'
             ),
         }
     )
@@ -178,13 +178,17 @@ def test_python_modules_are_checked_and_parse_errors_fail_closed() -> None:
     assert malformed.diagnostics[0].location == "line 1"
 
 
-def test_repository_graph_is_acyclic_and_keeps_only_three_production_edges() -> None:
+def test_repository_graph_is_acyclic_with_team_forecast_contract() -> None:
     result = inspect_repository_module_cycles(load_dependency_authority())
 
-    assert result.modules == 6
+    assert result.modules == 7
     assert [(edge.source, edge.target) for edge in result.module_edges] == [
         (
             "frontend/src/adapters/browser/clock/",
+            "frontend/src/ports/clock/",
+        ),
+        (
+            "frontend/src/application/team-forecast/",
             "frontend/src/ports/clock/",
         ),
         (

@@ -7,12 +7,14 @@ déclarées dans `config/maintainability.json`. Il mesure les lignes non vides e
 des fichiers et des fonctions. Les plafonds courants sont de 350 lignes non vides et 50 points de
 complexité par fichier, puis de 50 lignes non vides et 15 points de complexité par fonction.
 
-Le graphe des imports détecte les nouvelles composantes cycliques. Deux règles de direction seulement sont
-appliquées, car elles découlent de la séparation frontend/backend décrite dans `ARCHITECTURE.md` : une
-source sous `frontend/src` ne dépend pas de `backend`, et une source sous `backend` ne dépend pas de
-`frontend/src`. Les directions internes entre métier, application, infrastructure et présentation ne sont
-pas définies assez précisément dans l’architecture actuelle ; elles restent donc un inconnu documenté et
-ne sont pas transformées en règles.
+Le graphe des imports détecte les nouvelles composantes cycliques. Les règles globales issues de la séparation
+frontend/backend décrite dans `ARCHITECTURE.md` interdisent à une source sous `frontend/src` de dépendre de
+`backend`, et réciproquement. Des règles locales protègent aussi les frontières déjà établies sans prétendre
+définir toutes les directions internes restantes. En particulier,
+`team-forecast-must-remain-react-independent` interdit à
+`frontend/src/application/team-forecast/**` d’importer les hooks, composants, présentation React, `react`,
+`react-dom` ou les packages Radix React. Les consommateurs React dépendent ainsi de l’API publique de la
+prévision, sans dépendance inverse possible.
 
 Tous les fichiers texte suivis par Git et déclarés par extension sont contrôlés pour détecter un nouvel
 encodage UTF-8 invalide, un caractère de remplacement ou une séquence typique de mojibake. Les chemins
@@ -34,6 +36,10 @@ mojibake apparaît.
 Une amélioration n’exige pas de modifier immédiatement la baseline : la valeur observée peut rester sous la
 valeur enregistrée. La prochaine mise à jour explicite abaisse alors le plafond propre à cette dette et
 empêche son retour au niveau précédent.
+
+Depuis le PBI 7.19, la liste `cycles` de la baseline est vide. La disparition de `CYC-001` et `CYC-002` est
+donc ratchetée : toute composante cyclique, y compris une arête constituée uniquement par un import de type,
+est une nouvelle dette et fait échouer le contrôle.
 
 ## Dette existante et nouvelle dérive
 

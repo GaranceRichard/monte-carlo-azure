@@ -58,6 +58,19 @@
       ]
     },
     {
+      "id": "team-forecast-must-remain-react-independent",
+      "evidence": "PBI 7.19 et ARCHITECTURE.md: le contrat applicatif de prévision frontend ne dépend ni de React ni de ses consommateurs de présentation.",
+      "sourcePatterns": ["frontend/src/application/team-forecast/**"],
+      "forbiddenPatterns": [
+        "frontend/src/hooks/**",
+        "frontend/src/components/**",
+        "frontend/src/presentation/react/**",
+        "react",
+        "react-dom",
+        "@radix-ui/react-*"
+      ]
+    },
+    {
       "id": "simulation-ui-must-not-depend-on-http-dtos",
       "evidence": "PBI 2.3 et ARCHITECTURE.md: les composants consomment les modèles métier et non les formes JSON de transport.",
       "sourcePatterns": ["frontend/src/components/**"],

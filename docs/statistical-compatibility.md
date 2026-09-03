@@ -27,7 +27,7 @@ protocole, la calibration et la preuve distributionnelle 1.0.
 | Surface normative | Composant / version | Autorités sémantiques principales | Consommateurs | Preuves obligatoires |
 | --- | --- | --- | --- | --- |
 | Validation et normalisation des entrées | `input-contract` 1.0 | `STAT-PAR-011..016`, limites, Value Objects et fabriques Python/TypeScript, schéma d’entrée | API, moteurs, runners | sondes, parité, exact |
-| Valeurs par défaut résolues | `resolved-defaults` 1.0 | `STAT-PAR-017`, `SimulateRequest`, `simulateForecastFromSamplesCore` | API, service frontend, commande moteur | sondes, parité |
+| Valeurs par défaut résolues | `resolved-defaults` 1.1 | `STAT-PAR-017`, `SimulateRequest`, `localTeamForecast.simulateForecastFromSamples` | API, contrat `TeamForecast`, commande moteur | sondes, parité |
 | Domaine et résolution de la seed | `seed-contract` 1.0 | `STAT-PAR-006..010`, bornes uint32, résolveurs et Value Objects | API, UI, moteurs, historiques, rejeu | sondes, parité, exact, dist. |
 | PRNG | `prng` 1.0 / `mca-prng-v1` | `STAT-PAR-003`, vecteurs, ports Python/TypeScript | moteurs, dérivation du corpus, rejeu | Corpus, parité, exact, calibration, dist. |
 | Conversion tirage–index | `prng` 1.0 / `mca-prng-v1` | multiplication haute uint32 et conversion TypeScript correspondante | ports de tirage des deux moteurs | Corpus, parité, exact, calibration, dist. |
@@ -97,6 +97,12 @@ Une release non initiale doit être strictement supérieure, chaîner version et
 traiter chaque catégorie historique affectée. Un changement de flux pseudo-aléatoire sous la même identité
 est toujours refusé. Le vert des tests existants, le seul corpus ou les deux moteurs modifiés ensemble ne
 constituent jamais une décision.
+
+Le PBI 7.19 publie la release append-only `resolved-defaults` 1.1. Elle rattache l’autorité TypeScript à
+`application/team-forecast/localTeamForecast.ts:simulateForecastFromSamples` après le retrait de la façade
+cyclique, sans modifier les valeurs par défaut ni les résultats historiques. Les sondes de validation 1.1 et
+la parité déterministe 1.2 ont été régénérées et restent identiques sur 22 sondes et 16 cas ; les résultats
+seedés conservent donc le traitement `compatible_without_action`.
 
 ## Historique, caches et artefacts
 

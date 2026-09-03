@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import forecastCoreSource from "../../hooks/simulationForecastCore.ts?raw";
 import { BrowserClock } from "../../adapters/browser/clock";
 import { DeterministicFrontendClock } from "../../test/deterministicFrontendClock";
 import { createBrowserComposition } from ".";
@@ -34,10 +33,5 @@ describe("frontend clock composition", () => {
 
     expect(composition.clock).toBeInstanceOf(BrowserClock);
     expect(composition.clock.now()).toBe(CONTROLLED_INSTANT);
-  });
-
-  it("confines direct current-time reads to the browser adapter", () => {
-    expect(forecastCoreSource).not.toContain("Date.now");
-    expect(forecastCoreSource).not.toContain("new Date(");
   });
 });

@@ -15,7 +15,7 @@ import type {
 } from "./simulationTypes";
 import { exportThroughputCsv as exportCsv } from "../utils/export";
 import { useSimulationChartData } from "./useSimulationChartData";
-import { runSimulationForecast } from "./simulationForecastService";
+import { localTeamForecast } from "../application/team-forecast";
 import { useSimulationHistory } from "./useSimulationHistory";
 import { useSimulationPrefs } from "./useSimulationPrefs";
 import { useSimulationQuickFilters } from "./useSimulationQuickFilters";
@@ -326,7 +326,7 @@ export function useSimulation({
     }, 1200);
 
     try {
-      const forecast = await runSimulationForecast({
+      const forecast = await localTeamForecast.runSimulationForecast({
         clock, demoMode,
         seed: replayContext?.signature === currentSimulation.signature ? replayContext.seed : undefined,
         selectedOrg,

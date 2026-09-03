@@ -3,7 +3,7 @@
     "authority": {
       "id": "mca-statistical-compatibility-authority",
       "schema_version": "1.0",
-      "semantic_fingerprint": "faa724ac5ab7aaadea64dfa0b6591e91f73cf85a51671d789278d0f5e5e35065",
+      "semantic_fingerprint": "f3a3d0be08953bea9eaa9859f9d78ec4d41657a3248755ea829cd8a9f49d9e22",
       "version": "1.0"
     },
     "blocking_when_executed": true,
@@ -121,10 +121,10 @@
   "format_version": "1.0",
   "generation": {
     "kind": "deterministic_source_snapshot",
-    "source_set_sha256": "67a2d1c493fc24699ae1e619050687f783def7281a00f78285c2f59d0768804d"
+    "source_set_sha256": "6c22616bbf9b026fb796b21a3d96a3f4ecf7d4cc709fa42e50f8b01dc58b6ff2"
   },
   "integrity": {
-    "content_sha256": "d8780d61b48186b5efd1f2d78d3877d64ff133e1a1f329ca759bf4c1e8968059",
+    "content_sha256": "01da4804ce8b6588295446b1f652e73b04088a54801c871dd6c76a73069471bd",
     "method": "sha256-canonical-json-without-content-sha256"
   },
   "limits": [
@@ -761,7 +761,7 @@
         "sha256": "c7653d306ae69a94dac49f6bdfdbdcc7334fda185fb8ddf20d17b7ce8f69e360",
         "version": "1.0"
       },
-      "sha256": "1261606e510f363187d28dd3980ccaa8a5183176e08978c18662e1c93c66a606",
+      "sha256": "22dbac8b9f4b02cc6d7054a9410b8bdd2a05dae8946d21ad7c7b6915bac2e080",
       "validation_status": "valid"
     },
     {
@@ -821,7 +821,7 @@
         "sha256": "744bc2bbd214ebb7c22ca3451a4e10b7297ff9599fa00e9bef46139760cc4b90",
         "version": "1.0"
       },
-      "sha256": "d11ea89dbe4514b229d57cc11f52a745823430892619609e638d189603521f58",
+      "sha256": "6e451e2e32254dbfcebb3545942c4edbb5e5a1f530b2d308d6cc4c26ce8bf8b3",
       "validation_status": "valid"
     },
     {
@@ -841,11 +841,11 @@
         "sha256": "a1bc03ac8541936931dc75e68ee6482646d044653cdc0715842adda5a31badf5",
         "version": "1.0"
       },
-      "sha256": "b6cb2d7754e1a63afa11db1731d89606a77abcfc8dc5e9f217e5ef42a755fd54",
+      "sha256": "00ff236fecacfea260dbb1bb7191635f03f25e644e1cca42764081a34febbce7",
       "validation_status": "valid"
     },
     {
-      "canonical_fingerprint": "b557524634319a7fd398698aa86a1e1905e77682f1799a025819c5904138ab33",
+      "canonical_fingerprint": "85d3737cfe750094fbda2c0138ce3e12087bf552ce6f504fab301f40e5dc9a99",
       "declared": {
         "id": "statistical_compatibility",
         "version": "1.0"
@@ -861,7 +861,7 @@
         "sha256": "1cd06fbbef19310463056ee511329c8e9221f0c25c70e523393d14db368a5555",
         "version": "1.0"
       },
-      "sha256": "b238b7c1b44da510b668299d7443231ff99754194eae74331063a54c17bf477d",
+      "sha256": "e1fddad48a4c9ec96336400844dd08d9cc528823b9fbf574f4ff658497a80cc1",
       "validation_status": "valid"
     }
   ],

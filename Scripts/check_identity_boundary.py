@@ -33,8 +33,8 @@ TARGET_FILES = (
     "frontend/src/api.ts",
     "frontend/src/api/simulationDtos.ts",
     "frontend/src/api/simulationMappers.ts",
-    "frontend/src/hooks/simulationForecastCore.ts",
-    "frontend/src/hooks/simulationForecastService.ts",
+    "frontend/src/application/team-forecast/contract.ts",
+    "frontend/src/application/team-forecast/localTeamForecast.ts",
     "backend/api_models.py",
     "backend/api_routes_simulate.py",
     "backend/simulation_store.py",
@@ -353,8 +353,8 @@ def _payload_candidate_files(root: Path) -> list[Path]:
         root / "frontend/src/api.ts",
         root / "frontend/src/api/simulationDtos.ts",
         root / "frontend/src/api/simulationMappers.ts",
-        root / "frontend/src/hooks/simulationForecastCore.ts",
-        root / "frontend/src/hooks/simulationForecastService.ts",
+        root / "frontend/src/application/team-forecast/contract.ts",
+        root / "frontend/src/application/team-forecast/localTeamForecast.ts",
     }
     src_root = root / "frontend/src"
     if not src_root.exists():

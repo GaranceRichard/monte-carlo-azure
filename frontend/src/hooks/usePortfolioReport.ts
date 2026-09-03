@@ -4,10 +4,7 @@ import { formatDateLocal, parseLocalIsoDate } from "../date";
 import type { CompletionSummary, SimulationMode, SimulationPercentiles } from "../domain/simulation";
 import type { WeeklyThroughputRow } from "../types";
 import { formatAdoHttpErrorMessage, type AdoErrorContext } from "../adoErrors";
-import {
-  fetchTeamThroughput,
-  simulateForecastFromSamples,
-} from "./simulationForecastService";
+import { localTeamForecast } from "../application/team-forecast";
 import type { PortfolioScenarioResult } from "./simulationTypes";
 import {
   buildCorrelatedPortfolioSamples, buildCorrelatedPortfolioWeeklyThroughputs,
@@ -24,6 +21,11 @@ import {
   type ScenarioSimulationObservation,
 } from "../utils/portfolioComparisonDiagnostic";
 import type { PortfolioPilotReference } from "../utils/portfolioComparisonPresentation";
+
+const {
+  fetchTeamThroughput,
+  simulateForecastFromSamples,
+} = localTeamForecast;
 
 export type TeamPortfolioConfig = {
   teamName: string;

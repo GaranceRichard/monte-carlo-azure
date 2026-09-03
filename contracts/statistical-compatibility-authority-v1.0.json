@@ -82,7 +82,7 @@
       "id": "validation-probes",
       "path": "contracts/statistical-validation-probes-v1.0.json",
       "schema_path": "contracts/statistical-validation-probes-v1.0.schema.json",
-      "version": "1.0",
+      "version": "1.1",
       "semantic_fingerprint": "edaae666e21023b39eb5a3fd0de5c0d2932d996672b56a3b561172ddbdd3f542",
       "version_bindings": [
         { "pointer": "/schema_version", "expected": "1.0" },
@@ -93,7 +93,7 @@
       "id": "deterministic-parity",
       "path": "reports/statistical-parity-report.json",
       "schema_path": "contracts/statistical-parity-report-v1.1.schema.json",
-      "version": "1.1",
+      "version": "1.2",
       "semantic_fingerprint": "9c03522244da4eddae86beaa7e068db9af6220e1fa159b4dfcb00c8cee3afc04",
       "version_bindings": [
         { "pointer": "/report_version", "expected": "1.1" },
@@ -187,14 +187,14 @@
     },
     {
       "id": "resolved-defaults",
-      "current_version": "1.0",
+      "current_version": "1.1",
       "surfaces": ["resolved_defaults"],
-      "consumers": ["backend API", "frontend forecast service", "normalized engine command"],
+      "consumers": ["backend API", "frontend TeamForecast application", "normalized engine command"],
       "dependencies": [{ "component": "input-contract", "version": "1.0" }],
       "authorities": [
         { "path": "docs/standards/STD-STAT-001.md", "kind": "markdown_rules", "selectors": ["STAT-PAR-017"] },
         { "path": "backend/api_models.py", "kind": "python_ast", "selectors": ["SimulateRequest"] },
-        { "path": "frontend/src/hooks/simulationForecastCore.ts", "kind": "typescript_declarations", "selectors": ["simulateForecastFromSamplesCore"] }
+        { "path": "frontend/src/application/team-forecast/localTeamForecast.ts", "kind": "typescript_declarations", "selectors": ["simulateForecastFromSamples"] }
       ],
       "required_proofs": ["validation-probes", "deterministic-parity"],
       "affected_data": ["seeded_results"],
@@ -202,6 +202,9 @@
       "releases": [{
         "version": "1.0", "identity": "STD-STAT-001-resolved-defaults", "semantic_fingerprint": "4fd6c645e9bcef1a6ea9f80d59b6727ea533998e2378aedf2dfa915a169390fe",
         "decision": { "id": "PBI-2.20-baseline-resolved-defaults", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": null, "to_version": "1.0", "from_fingerprint": null, "to_fingerprint": "4fd6c645e9bcef1a6ea9f80d59b6727ea533998e2378aedf2dfa915a169390fe", "changed_surfaces": [], "rationale": "Initial semantic baseline adopted without changing resolved defaults.", "traceability": ["docs/statistical-compatibility.md"], "proof_artifacts": ["validation-probes", "deterministic-parity"], "data_treatments": [{ "category": "seeded_results", "treatment": "compatible_without_action", "rationale": "No default changed while establishing this compatibility baseline.", "evidence": ["reports/statistical-parity-report.json"] }] }
+      }, {
+        "version": "1.1", "identity": "STD-STAT-001-resolved-defaults", "semantic_fingerprint": "e74ba0c6f1cb39d30eda84e07a67f492e61fd08c77be1aab6ba99282b31628b5",
+        "decision": { "id": "PBI-7.19-team-forecast-contract", "status": "accepted", "classification": "compatible_without_historical_result_change", "from_version": "1.0", "to_version": "1.1", "from_fingerprint": "4fd6c645e9bcef1a6ea9f80d59b6727ea533998e2378aedf2dfa915a169390fe", "to_fingerprint": "e74ba0c6f1cb39d30eda84e07a67f492e61fd08c77be1aab6ba99282b31628b5", "changed_surfaces": ["resolved_defaults"], "rationale": "The resolved-defaults authority moved from the cyclic React-facing forecast facade to the React-independent team-forecast application implementation without changing any default value or statistical result.", "traceability": ["docs/statistical-compatibility.md", "frontend/src/application/team-forecast/contract.test.ts", "reports/statistical-parity-report.json"], "proof_artifacts": ["validation-probes", "deterministic-parity"], "data_treatments": [{ "category": "seeded_results", "treatment": "compatible_without_action", "rationale": "Existing seeded results retain identical default resolution and require no migration or invalidation.", "evidence": ["reports/statistical-parity-report.json"] }] }
       }]
     },
     {

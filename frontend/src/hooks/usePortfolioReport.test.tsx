@@ -1,14 +1,18 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fetchTeamThroughput, simulateForecastFromSamples } from "./simulationForecastService";
+import { localTeamForecast } from "../application/team-forecast";
 import { exportPortfolioPrintReport } from "../components/steps/portfolioPrintReport";
 import { getPortfolioErrorMessage, usePortfolioReport } from "./usePortfolioReport";
 import { createSimulationSeed } from "../domain/simulationValueObjects";
 
-vi.mock("./simulationForecastService", () => ({
-  fetchTeamThroughput: vi.fn(),
-  simulateForecastFromSamples: vi.fn(),
+vi.mock("../application/team-forecast", () => ({
+  localTeamForecast: {
+    fetchTeamThroughput: vi.fn(),
+    simulateForecastFromSamples: vi.fn(),
+  },
 }));
+
+const { fetchTeamThroughput, simulateForecastFromSamples } = localTeamForecast;
 
 vi.mock("../components/steps/portfolioPrintReport", () => ({
   exportPortfolioPrintReport: vi.fn(),

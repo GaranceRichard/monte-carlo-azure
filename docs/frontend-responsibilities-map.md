@@ -31,7 +31,7 @@ rg -n "fetch|localStorage|document\.|window\.|globalThis\.crypto|new Date|Date\.
 | --- | --- | --- |
 | Application navigateur | `index.html` → `src/main.tsx` → composition navigateur → `App` | Vite charge `main.tsx`, qui compose l’horloge réelle puis crée la racine React en mode strict. `App` résout le runtime, instancie les hooks d’onboarding et de simulation, initialise thème et cookie, puis compose le shell. |
 | Routage d’écran interne | `App` → `AppFlowContent` → composant d’étape | Aucun routeur externe : la valeur `step` de `useOnboarding` sélectionne `PatStep`, `OrgStep`, `ProjectStep`, `TeamStep`, `SimulationStep` ou `PortfolioStep`. Les deux derniers sont chargés avec `React.lazy`. |
-| Simulation d’équipe | `App` → `useSimulation` → `simulationForecastService` → `simulationForecastCore` | `App` construit un grand view model puis `SimulationStep` le diffuse par `SimulationContext` aux contrôles, résultats et graphiques. |
+| Simulation d’équipe | `App` → `useSimulation` → API publique `application/team-forecast` → `localTeamForecast` | `App` construit un grand view model puis `SimulationStep` le diffuse par `SimulationContext` aux contrôles, résultats et graphiques. Le hook dépend du contrat applicatif sans dépendance retour vers React. |
 | Portefeuille | `AppFlowContent` → `PortfolioStep` → `usePortfolio` → `usePortfolioReport` | Le hook de vue détient les critères et équipes ; le hook de rapport collecte, simule, diagnostique et déclenche le téléchargement. |
 | Corpus TypeScript | `scripts/run-statistical-reference-corpus.mjs` → Vite SSR → `statisticalCorpusRunner.ts` | Valide le corpus par le script Python autoritaire, charge le moteur TypeScript, exécute les cas et écrit le rapport JSON sur la sortie standard. |
 | Sondes de validation | `scripts/run-statistical-validation-probes.mjs` → Vite SSR → `statisticalCorpusRunner.ts` | Charge les sondes versionnées, applique la construction de commande et publie l’acceptation ou le rejet. |
@@ -61,7 +61,7 @@ préjugent pas de leur emplacement futur.
 | Hooks spécialisés simulation | `useTeamOptions.ts`, `useSimulationPrefs.ts`, `useSimulationHistory.ts`, `useSimulationQuickFilters.ts`, `useSimulationChartData.ts` | Chargement/fallback des types et états, persistance des préférences et historiques, persistance des filtres, dérivation des séries de graphiques et résumés Cycle Time. |
 | Contexte React | `hooks/SimulationContext.tsx` | Diffusion du `SimulationViewModel` complet et de l’équipe sélectionnée à tout le sous-arbre simulation. |
 | Orchestration portefeuille | `hooks/usePortfolio.ts`, `hooks/usePortfolioReport.ts` | État des critères et équipes, cache mémoire des options, préférences, collecte parallèle, simulation parallèle équipes/scénarios, tolérance aux échecs partiels, diagnostic comparatif et export. |
-| Façade/noyau de prévision | `hooks/simulationForecastService.ts`, `hooks/simulationForecastCore.ts`, `hooks/simulationSeedResolver.ts` | Contrats de paramètres, sélection données réelles/démo, construction de commande, choix moteur HTTP/local, traduction d’erreurs, seed, statistiques d’échantillon et création de l’entrée d’historique avec un instant injecté. |
+| Contrat et implémentation de prévision | `application/team-forecast/index.ts`, `application/team-forecast/contract.ts`, `application/team-forecast/localTeamForecast.ts` | Le contrat `TeamForecast` définit collecte, simulation sur échantillons et prévision complète. L’implémentation locale sélectionne données réelles/démo, construit la commande, choisit le moteur HTTP/local, traduit les erreurs et crée l’entrée d’historique avec une seed et un instant injecté, sans importer React ni les hooks. |
 | Temps de prévision | `ports/clock/index.ts`, `adapters/browser/clock/index.ts`, `composition/browser/index.ts` | Port minimal retournant l’instant ISO, lecture réelle de `Date` confinée à l’adaptateur et assemblage au bootstrap React. |
 | Accès Azure DevOps | `adoClient.ts`, `adoPlatform.ts`, `adoErrors.ts` | Détection Cloud/Server, en-têtes PAT, découverte profil/organisation/collection/projet/équipe, types/états, WIQL, lots de work items, révisions, erreurs contextualisées et avertissements de collecte partielle. |
 | Accès backend Monte Carlo | `api.ts`, `apiHelpers.ts`, `api/simulationDtos.ts`, `api/simulationMappers.ts` | `POST /simulate`, base d’API Vite, DTO `snake_case`, transformation commande/réponse et validation des invariants statistiques reçus. |
@@ -124,7 +124,7 @@ Contrôles React
   -> useSimulation
   -> signature de la configuration
      -> entrée locale valide trouvée : restauration sans appel externe
-     -> sinon : simulationForecastCore
+     -> sinon : API publique TeamForecast -> localTeamForecast.runSimulationForecast
         -> démo : demoData
         -> connecté : adoClient / WIQL / work items / révisions
         -> weeklyThroughput + cycleTimeDaysData + avertissement
@@ -180,10 +180,10 @@ un JSON écrit sur la sortie standard ; ils n’utilisent ni React, ni Azure Dev
 | Périmètre équipe | `adoClient.ts` | équipe → clause Area Path exacte ou récursive, avec fallback projet/équipe. |
 | Collecte delivery | `adoClient.ts` | WIQL + DTO work items/révisions → semaines de throughput, sources Cycle Time et avertissements. |
 | Cycle Time | `utils/cycleTime.ts` | révisions → observations en jours → tendance glissante, bornes et résumé. |
-| Entrée utilisateur | `simulationForecastCore.ts` puis `domain/*` | chaînes/nombres et échantillons → commande discriminée et Value Objects validés. |
+| Entrée utilisateur | `application/team-forecast/localTeamForecast.ts` puis `domain/*` | chaînes/nombres et échantillons → commande discriminée et Value Objects validés. |
 | Transport backend | `api/simulationMappers.ts` | commande `camelCase` → DTO `snake_case` ; réponse fermée → `SimulationResult` validé. |
 | Simulation locale | `utils/simulation.ts` | commande + port de tirage → échantillons simulés, percentiles, censures, histogramme, Risk Score et fiabilité. |
-| Horodatage de prévision | `simulationForecastCore.ts` + `FrontendClock` | instant injecté lu une fois → `createdAt` et fallback d’identité de la même entrée. |
+| Horodatage de prévision | `application/team-forecast/localTeamForecast.ts` + `FrontendClock` | instant injecté lu une fois → `createdAt` et fallback d’identité de la même entrée. |
 | Scénarios portefeuille | `utils/simulation.ts` | historiques de plusieurs équipes → échantillons indépendant, aligné, friction et agrégation par semaines communes. |
 | Historique local | `storage/simulationHistoryMappers.ts` | modèle interne ↔ DTO version 2 ; anciennes valeurs Cycle Time sans version → jours. |
 | Identité de configuration | `utils/simulationSignature.ts` | contexte et critères triés/canonisés → signature JSON ; historique → réutilisable ou non. |
@@ -198,29 +198,32 @@ Les relations suivantes sont directement présentes dans les imports et points d
 
 - `index.html` importe `/src/main.tsx`, qui importe la composition navigateur et `App` ; la composition
   instancie `BrowserClock`, puis `App` transmet le port à `useSimulation` ;
-- `simulationForecastCore.ts` importe directement `adoClient`, `api`, les mappers HTTP, `demoData`,
-  l’adaptateur PRNG et le moteur de `utils/simulation.ts` ;
-- `simulationForecastService.ts` importe le noyau, tandis que le noyau importe les types déclarés par la
-  façade avec `import type` ; la façade déclare aussi `FrontendClock` comme dépendance obligatoire ;
-- `usePortfolioReport.ts` importe directement le service de prévision, le PRNG, les calculs de scénarios,
-  les diagnostics et, dynamiquement, le rapport de présentation ;
-- `domain/simulationHistory.ts` importe les formes de `types.ts`, `utils/cycleTime.ts` importe des types de
-  `hooks/simulationTypes.ts`, et `demoData.ts` importe `TeamPortfolioConfig` depuis un hook ;
+- `application/team-forecast/localTeamForecast.ts` importe directement `adoClient`, `api`, les mappers HTTP,
+  `demoData`, l’adaptateur PRNG et le moteur de `utils/simulation.ts` ;
+- `application/team-forecast/contract.ts` ne dépend que des formes du domaine et de `FrontendClock` ; le
+  module ne possède aucune arête vers React, les hooks, les composants ou la présentation React ;
+- `useSimulation.ts` et `usePortfolioReport.ts` importent la prévision uniquement par
+  `application/team-forecast/index.ts` ; `usePortfolioReport.ts` conserve ses dépendances directes vers les
+  calculs de scénarios, les diagnostics et, dynamiquement, le rapport de présentation ;
+- `domain/simulationHistory.ts` importe les formes de `types.ts` et `utils/cycleTime.ts` importe des types de
+  `hooks/simulationTypes.ts` ; `demoData.ts` ne dépend plus d’un type déclaré par un hook ;
 - les rapports importent `hooks/probability.ts` et `hooks/simulationTypes.ts`, puis
   `simulationPdfDownload.ts` relit leurs HTML par sélecteurs DOM ;
-- les frontières d’horloge et de composition exposent des API publiques `index.ts`, conformément à
-  l’autorité de dépendances ; les modules non ciblés conservent leurs chemins actuels.
+- les frontières de prévision, d’horloge et de composition exposent des API publiques `index.ts`, conformément
+  à l’autorité de dépendances ; les anciennes façades `simulationForecastService.ts` et
+  `simulationForecastCore.ts` ne sont plus présentes.
 
 ## Responsabilités ambiguës, chevauchements et couplages observés
 
-Ces écarts sont des observations de la baseline. Cette carte ne décide ni correction, ni ordre de migration.
+Ces écarts sont des observations de l’état courant. Une ligne résolue est conservée explicitement pour rendre
+la réduction de couplage traçable ; cette carte ne décide pas l’ordre des migrations restantes.
 
 | Identifiant | Constat factuel | Preuves dans le graphe actuel |
 | --- | --- | --- |
-| FE-01 | La composition technique reste distribuée entre `App` et le noyau de prévision. | Une composition frontend distincte assemble désormais l’horloge réelle, mais `App` instancie encore les hooks et `simulationForecastCore` choisit lui-même données démo/réelles, moteur local/HTTP et adaptateur PRNG. |
+| FE-01 | La composition technique reste distribuée entre `App` et l’implémentation locale de prévision. | Une composition frontend distincte assemble l’horloge réelle, mais `App` instancie encore les hooks et `localTeamForecast` choisit lui-même données démo/réelles, moteur local/HTTP et adaptateur PRNG. |
 | FE-02 | Les hooks cumulent état React et orchestration applicative. | `useOnboarding` valide le PAT et pilote la découverte ; `useSimulation` gère cache, invalidation, persistance et exécution ; `usePortfolioReport` collecte, simule, diagnostique et exporte. |
 | FE-03 | `adoClient.ts` concentre plusieurs raisons de changer. | Le même fichier contient authentification, découverte Cloud/Server, transport HTTP, construction WIQL, lots/révisions, politique d’erreur partielle, agrégation hebdomadaire et appel du calcul Cycle Time. |
-| FE-04 | La façade de prévision et son noyau se référencent dans les deux sens. | `simulationForecastService` importe les fonctions du noyau ; `simulationForecastCore` importe les types de paramètres/résultats depuis la façade. La dépendance retour est limitée aux types et effacée à l’exécution compilée, mais la relation reste bidirectionnelle dans le graphe source. |
+| FE-04 — résolu par 7.19 | La frontière de prévision est unidirectionnelle. | Les hooks consommateurs importent l’API publique `application/team-forecast/index.ts`; le contrat et `localTeamForecast` n’importent ni React ni les hooks. Les deux anciennes façades ont été supprimées, les deux composantes cycliques observées ont disparu et la règle `team-forecast-must-remain-react-independent` interdit la dépendance retour. |
 | FE-05 | L’autorité des modèles est répartie entre plusieurs zones. | Modèles dans `types.ts`, `domain/*`, `hooks/simulationTypes.ts`, DTO HTTP et DTO stockage ; `domain/simulationHistory` dépend de `types.ts`, et des utilitaires/rapports dépendent de types de hooks. |
 | FE-06 | Le répertoire `utils` porte à la fois domaine, application et présentation. | `utils/simulation.ts` contient le moteur et les scénarios ; `forecastDiagnostics.ts` contient des règles décisionnelles ; `export.ts` manipule le DOM ; les modules `*Presentation` et de signature y résident aussi. |
 | FE-07 | Des composants React dérivent encore des valeurs de restitution. | `SimulationChartTabs` calcule moyenne mobile, modèle Cycle Time, fiabilité et diagnostic ; `SimulationResultsPanel` recalcule une légende de risque, la fiabilité et le même diagnostic. |

@@ -39,9 +39,9 @@ def _build_repo(root: Path, overrides: dict[str, str] | None = None) -> Path:
               });
             }
         """,
-        "frontend/src/hooks/simulationForecastCore.ts": """
-            import { postSimulate } from "../api";
-            import type { ForecastRequestPayload } from "../types";
+        "frontend/src/application/team-forecast/localTeamForecast.ts": """
+            import { postSimulate } from "../../api";
+            import type { ForecastRequestPayload } from "../../types";
 
             export async function runSimulation() {
               const payload: ForecastRequestPayload = {
@@ -53,10 +53,10 @@ def _build_repo(root: Path, overrides: dict[str, str] | None = None) -> Path:
               return postSimulate(payload);
             }
         """,
-        "frontend/src/hooks/simulationForecastService.ts": """
-            export function noop() {
-              return null;
-            }
+        "frontend/src/application/team-forecast/contract.ts": """
+            export type TeamForecast = {
+              runSimulation: () => Promise<Response>;
+            };
         """,
         "frontend/src/hooks/useOnboarding.ts": """
             export function useOnboarding() {

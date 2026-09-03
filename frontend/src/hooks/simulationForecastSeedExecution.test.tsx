@@ -2,11 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getTeamDeliveryDataDirect } from "../adoClient";
 import { postSimulate } from "../api";
 import { SIMULATION_SEED_MAX } from "../domain/simulationValueObjects";
-import {
+import { localTeamForecast } from "../application/team-forecast";
+import { DeterministicFrontendClock } from "../test/deterministicFrontendClock";
+
+const {
   runSimulationForecast,
   simulateForecastFromSamples,
-} from "./simulationForecastService";
-import { DeterministicFrontendClock } from "../test/deterministicFrontendClock";
+} = localTeamForecast;
 
 vi.mock("../adoClient", () => ({
   getTeamDeliveryDataDirect: vi.fn(),

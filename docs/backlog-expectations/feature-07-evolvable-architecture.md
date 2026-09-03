@@ -312,7 +312,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Rompre le cycle de prévision frontend autour d’une frontière applicative cohérente.
 - **Frontière principale :** Prévision applicative frontend.
 - **Famille d’invariants :** Indépendance de la prévision vis-à-vis de React.
-- **Preuve principale :** Tests contractuels de la prévision et contrôle de l’absence du cycle.
+- **Preuve principale :** [Tests contractuels de `TeamForecast`](../../frontend/src/application/team-forecast/contract.test.ts), [graphe observé sans cycle](../../reports/dependency-graph.json) et [contrôle de maintenabilité anti-régression](../../tests/test_maintainability.py).
 - **Éléments de réalisation inclus :** Contrat des opérations de prévision ; implémentation locale ; migration du noyau consommateur ; retrait des déclarations historiques ; blocage de l’import inverse ; documentation.
 - **Hors périmètre :** Expérience utilisateur de simulation et distribution externe du moteur Python.
 - **Surface prévisionnelle :** 8 fichiers de production ; 13 fichiers versionnés

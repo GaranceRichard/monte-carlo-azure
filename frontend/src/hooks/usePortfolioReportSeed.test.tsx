@@ -3,16 +3,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createSeededSampleIndexDrawPort } from "../adapters/seededSampleIndexDrawPort";
 import { exportPortfolioPrintReport } from "../components/steps/portfolioPrintReport";
 import { createSimulationSeed } from "../domain/simulationValueObjects";
-import {
-  fetchTeamThroughput,
-  simulateForecastFromSamples,
-} from "./simulationForecastService";
+import { localTeamForecast } from "../application/team-forecast";
 import { usePortfolioReport } from "./usePortfolioReport";
 
-vi.mock("./simulationForecastService", () => ({
-  fetchTeamThroughput: vi.fn(),
-  simulateForecastFromSamples: vi.fn(),
+vi.mock("../application/team-forecast", () => ({
+  localTeamForecast: {
+    fetchTeamThroughput: vi.fn(),
+    simulateForecastFromSamples: vi.fn(),
+  },
 }));
+
+const { fetchTeamThroughput, simulateForecastFromSamples } = localTeamForecast;
 
 vi.mock("../components/steps/portfolioPrintReport", () => ({
   exportPortfolioPrintReport: vi.fn(),
