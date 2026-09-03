@@ -162,8 +162,11 @@ une connexion Azure DevOps réelle.
   collecte, d’UI ou de garantie statistique.
 - **Fenêtre historique delivery.** Le même domaine porte une fenêtre absolue `[début inclus, fin exclue]` et
   l’unique règle qui sélectionne les items sur leur fait `item_delivered`, tout en conservant leurs faits de
-  cycle de vie nécessaires au Cycle Time. Le filtre Azure DevOps reste une présélection de transport ; semaine,
-  fuseau, périodes partielles et profondeur choisie restent inchangés.
+  cycle de vie nécessaires au Cycle Time. Le filtre Azure DevOps reste une présélection de transport ; les
+  périodes partielles et la profondeur choisie restent inchangées.
+- **Calendrier delivery unique.** Le Value Object `DeliveryWeek` rattache chaque instant à une semaine
+  ISO-8601 du lundi au dimanche, évaluée en `UTC` et identifiée par la date du lundi. Throughput, Cycle Time,
+  portefeuille, séries synthétiques et démonstration consomment tous cette même politique publique.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 

@@ -1,6 +1,7 @@
-import { formatDateLocal, getCompleteWeekRange, parseLocalIsoDate, startOfIsoWeek } from "./date";
+import { getCompleteWeekRange, parseLocalIsoDate } from "./date";
 import type { CycleTimePoint, WeeklyThroughputRow } from "./types";
-import { createDeliveryHistoryWindow, selectDeliveryHistoryEvents, type DeliveryEvent } from "./domain/delivery";
+import { createDeliveryHistoryWindow, createDeliveryInstant, createDeliveryWeek, deliveryWeekOf,
+  nextDeliveryWeek, selectDeliveryHistoryEvents, type DeliveryEvent } from "./domain/delivery";
 import {
   azureRevisionDtosToDeliveryEvents,
   azureWorkItemDtoToDeliveryEvent,
@@ -78,10 +79,6 @@ function buildCompletionDateFilter(startDate: string, endDate: string): string {
         AND [Microsoft.VSTS.Common.ResolvedDate] <= '${endDate}'
       )
     )`;
-}
-
-function toWeekKey(dateValue: string): string {
-  return formatDateLocal(startOfIsoWeek(new Date(dateValue)));
 }
 
 function getAdoRuntimeContext(serverUrl?: string, collectionName?: string): AdoRuntimeContext {
@@ -494,7 +491,12 @@ export async function getTeamDeliveryDataDirect(
   const { startDate: alignedStartDate, endDate: alignedEndDate } = completeWeekRange;
   const start = parseLocalIsoDate(alignedStartDate);
   const end = parseLocalIsoDate(alignedEndDate);
-  const historyWindow = createDeliveryHistoryWindow({ startInclusive: start.toISOString(), endExclusive: new Date(end.getFullYear(), end.getMonth(), end.getDate() + 1).toISOString() });
+  const endExclusive = new Date(end);
+  endExclusive.setUTCDate(endExclusive.getUTCDate() + 1);
+  const historyWindow = createDeliveryHistoryWindow({
+    startInclusive: start.toISOString(),
+    endExclusive: endExclusive.toISOString(),
+  });
   const runtime = getAdoRuntimeContext(serverUrl, org);
   const api = getApiVersionQuery(runtime);
   const teamAreaFilter = await getTeamAreaPathFilterClause(org, project, team, pat, serverUrl);
@@ -614,16 +616,16 @@ export async function getTeamDeliveryDataDirect(
   const weekMap = new Map<string, number>();
   selectedDeliveryEvents.forEach((event) => {
     if (event.kind !== "item_delivered") return;
-    const key = toWeekKey(event.occurredAt);
+    const key = deliveryWeekOf(event.occurredAt);
     weekMap.set(key, (weekMap.get(key) ?? 0) + 1);
   });
 
   const result: WeeklyThroughputRow[] = [];
-  const cursor = new Date(start);
-  while (cursor <= end) {
-    const key = formatDateLocal(cursor);
-    result.push({ week: key, throughput: weekMap.get(key) ?? 0 });
-    cursor.setDate(cursor.getDate() + 7);
+  let week = createDeliveryWeek(alignedStartDate);
+  const finalWeek = deliveryWeekOf(createDeliveryInstant(end.toISOString()));
+  while (week <= finalWeek) {
+    result.push({ week, throughput: weekMap.get(week) ?? 0 });
+    week = nextDeliveryWeek(week);
   }
 
   const warnings: string[] = [];

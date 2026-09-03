@@ -1,5 +1,6 @@
 import type { CompletionSummary, SimulationResultKind, SimulationPercentiles, ThroughputReliability } from "../../domain/simulation";
 import type { PortfolioScenarioResult } from "../../hooks/simulationTypes";
+import { createDeliveryWeek } from "../../domain/delivery";
 import { buildProbabilityCurve } from "../../hooks/probability";
 import {
   computeFrictionRatePercent,
@@ -261,7 +262,11 @@ function buildTeamLikePageHtml({
     const start = Math.max(0, index - windowSize + 1);
     const slice = arr.slice(start, index + 1);
     const average = slice.reduce((sum, p) => sum + p.throughput, 0) / slice.length;
-    return { week: String(point.week).slice(0, 10), throughput: point.throughput, movingAverage: Number(average.toFixed(2)) };
+    return {
+      week: createDeliveryWeek(point.week),
+      throughput: point.throughput,
+      movingAverage: Number(average.toFixed(2)),
+    };
   });
 
   const sortedDistribution = [...distribution]

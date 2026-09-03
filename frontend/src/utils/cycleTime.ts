@@ -1,16 +1,13 @@
-import { formatDateLocal } from "../date";
-import type { DeliveryEvent } from "../domain/delivery";
+import {
+  deliveryWeekOf,
+  type DeliveryEvent,
+  type DeliveryInstant,
+} from "../domain/delivery";
 import type { CycleTimePoint } from "../types";
 import type { CycleTimeSummary, CycleTimeTrendPoint } from "../hooks/simulationTypes";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
-
-function getWeekKey(date: Date): string {
-  const monday = new Date(date);
-  monday.setDate(date.getDate() - ((date.getDay() + 6) % 7));
-  return formatDateLocal(monday);
-}
 
 function toRoundedCalendarDays(start: Date, end: Date): number {
   return Number(((end.getTime() - start.getTime()) / DAY_MS).toFixed(2));
@@ -37,19 +34,20 @@ export function calculateCycleTimeData(
 
   const eventPairs = new Map<
     string,
-    { startedAt?: Date; completedAt?: Date }
+    { startedAt?: DeliveryInstant; completedAt?: DeliveryInstant }
   >();
   [...events]
-    .sort((left, right) => left.occurredAt.localeCompare(right.occurredAt))
+    .sort((left, right) => (
+      new Date(left.occurredAt).getTime() - new Date(right.occurredAt).getTime()
+    ))
     .forEach((event) => {
       if (event.kind === "item_delivered") return;
       const pair = eventPairs.get(event.itemId) ?? {};
-      const occurredAt = new Date(event.occurredAt);
       if (event.kind === "work_started" && !pair.startedAt) {
-        pair.startedAt = occurredAt;
+        pair.startedAt = event.occurredAt;
       }
       if (event.kind === "work_completed" && !pair.completedAt) {
-        pair.completedAt = occurredAt;
+        pair.completedAt = event.occurredAt;
       }
       eventPairs.set(event.itemId, pair);
     });
@@ -57,11 +55,14 @@ export function calculateCycleTimeData(
   const buckets = new Map<string, CycleTimePoint>();
 
   eventPairs.forEach(({ startedAt, completedAt }) => {
-    if (!startedAt || !completedAt || completedAt < startedAt) return;
+    if (!startedAt || !completedAt) return;
+    const startedDate = new Date(startedAt);
+    const completedDate = new Date(completedAt);
+    if (completedDate < startedDate) return;
     aggregateCycleTimePoint(
       buckets,
-      getWeekKey(completedAt),
-      toRoundedCalendarDays(startedAt, completedAt),
+      deliveryWeekOf(completedAt),
+      toRoundedCalendarDays(startedDate, completedDate),
     );
   });
 

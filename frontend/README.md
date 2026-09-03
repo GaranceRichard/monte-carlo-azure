@@ -71,14 +71,18 @@ Azure DevOps. Les règles complètes et les chemins contrôlés sont définis da
 
 ## Données temporelles et historique local
 
-Le throughput utilise uniquement des semaines ISO complètes :
+Le Value Object public `DeliveryWeek` applique l’unique politique calendaire delivery : semaines ISO-8601
+du lundi au dimanche, évaluées en `UTC` et identifiées par la date du lundi. Le throughput utilise uniquement
+des semaines complètes :
 
 - début aligné sur un lundi ;
 - fin alignée sur un dimanche ;
 - semaine entièrement incluse dans la période choisie ;
 - semaine courante exclue tant qu’elle n’est pas terminée.
 
-Les chaînes `YYYY-MM-DD` sont traitées comme dates locales afin d’éviter un décalage UTC d’un jour.
+Les chaînes `YYYY-MM-DD` de la fenêtre sont interprétées comme dates calendaires `UTC`. Les timestamps avec
+offset sont normalisés en instants absolus avant leur rattachement à `DeliveryWeek` ; throughput, Cycle Time,
+portefeuille, données synthétiques et démonstration réutilisent cette même politique.
 
 L’historique détaillé d’une équipe reste dans `localStorage`. Il est contextualisé, versionné et distinct de
 l’historique backend statistique minimisé. Les anciennes entrées sans `schemaVersion` sont migrées une seule

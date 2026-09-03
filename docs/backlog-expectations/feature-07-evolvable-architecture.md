@@ -369,7 +369,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Éviter des regroupements temporels divergents entre couches.
 - **Frontière principale :** Calendrier du domaine delivery.
 - **Famille d’invariants :** Semaine ISO et normalisation temporelle.
-- **Preuve principale :** Tests des changements de semaine, d’année et de fuseau.
+- **Preuve principale :** [Tests de la politique calendaire](../../frontend/src/domain/delivery/deliveryWeek.test.ts) et [preuve d’intégration throughput/Cycle Time](../../frontend/src/adoClient.deliveryWeek.test.ts).
 - **Éléments de réalisation inclus :** Value Object de semaine ; politique de fuseau ; migration locale des regroupements ; retrait des calculs concurrents.
 - **Hors périmètre :** Contexte fonctionnel des sprints Azure DevOps.
 - **Surface prévisionnelle :** 6 fichiers de production ; 11 fichiers versionnés

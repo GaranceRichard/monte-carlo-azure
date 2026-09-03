@@ -8,6 +8,12 @@ export {
   createDeliveryHistoryWindow,
   selectDeliveryHistoryEvents,
 } from "./historicalWindow";
+export {
+  createDeliveryWeek,
+  DELIVERY_CALENDAR_POLICY,
+  deliveryWeekOf,
+  nextDeliveryWeek,
+} from "./deliveryWeek";
 
 export type {
   DeliveryEvent,
@@ -20,3 +26,4 @@ export type {
   DeliveryHistoryWindow,
   DeliveryHistoryWindowInput,
 } from "./historicalWindow";
+export type { DeliveryWeek } from "./deliveryWeek";

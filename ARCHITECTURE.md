@@ -99,11 +99,14 @@ Contrôles associés :
 
 Invariants de préparation du throughput côté frontend :
 
-- l’historique Azure DevOps est regroupé par semaines ISO du lundi au dimanche ;
+- le domaine delivery définit l’unique politique calendaire : semaines ISO-8601 du lundi au dimanche,
+  évaluées en `UTC` et identifiées par la date du lundi ;
+- l’historique Azure DevOps, le Cycle Time, les agrégations portefeuille et les séries synthétiques utilisent
+  tous le Value Object `DeliveryWeek` fourni par cette politique ;
 - seules les semaines complètes, entièrement incluses dans la plage demandée, sont conservées ;
 - la semaine courante est exclue tant qu’elle n’est pas entièrement écoulée ;
-- les chaînes `YYYY-MM-DD` sont traitées comme dates locales (`src/date.ts`) pour éviter toute dérive UTC
-  d’un jour ;
+- les chaînes `YYYY-MM-DD` de la fenêtre sont traitées comme dates calendaires `UTC` (`src/date.ts`) ; les
+  timestamps avec offset sont d’abord normalisés en instants absolus avant leur rattachement hebdomadaire ;
 - le domaine delivery porte la fenêtre absolue semi-ouverte `[début inclus, fin exclue]` ; il sélectionne
   les items sur leur fait `item_delivered` puis conserve leurs faits de cycle de vie. La requête WIQL ne
   constitue qu’une présélection de transport.
@@ -152,6 +155,7 @@ frontend/
       delivery/
         index.ts            # API publique des événements delivery
         deliveryEvent.ts    # identité opaque, faits fermés et instant absolu immuable
+        deliveryWeek.ts     # semaine ISO et politique métier UTC uniques
         historicalWindow.ts # bornes absolues et sélection cohésive de l’historique
       sampleIndexDrawPort.ts # port minimal de tirage injecté dans les moteurs
       simulation.ts        # commande et résultat statistiques métier en camelCase
@@ -963,6 +967,8 @@ Frontend :
   faits `item_delivered`, `work_started` et `work_completed` avant toute transformation temporelle
 - fenêtre historique possédée par le même domaine : bornes absolues semi-ouvertes, fenêtre vide explicite et
   sélection unique des items livrés, réutilisée avant throughput et Cycle Time
+- calendrier delivery possédé par le même domaine : `DeliveryWeek`, semaines ISO du lundi au dimanche et
+  politique `UTC` partagée par tous les regroupements et toutes les séquences hebdomadaires
 - moteur Monte Carlo frontend et scénarios portefeuille désormais pilotés par une `seed`
   explicite unique par exécution logique, sans `Math.random()` dans les calculs de simulation
 - calcul du Cycle Time dans `src/utils/cycleTime.ts` à partir des seuls événements normalisés, avec couverture

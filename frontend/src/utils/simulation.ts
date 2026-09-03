@@ -16,6 +16,7 @@ import {
   SIMULATION_HORIZON_WEEKS_MAX,
 } from "../domain/simulationValueObjects";
 import { computeThroughputReliability } from "../domain/throughputReliability";
+import { createDeliveryWeek } from "../domain/delivery";
 import { clamp } from "./math";
 
 export { computeThroughputReliability };
@@ -207,12 +208,14 @@ export function buildScenarioSamples(
 }
 
 function normalizeWeeklyThroughputRow(row: WeeklyThroughputRow, teamIndex: number): { week: string; throughput: number } {
-  const week = String(row.week ?? "").slice(0, 10);
-  const throughput = Number(row.throughput);
-
-  if (!week) {
+  let week: string;
+  try {
+    week = createDeliveryWeek(row.week);
+  } catch {
     throw new Error(`buildCorrelatedPortfolioSamples: semaine invalide pour l'equipe ${String(teamIndex + 1)}.`);
   }
+  const throughput = Number(row.throughput);
+
   if (!Number.isFinite(throughput)) {
     throw new Error(`buildCorrelatedPortfolioSamples: throughput invalide pour la semaine ${week}.`);
   }

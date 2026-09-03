@@ -1,15 +1,15 @@
 {
   "schemaVersion": "1.0.0",
-  "classificationInventorySha256": "fed090852deb2c44c36443e4aa586ce95aa293279e1fd843b22906b13c9c7312",
+  "classificationInventorySha256": "66a41dcfcc594a56a7ec5e51e1d0ea7f41b36c515a22f78e7e1464e4bc4492ea",
   "totals": {
-    "logicalCases": 1500,
-    "collectedInstances": 1915,
-    "executedInstances": 1915,
+    "logicalCases": 1508,
+    "collectedInstances": 1923,
+    "executedInstances": 1923,
     "skippedInstances": 0,
-    "attempts": 1915,
+    "attempts": 1923,
     "retries": 0,
     "results": {
-      "passed": 1915,
+      "passed": 1923,
       "failed": 0,
       "skipped": 0,
       "todo": 0,
@@ -48,14 +48,14 @@
       }
     },
     "vitest": {
-      "logicalCases": 710,
-      "collectedInstances": 830,
-      "executedInstances": 830,
+      "logicalCases": 718,
+      "collectedInstances": 838,
+      "executedInstances": 838,
       "skippedInstances": 0,
-      "attempts": 830,
+      "attempts": 838,
       "retries": 0,
       "results": {
-        "passed": 830,
+        "passed": 838,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -65,14 +65,14 @@
   },
   "classificationStatuses": {
     "classified": {
-      "logicalCases": 1500,
-      "collectedInstances": 1915,
-      "executedInstances": 1915,
+      "logicalCases": 1508,
+      "collectedInstances": 1923,
+      "executedInstances": 1923,
       "skippedInstances": 0,
-      "attempts": 1915,
+      "attempts": 1923,
       "retries": 0,
       "results": {
-        "passed": 1915,
+        "passed": 1923,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -82,14 +82,14 @@
   },
   "natures": {
     "component": {
-      "logicalCases": 414,
-      "collectedInstances": 441,
-      "executedInstances": 441,
+      "logicalCases": 415,
+      "collectedInstances": 442,
+      "executedInstances": 442,
       "skippedInstances": 0,
-      "attempts": 441,
+      "attempts": 442,
       "retries": 0,
       "results": {
-        "passed": 441,
+        "passed": 442,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -142,14 +142,14 @@
       }
     },
     "unit": {
-      "logicalCases": 719,
-      "collectedInstances": 1031,
-      "executedInstances": 1031,
+      "logicalCases": 726,
+      "collectedInstances": 1038,
+      "executedInstances": 1038,
       "skippedInstances": 0,
-      "attempts": 1031,
+      "attempts": 1038,
       "retries": 0,
       "results": {
-        "passed": 1031,
+        "passed": 1038,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -159,14 +159,14 @@
   },
   "executionProfiles": {
     "pr": {
-      "logicalCases": 1218,
-      "collectedInstances": 1579,
-      "executedInstances": 1579,
+      "logicalCases": 1226,
+      "collectedInstances": 1587,
+      "executedInstances": 1587,
       "skippedInstances": 0,
-      "attempts": 1579,
+      "attempts": 1587,
       "retries": 0,
       "results": {
-        "passed": 1579,
+        "passed": 1587,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -18261,6 +18261,28 @@
       }
     },
     {
+      "logicalCaseId": "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/adoClient.deliveryWeek.test.ts",
+      "selector": "adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "component",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
       "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/adoClient.test.ts",
@@ -24883,10 +24905,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [73:3]",
+      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [74:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/date.test.ts",
-      "selector": "date helpers > excludes a sunday still in progress from the current week [73:3]",
+      "selector": "date helpers > excludes a sunday still in progress from the current week [74:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -24905,10 +24927,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [62:3]",
+      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [63:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/date.test.ts",
-      "selector": "date helpers > excludes the current week until it is fully elapsed [62:3]",
+      "selector": "date helpers > excludes the current week until it is fully elapsed [63:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -24927,10 +24949,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [55:3]",
+      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [56:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/date.test.ts",
-      "selector": "date helpers > excludes the partial week at the end when endDate is midweek [55:3]",
+      "selector": "date helpers > excludes the partial week at the end when endDate is midweek [56:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -24949,10 +24971,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [48:3]",
+      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [49:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/date.test.ts",
-      "selector": "date helpers > excludes the partial week at the start when startDate is midweek [48:3]",
+      "selector": "date helpers > excludes the partial week at the start when startDate is midweek [49:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -24971,10 +24993,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [31:3]",
+      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [32:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/date.test.ts",
-      "selector": "date helpers > finds the first complete monday included or after the start date [31:3]",
+      "selector": "date helpers > finds the first complete monday included or after the start date [32:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -24993,10 +25015,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [36:3]",
+      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [37:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/date.test.ts",
-      "selector": "date helpers > finds the last sunday included or before the end date [36:3]",
+      "selector": "date helpers > finds the last sunday included or before the end date [37:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -25015,10 +25037,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [41:3]",
+      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [42:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/date.test.ts",
-      "selector": "date helpers > keeps a full monday-sunday week when the requested range already matches it [41:3]",
+      "selector": "date helpers > keeps a full monday-sunday week when the requested range already matches it [42:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -25037,10 +25059,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD without UTC day drift [12:3]",
+      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [12:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/date.test.ts",
-      "selector": "date helpers > parses YYYY-MM-DD without UTC day drift [12:3]",
+      "selector": "date helpers > parses YYYY-MM-DD as a UTC calendar date [12:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -25059,10 +25081,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [21:3]",
+      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [22:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/date.test.ts",
-      "selector": "date helpers > rejects invalid local ISO dates [21:3]",
+      "selector": "date helpers > rejects invalid local ISO dates [22:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -25081,10 +25103,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [69:3]",
+      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [70:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/date.test.ts",
-      "selector": "date helpers > returns null when no complete week is available [69:3]",
+      "selector": "date helpers > returns null when no complete week is available [70:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -25103,10 +25125,32 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [26:3]",
+      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [27:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/date.test.ts",
-      "selector": "date helpers > returns the monday of the ISO week [26:3]",
+      "selector": "date helpers > returns the monday of the ISO week [27:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > uses the UTC calendar when the reference instant carries another offset [81:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/date.test.ts",
+      "selector": "date helpers > uses the UTC calendar when the reference instant carries another offset [81:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -25371,6 +25415,138 @@
       "framework": "vitest",
       "sourcePath": "frontend/src/domain/delivery/deliveryEvent.test.ts",
       "selector": "DeliveryEvent > rejects facts outside the delivery vocabulary [46:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > applies UTC rather than the source offset at a week boundary [33:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/domain/delivery/deliveryWeek.test.ts",
+      "selector": "delivery calendar policy > applies UTC rather than the source offset at a week boundary [33:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > constructs and advances valid week values without local calendar arithmetic [38:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/domain/delivery/deliveryWeek.test.ts",
+      "selector": "delivery calendar policy > constructs and advances valid week values without local calendar arithmetic [38:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > groups every instant from monday through sunday under its ISO monday [21:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/domain/delivery/deliveryWeek.test.ts",
+      "selector": "delivery calendar policy > groups every instant from monday through sunday under its ISO monday [21:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > publishes the single explicit ISO week and timezone policy [11:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/domain/delivery/deliveryWeek.test.ts",
+      "selector": "delivery calendar policy > publishes the single explicit ISO week and timezone policy [11:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > rejects dates that are not valid UTC ISO mondays [44:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/domain/delivery/deliveryWeek.test.ts",
+      "selector": "delivery calendar policy > rejects dates that are not valid UTC ISO mondays [44:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
+      "logicalCaseId": "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > uses the ISO week-year across the civil year boundary [27:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/domain/delivery/deliveryWeek.test.ts",
+      "selector": "delivery calendar policy > uses the ISO week-year across the civil year boundary [27:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",
@@ -28865,10 +29041,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/hooks/usePortfolioReport.test.tsx::usePortfolioReport > uses local calendar dates for synthetic scenario weeks [187:3]",
+      "logicalCaseId": "vitest:frontend/src/hooks/usePortfolioReport.test.tsx::usePortfolioReport > uses authoritative complete UTC ISO weeks for synthetic scenarios [187:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/hooks/usePortfolioReport.test.tsx",
-      "selector": "usePortfolioReport > uses local calendar dates for synthetic scenario weeks [187:3]",
+      "selector": "usePortfolioReport > uses authoritative complete UTC ISO weeks for synthetic scenarios [187:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "component",
@@ -31747,6 +31923,28 @@
       }
     },
     {
+      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > aligns offset timestamps with the authoritative UTC delivery week [316:3]",
+      "framework": "vitest",
+      "sourcePath": "frontend/src/utils/simulation.test.ts",
+      "selector": "buildCorrelatedPortfolioSamples > aligns offset timestamps with the authoritative UTC delivery week [316:3]",
+      "classificationStatus": "classified",
+      "executionProfile": "pr",
+      "nature": "unit",
+      "logicalCases": 1,
+      "collectedInstances": 1,
+      "executedInstances": 1,
+      "skippedInstances": 0,
+      "attempts": 1,
+      "retries": 0,
+      "results": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "infrastructureError": 0
+      }
+    },
+    {
       "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > applies includeZeroWeeks after aggregating the portfolio total [191:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulation.test.ts",
@@ -31773,28 +31971,6 @@
       "framework": "vitest",
       "sourcePath": "frontend/src/utils/simulation.test.ts",
       "selector": "buildCorrelatedPortfolioSamples > is not mathematically forced to match optimistic independent draws [207:3]",
-      "classificationStatus": "classified",
-      "executionProfile": "pr",
-      "nature": "unit",
-      "logicalCases": 1,
-      "collectedInstances": 1,
-      "executedInstances": 1,
-      "skippedInstances": 0,
-      "attempts": 1,
-      "retries": 0,
-      "results": {
-        "passed": 1,
-        "failed": 0,
-        "skipped": 0,
-        "todo": 0,
-        "infrastructureError": 0
-      }
-    },
-    {
-      "logicalCaseId": "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps ISO week timestamps aligned after normalization [316:3]",
-      "framework": "vitest",
-      "sourcePath": "frontend/src/utils/simulation.test.ts",
-      "selector": "buildCorrelatedPortfolioSamples > keeps ISO week timestamps aligned after normalization [316:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "unit",

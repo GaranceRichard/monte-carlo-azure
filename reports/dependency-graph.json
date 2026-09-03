@@ -12,13 +12,13 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 272,
-    "importEdges": 1410,
+    "sourceModules": 273,
+    "importEdges": 1418,
     "entrypoints": 85,
     "missingEntrypoints": 5,
     "cycles": 0,
     "runtimeCycles": 0,
-    "deepImports": 134,
+    "deepImports": 141,
     "apiBypasses": 2
   },
   "observed": {
@@ -1140,6 +1140,11 @@
       },
       {
         "path": "frontend/src/domain/delivery/deliveryEvent.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/domain/delivery/deliveryWeek.ts",
         "area": "frontend",
         "language": "javascript"
       },
@@ -11657,7 +11662,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
-        "line": 4,
+        "line": 5,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adapters/azure-devops/deliveryEventMappers",
@@ -11666,7 +11671,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adoErrors.ts",
-        "line": 8,
+        "line": 9,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adoErrors",
@@ -11675,7 +11680,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adoPlatform.ts",
-        "line": 14,
+        "line": 15,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adoPlatform",
@@ -11711,7 +11716,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/utils/cycleTime.ts",
-        "line": 21,
+        "line": 22,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./utils/cycleTime",
@@ -12422,7 +12427,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/components/steps/simulationChartsSvg.ts",
-        "line": 8,
+        "line": 9,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./simulationChartsSvg",
@@ -12431,10 +12436,19 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/components/steps/simulationPdfDownload.ts",
-        "line": 17,
+        "line": 18,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./simulationPdfDownload",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/components/steps/portfolioPrintReport.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 3,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../domain/delivery",
         "resolution": "internal"
       },
       {
@@ -12449,7 +12463,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/hooks/probability.ts",
-        "line": 3,
+        "line": 4,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../../hooks/probability",
@@ -12467,7 +12481,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/utils/decisionLanguage.ts",
-        "line": 18,
+        "line": 19,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../../utils/decisionLanguage",
@@ -12476,7 +12490,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/utils/portfolioComparisonDiagnostic.ts",
-        "line": 20,
+        "line": 21,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../../utils/portfolioComparisonDiagnostic",
@@ -12485,7 +12499,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/utils/portfolioComparisonPresentation.ts",
-        "line": 21,
+        "line": 22,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../../utils/portfolioComparisonPresentation",
@@ -12494,7 +12508,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/utils/simulation.ts",
-        "line": 4,
+        "line": 5,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../../utils/simulation",
@@ -12503,7 +12517,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/utils/simulationDecisionDiagnostic.ts",
-        "line": 19,
+        "line": 20,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../../utils/simulationDecisionDiagnostic",
@@ -12654,12 +12668,21 @@
         "resolution": "internal"
       },
       {
-        "source": "frontend/src/demoData.ts",
-        "target": "frontend/src/date.ts",
+        "source": "frontend/src/date.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
         "line": 1,
         "kind": "js-import",
         "phase": "runtime",
-        "specifier": "./date",
+        "specifier": "./domain/delivery",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/demoData.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./domain/delivery",
         "resolution": "internal"
       },
       {
@@ -12669,6 +12692,15 @@
         "kind": "js-import",
         "phase": "compile",
         "specifier": "./types",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/deliveryWeek.ts",
+        "target": "frontend/src/domain/delivery/deliveryEvent.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./deliveryEvent",
         "resolution": "internal"
       },
       {
@@ -12692,10 +12724,28 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/deliveryEvent.ts",
-        "line": 12,
+        "line": 18,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./deliveryEvent",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/index.ts",
+        "target": "frontend/src/domain/delivery/deliveryWeek.ts",
+        "line": 11,
+        "kind": "js-export",
+        "phase": "runtime",
+        "specifier": "./deliveryWeek",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/index.ts",
+        "target": "frontend/src/domain/delivery/deliveryWeek.ts",
+        "line": 29,
+        "kind": "js-export",
+        "phase": "compile",
+        "specifier": "./deliveryWeek",
         "resolution": "internal"
       },
       {
@@ -12710,7 +12760,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/historicalWindow.ts",
-        "line": 19,
+        "line": 25,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./historicalWindow",
@@ -13115,7 +13165,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/adoErrors.ts",
-        "line": 6,
+        "line": 7,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../adoErrors",
@@ -13124,7 +13174,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/application/team-forecast/index.ts",
-        "line": 7,
+        "line": 8,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../application/team-forecast",
@@ -13133,7 +13183,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/components/steps/portfolioPrintReport.ts",
-        "line": 515,
+        "line": 516,
         "kind": "js-dynamic-import",
         "phase": "runtime",
         "specifier": "../components/steps/portfolioPrintReport",
@@ -13150,8 +13200,17 @@
       },
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
-        "target": "frontend/src/domain/simulation.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
         "line": 4,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../domain/delivery",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/hooks/usePortfolioReport.ts",
+        "target": "frontend/src/domain/simulation.ts",
+        "line": 5,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../domain/simulation",
@@ -13160,7 +13219,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/hooks/simulationSeedResolver.ts",
-        "line": 16,
+        "line": 17,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./simulationSeedResolver",
@@ -13169,7 +13228,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/hooks/simulationTypes.ts",
-        "line": 8,
+        "line": 9,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "./simulationTypes",
@@ -13178,7 +13237,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/types.ts",
-        "line": 5,
+        "line": 6,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../types",
@@ -13187,7 +13246,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/portfolioComparisonDiagnostic.ts",
-        "line": 18,
+        "line": 19,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/portfolioComparisonDiagnostic",
@@ -13196,7 +13255,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/portfolioComparisonPresentation.ts",
-        "line": 23,
+        "line": 24,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../utils/portfolioComparisonPresentation",
@@ -13205,7 +13264,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/simulation.ts",
-        "line": 9,
+        "line": 10,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/simulation",
@@ -13214,7 +13273,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/simulationDecisionDiagnostic.ts",
-        "line": 17,
+        "line": 18,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/simulationDecisionDiagnostic",
@@ -13372,6 +13431,15 @@
         "phase": "runtime",
         "specifier": "react",
         "resolution": "external"
+      },
+      {
+        "source": "frontend/src/hooks/useSimulationChartData.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 7,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../domain/delivery",
+        "resolution": "internal"
       },
       {
         "source": "frontend/src/hooks/useSimulationChartData.ts",
@@ -13762,26 +13830,17 @@
       },
       {
         "source": "frontend/src/utils/cycleTime.ts",
-        "target": "frontend/src/date.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
         "line": 1,
         "kind": "js-import",
         "phase": "runtime",
-        "specifier": "../date",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/utils/cycleTime.ts",
-        "target": "frontend/src/domain/delivery/index.ts",
-        "line": 2,
-        "kind": "js-import",
-        "phase": "compile",
         "specifier": "../domain/delivery",
         "resolution": "internal"
       },
       {
         "source": "frontend/src/utils/cycleTime.ts",
         "target": "frontend/src/hooks/simulationTypes.ts",
-        "line": 4,
+        "line": 7,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../hooks/simulationTypes",
@@ -13790,7 +13849,7 @@
       {
         "source": "frontend/src/utils/cycleTime.ts",
         "target": "frontend/src/types.ts",
-        "line": 3,
+        "line": 6,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../types",
@@ -13803,6 +13862,15 @@
         "kind": "js-import",
         "phase": "compile",
         "specifier": "./forecastDiagnostics",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/utils/export.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 2,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../domain/delivery",
         "resolution": "internal"
       },
       {
@@ -13870,6 +13938,15 @@
       },
       {
         "source": "frontend/src/utils/simulation.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 19,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../domain/delivery",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/utils/simulation.ts",
         "target": "frontend/src/domain/histogram.ts",
         "line": 10,
         "kind": "js-import",
@@ -13907,7 +13984,7 @@
       {
         "source": "frontend/src/utils/simulation.ts",
         "target": "frontend/src/domain/simulationValueObjects.ts",
-        "line": 45,
+        "line": 46,
         "kind": "js-export",
         "phase": "runtime",
         "specifier": "../domain/simulationValueObjects",
@@ -13934,7 +14011,7 @@
       {
         "source": "frontend/src/utils/simulation.ts",
         "target": "frontend/src/utils/math.ts",
-        "line": 19,
+        "line": 20,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./math",
@@ -14704,7 +14781,7 @@
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "runtime",
-        "count": 155
+        "count": 163
       },
       {
         "sourceArea": "launcher",
@@ -14917,7 +14994,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
-        "line": 4,
+        "line": 5,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adapters/azure-devops/deliveryEventMappers",
@@ -14937,7 +15014,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/utils/cycleTime.ts",
-        "line": 21,
+        "line": 22,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./utils/cycleTime",
@@ -15336,6 +15413,16 @@
       },
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 3,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../../domain/delivery",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/domain/simulation.ts",
         "line": 1,
         "kind": "js-import",
@@ -15347,7 +15434,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/hooks/probability.ts",
-        "line": 3,
+        "line": 4,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../../hooks/probability",
@@ -15367,7 +15454,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/utils/decisionLanguage.ts",
-        "line": 18,
+        "line": 19,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../../utils/decisionLanguage",
@@ -15377,7 +15464,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/utils/portfolioComparisonDiagnostic.ts",
-        "line": 20,
+        "line": 21,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../../utils/portfolioComparisonDiagnostic",
@@ -15387,7 +15474,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/utils/portfolioComparisonPresentation.ts",
-        "line": 21,
+        "line": 22,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../../utils/portfolioComparisonPresentation",
@@ -15397,7 +15484,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/utils/simulation.ts",
-        "line": 4,
+        "line": 5,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../../utils/simulation",
@@ -15407,7 +15494,7 @@
       {
         "source": "frontend/src/components/steps/portfolioPrintReport.ts",
         "target": "frontend/src/utils/simulationDecisionDiagnostic.ts",
-        "line": 19,
+        "line": 20,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../../utils/simulationDecisionDiagnostic",
@@ -15483,6 +15570,26 @@
         "specifier": "../../ports/clock",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/ports"
+      },
+      {
+        "source": "frontend/src/date.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./domain/delivery",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/demoData.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./domain/delivery",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
       },
       {
         "source": "frontend/src/e2e/runtime.ts",
@@ -15617,7 +15724,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/application/team-forecast/index.ts",
-        "line": 7,
+        "line": 8,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../application/team-forecast",
@@ -15627,7 +15734,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/components/steps/portfolioPrintReport.ts",
-        "line": 515,
+        "line": 516,
         "kind": "js-dynamic-import",
         "phase": "runtime",
         "specifier": "../components/steps/portfolioPrintReport",
@@ -15636,8 +15743,18 @@
       },
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
-        "target": "frontend/src/domain/simulation.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
         "line": 4,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../domain/delivery",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/hooks/usePortfolioReport.ts",
+        "target": "frontend/src/domain/simulation.ts",
+        "line": 5,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../domain/simulation",
@@ -15647,7 +15764,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/portfolioComparisonDiagnostic.ts",
-        "line": 18,
+        "line": 19,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/portfolioComparisonDiagnostic",
@@ -15657,7 +15774,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/portfolioComparisonPresentation.ts",
-        "line": 23,
+        "line": 24,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../utils/portfolioComparisonPresentation",
@@ -15667,7 +15784,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/simulation.ts",
-        "line": 9,
+        "line": 10,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/simulation",
@@ -15677,7 +15794,7 @@
       {
         "source": "frontend/src/hooks/usePortfolioReport.ts",
         "target": "frontend/src/utils/simulationDecisionDiagnostic.ts",
-        "line": 17,
+        "line": 18,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../utils/simulationDecisionDiagnostic",
@@ -15753,6 +15870,16 @@
         "specifier": "../utils/simulationSignature",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/utils"
+      },
+      {
+        "source": "frontend/src/hooks/useSimulationChartData.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 7,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../domain/delivery",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
       },
       {
         "source": "frontend/src/hooks/useSimulationChartData.ts",
@@ -15937,9 +16064,9 @@
       {
         "source": "frontend/src/utils/cycleTime.ts",
         "target": "frontend/src/domain/delivery/index.ts",
-        "line": 2,
+        "line": 1,
         "kind": "js-import",
-        "phase": "compile",
+        "phase": "runtime",
         "specifier": "../domain/delivery",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/domain"
@@ -15947,12 +16074,22 @@
       {
         "source": "frontend/src/utils/cycleTime.ts",
         "target": "frontend/src/hooks/simulationTypes.ts",
-        "line": 4,
+        "line": 7,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../hooks/simulationTypes",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/hooks"
+      },
+      {
+        "source": "frontend/src/utils/export.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 2,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../domain/delivery",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
       },
       {
         "source": "frontend/src/utils/forecastDiagnostics.ts",
@@ -15971,6 +16108,16 @@
         "kind": "js-import",
         "phase": "compile",
         "specifier": "../domain/simulation",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/utils/simulation.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 19,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "../domain/delivery",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/domain"
       },
@@ -16017,7 +16164,7 @@
       {
         "source": "frontend/src/utils/simulation.ts",
         "target": "frontend/src/domain/simulationValueObjects.ts",
-        "line": 45,
+        "line": 46,
         "kind": "js-export",
         "phase": "runtime",
         "specifier": "../domain/simulationValueObjects",

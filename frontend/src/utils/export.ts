@@ -1,9 +1,10 @@
 import type { WeeklyThroughputRow } from "../types";
+import { createDeliveryWeek } from "../domain/delivery";
 
 export function exportThroughputCsv(weeklyThroughput: WeeklyThroughputRow[], teamName: string): void {
   if (!weeklyThroughput.length) return;
   const header = "week,throughput";
-  const rows = weeklyThroughput.map((row) => `${String(row.week).slice(0, 10)},${row.throughput}`);
+  const rows = weeklyThroughput.map((row) => `${createDeliveryWeek(row.week)},${row.throughput}`);
   const csv = [header, ...rows].join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);

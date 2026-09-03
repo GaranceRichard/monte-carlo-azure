@@ -1,7 +1,9 @@
+import { createDeliveryInstant, deliveryWeekOf } from "./domain/delivery";
+
 export function formatDateLocal(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(date.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
 
@@ -13,13 +15,13 @@ export function parseLocalIsoDate(value: string): Date {
   const year = Number(yearRaw);
   const monthIndex = Number(monthRaw) - 1;
   const day = Number(dayRaw);
-  const date = new Date(year, monthIndex, day);
+  const date = new Date(Date.UTC(year, monthIndex, day));
 
   if (
     Number.isNaN(date.getTime()) ||
-    date.getFullYear() !== year ||
-    date.getMonth() !== monthIndex ||
-    date.getDate() !== day
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== monthIndex ||
+    date.getUTCDate() !== day
   ) {
     throw new Error(`Invalid ISO local date: ${value}`);
   }
@@ -29,21 +31,22 @@ export function parseLocalIsoDate(value: string): Date {
 
 function addDays(date: Date, days: number): Date {
   const next = new Date(date);
-  next.setDate(next.getDate() + days);
+  next.setUTCDate(next.getUTCDate() + days);
   return next;
 }
 
 export function startOfIsoWeek(date: Date): Date {
-  return addDays(date, -((date.getDay() + 6) % 7));
+  const week = deliveryWeekOf(createDeliveryInstant(date.toISOString()));
+  return new Date(`${week}T00:00:00.000Z`);
 }
 
 export function nextMonday(date: Date): Date {
   const monday = startOfIsoWeek(date);
-  return date.getDay() === 1 ? monday : addDays(monday, 7);
+  return date.getUTCDay() === 1 ? monday : addDays(monday, 7);
 }
 
 export function previousSunday(date: Date): Date {
-  return addDays(date, -(date.getDay() || 0));
+  return addDays(date, -(date.getUTCDay() || 0));
 }
 
 function lastCompletedSunday(referenceDate: Date): Date {
@@ -76,6 +79,6 @@ export function today(): string {
 
 export function nWeeksAgo(weeks: number): string {
   const date = new Date();
-  date.setDate(date.getDate() - weeks * 7);
+  date.setUTCDate(date.getUTCDate() - weeks * 7);
   return formatDateLocal(date);
 }

@@ -9,13 +9,14 @@ import {
 } from "./date";
 
 describe("date helpers", () => {
-  it("parses YYYY-MM-DD without UTC day drift", () => {
+  it("parses YYYY-MM-DD as a UTC calendar date", () => {
     const parsed = parseLocalIsoDate("2026-01-05");
 
     expect(formatDateLocal(parsed)).toBe("2026-01-05");
-    expect(parsed.getFullYear()).toBe(2026);
-    expect(parsed.getMonth()).toBe(0);
-    expect(parsed.getDate()).toBe(5);
+    expect(parsed.toISOString()).toBe("2026-01-05T00:00:00.000Z");
+    expect(parsed.getUTCFullYear()).toBe(2026);
+    expect(parsed.getUTCMonth()).toBe(0);
+    expect(parsed.getUTCDate()).toBe(5);
   });
 
   it("rejects invalid local ISO dates", () => {
@@ -75,5 +76,15 @@ describe("date helpers", () => {
       startDate: "2026-01-05",
       endDate: "2026-01-11",
     });
+  });
+
+  it("uses the UTC calendar when the reference instant carries another offset", () => {
+    expect(
+      getCompleteWeekRange(
+        "2025-12-29",
+        "2026-01-11",
+        new Date("2026-01-05T00:30:00+02:00"),
+      ),
+    ).toBeNull();
   });
 });

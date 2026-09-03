@@ -5,7 +5,8 @@
 Ce registre décrit les autorités exécutées du produit, établi le 20 août 2026 au commit
 `661720f038f2d1136517cceaca435097df77fc97` puis tenu à jour lors de leurs basculements atomiques. Le PBI 7.21
 a transféré les événements SD-07 au domaine delivery le 23 août 2026 ; le PBI 7.22 y a ajouté l’autorité de
-leur fenêtre historique le 26 août 2026. Il prolonge les cartographies factuelles
+leur fenêtre historique le 26 août 2026 et le PBI 7.23 l’unique calendrier ISO `UTC` le 3 septembre 2026. Il
+prolonge les cartographies factuelles
 [`frontend`](frontend-responsibilities-map.md) et [`backend`](backend-responsibilities-map.md) sans décider
 d'une architecture cible. Aucun producteur, consommateur, import, mapper, modèle, contrat statistique ou flux
 n'est modifié par ce document.
@@ -33,7 +34,7 @@ dans la colonne `Ambiguïté` et détaillée plus bas.
 | SD-04 | Cible et adresse Azure DevOps | `frontend/src/adoPlatform.ts` : `AdoDeploymentTarget` et fonctions de normalisation/collection | URL Server/TFS saisie ou absence d'URL pour Cloud | `useOnboarding`, `adoClient` et `OrgStep` | URL libre → cible `cloud`/`onprem`, racine normalisée, collection et candidats | A-01 |
 | SD-05 | Entité de découverte organisation/projet/équipe côté application | `frontend/src/types.ts` : `NamedEntity` | réponses de `adoClient` et `demoData` | `useOnboarding`, `usePortfolio`, vues de sélection, `teamSort` | DTO Azure DevOps `{id,name}` ou `{name}` → forme structurale interne puis tri | A-02 |
 | SD-06 | Options de types et d'états d'une équipe | signature de retour de `frontend/src/adoClient.ts:getTeamOptionsDirect` | endpoints work item types/states Azure DevOps et `DEMO_TEAM_OPTIONS` | `useTeamOptions` et `usePortfolio` | listes techniques → types triés + `statesByType`; les hooks valident ensuite les raccourcis sélectionnés | A-03 |
-| SD-07 | Événements delivery normalisés et fenêtre historique | `frontend/src/domain/delivery/` : `DeliveryEvent`, `DeliveryHistoryWindow` et leurs constructeurs | mapper `adapters/azure-devops/deliveryEventMappers.ts`, puis construction de la fenêtre par `getTeamDeliveryDataDirect` | sélection delivery, puis agrégation hebdomadaire de `adoClient.ts` et calcul de Cycle Time dans `utils/cycleTime.ts` | DTO work item/révision → faits UTC immuables ; bornes absolues `[début inclus, fin exclue]` → items livrés et faits de cycle de vie associés | aucune définition concurrente observée |
+| SD-07 | Événements, fenêtre et calendrier delivery | `frontend/src/domain/delivery/` : `DeliveryEvent`, `DeliveryHistoryWindow`, `DeliveryWeek`, politique `DELIVERY_CALENDAR_POLICY` et constructeurs | mapper `adapters/azure-devops/deliveryEventMappers.ts`, fenêtre construite par `getTeamDeliveryDataDirect`, semaines reçues des historiques | sélection delivery, throughput, Cycle Time, semaines corrélées portefeuille, séries synthétiques et démonstration | DTO → faits UTC immuables ; bornes absolues → items retenus ; instant ou lundi ISO → semaine ISO `UTC` identifiée par son lundi | aucune définition concurrente observée |
 | SD-08 | Signification normative des entrées et résultats statistiques | `docs/standards/STD-STAT-001.md` | moteurs Python et TypeScript conformes au standard | API, historiques, UI, rapports et runners statistiques | distribution brute → percentiles, censure, Risk Score, fiabilité et histogramme selon les règles `STAT-PAR-*` | A-05 |
 | SD-09 | Commande, primitives et résultat statistiques en mémoire TypeScript | module `frontend/src/domain/`, principalement `simulation.ts` et `simulationValueObjects.ts` | `localTeamForecast` par le contrat applicatif `TeamForecast`, mapper HTTP, mapper de stockage, moteur local et runner de corpus | moteur local, mapper HTTP, hooks, historique, diagnostics et runners | entrées inconnues → Value Objects/commande discriminée ; moteur ou DTO validé → `SimulationResult` immuable | A-05, A-06, A-07 |
 | SD-10 | Contrat HTTP public de simulation et d'historique | `backend/api_models.py` : `SimulateRequest`, `SimulateResponse`, `SimulationHistoryItem` | FastAPI/Pydantic à l'entrée ; `result_to_response` et `persistence_row_to_history_item` à la sortie | route `POST /simulate`, route `GET /simulations/history`, OpenAPI et mappers frontend | JSON `snake_case` fermé ↔ DTO Pydantic ; les mappers traduisent vers/depuis les modèles de domaine | A-05, A-06, A-08 |
@@ -57,7 +58,7 @@ dans la colonne `Ambiguïté` et détaillée plus bas.
 | --- | --- | --- |
 | T-01 | URL publique → SD-01 → shell | `resolveAppRuntime` applique la priorité `demo`, puis `connect` sur Pages, puis le mode démo Pages. |
 | T-02 | saisies onboarding → SD-04/SD-05/SD-06 | `adoPlatform` normalise la cible ; `adoClient` transforme les réponses Cloud ou Server/TFS en entités et options consommables. |
-| T-03 | dates/types/états/équipe → SD-07 | `getCompleteWeekRange` conserve l’alignement existant ; le mapper Azure DevOps convertit work items et révisions en événements ; `DeliveryHistoryWindow` sélectionne les items livrés avant que `adoClient` regroupe leurs faits par lundi et que `calculateCycleTimeData` convertisse leurs paires début/fin en jours. |
+| T-03 | dates/types/états/équipe → SD-07 | `getCompleteWeekRange` aligne la fenêtre en `UTC` ; le mapper Azure DevOps convertit work items et révisions en événements ; `DeliveryHistoryWindow` sélectionne les items livrés ; `DeliveryWeek` attribue leurs instants au lundi ISO `UTC` partagé par le throughput et le Cycle Time. |
 | T-04 | SD-07 + critères + seed → SD-09 | `localTeamForecast` construit la commande TypeScript derrière le contrat `TeamForecast` ; les Value Objects filtrent éventuellement les zéros et appliquent les bornes existantes. |
 | T-05 | SD-09 → SD-10 → SD-21 | `simulationCommandToDto` passe de `camelCase` à `snake_case`; Pydantic valide le transport ; `request_to_command` reconstruit la commande Python. |
 | T-06 | SD-09 ou SD-21 → résultat statistique | les moteurs produisent la distribution brute ; leurs domaines dérivent et valident les résultats sous l'autorité SD-08. |
@@ -138,12 +139,13 @@ rg -n "fetch|localStorage|document\.|request\.cookies|_simulation_document|Simul
 git diff --name-status 4bc9b01fce83682da3e7dbd79df898461a2437b4..HEAD -- frontend/src backend
 ```
 
-Le basculement SD-07 est prouvé par les tests des événements, de la fenêtre historique, des mappers Azure
-DevOps, du calcul de Cycle Time et du client Azure DevOps. Les anciennes sources de révisions et les
-consommations directes des événements bruts ne traversent plus les calculs ; la forme hebdomadaire et les
-points de Cycle Time restent des résultats dérivés destinés aux consommateurs existants.
+Le basculement SD-07 est prouvé par les tests des événements, de la fenêtre historique, du calendrier, des
+mappers Azure DevOps, du calcul de Cycle Time, du portefeuille et du client Azure DevOps. Les anciennes
+sources de révisions, les consommations directes des événements bruts et les calculs hebdomadaires locaux ne
+traversent plus les calculs ; la forme hebdomadaire et les points de Cycle Time restent des résultats dérivés
+destinés aux consommateurs existants.
 
 La dernière commande constituait la preuve d’absence de migration du registre initial. Les tests existants de
 modèles, mappers, routes, persistance, identité, domaine statistique et compatibilité restent les preuves
-exécutables des autres chemins. Les transformations de semaine, période partielle, throughput, Cycle Time et
-diagnostics prévues par 7.23 à 7.30 ne sont pas anticipées.
+exécutables des autres chemins. Les transformations de période partielle, throughput, Cycle Time et
+diagnostics prévues par 7.24 à 7.30 ne sont pas anticipées.

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { createSeededSampleIndexDrawPort } from "../adapters/seededSampleIndexDrawPort";
-import { formatDateLocal, parseLocalIsoDate } from "../date";
+import { formatDateLocal, nextMonday, parseLocalIsoDate } from "../date";
+import { createDeliveryWeek, nextDeliveryWeek } from "../domain/delivery";
 import type { CompletionSummary, SimulationMode, SimulationPercentiles } from "../domain/simulation";
 import type { WeeklyThroughputRow } from "../types";
 import { formatAdoHttpErrorMessage, type AdoErrorContext } from "../adoErrors";
@@ -122,11 +123,11 @@ export function getPortfolioErrorMessage(error: unknown, context: AdoErrorContex
 }
 
 function buildSyntheticWeeklyData(samples: number[], startDate: string): WeeklyThroughputRow[] {
-  const cursor = parseLocalIsoDate(startDate);
+  let week = createDeliveryWeek(formatDateLocal(nextMonday(parseLocalIsoDate(startDate))));
   return samples.map((value, index) => {
-    if (index > 0) cursor.setDate(cursor.getDate() + 7);
+    if (index > 0) week = nextDeliveryWeek(week);
     return {
-      week: formatDateLocal(cursor),
+      week,
       throughput: value,
     };
   });

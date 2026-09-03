@@ -313,13 +313,13 @@ describe("buildCorrelatedPortfolioSamples", () => {
     expect(() => buildCorrelatedPortfolioWeeklyThroughputs(teamWeekly, false)).toThrow("total portefeuille > 0");
   });
 
-  it("keeps ISO week timestamps aligned after normalization", () => {
+  it("aligns offset timestamps with the authoritative UTC delivery week", () => {
     const teams = [
       [
         { week: "2026-01-05", throughput: 10 },
       ],
       [
-        { week: "2026-01-05T00:00:00.000Z", throughput: 12 },
+        { week: "2026-01-04T23:30:00-02:00", throughput: 12 },
       ],
     ];
 
