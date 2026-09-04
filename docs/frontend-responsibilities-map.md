@@ -8,8 +8,8 @@ ci-dessous servent à localiser les responsabilités actuelles, pas à prescrire
 
 Depuis cette baseline, le PBI 7.31 a fait évoluer un périmètre cohésif : le timestamp de la nouvelle entrée
 d’historique de prévision passe par `FrontendClock`, `BrowserClock` porte l’accès réel et le bootstrap React
-les relie par `createBrowserComposition`. Ce PBI n’avait pas migré les règles de semaine/fuseau ; le PBI 7.23
-a depuis confié ces règles au Value Object `DeliveryWeek` et à la politique ISO-8601 `UTC` du domaine delivery.
+les relie par `createBrowserComposition`. Les règles de semaine/fuseau et les autres usages calendaires ne
+sont pas migrés par cet outcome.
 
 L’analyse couvre les sources exécutables sous `frontend/src/`, le point d’entrée Vite, les scripts qui
 chargent le moteur TypeScript hors navigateur et les frontières navigateur, HTTP et stockage. Les tests ont
@@ -68,7 +68,7 @@ préjugent pas de leur emplacement futur.
 | Domaine statistique explicite | `domain/simulation.ts`, `domain/simulationValueObjects.ts`, `domain/histogram.ts`, `domain/riskScore.ts`, `domain/throughputReliability.ts`, `domain/sampleIndexDrawPort.ts` | Commande discriminée, Value Objects et bornes, percentiles, censures, histogramme, Risk Score, fiabilité du throughput et port minimal de tirage. |
 | Modèle d’historique | `domain/simulationHistory.ts` | Forme interne de l’historique local, contexte d’équipe, critères, échantillon, résultat et avertissement. |
 | Moteur et scénarios | `utils/simulation.ts`, `adapters/seededSampleIndexDrawPort.ts` | Moteur Monte Carlo local, bootstrap déterministe, scénarios portefeuille, agrégation corrélée, légende de risque et adaptateur PRNG contractuel. |
-| Delivery et temps | `domain/delivery/`, `date.ts`, `utils/cycleTime.ts`, `types.ts` | Événements et fenêtre métier, politique ISO-8601 `UTC` et Value Object `DeliveryWeek`, semaines complètes, calcul et tendances de Cycle Time, formes partagées `NamedEntity`, throughput et Cycle Time. |
+| Delivery et temps | `date.ts`, `utils/cycleTime.ts`, `types.ts` | Dates locales, semaines ISO complètes, agrégation hebdomadaire, calcul et tendances de Cycle Time, formes partagées `NamedEntity`, throughput et Cycle Time. |
 | Diagnostics décisionnels | `utils/forecastDiagnostics.ts`, `utils/decisionLanguage.ts`, `utils/simulationDecisionDiagnostic.ts`, `utils/portfolioComparisonDiagnostic.ts`, `utils/portfolioComparisonPresentation.ts` | Qualité des données, incertitude, sensibilité historique, recommandation, langage utilisateur, crédibilité/stabilité des scénarios portefeuille et présentation associée. |
 | Identité de résultat | `utils/simulationSignature.ts` | Canonicalisation des paramètres, signature de résultat, validation d’une entrée réutilisable et sélection de la plus récente. |
 | Limites et utilitaires | `simulationLimits.ts`, `utils/math.ts`, `utils/teamSort.ts`, `utils/selectTopStart.ts` | Réexport des bornes du domaine, validation d’entrée, conversions numériques, tri et comportement de listes. |
@@ -144,12 +144,10 @@ présents dans `SimulateRequestDto`. Le cookie pseudonyme est joint par `credent
 ### Collecte et transformations delivery
 
 `adoClient.ts` aligne d’abord la période sur des semaines complètes. Il construit ensuite une requête WIQL,
-résout le périmètre d’équipe, charge les work items par lots de 200 puis leurs révisions. Le domaine delivery
-normalise chaque date de fermeture/résolution vers `DeliveryWeek` selon l’unique politique ISO-8601 `UTC` ;
-throughput et Cycle Time réutilisent exactement cette attribution. Les semaines corrélées portefeuille, les
-séries synthétiques et la démonstration utilisent le même constructeur et le même successeur de semaine. Les
-échecs de lots ou de révisions sont conservés sous forme d’avertissement tandis que les données disponibles
-continuent leur chemin.
+résout le périmètre d’équipe, charge les work items par lots de 200 puis leurs révisions. Les dates de
+fermeture/résolution deviennent un compte par lundi ISO. Les transitions `New` vers un état actif puis vers
+un état terminé deviennent des observations de Cycle Time en jours. Les échecs de lots ou de révisions sont
+conservés sous forme d’avertissement tandis que les données disponibles continuent leur chemin.
 
 ### Portefeuille et rapport
 
@@ -178,10 +176,9 @@ un JSON écrit sur la sortie standard ; ils n’utilisent ni React, ni Azure Dev
 | Transformation | Propriétaire actuel | Entrée → sortie |
 | --- | --- | --- |
 | Cible Azure DevOps | `adoPlatform.ts` | URL libre → cible Cloud/Server, racine, collection et candidats. |
-| Fenêtre complète | `date.ts` + `domain/delivery/deliveryWeek.ts` | dates `UTC` demandées → premier lundi ISO, dernier dimanche terminé ou aucune fenêtre. |
+| Fenêtre complète | `date.ts` | dates locales demandées → premier lundi, dernier dimanche terminé ou aucune fenêtre. |
 | Périmètre équipe | `adoClient.ts` | équipe → clause Area Path exacte ou récursive, avec fallback projet/équipe. |
-| Calendrier delivery | `domain/delivery/deliveryWeek.ts` | instant absolu ou lundi ISO → `DeliveryWeek` selon la politique ISO-8601 `UTC` ; semaine → semaine suivante. |
-| Collecte delivery | `adoClient.ts` | WIQL + DTO work items/révisions → semaines de throughput via `DeliveryWeek`, sources Cycle Time et avertissements. |
+| Collecte delivery | `adoClient.ts` | WIQL + DTO work items/révisions → semaines de throughput, sources Cycle Time et avertissements. |
 | Cycle Time | `utils/cycleTime.ts` | révisions → observations en jours → tendance glissante, bornes et résumé. |
 | Entrée utilisateur | `application/team-forecast/localTeamForecast.ts` puis `domain/*` | chaînes/nombres et échantillons → commande discriminée et Value Objects validés. |
 | Transport backend | `api/simulationMappers.ts` | commande `camelCase` → DTO `snake_case` ; réponse fermée → `SimulationResult` validé. |

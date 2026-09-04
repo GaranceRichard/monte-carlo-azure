@@ -184,7 +184,7 @@ describe("usePortfolioReport", () => {
     expect(vi.mocked(simulateForecastFromSamples).mock.calls.every(([input]) => input.demoMode === true)).toBe(true);
   });
 
-  it("uses authoritative complete UTC ISO weeks for synthetic scenarios", async () => {
+  it("uses local calendar dates for synthetic scenario weeks", async () => {
     vi.mocked(fetchTeamThroughput).mockResolvedValue(throughputData);
     vi.mocked(simulateForecastFromSamples).mockResolvedValue(simulationResult);
     const { result } = setupReportHook({ startDate: "2026-01-01" });
@@ -196,7 +196,7 @@ describe("usePortfolioReport", () => {
     const exportArgs = vi.mocked(exportPortfolioPrintReport).mock.calls[0]?.[0];
     const syntheticScenarios = exportArgs.scenarios.filter((scenario) => scenario.label !== "Historique corr\u00E9l\u00E9");
     expect(syntheticScenarios).toHaveLength(3);
-    expect(syntheticScenarios.every((scenario) => scenario.weeklyData[0]?.week === "2026-01-05")).toBe(true);
+    expect(syntheticScenarios.every((scenario) => scenario.weeklyData[0]?.week === "2026-01-01")).toBe(true);
   });
 
   it("excludes failed teams from phase 1 and still exports", async () => {

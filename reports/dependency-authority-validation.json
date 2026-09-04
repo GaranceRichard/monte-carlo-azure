@@ -36,7 +36,7 @@
     "domainDependencies": 16,
     "domainTechnologyViolations": 0,
     "moduleFiles": 197,
-    "moduleDependencies": 721,
+    "moduleDependencies": 717,
     "governedModules": 7,
     "publicApiEntrypoints": 7,
     "deepImportExceptions": 0,

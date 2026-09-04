@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "classificationInventorySha256": "66a41dcfcc594a56a7ec5e51e1d0ea7f41b36c515a22f78e7e1464e4bc4492ea",
+  "classificationInventorySha256": "d801f52aa5a2a5b732c3619a9ce6f79c012fb47607cc2e2a8429a5ab6b6e66a3",
   "totals": {
     "logicalCases": 1508,
     "collectedInstances": 1923,
@@ -29041,10 +29041,10 @@
       }
     },
     {
-      "logicalCaseId": "vitest:frontend/src/hooks/usePortfolioReport.test.tsx::usePortfolioReport > uses authoritative complete UTC ISO weeks for synthetic scenarios [187:3]",
+      "logicalCaseId": "vitest:frontend/src/hooks/usePortfolioReport.test.tsx::usePortfolioReport > uses local calendar dates for synthetic scenario weeks [187:3]",
       "framework": "vitest",
       "sourcePath": "frontend/src/hooks/usePortfolioReport.test.tsx",
-      "selector": "usePortfolioReport > uses authoritative complete UTC ISO weeks for synthetic scenarios [187:3]",
+      "selector": "usePortfolioReport > uses local calendar dates for synthetic scenario weeks [187:3]",
       "classificationStatus": "classified",
       "executionProfile": "pr",
       "nature": "component",

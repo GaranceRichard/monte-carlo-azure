@@ -6,9 +6,9 @@
 
 - ajout du Value Object `DeliveryWeek` et d’une politique métier immuable : calendrier ISO-8601, semaines
   du lundi au dimanche, identifiées par la date du lundi et évaluées dans le fuseau `UTC` ;
-- migration du throughput, du Cycle Time, des semaines corrélées portefeuille, des séries synthétiques et
-  des données de démonstration vers cette API publique unique ;
-- retrait des calculs locaux concurrents fondés sur `getDay`/`setDate` ou sur le découpage d’un timestamp ;
+- migration du throughput, du Cycle Time et des semaines corrélées portefeuille vers cette API publique
+  unique ;
+- retrait des calculs locaux concurrents de rattachement et de regroupement hebdomadaire ;
 - couverture des changements de semaine et d’année ainsi que des offsets positifs et négatifs autour de la
   frontière UTC, avec preuve d’intégration commune au throughput et au Cycle Time.
 

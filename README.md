@@ -166,7 +166,7 @@ une connexion Azure DevOps réelle.
   périodes partielles et la profondeur choisie restent inchangées.
 - **Calendrier delivery unique.** Le Value Object `DeliveryWeek` rattache chaque instant à une semaine
   ISO-8601 du lundi au dimanche, évaluée en `UTC` et identifiée par la date du lundi. Throughput, Cycle Time,
-  portefeuille, séries synthétiques et démonstration consomment tous cette même politique publique.
+  et agrégation corrélée portefeuille consomment tous cette même politique publique.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 

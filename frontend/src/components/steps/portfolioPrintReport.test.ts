@@ -86,8 +86,8 @@ function baseArgs(): PortfolioPrintReportArgs {
         seed: 101,
         samples: [3, 4, 5],
         weeklyData: [
-          { week: "2026-01-05", throughput: 3 },
-          { week: "2026-01-12", throughput: 4 },
+          { week: "2026-01-01", throughput: 3 },
+          { week: "2026-01-08", throughput: 4 },
         ],
         percentiles: { P50: 10, P70: 12, P90: 15 },
         riskScore: 0.2,
@@ -102,8 +102,8 @@ function baseArgs(): PortfolioPrintReportArgs {
         seed: 102,
         samples: [2, 3, 4],
         weeklyData: [
-          { week: "2026-01-05", throughput: 2 },
-          { week: "2026-01-12", throughput: 3 },
+          { week: "2026-01-01", throughput: 2 },
+          { week: "2026-01-08", throughput: 3 },
         ],
         percentiles: { P50: 8, P70: 10, P90: 12 },
         riskScore: 0.25,
@@ -118,8 +118,8 @@ function baseArgs(): PortfolioPrintReportArgs {
         seed: 103,
         samples: [1.5, 2, 2.5],
         weeklyData: [
-          { week: "2026-01-05", throughput: 1.5 },
-          { week: "2026-01-12", throughput: 2 },
+          { week: "2026-01-01", throughput: 1.5 },
+          { week: "2026-01-08", throughput: 2 },
         ],
         percentiles: { P50: 7, P70: 8, P90: 10 },
         riskScore: 0.28,
@@ -134,8 +134,8 @@ function baseArgs(): PortfolioPrintReportArgs {
         seed: 104,
         samples: [1, 2, 3],
         weeklyData: [
-          { week: "2026-01-05", throughput: 1 },
-          { week: "2026-01-12", throughput: 2 },
+          { week: "2026-01-01", throughput: 1 },
+          { week: "2026-01-08", throughput: 2 },
         ],
         percentiles: { P50: 6, P70: 7, P90: 9 },
         riskScore: 0.3,
@@ -160,7 +160,7 @@ function baseArgs(): PortfolioPrintReportArgs {
         riskScore: 0.3,
         throughputReliability: { cv: 0.62, iqrRatio: 0.55, slopeNorm: -0.07, label: "incertain" as const, samplesCount: 10 },
         distribution: [{ x: 10, count: 20 }],
-        weeklyThroughput: [{ week: "2026-01-05", throughput: 3 }],
+        weeklyThroughput: [{ week: "2026-01-01", throughput: 3 }],
         displayPercentiles: { P50: 10, P70: 12, P90: 15 },
       },
     ],
@@ -637,8 +637,8 @@ describe("portfolioPrintReport", () => {
       throughputReliability: null,
       displayPercentiles: undefined as unknown as Record<string, number>,
       weeklyThroughput: [
-        { week: "2026-01-05", throughput: 3 },
-        { week: "2026-01-12", throughput: 0 },
+        { week: "2026-01-01", throughput: 3 },
+        { week: "2026-01-08", throughput: 0 },
       ],
     };
 
@@ -701,7 +701,7 @@ describe("portfolioPrintReport", () => {
           hypothesis: "hyp optimistic",
           seed: 301,
           samples: [3, 4, 5],
-          weeklyData: [{ week: "2026-01-05", throughput: 3 }],
+          weeklyData: [{ week: "2026-01-01", throughput: 3 }],
           percentiles: {} as Record<string, number>,
           riskScore: undefined,
           riskLegend: "fiable",
@@ -713,7 +713,7 @@ describe("portfolioPrintReport", () => {
           hypothesis: "hyp correlated",
           seed: 302,
           samples: [1, 2, 3],
-          weeklyData: [{ week: "2026-01-05", throughput: 1 }],
+          weeklyData: [{ week: "2026-01-01", throughput: 1 }],
           percentiles: {} as Record<string, number>,
           riskScore: Number.NaN,
           riskLegend: "incertain",
@@ -787,5 +787,6 @@ describe("portfolioPrintReport", () => {
     Object.defineProperty(window, "alert", { value: originalAlert, configurable: true });
   });
 });
+
 
 

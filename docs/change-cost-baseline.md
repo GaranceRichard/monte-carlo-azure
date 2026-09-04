@@ -41,7 +41,7 @@ Sources : `docs/frontend-responsibilities-map.md#collecte-et-transformations-del
 
 | Fichiers | Production | Tests | Lignes | Couches | Arêtes internes | Arêtes de frontière | Hotspots |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 11 | 7 | 4 | 2608 | 4 | 7 | 63 | 3 |
+| 11 | 7 | 4 | 2608 | 4 | 7 | 64 | 3 |
 
 Couches : `frontend-application`, `frontend-azure-adapter`, `frontend-delivery-or-engine`, `proof-tests`.
 

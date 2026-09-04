@@ -22719,10 +22719,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/usePortfolioReport.test.tsx::usePortfolioReport > uses authoritative complete UTC ISO weeks for synthetic scenarios [187:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/usePortfolioReport.test.tsx::usePortfolioReport > uses local calendar dates for synthetic scenario weeks [187:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/usePortfolioReport.test.tsx",
-    "selector": "usePortfolioReport > uses authoritative complete UTC ISO weeks for synthetic scenarios [187:3]",
+    "selector": "usePortfolioReport > uses local calendar dates for synthetic scenario weeks [187:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",

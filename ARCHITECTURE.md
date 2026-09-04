@@ -101,8 +101,8 @@ Invariants de préparation du throughput côté frontend :
 
 - le domaine delivery définit l’unique politique calendaire : semaines ISO-8601 du lundi au dimanche,
   évaluées en `UTC` et identifiées par la date du lundi ;
-- l’historique Azure DevOps, le Cycle Time, les agrégations portefeuille et les séries synthétiques utilisent
-  tous le Value Object `DeliveryWeek` fourni par cette politique ;
+- le throughput Azure DevOps, le Cycle Time et l’agrégation corrélée portefeuille utilisent tous le Value
+  Object `DeliveryWeek` fourni par cette politique ;
 - seules les semaines complètes, entièrement incluses dans la plage demandée, sont conservées ;
 - la semaine courante est exclue tant qu’elle n’est pas entièrement écoulée ;
 - les chaînes `YYYY-MM-DD` de la fenêtre sont traitées comme dates calendaires `UTC` (`src/date.ts`) ; les
@@ -968,7 +968,7 @@ Frontend :
 - fenêtre historique possédée par le même domaine : bornes absolues semi-ouvertes, fenêtre vide explicite et
   sélection unique des items livrés, réutilisée avant throughput et Cycle Time
 - calendrier delivery possédé par le même domaine : `DeliveryWeek`, semaines ISO du lundi au dimanche et
-  politique `UTC` partagée par tous les regroupements et toutes les séquences hebdomadaires
+  politique `UTC` partagée par tous les regroupements delivery
 - moteur Monte Carlo frontend et scénarios portefeuille désormais pilotés par une `seed`
   explicite unique par exécution logique, sans `Math.random()` dans les calculs de simulation
 - calcul du Cycle Time dans `src/utils/cycleTime.ts` à partir des seuls événements normalisés, avec couverture

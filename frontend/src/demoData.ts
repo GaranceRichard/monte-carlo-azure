@@ -1,4 +1,4 @@
-import { createDeliveryWeek, nextDeliveryWeek } from "./domain/delivery";
+import { formatDateLocal } from "./date";
 import type { CycleTimePoint, NamedEntity } from "./types";
 
 const DEMO_START_DATE = "2025-11-24";
@@ -12,11 +12,11 @@ const DEMO_STATES_BY_TYPE: Record<string, string[]> = {
 const DEMO_DONE_STATES = ["Done", "Closed", "Resolved"];
 
 function buildWeeklyThroughputRows(startDate: string, samples: number[]) {
-  let week = createDeliveryWeek(startDate);
+  const cursor = new Date(startDate);
   return samples.map((throughput, index) => {
-    if (index > 0) week = nextDeliveryWeek(week);
+    if (index > 0) cursor.setDate(cursor.getDate() + 7);
     return {
-      week,
+      week: formatDateLocal(cursor),
       throughput,
     };
   });

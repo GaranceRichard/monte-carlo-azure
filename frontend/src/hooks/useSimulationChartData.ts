@@ -4,7 +4,6 @@ import type { CycleTimePoint, WeeklyThroughputRow } from "../types";
 import { buildProbabilityCurve } from "./probability";
 import type { ChartPoint, ProbabilityPoint, ThroughputPoint } from "./simulationTypes";
 import { buildCycleTimeTrendData, summarizeCycleTime } from "../utils/cycleTime";
-import { createDeliveryWeek } from "../domain/delivery";
 
 function smoothHistogramCounts(points: Array<{ x: number; count: number }>): number[] {
   if (!points.length) return [];
@@ -38,7 +37,7 @@ export function useSimulationChartData({
   const throughputData = useMemo((): ThroughputPoint[] => {
     const rows = includeZeroWeeks ? weeklyThroughput : weeklyThroughput.filter((row) => row.throughput > 0);
     return rows.map((row) => ({
-      week: createDeliveryWeek(row.week),
+      week: String(row.week).slice(0, 10),
       throughput: row.throughput,
     }));
   }, [weeklyThroughput, includeZeroWeeks]);
