@@ -11,14 +11,14 @@ restent applicables.
 
 ## 1. Niveaux de validation
 
-- **Validation ciblée** : plan `targeted` ou `impacted` construit à partir des chemins modifiés. Elle couvre
-  les contrôles généraux obligatoires, les tests directs et, pour `impacted`, les dépendances proches du
-  domaine concerné.
+- **Retour ciblé de développement** : test, lint ou typecheck choisi à partir du risque modifié. Il est lancé
+  explicitement lorsqu'il peut invalider une hypothèse, sans couverture, génération ou preuve globale.
 - **Validation massive** : plan complet déclenché par un changement transverse, structurel, central,
-  inconnu ou ambigu. Toute résolution incertaine se replie vers `massive`.
-- **Validation complète** : task VS Code `Validation : profil main`, avec conformité de classification, lint,
-  typecheck, couvertures Python et frontend, build, E2E, Vitals, convention de nommage et sous-DAG
-  statistique bloquant décrit dans
+  inconnu ou ambigu. Le contrôle de périmètre exige son acquittement explicite avant développement ; ce
+  classement ne déclenche pas à lui seul une gate coûteuse.
+- **Validation complète** : pré-push du candidat, ou task VS Code `Validation : profil main` pour diagnostic,
+  avec conformité de classification, lint, typecheck, couvertures Python et frontend, build, E2E, Vitals,
+  convention de nommage, smoke Docker et sous-DAG statistique bloquant décrit dans
   [`statistical-main-enforcement.md`](statistical-main-enforcement.md).
 - **Conformité DoD** : validation complète verte, seuils respectés, documentation normative cohérente,
   sécurité et traçabilité vérifiées.
@@ -27,18 +27,32 @@ restent applicables.
 
 ## 2. Orchestration des gates
 
-- Le pré-commit exécute `python Scripts/quality_gate.py fast`. La liste et le contenu contrôlés proviennent
-  de l’index Git ; les modifications non indexées sont ignorées.
-- Dès que l'index contient au moins un changement, le `README.md` racine doit y apparaître avec le statut
-  ajouté ou modifié. Un README imbriqué, une modification limitée au worktree, ou la suppression/renommage
-  du README racine ne satisfait pas cette condition. Un index vide reste accepté par ce contrôle.
+- `git commit` est un checkpoint local sans validation : il peut figer un état transitoire et reste
+  indépendant du push. Le hook pré-commit n'exécute aucune gate et aucune modification artificielle du
+  README n'est exigée.
+- `python Scripts/quality_gate.py scope --base <référence> --allow <chemin> [...]` compare le worktree entier
+  au merge-base, inclut les fichiers non suivis non ignorés, refuse tout chemin hors périmètre et exige
+  `--allow-massive` pour une autorité transverse. Il n'exécute aucun test et ne génère aucun artefact.
+- Pendant le développement, les tests sont invoqués directement et au plus près du risque. Le mode `fast`
+  reste un diagnostic volontaire de l'index ; son succès n'est ni requis au commit ni réutilisé comme preuve
+  de publication.
 - Le pré-push lit les références transmises par Git, calcule les commits introduits et valide chaque SHA
   terminal distinct dans un worktree détaché temporaire. Il n’utilise aucun stash et ignore le workspace
   courant. Une entrée totalement vide réussit sans lancer la gate ; toute ligne non vide malformée reste
   bloquante.
-- Le snapshot du pré-commit matérialise l’index sans `.git`. Les tests qui ne portent pas sur Git injectent
-  explicitement cette frontière déjà isolée ; les tests du snapshot Git utilisent exclusivement un dépôt et
-  un index temporaires. Le snapshot complet de `main` continue d’exiger un dépôt et un index valides.
+- Chaque candidat pré-push exécute le profil `main` complet, même si ses chemins sont `targeted` ou
+  `impacted`. Tous les commits introduits sont scannés avant publication ; supprimer d'un commit final un
+  secret présent dans un checkpoint antérieur ne suffit pas.
+- Avant le DAG coûteux, le pré-push exige, pour chaque plage introduisant de nouveaux commits, un
+  `README.md` racine présent dans l'état final et un blob différent de celui de chacune des bases de la
+  plage. La pertinence de la synthèse reste contrôlée en revue ; aucun checkpoint isolé n'impose d'édition.
+- Le cycle normal n'exécute pas la task canonique avant le push : le hook valide une seule fois chaque SHA
+  terminal distinct avant le transfert. Une nouvelle exécution n'est utile qu'après modification du
+  candidat ou résolution d'un échec ; la CI distante conserve sa propre frontière de confiance.
+- Le snapshot volontaire du mode `fast` matérialise l’index sans `.git`. Les tests qui ne portent pas sur
+  Git injectent explicitement cette frontière déjà isolée ; les tests du snapshot Git utilisent exclusivement
+  un dépôt et un index temporaires. Le snapshot complet de `main` continue d’exiger un dépôt et un index
+  valides.
 - Toute validation isolée transmet `MONTECARLO_E2E_PYTHON` avec l’interpréteur Python hôte à chaque chemin
   d’exécution : séquence, branches parallèles du DAG et nœud sélectionné. Le serveur Playwright du worktree
   réutilise ainsi explicitement les dépendances Python hôte.
@@ -54,14 +68,16 @@ restent applicables.
   fichiers suivis et non ignorés. Les sorties ne modifient pas les preuves versionnées du workspace ; le
   snapshot, l’exposition unique de `frontend/node_modules` et les temporaires sont nettoyés après succès,
   échec ou interruption.
+- Le smoke Docker du candidat utilise `.env` lorsqu'il est disponible ; dans un worktree détaché sans secret,
+  la même configuration que la CI est copiée depuis `.env.example`, puis supprimée après le contrôle.
 - Dans `main`, corpus et sondes, parité déterministe, rejeu exact, indépendance du batching, protocole et
   parité distributionnels, compatibilité, génération et validation du rapport consolidé sont obligatoires.
   Les trois preuves indépendantes précèdent la compatibilité ; le rapport consomme leurs artefacts validés
   du run et `aggregate` refuse tout nœud statistique échoué ou sauté.
 - La hiérarchie obligatoire est `pr = pr`, `main = pr + main`,
   `nightly = pr + main + nightly` et `release = pr + main + release`.
-- Les niveaux `targeted`, `impacted` et `massive` restent des portées de changement et ne remplacent jamais
-  le profil principal d’un cas.
+- Les niveaux `targeted`, `impacted` et `massive` guident le retour de développement et rendent le coût
+  visible, mais ne réduisent jamais le profil `main` d'un candidat à publication.
 - Les gates sont fail-fast. Une suppression de référence au pré-push ne déclenche pas de suite.
 - Les plans agrégés sont déterministes et sans commande identique répétée. Quand une suite avec couverture
   est requise, la même suite simple n’est pas exécutée auparavant.
@@ -186,14 +202,14 @@ Seuls le code trivial et le code purement déclaratif sans logique peuvent reste
 - Le code est lisible, explicite et maintenable.
 - Aucun `TODO` ou `FIXME` critique n’est laissé sans ticket associé.
 - Les impacts, risques et commandes de validation sont explicités dans la PR.
-- Toute évolution destinée à un commit comprend une modification pertinente du `README.md` racine et cette
-  modification est réellement stagée avec les autres changements. La garde vérifie la présence dans l'index ;
-  la pertinence du contenu relève de la DoD et de la revue, sans heuristique lexicale ou volumétrique.
+- Le README final respecte la règle de publication par plage de nouveaux commits et décrit pertinemment le
+  changement livré. La documentation normative évolue lorsque le comportement ou la gouvernance
+  correspondante change ; un checkpoint intermédiaire n'impose jamais une édition documentaire artificielle.
 
 ## Checklist DoD
 
-- [ ] Plan adapté au changement exécuté sans repli non traité.
-- [ ] Task `Validation : profil main` entièrement verte.
+- [ ] Périmètre déclaré contrôlé, sans chemin inattendu ni portée massive non acquittée.
+- [ ] Gate pré-push du profil `main` entièrement verte sur le SHA terminal publié.
 - [ ] Classification bloquante verte : inventaire exact, déterministe et sans `unresolved` ni exception
       invalide.
 - [ ] Gouvernance bloquante verte : aucun mécanisme non gouverné, marqueur inconnu, état critique ignoré,
@@ -209,9 +225,10 @@ Seuls le code trivial et le code purement déclaratif sans logique peuvent reste
 - [ ] Artefacts de couverture présents, cohérents, frais et issus de l’exécution attendue.
 - [ ] Aucun secret commité et frontière d’identité respectée.
 - [ ] Ratchet de maintenabilité vert, sans régénération automatique de la baseline.
-- [ ] Synthèse du backlog et répartition des reliquats régénérées depuis les tables de PBI, sans divergence.
-- [ ] Documentation normative et README cohérents avec le comportement livré ; `README.md` contient une
-      évolution pertinente et figure comme fichier ajouté ou modifié dans tout index non vide.
+- [ ] Synthèse du backlog et répartition des reliquats conformes aux tables de PBI, régénérées uniquement
+      lorsque leurs autorités sources ont changé, sans divergence.
+- [ ] README racine présent et différent des bases de chaque plage de nouveaux commits ; documentation
+      normative et synthèse cohérentes avec le comportement livré, sans édition imposée par checkpoint.
 - [ ] Worktree et branche vérifiés ; remote GitHub présent avant toute déclaration de publiabilité.
 
 <!--

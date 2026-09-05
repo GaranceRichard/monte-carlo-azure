@@ -150,6 +150,10 @@ def test_versioned_global_reference_can_be_verified_without_replaying_suites(
     assert any(
         "inventory fingerprint" in item for item in counts.validate_report_reference(tmp_path)
     )
+    assert counts.main(["--root", str(tmp_path), "--refresh-and-check"]) == 0
+    assert counts.validate_report_reference(tmp_path) == []
+    (tmp_path / "reports/test-execution-native/pytest.json").unlink()
+    assert counts.main(["--root", str(tmp_path), "--refresh-and-check"]) == 1
 
 
 def test_versioned_reference_rejects_every_invalid_contract_shape(
@@ -176,6 +180,20 @@ def test_versioned_reference_rejects_every_invalid_contract_shape(
     ]
     (tmp_path / counts.DEFAULT_OUTPUT).unlink()
     assert "Unable to validate" in counts.validate_report_reference(tmp_path)[0]
+
+    from Scripts.test_execution_counts_reference import refresh_and_validate
+
+    def corrupt_fingerprint(payload, destination):
+        return counts.write_report(
+            payload | {"classificationInventorySha256": "0" * 64}, destination
+        )
+
+    assert refresh_and_validate(
+        tmp_path, counts.DEFAULT_INVENTORY, counts.DEFAULT_OUTPUT, counts.DEFAULT_NATIVE,
+        consolidate=counts.consolidate,
+        report_writer=corrupt_fingerprint,
+        validate_report=counts.validate_report_reference,
+    ) == 1
 
 
 def test_two_consolidations_are_byte_identical_and_cli_writes_the_report(tmp_path: Path) -> None:

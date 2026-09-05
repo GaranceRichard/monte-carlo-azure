@@ -136,7 +136,7 @@ une connexion Azure DevOps réelle.
   relie explicitement les décisions 7.7/7.8, décrit les six couches, leur matrice complète et les frontières
   cibles des trois runtimes. Son contrôle refuse les défauts d’autorité ainsi que toute dépendance du domaine
   vers un adaptateur, un package externe ou une ressource technique, avec fichier et ligne, y compris dans
-  le snapshot staged isolé utilisé par les hooks ; une source produit illisible ou non analysable échoue de
+  le snapshot isolé du candidat pré-push ; une source produit illisible ou non analysable échoue de
   façon fermée avec un diagnostic localisé. Il exige aussi un `index.*` ou `__init__.py` à la racine de chaque
   module gouverné et refuse les imports profonds avec fichier, ligne et frontière publique attendue ; les
   seules exceptions possibles sont des couples source/cible exacts, justifiés dans le manifeste. Il projette
@@ -301,6 +301,7 @@ Le backend écoute par défaut sur `http://127.0.0.1:8000` et le frontend sur
 ### Contribuer et valider
 
 - [Carte complète de la documentation](docs/README.md)
+- [Cycle de contribution proportionné](docs/contribution-cycle.md)
 - [Cartographie des responsabilités de l’infrastructure qualité](docs/quality-infrastructure-responsibilities-map.md)
 - [Definition of Done](docs/definition-of-done.md)
 - [Chemins critiques](docs/critical-paths.md)
@@ -316,7 +317,16 @@ dans un worktree : `.venv`, `frontend/node_modules` et les autres dépendances y
 nécessaire, ou les outils partagés sont invoqués directement sans lien filesystem. Avant publication, vérifier
 l’absence de reparse point et de résidu temporaire bloquant conformément à [`AGENTS.md`](AGENTS.md).
 
-La validation complète est la tâche VS Code `Validation : profil main`, qui exécute :
+Un commit est un checkpoint local sans gate et peut conserver un état transitoire. Le périmètre est contrôlé
+tôt avec `python Scripts/quality_gate.py scope --base origin/main --allow <chemin> [...]`; pendant le
+développement, seuls les tests directement informatifs sont exécutés. Le pré-push est l'unique gate locale
+de publication : il exige un README racine final dont le contenu diffère des bases de chaque plage de
+nouveaux commits, scanne tous les commits introduits et exécute une seule fois le profil `main` complet,
+smoke Docker inclus, sur chaque SHA terminal réellement envoyé. Le détail et les exemples sont dans le
+[cycle de contribution](docs/contribution-cycle.md).
+
+La même validation complète reste disponible pour un diagnostic explicite avec la tâche VS Code
+`Validation : profil main`, qui exécute :
 
 ```powershell
 .\.venv\Scripts\python.exe Scripts/quality_gate.py ci --profile main
@@ -332,11 +342,11 @@ Les profils couverts distribuent ce nœud Pytest sur deux workers en mode `works
 automatique. Le contrôleur fusionne et vérifie exhaustivement les preuves natives et la couverture avant les
 contrôles existants ; la sélection gouvernée, MongoDB réel et les seuils par fichier restent inchangés.
 
-Le profil rapide valide exclusivement le snapshot construit depuis l’index Git. Lorsqu’un contrôle déclaré
-dépend de l’outillage frontend, la gate expose temporairement le seul `frontend/node_modules` de
-l’installation hôte dans ce snapshot, y compris si aucune suite frontend n’est sélectionnée. Les sources
-restent celles du snapshot, le lien est partagé puis nettoyé après succès, échec ou interruption, et
-l’absence des dépendances hôtes provoque un échec explicite.
+Le profil rapide reste un diagnostic volontaire du snapshot construit depuis l’index Git ; il n'est associé
+ni au commit ni à la publiabilité. Lorsqu’un contrôle isolé dépend de l’outillage frontend, la gate expose
+temporairement le seul `frontend/node_modules` de l’installation hôte. Les sources restent celles du
+snapshot, le lien est partagé puis nettoyé après succès, échec ou interruption, et l’absence des dépendances
+hôtes provoque un échec explicite.
 
 Une validation ciblée ne vaut pas validation complète. Les règles de couverture, de conformité DoD et de
 publiabilité restent définies dans [`docs/definition-of-done.md`](docs/definition-of-done.md).

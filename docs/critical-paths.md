@@ -180,9 +180,9 @@ reporting stratégique consolidé qui distingue conformité opérationnelle et c
 statistique dispose aussi d’une preuve canonique de compatibilité et de mutations contrôlées, consommée par
 le rapport consolidé dans le sous-DAG bloquant du profil `main`. Les attestations refusent les preuves
 périmées, d’un autre snapshot ou liées à une dépendance incohérente. Le chemin
-de commit impose aussi, via `Scripts/pre_commit_guard.py`, un `README.md` racine ajouté ou modifié dans tout
-index non vide ; `tests/test_pre_commit_guard.py` couvre les statuts et les cas de refus sans muter l'index
-réel. Le parcours reste partiellement couvert : le rapport rend le mutation testing et la démonstration
+de publication contrôle aussi la cohérence du README et scanne l'arbre final ainsi que tous les commits
+introduits avant le push. Les checkpoints locaux restent sans gate. Le parcours reste partiellement couvert :
+le rapport rend le mutation testing et la démonstration
 complète du risque `not_measured` au lieu de les assimiler à une maîtrise. Traitement résiduel prévu par le
 PBI 6.3.
 

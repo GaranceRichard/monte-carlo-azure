@@ -73,7 +73,8 @@ def test_maintainability_control_is_versioned_documented_and_delegated() -> None
     assert all((ROOT / path).is_file() for path in required)
     assert "docs/maintainability.md" in _read("README.md")
     assert "Scripts/check_maintainability.py" in _read("Scripts/quality_gate_plan.py")
-    assert "Backlog consistency" in _read("Scripts/pre_commit_guard.py")
+    assert "Backlog consistency" in _read("Scripts/quality_gate_plan.py")
+    assert "check_backlog_consistency.py" not in _read("Scripts/pre_commit_guard.py")
 
 
 def test_frontend_unit_coverage_thresholds_are_at_least_80() -> None:

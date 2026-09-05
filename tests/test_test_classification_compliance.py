@@ -299,6 +299,11 @@ def test_generated_and_versioned_inventory_divergence_is_blocking(tmp_path: Path
 
     assert any("generated inventory differs" in error for error in errors)
     assert any("execution report fingerprint differs" in error for error in errors)
+    source_errors = compliance.validate_repository(
+        tmp_path, discoverer=lambda *_args: [case], include_execution=False
+    )
+    assert any("generated inventory differs" in error for error in source_errors)
+    assert not any("execution report fingerprint" in error for error in source_errors)
 
 
 def test_catalog_schema_and_rule_contract_defects_are_blocking(tmp_path: Path) -> None:
@@ -740,6 +745,9 @@ def test_control_is_in_main_profile_validation_once() -> None:
     assert sum(
         command.step == "Test classification compliance" for command in plan.commands
     ) == 1
+    commands = {command.step: command for command in plan.commands}
+    assert "--source-only" in commands["Test classification compliance"].argv
+    assert commands["Verify global execution count reference"].argv[-1] == "--refresh-and-check"
 
 
 def test_classification_files_are_massive_changes() -> None:
@@ -787,5 +795,5 @@ def test_cli_reports_failure_success_and_main_guard(
 
 def test_real_repository_is_compliant_with_zero_unresolved() -> None:
     inventory = compliance.load_json(ROOT / compliance.INVENTORY_PATH)
-    assert not compliance.validate_repository(ROOT)
+    assert not compliance.validate_repository(ROOT, include_execution=False)
     assert all(record["status"] != "unresolved" for record in inventory)

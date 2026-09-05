@@ -1,9 +1,9 @@
 # Cartographie des responsabilités de l’infrastructure qualité
 
-Cette carte décrit l’état observé de l’infrastructure qualité au commit
-`4bc9b01fce83682da3e7dbd79df898461a2437b4`. Elle attribue les responsabilités réellement exercées par les
-profils, scripts, runners et artefacts, sans proposer de cible ni modifier un contrôle. Les recouvrements et
-couplages recensés sont donc des constats, pas des décisions de rationalisation.
+Cette carte décrit l’infrastructure qualité de la révision qui la contient, y compris le
+[cycle de contribution](contribution-cycle.md) qui concentre les contrôles locaux de publication au
+pré-push. Elle attribue les responsabilités réellement exercées par les profils, scripts, runners et
+artefacts ; les sources liées permettent de vérifier chaque constat dans la même révision.
 
 ## Vocabulaire de lecture
 
@@ -46,8 +46,9 @@ sélectionnent la portée d’un changement mais ne remplacent pas un profil.
 
 | Entrée réelle | Profil résolu | Source et isolation | Portée effectivement construite |
 | --- | --- | --- | --- |
-| `.githooks/pre-commit` → `quality_gate.py fast` | `pr` | snapshot temporaire de l’index Git ; modifications non indexées absentes | contrôles de base, puis documentation seule ou tests ciblés/impactés ; repli complet si changement `massive` |
-| `.githooks/pre-push` → `quality_gate.py push` | `main` | chaque SHA terminal introduit dans un worktree détaché temporaire | sélection adaptative sur les chemins des commits ; le sous-DAG complet n’est présent que si le changement est `massive` |
+| `.githooks/pre-commit` | aucun | aucun snapshot ni outil requis | checkpoint technique sans validation |
+| `quality_gate.py scope --base … --allow …` | aucun | merge-base, worktree et fichiers non suivis non ignorés, en lecture seule | comparaison stricte aux chemins déclarés ; acquittement explicite d’une portée `massive` |
+| `.githooks/pre-push` → `quality_gate.py push` | `main` | chaque SHA terminal introduit dans un worktree détaché temporaire | README final contrôlé par plage avant le DAG, puis 37 commandes incluant le scan de tous les commits introduits, et smoke Docker ; aucune réduction adaptative |
 | pull request GitHub → `ci --profile pr --node …` | `pr` | checkout de `${{ github.sha }}` propre à chaque job | plan complet du profil `pr` : préflight, statique, Pytest et Vitest sans couverture ; les nœuds sans commande écrivent néanmoins un résultat de nœud |
 | tâche VS Code `Validation : profil main` → `ci --profile main` | `main = pr + main` | copie temporaire des fichiers suivis et des fichiers non suivis non ignorés ; `.env` inclus s’il existe ; `node_modules` hôte exposé temporairement | les 36 commandes matérialisées, le smoke Docker et l’agrégation, exécutés en DAG parallèle |
 | push GitHub sur `main` → `ci --profile main --node …` | `main = pr + main` | checkout de `${{ github.sha }}` par job, sans snapshot supplémentaire pour un nœud sélectionné | mêmes nœuds et commandes, distribués entre jobs avec transfert des artefacts |
@@ -79,7 +80,7 @@ E2E ou Vitals. Elles produisent une preuve partielle et ne traversent pas l’ag
 | `backend-tests` | `preflight` | sélection du profil Pytest, distribution sur deux workers sans redémarrage, fusion exhaustive des instances et de la couverture, contrôle de périmètre et conformité par fichier | `pytest-args.txt`, `coverage.json`, `pytest.json` |
 | `frontend-tests` | `preflight` | Vitest avec couverture V8 et reporter d’exécution logique | `coverage/coverage-final.json`, `vitest.json` |
 | `e2e` | `preflight` | Playwright, serveurs backend/Vite, collecte Istanbul et reporter d’exécution logique | `e2e-coverage-summary.json`, `playwright.json` |
-| `release-or-container-checks` | `preflight` | validation du contrat de profils ; smoke Docker ajouté par l’exécuteur pour les plans complets `ci`, `nightly` et `release` | `release-or-container-checks/result.json`, logs Docker seulement en diagnostic |
+| `release-or-container-checks` | `preflight` | validation du contrat de profils ; smoke Docker ajouté par l’exécuteur pour tout candidat pré-push et les plans complets `ci`, `nightly` et `release` | `release-or-container-checks/result.json`, logs Docker seulement en diagnostic |
 | `aggregate` | statique, tests, E2E, conteneur ; rapport statistique conditionnel | promotion des artefacts, plan rendu, référence de dénombrement, Vitals, gouvernance et rapport stratégique | rapports d’exécution, Vitals, gouvernance et stratégie |
 
 Les ressources exclusives déclarées sont MongoDB pour `backend-tests`, les ports `8000`/`4173` pour `e2e`,
@@ -99,7 +100,7 @@ parallèles déclarées écrivent le même artefact ou utilisent la même ressou
 | [`Scripts/quality_gate_docker_runtime.py`](../Scripts/quality_gate_docker_runtime.py) | exécution | démarre Compose, attend les services, exerce le smoke HTTP, collecte les logs d’échec et nettoie les services |
 | [`Scripts/test_execution_profiles.py`](../Scripts/test_execution_profiles.py) et modules `test_execution_profiles_*` | contrat et orchestration | valident profils/DAG/inventaire, rendent le plan, sélectionnent les cas d’un framework et font correspondre chaque commande à un nœud unique |
 | [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | orchestration CI | résout le profil par événement, reproduit le DAG en jobs GitHub, prépare les runtimes/services, transfère les artefacts et impose le succès ou le saut attendu de chaque job |
-| [`.githooks/pre-commit`](../.githooks/pre-commit) et [`.githooks/pre-push`](../.githooks/pre-push) | points d’entrée locaux | choisissent l’interpréteur puis délèguent respectivement à `fast` et `push` |
+| [`.githooks/pre-commit`](../.githooks/pre-commit) et [`.githooks/pre-push`](../.githooks/pre-push) | points d’entrée locaux | le premier laisse le commit servir de checkpoint ; le second choisit l’interpréteur et délègue l’unique engagement local à `push` |
 | Pytest + [`tests/execution_counts_plugin.py`](../tests/execution_counts_plugin.py) | exécution et preuve | exécute backend, scripts et tests d’infrastructure ; le plugin toujours chargé par `tests/conftest.py` rattache les instances aux cas logiques et écrit `pytest.json` |
 | Vitest + [`frontend/scripts/vitest-execution-reporter.mjs`](../frontend/scripts/vitest-execution-reporter.mjs) | exécution et preuve | exécute les tests frontend, mesure V8 et écrit les instances/tentatives dans `vitest.json` |
 | Playwright + [`frontend/scripts/run-e2e-coverage.mjs`](../frontend/scripts/run-e2e-coverage.mjs) + reporter | exécution et preuve | lance les serveurs et scénarios navigateur, collecte/valide Istanbul et écrit `playwright.json` |
@@ -111,7 +112,7 @@ parallèles déclarées écrivent le même artefact ou utilisent la même ressou
 | --- | --- | --- | --- | --- |
 | Classification | catalogues, règles, overrides, sources de tests | `classify_tests.py` pour la mise à jour explicite ; le contrôle recalcule aussi en mémoire | `check_test_classification.py` et modules `test_classification_*` | `reports/test-classification-inventory.json` versionné |
 | Profils d’exécution | contrat et schéma de profils, inventaire classifié | `test_execution_profiles.py` ou `_prepare_aggregate_inputs` rendent le plan | `test_execution_profiles.py --check`, plus validations incluses dans la classification | `reports/test-execution-plan.json`, sélection Pytest temporaire |
-| Résultats natifs | inventaire classifié et exécutions des trois frameworks | plugins/reporters Pytest, Vitest, Playwright | `report_test_execution_counts.py` vérifie complétude et invariants lorsqu’il consolide ; `--check` ne rejoue rien et valide la référence versionnée | `pytest.json`, `vitest.json`, `playwright.json`, `reports/test-execution-counts.json` |
+| Résultats natifs | inventaire classifié et exécutions des trois frameworks | plugins/reporters Pytest, Vitest, Playwright | `report_test_execution_counts.py --refresh-and-check` consolide le run complet puis relit le résultat et vérifie empreinte, complétude et invariants ; `--check` reste un diagnostic sans rejeu | `pytest.json`, `vitest.json`, `playwright.json`, compteur courant ignoré par Git et archivé en CI |
 | Couverture Python | `.coveragerc`, sélection Pytest, sources suivies | `pytest-cov` | `check_python_coverage.py` vérifie périmètre, branches, seuils et chaque fichier | `.coverage`, `coverage.json`, promotion en `.coverage.python.json` |
 | Couverture frontend | `vitest.config.js`, sources frontend | Vitest/V8 | seuils Vitest `perFile` à 80 % | `coverage-final.json`, HTML |
 | Couverture E2E | `e2e-coverage.config.json`, couverture navigateur | helpers Playwright/Istanbul via `run-e2e-coverage.mjs` | `check_e2e_coverage.py` vérifie schéma, scope, run, fraîcheur et seuils à 80 % | `e2e-coverage-summary.json` |
@@ -119,7 +120,7 @@ parallèles déclarées écrivent le même artefact ou utilisent la même ressou
 | Gouvernance des tests | contrat de gouvernance, inventaire, mécanismes détectés, résultats natifs | `check_test_governance.py` construit le modèle et écrit le rapport | le même script valide contrat, détections, runtime, expirations et cohérence avant son code retour | `reports/test-governance-report.json` |
 | Stratégie de test | inventaire, profils, résultats de nœuds, couvertures, gouvernance et résultats natifs | `report_test_strategy.py` construit un modèle JSON puis sa projection Markdown | le même script calcule `qualityGateStatus` et échoue s’il n’est pas `compliant` | `reports/test-strategy-report.json` et `.md` |
 | Maintenabilité | config, baseline, exceptions, sources produit et qualité | `check_maintainability.py --write-baseline` uniquement sur action explicite | `check_maintainability.py` compare métriques, dépendances et mojibake au ratchet | baseline versionnée ; diagnostic console courant |
-| Hygiène/dépôt | index Git, README, DoD, backlog, secrets et sources | aucun producteur courant | `pre_commit_guard.py`, contrôles backlog, secret, identité et nommage | verdicts console ; rapports de backlog seulement via autorités versionnées |
+| Hygiène/dépôt | arbre final, commits introduits, README, DoD, backlog, secrets et sources | aucun producteur courant | contrôle README par plage avant le DAG, `pre_commit_guard.py`, scan de secrets par arbre/range, contrôles backlog, identité et nommage | verdicts console ; rapports de backlog seulement via autorités versionnées |
 | Statistique déterministe | corpus, sondes, moteurs Python/TypeScript | `run_statistical_reference_corpus.py` | `statistical_main_enforcement.py enforce --kind parity` | parité JSON/Markdown et attestation |
 | Rejeu exact/batching | corpus et moteurs | `run_statistical_exact_replay.py` | deux invocations d’enforcement sur la même preuve | preuve exacte, attestations exact/batching |
 | Statistique distributionnelle | protocole, calibration, seeds et moteurs | `run_statistical_distribution.py` | enforcement distributionnel | preuve distributionnelle et attestation |
@@ -186,7 +187,8 @@ comme artefact GitHub dédié, tandis que les producteurs conservent leurs bundl
 - Le local complet partage les outils installés de l’hôte mais pas ses sources : l’interpréteur Python est
   transmis par `MONTECARLO_E2E_PYTHON` et `frontend/node_modules` est lié temporairement dans le snapshot.
 - Le pré-push dépend de Git pour construire et nettoyer des worktrees détachés ; il ne lit pas l’état non
-  commité du workspace.
+  commité du workspace. Il matérialise au besoin `.env.example` comme `.env` temporaire pour le smoke, puis
+  le supprime.
 - La CI reconstruit l’environnement dans chaque job. MongoDB n’existe que pour `backend-tests`, Chromium
   n’est installé que pour `e2e`, et les preuves statistiques se transmettent explicitement aux nœuds
   consommateurs.
@@ -203,9 +205,9 @@ comme artefact GitHub dédié, tandis que les producteurs conservent leurs bundl
 | Le nœud conteneur porte deux contrôles différents | son unique commande valide le contrat des profils ; le smoke Docker est une action conditionnelle injectée après la commande par `quality_gate_dag.py`, sans seconde commande déclarée |
 | Un libellé statistique déclaré n’est pas une commande distincte | `Blocking consolidated statistical verdict` figure dans le contrat et le plan rendu, mais le plan `main` matérialise seulement génération et validation consolidées ; le code retour bloquant est porté par le validateur |
 | Producteur et validateur sont parfois la même entrée | `check_test_governance.py` et `report_test_strategy.py` écrivent leur rapport puis décident eux-mêmes du succès ; la séparation est interne aux modules, pas au chemin d’exécution |
-| Le backlog est contrôlé deux fois dans `preflight` | `pre_commit_guard.py` appelle `check_backlog_consistency.py`, puis le plan exécute aussi une commande `Backlog consistency` distincte |
+| Le doublon backlog a été supprimé | `pre_commit_guard.py` ne relance plus `check_backlog_consistency.py` ; la commande dédiée du plan reste l’unique verdict |
 | Le contrat de profils est validé par plusieurs chemins | classification, préparation de sélection Pytest et nœud `release-or-container-checks` chargent ou valident le même contrat à des moments différents |
-| Référence et exécution courante coexistent | `reports/test-execution-counts.json` est vérifié en lecture seule ; gouvernance et stratégie consomment parallèlement les résultats natifs du run courant |
+| Le compteur est une sortie du run | `reports/test-execution-counts.json` est consolidé et revérifié après les producteurs ; aucune suite n'est rejouée pour le préparer avant la gate. La référence initiale reste dans `reports/contribution-cycle-before-counts.json` |
 | Les reporters sont attachés aux runners | le plugin Pytest est chargé globalement par `tests/conftest.py`; les reporters Vitest/Playwright sont déclarés dans leurs configurations et produisent une preuve même quand l’appelant ne l’agrège pas |
 | La sélection adaptative connaît des fichiers produit précis | tables de `quality_gate.py`, chemins `massive`, règles d’identité, Vitals et maintenabilité doivent évoluer avec la topologie observée du produit |
 | Les runners statistiques traversent la frontière produit | le runner Python importe des modules backend internes ; les runners TypeScript appartiennent à `frontend/src` et importent moteur, domaine et adaptateur |

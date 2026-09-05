@@ -1,17 +1,4 @@
 #!/usr/bin/env sh
-set -eu
-
-REPO_ROOT=$(git rev-parse --show-toplevel)
-
-if [ -x "$REPO_ROOT/.venv/Scripts/python.exe" ]; then
-  PYTHON="$REPO_ROOT/.venv/Scripts/python.exe"
-elif [ -x "$REPO_ROOT/.venv/bin/python" ]; then
-  PYTHON="$REPO_ROOT/.venv/bin/python"
-elif command -v python >/dev/null 2>&1; then
-  PYTHON=python
-else
-  echo "ERROR: Python is required. Create .venv or install python before committing." >&2
-  exit 1
-fi
-
-exec "$PYTHON" "$REPO_ROOT/Scripts/quality_gate.py" fast
+# A commit is a local checkpoint, not a publication candidate. Publication controls
+# run once from pre-push against every introduced commit and the terminal tree.
+exit 0

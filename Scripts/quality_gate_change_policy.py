@@ -147,8 +147,27 @@ def classification_gate_command(
 ) -> Any:
     return command_factory(
         "Test classification compliance",
-        (python_executable, "Scripts/check_test_classification.py"),
+        (python_executable, "Scripts/check_test_classification.py", "--source-only"),
         "Regenerate and correct the test classification inventory, rules, or overrides.",
         input_sources=input_sources,
         requires_frontend_dependencies=True,
     )
+
+
+def introduced_secret_commands(
+    command_factory: Callable[..., Any],
+    python_executable: str,
+    input_sources: tuple[Any, ...],
+    context: Any,
+) -> list[Any]:
+    if context.mode != "push" or not context.introduced_commit_shas:
+        return []
+    return [
+        command_factory(
+            "Introduced commit secret scan",
+            (python_executable, "Scripts/check_no_secrets.py", "--commits",
+             *context.introduced_commit_shas),
+            "Remove the secret from every local checkpoint before publication.",
+            input_sources=input_sources,
+        )
+    ]

@@ -9,13 +9,14 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1218,
+      "logicalCases": 1221,
       "nodes": [
         {
           "id": "preflight",
           "needs": [],
           "conditionalNeeds": [],
           "commands": [
+            "Introduced commit secret scan",
             "Repository hygiene (README, encoding, secrets and DoD)",
             "Backlog consistency",
             "Backlog atomicity",
@@ -341,19 +342,14 @@
             "pytest:tests/test_numpy_sample_index_draw_port.py::test_numpy_draw_port_rejects_invalid_sample_count",
             "pytest:tests/test_numpy_sample_index_draw_port.py::test_numpy_draw_port_rejects_invalid_vectorized_shape",
             "pytest:tests/test_operational_scripts.py::test_purge_env_integer_defaults_and_main",
+            "pytest:tests/test_pre_commit_guard.py::test_final_readme_must_exist_and_have_valid_encoding",
+            "pytest:tests/test_pre_commit_guard.py::test_final_tree_guard_stops_at_the_first_failure",
             "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_accepts_accented_prose_and_ascii_code",
             "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_is_independent_from_mojibake",
             "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_rejects_massively_deaccented_prose",
-            "pytest:tests/test_pre_commit_guard.py::test_guard_plan_locks_order_and_repository_inputs",
-            "pytest:tests/test_pre_commit_guard.py::test_main_is_fail_fast_and_leaves_naming_to_the_main_quality_plan",
-            "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_checks_pass",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_gate_accepts_only_commits_containing_an_added_or_modified_root_readme",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_gate_rejects_every_staged_change_without_a_modified_root_readme",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_gate_reports_when_readme_is_modified_only_in_worktree",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_staging_encoding_and_missing_file_errors",
-            "pytest:tests/test_pre_commit_guard.py::test_staged_changes_exits_two_when_the_index_cannot_be_read",
-            "pytest:tests/test_pre_commit_guard.py::test_staged_changes_reads_added_modified_deleted_and_renamed_index_entries",
-            "pytest:tests/test_pre_commit_guard.py::test_worktree_readme_probe_is_read_only_and_fails_closed",
+            "pytest:tests/test_pre_commit_guard.py::test_guard_plan_checks_the_final_tree_without_reinspecting_the_index",
+            "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_final_checks_pass",
+            "pytest:tests/test_pre_commit_hook_integration.py::test_real_commit_saves_a_transient_index_without_readme_or_validation",
             "pytest:tests/test_quality_gate.py::test_aggregated_plan_contains_no_duplicate_commands",
             "pytest:tests/test_quality_gate.py::test_change_classification_rules",
             "pytest:tests/test_quality_gate.py::test_change_classification_uses_the_highest_level_across_mixed_paths",
@@ -629,18 +625,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 508
+            "pytest": 503
           },
           "natures": {
-            "component": 83,
+            "component": 81,
             "contract": 47,
-            "integration": 40,
-            "unit": 338
+            "integration": 41,
+            "unit": 334
           },
           "criticalities": {
             "critical": 74,
             "high": 16,
-            "unassigned": 418
+            "unassigned": 413
           }
         },
         {
@@ -695,6 +691,7 @@
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > rejects invalid sampleCount %s without normalization [43:35]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > reproduces exactly the previous createSeededRandom suite [16:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > counts resolved items with ResolvedDate when ClosedDate is missing [52:3]",
@@ -996,17 +993,18 @@
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > composes the real browser clock for the React bootstrap [28:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > reads the current browser instant as UTC ISO [21:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > returns the controlled timestamp and records each deterministic read [13:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [73:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [62:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [55:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [48:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [31:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [36:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [41:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD without UTC day drift [12:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [21:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [69:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [26:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [74:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [63:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [56:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [49:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [32:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [37:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [42:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [12:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [22:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [70:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [27:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > uses the UTC calendar when the reference instant carries another offset [81:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes coherent demo portfolio and app defaults [159:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes differentiated and coherent public decision language for the three demo teams [137:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > keeps demo dates valid, ordered and aligned across throughput and Cycle Time [112:3]",
@@ -1019,6 +1017,12 @@
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects an invalid item identity: %s [29:43]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects facts outside the delivery vocabulary [46:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > applies UTC rather than the source offset at a week boundary [33:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > constructs and advances valid week values without local calendar arithmetic [38:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > groups every instant from monday through sunday under its ISO monday [21:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > publishes the single explicit ISO week and timezone policy [11:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > rejects dates that are not valid UTC ISO mondays [44:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > uses the ISO week-year across the civil year boundary [27:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > normalizes immutable absolute bounds [19:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
@@ -1308,9 +1312,9 @@
             "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > marks common correlated history as observed without recommending it [75:3]",
             "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > raises a fragile and declining team as a portfolio fact to verify [85:3]",
             "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > reports trend divergence without causal or unproven substitutability claims [102:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > aligns offset timestamps with the authoritative UTC delivery week [316:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > applies includeZeroWeeks after aggregating the portfolio total [191:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > is not mathematically forced to match optimistic independent draws [207:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps ISO week timestamps aligned after normalization [316:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps only the intersection of aligned weeks [156:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > returns the same history for a single team [178:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > sums aligned weekly throughput for two teams [131:3]",
@@ -1377,15 +1381,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 710
+            "vitest": 718
           },
           "natures": {
-            "component": 331,
-            "unit": 379
+            "component": 332,
+            "unit": 386
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 602
+            "unassigned": 610
           }
         },
         {
@@ -1491,13 +1495,14 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1500,
+      "logicalCases": 1508,
       "nodes": [
         {
           "id": "preflight",
           "needs": [],
           "conditionalNeeds": [],
           "commands": [
+            "Introduced commit secret scan",
             "Repository hygiene (README, encoding, secrets and DoD)",
             "Backlog consistency",
             "Backlog atomicity",
@@ -1982,21 +1987,16 @@
             "pytest:tests/test_operational_scripts.py::test_git_hook_setup_skips_missing_repo_and_reports_git_results",
             "pytest:tests/test_operational_scripts.py::test_purge_env_integer_defaults_and_main",
             "pytest:tests/test_pre_commit_guard.py::test_external_checks_cover_missing_failure_and_success",
+            "pytest:tests/test_pre_commit_guard.py::test_final_readme_must_exist_and_have_valid_encoding",
+            "pytest:tests/test_pre_commit_guard.py::test_final_tree_guard_stops_at_the_first_failure",
             "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_accepts_accented_prose_and_ascii_code",
             "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_is_independent_from_mojibake",
             "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_rejects_massively_deaccented_prose",
-            "pytest:tests/test_pre_commit_guard.py::test_guard_plan_locks_order_and_repository_inputs",
-            "pytest:tests/test_pre_commit_guard.py::test_main_is_fail_fast_and_leaves_naming_to_the_main_quality_plan",
-            "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_checks_pass",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_gate_accepts_only_commits_containing_an_added_or_modified_root_readme",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_gate_rejects_every_staged_change_without_a_modified_root_readme",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_gate_reports_when_readme_is_modified_only_in_worktree",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_staging_encoding_and_missing_file_errors",
+            "pytest:tests/test_pre_commit_guard.py::test_guard_plan_checks_the_final_tree_without_reinspecting_the_index",
+            "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_final_checks_pass",
             "pytest:tests/test_pre_commit_guard.py::test_run_executes_in_repository",
-            "pytest:tests/test_pre_commit_guard.py::test_staged_changes_exits_two_when_the_index_cannot_be_read",
-            "pytest:tests/test_pre_commit_guard.py::test_staged_changes_reads_added_modified_deleted_and_renamed_index_entries",
-            "pytest:tests/test_pre_commit_guard.py::test_worktree_readme_probe_is_read_only_and_fails_closed",
-            "pytest:tests/test_pre_commit_hook_integration.py::test_real_fast_path_uses_the_isolated_commit_index_for_the_readme_gate",
+            "pytest:tests/test_pre_commit_hook_integration.py::test_publication_secret_scan_rejects_a_secret_removed_by_a_later_checkpoint",
+            "pytest:tests/test_pre_commit_hook_integration.py::test_real_commit_saves_a_transient_index_without_readme_or_validation",
             "pytest:tests/test_python_coverage.py::test_complete_report_passes_and_tests_are_excluded",
             "pytest:tests/test_python_coverage.py::test_expected_sources_and_tracked_git_listing",
             "pytest:tests/test_python_coverage.py::test_invalid_policy_and_report_are_rejected",
@@ -2017,6 +2017,7 @@
             "pytest:tests/test_quality_gate.py::test_command_environment_preserves_existing_values_without_mutating_input",
             "pytest:tests/test_quality_gate.py::test_complete_coverage_task_scripts_are_selectively_publishable",
             "pytest:tests/test_quality_gate.py::test_detached_worktree_cleanup_runs_after_success_and_failure",
+            "pytest:tests/test_quality_gate.py::test_diagnostic_push_skips_docker_but_publication_and_main_ci_require_it",
             "pytest:tests/test_quality_gate.py::test_docker_http_smoke_reports_protocol_failures",
             "pytest:tests/test_quality_gate.py::test_docker_rate_limit_failures_and_smoke_orchestration",
             "pytest:tests/test_quality_gate.py::test_docker_smoke_retries_a_transient_connection_reset",
@@ -2070,7 +2071,11 @@
             "pytest:tests/test_quality_gate.py::test_pre_push_two_references_with_distinct_terminal_shas_validate_both",
             "pytest:tests/test_quality_gate.py::test_pre_push_two_references_with_same_terminal_sha_validate_it_once",
             "pytest:tests/test_quality_gate.py::test_pre_push_update_of_one_commit",
-            "pytest:tests/test_quality_gate.py::test_push_never_runs_docker_but_ci_runs_the_docker_smoke",
+            "pytest:tests/test_quality_gate.py::test_publication_creation_boundaries_handle_merges_roots_and_git_errors",
+            "pytest:tests/test_quality_gate.py::test_publication_readme_checks_each_reference_and_blocks_before_worktree",
+            "pytest:tests/test_quality_gate.py::test_publication_readme_creation_checks_every_boundary_and_accepts_root_history",
+            "pytest:tests/test_quality_gate.py::test_publication_readme_uses_terminal_and_remote_blobs_not_intermediate_paths",
+            "pytest:tests/test_quality_gate.py::test_publication_tree_blob_lookup_checks_exact_path_type_and_oid",
             "pytest:tests/test_quality_gate.py::test_push_plan_locks_command_order_sources_and_coverage_artifacts",
             "pytest:tests/test_quality_gate.py::test_push_plan_rejects_missing_remote_git_errors_and_invalid_revisions",
             "pytest:tests/test_quality_gate.py::test_pytest_basetemp_cleanup_handles_readonly_git_objects",
@@ -2471,10 +2476,10 @@
             "pytest": 758
           },
           "natures": {
-            "component": 83,
+            "component": 81,
             "contract": 47,
-            "integration": 288,
-            "unit": 340
+            "integration": 294,
+            "unit": 336
           },
           "criticalities": {
             "critical": 87,
@@ -2534,6 +2539,7 @@
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > rejects invalid sampleCount %s without normalization [43:35]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > reproduces exactly the previous createSeededRandom suite [16:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > counts resolved items with ResolvedDate when ClosedDate is missing [52:3]",
@@ -2835,17 +2841,18 @@
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > composes the real browser clock for the React bootstrap [28:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > reads the current browser instant as UTC ISO [21:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > returns the controlled timestamp and records each deterministic read [13:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [73:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [62:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [55:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [48:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [31:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [36:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [41:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD without UTC day drift [12:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [21:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [69:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [26:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [74:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [63:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [56:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [49:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [32:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [37:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [42:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [12:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [22:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [70:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [27:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > uses the UTC calendar when the reference instant carries another offset [81:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes coherent demo portfolio and app defaults [159:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes differentiated and coherent public decision language for the three demo teams [137:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > keeps demo dates valid, ordered and aligned across throughput and Cycle Time [112:3]",
@@ -2858,6 +2865,12 @@
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects an invalid item identity: %s [29:43]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects facts outside the delivery vocabulary [46:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > applies UTC rather than the source offset at a week boundary [33:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > constructs and advances valid week values without local calendar arithmetic [38:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > groups every instant from monday through sunday under its ISO monday [21:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > publishes the single explicit ISO week and timezone policy [11:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > rejects dates that are not valid UTC ISO mondays [44:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > uses the ISO week-year across the civil year boundary [27:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > normalizes immutable absolute bounds [19:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
@@ -3147,9 +3160,9 @@
             "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > marks common correlated history as observed without recommending it [75:3]",
             "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > raises a fragile and declining team as a portfolio fact to verify [85:3]",
             "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > reports trend divergence without causal or unproven substitutability claims [102:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > aligns offset timestamps with the authoritative UTC delivery week [316:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > applies includeZeroWeeks after aggregating the portfolio total [191:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > is not mathematically forced to match optimistic independent draws [207:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps ISO week timestamps aligned after normalization [316:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps only the intersection of aligned weeks [156:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > returns the same history for a single team [178:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > sums aligned weekly throughput for two teams [131:3]",
@@ -3216,15 +3229,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 710
+            "vitest": 718
           },
           "natures": {
-            "component": 331,
-            "unit": 379
+            "component": 332,
+            "unit": 386
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 602
+            "unassigned": 610
           }
         },
         {
@@ -3431,13 +3444,14 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1500,
+      "logicalCases": 1508,
       "nodes": [
         {
           "id": "preflight",
           "needs": [],
           "conditionalNeeds": [],
           "commands": [
+            "Introduced commit secret scan",
             "Repository hygiene (README, encoding, secrets and DoD)",
             "Backlog consistency",
             "Backlog atomicity",
@@ -3922,21 +3936,16 @@
             "pytest:tests/test_operational_scripts.py::test_git_hook_setup_skips_missing_repo_and_reports_git_results",
             "pytest:tests/test_operational_scripts.py::test_purge_env_integer_defaults_and_main",
             "pytest:tests/test_pre_commit_guard.py::test_external_checks_cover_missing_failure_and_success",
+            "pytest:tests/test_pre_commit_guard.py::test_final_readme_must_exist_and_have_valid_encoding",
+            "pytest:tests/test_pre_commit_guard.py::test_final_tree_guard_stops_at_the_first_failure",
             "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_accepts_accented_prose_and_ascii_code",
             "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_is_independent_from_mojibake",
             "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_rejects_massively_deaccented_prose",
-            "pytest:tests/test_pre_commit_guard.py::test_guard_plan_locks_order_and_repository_inputs",
-            "pytest:tests/test_pre_commit_guard.py::test_main_is_fail_fast_and_leaves_naming_to_the_main_quality_plan",
-            "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_checks_pass",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_gate_accepts_only_commits_containing_an_added_or_modified_root_readme",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_gate_rejects_every_staged_change_without_a_modified_root_readme",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_gate_reports_when_readme_is_modified_only_in_worktree",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_staging_encoding_and_missing_file_errors",
+            "pytest:tests/test_pre_commit_guard.py::test_guard_plan_checks_the_final_tree_without_reinspecting_the_index",
+            "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_final_checks_pass",
             "pytest:tests/test_pre_commit_guard.py::test_run_executes_in_repository",
-            "pytest:tests/test_pre_commit_guard.py::test_staged_changes_exits_two_when_the_index_cannot_be_read",
-            "pytest:tests/test_pre_commit_guard.py::test_staged_changes_reads_added_modified_deleted_and_renamed_index_entries",
-            "pytest:tests/test_pre_commit_guard.py::test_worktree_readme_probe_is_read_only_and_fails_closed",
-            "pytest:tests/test_pre_commit_hook_integration.py::test_real_fast_path_uses_the_isolated_commit_index_for_the_readme_gate",
+            "pytest:tests/test_pre_commit_hook_integration.py::test_publication_secret_scan_rejects_a_secret_removed_by_a_later_checkpoint",
+            "pytest:tests/test_pre_commit_hook_integration.py::test_real_commit_saves_a_transient_index_without_readme_or_validation",
             "pytest:tests/test_python_coverage.py::test_complete_report_passes_and_tests_are_excluded",
             "pytest:tests/test_python_coverage.py::test_expected_sources_and_tracked_git_listing",
             "pytest:tests/test_python_coverage.py::test_invalid_policy_and_report_are_rejected",
@@ -3957,6 +3966,7 @@
             "pytest:tests/test_quality_gate.py::test_command_environment_preserves_existing_values_without_mutating_input",
             "pytest:tests/test_quality_gate.py::test_complete_coverage_task_scripts_are_selectively_publishable",
             "pytest:tests/test_quality_gate.py::test_detached_worktree_cleanup_runs_after_success_and_failure",
+            "pytest:tests/test_quality_gate.py::test_diagnostic_push_skips_docker_but_publication_and_main_ci_require_it",
             "pytest:tests/test_quality_gate.py::test_docker_http_smoke_reports_protocol_failures",
             "pytest:tests/test_quality_gate.py::test_docker_rate_limit_failures_and_smoke_orchestration",
             "pytest:tests/test_quality_gate.py::test_docker_smoke_retries_a_transient_connection_reset",
@@ -4010,7 +4020,11 @@
             "pytest:tests/test_quality_gate.py::test_pre_push_two_references_with_distinct_terminal_shas_validate_both",
             "pytest:tests/test_quality_gate.py::test_pre_push_two_references_with_same_terminal_sha_validate_it_once",
             "pytest:tests/test_quality_gate.py::test_pre_push_update_of_one_commit",
-            "pytest:tests/test_quality_gate.py::test_push_never_runs_docker_but_ci_runs_the_docker_smoke",
+            "pytest:tests/test_quality_gate.py::test_publication_creation_boundaries_handle_merges_roots_and_git_errors",
+            "pytest:tests/test_quality_gate.py::test_publication_readme_checks_each_reference_and_blocks_before_worktree",
+            "pytest:tests/test_quality_gate.py::test_publication_readme_creation_checks_every_boundary_and_accepts_root_history",
+            "pytest:tests/test_quality_gate.py::test_publication_readme_uses_terminal_and_remote_blobs_not_intermediate_paths",
+            "pytest:tests/test_quality_gate.py::test_publication_tree_blob_lookup_checks_exact_path_type_and_oid",
             "pytest:tests/test_quality_gate.py::test_push_plan_locks_command_order_sources_and_coverage_artifacts",
             "pytest:tests/test_quality_gate.py::test_push_plan_rejects_missing_remote_git_errors_and_invalid_revisions",
             "pytest:tests/test_quality_gate.py::test_pytest_basetemp_cleanup_handles_readonly_git_objects",
@@ -4411,10 +4425,10 @@
             "pytest": 758
           },
           "natures": {
-            "component": 83,
+            "component": 81,
             "contract": 47,
-            "integration": 288,
-            "unit": 340
+            "integration": 294,
+            "unit": 336
           },
           "criticalities": {
             "critical": 87,
@@ -4474,6 +4488,7 @@
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > rejects invalid sampleCount %s without normalization [43:35]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > reproduces exactly the previous createSeededRandom suite [16:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > counts resolved items with ResolvedDate when ClosedDate is missing [52:3]",
@@ -4775,17 +4790,18 @@
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > composes the real browser clock for the React bootstrap [28:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > reads the current browser instant as UTC ISO [21:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > returns the controlled timestamp and records each deterministic read [13:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [73:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [62:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [55:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [48:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [31:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [36:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [41:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD without UTC day drift [12:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [21:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [69:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [26:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [74:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [63:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [56:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [49:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [32:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [37:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [42:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [12:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [22:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [70:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [27:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > uses the UTC calendar when the reference instant carries another offset [81:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes coherent demo portfolio and app defaults [159:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes differentiated and coherent public decision language for the three demo teams [137:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > keeps demo dates valid, ordered and aligned across throughput and Cycle Time [112:3]",
@@ -4798,6 +4814,12 @@
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects an invalid item identity: %s [29:43]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects facts outside the delivery vocabulary [46:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > applies UTC rather than the source offset at a week boundary [33:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > constructs and advances valid week values without local calendar arithmetic [38:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > groups every instant from monday through sunday under its ISO monday [21:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > publishes the single explicit ISO week and timezone policy [11:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > rejects dates that are not valid UTC ISO mondays [44:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > uses the ISO week-year across the civil year boundary [27:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > normalizes immutable absolute bounds [19:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
@@ -5087,9 +5109,9 @@
             "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > marks common correlated history as observed without recommending it [75:3]",
             "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > raises a fragile and declining team as a portfolio fact to verify [85:3]",
             "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > reports trend divergence without causal or unproven substitutability claims [102:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > aligns offset timestamps with the authoritative UTC delivery week [316:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > applies includeZeroWeeks after aggregating the portfolio total [191:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > is not mathematically forced to match optimistic independent draws [207:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps ISO week timestamps aligned after normalization [316:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps only the intersection of aligned weeks [156:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > returns the same history for a single team [178:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > sums aligned weekly throughput for two teams [131:3]",
@@ -5156,15 +5178,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 710
+            "vitest": 718
           },
           "natures": {
-            "component": 331,
-            "unit": 379
+            "component": 332,
+            "unit": 386
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 602
+            "unassigned": 610
           }
         },
         {
@@ -5371,13 +5393,14 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1500,
+      "logicalCases": 1508,
       "nodes": [
         {
           "id": "preflight",
           "needs": [],
           "conditionalNeeds": [],
           "commands": [
+            "Introduced commit secret scan",
             "Repository hygiene (README, encoding, secrets and DoD)",
             "Backlog consistency",
             "Backlog atomicity",
@@ -5862,21 +5885,16 @@
             "pytest:tests/test_operational_scripts.py::test_git_hook_setup_skips_missing_repo_and_reports_git_results",
             "pytest:tests/test_operational_scripts.py::test_purge_env_integer_defaults_and_main",
             "pytest:tests/test_pre_commit_guard.py::test_external_checks_cover_missing_failure_and_success",
+            "pytest:tests/test_pre_commit_guard.py::test_final_readme_must_exist_and_have_valid_encoding",
+            "pytest:tests/test_pre_commit_guard.py::test_final_tree_guard_stops_at_the_first_failure",
             "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_accepts_accented_prose_and_ascii_code",
             "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_is_independent_from_mojibake",
             "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_rejects_massively_deaccented_prose",
-            "pytest:tests/test_pre_commit_guard.py::test_guard_plan_locks_order_and_repository_inputs",
-            "pytest:tests/test_pre_commit_guard.py::test_main_is_fail_fast_and_leaves_naming_to_the_main_quality_plan",
-            "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_checks_pass",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_gate_accepts_only_commits_containing_an_added_or_modified_root_readme",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_gate_rejects_every_staged_change_without_a_modified_root_readme",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_gate_reports_when_readme_is_modified_only_in_worktree",
-            "pytest:tests/test_pre_commit_guard.py::test_readme_staging_encoding_and_missing_file_errors",
+            "pytest:tests/test_pre_commit_guard.py::test_guard_plan_checks_the_final_tree_without_reinspecting_the_index",
+            "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_final_checks_pass",
             "pytest:tests/test_pre_commit_guard.py::test_run_executes_in_repository",
-            "pytest:tests/test_pre_commit_guard.py::test_staged_changes_exits_two_when_the_index_cannot_be_read",
-            "pytest:tests/test_pre_commit_guard.py::test_staged_changes_reads_added_modified_deleted_and_renamed_index_entries",
-            "pytest:tests/test_pre_commit_guard.py::test_worktree_readme_probe_is_read_only_and_fails_closed",
-            "pytest:tests/test_pre_commit_hook_integration.py::test_real_fast_path_uses_the_isolated_commit_index_for_the_readme_gate",
+            "pytest:tests/test_pre_commit_hook_integration.py::test_publication_secret_scan_rejects_a_secret_removed_by_a_later_checkpoint",
+            "pytest:tests/test_pre_commit_hook_integration.py::test_real_commit_saves_a_transient_index_without_readme_or_validation",
             "pytest:tests/test_python_coverage.py::test_complete_report_passes_and_tests_are_excluded",
             "pytest:tests/test_python_coverage.py::test_expected_sources_and_tracked_git_listing",
             "pytest:tests/test_python_coverage.py::test_invalid_policy_and_report_are_rejected",
@@ -5897,6 +5915,7 @@
             "pytest:tests/test_quality_gate.py::test_command_environment_preserves_existing_values_without_mutating_input",
             "pytest:tests/test_quality_gate.py::test_complete_coverage_task_scripts_are_selectively_publishable",
             "pytest:tests/test_quality_gate.py::test_detached_worktree_cleanup_runs_after_success_and_failure",
+            "pytest:tests/test_quality_gate.py::test_diagnostic_push_skips_docker_but_publication_and_main_ci_require_it",
             "pytest:tests/test_quality_gate.py::test_docker_http_smoke_reports_protocol_failures",
             "pytest:tests/test_quality_gate.py::test_docker_rate_limit_failures_and_smoke_orchestration",
             "pytest:tests/test_quality_gate.py::test_docker_smoke_retries_a_transient_connection_reset",
@@ -5950,7 +5969,11 @@
             "pytest:tests/test_quality_gate.py::test_pre_push_two_references_with_distinct_terminal_shas_validate_both",
             "pytest:tests/test_quality_gate.py::test_pre_push_two_references_with_same_terminal_sha_validate_it_once",
             "pytest:tests/test_quality_gate.py::test_pre_push_update_of_one_commit",
-            "pytest:tests/test_quality_gate.py::test_push_never_runs_docker_but_ci_runs_the_docker_smoke",
+            "pytest:tests/test_quality_gate.py::test_publication_creation_boundaries_handle_merges_roots_and_git_errors",
+            "pytest:tests/test_quality_gate.py::test_publication_readme_checks_each_reference_and_blocks_before_worktree",
+            "pytest:tests/test_quality_gate.py::test_publication_readme_creation_checks_every_boundary_and_accepts_root_history",
+            "pytest:tests/test_quality_gate.py::test_publication_readme_uses_terminal_and_remote_blobs_not_intermediate_paths",
+            "pytest:tests/test_quality_gate.py::test_publication_tree_blob_lookup_checks_exact_path_type_and_oid",
             "pytest:tests/test_quality_gate.py::test_push_plan_locks_command_order_sources_and_coverage_artifacts",
             "pytest:tests/test_quality_gate.py::test_push_plan_rejects_missing_remote_git_errors_and_invalid_revisions",
             "pytest:tests/test_quality_gate.py::test_pytest_basetemp_cleanup_handles_readonly_git_objects",
@@ -6351,10 +6374,10 @@
             "pytest": 758
           },
           "natures": {
-            "component": 83,
+            "component": 81,
             "contract": 47,
-            "integration": 288,
-            "unit": 340
+            "integration": 294,
+            "unit": 336
           },
           "criticalities": {
             "critical": 87,
@@ -6414,6 +6437,7 @@
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > rejects invalid sampleCount %s without normalization [43:35]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > reproduces exactly the previous createSeededRandom suite [16:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > counts resolved items with ResolvedDate when ClosedDate is missing [52:3]",
@@ -6715,17 +6739,18 @@
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > composes the real browser clock for the React bootstrap [28:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > reads the current browser instant as UTC ISO [21:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > returns the controlled timestamp and records each deterministic read [13:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [73:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [62:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [55:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [48:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [31:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [36:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [41:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD without UTC day drift [12:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [21:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [69:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [26:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [74:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [63:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [56:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [49:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [32:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [37:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [42:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [12:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [22:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [70:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [27:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > uses the UTC calendar when the reference instant carries another offset [81:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes coherent demo portfolio and app defaults [159:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes differentiated and coherent public decision language for the three demo teams [137:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > keeps demo dates valid, ordered and aligned across throughput and Cycle Time [112:3]",
@@ -6738,6 +6763,12 @@
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects an invalid item identity: %s [29:43]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects facts outside the delivery vocabulary [46:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > applies UTC rather than the source offset at a week boundary [33:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > constructs and advances valid week values without local calendar arithmetic [38:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > groups every instant from monday through sunday under its ISO monday [21:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > publishes the single explicit ISO week and timezone policy [11:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > rejects dates that are not valid UTC ISO mondays [44:3]",
+            "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > uses the ISO week-year across the civil year boundary [27:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > normalizes immutable absolute bounds [19:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
@@ -7027,9 +7058,9 @@
             "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > marks common correlated history as observed without recommending it [75:3]",
             "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > raises a fragile and declining team as a portfolio fact to verify [85:3]",
             "vitest:frontend/src/utils/portfolioComparisonDiagnostic.test.ts::buildPortfolioComparisonDiagnostic > reports trend divergence without causal or unproven substitutability claims [102:3]",
+            "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > aligns offset timestamps with the authoritative UTC delivery week [316:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > applies includeZeroWeeks after aggregating the portfolio total [191:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > is not mathematically forced to match optimistic independent draws [207:3]",
-            "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps ISO week timestamps aligned after normalization [316:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > keeps only the intersection of aligned weeks [156:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > returns the same history for a single team [178:3]",
             "vitest:frontend/src/utils/simulation.test.ts::buildCorrelatedPortfolioSamples > sums aligned weekly throughput for two teams [131:3]",
@@ -7096,15 +7127,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 710
+            "vitest": 718
           },
           "natures": {
-            "component": 331,
-            "unit": 379
+            "component": 332,
+            "unit": 386
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 602
+            "unassigned": 610
           }
         },
         {

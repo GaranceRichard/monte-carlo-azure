@@ -393,6 +393,10 @@ def test_nominal_pr_model_is_strict_deterministic_and_honest(tmp_path: Path) -> 
     assert dimensions["trends"] == "not_measured"
     assert dimensions["mutation_testing"] == "not_measured"
     assert dimensions["critical_risk_demonstration"] == "not_measured"
+    (root / "reports/test-execution-counts.json").unlink()
+    without_global_counts = reporting.build_report_model(root, "pr", now=NOW)
+    assert without_global_counts["conclusions"]["qualityGateStatus"] == "compliant"
+    assert reporting.validate_report(without_global_counts) == []
 
 
 def test_global_reference_and_profile_execution_are_independent(tmp_path: Path) -> None:
@@ -885,6 +889,6 @@ def test_reporting_is_planned_once_for_every_execution_profile() -> None:
             quality_gate.build_change_context("ci", [], execution_profile=profile)
         )
         steps = [command.step for command in plan.commands]
-        assert steps.count("Verify global execution count reference") == 1
+        assert steps.count("Verify global execution count reference") == int(profile != "pr")
         assert steps.count("Test strategy reporting") == 1
         assert steps.index("Test governance compliance") < steps.index("Test strategy reporting")

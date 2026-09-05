@@ -342,8 +342,8 @@ orchestrateurs et runners transversaux utilisent une API publique ou cette surfa
 | Preuves statistiques et compatibilité | Producteurs/vérificateurs sous `quality/evidence/statistical` via `StatisticalProofExecution` |
 | Promotion, agrégation et verdict | `quality/application/aggregate` |
 
-Les isolations restent contractuelles : le pré-commit exerce un snapshot de l’index ; le pré-push chaque SHA
-terminale dans un worktree détaché ; le `main` local un snapshot des fichiers suivis et non suivis non ignorés ;
+Les isolations restent contractuelles : le mode `fast` volontaire exerce un snapshot de l’index ; le pré-push
+chaque SHA terminale dans un worktree détaché ; le `main` local un snapshot des fichiers suivis et non suivis non ignorés ;
 la CI un checkout par job avec transfert d’artefacts. MongoDB, les ports `8000`/`4173` et le projet Compose sur
 `18080` restent des ressources exclusives, et deux nœuds parallèles ne partagent ni ressource exclusive ni
 chemin d’artefact.

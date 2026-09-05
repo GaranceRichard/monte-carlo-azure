@@ -5,7 +5,48 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any
 
-from Scripts.test_strategy_evidence import reason
+from Scripts.test_strategy_evidence import mark_status, reason
+
+
+def check_source_consistency(
+    profile: str,
+    counts: dict[str, Any],
+    governance: dict[str, Any],
+    manifest: list[dict[str, Any]],
+) -> None:
+    inventory_entry = next(item for item in manifest if item["id"] == "classification-inventory")
+    counts_entry = next(item for item in manifest if item["id"] == "execution-counts")
+    if profile == "pr" and counts_entry["status"] == "missing":
+        mark_status(
+            counts_entry, "not_applicable",
+            reason(
+                "counts.publication_only", "Global counts require a complete publication run."
+            ),
+        )
+    if (
+        counts.get("classificationInventorySha256") != inventory_entry.get("fingerprint")
+        and counts_entry["status"] == "valid"
+    ):
+        mark_status(
+            counts_entry,
+            "inconsistent",
+            reason(
+                "counts.inventory_mismatch",
+                "Execution-count reference does not identify the current classification inventory.",
+                ["classification-inventory", "execution-counts"],
+            ),
+        )
+    governance_entry = next(item for item in manifest if item["id"] == "governance")
+    if governance.get("profile") != profile and governance_entry["status"] == "valid":
+        mark_status(
+            governance_entry,
+            "inconsistent",
+            reason(
+                "governance.profile_mismatch",
+                "Governance evidence belongs to another profile.",
+                ["governance"],
+            ),
+        )
 
 
 def _counter(

@@ -89,10 +89,25 @@ def test_git_helpers_and_staged_file_failures(monkeypatch, capsys) -> None:
     assert check_no_secrets.run_git(["status"]) == (0, "a.py\n", "")
     assert check_no_secrets.get_staged_files() == ["a.py"]
 
+    monkeypatch.setattr(
+        check_no_secrets,
+        "run_git",
+        lambda _args: (0, "a.py\0b.py\0", ""),
+    )
+    assert check_no_secrets.get_workspace_files() == ["a.py", "b.py"]
+    assert check_no_secrets.get_commit_files("a" * 40) == ["a.py", "b.py"]
+
     monkeypatch.setattr(check_no_secrets, "run_git", lambda _args: (1, "", "boom"))
     with pytest.raises(SystemExit, match="2"):
         check_no_secrets.get_staged_files()
-    assert "Unable to list staged files" in capsys.readouterr().err
+    with pytest.raises(SystemExit, match="2"):
+        check_no_secrets.get_workspace_files()
+    with pytest.raises(SystemExit, match="2"):
+        check_no_secrets.get_commit_files("b" * 40)
+    errors = capsys.readouterr().err
+    assert "Unable to list staged files" in errors
+    assert "Unable to list tracked workspace files" in errors
+    assert "Unable to inspect introduced commit" in errors
 
 
 def test_skip_binary_staged_reads_and_rules(tmp_path: Path, monkeypatch) -> None:
@@ -101,7 +116,7 @@ def test_skip_binary_staged_reads_and_rules(tmp_path: Path, monkeypatch) -> None
     large.write_bytes(b"x" * (check_no_secrets.MAX_FILE_BYTES + 1))
     assert check_no_secrets.should_skip_file("image.png")
     assert check_no_secrets.should_skip_file("node_modules/source.txt")
-    assert check_no_secrets.should_skip_file("large.txt")
+    assert not check_no_secrets.should_skip_file("large.txt")
     assert not check_no_secrets.should_skip_file("missing.txt")
     assert check_no_secrets.is_probably_binary(b"a\0b")
     assert not check_no_secrets.is_probably_binary(b"text")
@@ -110,16 +125,37 @@ def test_skip_binary_staged_reads_and_rules(tmp_path: Path, monkeypatch) -> None
     assert check_no_secrets.read_staged_file_bytes("missing.txt") is None
     monkeypatch.setattr(check_no_secrets, "run_git", lambda _args: (0, "hello", ""))
     assert check_no_secrets.read_staged_file_bytes("file.txt") == b"hello"
+    assert check_no_secrets.read_commit_file_bytes("a" * 40, "file.txt") == b"hello"
+    (tmp_path / "workspace.txt").write_bytes(b"workspace")
+    assert check_no_secrets.read_workspace_file_bytes("workspace.txt") == b"workspace"
+    assert check_no_secrets.read_workspace_file_bytes("absent.txt") is None
 
     rules = check_no_secrets.compile_rules()
     findings = check_no_secrets.scan_text(
         "file.env",
-        "# token='ignored-value'\npassword='long-password'\n",
+        "# to" "ken='ignored-value'\npass" "word='long-password'\n",
         rules,
     )
     assert [finding.rule for finding in findings] == ["Generic token assignment"]
     assert check_no_secrets.mask_excerpt("short") == "***REDACTED***"
     assert check_no_secrets.mask_excerpt("x" * 40).startswith("x" * 12)
+
+    historical_secret = check_no_secrets.scan_files(
+        ["large.txt"],
+        lambda _path: b"pass" b"word='historical-secret'",
+        rules,
+    )
+    assert [finding.rule for finding in historical_secret] == [
+        "Generic token assignment"
+    ]
+    assert (
+        check_no_secrets.scan_files(
+            ["large.txt"],
+            lambda _path: b"x" * (check_no_secrets.MAX_FILE_BYTES + 1),
+            rules,
+        )
+        == []
+    )
 
 
 def test_ado_scanner_ignores_comments_and_placeholders() -> None:
@@ -153,7 +189,7 @@ def test_main_covers_repository_empty_and_finding_paths(monkeypatch, capsys) -> 
         "missing.txt": None,
         "binary.txt": b"bad\0data",
         "safe.txt": b"ordinary text",
-        "secret.txt": b"password='long-password'",
+        "secret.txt": b"pass" b"word='long-password'",
     }
     monkeypatch.setattr(check_no_secrets, "read_staged_file_bytes", payloads.get)
     assert check_no_secrets.main() == 1
@@ -161,3 +197,25 @@ def test_main_covers_repository_empty_and_finding_paths(monkeypatch, capsys) -> 
 
     monkeypatch.setattr(check_no_secrets, "get_staged_files", lambda: ["safe.txt"])
     assert check_no_secrets.main() == 0
+
+    monkeypatch.setattr(check_no_secrets, "get_workspace_files", lambda: ["safe.txt"])
+    monkeypatch.setattr(
+        check_no_secrets,
+        "read_workspace_file_bytes",
+        lambda _path: b"ordinary text",
+    )
+    assert check_no_secrets.main(["--workspace"]) == 0
+
+    commits = []
+    monkeypatch.setattr(
+        check_no_secrets,
+        "get_commit_files",
+        lambda commit: commits.append(commit) or ["safe.txt"],
+    )
+    monkeypatch.setattr(
+        check_no_secrets,
+        "read_commit_file_bytes",
+        lambda _commit, _path: b"ordinary text",
+    )
+    assert check_no_secrets.main(["--commits", "a" * 40, "b" * 40]) == 0
+    assert commits == ["a" * 40, "b" * 40]

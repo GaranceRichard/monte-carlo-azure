@@ -206,9 +206,15 @@ publiable autonome.
 
 ## Gate README
 
-La règle issue du PBI 1.11 exige qu’une évolution pertinente de `README.md` soit réellement stagée avec tout
-commit. La gate vérifie le contenu indexé et refuse un commit si le README est absent du staging ou seulement
-modifié dans le worktree. Une modification artificielle ne satisfait pas cette règle.
+L'outcome documentaire du PBI 1.11 est contrôlé sur l'état candidat : pour chaque plage introduisant de
+nouveaux commits, `README.md` racine doit exister dans l'état final et son blob doit différer de celui de
+chacune des bases de la plage. Le pré-push vérifie cette condition avant la validation coûteuse ; une
+modification suivie d'un retour au contenu initial ne suffit pas.
+
+Le mécanisme historique qui exigeait le README dans chaque commit est retiré du cycle de contribution,
+car un checkpoint transitoire n'est ni une livraison ni une preuve de pertinence. La synthèse finale doit
+refléter le changement livré ; sa cohérence reste bloquante dans la DoD et la revue, et une modification
+artificielle ne la satisfait pas.
 
 ## Gestion des statuts, dates et compteurs
 

@@ -5492,6 +5492,37 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_final_readme_must_exist_and_have_valid_encoding",
+    "framework": "pytest",
+    "sourcePath": "tests/test_pre_commit_guard.py",
+    "selector": "test_final_readme_must_exist_and_have_valid_encoding",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_final_tree_guard_stops_at_the_first_failure",
+    "framework": "pytest",
+    "sourcePath": "tests/test_pre_commit_guard.py",
+    "selector": "test_final_tree_guard_stops_at_the_first_failure",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional",
+      "resilience"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_french_accent_guard_accepts_accented_prose_and_ascii_code",
     "framework": "pytest",
     "sourcePath": "tests/test_pre_commit_guard.py",
@@ -5537,10 +5568,10 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_guard_plan_locks_order_and_repository_inputs",
+    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_guard_plan_checks_the_final_tree_without_reinspecting_the_index",
     "framework": "pytest",
     "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_guard_plan_locks_order_and_repository_inputs",
+    "selector": "test_guard_plan_checks_the_final_tree_without_reinspecting_the_index",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -5552,91 +5583,13 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_main_is_fail_fast_and_leaves_naming_to_the_main_quality_plan",
+    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_final_checks_pass",
     "framework": "pytest",
     "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_main_is_fail_fast_and_leaves_naming_to_the_main_quality_plan",
+    "selector": "test_main_returns_zero_when_all_final_checks_pass",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
-    "purposes": [
-      "functional",
-      "resilience"
-    ],
-    "domains": [
-      "quality_chain"
-    ]
-  },
-  {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_checks_pass",
-    "framework": "pytest",
-    "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_main_returns_zero_when_all_checks_pass",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "component",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "quality_chain"
-    ]
-  },
-  {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_readme_gate_accepts_only_commits_containing_an_added_or_modified_root_readme",
-    "framework": "pytest",
-    "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_readme_gate_accepts_only_commits_containing_an_added_or_modified_root_readme",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "quality_chain"
-    ]
-  },
-  {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_readme_gate_rejects_every_staged_change_without_a_modified_root_readme",
-    "framework": "pytest",
-    "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_readme_gate_rejects_every_staged_change_without_a_modified_root_readme",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "quality_chain"
-    ]
-  },
-  {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_readme_gate_reports_when_readme_is_modified_only_in_worktree",
-    "framework": "pytest",
-    "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_readme_gate_reports_when_readme_is_modified_only_in_worktree",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional",
-      "observability"
-    ],
-    "domains": [
-      "reporting",
-      "quality_chain"
-    ]
-  },
-  {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_readme_staging_encoding_and_missing_file_errors",
-    "framework": "pytest",
-    "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_readme_staging_encoding_and_missing_file_errors",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "integration",
     "purposes": [
       "functional"
     ],
@@ -5660,56 +5613,10 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_staged_changes_exits_two_when_the_index_cannot_be_read",
-    "framework": "pytest",
-    "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_staged_changes_exits_two_when_the_index_cannot_be_read",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "component",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "quality_chain"
-    ]
-  },
-  {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_staged_changes_reads_added_modified_deleted_and_renamed_index_entries",
-    "framework": "pytest",
-    "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_staged_changes_reads_added_modified_deleted_and_renamed_index_entries",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "quality_chain"
-    ]
-  },
-  {
-    "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_worktree_readme_probe_is_read_only_and_fails_closed",
-    "framework": "pytest",
-    "sourcePath": "tests/test_pre_commit_guard.py",
-    "selector": "test_worktree_readme_probe_is_read_only_and_fails_closed",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "component",
-    "purposes": [
-      "functional",
-      "resilience"
-    ],
-    "domains": [
-      "quality_chain"
-    ]
-  },
-  {
-    "logicalCaseId": "pytest:tests/test_pre_commit_hook_integration.py::test_real_fast_path_uses_the_isolated_commit_index_for_the_readme_gate",
+    "logicalCaseId": "pytest:tests/test_pre_commit_hook_integration.py::test_publication_secret_scan_rejects_a_secret_removed_by_a_later_checkpoint",
     "framework": "pytest",
     "sourcePath": "tests/test_pre_commit_hook_integration.py",
-    "selector": "test_real_fast_path_uses_the_isolated_commit_index_for_the_readme_gate",
+    "selector": "test_publication_secret_scan_rejects_a_secret_removed_by_a_later_checkpoint",
     "status": "classified",
     "executionProfile": "main",
     "nature": "integration",
@@ -5718,8 +5625,22 @@
       "security"
     ],
     "domains": [
-      "identity",
-      "azure_devops",
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_pre_commit_hook_integration.py::test_real_commit_saves_a_transient_index_without_readme_or_validation",
+    "framework": "pytest",
+    "sourcePath": "tests/test_pre_commit_hook_integration.py",
+    "selector": "test_real_commit_saves_a_transient_index_without_readme_or_validation",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "persistence",
       "quality_chain"
     ]
   },
@@ -6073,6 +5994,22 @@
       "resilience"
     ],
     "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_diagnostic_push_skips_docker_but_publication_and_main_ci_require_it",
+    "framework": "pytest",
+    "sourcePath": "tests/test_quality_gate.py",
+    "selector": "test_diagnostic_push_skips_docker_but_publication_and_main_ci_require_it",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "deployment",
       "quality_chain"
     ]
   },
@@ -6942,10 +6879,10 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_push_never_runs_docker_but_ci_runs_the_docker_smoke",
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_publication_creation_boundaries_handle_merges_roots_and_git_errors",
     "framework": "pytest",
     "sourcePath": "tests/test_quality_gate.py",
-    "selector": "test_push_never_runs_docker_but_ci_runs_the_docker_smoke",
+    "selector": "test_publication_creation_boundaries_handle_merges_roots_and_git_errors",
     "status": "classified",
     "executionProfile": "main",
     "nature": "integration",
@@ -6953,7 +6890,73 @@
       "functional"
     ],
     "domains": [
-      "deployment",
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_publication_readme_checks_each_reference_and_blocks_before_worktree",
+    "framework": "pytest",
+    "sourcePath": "tests/test_quality_gate.py",
+    "selector": "test_publication_readme_checks_each_reference_and_blocks_before_worktree",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_publication_readme_creation_checks_every_boundary_and_accepts_root_history",
+    "framework": "pytest",
+    "sourcePath": "tests/test_quality_gate.py",
+    "selector": "test_publication_readme_creation_checks_every_boundary_and_accepts_root_history",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history",
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_publication_readme_uses_terminal_and_remote_blobs_not_intermediate_paths",
+    "framework": "pytest",
+    "sourcePath": "tests/test_quality_gate.py",
+    "selector": "test_publication_readme_uses_terminal_and_remote_blobs_not_intermediate_paths",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops",
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_quality_gate.py::test_publication_tree_blob_lookup_checks_exact_path_type_and_oid",
+    "framework": "pytest",
+    "sourcePath": "tests/test_quality_gate.py",
+    "selector": "test_publication_tree_blob_lookup_checks_exact_path_type_and_oid",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops",
       "quality_chain"
     ]
   },

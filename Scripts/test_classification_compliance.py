@@ -50,9 +50,10 @@ def validate_repository(
     node_command: str = "node",
     today: date | None = None,
     discoverer: Callable[[Path, str], list[LogicalCase]] = discover_all,
+    include_execution: bool = True,
 ) -> list[str]:
     root = root.resolve()
-    artifacts, errors = _load_artifacts(root)
+    artifacts, errors = _load_artifacts(root, include_execution=include_execution)
     cases, discovery_errors = _discover_cases(root, node_command, discoverer)
     errors.extend(discovery_errors)
     errors.extend(_contract_errors(artifacts, cases, today or date.today()))
@@ -63,11 +64,12 @@ def validate_repository(
     errors.extend(_execution_profile_errors(artifacts))
     errors.extend(inventory_identity_errors(cases, records))
     errors.extend(_generation_errors(root, artifacts, cases))
-    errors.extend(
-        execution_fingerprint_errors(
-            root, INVENTORY_PATH, artifacts[EXECUTION_REPORT_PATH]
+    if include_execution:
+        errors.extend(
+            execution_fingerprint_errors(
+                root, INVENTORY_PATH, artifacts[EXECUTION_REPORT_PATH]
+            )
         )
-    )
     return errors
 
 
@@ -88,10 +90,14 @@ def _execution_profile_errors(artifacts: dict[Path, Any]) -> list[str]:
     return errors
 
 
-def _load_artifacts(root: Path) -> tuple[dict[Path, Any], list[str]]:
+def _load_artifacts(
+    root: Path, *, include_execution: bool = True
+) -> tuple[dict[Path, Any], list[str]]:
     artifacts: dict[Path, Any] = {}
     errors: list[str] = []
     for relative in ARTIFACT_PATHS:
+        if relative == EXECUTION_REPORT_PATH and not include_execution:
+            continue
         try:
             artifacts[relative] = load_json(root / relative)
         except ValueError as exc:

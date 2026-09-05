@@ -30,6 +30,7 @@
       "needs": [],
       "conditionalNeeds": [],
       "commands": [
+        "Introduced commit secret scan",
         "Repository hygiene (README, encoding, secrets and DoD)",
         "Backlog consistency",
         "Backlog atomicity",

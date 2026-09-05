@@ -2,23 +2,23 @@
 # -*- coding: utf-8 -*-
 """
 check_no_secrets.py
-Fail fast if staged files contain obvious secrets or non-fake ADO test data.
+Fail fast if a selected Git state contains obvious secrets or non-fake ADO test data.
 
-- Scans only staged files (git index), not the whole repo.
+- Scans the index by default, the tracked workspace with ``--workspace``, or every
+  added/modified blob in introduced commits with ``--commits``.
 - Ignores binaries and large files.
 - Exits 1 if it detects a potential secret.
-
-Recommended integration: .git/hooks/pre-commit
 """
 
 from __future__ import annotations
 
+import argparse
 import re
 import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 # --- Tuning knobs ---
 MAX_FILE_BYTES = 1_000_000  # 1 MB max per file (avoid scanning big blobs)
@@ -94,21 +94,49 @@ def get_staged_files() -> List[str]:
     return files
 
 
+def _nul_separated_paths(output: str) -> List[str]:
+    return [item for item in output.split("\0") if item]
+
+
+def get_workspace_files() -> List[str]:
+    """Return tracked files from the exact workspace being validated."""
+    code, out, err = run_git(["ls-files", "--cached", "-z"])
+    if code != 0:
+        print("ERROR: Unable to list tracked workspace files.", file=sys.stderr)
+        print(err, file=sys.stderr)
+        raise SystemExit(2)
+    return _nul_separated_paths(out)
+
+
+def get_commit_files(commit: str) -> List[str]:
+    """Return blobs added or modified by one introduced commit."""
+    code, out, err = run_git(
+        [
+            "diff-tree",
+            "--root",
+            "-m",
+            "--no-commit-id",
+            "--name-only",
+            "--diff-filter=ACMR",
+            "-r",
+            "-z",
+            commit,
+        ]
+    )
+    if code != 0:
+        print(f"ERROR: Unable to inspect introduced commit {commit}.", file=sys.stderr)
+        print(err, file=sys.stderr)
+        raise SystemExit(2)
+    return list(dict.fromkeys(_nul_separated_paths(out)))
+
+
 def should_skip_file(path: str) -> bool:
+    """Skip only from immutable path metadata; blob size is checked after reading."""
     p = Path(path)
     if p.suffix.lower() in SKIP_EXTENSIONS:
         return True
     parts = {part.lower() for part in p.parts}
-    if any(part in parts for part in SKIP_PATH_PARTS):
-        return True
-    try:
-        st = p.stat()
-        if st.st_size > MAX_FILE_BYTES:
-            return True
-    except FileNotFoundError:
-        # In unusual cases (renames), file might not exist on disk; still try reading from git blob.
-        pass
-    return False
+    return any(part in parts for part in SKIP_PATH_PARTS)
 
 
 def is_probably_binary(data: bytes) -> bool:
@@ -127,6 +155,20 @@ def read_staged_file_bytes(path: str) -> Optional[bytes]:
         return None
     # `out` is text; convert back to bytes conservatively.
     # We re-run with -p? Not needed. We'll encode to bytes for binary detection.
+    return out.encode("utf-8", errors="replace")
+
+
+def read_workspace_file_bytes(path: str) -> Optional[bytes]:
+    try:
+        return Path(path).read_bytes()
+    except OSError:
+        return None
+
+
+def read_commit_file_bytes(commit: str, path: str) -> Optional[bytes]:
+    code, out, _err = run_git(["show", f"{commit}:{path}"])
+    if code != 0:
+        return None
     return out.encode("utf-8", errors="replace")
 
 
@@ -224,7 +266,7 @@ def mask_excerpt(line: str) -> str:
     s = line.rstrip("\n")
     if len(s) <= 24:
         return "***REDACTED***"
-    return s[:12] + "â€¦" + s[-8:]
+    return s[:12] + "..." + s[-8:]
 
 
 def scan_text(path: str, text: str, rules: List[Tuple[str, re.Pattern]]) -> List[Finding]:
@@ -251,38 +293,60 @@ def scan_text(path: str, text: str, rules: List[Tuple[str, re.Pattern]]) -> List
     return findings
 
 
-def main() -> int:
+def scan_files(
+    paths: List[str],
+    read_bytes: Callable[[str], Optional[bytes]],
+    rules: List[Tuple[str, re.Pattern]],
+) -> List[Finding]:
+    """Scan one deterministic file list through an injected blob reader."""
+    all_findings: List[Finding] = []
+    for path in paths:
+        if should_skip_file(path):
+            continue
+        data = read_bytes(path)
+        if data is None or len(data) > MAX_FILE_BYTES or is_probably_binary(data):
+            continue
+        text = data.decode("utf-8", errors="replace")
+        all_findings.extend(scan_text(path, text, rules))
+        all_findings.extend(scan_ado_non_prod_values(path, text))
+    return all_findings
+
+
+def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("--workspace", action="store_true")
+    source.add_argument("--commits", nargs="+")
+    return parser.parse_args(argv)
+
+
+def main(argv: Optional[List[str]] = None) -> int:
     # Quick check: must be in a git repo
     code, _, _ = run_git(["rev-parse", "--is-inside-work-tree"])
     if code != 0:
         print("ERROR: Not inside a git repository.", file=sys.stderr)
         return 2
 
-    staged_files = get_staged_files()
-    if not staged_files:
-        return 0
-
+    args = parse_args(argv or [])
     rules = compile_rules()
-    all_findings: List[Finding] = []
-
-    for path in staged_files:
-        if should_skip_file(path):
-            continue
-
-        data = read_staged_file_bytes(path)
-        if data is None:
-            continue
-        if is_probably_binary(data):
-            continue
-
-        text = data.decode("utf-8", errors="replace")
-
-        all_findings.extend(scan_text(path, text, rules))
-        all_findings.extend(scan_ado_non_prod_values(path, text))
+    if args.workspace:
+        all_findings = scan_files(get_workspace_files(), read_workspace_file_bytes, rules)
+    elif args.commits:
+        all_findings = []
+        for commit in args.commits:
+            all_findings.extend(
+                scan_files(
+                    get_commit_files(commit),
+                    lambda path, revision=commit: read_commit_file_bytes(revision, path),
+                    rules,
+                )
+            )
+    else:
+        all_findings = scan_files(get_staged_files(), read_staged_file_bytes, rules)
 
     if all_findings:
         print(
-            "\nPotential secrets or disallowed test data detected in staged files.\n",
+            "\nPotential secrets or disallowed test data detected in the selected Git state.\n",
             file=sys.stderr,
         )
         for f in all_findings:
@@ -291,8 +355,8 @@ def main() -> int:
         print(
             "\nActions:\n"
             "  1) Remove/replace the secret or use a fake placeholder value\n"
-            "  2) Re-stage files: git add -A\n"
-            "  3) Re-try commit\n",
+            "  2) Remove it from all unpublished commits that introduced it\n"
+            "  3) Re-try the candidate validation\n",
             file=sys.stderr,
         )
         return 1
@@ -301,4 +365,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv[1:]))

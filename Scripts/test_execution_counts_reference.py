@@ -36,8 +36,35 @@ def build_parser(
     parser.add_argument("--inventory", type=Path, default=default_inventory)
     parser.add_argument("--native", type=Path, action="append")
     parser.add_argument("--output", type=Path, default=default_output)
-    parser.add_argument("--check", action="store_true")
+    action = parser.add_mutually_exclusive_group()
+    action.add_argument("--check", action="store_true")
+    action.add_argument("--refresh-and-check", action="store_true")
     return parser
+
+
+def refresh_and_validate(
+    root: Path,
+    inventory: Path,
+    output: Path,
+    native: tuple[Path, ...] | list[Path],
+    *,
+    consolidate: Callable[..., dict[str, Any]],
+    report_writer: Callable[[dict[str, Any], Path], bytes],
+    validate_report: Callable[[Path, Path, Path], list[str]],
+) -> int:
+    """Consolidate this run once, then enforce the unchanged persisted-report checks."""
+    try:
+        report = consolidate(root, inventory, native)
+        report_writer(report, _resolve(root, output))
+        errors = validate_report(root, inventory, output)
+    except (OSError, KeyError, TypeError, ValueError) as exc:
+        errors = [str(exc)]
+    if errors:
+        for error in errors:
+            print(f"ERROR: {error}")
+        return 1
+    print(json.dumps(report["totals"], sort_keys=True))
+    return 0
 
 
 def _resolve(root: Path, path: Path) -> Path:
@@ -158,6 +185,12 @@ def execution_counts_main(
             default_output,
         ).parse_args(argv)
         root = args.root.resolve()
+        if args.refresh_and_check:
+            return refresh_and_validate(
+                root, args.inventory, args.output, args.native or default_native,
+                consolidate=consolidate, report_writer=report_writer,
+                validate_report=validate_report,
+            )
         if args.check:
             errors = validate_report(root, args.inventory, args.output)
             if errors:

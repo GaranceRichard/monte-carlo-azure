@@ -516,6 +516,9 @@ jobs:
           path: |
             reports/test-strategy-report.json
             reports/test-strategy-report.md
+            reports/test-execution-counts.json
+            reports/test-classification-inventory.json
+            reports/test-execution-plan.json
 
   publish:
     needs: [aggregate]

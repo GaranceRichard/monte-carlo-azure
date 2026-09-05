@@ -7,11 +7,38 @@
 - Un PBI ne crée aucun junction, lien symbolique, mount point ou autre reparse point dans son worktree.
 - Les contrôles qualité existants ne sont ni affaiblis ni contournés pour obtenir un résultat vert.
 
+## Cycle de contribution
+
+- Avant de coder, le PBI fixe un outcome unique et les chemins autorisés. La commande
+  `python Scripts/quality_gate.py scope --base origin/main --allow <chemin> [...]` compare en une seule
+  inspection les changements suivis et non suivis à ce périmètre. Un chemin inattendu bloque le travail ;
+  une portée `massive` exige l'acquittement explicite `--allow-massive` avant de poursuivre.
+- Pendant le développement, exécuter seulement le test, le lint ou le typecheck directement lié au risque
+  que le dernier changement vient d'introduire. Ne pas relancer un contrôle inchangé et ne pas produire de
+  couverture, build, rapport ou preuve canonique avant que leur résultat puisse changer une décision.
+- `git commit` est un checkpoint local purement technique. Il peut figer un état transitoire, n'implique ni
+  validation, ni mise à jour artificielle du README, ni intention de push.
+- Une régénération n'est exécutée qu'après modification de son autorité source, une seule fois sur la tranche
+  cohérente finale. Les inspections Git complètes sont limitées au contrôle de périmètre et à la préparation
+  de la publication.
+- Les compteurs d'exécution sont produits et revérifiés par l'agrégateur depuis les résultats natifs du run
+  canonique. Ne pas rejouer les suites pour préfabriquer ces preuves ; seule la classification statique
+  modifiée est régénérée avant le push. Les résultats courants sont archivés par la CI pour le SHA validé.
+- Le premier état candidat est entièrement commité, resynchronisé sur `origin/main` et contrôlé une dernière
+  fois par `scope`. Ne pas lancer la validation canonique séparément : le pré-push l'exécute une seule fois
+  sur chaque SHA terminal réellement envoyé.
+- Pour chaque plage introduisant de nouveaux commits, le pré-push exige que `README.md` racine existe dans
+  l'état final et que son blob diffère de celui de chacune des bases de la plage. Ce contrôle peu coûteux
+  précède le DAG ; la pertinence de la synthèse reste une exigence de revue, sans édition par checkpoint.
+- Le pré-push scanne tous les commits introduits, valide le profil `main` complet, couvertures, E2E, preuves
+  statistiques et smoke Docker inclus. La CI distante répète ces garanties parce qu'elle constitue une
+  frontière de confiance indépendante, et non une preuve locale redondante.
+
 ## Intégration asynchrone
 
 - Le premier PBI prêt s'intègre et se pousse immédiatement sur `main`, sans attendre les autres PBI.
 - Avant de publier, un PBI retardataire se resynchronise sur le dernier `origin/main`, résout ses éventuels conflits et valide l'état final réellement destiné à `main`.
-- La validation canonique porte sur cet état final. Les vérifications partielles ne remplacent pas son verdict lorsqu'elle est requise.
+- La validation canonique du pré-push porte sur cet état final. Les vérifications partielles ne remplacent pas son verdict.
 - Après confirmation du push, le PBI nettoie uniquement son propre worktree et sa propre branche.
 
 ## Hygiène locale et publication
@@ -28,6 +55,7 @@ Avant le push, vérifier seulement que :
 
 - le PBI est sur la branche attendue et son état Git destiné à `main` est maîtrisé ;
 - le remote GitHub est présent ;
-- la validation canonique requise pour l'état destiné à `main` est verte.
+- le périmètre déclaré est toujours respecté et l'état candidat est entièrement commité.
 
-Publier dès que ces conditions sont remplies, sans dépendre de l'avancement ou de l'hygiène locale des autres PBI.
+Le `git push` lance alors la validation canonique avant tout transfert. Publier dès qu'elle est verte, sans
+dépendre de l'avancement ou de l'hygiène locale des autres PBI.

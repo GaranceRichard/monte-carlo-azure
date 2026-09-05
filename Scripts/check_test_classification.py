@@ -20,8 +20,14 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--node-command", default="node")
+    parser.add_argument(
+        "--source-only", action="store_true",
+        help="Check source classification; the final aggregator enforces execution fingerprints.",
+    )
     args = parser.parse_args(argv)
-    errors = validate_repository(args.root, node_command=args.node_command)
+    errors = validate_repository(
+        args.root, node_command=args.node_command, include_execution=not args.source_only
+    )
     if errors:
         print("ERROR: test classification compliance failed.", file=sys.stderr)
         for error in errors:

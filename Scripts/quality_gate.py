@@ -16,8 +16,6 @@ import urllib.error
 import urllib.request
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager, nullcontext
-from dataclasses import dataclass
-from enum import Enum
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,6 +24,8 @@ sys.path.insert(0, str(ROOT))
 
 from Scripts import quality_gate_change_policy as change_policy  # noqa: E402
 from Scripts import quality_gate_docker_runtime as docker_runtime  # noqa: E402
+from Scripts import quality_gate_publication as publication_policy  # noqa: E402
+from Scripts import quality_gate_scope as scope_policy  # noqa: E402
 from Scripts import quality_gate_workspace_snapshot as workspace_isolation  # noqa: E402
 from Scripts.git_staging import (  # noqa: E402
     GitStagingError,
@@ -36,162 +36,30 @@ from Scripts.git_staging import (  # noqa: E402
     isolated_git_environment,
     read_staged_changes,
 )
+from Scripts.quality_gate_models import (  # noqa: E402
+    ChangeClassification,
+    ChangeContext,
+    ChangeDomain,
+    ChangeLevel,
+    GateCommand,
+    GateExecutionPlan,
+    InputSource,
+    PathClassification,
+    PrePushRefUpdate,
+    PushCommitRange,
+    PushValidationPlan,
+    PushValidationTarget,
+    TestResolution,
+)
+from Scripts.quality_gate_models import (  # noqa: E402
+    is_zero_oid as is_zero_oid,
+)
 from Scripts.quality_gate_pytest_runtime import BACKEND_TEST_ENV  # noqa: E402
 
 DOCUMENTATION_PATHS = {"README.md", "LICENSE", "NOTICE"}
 NPM_COMMAND = "npm.cmd" if os.name == "nt" else "npm"
 
 
-class InputSource(str, Enum):
-    """Repository state read by a gate control."""
-
-    GIT_INDEX = "git-index"
-    WORKSPACE = "workspace"
-    HEAD = "HEAD"
-
-
-class ChangeLevel(str, Enum):
-    """Conservative change scope used by future adaptive validation."""
-
-    TARGETED = "targeted"
-    IMPACTED = "impacted"
-    MASSIVE = "massive"
-
-
-class ChangeDomain(str, Enum):
-    """Application domain affected by a resolvable change."""
-
-    DOCUMENTATION = "documentation"
-    BACKEND = "backend"
-    FRONTEND = "frontend"
-
-
-@dataclass(frozen=True)
-class PathClassification:
-    """Classification evidence for one changed repository path."""
-
-    path: str
-    level: ChangeLevel
-    justification: str
-
-
-@dataclass(frozen=True)
-class ChangeClassification:
-    """Overall classification plus the paths that determined its level."""
-
-    level: ChangeLevel
-    trigger_paths: tuple[str, ...]
-    justification: str
-    path_decisions: tuple[PathClassification, ...]
-
-
-@dataclass(frozen=True)
-class TestResolution:
-    """Pure test/domain resolution performed before commands are built."""
-
-    level: ChangeLevel
-    domains: tuple[ChangeDomain, ...]
-    impacted_domains: tuple[ChangeDomain, ...]
-    backend_tests: tuple[str, ...]
-    frontend_tests: tuple[str, ...]
-    unresolved_paths: tuple[str, ...]
-    justification: str
-
-
-@dataclass(frozen=True)
-class GateCommand:
-    step: str
-    argv: tuple[str, ...]
-    correction: str
-    backend_test: bool = False
-    input_sources: tuple[InputSource, ...] = (InputSource.WORKSPACE,)
-    coverage_artifacts: tuple[str, ...] = ()
-    requires_frontend_dependencies: bool = False
-
-
-@dataclass(frozen=True)
-class ChangeContext:
-    """Inputs used to select the current gate plan."""
-
-    mode: str
-    changed_paths: tuple[str, ...]
-    changed_paths_source: InputSource | None
-    documentation_only: bool
-    terminal_sha: str | None = None
-    introduced_commit_shas: tuple[str, ...] = ()
-    revision_ranges: tuple[tuple[str, ...], ...] = ()
-    classification: ChangeClassification | None = None
-    execution_profile: str | None = None
-    staged_changes: tuple[StagedChange, ...] | None = None
-
-
-@dataclass(frozen=True)
-class GateExecutionPlan:
-    """Pure description of the commands and final smoke check to execute."""
-
-    context: ChangeContext
-    commands: tuple[GateCommand, ...]
-    docker_smoke: bool
-    resolution: TestResolution | None = None
-    execution_profile: str = "pr"
-
-    @property
-    def coverage_artifacts(self) -> tuple[str, ...]:
-        """Return reusable coverage outputs in deterministic production order."""
-        return tuple(
-            dict.fromkeys(
-                artifact
-                for command in self.commands
-                for artifact in command.coverage_artifacts
-            )
-        )
-
-
-@dataclass(frozen=True)
-class PrePushRefUpdate:
-    """One reference update received by the Git pre-push hook."""
-
-    local_ref: str
-    local_sha: str
-    remote_ref: str
-    remote_sha: str
-
-    @property
-    def is_creation(self) -> bool:
-        return is_zero_oid(self.remote_sha) and not is_zero_oid(self.local_sha)
-
-    @property
-    def is_deletion(self) -> bool:
-        return is_zero_oid(self.local_sha)
-
-
-@dataclass(frozen=True)
-class PushCommitRange:
-    """Revision range and commits introduced by one pushed reference."""
-
-    update: PrePushRefUpdate
-    terminal_sha: str | None
-    revision_args: tuple[str, ...]
-    commit_shas: tuple[str, ...]
-    changed_paths: tuple[str, ...]
-
-
-@dataclass(frozen=True)
-class PushValidationTarget:
-    """One terminal commit to validate with its aggregated change context."""
-
-    terminal_sha: str
-    ranges: tuple[PushCommitRange, ...]
-    changed_paths: tuple[str, ...]
-
-
-@dataclass(frozen=True)
-class PushValidationPlan:
-    """Pure pre-push interpretation before worktrees are created."""
-
-    updates: tuple[PrePushRefUpdate, ...]
-    ranges: tuple[PushCommitRange, ...]
-    targets: tuple[PushValidationTarget, ...]
 
 
 OID_PATTERN = re.compile(r"^[0-9a-fA-F]{40}(?:[0-9a-fA-F]{24})?$")
@@ -271,10 +139,6 @@ FRONTEND_NEARBY_TESTS = {
 }
 
 
-def is_zero_oid(value: str) -> bool:
-    return bool(value) and set(value) == {"0"} and len(value) in {40, 64}
-
-
 def parse_pre_push_updates(stdin_text: str) -> tuple[PrePushRefUpdate, ...]:
     """Parse zero or more four-column records supplied to a Git pre-push hook."""
     updates: list[PrePushRefUpdate] = []
@@ -324,6 +188,38 @@ def _git_output(
     return result.stdout
 
 
+def changed_paths_since_base(
+    base: str,
+    repository_root: Path = ROOT,
+) -> tuple[str, tuple[str, ...]]:
+    return scope_policy.changed_paths_since_base(
+        base,
+        repository_root,
+        git_output=_git_output,
+    )
+
+
+_scope_pattern_matches = scope_policy.pattern_matches
+_summarize_values = scope_policy.summarize_values
+
+
+def run_scope_check(
+    base: str,
+    allowed_patterns: tuple[str, ...],
+    *,
+    allow_massive: bool,
+    repository_root: Path = ROOT,
+) -> int:
+    return scope_policy.run_scope_check(
+        base,
+        allowed_patterns,
+        allow_massive=allow_massive,
+        changed_paths_loader=changed_paths_since_base,
+        classify=classify_changes,
+        repository_root=repository_root,
+    )
+
+
 def resolve_commit_sha(sha: str, repository_root: Path = ROOT) -> str:
     """Resolve an object to the canonical commit SHA required by a detached worktree."""
     try:
@@ -342,7 +238,7 @@ def _revision_args_for_update(
     update: PrePushRefUpdate,
     remote_name: str,
     repository_root: Path,
-) -> tuple[str, tuple[str, ...]]:
+) -> tuple[str, tuple[str, ...], tuple[str, ...]]:
     terminal_sha = resolve_commit_sha(update.local_sha, repository_root)
     if update.is_creation:
         return (
@@ -354,11 +250,13 @@ def _revision_args_for_update(
                 "--not",
                 f"--remotes={remote_name}",
             ),
+            (),
         )
     remote_commit = resolve_commit_sha(update.remote_sha, repository_root)
     return (
         terminal_sha,
         ("--reverse", "--topo-order", f"{remote_commit}..{terminal_sha}"),
+        (remote_commit,),
     )
 
 
@@ -395,6 +293,18 @@ def _changed_paths_for_commits(
     return tuple(changed_paths)
 
 
+def _introduced_boundary_shas(
+    commit_shas: tuple[str, ...],
+    repository_root: Path,
+) -> tuple[str, ...]:
+    return publication_policy.introduced_boundary_shas(
+        commit_shas,
+        repository_root,
+        git_output=_git_output,
+        valid_oid=lambda value: OID_PATTERN.fullmatch(value) is not None,
+    )
+
+
 def build_push_validation_plan(
     updates: tuple[PrePushRefUpdate, ...],
     remote_name: str,
@@ -418,7 +328,7 @@ def build_push_validation_plan(
             )
             continue
 
-        terminal_sha, revision_args = _revision_args_for_update(
+        terminal_sha, revision_args, base_shas = _revision_args_for_update(
             update,
             remote_name,
             repository_root,
@@ -432,14 +342,9 @@ def build_push_validation_plan(
             raise ValueError(
                 f"Unable to resolve pushed commit range for {update.local_ref}."
             ) from exc
-        commits = tuple(line.strip().lower() for line in output.splitlines() if line.strip())
-        if not commits and update.is_creation:
-            commits = (terminal_sha,)
-        for commit_sha in commits:
-            if not OID_PATTERN.fullmatch(commit_sha):
-                raise ValueError(
-                    f"Git returned an invalid commit SHA for {update.local_ref}: {commit_sha}"
-                )
+        commits = publication_policy.commit_shas(
+            output, update.local_ref, valid_oid=OID_PATTERN.fullmatch
+        )
         changed_paths = _changed_paths_for_commits(commits, repository_root)
         ranges.append(
             PushCommitRange(
@@ -448,6 +353,10 @@ def build_push_validation_plan(
                 revision_args=revision_args,
                 commit_shas=commits,
                 changed_paths=changed_paths,
+                base_shas=(
+                    _introduced_boundary_shas(commits, repository_root)
+                    if update.is_creation else base_shas
+                ),
             )
         )
 
@@ -482,6 +391,42 @@ def build_push_validation_plan(
         updates=updates,
         ranges=tuple(ranges),
         targets=tuple(targets),
+    )
+
+
+def _tree_blob_oid(
+    commit_sha: str,
+    path: str,
+    repository_root: Path,
+) -> str | None:
+    return publication_policy.tree_blob_oid(
+        commit_sha,
+        path,
+        repository_root,
+        git_output=_git_output,
+        valid_oid=lambda value: OID_PATTERN.fullmatch(value) is not None,
+    )
+
+
+def publication_readme_changed(
+    commit_range: PushCommitRange,
+    repository_root: Path = ROOT,
+) -> bool:
+    return publication_policy.publication_readme_changed(
+        commit_range,
+        repository_root,
+        read_blob_oid=_tree_blob_oid,
+    )
+
+
+def validate_publication_readme(
+    validation: PushValidationPlan,
+    repository_root: Path = ROOT,
+) -> None:
+    publication_policy.validate_publication_readme(
+        validation,
+        repository_root,
+        readme_changed=publication_readme_changed,
     )
 
 
@@ -924,7 +869,7 @@ def build_change_context(
 
 
 def build_push_change_context(target: PushValidationTarget) -> ChangeContext:
-    """Build the future adaptive-selection context for one terminal commit."""
+    """Build the full-publication context for one terminal commit and its history."""
     introduced_commits: list[str] = []
     seen: set[str] = set()
     for commit_range in target.ranges:
@@ -943,6 +888,7 @@ def build_push_change_context(target: PushValidationTarget) -> ChangeContext:
             commit_range.revision_args for commit_range in target.ranges
         ),
         classification=classify_changes(target.changed_paths),
+        publication_candidate=True,
     )
 
 
@@ -1295,6 +1241,9 @@ def _validate_docker_smoke_configuration(repository_root: Path | None = None) ->
     return True
 
 
+_docker_smoke_environment = docker_runtime.smoke_environment
+
+
 def _run_docker_http_smoke() -> None:
     print("\n==> Docker smoke test")
     print("$ HTTP health, Mongo persistence, and shared rate-limit checks")
@@ -1359,15 +1308,16 @@ def _run_docker_smoke(repository_root: Path | None = None) -> int:
     configured = _validate_docker_smoke_configuration if repository_root is None else (
         lambda: _validate_docker_smoke_configuration(root)
     )
-    return docker_runtime.run_docker_smoke(
-        root=root,
-        port=DOCKER_SMOKE_PORT,
-        configured=configured,
-        command_type=GateCommand,
-        run_command=_run_command,
-        http_smoke=_run_docker_http_smoke,
-        logs=_docker_logs,
-    )
+    with _docker_smoke_environment(root):
+        return docker_runtime.run_docker_smoke(
+            root=root,
+            port=DOCKER_SMOKE_PORT,
+            configured=configured,
+            command_type=GateCommand,
+            run_command=_run_command,
+            http_smoke=_run_docker_http_smoke,
+            logs=_docker_logs,
+        )
 
 
 def _command_environment(
@@ -1456,7 +1406,7 @@ def _execute_gate_plan(
     )
 
 
-def _print_plan_selection(plan: GateExecutionPlan) -> None:
+def _print_plan_selection(plan: GateExecutionPlan, *, verbose: bool = True) -> None:
     classification = plan.context.classification
     resolution = plan.resolution
     level = (
@@ -1467,6 +1417,13 @@ def _print_plan_selection(plan: GateExecutionPlan) -> None:
         else ChangeLevel.MASSIVE
     )
     triggers = classification.trigger_paths if classification is not None else ()
+    if not verbose:
+        print(
+            f"Validation plan: level={level.value} profile={plan.execution_profile} "
+            f"commands={len(plan.commands)}"
+        )
+        print(f"Trigger paths: {_summarize_values(triggers)}")
+        return
     print(f"Change validation level: {level.value}")
     if plan.context.staged_changes is not None:
         staged = ", ".join(
@@ -1488,6 +1445,7 @@ def run_gate(
     *,
     execution_profile: str | None = None,
     selected_node: str | None = None,
+    verbose_plan: bool = True,
 ) -> int:
     """Run a gate and propagate the first failing command exit code."""
     context = resolve_change_context(mode, paths, execution_profile=execution_profile)
@@ -1496,7 +1454,7 @@ def run_gate(
     print(f"Execution profile: {plan.execution_profile}")
     if context.documentation_only:
         print("Documentation-only change detected: expensive code checks are skipped.")
-    _print_plan_selection(plan)
+    _print_plan_selection(plan, verbose=verbose_plan)
 
     with workspace_isolation.validation_snapshot(
         mode=mode,
@@ -1547,20 +1505,31 @@ def _print_push_validation(
         )
 
 
+is_github_remote_url = publication_policy.is_github_remote_url
+
+
 def run_pre_push_gate(
     stdin_text: str,
     *,
     remote_name: str,
     remote_url: str = "",
     repository_root: Path = ROOT,
+    verbose_plan: bool = False,
 ) -> int:
     """Validate each distinct terminal commit while preserving introduced diffs."""
+    if remote_url and not is_github_remote_url(remote_url):
+        print(
+            f"ERROR: pre-push publication requires a GitHub remote, received {remote_url!r}.",
+            file=sys.stderr,
+        )
+        return 2
     try:
         updates = parse_pre_push_updates(stdin_text)
         if not updates:
             print("Pre-push: no reference updates; nothing to validate.")
             return 0
         validation = build_push_validation_plan(updates, remote_name, repository_root)
+        validate_publication_readme(validation, repository_root)
     except (RuntimeError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
@@ -1571,7 +1540,7 @@ def run_pre_push_gate(
         print(f"\nValidating pushed terminal commit: {target.terminal_sha}")
         context = build_push_change_context(target)
         plan = build_execution_plan(context)
-        _print_plan_selection(plan)
+        _print_plan_selection(plan, verbose=verbose_plan)
         try:
             with detached_commit_worktree(
                 target.terminal_sha,
@@ -1601,29 +1570,41 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "mode",
-        choices=("fast", "push", "ci", "nightly", "release"),
+        choices=("scope", "fast", "push", "ci", "nightly", "release"),
         help="hook or automation mode used to resolve the execution profile",
     )
     parser.add_argument("--remote-name", default="")
     parser.add_argument("--remote-url", default="")
     parser.add_argument("--profile", choices=("pr", "main", "nightly", "release"))
     parser.add_argument("--node")
+    parser.add_argument("--base", default="origin/main")
+    parser.add_argument("--allow", action="append", default=[])
+    parser.add_argument("--allow-massive", action="store_true")
+    parser.add_argument("--verbose-plan", action="store_true")
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    if args.mode == "scope":
+        return run_scope_check(
+            args.base,
+            tuple(args.allow),
+            allow_massive=args.allow_massive,
+        )
     if args.mode == "push":
         return run_pre_push_gate(
             sys.stdin.read(),
             remote_name=args.remote_name,
             remote_url=args.remote_url,
+            verbose_plan=args.verbose_plan,
         )
     options = {}
     if args.profile is not None:
         options["execution_profile"] = args.profile
     if args.node is not None:
         options["selected_node"] = args.node
+    options["verbose_plan"] = args.verbose_plan
     return run_gate(args.mode, **options)
 
 

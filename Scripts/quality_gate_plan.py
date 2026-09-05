@@ -5,7 +5,10 @@ from __future__ import annotations
 import sys
 from typing import Any
 
-from Scripts.quality_gate_change_policy import classification_gate_command
+from Scripts.quality_gate_change_policy import (
+    classification_gate_command,
+    introduced_secret_commands,
+)
 from Scripts.quality_gate_statistical_plan import statistical_commands
 
 
@@ -64,7 +67,6 @@ def _python_coverage_commands(
                 "--cov",
                 "--cov-config=.coveragerc",
                 f"--cov-report=json:{report}",
-                "--cov-report=term-missing",
                 "-q",
                 "-n",
                 "2",
@@ -86,12 +88,16 @@ def _python_coverage_commands(
     )
 
 
-def _base_commands(q: Any, command_input: tuple[Any, ...]) -> list[Any]:
-    return [
+def _base_commands(q: Any, command_input: tuple[Any, ...], context: Any) -> list[Any]:
+    commands = introduced_secret_commands(
+        q.GateCommand, sys.executable, command_input, context
+    )
+    commands.extend(
+        [
         q.GateCommand(
             "Repository hygiene (README, encoding, secrets and DoD)",
             (sys.executable, "Scripts/pre_commit_guard.py"),
-            "Correct the reported README, encoding, secret, or DoD issue and stage the fix.",
+            "Correct the terminal README, secret, or DoD issue and commit the candidate fix.",
             input_sources=command_input,
         ),
         q.GateCommand(
@@ -125,7 +131,9 @@ def _base_commands(q: Any, command_input: tuple[Any, ...]) -> list[Any]:
             "Remove the new maintainability drift or explicitly review the versioned baseline.",
             input_sources=command_input,
         ),
-    ]
+        ]
+    )
+    return commands
 
 
 def _backend_lint(q: Any, inputs: tuple[Any, ...]) -> Any:
@@ -252,11 +260,11 @@ def _aggregate_commands(
     require_runtime: bool,
 ) -> tuple[Any, ...]:
     report = "frontend/coverage/vitals-coverage-report.json"
-    commands = [
+    commands = [] if profile == "pr" else [
         q.GateCommand(
             "Verify global execution count reference",
-            (sys.executable, "Scripts/report_test_execution_counts.py", "--check"),
-            "Regenerate the global count snapshot from a complete three-framework run.",
+            (sys.executable, "Scripts/report_test_execution_counts.py", "--refresh-and-check"),
+            "Restore complete current native results and their exact inventory fingerprint.",
             input_sources=inputs,
         )
     ]
@@ -334,7 +342,7 @@ def build_execution_plan(context: Any, q: Any) -> Any:
     """Build the immutable deterministic command list and its DAG profile."""
     profile = execution_profile_for_mode(context.mode, context.execution_profile)
     inputs = q._gate_input_sources(context.mode)
-    commands = _base_commands(q, inputs)
+    commands = _base_commands(q, inputs, context)
     resolution = q.resolve_tests(context)
     if (
         context.documentation_only
@@ -343,7 +351,7 @@ def build_execution_plan(context: Any, q: Any) -> Any:
     ):
         commands.append(_test_governance_command(q, inputs, profile, require_runtime=False))
         return q.GateExecutionPlan(context, tuple(commands), False, resolution, profile)
-    if resolution.level != q.ChangeLevel.MASSIVE:
+    if not context.publication_candidate and resolution.level != q.ChangeLevel.MASSIVE:
         commands.append(_test_governance_command(q, inputs, profile, require_runtime=False))
         known = {command.argv for command in commands}
         for command in _selected_commands(q, resolution, inputs):
@@ -357,7 +365,9 @@ def build_execution_plan(context: Any, q: Any) -> Any:
     commands.extend(test_commands)
     commands.extend(statistical_commands(q, profile, inputs))
     commands.extend(_aggregate_commands(q, inputs, profile, require_runtime=True))
-    docker_smoke = has_release_checks and context.mode in {"ci", "nightly", "release"}
+    docker_smoke = has_release_checks and (
+        context.publication_candidate or context.mode in {"ci", "nightly", "release"}
+    )
     return q.GateExecutionPlan(context, tuple(commands), docker_smoke, resolution, profile)
 
 

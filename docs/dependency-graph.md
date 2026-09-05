@@ -15,7 +15,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 273 | 1414 | 85 | 5 | 0 | 0 | 136 | 2 |
+| 276 | 1433 | 84 | 5 | 0 | 0 | 136 | 2 |
 
 ### Directions observées
 
@@ -27,7 +27,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 | launcher | backend | runtime | 1 |
 | quality | backend | runtime | 5 |
 | quality | frontend | runtime | 3 |
-| quality | quality | runtime | 267 |
+| quality | quality | runtime | 271 |
 
 ### Cycles localisés
 
@@ -35,7 +35,6 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Déclaré dans | Ligne | Nature | Cible | Résolution |
 | --- | --- | --- | --- | --- |
-| .githooks/pre-commit | 17 | executable-reference | Scripts/quality_gate.py | internal |
 | .githooks/pre-push | 17 | executable-reference | Scripts/quality_gate.py | internal |
 | .github/workflows/ci.yml | 59 | executable-reference | Scripts/quality_gate.py | internal |
 | .github/workflows/ci.yml | 83 | executable-reference | Scripts/quality_gate.py | internal |
@@ -73,20 +72,20 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 | Scripts/check_identity_boundary.py | 505 | python-main-guard | Scripts/check_identity_boundary.py | internal |
 | Scripts/check_maintainability.py | 148 | python-main-guard | Scripts/check_maintainability.py | internal |
 | Scripts/check_naming_convention.py | 180 | python-main-guard | Scripts/check_naming_convention.py | internal |
-| Scripts/check_no_secrets.py | 301 | python-main-guard | Scripts/check_no_secrets.py | internal |
+| Scripts/check_no_secrets.py | 365 | python-main-guard | Scripts/check_no_secrets.py | internal |
 | Scripts/check_python_coverage.py | 170 | python-main-guard | Scripts/check_python_coverage.py | internal |
-| Scripts/check_test_classification.py | 32 | python-main-guard | Scripts/check_test_classification.py | internal |
+| Scripts/check_test_classification.py | 38 | python-main-guard | Scripts/check_test_classification.py | internal |
 | Scripts/check_test_governance.py | 113 | python-main-guard | Scripts/check_test_governance.py | internal |
 | Scripts/check_vitals_compliance.py | 191 | python-main-guard | Scripts/check_vitals_compliance.py | internal |
 | Scripts/classify_tests.py | 105 | python-main-guard | Scripts/classify_tests.py | internal |
 | Scripts/generate_statistical_consolidated_report.py | 81 | python-main-guard | Scripts/generate_statistical_consolidated_report.py | internal |
-| Scripts/pre_commit_guard.py | 293 | python-main-guard | Scripts/pre_commit_guard.py | internal |
+| Scripts/pre_commit_guard.py | 195 | python-main-guard | Scripts/pre_commit_guard.py | internal |
 | Scripts/purge_inactive_clients.py | 47 | python-main-guard | Scripts/purge_inactive_clients.py | internal |
-| Scripts/quality_gate.py | 1628 | python-main-guard | Scripts/quality_gate.py | internal |
+| Scripts/quality_gate.py | 1609 | python-main-guard | Scripts/quality_gate.py | internal |
 | Scripts/report_change_cost_baseline.py | 288 | python-main-guard | Scripts/report_change_cost_baseline.py | internal |
 | Scripts/report_dependency_graph.py | 276 | python-main-guard | Scripts/report_dependency_graph.py | internal |
 | Scripts/report_test_execution_counts.py | 359 | python-main-guard | Scripts/report_test_execution_counts.py | internal |
-| Scripts/report_test_strategy.py | 502 | python-main-guard | Scripts/report_test_strategy.py | internal |
+| Scripts/report_test_strategy.py | 473 | python-main-guard | Scripts/report_test_strategy.py | internal |
 | Scripts/report_vitals_coverage.py | 367 | python-main-guard | Scripts/report_vitals_coverage.py | internal |
 | Scripts/run_statistical_compatibility.py | 111 | python-main-guard | Scripts/run_statistical_compatibility.py | internal |
 | Scripts/run_statistical_distribution.py | 102 | python-main-guard | Scripts/run_statistical_distribution.py | internal |

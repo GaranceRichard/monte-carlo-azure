@@ -22,17 +22,17 @@ Les responsabilités demeurent distinctes :
 
 | Entrée | Source contrôlée | Portée | Garantie statistique complète |
 | --- | --- | --- | --- |
-| `fast` / pré-commit | snapshot de l’index | retour ciblé, profil `pr` | non |
-| `push` / pré-push | SHA terminal dans un worktree détaché | ciblé ou impacté ; plan complet seulement pour un changement `massive` | seulement lorsque le risque `massive` déclenche le plan complet |
+| `fast` volontaire | snapshot de l’index | diagnostic ciblé, profil `pr` | non |
+| `push` / pré-push | SHA terminal dans un worktree détaché | profil `main` complet pour tout candidat | oui |
 | `ci --profile pr` / pull request | checkout de `${{ github.sha }}` | profil `pr` | non |
 | `ci --profile main` / push sur `main` et tâche VS Code | snapshot local complet ou checkout de `${{ github.sha }}` | autorité complète | oui |
 | `nightly` | même socle que `main`, plus le profil planifié | autorité complète héritée | oui |
 | `release` | même socle que `main`, plus le profil de publication | autorité complète héritée | oui |
 
-Les modes légers ne sont donc pas présentés comme équivalents à `main`. Le pré-push conserve son
-déclenchement `massive` pour les changements de gate, d’autorités ou de moteurs : le risque couvert est le
-faux vert avant publication, le coût supplémentaire est celui mesuré ci-dessous et aucune suite existante
-n’est supprimée.
+Le retour ciblé de développement n'est donc jamais présenté comme équivalent à `main`. Le pré-push ne réduit
+plus son plan selon la classification des chemins : le risque couvert est le faux vert avant publication, et
+le coût complet n'est payé qu'une fois lorsque le SHA devient candidat. Aucune suite existante n'est
+supprimée.
 
 ## DAG d’autorité
 

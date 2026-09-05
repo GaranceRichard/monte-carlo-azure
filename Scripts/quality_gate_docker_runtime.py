@@ -2,10 +2,29 @@
 
 from __future__ import annotations
 
+import shutil
 import sys
 import urllib.error
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Callable
+
+
+@contextmanager
+def smoke_environment(repository_root: Path) -> Iterator[None]:
+    """Provide the same non-secret Docker defaults used by CI, then clean them."""
+    environment_path = repository_root / ".env"
+    example_path = repository_root / ".env.example"
+    created = False
+    if not environment_path.exists() and example_path.is_file():
+        shutil.copy2(example_path, environment_path)
+        created = True
+    try:
+        yield
+    finally:
+        if created:
+            environment_path.unlink(missing_ok=True)
 
 
 def _start_services(

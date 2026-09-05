@@ -60,6 +60,9 @@ from Scripts.test_strategy_rendering import (
     write_reports as write_reports,
 )
 from Scripts.test_strategy_summary import (
+    check_source_consistency as _check_source_consistency,
+)
+from Scripts.test_strategy_summary import (
     classification_summary,
     dimension,
     governance_summary,
@@ -272,38 +275,6 @@ def _profile_execution(
     }
 
 
-def _check_source_consistency(
-    profile: str,
-    counts: dict[str, Any],
-    governance: dict[str, Any],
-    manifest: list[dict[str, Any]],
-) -> None:
-    inventory_entry = next(item for item in manifest if item["id"] == "classification-inventory")
-    counts_entry = next(item for item in manifest if item["id"] == "execution-counts")
-    if (
-        counts.get("classificationInventorySha256") != inventory_entry.get("fingerprint")
-        and counts_entry["status"] == "valid"
-    ):
-        mark_status(
-            counts_entry,
-            "inconsistent",
-            reason(
-                "counts.inventory_mismatch",
-                "Execution-count reference does not identify the current classification inventory.",
-                ["classification-inventory", "execution-counts"],
-            ),
-        )
-    governance_entry = next(item for item in manifest if item["id"] == "governance")
-    if governance.get("profile") != profile and governance_entry["status"] == "valid":
-        mark_status(
-            governance_entry,
-            "inconsistent",
-            reason(
-                "governance.profile_mismatch",
-                "Governance evidence belongs to another profile.",
-                ["governance"],
-            ),
-        )
 
 
 def _select_profile(

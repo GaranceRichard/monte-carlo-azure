@@ -1,20 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Pre-commit guard for repository hygiene.
+"""Repository-hygiene checks executed from the publication quality plan.
 
-Checks:
-1) README update is staged whenever at least one change is staged.
-2) README text does not contain common mojibake artifacts.
-3) README French prose is not massively de-accented.
-4) Secret scan via Scripts/check_no_secrets.py.
-5) DoD compliance guard via Scripts/check_dod_compliance.py.
-6) Generated backlog consistency via Scripts/check_backlog_consistency.py.
+The pre-push orchestrator separately verifies that the terminal README differs from
+the remote base and scans every introduced commit for secrets. This module checks
+the terminal tree: README integrity, tracked-file secrets, and DoD compliance.
+Backlog consistency is executed separately by the shared quality plan.
 """
 
 from __future__ import annotations
 
-import os
 import re
 import subprocess
 import sys
@@ -25,19 +20,9 @@ from typing import Callable
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
-from Scripts.git_staging import (  # noqa: E402
-    GitStagingError,
-    StagedChange,
-    read_staged_changes,
-)
-from Scripts.git_staging import (  # noqa: E402
-    parse_staged_changes as parse_staged_changes,
-)
-
 README_PATH = REPO_ROOT / "README.md"
 SECRET_CHECK_PATH = REPO_ROOT / "Scripts" / "check_no_secrets.py"
 DOD_CHECK_PATH = REPO_ROOT / "Scripts" / "check_dod_compliance.py"
-BACKLOG_CHECK_PATH = REPO_ROOT / "Scripts" / "check_backlog_consistency.py"
 
 # Typical mojibake fragments seen when UTF-8 is decoded as cp1252/latin1.
 MOJIBAKE_TOKENS = (
@@ -117,53 +102,6 @@ def run(cmd: list[str]) -> subprocess.CompletedProcess[str]:
     )
 
 
-def staged_changes() -> list[StagedChange]:
-    try:
-        return list(
-            read_staged_changes(
-                REPO_ROOT,
-                environment=os.environ,
-            )
-        )
-    except GitStagingError as exc:
-        print("ERROR: unable to read staged changes.", file=sys.stderr)
-        print(str(exc), file=sys.stderr)
-        raise SystemExit(2)
-
-
-def readme_modified_in_worktree() -> bool:
-    p = run(["git", "diff", "--name-only", "--", "README.md"])
-    if p.returncode != 0:
-        print("ERROR: unable to inspect the README.md worktree state.", file=sys.stderr)
-        print(p.stderr, file=sys.stderr)
-        raise SystemExit(2)
-    return "README.md" in {line.strip() for line in p.stdout.splitlines()}
-
-
-def readme_is_modified_or_added(changes: list[StagedChange]) -> bool:
-    return any(
-        change.status in {"A", "M"} and change.paths == ("README.md",)
-        for change in changes
-    )
-
-
-def check_readme_staged(
-    changes: list[StagedChange],
-    *,
-    modified_only_in_worktree: bool = False,
-) -> int:
-    if not changes or readme_is_modified_or_added(changes):
-        return 0
-    print(
-        "Commit refusé : README.md doit contenir une évolution pertinente et être inclus "
-        "dans les changements stagés.",
-        file=sys.stderr,
-    )
-    if modified_only_in_worktree:
-        print("README.md est modifié mais non stagé.", file=sys.stderr)
-    return 1
-
-
 def check_readme_encoding(readme_path: Path | None = None) -> int:
     readme_path = readme_path or README_PATH
     if not readme_path.exists():
@@ -214,7 +152,7 @@ def check_no_secrets() -> int:
     if not SECRET_CHECK_PATH.exists():
         print("ERROR: Scripts/check_no_secrets.py is missing.", file=sys.stderr)
         return 1
-    p = run([sys.executable, str(SECRET_CHECK_PATH)])
+    p = run([sys.executable, str(SECRET_CHECK_PATH), "--workspace"])
     if p.returncode != 0:
         if p.stdout:
             print(p.stdout, file=sys.stderr, end="")
@@ -238,54 +176,18 @@ def check_dod_compliance() -> int:
     return 0
 
 
-def check_backlog_consistency() -> int:
-    if not BACKLOG_CHECK_PATH.exists():
-        print("ERROR: Scripts/check_backlog_consistency.py is missing.", file=sys.stderr)
-        return 1
-    p = run([sys.executable, str(BACKLOG_CHECK_PATH)])
-    if p.returncode != 0:
-        if p.stdout:
-            print(p.stdout, file=sys.stderr, end="")
-        if p.stderr:
-            print(p.stderr, file=sys.stderr, end="")
-        return p.returncode
-    return 0
-
-
-def guard_plan(
-    changes: list[StagedChange],
-    *,
-    readme_worktree_only: bool = False,
-) -> tuple[GuardCheck, ...]:
+def guard_plan() -> tuple[GuardCheck, ...]:
     """Describe the current ordered checks without executing them."""
     return (
-        GuardCheck(
-            "README staged with every commit",
-            ("git-index",),
-            lambda: check_readme_staged(
-                changes,
-                modified_only_in_worktree=readme_worktree_only,
-            ),
-        ),
-        GuardCheck("README encoding", ("git-index",), check_readme_encoding),
-        GuardCheck("README French accents", ("git-index",), check_readme_french_accents),
-        GuardCheck("Secret scan", ("git-index",), check_no_secrets),
-        GuardCheck("DoD compliance", ("git-index",), check_dod_compliance),
-        GuardCheck("Backlog consistency", ("git-index",), check_backlog_consistency),
+        GuardCheck("README encoding", ("workspace",), check_readme_encoding),
+        GuardCheck("README French accents", ("workspace",), check_readme_french_accents),
+        GuardCheck("Final tree secret scan", ("workspace",), check_no_secrets),
+        GuardCheck("DoD compliance", ("workspace",), check_dod_compliance),
     )
 
 
 def main() -> int:
-    changes = staged_changes()
-    readme_worktree_only = (
-        bool(changes)
-        and not readme_is_modified_or_added(changes)
-        and readme_modified_in_worktree()
-    )
-    for check in guard_plan(
-        changes,
-        readme_worktree_only=readme_worktree_only,
-    ):
+    for check in guard_plan():
         code = check.run()
         if code != 0:
             return code

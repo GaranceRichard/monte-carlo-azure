@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 from contextlib import contextmanager
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -53,6 +54,7 @@ def _mock_push_git(
     *,
     commits_by_range: dict[str, tuple[str, ...]],
     paths_by_commit: dict[str, tuple[str, ...]],
+    parents_by_commit: dict[str, tuple[str, ...]] | None = None,
 ) -> None:
     monkeypatch.setattr(
         quality_gate,
@@ -62,6 +64,9 @@ def _mock_push_git(
 
     def fake_git_output(args: list[str], **_kwargs: object) -> str:
         if args[0] == "rev-list":
+            if "--parents" in args:
+                sha = args[-1]
+                return " ".join((sha, *(parents_by_commit or {}).get(sha, ())))
             range_key = next(
                 (
                     argument
@@ -778,6 +783,11 @@ def test_plan_selection_output_explains_level_triggers_and_commands(capsys) -> N
     assert "Frontend lint (ESLint, zero warning)" in output
     assert "Selected frontend unit tests (Vitest)" in output
 
+    quality_gate._print_plan_selection(plan, verbose=False)
+    compact_output = capsys.readouterr().out
+    assert "Validation plan: level=impacted profile=main" in compact_output
+    assert "Selected commands:" not in compact_output
+
     staged_context = quality_gate.build_change_context(
         "fast",
         ["README.md", "backend/api.py"],
@@ -909,6 +919,15 @@ def test_pre_push_multiple_commits_keep_range_but_validate_only_terminal_sha(
     assert context.terminal_sha == local_sha
     assert context.introduced_commit_shas == (first_sha, local_sha)
     assert context.revision_ranges == (plan.ranges[0].revision_args,)
+    assert context.publication_candidate
+    candidate_plan = quality_gate.build_execution_plan(context)
+    assert candidate_plan.docker_smoke
+    assert "Versioned Python coverage" in {
+        command.step for command in candidate_plan.commands
+    }
+    secret_scan = candidate_plan.commands[0]
+    assert secret_scan.step == "Introduced commit secret scan"
+    assert secret_scan.argv[-2:] == (first_sha, local_sha)
 
 
 def test_pre_push_remote_branch_creation_uses_remote_reachability(monkeypatch) -> None:
@@ -938,8 +957,193 @@ def test_pre_push_remote_branch_creation_uses_remote_reachability(monkeypatch) -
         "--remotes=origin",
     )
     assert [target.terminal_sha for target in plan.targets] == [local_sha]
-    assert plan.ranges[0].commit_shas == (local_sha,)
-    assert plan.ranges[0].changed_paths == ("backend/new_module.py",)
+    assert plan.ranges[0].commit_shas == ()
+    assert plan.ranges[0].changed_paths == ()
+    assert plan.ranges[0].base_shas == ()
+    assert quality_gate.build_push_change_context(plan.targets[0]).introduced_commit_shas == ()
+    base_sha = _oid("a")
+    _mock_push_git(
+        monkeypatch,
+        commits_by_range={local_sha: (local_sha,)},
+        paths_by_commit={local_sha: ("backend/new_module.py",)},
+        parents_by_commit={local_sha: (base_sha,)},
+    )
+    introduced_plan = quality_gate.build_push_validation_plan(updates, "origin")
+    assert introduced_plan.ranges[0].commit_shas == (local_sha,)
+    assert introduced_plan.ranges[0].changed_paths == ("backend/new_module.py",)
+    assert introduced_plan.ranges[0].base_shas == (base_sha,)
+
+
+def test_publication_tree_blob_lookup_checks_exact_path_type_and_oid(
+    tmp_path: Path, monkeypatch
+) -> None:
+    commit_sha = _oid("a")
+    blob_sha = _oid("b")
+    calls: list[tuple[list[str], Path]] = []
+
+    def read_tree(args: list[str], *, repository_root: Path) -> str:
+        calls.append((args, repository_root))
+        return f"100644 blob {blob_sha.upper()}\tREADME.md\0"
+
+    monkeypatch.setattr(quality_gate, "_git_output", read_tree)
+    assert quality_gate._tree_blob_oid(commit_sha, "README.md", tmp_path) == blob_sha
+    assert calls == [(["ls-tree", "-z", commit_sha, "--", "README.md"], tmp_path)]
+    monkeypatch.setattr(quality_gate, "_git_output", lambda *_args, **_kwargs: "")
+    assert quality_gate._tree_blob_oid(commit_sha, "README.md", tmp_path) is None
+
+    for malformed in (
+        "missing-tab",
+        f"100644 blob {blob_sha}\tREADME.md\0second-record\0",
+        f"100644 blob {blob_sha}\tother.md\0",
+        f"100644 {blob_sha}\tREADME.md\0",
+        f"040000 tree {blob_sha}\tREADME.md\0",
+        "100644 blob not-an-oid\tREADME.md\0",
+    ):
+        monkeypatch.setattr(
+            quality_gate, "_git_output", lambda *_args, value=malformed, **_kwargs: value
+        )
+        with pytest.raises(ValueError, match="invalid tree entry"):
+            quality_gate._tree_blob_oid(commit_sha, "README.md", tmp_path)
+
+    def unavailable(*_args, **_kwargs) -> str:
+        raise RuntimeError("Git unavailable")
+
+    monkeypatch.setattr(quality_gate, "_git_output", unavailable)
+    with pytest.raises(ValueError, match="Unable to inspect README.md"):
+        quality_gate._tree_blob_oid(commit_sha, "README.md", tmp_path)
+
+
+def test_publication_readme_uses_terminal_and_remote_blobs_not_intermediate_paths(
+    tmp_path: Path, monkeypatch
+) -> None:
+    remote_sha, checkpoint_sha, terminal_sha = (_oid(value) for value in "abc")
+    update = quality_gate.PrePushRefUpdate(
+        "refs/heads/main", terminal_sha, "refs/heads/main", remote_sha
+    )
+    commit_range = quality_gate.PushCommitRange(
+        update, terminal_sha, (), (checkpoint_sha, terminal_sha), ("README.md",), (remote_sha,)
+    )
+    blobs = {remote_sha: _oid("d"), checkpoint_sha: _oid("e"), terminal_sha: _oid("f")}
+    inspected: list[str] = []
+
+    def read_blob(sha: str, path: str, root: Path) -> str | None:
+        assert path == "README.md"
+        assert root == tmp_path
+        inspected.append(sha)
+        return blobs.get(sha)
+
+    monkeypatch.setattr(quality_gate, "_tree_blob_oid", read_blob)
+    assert quality_gate.publication_readme_changed(commit_range, tmp_path)
+    assert inspected == [terminal_sha, remote_sha]
+    blobs[terminal_sha] = blobs[remote_sha]
+    assert not quality_gate.publication_readme_changed(commit_range, tmp_path)
+    del blobs[terminal_sha]
+    assert not quality_gate.publication_readme_changed(commit_range, tmp_path)
+    with pytest.raises(ValueError, match="Missing publication base"):
+        quality_gate.publication_readme_changed(replace(commit_range, base_shas=()), tmp_path)
+
+
+def test_publication_readme_creation_checks_every_boundary_and_accepts_root_history(
+    tmp_path: Path, monkeypatch
+) -> None:
+    first_sha, terminal_sha, first_base, second_base = (_oid(value) for value in "abcd")
+    update = quality_gate.PrePushRefUpdate(
+        "refs/heads/topic", terminal_sha, "refs/heads/topic", "0" * 40
+    )
+    commit_range = quality_gate.PushCommitRange(
+        update, terminal_sha, (), (first_sha, terminal_sha), (), (first_base, second_base)
+    )
+    blobs = {terminal_sha: _oid("e"), first_base: _oid("f"), second_base: _oid("a")}
+    monkeypatch.setattr(quality_gate, "_tree_blob_oid", lambda sha, *_args: blobs.get(sha))
+    assert quality_gate.publication_readme_changed(commit_range, tmp_path)
+    blobs[second_base] = blobs[terminal_sha]
+    assert not quality_gate.publication_readme_changed(commit_range, tmp_path)
+    assert quality_gate.publication_readme_changed(replace(commit_range, base_shas=()), tmp_path)
+    del blobs[terminal_sha]
+    assert not quality_gate.publication_readme_changed(
+        replace(commit_range, base_shas=()), tmp_path
+    )
+    monkeypatch.setattr(
+        quality_gate,
+        "_tree_blob_oid",
+        lambda *_args: pytest.fail("No introduced history must not impose a README change."),
+    )
+    assert quality_gate.publication_readme_changed(replace(commit_range, commit_shas=()), tmp_path)
+    assert quality_gate.publication_readme_changed(
+        replace(commit_range, terminal_sha=None), tmp_path
+    )
+
+
+def test_publication_creation_boundaries_handle_merges_roots_and_git_errors(
+    tmp_path: Path, monkeypatch
+) -> None:
+    first_sha, terminal_sha, first_base, second_base = (_oid(value) for value in "abcd")
+    lineages = {
+        first_sha: f"{first_sha} {first_base}",
+        terminal_sha: f"{terminal_sha} {first_sha} {second_base.upper()} {first_base}",
+    }
+    monkeypatch.setattr(
+        quality_gate, "_git_output", lambda args, **_kwargs: lineages[args[-1]]
+    )
+    assert quality_gate._introduced_boundary_shas(
+        (first_sha, terminal_sha), tmp_path
+    ) == (first_base, second_base)
+    lineages[first_sha] = first_sha
+    assert quality_gate._introduced_boundary_shas((first_sha,), tmp_path) == ()
+    assert quality_gate._introduced_boundary_shas((), tmp_path) == ()
+    for malformed in ("", terminal_sha, f"{first_sha} invalid-parent"):
+        lineages[first_sha] = malformed
+        with pytest.raises(ValueError, match="invalid parent"):
+            quality_gate._introduced_boundary_shas((first_sha,), tmp_path)
+
+    def unavailable(*_args, **_kwargs) -> str:
+        raise RuntimeError("Git unavailable")
+
+    monkeypatch.setattr(quality_gate, "_git_output", unavailable)
+    with pytest.raises(ValueError, match="Unable to resolve the publication boundary"):
+        quality_gate._introduced_boundary_shas((first_sha,), tmp_path)
+
+
+def test_publication_readme_checks_each_reference_and_blocks_before_worktree(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    terminal_sha = _oid("c")
+    updates = tuple(
+        quality_gate.PrePushRefUpdate(
+            f"refs/heads/{name}", terminal_sha, f"refs/heads/{name}", _oid("a")
+        )
+        for name in ("main", "release")
+    )
+    ranges = tuple(
+        quality_gate.PushCommitRange(update, terminal_sha, (), (terminal_sha,), (), (_oid("a"),))
+        for update in updates
+    )
+    target = quality_gate.PushValidationTarget(terminal_sha, ranges, ())
+    validation = quality_gate.PushValidationPlan(updates, ranges, (target,))
+    checked: list[quality_gate.PushCommitRange] = []
+
+    def unchanged(commit_range, root: Path) -> bool:
+        assert root == tmp_path
+        checked.append(commit_range)
+        return False
+
+    monkeypatch.setattr(quality_gate, "publication_readme_changed", unchanged)
+    with pytest.raises(ValueError, match="refs/heads/main, refs/heads/release"):
+        quality_gate.validate_publication_readme(validation, tmp_path)
+    assert checked == list(ranges)
+    monkeypatch.setattr(quality_gate, "parse_pre_push_updates", lambda _text: updates)
+    monkeypatch.setattr(quality_gate, "build_push_validation_plan", lambda *_args: validation)
+    monkeypatch.setattr(
+        quality_gate,
+        "detached_commit_worktree",
+        lambda *_args: pytest.fail("README rejection must precede expensive validation."),
+    )
+    assert quality_gate.run_pre_push_gate(
+        "updates", remote_name="origin", repository_root=tmp_path
+    ) == 2
+    assert "README.md must differ in the terminal publication state" in capsys.readouterr().err
+    monkeypatch.setattr(quality_gate, "publication_readme_changed", lambda *_args: True)
+    assert quality_gate.validate_publication_readme(validation, tmp_path) is None
 
 
 def test_pre_push_remote_branch_deletion_runs_no_commit_validation(monkeypatch) -> None:
@@ -1136,6 +1340,7 @@ def test_pre_push_executes_once_per_terminal_sha_with_aggregated_context(
     executed_roots: list[Path] = []
     contexts: list[quality_gate.ChangeContext] = []
     cleaned: list[str] = []
+    publication_steps: list[str] = []
 
     monkeypatch.setattr(
         quality_gate,
@@ -1155,6 +1360,7 @@ def test_pre_push_executes_once_per_terminal_sha_with_aggregated_context(
 
     @contextmanager
     def fake_worktree(commit_sha: str, _repository_root: Path):
+        publication_steps.append("worktree")
         try:
             yield worktree
         finally:
@@ -1166,12 +1372,18 @@ def test_pre_push_executes_once_per_terminal_sha_with_aggregated_context(
         validation_root: Path,
         **_kwargs: object,
     ) -> int:
+        publication_steps.append("canonical")
         executed_roots.append(validation_root)
         contexts.append(plan.context)
         return 0
 
     monkeypatch.setattr(quality_gate, "detached_commit_worktree", fake_worktree)
     monkeypatch.setattr(quality_gate, "_execute_gate_plan", fake_execute)
+    monkeypatch.setattr(
+        quality_gate,
+        "validate_publication_readme",
+        lambda *_args: publication_steps.append("README policy"),
+    )
 
     assert quality_gate.run_pre_push_gate(
         _pre_push_line(
@@ -1185,6 +1397,7 @@ def test_pre_push_executes_once_per_terminal_sha_with_aggregated_context(
     assert executed_roots == [worktree]
     assert quality_gate.ROOT not in executed_roots
     assert cleaned == [terminal_sha]
+    assert publication_steps == ["README policy", "worktree", "canonical"]
     assert len(contexts) == 1
     context = contexts[0]
     assert context.mode == "push"
@@ -1197,6 +1410,7 @@ def test_pre_push_executes_once_per_terminal_sha_with_aggregated_context(
     assert context.classification is not None
     assert context.classification.level == quality_gate.ChangeLevel.MASSIVE
     assert context.classification.trigger_paths == ("frontend/src/App.tsx",)
+    assert context.publication_candidate
 
 
 def test_detached_worktree_cleanup_runs_after_success_and_failure(
@@ -1862,7 +2076,7 @@ def test_isolated_frontend_plan_reports_missing_host_dependencies(
     (validation_root / "frontend").mkdir(parents=True)
     command = quality_gate.GateCommand(
         "Test classification compliance",
-        (sys.executable, "Scripts/check_test_classification.py"),
+        (sys.executable, "Scripts/check_test_classification.py", "--source-only"),
         "Correct the classification.",
         requires_frontend_dependencies=True,
     )
@@ -1935,7 +2149,7 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
         (sys.executable, "Scripts/pre_commit_guard.py"),
         (sys.executable, "Scripts/check_backlog_consistency.py"),
         (sys.executable, "Scripts/check_backlog_atomicity.py"),
-        (sys.executable, "Scripts/check_test_classification.py"),
+        (sys.executable, "Scripts/check_test_classification.py", "--source-only"),
         (sys.executable, "Scripts/check_identity_boundary.py"),
         (sys.executable, "Scripts/check_naming_convention.py"),
         (sys.executable, "Scripts/check_maintainability.py"),
@@ -1969,7 +2183,6 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
             "--cov",
             "--cov-config=.coveragerc",
             "--cov-report=json:reports/test-execution-artifacts/main/backend-tests/coverage.json",
-            "--cov-report=term-missing",
             "-q",
             "-n",
             "2",
@@ -1993,7 +2206,7 @@ def test_push_plan_locks_command_order_sources_and_coverage_artifacts() -> None:
         (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run", "build"),
         (quality_gate.NPM_COMMAND, "--prefix", "frontend", "run", "test:e2e"),
         (sys.executable, "Scripts/test_execution_profiles.py", "--check"),
-        (sys.executable, "Scripts/report_test_execution_counts.py", "--check"),
+        (sys.executable, "Scripts/report_test_execution_counts.py", "--refresh-and-check"),
         (
             sys.executable,
             "Scripts/report_vitals_coverage.py",
@@ -2099,8 +2312,10 @@ def test_naming_convention_runs_once_in_the_main_plan() -> None:
     assert sum(command.step == "Naming convention" for command in plan.commands) == 1
     assert all(
         check.name != "Naming convention"
-        for check in pre_commit_guard.guard_plan(["Scripts/quality_gate.py"])
+        for check in pre_commit_guard.guard_plan()
     )
+    assert sum(command.step == "Backlog consistency" for command in plan.commands) == 1
+    assert all(check.name != "Backlog consistency" for check in pre_commit_guard.guard_plan())
 
 
 def test_maintainability_ratchet_runs_once_in_the_main_plan() -> None:
@@ -2549,7 +2764,7 @@ def test_first_failed_command_exit_code_is_propagated(monkeypatch) -> None:
     assert calls == ["Repository hygiene (README, encoding, secrets and DoD)"]
 
 
-def test_push_never_runs_docker_but_ci_runs_the_docker_smoke(
+def test_diagnostic_push_skips_docker_but_publication_and_main_ci_require_it(
     tmp_path: Path, monkeypatch
 ) -> None:
     import Scripts.quality_gate_dag as quality_gate_dag
@@ -2582,6 +2797,19 @@ def test_push_never_runs_docker_but_ci_runs_the_docker_smoke(
 
     assert quality_gate.run_gate("push", paths=["backend/api.py"]) == 0
     assert not docker_called
+    candidate = quality_gate.build_execution_plan(
+        quality_gate.build_push_change_context(
+            quality_gate.PushValidationTarget(_oid("a"), (), ("backend/api.py",))
+        )
+    )
+    assert candidate.docker_smoke
+    assert candidate.execution_profile == "main"
+    assert {
+        "Versioned Python coverage",
+        "Frontend unit coverage",
+        "End-to-end tests (Playwright)",
+        "Release or container checks",
+    } <= {command.step for command in candidate.commands}
     assert quality_gate.run_gate(
         "ci", paths=["backend/api.py"], execution_profile="main"
     ) == 0
@@ -2615,6 +2843,21 @@ def test_real_docker_smoke_is_blocked_without_env(
 
     assert quality_gate._run_docker_smoke() == 1
     assert ".env is required for Docker smoke testing" in capsys.readouterr().err
+
+    (tmp_path / ".env.example").write_text("APP_PORT=8000\n", encoding="utf-8")
+
+    def run_with_environment(**kwargs: object) -> int:
+        assert (tmp_path / ".env").read_text(encoding="utf-8") == "APP_PORT=8000\n"
+        assert kwargs["root"] == tmp_path
+        return 0
+
+    monkeypatch.setattr(
+        quality_gate.docker_runtime,
+        "run_docker_smoke",
+        run_with_environment,
+    )
+    assert quality_gate._run_docker_smoke() == 0
+    assert not (tmp_path / ".env").exists()
 
 
 def test_docker_smoke_retries_a_transient_connection_reset(monkeypatch) -> None:
@@ -2652,7 +2895,11 @@ def test_hooks_and_ci_delegate_to_the_central_command() -> None:
     pre_push = (ROOT / ".githooks" / "pre-push").read_text(encoding="utf-8")
     ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
 
-    assert "Scripts/quality_gate.py\" fast" in pre_commit
+    assert "quality_gate.py" not in pre_commit
+    executable_lines = [
+        line.strip() for line in pre_commit.splitlines() if line and not line.startswith("#")
+    ]
+    assert executable_lines == ["exit 0"]
     assert "Scripts/quality_gate.py\" push" in pre_push
     assert '--remote-name "${1:-}"' in pre_push
     assert '--remote-url "${2:-}"' in pre_push
@@ -2669,6 +2916,7 @@ def test_ci_mode_statically_keeps_the_docker_smoke() -> None:
     )
 
     assert 'context.mode in {"ci", "nightly", "release"}' in plan
+    assert "context.publication_candidate" in plan
     assert 'plan.docker_smoke and node == "release-or-container-checks"' in gate
     assert '("docker", "compose", "build")' in docker
 
@@ -2857,6 +3105,58 @@ def test_git_helpers_and_staged_listing_cover_failures(tmp_path: Path, monkeypat
     with pytest.raises(RuntimeError, match="git diff"):
         quality_gate.staged_files()
     assert "index failed" in capsys.readouterr().err
+
+    oid = "a" * 40
+    outputs = iter([oid + "\n", "AGENTS.md\0Scripts/quality_gate.py\0", "notes.txt\0"])
+    monkeypatch.setattr(quality_gate, "_git_output", lambda *_a, **_k: next(outputs))
+    merge_base, paths = quality_gate.changed_paths_since_base("origin/main", tmp_path)
+    assert merge_base == oid
+    assert paths == ("AGENTS.md", "Scripts/quality_gate.py", "notes.txt")
+    assert quality_gate._scope_pattern_matches("Scripts/quality_gate.py", "Scripts")
+    assert quality_gate._scope_pattern_matches("tests/test_a.py", "tests/test_*.py")
+    assert not quality_gate._scope_pattern_matches("backend/api.py", "")
+    assert quality_gate._summarize_values(tuple(str(index) for index in range(10))).endswith(
+        "(+2)"
+    )
+
+    assert quality_gate.run_scope_check("origin/main", (), allow_massive=False) == 2
+    monkeypatch.setattr(
+        quality_gate,
+        "changed_paths_since_base",
+        lambda *_a, **_k: (_ for _ in ()).throw(RuntimeError("missing base")),
+    )
+    assert quality_gate.run_scope_check(
+        "origin/main", ("docs",), allow_massive=False, repository_root=tmp_path
+    ) == 2
+    monkeypatch.setattr(
+        quality_gate,
+        "changed_paths_since_base",
+        lambda *_a, **_k: (oid, ("Scripts/quality_gate.py", "backend/api.py")),
+    )
+    assert quality_gate.run_scope_check(
+        "origin/main", ("Scripts",), allow_massive=True, repository_root=tmp_path
+    ) == 1
+    assert quality_gate.run_scope_check(
+        "origin/main",
+        ("Scripts", "backend"),
+        allow_massive=False,
+        repository_root=tmp_path,
+    ) == 1
+    assert quality_gate.run_scope_check(
+        "origin/main",
+        ("Scripts", "backend"),
+        allow_massive=True,
+        repository_root=tmp_path,
+    ) == 0
+    for scoped_paths in ((), ("docs/contribution-cycle.md",)):
+        monkeypatch.setattr(
+            quality_gate,
+            "changed_paths_since_base",
+            lambda *_args, paths=scoped_paths, **_kwargs: (oid, paths),
+        )
+        assert quality_gate.run_scope_check(
+            "origin/main", ("docs",), allow_massive=False, repository_root=tmp_path
+        ) == 0
 
 
 def test_index_environment_resolution_fails_closed(tmp_path: Path, monkeypatch) -> None:
@@ -3202,6 +3502,20 @@ def test_execute_plan_dependency_error_pre_push_interrupt_and_main_dispatch(
     ) == 1
     assert "unable to expose" in capsys.readouterr().err
 
+    assert quality_gate.is_github_remote_url(
+        "https://github.com/GaranceRichard/monte-carlo-azure"
+    )
+    assert quality_gate.is_github_remote_url("git@github.com:owner/repository.git")
+    assert not quality_gate.is_github_remote_url("https://example.com/repository.git")
+    assert (
+        quality_gate.run_pre_push_gate(
+            "updates",
+            remote_name="origin",
+            remote_url="https://example.com/repository.git",
+        )
+        == 2
+    )
+
     assert quality_gate.run_pre_push_gate("bad", remote_name="origin") == 2
     target = quality_gate.PushValidationTarget("a" * 40, (), ())
     validation = quality_gate.PushValidationPlan((), (), (target,))
@@ -3220,7 +3534,9 @@ def test_execute_plan_dependency_error_pre_push_interrupt_and_main_dispatch(
     monkeypatch.setattr(quality_gate, "run_pre_push_gate", lambda *a, **k: 4)
     monkeypatch.setattr(quality_gate.sys, "stdin", io.StringIO("updates"))
     assert quality_gate.main(["push", "--remote-name", "origin"]) == 4
-    monkeypatch.setattr(quality_gate, "run_gate", lambda mode: 5)
+    monkeypatch.setattr(quality_gate, "run_scope_check", lambda *a, **k: 3)
+    assert quality_gate.main(["scope", "--allow", "docs"]) == 3
+    monkeypatch.setattr(quality_gate, "run_gate", lambda mode, **_kwargs: 5)
     assert quality_gate.main(["ci"]) == 5
 
 
@@ -3339,11 +3655,12 @@ def test_docker_smoke_success_and_pre_push_reference_output(tmp_path: Path, monk
         "refs/heads/main", "a" * 40, "refs/heads/main", "b" * 40
     )
     commit_range = quality_gate.PushCommitRange(
-        update, "a" * 40, ("--reverse", "b..a"), ("a" * 40,), ("README.md",)
+        update, "a" * 40, ("--reverse", "b..a"), ("a" * 40,), ("README.md",), ("b" * 40,)
     )
     validation = quality_gate.PushValidationPlan((update,), (commit_range,), ())
     monkeypatch.setattr(quality_gate, "parse_pre_push_updates", lambda _text: (update,))
     monkeypatch.setattr(quality_gate, "build_push_validation_plan", lambda *_a, **_k: validation)
+    monkeypatch.setattr(quality_gate, "_tree_blob_oid", lambda sha, *_args: sha)
     assert (
         quality_gate.run_pre_push_gate(
             "update", remote_name="origin", repository_root=tmp_path

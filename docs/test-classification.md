@@ -80,28 +80,32 @@ timestamp rendent deux générations successives identiques octet pour octet.
 Le diagnostic bloquant, strictement en lecture seule, s'exécute avec :
 
 ```bash
-python Scripts/check_test_classification.py
+python Scripts/check_test_classification.py --source-only
 ```
 
 Il redécouvre tous les cas, régénère l'inventaire en mémoire, compare sa sérialisation exacte au fichier
 versionné et refuse les cas absents ou obsolètes, les doublons, les contrats invalides, les `unresolved`, les
-overrides orphelins ou incomplets et les exemptions non approuvées, incomplètes ou expirées. Il vérifie aussi
-que l'empreinte de `reports/test-execution-counts.json` correspond aux octets de l'inventaire versionné. Le
-contrôle n'écrit aucun fichier et ne régénère jamais silencieusement un artefact.
+overrides orphelins ou incomplets et les exemptions non approuvées, incomplètes ou expirées. Le contrôle
+des sources n'écrit aucun fichier. La concordance entre l'empreinte de l'inventaire et les résultats
+d'exécution est bloquante dans l'agrégateur, après les tests qui produisent ces résultats. Sans
+`--source-only`, le contrôle direct vérifie également cette empreinte et exige le rapport courant.
 
-Après ajout, suppression, renommage ou modification d'un test, la procédure de régénération est :
+Après une modification qui change l'inventaire découvert, régénérer une fois les autorités statiques
+sur la tranche candidate cohérente :
 
 ```bash
 python Scripts/classify_tests.py
-python -m pytest -q
-npm --prefix frontend run test:unit
-npm --prefix frontend run test:e2e
-python Scripts/report_test_execution_counts.py
-python Scripts/check_test_classification.py
+python Scripts/test_execution_profiles.py
+python Scripts/check_test_classification.py --source-only
 ```
 
-Les trois exécutions complètes reconstruisent les artefacts natifs nécessaires au rapport d'exécution. Une
-modification de règles ou d'override exige la même régénération, même si aucun fichier de test n'a changé.
+Ne pas exécuter trois suites complètes pour préparer des compteurs avant le pré-push. La validation
+canonique du candidat produit une seule fois les artefacts natifs nécessaires. L'agrégateur exécute
+`python Scripts/report_test_execution_counts.py --refresh-and-check` : consolidation des trois frameworks,
+complétude, unicité, invariants, écriture puis relecture et vérification de l'empreinte. Un artefact absent,
+une instance orpheline ou une empreinte incohérente bloque la publication. Les compteurs courants sont
+des sorties ignorées par Git et archivées avec les preuves CI du SHA validé. Une modification de règles
+ou d'override exige la même régénération statique si l'inventaire résultant change.
 
 La découverte ne lance pas les tests :
 
@@ -204,7 +208,7 @@ Ces exemples illustrent des décisions désormais produites dans l’inventaire 
 
 ## Comptage des collections et exécutions
 
-Le rapport [`reports/test-execution-counts.json`](../reports/test-execution-counts.json) applique les
+Le rapport courant `reports/test-execution-counts.json`, produit par le profil complet, applique les
 définitions communes suivantes :
 
 - `logicalCases` : déclarations uniques présentes dans l'inventaire de classification ;
@@ -244,10 +248,13 @@ override strictement ciblé et auditable. Le comptage d'exécution ne change pas
 
 Le contrôle de classification est exécuté une seule fois par plan `fast`, `push`, `ci`, `nightly` et `release`
 via `Scripts/quality_gate.py`, avec respectivement l'index Git, le commit détaché et le workspace comme source.
-La task `Validation : profil main` l'exécute directement avec `ci --profile main`.
+`fast` est un diagnostic volontaire ; le commit ne déclenche aucun plan. La task `Validation : profil main`
+l'exécute directement avec `ci --profile main` pour un diagnostic explicite ; le cycle de publication
+normal réserve cette validation canonique au pré-push.
 
 Le profil `main` possède en plus six nœuds statistiques explicites. Ils ne reclassifient aucun cas logique et
-ne rendent pas `fast`, `pr` ou un `push` ciblé équivalents à la gate complète. Les tests d’enforcement sont
+ne rendent pas `fast` ou `pr` équivalents à la gate complète. Tout candidat pré-push exécute `main` sans
+réduction fondée sur les chemins touchés. Les tests d’enforcement sont
 classifiés selon les mêmes règles que le reste du patrimoine ; leurs mutations couvrent les statuts fermés,
 la fraîcheur, les dépendances, l’isolation et le refus des contournements. Le plan complet, les commandes
 isolées et la mesure de coût sont documentés dans
@@ -256,8 +263,8 @@ isolées et la mesure de coût sont documentés dans
 Trois contrôles statiques auparavant réservés à `nightly` ou `release` appartiennent désormais à `main` :
 déterminisme et dépendances du plan, alignement du workflow GitHub Actions et vérification du SHA publié.
 Ce déplacement couvre le risque de divergence de l’autorité `main` avec un coût de lecture locale
-négligeable ; il n’ajoute aucun moteur, navigateur ni suite spécialisée aux profils `fast`, `pr` ou `push`
-ciblé. Il permet aussi au nœud backend `main` de produire l’inventaire Pytest global complet sans fusionner
+négligeable ; il n’ajoute aucun moteur, navigateur ni suite spécialisée aux profils `fast` ou `pr`.
+Il permet aussi au nœud backend `main` de produire l’inventaire Pytest global complet sans fusionner
 des artefacts issus de révisions différentes.
 
 ## Gouvernance distincte des états d'exécution

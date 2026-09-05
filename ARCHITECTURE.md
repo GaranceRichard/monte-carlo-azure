@@ -587,8 +587,8 @@ Objectif :
 Contrôle :
 
 - le plan central de `Scripts/quality_gate.py` exécute `Scripts/check_naming_convention.py` une seule fois ;
-- le pré-commit l’exécute sur l’instantané de l’index Git, le pré-push sur le commit dans son worktree
-  détaché, et la CI sur son checkout ;
+- le pré-push l’exécute sur l’état final dans son worktree détaché, et la CI sur son checkout ; le mode
+  `fast` reste un diagnostic volontaire de l’index, indépendant du commit ;
 - le contrôle bloque les termes français déjà identifiés comme dette dans les identifiants de code.
 
 ## API
@@ -798,7 +798,9 @@ les retries ajoutent des tentatives à la même instance. Le consolidateur ne re
 rattachements absents ou ambigus. Le rapport agrège aussi les quatre profils principaux.
 
 Les artefacts natifs sous `reports/test-execution-native/` sont des entrées locales régénérables. Seul le
-rapport déterministe `reports/test-execution-counts.json`, lié par SHA-256 à l'inventaire, est versionné.
+rapport déterministe `reports/test-execution-counts.json`, lié par SHA-256 à l'inventaire, est produit et
+revérifié par l'agrégation du run canonique. Il est archivé en CI pour le SHA validé et ignoré par Git ;
+la référence antérieure est conservée dans `reports/contribution-cycle-before-counts.json`.
 
 Une couche indépendante réside dans `config/test-governance.json`, avec son propre schéma Draft 2020-12.
 Elle cible les `logicalCaseId` sans enrichir ni surcharger la classification. Le détecteur statique
@@ -834,9 +836,10 @@ d'exécution. Les 16 ambiguïtés initiales sont résolues par l'analyse comport
 exemption.
 
 Le contrôle est un invariant commun construit une seule fois dans chaque plan de `Scripts/quality_gate.py` :
-`fast` l'exécute sur le snapshot de l'index, `push` sur le worktree temporaire du commit détaché et les modes
-d’automatisation sur le workspace. La task `Validation : profil main` appelle directement ce même gate avec
-`ci --profile main` et exécute son DAG parallélisable.
+le diagnostic volontaire `fast` l'exécute sur le snapshot de l'index, le pré-push sur le worktree temporaire
+du commit détaché et les modes d’automatisation sur le workspace. La task `Validation : profil main` appelle
+directement ce même gate avec `ci --profile main` pour un diagnostic explicite. Le cycle normal laisse le
+pré-push exécuter une seule validation canonique du candidat avant publication.
 
 Le contrat [`config/test-execution-profiles.json`](config/test-execution-profiles.json) est la source de
 vérité du DAG. `Scripts/test_execution_profiles.py` valide les inclusions, identifiants, dépendances,
@@ -865,11 +868,17 @@ snapshot et tout lien ou répertoire temporaire est nettoyé. Le plan, les statu
 détaillés dans
 [`docs/statistical-main-enforcement.md`](docs/statistical-main-enforcement.md).
 
-La sélection des contrôles est centralisée dans `Scripts/quality_gate.py` :
+La classification des chemins est centralisée dans `Scripts/quality_gate.py`. Elle rend le coût visible dès
+le contrôle de périmètre `scope`, avant tout test ou génération, et guide les diagnostics volontaires :
 
 - `targeted` exécute les contrôles généraux et les tests directs identifiables ;
 - `impacted` ajoute les contrôles du domaine et les dépendances proches ;
 - `massive` exécute le plan complet ; tout chemin inconnu ou ambigu utilise ce niveau.
+
+Le contrôle `scope` refuse les chemins non déclarés et demande `--allow-massive` pour acquitter une portée
+transverse ; il ne déclenche aucune suite. Pendant le développement, les contrôles ciblés sont lancés
+seulement lorsqu’ils apportent une information utile. Tout candidat pré-push exécute le profil `main`
+complet, indépendamment de sa classification, avec couvertures, E2E, preuves statistiques et smoke Docker.
 
 Le même plan exécute le ratchet de maintenabilité. Il compare les métriques de taille et de complexité,
 les cycles, les directions de dépendance documentées et le mojibake à une baseline versionnée. La dette
@@ -878,21 +887,24 @@ directions imposées sont la séparation entre `frontend/src` et `backend` dans 
 internes entre métier, application, infrastructure et présentation ne sont pas assez définies pour devenir
 des règles automatiques.
 
-Les sources de changement sont distinctes : index Git pour le pré-commit, commits introduits pour le
-pré-push, checkout de travail pour la CI. Le pré-push valide chaque SHA terminal distinct dans un worktree
-détaché temporaire et n’utilise pas le workspace courant.
+Les sources de changement sont distinctes : index Git pour le diagnostic volontaire `fast`, commits
+introduits pour le pré-push, checkout de travail pour la CI. Le pré-push valide une seule fois chaque SHA
+terminal distinct dans un worktree détaché temporaire et n’utilise pas le workspace courant.
 
-Le hook `.githooks/pre-commit` délègue à `Scripts/quality_gate.py fast`, dont le contrôle de dépôt appelle
-`Scripts/pre_commit_guard.py`. Cette garde lit les entrées `A/M/D/R` de l'index réel : tout index non vide doit
-contenir `README.md` racine avec un statut ajouté ou modifié. Un README imbriqué, supprimé, renommé ou modifié
-seulement dans le worktree est refusé. L'index vide reste accepté afin que les validations de conformité sans
-intention de commit puissent s'exécuter.
+Le hook `.githooks/pre-commit` réussit sans exécuter de validation. Un commit est un checkpoint technique
+local, éventuellement transitoire, et ne demande pas de modification de README. Le pré-push reprend les
+garanties de publication : pour chaque plage introduisant de nouveaux commits, `README.md` racine doit
+exister dans l’état final et son blob doit différer de celui de chacune des bases de cette plage. Une
+modification suivie d’un retour au contenu initial ne satisfait pas cette règle ; la pertinence de la
+synthèse reste contrôlée en revue. Ce contrôle précède le DAG coûteux. `Scripts/pre_commit_guard.py`
+contrôle ensuite l’encodage et les accents du README final, la DoD et les secrets de l’arbre final. Le scan
+de tous les commits introduits bloque également un secret ajouté puis supprimé avant le commit terminal.
 
-Le snapshot `fast` matérialise le contenu de l'index sans embarquer de répertoire `.git`; il est déjà la
-frontière isolée du pré-commit. Les tests unitaires qui vérifient uniquement l'orchestration injectent
-explicitement cette frontière, tandis que les tests du comportement Git construisent un dépôt et un index
-temporaires. Le snapshot complet de `main` reste distinct : une exécution réelle doit résoudre l'index et le
-`GIT_DIR` du dépôt contrôlé et échoue explicitement si cette autorité Git manque.
+Le snapshot volontaire `fast` matérialise le contenu de l'index sans embarquer de répertoire `.git`. Les
+tests unitaires qui vérifient uniquement l'orchestration injectent explicitement cette frontière, tandis
+que les tests du comportement Git construisent un dépôt et un index temporaires. Le snapshot complet de
+`main` reste distinct : une exécution réelle doit résoudre l'index et le `GIT_DIR` du dépôt contrôlé et
+échoue explicitement si cette autorité Git manque.
 
 Une invocation pré-push sans mise à jour de référence est un no-op réussi et ne construit aucun plan. Dès
 qu'une ligne non vide est fournie, sa forme à quatre champs et ses OID complets restent validés de manière
