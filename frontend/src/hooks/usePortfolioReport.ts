@@ -5,6 +5,7 @@ import type { CompletionSummary, SimulationMode, SimulationPercentiles } from ".
 import type { WeeklyThroughputRow } from "../types";
 import { formatAdoHttpErrorMessage, type AdoErrorContext } from "../adoErrors";
 import { localTeamForecast } from "../application/team-forecast";
+import type { TeamPortfolioConfig } from "../application/portfolio-forecast";
 import type { PortfolioScenarioResult } from "./simulationTypes";
 import {
   buildCorrelatedPortfolioSamples, buildCorrelatedPortfolioWeeklyThroughputs,
@@ -26,14 +27,6 @@ const {
   fetchTeamThroughput,
   simulateForecastFromSamples,
 } = localTeamForecast;
-
-export type TeamPortfolioConfig = {
-  teamName: string;
-  workItemTypeOptions: string[];
-  statesByType: Record<string, string[]>;
-  types: string[];
-  doneStates: string[];
-};
 
 export type TeamReportError = {
   teamName: string;

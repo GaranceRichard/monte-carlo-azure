@@ -166,6 +166,9 @@ frontend/
         index.ts            # API publique de la prévision applicative
         contract.ts         # contrat TeamForecast indépendant de React
         localTeamForecast.ts # implémentation locale HTTP/démo du contrat
+      portfolio-forecast/
+        index.ts            # API publique de la configuration portefeuille
+        contract.ts         # contrat TeamPortfolioConfig indépendant de React
     composition/
       browser/index.ts     # composition des adaptateurs réels du bootstrap React
     ports/
@@ -973,6 +976,9 @@ Frontend :
 - contrat applicatif `TeamForecast` et implémentation `localTeamForecast` exposés par l’API publique
   `src/application/team-forecast/index.ts`, sans import direct de React ni des hooks ; `useSimulation` et
   `usePortfolioReport` sont des consommateurs et les anciennes façades cycliques ont été retirées
+- contrat applicatif `TeamPortfolioConfig` exposé par
+  `src/application/portfolio-forecast/index.ts` ; `demoData`, `usePortfolio` et `usePortfolioReport` le
+  consomment sans déclaration ni réexport concurrent dans les hooks
 - port `src/ports/clock/` injecté dans le forecast, adaptateur `src/adapters/browser/clock/` et composition
   réelle sous `src/composition/browser/`, avec double déterministe réservé aux tests
 - événements delivery possédés par `src/domain/delivery/` : les DTO Azure DevOps sont convertis localement en

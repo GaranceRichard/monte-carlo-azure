@@ -14,7 +14,12 @@ définir toutes les directions internes restantes. En particulier,
 `team-forecast-must-remain-react-independent` interdit à
 `frontend/src/application/team-forecast/**` d’importer les hooks, composants, présentation React, `react`,
 `react-dom` ou les packages Radix React. Les consommateurs React dépendent ainsi de l’API publique de la
-prévision, sans dépendance inverse possible.
+prévision, sans dépendance inverse possible. La règle
+`portfolio-configuration-must-remain-react-independent` applique la même fermeture à
+`frontend/src/application/portfolio-forecast/**` : le contrat de configuration reste possédé par
+l’application même lorsque les hooks portefeuille évoluent. La règle
+`demo-portfolio-configuration-must-not-depend-on-hooks` interdit en complément le retour de l’ancien import
+`demoData.ts` vers `usePortfolioReport.ts`.
 
 Tous les fichiers texte suivis par Git et déclarés par extension sont contrôlés pour détecter un nouvel
 encodage UTF-8 invalide, un caractère de remplacement ou une séquence typique de mojibake. Les chemins

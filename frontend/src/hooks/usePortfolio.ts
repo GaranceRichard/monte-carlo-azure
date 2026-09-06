@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { getTeamOptionsDirect } from "../adoClient";
+import type { TeamPortfolioConfig } from "../application/portfolio-forecast";
 import { nWeeksAgo, today } from "../date";
 import type { SimulationMode } from "../domain/simulation";
 import type { NamedEntity } from "../types";
@@ -12,7 +13,7 @@ import {
   writeStoredPortfolioPrefs,
   writeStoredQuickFilters,
 } from "../storage";
-import { getPortfolioErrorMessage, usePortfolioReport, type TeamPortfolioConfig } from "./usePortfolioReport";
+import { getPortfolioErrorMessage, usePortfolioReport } from "./usePortfolioReport";
 import type { AdoErrorContext } from "../adoErrors";
 import { DEMO_CONFIG, DEMO_PORTFOLIO_TEAM_CONFIGS, DEMO_TEAM_OPTIONS } from "../demoData";
 import {
@@ -21,8 +22,6 @@ import {
   isBoundedIntegerValue,
 } from "../simulationLimits";
 import type { PortfolioPilotReference } from "../utils/portfolioComparisonPresentation";
-
-export type { TeamPortfolioConfig } from "./usePortfolioReport";
 
 type UsePortfolioParams = {
   demoMode?: boolean;

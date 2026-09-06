@@ -32,7 +32,7 @@ rg -n "fetch|localStorage|document\.|window\.|globalThis\.crypto|new Date|Date\.
 | Application navigateur | `index.html` → `src/main.tsx` → composition navigateur → `App` | Vite charge `main.tsx`, qui compose l’horloge réelle puis crée la racine React en mode strict. `App` résout le runtime, instancie les hooks d’onboarding et de simulation, initialise thème et cookie, puis compose le shell. |
 | Routage d’écran interne | `App` → `AppFlowContent` → composant d’étape | Aucun routeur externe : la valeur `step` de `useOnboarding` sélectionne `PatStep`, `OrgStep`, `ProjectStep`, `TeamStep`, `SimulationStep` ou `PortfolioStep`. Les deux derniers sont chargés avec `React.lazy`. |
 | Simulation d’équipe | `App` → `useSimulation` → API publique `application/team-forecast` → `localTeamForecast` | `App` construit un grand view model puis `SimulationStep` le diffuse par `SimulationContext` aux contrôles, résultats et graphiques. Le hook dépend du contrat applicatif sans dépendance retour vers React. |
-| Portefeuille | `AppFlowContent` → `PortfolioStep` → `usePortfolio` → `usePortfolioReport` | Le hook de vue détient les critères et équipes ; le hook de rapport collecte, simule, diagnostique et déclenche le téléchargement. |
+| Portefeuille | `AppFlowContent` → `PortfolioStep` → `usePortfolio` → `usePortfolioReport` | Les deux hooks consomment la configuration d’équipe par l’API publique `application/portfolio-forecast` ; le hook de vue détient les critères et équipes, puis le hook de rapport collecte, simule, diagnostique et déclenche le téléchargement. |
 | Corpus TypeScript | `scripts/run-statistical-reference-corpus.mjs` → Vite SSR → `statisticalCorpusRunner.ts` | Valide le corpus par le script Python autoritaire, charge le moteur TypeScript, exécute les cas et écrit le rapport JSON sur la sortie standard. |
 | Sondes de validation | `scripts/run-statistical-validation-probes.mjs` → Vite SSR → `statisticalCorpusRunner.ts` | Charge les sondes versionnées, applique la construction de commande et publie l’acceptation ou le rejet. |
 | Plan distributionnel | `scripts/run-statistical-distribution.mjs` → Vite SSR → `statisticalDistributionRunner.ts` | Lit un plan JSON sur l’entrée standard, vérifie son contrat puis réutilise le runner de corpus. |
@@ -61,6 +61,7 @@ préjugent pas de leur emplacement futur.
 | Hooks spécialisés simulation | `useTeamOptions.ts`, `useSimulationPrefs.ts`, `useSimulationHistory.ts`, `useSimulationQuickFilters.ts`, `useSimulationChartData.ts` | Chargement/fallback des types et états, persistance des préférences et historiques, persistance des filtres, dérivation des séries de graphiques et résumés Cycle Time. |
 | Contexte React | `hooks/SimulationContext.tsx` | Diffusion du `SimulationViewModel` complet et de l’équipe sélectionnée à tout le sous-arbre simulation. |
 | Orchestration portefeuille | `hooks/usePortfolio.ts`, `hooks/usePortfolioReport.ts` | État des critères et équipes, cache mémoire des options, préférences, collecte parallèle, simulation parallèle équipes/scénarios, tolérance aux échecs partiels, diagnostic comparatif et export. |
+| Contrat de configuration portefeuille | `application/portfolio-forecast/index.ts`, `application/portfolio-forecast/contract.ts` | `TeamPortfolioConfig` définit les options et sélections d’une équipe indépendamment de React ; les données de démonstration et les hooks le consomment par l’API publique. |
 | Contrat et implémentation de prévision | `application/team-forecast/index.ts`, `application/team-forecast/contract.ts`, `application/team-forecast/localTeamForecast.ts` | Le contrat `TeamForecast` définit collecte, simulation sur échantillons et prévision complète. L’implémentation locale sélectionne données réelles/démo, construit la commande, choisit le moteur HTTP/local, traduit les erreurs et crée l’entrée d’historique avec une seed et un instant injecté, sans importer React ni les hooks. |
 | Temps de prévision | `ports/clock/index.ts`, `adapters/browser/clock/index.ts`, `composition/browser/index.ts` | Port minimal retournant l’instant ISO, lecture réelle de `Date` confinée à l’adaptateur et assemblage au bootstrap React. |
 | Accès Azure DevOps | `adoClient.ts`, `adoPlatform.ts`, `adoErrors.ts` | Détection Cloud/Server, en-têtes PAT, découverte profil/organisation/collection/projet/équipe, types/états, WIQL, lots de work items, révisions, erreurs contextualisées et avertissements de collecte partielle. |
@@ -153,6 +154,7 @@ conservés sous forme d’avertissement tandis que les données disponibles cont
 
 ```text
 Critères + configurations d’équipes
+  -> contrat public application/portfolio-forecast
   -> usePortfolioReport
   -> collectes d’équipes en parallèle
   -> équipes réussies + erreurs partielles
@@ -205,6 +207,8 @@ Les relations suivantes sont directement présentes dans les imports et points d
 - `useSimulation.ts` et `usePortfolioReport.ts` importent la prévision uniquement par
   `application/team-forecast/index.ts` ; `usePortfolioReport.ts` conserve ses dépendances directes vers les
   calculs de scénarios, les diagnostics et, dynamiquement, le rapport de présentation ;
+- `demoData.ts`, `usePortfolio.ts` et `usePortfolioReport.ts` importent `TeamPortfolioConfig` uniquement par
+  `application/portfolio-forecast/index.ts` ; ce contrat n’importe ni React ni les hooks consommateurs ;
 - `domain/simulationHistory.ts` importe les formes de `types.ts` et `utils/cycleTime.ts` importe des types de
   `hooks/simulationTypes.ts` ; `demoData.ts` ne dépend plus d’un type déclaré par un hook ;
 - les rapports importent `hooks/probability.ts` et `hooks/simulationTypes.ts`, puis
@@ -234,7 +238,7 @@ la réduction de couplage traçable ; cette carte ne décide pas l’ordre des m
 | FE-12 | Les flux simulation et portefeuille dupliquent la sélection de filtres. | `useTeamOptions.ts` et `usePortfolio.ts` possèdent chacun leur validation types/états, lecture des raccourcis, fallback et mise à jour d’état. |
 | FE-13 | Le contexte de simulation expose une surface large. | `SimulationContext` transmet tout le `SimulationViewModel`; chaque sous-composant peut lire commandes, données, stockage, erreurs et actions sans contrat local plus étroit. |
 | FE-14 | Des surfaces exportées ne participent à aucun chemin produit observé. | `listOrgsDirect`, `getWeeklyThroughputDirect`, `simulationHistoryItemDtoToModel` et `validateSimulationInputContract` n’ont aucun consommateur hors de leur déclaration ou de leurs tests ; le chemin de mapping de l’historique backend associé n’est pas appelé par l’application. |
-| FE-15 | Les données de démonstration dépendent d’un type appartenant à un hook. | `demoData.ts` importe `TeamPortfolioConfig` depuis `usePortfolioReport.ts`, alors que les hooks consomment ensuite les données de démonstration. |
+| FE-15 — résolu par 7.20 | La configuration portefeuille possède une autorité applicative stable. | `demoData.ts`, `usePortfolio.ts` et `usePortfolioReport.ts` importent `TeamPortfolioConfig` par l’API publique `application/portfolio-forecast/index.ts`. Les hooks ne déclarent ni ne réexportent plus ce type, et la règle `portfolio-configuration-must-remain-react-independent` interdit toute dépendance retour du contrat vers React ou les hooks. |
 
 ## Limites de la carte
 

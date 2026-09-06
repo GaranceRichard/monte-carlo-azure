@@ -42,7 +42,7 @@ dans la colonne `Ambiguïté` et détaillée plus bas.
 | SD-12 | Représentation persistée de l'historique local | frontière `frontend/src/storage/`, principalement `simulationHistoryDtos.ts` et `simulationHistoryMappers.ts` | `simulationHistoryModelToDto`, puis `useSimulationHistory` | `localStorage`, `parseSimulationHistory`, puis modèle SD-11 | modèle interne ↔ DTO version 2 ; ancien `cycleTime` en semaines → `cycleTimeDays` lors d'une lecture legacy | A-09 |
 | SD-13 | Préférences de simulation persistées | `frontend/src/hooks/simulationTypes.ts` : `StoredSimulationPrefs` | `useSimulationPrefs` | `useSimulationPrefs` via `mc_simulation_prefs_v2` | état de contrôles → JSON ; lecture JSON best effort → valeurs initiales | A-04 |
 | SD-14 | Raccourcis d'équipe et préférences portefeuille persistés | `frontend/src/storage.ts` : `StoredQuickFilters`, `StoredPortfolioPrefs` et clés associées | `useSimulationQuickFilters` et `usePortfolio` | `useTeamOptions` et `usePortfolio` | sélection contextualisée → JSON ; lecture filtre/déduplique ; `arrimageRate` legacy → `alignmentRate` | A-04 |
-| SD-15 | Configuration d'une équipe du portefeuille | `frontend/src/hooks/usePortfolioReport.ts` : `TeamPortfolioConfig` | `usePortfolio` et `DEMO_PORTFOLIO_TEAM_CONFIGS` | `usePortfolioReport` | options équipe + sélections types/états → configuration transmise à la collecte et aux simulations | A-10 |
+| SD-15 | Configuration d'une équipe du portefeuille | `frontend/src/application/portfolio-forecast/` : contrat public `TeamPortfolioConfig` | `usePortfolio` et `DEMO_PORTFOLIO_TEAM_CONFIGS` | `usePortfolio` et `usePortfolioReport` par l’API publique | options équipe + sélections types/états → configuration transmise à la collecte et aux simulations | A-10 résolu par 7.20 |
 | SD-16 | Résultat d'un scénario portefeuille | `frontend/src/hooks/simulationTypes.ts` : `PortfolioScenarioResult` | `usePortfolioReport:toScenarioResult` | diagnostic comparatif et `portfolioPrintReport` | échantillons de scénario + résultat statistique → hypothèse, seed, percentiles, distribution et diagnostic | A-11 |
 | SD-17 | Section d'équipe d'un rapport portefeuille | `frontend/src/hooks/usePortfolioReport.ts` : `PortfolioReportSection` | phase de simulation d'équipes de `usePortfolioReport` | `portfolioPrintReport` chargé dynamiquement | configuration + observations + résultat → section structurée de rapport | A-11 |
 | SD-18 | Diagnostic comparatif portefeuille | `frontend/src/utils/portfolioComparisonDiagnostic.ts` : `PortfolioComparisonDiagnostic` | `buildPortfolioComparisonDiagnostic` | `usePortfolioReport`, présentation comparative et rapport portefeuille | observations d'équipes + stabilité des scénarios + semaines communes → faits, limites, risques et conclusion | A-11 |
@@ -65,7 +65,7 @@ dans la colonne `Ambiguïté` et détaillée plus bas.
 | T-07 | SD-21 → SD-10 → SD-09 | `result_to_response` sérialise ; `simulateResponseDtoToResult` ferme, transforme et revalide la réponse. |
 | T-08 | SD-09 + contexte + `FrontendClock` → SD-11 → SD-12 | `localTeamForecast` lit un instant, le réutilise pour le timestamp et l’identité de repli, puis les mappers de stockage sérialisent, migrent les anciennes durées et refusent les résultats invalides. |
 | T-09 | SD-21 + SD-19 → SD-22 → SD-23 | `_simulation_document` écrit ; `list_recent` projette/minimise ; le mapper construit le DTO public. |
-| T-10 | SD-07 + SD-15 → SD-16/SD-17/SD-18 | `usePortfolioReport` collecte et simule en parallèle, construit les scénarios/sections puis le diagnostic avant le rendu PDF. |
+| T-10 | SD-07 + SD-15 → SD-16/SD-17/SD-18 | `usePortfolioReport` consomme le contrat applicatif, collecte et simule en parallèle, construit les scénarios/sections puis le diagnostic avant le rendu PDF. |
 | T-11 | environnement → SD-20 → API/store | `get_api_config` parse les variables et les objets globaux fournissent CORS, timeout, rate limit, cookie et paramètres Mongo. |
 
 ## Ambiguïtés et définitions concurrentes observées
@@ -98,9 +98,10 @@ Ces constats ne sont ni corrigés ni transformés en cible par ce PBI.
 - **A-09 — version d'historique local répétée :** la valeur `2` apparaît dans le modèle SD-11, le DTO SD-12,
   le mapper et le contrôle de réutilisation. Le mapper est la seule transition de stockage exécutée, mais les
   littéraux ne sont pas dérivés d'une constante partagée.
-- **A-10 — configuration portefeuille déclarée par son consommateur :** `demoData.ts` importe
-  `TeamPortfolioConfig` depuis `usePortfolioReport.ts`, que `usePortfolio.ts` réexporte ensuite. L'autorité est
-  unique mais placée dans le hook d'orchestration qui consomme la donnée.
+- **A-10 — résolu par 7.20, configuration portefeuille applicative :** `TeamPortfolioConfig` appartient à
+  l’API publique `application/portfolio-forecast`. `demoData.ts`, `usePortfolio.ts` et
+  `usePortfolioReport.ts` dépendent de ce contrat ; aucun hook ne le déclare ni ne le réexporte, et le ratchet
+  de maintenabilité interdit au contrat de dépendre de React ou des hooks.
 - **A-11 — modèles de restitution dispersés :** scénarios, sections et diagnostics ont chacun l'autorité
   enregistrée en SD-16 à SD-18. Les composants et rapports recalculent encore certaines dérivations de
   présentation, notamment probabilités, légendes et diagnostics ; elles ne remplacent pas le résultat

@@ -2,6 +2,15 @@
 
 ## Recent
 
+### Contrat applicatif de configuration portefeuille — PBI 7.20
+
+- ajout de l’API publique `application/portfolio-forecast` qui possède désormais le contrat
+  `TeamPortfolioConfig`, sans dépendance vers React ou les hooks ;
+- migration des données de démonstration, de `usePortfolio` et de `usePortfolioReport` vers cette autorité,
+  avec retrait de la déclaration et de la réexportation historiques depuis les hooks ;
+- ajout d’un test contractuel et de ratchets de dépendance qui bloquent le retour d’un import inverse vers
+  React, les composants ou les hooks, ainsi que l’ancien import des données démo vers le hook.
+
 ### Calendrier delivery ISO en UTC — PBI 7.23
 
 - ajout du Value Object `DeliveryWeek` et d’une politique métier immuable : calendrier ISO-8601, semaines

@@ -168,9 +168,10 @@ frontend/src/domain/delivery/index.ts:line 1: [DEP-MODULE-CYCLE] Le graphe des m
 racine gouvernée ne peut pas être inspectée complètement. Il n’existe ni exception de cycle, ni commentaire
 d’ignorance, ni droit acquis pour un import de type.
 
-La preuve courante porte sept modules gouvernés, quatre arêtes inter-modules de production et zéro cycle. Le
-module `frontend/src/application/team-forecast/` déclare `index.ts` comme API publique ; les hooks de simulation
-et de portefeuille le consomment par cette frontière. Les deux composantes cycliques factuelles `CYC-001` et
+La preuve courante porte huit modules gouvernés, quatre arêtes inter-modules de production et zéro cycle. Les
+modules `frontend/src/application/team-forecast/` et `frontend/src/application/portfolio-forecast/` déclarent
+`index.ts` comme API publique ; les hooks consomment la prévision et la configuration par ces frontières. Les
+deux composantes cycliques factuelles `CYC-001` et
 `CYC-002` ont disparu du [graphe observé](dependency-graph.md#cycles-localisés) avec le retrait des anciennes
 façades `simulationForecastService.ts` et `simulationForecastCore.ts`. La baseline de maintenabilité ne
 conserve aucune dette cyclique : toute réintroduction devient une nouvelle dérive bloquante.
@@ -201,5 +202,7 @@ profils de gate : cette responsabilité appartient au PBI 7.17.
 Le contrôle 7.13, pris isolément, ne traitait ni indépendance entre adaptateurs (7.14), ni confinement des DTO
 (7.15), ni direction des modules partagés (7.16), ni branchement du contrôle aux profils de gate (7.17). Le
 PBI 7.19 ajoute la frontière applicative de prévision et migre les deux cycles frontend recensés sans modifier
-le contenu fonctionnel des API ni les formules, seuils, corpus ou protocoles statistiques. L’autorité
+le contenu fonctionnel des API ni les formules, seuils, corpus ou protocoles statistiques. Le PBI 7.20 place
+la configuration d’équipe portefeuille dans un contrat applicatif public indépendant des hooks, sans migrer
+l’orchestration fonctionnelle du portefeuille. L’autorité
 `resolved-defaults` est réattachée par une release compatible et ses preuves obligatoires sont régénérées.

@@ -142,8 +142,9 @@ une connexion Azure DevOps réelle.
   seules exceptions possibles sont des couples source/cible exacts, justifiés dans le manifeste. Il projette
   aussi les imports de production entre modules gouvernés et refuse tout cycle direct ou indirect, y compris
   lorsqu’une arête est un import de type, avec le chemin fermé et chaque import localisé. Le module gouverné
-  `frontend/src/application/team-forecast/` est exposé uniquement par son `index.ts` ; la preuve courante porte
-  sept modules, quatre arêtes inter-modules et zéro cycle. Le rendu du chemin suit le séparateur natif de la
+  `frontend/src/application/team-forecast/` et `frontend/src/application/portfolio-forecast/` sont exposés
+  uniquement par leur `index.ts` ; la preuve courante porte huit modules, quatre arêtes inter-modules et zéro
+  cycle. Le rendu du chemin suit le séparateur natif de la
   plateforme et sa portabilité reste couverte explicitement pour les représentations POSIX et Windows.
 - **Prévision indépendante de React.** Le contrat applicatif `TeamForecast` porte les trois opérations de
   collecte, simulation sur échantillons et prévision complète. `useSimulation` et `usePortfolioReport`
@@ -151,6 +152,11 @@ une connexion Azure DevOps réelle.
   n’importent React ou les hooks. Les anciennes façades cycliques `simulationForecastService.ts` et
   `simulationForecastCore.ts` ont été retirées. Une règle de direction dédiée et la baseline globale à zéro
   cycle empêchent le retour de cette dépendance inverse.
+- **Configuration portefeuille indépendante de React.** Le contrat applicatif public
+  `application/portfolio-forecast` possède désormais `TeamPortfolioConfig`. Les données de démonstration,
+  `usePortfolio` et `usePortfolioReport` consomment tous cette frontière ; aucun hook ne déclare ni ne
+  réexporte plus la configuration. Deux ratchets dédiés interdisent au contrat d’importer React ou les hooks
+  et aux données démo de reprendre l’ancien chemin.
 - **Migration ordonnée sans lot bloquant.** La [séquence architecturale](docs/architecture-migration-sequence.md)
   fixe un graphe acyclique de publications autonomes, calcule les vagues de disponibilité les plus précoces
   et protège automatiquement les précédences. Après sa publication, six outcomes indépendants peuvent

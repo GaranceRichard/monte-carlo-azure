@@ -178,10 +178,10 @@ def test_python_modules_are_checked_and_parse_errors_fail_closed() -> None:
     assert malformed.diagnostics[0].location == "line 1"
 
 
-def test_repository_graph_is_acyclic_with_team_forecast_contract() -> None:
+def test_repository_graph_is_acyclic_with_frontend_application_contracts() -> None:
     result = inspect_repository_module_cycles(load_dependency_authority())
 
-    assert result.modules == 7
+    assert result.modules == 8
     assert [(edge.source, edge.target) for edge in result.module_edges] == [
         (
             "frontend/src/adapters/browser/clock/",

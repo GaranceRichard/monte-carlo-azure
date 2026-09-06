@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1221,
+      "logicalCases": 1224,
       "nodes": [
         {
           "id": "preflight",
@@ -257,7 +257,7 @@
             "pytest:tests/test_dependency_cycles.py::test_direct_cycle_including_a_type_import_is_rejected_with_its_edges",
             "pytest:tests/test_dependency_cycles.py::test_indirect_cycle_is_rejected_with_a_canonical_closed_path",
             "pytest:tests/test_dependency_cycles.py::test_python_modules_are_checked_and_parse_errors_fail_closed",
-            "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_team_forecast_contract",
+            "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_frontend_application_contracts",
             "pytest:tests/test_dependency_public_api.py::test_comments_strings_and_unrelated_imports_are_ignored",
             "pytest:tests/test_dependency_public_api.py::test_exact_authorized_exception_does_not_cover_neighbors",
             "pytest:tests/test_dependency_public_api.py::test_javascript_deep_imports_are_localized_for_every_import_form",
@@ -757,6 +757,8 @@
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [9:3]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > uses the configured API base [5:3]",
+            "vitest:frontend/src/application/portfolio-forecast/contract.test.ts::portfolio configuration application contract > exposes the team configuration through its public entrypoint [7:3]",
+            "vitest:frontend/src/application/portfolio-forecast/contract.test.ts::portfolio configuration application contract > keeps the contract independent from React and hooks [26:3]",
             "vitest:frontend/src/application/team-forecast/contract.test.ts::TeamForecast application contract > exposes the stable forecast operations through its public entrypoint [9:3]",
             "vitest:frontend/src/application/team-forecast/contract.test.ts::TeamForecast application contract > keeps the contract and implementation independent from React hooks [20:3]",
             "vitest:frontend/src/clientId.test.ts::ensureMontecarloClientCookie > creates a UUID cookie on first call [9:3]",
@@ -1231,6 +1233,7 @@
             "vitest:frontend/src/hooks/useTeamOptions.test.tsx::useTeamOptions quick filters > uses default fallback and applies matching quick filters when team options fetch fails [201:3]",
             "vitest:frontend/src/main.test.tsx::main bootstrap > renders the app into #root [10:3]",
             "vitest:frontend/src/main.test.tsx::main bootstrap > throws when #root is missing [28:3]",
+            "vitest:frontend/src/portfolioConfigurationContract.test.ts::portfolio configuration consumers > use the application contract without the legacy hook authority [7:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > defaults to standard mode when pages flag is disabled [15:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
@@ -1382,15 +1385,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 718
+            "vitest": 721
           },
           "natures": {
             "component": 332,
-            "unit": 386
+            "unit": 389
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 610
+            "unassigned": 613
           }
         },
         {
@@ -1496,7 +1499,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1509,
+      "logicalCases": 1514,
       "nodes": [
         {
           "id": "preflight",
@@ -1865,7 +1868,7 @@
             "pytest:tests/test_dependency_cycles.py::test_direct_cycle_including_a_type_import_is_rejected_with_its_edges",
             "pytest:tests/test_dependency_cycles.py::test_indirect_cycle_is_rejected_with_a_canonical_closed_path",
             "pytest:tests/test_dependency_cycles.py::test_python_modules_are_checked_and_parse_errors_fail_closed",
-            "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_team_forecast_contract",
+            "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_frontend_application_contracts",
             "pytest:tests/test_dependency_cycles.py::test_repository_scan_reports_unreadable_sources",
             "pytest:tests/test_dependency_public_api.py::test_comments_strings_and_unrelated_imports_are_ignored",
             "pytest:tests/test_dependency_public_api.py::test_exact_authorized_exception_does_not_cover_neighbors",
@@ -1924,6 +1927,7 @@
             "pytest:tests/test_maintainability.py::test_cli_writes_baseline_passes_fails_and_reports_loading_error",
             "pytest:tests/test_maintainability.py::test_configuration_rejects_invalid_json_schema_payload_and_limit_drift",
             "pytest:tests/test_maintainability.py::test_cycles_include_self_edges_and_ignore_edges_outside_graph",
+            "pytest:tests/test_maintainability.py::test_demo_portfolio_configuration_rejects_the_legacy_hook_path",
             "pytest:tests/test_maintainability.py::test_dependency_collection_resolves_relative_external_and_js_imports",
             "pytest:tests/test_maintainability.py::test_exception_without_justification_is_rejected",
             "pytest:tests/test_maintainability.py::test_identical_baseline_passes",
@@ -1936,6 +1940,7 @@
             "pytest:tests/test_maintainability.py::test_new_documented_dependency_direction_violation_is_detected",
             "pytest:tests/test_maintainability.py::test_new_mojibake_is_detected_in_a_tracked_text_file",
             "pytest:tests/test_maintainability.py::test_new_violation_fails",
+            "pytest:tests/test_maintainability.py::test_portfolio_configuration_contract_rejects_react_and_hook_dependencies",
             "pytest:tests/test_maintainability.py::test_python_and_javascript_metrics_cover_supported_constructs",
             "pytest:tests/test_maintainability.py::test_ratchet_existing_cycle_direction_and_mojibake_debt_stays_stable",
             "pytest:tests/test_maintainability.py::test_repository_ratchet_limits_and_baseline_are_locked",
@@ -2476,18 +2481,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 759
+            "pytest": 761
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 295,
+            "integration": 297,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 652
+            "unassigned": 654
           }
         },
         {
@@ -2607,6 +2612,8 @@
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [9:3]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > uses the configured API base [5:3]",
+            "vitest:frontend/src/application/portfolio-forecast/contract.test.ts::portfolio configuration application contract > exposes the team configuration through its public entrypoint [7:3]",
+            "vitest:frontend/src/application/portfolio-forecast/contract.test.ts::portfolio configuration application contract > keeps the contract independent from React and hooks [26:3]",
             "vitest:frontend/src/application/team-forecast/contract.test.ts::TeamForecast application contract > exposes the stable forecast operations through its public entrypoint [9:3]",
             "vitest:frontend/src/application/team-forecast/contract.test.ts::TeamForecast application contract > keeps the contract and implementation independent from React hooks [20:3]",
             "vitest:frontend/src/clientId.test.ts::ensureMontecarloClientCookie > creates a UUID cookie on first call [9:3]",
@@ -3081,6 +3088,7 @@
             "vitest:frontend/src/hooks/useTeamOptions.test.tsx::useTeamOptions quick filters > uses default fallback and applies matching quick filters when team options fetch fails [201:3]",
             "vitest:frontend/src/main.test.tsx::main bootstrap > renders the app into #root [10:3]",
             "vitest:frontend/src/main.test.tsx::main bootstrap > throws when #root is missing [28:3]",
+            "vitest:frontend/src/portfolioConfigurationContract.test.ts::portfolio configuration consumers > use the application contract without the legacy hook authority [7:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > defaults to standard mode when pages flag is disabled [15:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
@@ -3232,15 +3240,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 718
+            "vitest": 721
           },
           "natures": {
             "component": 332,
-            "unit": 386
+            "unit": 389
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 610
+            "unassigned": 613
           }
         },
         {
@@ -3447,7 +3455,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1509,
+      "logicalCases": 1514,
       "nodes": [
         {
           "id": "preflight",
@@ -3816,7 +3824,7 @@
             "pytest:tests/test_dependency_cycles.py::test_direct_cycle_including_a_type_import_is_rejected_with_its_edges",
             "pytest:tests/test_dependency_cycles.py::test_indirect_cycle_is_rejected_with_a_canonical_closed_path",
             "pytest:tests/test_dependency_cycles.py::test_python_modules_are_checked_and_parse_errors_fail_closed",
-            "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_team_forecast_contract",
+            "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_frontend_application_contracts",
             "pytest:tests/test_dependency_cycles.py::test_repository_scan_reports_unreadable_sources",
             "pytest:tests/test_dependency_public_api.py::test_comments_strings_and_unrelated_imports_are_ignored",
             "pytest:tests/test_dependency_public_api.py::test_exact_authorized_exception_does_not_cover_neighbors",
@@ -3875,6 +3883,7 @@
             "pytest:tests/test_maintainability.py::test_cli_writes_baseline_passes_fails_and_reports_loading_error",
             "pytest:tests/test_maintainability.py::test_configuration_rejects_invalid_json_schema_payload_and_limit_drift",
             "pytest:tests/test_maintainability.py::test_cycles_include_self_edges_and_ignore_edges_outside_graph",
+            "pytest:tests/test_maintainability.py::test_demo_portfolio_configuration_rejects_the_legacy_hook_path",
             "pytest:tests/test_maintainability.py::test_dependency_collection_resolves_relative_external_and_js_imports",
             "pytest:tests/test_maintainability.py::test_exception_without_justification_is_rejected",
             "pytest:tests/test_maintainability.py::test_identical_baseline_passes",
@@ -3887,6 +3896,7 @@
             "pytest:tests/test_maintainability.py::test_new_documented_dependency_direction_violation_is_detected",
             "pytest:tests/test_maintainability.py::test_new_mojibake_is_detected_in_a_tracked_text_file",
             "pytest:tests/test_maintainability.py::test_new_violation_fails",
+            "pytest:tests/test_maintainability.py::test_portfolio_configuration_contract_rejects_react_and_hook_dependencies",
             "pytest:tests/test_maintainability.py::test_python_and_javascript_metrics_cover_supported_constructs",
             "pytest:tests/test_maintainability.py::test_ratchet_existing_cycle_direction_and_mojibake_debt_stays_stable",
             "pytest:tests/test_maintainability.py::test_repository_ratchet_limits_and_baseline_are_locked",
@@ -4427,18 +4437,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 759
+            "pytest": 761
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 295,
+            "integration": 297,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 652
+            "unassigned": 654
           }
         },
         {
@@ -4558,6 +4568,8 @@
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [9:3]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > uses the configured API base [5:3]",
+            "vitest:frontend/src/application/portfolio-forecast/contract.test.ts::portfolio configuration application contract > exposes the team configuration through its public entrypoint [7:3]",
+            "vitest:frontend/src/application/portfolio-forecast/contract.test.ts::portfolio configuration application contract > keeps the contract independent from React and hooks [26:3]",
             "vitest:frontend/src/application/team-forecast/contract.test.ts::TeamForecast application contract > exposes the stable forecast operations through its public entrypoint [9:3]",
             "vitest:frontend/src/application/team-forecast/contract.test.ts::TeamForecast application contract > keeps the contract and implementation independent from React hooks [20:3]",
             "vitest:frontend/src/clientId.test.ts::ensureMontecarloClientCookie > creates a UUID cookie on first call [9:3]",
@@ -5032,6 +5044,7 @@
             "vitest:frontend/src/hooks/useTeamOptions.test.tsx::useTeamOptions quick filters > uses default fallback and applies matching quick filters when team options fetch fails [201:3]",
             "vitest:frontend/src/main.test.tsx::main bootstrap > renders the app into #root [10:3]",
             "vitest:frontend/src/main.test.tsx::main bootstrap > throws when #root is missing [28:3]",
+            "vitest:frontend/src/portfolioConfigurationContract.test.ts::portfolio configuration consumers > use the application contract without the legacy hook authority [7:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > defaults to standard mode when pages flag is disabled [15:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
@@ -5183,15 +5196,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 718
+            "vitest": 721
           },
           "natures": {
             "component": 332,
-            "unit": 386
+            "unit": 389
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 610
+            "unassigned": 613
           }
         },
         {
@@ -5398,7 +5411,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1509,
+      "logicalCases": 1514,
       "nodes": [
         {
           "id": "preflight",
@@ -5767,7 +5780,7 @@
             "pytest:tests/test_dependency_cycles.py::test_direct_cycle_including_a_type_import_is_rejected_with_its_edges",
             "pytest:tests/test_dependency_cycles.py::test_indirect_cycle_is_rejected_with_a_canonical_closed_path",
             "pytest:tests/test_dependency_cycles.py::test_python_modules_are_checked_and_parse_errors_fail_closed",
-            "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_team_forecast_contract",
+            "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_frontend_application_contracts",
             "pytest:tests/test_dependency_cycles.py::test_repository_scan_reports_unreadable_sources",
             "pytest:tests/test_dependency_public_api.py::test_comments_strings_and_unrelated_imports_are_ignored",
             "pytest:tests/test_dependency_public_api.py::test_exact_authorized_exception_does_not_cover_neighbors",
@@ -5826,6 +5839,7 @@
             "pytest:tests/test_maintainability.py::test_cli_writes_baseline_passes_fails_and_reports_loading_error",
             "pytest:tests/test_maintainability.py::test_configuration_rejects_invalid_json_schema_payload_and_limit_drift",
             "pytest:tests/test_maintainability.py::test_cycles_include_self_edges_and_ignore_edges_outside_graph",
+            "pytest:tests/test_maintainability.py::test_demo_portfolio_configuration_rejects_the_legacy_hook_path",
             "pytest:tests/test_maintainability.py::test_dependency_collection_resolves_relative_external_and_js_imports",
             "pytest:tests/test_maintainability.py::test_exception_without_justification_is_rejected",
             "pytest:tests/test_maintainability.py::test_identical_baseline_passes",
@@ -5838,6 +5852,7 @@
             "pytest:tests/test_maintainability.py::test_new_documented_dependency_direction_violation_is_detected",
             "pytest:tests/test_maintainability.py::test_new_mojibake_is_detected_in_a_tracked_text_file",
             "pytest:tests/test_maintainability.py::test_new_violation_fails",
+            "pytest:tests/test_maintainability.py::test_portfolio_configuration_contract_rejects_react_and_hook_dependencies",
             "pytest:tests/test_maintainability.py::test_python_and_javascript_metrics_cover_supported_constructs",
             "pytest:tests/test_maintainability.py::test_ratchet_existing_cycle_direction_and_mojibake_debt_stays_stable",
             "pytest:tests/test_maintainability.py::test_repository_ratchet_limits_and_baseline_are_locked",
@@ -6378,18 +6393,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 759
+            "pytest": 761
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 295,
+            "integration": 297,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 652
+            "unassigned": 654
           }
         },
         {
@@ -6509,6 +6524,8 @@
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > prefers the API error detail and otherwise uses the HTTP status [14:3]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > reads JSON and falls back when the response body is invalid [9:3]",
             "vitest:frontend/src/apiHelpers.test.ts::api helpers > uses the configured API base [5:3]",
+            "vitest:frontend/src/application/portfolio-forecast/contract.test.ts::portfolio configuration application contract > exposes the team configuration through its public entrypoint [7:3]",
+            "vitest:frontend/src/application/portfolio-forecast/contract.test.ts::portfolio configuration application contract > keeps the contract independent from React and hooks [26:3]",
             "vitest:frontend/src/application/team-forecast/contract.test.ts::TeamForecast application contract > exposes the stable forecast operations through its public entrypoint [9:3]",
             "vitest:frontend/src/application/team-forecast/contract.test.ts::TeamForecast application contract > keeps the contract and implementation independent from React hooks [20:3]",
             "vitest:frontend/src/clientId.test.ts::ensureMontecarloClientCookie > creates a UUID cookie on first call [9:3]",
@@ -6983,6 +7000,7 @@
             "vitest:frontend/src/hooks/useTeamOptions.test.tsx::useTeamOptions quick filters > uses default fallback and applies matching quick filters when team options fetch fails [201:3]",
             "vitest:frontend/src/main.test.tsx::main bootstrap > renders the app into #root [10:3]",
             "vitest:frontend/src/main.test.tsx::main bootstrap > throws when #root is missing [28:3]",
+            "vitest:frontend/src/portfolioConfigurationContract.test.ts::portfolio configuration consumers > use the application contract without the legacy hook authority [7:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > defaults to standard mode when pages flag is disabled [15:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves connect mode on pages builds [39:3]",
             "vitest:frontend/src/runtime.test.ts::resolveAppRuntime > resolves demo mode ahead of pages landing/connect modes [27:3]",
@@ -7134,15 +7152,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 718
+            "vitest": 721
           },
           "natures": {
             "component": 332,
-            "unit": 386
+            "unit": 389
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 610
+            "unassigned": 613
           }
         },
         {

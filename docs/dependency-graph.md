@@ -15,14 +15,14 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 276 | 1433 | 84 | 5 | 0 | 0 | 136 | 2 |
+| 278 | 1436 | 84 | 5 | 0 | 0 | 139 | 2 |
 
 ### Directions observées
 
 | Source | Cible | Phase | Arêtes |
 | --- | --- | --- | --- |
 | backend | backend | runtime | 39 |
-| frontend | frontend | compile | 93 |
+| frontend | frontend | compile | 96 |
 | frontend | frontend | runtime | 159 |
 | launcher | backend | runtime | 1 |
 | quality | backend | runtime | 5 |
@@ -213,6 +213,7 @@ Ces listes signalent des surfaces à examiner ; elles ne déclarent ni dépendan
 | frontend/src/composition/browser/index.ts | frontend/src/adapters/browser/clock/index.ts | 1 | runtime | frontend/src/adapters |
 | frontend/src/composition/browser/index.ts | frontend/src/ports/clock/index.ts | 2 | compile | frontend/src/ports |
 | frontend/src/date.ts | frontend/src/domain/delivery/index.ts | 1 | runtime | frontend/src/domain |
+| frontend/src/demoData.ts | frontend/src/application/portfolio-forecast/index.ts | 3 | compile | frontend/src/application |
 | frontend/src/e2e/runtime.ts | frontend/src/hooks/useSimulationHistory.ts | 4 | runtime | frontend/src/hooks |
 | frontend/src/e2e/runtime.ts | frontend/src/utils/teamSort.ts | 3 | runtime | frontend/src/utils |
 | frontend/src/hooks/probability.ts | frontend/src/domain/simulation.ts | 1 | compile | frontend/src/domain |
@@ -222,17 +223,19 @@ Ces listes signalent des surfaces à examiner ; elles ne déclarent ni dépendan
 | frontend/src/hooks/simulationTypes.ts | frontend/src/domain/simulationHistory.ts | 9 | compile | frontend/src/domain |
 | frontend/src/hooks/simulationTypes.ts | frontend/src/utils/decisionLanguage.ts | 14 | compile | frontend/src/utils |
 | frontend/src/hooks/useOnboarding.ts | frontend/src/utils/teamSort.ts | 10 | runtime | frontend/src/utils |
-| frontend/src/hooks/usePortfolio.ts | frontend/src/domain/simulation.ts | 5 | compile | frontend/src/domain |
-| frontend/src/hooks/usePortfolio.ts | frontend/src/utils/portfolioComparisonPresentation.ts | 23 | compile | frontend/src/utils |
-| frontend/src/hooks/usePortfolio.ts | frontend/src/utils/teamSort.ts | 7 | runtime | frontend/src/utils |
+| frontend/src/hooks/usePortfolio.ts | frontend/src/application/portfolio-forecast/index.ts | 4 | compile | frontend/src/application |
+| frontend/src/hooks/usePortfolio.ts | frontend/src/domain/simulation.ts | 6 | compile | frontend/src/domain |
+| frontend/src/hooks/usePortfolio.ts | frontend/src/utils/portfolioComparisonPresentation.ts | 24 | compile | frontend/src/utils |
+| frontend/src/hooks/usePortfolio.ts | frontend/src/utils/teamSort.ts | 8 | runtime | frontend/src/utils |
 | frontend/src/hooks/usePortfolioReport.ts | frontend/src/adapters/seededSampleIndexDrawPort.ts | 2 | runtime | frontend/src/adapters |
+| frontend/src/hooks/usePortfolioReport.ts | frontend/src/application/portfolio-forecast/index.ts | 8 | compile | frontend/src/application |
 | frontend/src/hooks/usePortfolioReport.ts | frontend/src/application/team-forecast/index.ts | 7 | runtime | frontend/src/application |
-| frontend/src/hooks/usePortfolioReport.ts | frontend/src/components/steps/portfolioPrintReport.ts | 515 | runtime | frontend/src/components |
+| frontend/src/hooks/usePortfolioReport.ts | frontend/src/components/steps/portfolioPrintReport.ts | 508 | runtime | frontend/src/components |
 | frontend/src/hooks/usePortfolioReport.ts | frontend/src/domain/simulation.ts | 4 | compile | frontend/src/domain |
-| frontend/src/hooks/usePortfolioReport.ts | frontend/src/utils/portfolioComparisonDiagnostic.ts | 18 | runtime | frontend/src/utils |
-| frontend/src/hooks/usePortfolioReport.ts | frontend/src/utils/portfolioComparisonPresentation.ts | 23 | compile | frontend/src/utils |
-| frontend/src/hooks/usePortfolioReport.ts | frontend/src/utils/simulation.ts | 9 | runtime | frontend/src/utils |
-| frontend/src/hooks/usePortfolioReport.ts | frontend/src/utils/simulationDecisionDiagnostic.ts | 17 | runtime | frontend/src/utils |
+| frontend/src/hooks/usePortfolioReport.ts | frontend/src/utils/portfolioComparisonDiagnostic.ts | 19 | runtime | frontend/src/utils |
+| frontend/src/hooks/usePortfolioReport.ts | frontend/src/utils/portfolioComparisonPresentation.ts | 24 | compile | frontend/src/utils |
+| frontend/src/hooks/usePortfolioReport.ts | frontend/src/utils/simulation.ts | 10 | runtime | frontend/src/utils |
+| frontend/src/hooks/usePortfolioReport.ts | frontend/src/utils/simulationDecisionDiagnostic.ts | 18 | runtime | frontend/src/utils |
 | frontend/src/hooks/useSimulation.ts | frontend/src/application/team-forecast/index.ts | 18 | runtime | frontend/src/application |
 | frontend/src/hooks/useSimulation.ts | frontend/src/domain/simulation.ts | 7 | compile | frontend/src/domain |
 | frontend/src/hooks/useSimulation.ts | frontend/src/domain/simulationHistory.ts | 8 | compile | frontend/src/domain |

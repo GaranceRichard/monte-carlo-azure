@@ -327,7 +327,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Permettre l’évolution de la configuration et du hook sans dépendance inverse.
 - **Frontière principale :** Configuration applicative portefeuille.
 - **Famille d’invariants :** Indépendance de la configuration vis-à-vis de React.
-- **Preuve principale :** Tests contractuels de configuration et contrôle des imports.
+- **Preuve principale :** [Tests contractuels de configuration](../../frontend/src/application/portfolio-forecast/contract.test.ts) et [ratchet des imports](../../tests/test_maintainability.py).
 - **Éléments de réalisation inclus :** Contrat local ; migration du consommateur cohésif ; retrait de la déclaration historique ; blocage du retour au hook ; documentation.
 - **Hors périmètre :** Orchestration fonctionnelle du portefeuille et expérience utilisateur.
 - **Surface prévisionnelle :** 5 fichiers de production ; 9 fichiers versionnés

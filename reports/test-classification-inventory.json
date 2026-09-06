@@ -3246,19 +3246,15 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_team_forecast_contract",
+    "logicalCaseId": "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_frontend_application_contracts",
     "framework": "pytest",
     "sourcePath": "tests/test_dependency_cycles.py",
-    "selector": "test_repository_graph_is_acyclic_with_team_forecast_contract",
+    "selector": "test_repository_graph_is_acyclic_with_frontend_application_contracts",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
     "purposes": [
       "functional"
-    ],
-    "domains": [
-      "azure_devops",
-      "statistical_engine"
     ]
   },
   {
@@ -4318,6 +4314,28 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_maintainability.py::test_demo_portfolio_configuration_rejects_the_legacy_hook_path",
+    "framework": "pytest",
+    "sourcePath": "tests/test_maintainability.py",
+    "selector": "test_demo_portfolio_configuration_rejects_the_legacy_hook_path",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security",
+      "compatibility",
+      "migration_recovery"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops",
+      "history",
+      "portfolio",
+      "quality_chain"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_maintainability.py::test_dependency_collection_resolves_relative_external_and_js_imports",
     "framework": "pytest",
     "sourcePath": "tests/test_maintainability.py",
@@ -4496,6 +4514,22 @@
       "resilience"
     ],
     "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_maintainability.py::test_portfolio_configuration_contract_rejects_react_and_hook_dependencies",
+    "framework": "pytest",
+    "sourcePath": "tests/test_maintainability.py",
+    "selector": "test_portfolio_configuration_contract_rejects_react_and_hook_dependencies",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "portfolio",
       "quality_chain"
     ]
   },
@@ -14581,6 +14615,38 @@
     ]
   },
   {
+    "logicalCaseId": "vitest:frontend/src/application/portfolio-forecast/contract.test.ts::portfolio configuration application contract > exposes the team configuration through its public entrypoint [7:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/application/portfolio-forecast/contract.test.ts",
+    "selector": "portfolio configuration application contract > exposes the team configuration through its public entrypoint [7:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "azure_devops",
+      "portfolio",
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/application/portfolio-forecast/contract.test.ts::portfolio configuration application contract > keeps the contract independent from React and hooks [26:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/application/portfolio-forecast/contract.test.ts",
+    "selector": "portfolio configuration application contract > keeps the contract independent from React and hooks [26:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "portfolio"
+    ]
+  },
+  {
     "logicalCaseId": "vitest:frontend/src/application/team-forecast/contract.test.ts::TeamForecast application contract > exposes the stable forecast operations through its public entrypoint [9:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/application/team-forecast/contract.test.ts",
@@ -23578,6 +23644,24 @@
     "nature": "component",
     "purposes": [
       "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/portfolioConfigurationContract.test.ts::portfolio configuration consumers > use the application contract without the legacy hook authority [7:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/portfolioConfigurationContract.test.ts",
+    "selector": "portfolio configuration consumers > use the application contract without the legacy hook authority [7:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "compatibility",
+      "migration_recovery"
+    ],
+    "domains": [
+      "history",
+      "portfolio"
     ]
   },
   {

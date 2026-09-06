@@ -1,5 +1,6 @@
 import { formatDateLocal } from "./date";
 import type { CycleTimePoint, NamedEntity } from "./types";
+import type { TeamPortfolioConfig } from "./application/portfolio-forecast";
 
 const DEMO_START_DATE = "2025-11-24";
 const DEMO_END_DATE = "2026-03-09";
@@ -74,7 +75,7 @@ export const DEMO_TEAM_OPTIONS = {
   defaultDoneStates: DEMO_DONE_STATES,
 };
 
-export const DEMO_PORTFOLIO_TEAM_CONFIGS = DEMO_TEAMS.map((team) => ({
+export const DEMO_PORTFOLIO_TEAM_CONFIGS: TeamPortfolioConfig[] = DEMO_TEAMS.map((team) => ({
   teamName: team.name || "",
   workItemTypeOptions: [...DEMO_WORK_ITEM_TYPES],
   statesByType: DEMO_STATES_BY_TYPE,

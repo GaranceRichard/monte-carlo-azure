@@ -209,6 +209,80 @@ def test_team_forecast_contract_rejects_react_and_hook_dependencies(
     ]
 
 
+def test_portfolio_configuration_contract_rejects_react_and_hook_dependencies(
+    tmp_path: Path,
+) -> None:
+    contract = tmp_path / "frontend/src/application/portfolio-forecast/contract.ts"
+    hook = tmp_path / "frontend/src/hooks/usePortfolioReport.ts"
+    contract.parent.mkdir(parents=True)
+    hook.parent.mkdir(parents=True)
+    contract.write_text(
+        'import type { FC } from "react";\n'
+        'import type { ReportState } from "../../hooks/usePortfolioReport";\n',
+        encoding="utf-8",
+    )
+    hook.write_text("export type ReportState = {};\n", encoding="utf-8")
+    config = json.loads(
+        (ROOT / "config/maintainability.json").read_text(encoding="utf-8")
+    )
+
+    snapshot = check_maintainability.build_snapshot(
+        tmp_path,
+        config,
+        tracked_paths=[
+            "frontend/src/application/portfolio-forecast/contract.ts",
+            "frontend/src/hooks/usePortfolioReport.ts",
+        ],
+    )
+
+    assert snapshot["dependencyViolations"] == [
+        {
+            "rule": "portfolio-configuration-must-remain-react-independent",
+            "source": "frontend/src/application/portfolio-forecast/contract.ts",
+            "target": "frontend/src/hooks/usePortfolioReport.ts",
+        },
+        {
+            "rule": "portfolio-configuration-must-remain-react-independent",
+            "source": "frontend/src/application/portfolio-forecast/contract.ts",
+            "target": "react",
+        },
+    ]
+
+
+def test_demo_portfolio_configuration_rejects_the_legacy_hook_path(
+    tmp_path: Path,
+) -> None:
+    demo_data = tmp_path / "frontend/src/demoData.ts"
+    hook = tmp_path / "frontend/src/hooks/usePortfolioReport.ts"
+    demo_data.parent.mkdir(parents=True)
+    hook.parent.mkdir(parents=True)
+    demo_data.write_text(
+        'import type { TeamPortfolioConfig } from "./hooks/usePortfolioReport";\n',
+        encoding="utf-8",
+    )
+    hook.write_text("export type TeamPortfolioConfig = {};\n", encoding="utf-8")
+    config = json.loads(
+        (ROOT / "config/maintainability.json").read_text(encoding="utf-8")
+    )
+
+    snapshot = check_maintainability.build_snapshot(
+        tmp_path,
+        config,
+        tracked_paths=[
+            "frontend/src/demoData.ts",
+            "frontend/src/hooks/usePortfolioReport.ts",
+        ],
+    )
+
+    assert snapshot["dependencyViolations"] == [
+        {
+            "rule": "demo-portfolio-configuration-must-not-depend-on-hooks",
+            "source": "frontend/src/demoData.ts",
+            "target": "frontend/src/hooks/usePortfolioReport.ts",
+        },
+    ]
+
+
 def test_new_mojibake_is_detected_in_a_tracked_text_file(tmp_path: Path) -> None:
     (tmp_path / "notes.md").write_text("Fran\u00c3\u00a7ais cassé\n", encoding="utf-8")
 
