@@ -87,9 +87,10 @@ toujours affichées.
 
 L'inventaire de classification et le plan sont régénérés seulement si leurs sources ont changé.
 Les compteurs ne sont plus une entrée préalable à leur propre exécution : l'agrégateur consolide les
-résultats natifs du candidat, écrit le rapport puis applique les vérifications d'empreinte et de cohérence
-existantes. La CI archive ce rapport avec l'inventaire et le plan du même SHA. Le contrôle direct
-`--check` reste disponible après exécution ; le profil de développement `pr` ne prétend pas produire un
+résultats natifs du candidat avec `Scripts/report_test_execution_counts.py --refresh-and-check`, écrit
+`reports/test-execution-counts.json`, ignoré par Git, puis applique les vérifications strictes d'empreinte
+et de cohérence existantes. La CI archive ce rapport avec l'inventaire et le plan du même SHA. Le contrôle
+direct `--check` reste disponible après exécution ; le profil de développement `pr` ne prétend pas produire un
 compteur global de publication. La [référence initiale](../reports/contribution-cycle-before-counts.json)
 reste conservée pour l'audit.
 
@@ -122,3 +123,10 @@ Les mesures intermédiaires conservées étaient : hook 0,070232 s, scope 0,2523
 Ces nombres ne prédisent pas la durée du profil complet. L'audit, les tests de migration et les
 régénérations statiques nécessaires sont un coût ponctuel, distinct du coût de chaque contribution.
 Aucune exécution complète n'est nécessaire pour régénérer les compteurs avant la validation canonique.
+
+Le candidat intermédiaire `82d5c643` a été refusé en 137,715 s, avant tout transfert : une empreinte de
+décision, une projection descriptive et une attente CLI obsolètes causaient 31 échecs Python. Ce coût
+appartient à la migration, pas au gain récurrent. La remise à jour de l'autorité de dépendances a pris
+2,220 s et celle de la projection descriptive du coût de changement 1,270 s. Aucun seuil ni dette autorisée
+du ratchet de maintenabilité n'a été relevé. Les résultats natifs de cet échec ne valent pas preuve du
+candidat corrigé, qui reçoit un nouveau SHA et sa propre validation canonique.

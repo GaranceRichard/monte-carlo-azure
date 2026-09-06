@@ -86,9 +86,12 @@ restent applicables.
 - Tous les jobs producteurs uploadent `reports/test-execution-artifacts`. `aggregate` télécharge et fusionne
   les preuves dans ce même répertoire, puis le promoteur retrouve les artefacts backend, Vitest et E2E sous
   leur arborescence versionnée par profil et nœud.
-- `aggregate` vérifie le dénombrement global versionné, produit les preuves Vitals et de gouvernance dans
-  l'ordre contractuel, puis écrit `reports/test-strategy-report.json` et `.md` depuis un modèle unique. Le
-  rapport n'exige pas le résultat final du nœud qui est encore en train de le produire.
+- `aggregate` produit `reports/test-execution-counts.json` depuis les artefacts natifs du run canonique avec
+  `python Scripts/report_test_execution_counts.py --refresh-and-check`, puis applique les contrôles stricts
+  de complétude, d'unicité, d'invariants et d'empreinte. Ce rapport courant est ignoré par Git ; la CI
+  l'archive avec l'inventaire et le plan du même SHA. L'agrégateur produit ensuite les preuves Vitals et de
+  gouvernance dans l'ordre contractuel, puis écrit `reports/test-strategy-report.json` et `.md` depuis un
+  modèle unique. Le rapport n'exige pas le résultat final du nœud qui est encore en train de le produire.
 - Le job `aggregate` installe Node 22 et les dépendances verrouillées par `frontend/package-lock.json` avant
   son agrégateur final : le contrôle de gouvernance redécouvre les tests Vitest et Playwright avec TypeScript.
 
@@ -161,10 +164,12 @@ répertoire de l’exécution courante est nettoyé ; le temporaire global de l�
 - Tout enregistrement de classification respecte le catalogue
   [`test-classification.json`](../config/test-classification.json) et son schéma
   [`test-classification.schema.json`](../config/test-classification.schema.json). Le contrôle
-  `python Scripts/check_test_classification.py` doit confirmer l'égalité exacte entre cas découverts et
-  inventoriés, `unresolved = 0`, l'absence d'override orphelin et d'exemption expirée, ainsi que la concordance
-  de l'empreinte du rapport d'exécution. Un ajout, une suppression ou une modification de test exige la
-  régénération de l'inventaire et du rapport d'exécution.
+  `python Scripts/check_test_classification.py --source-only` doit confirmer l'égalité exacte entre cas
+  découverts et inventoriés, `unresolved = 0`, l'absence d'override orphelin et d'exemption expirée. Un
+  changement de l'inventaire découvert exige sa régénération statique sur la tranche candidate cohérente.
+  Le rapport d'exécution est produit par l'agrégateur à partir du run canonique, puis son empreinte est
+  vérifiée contre l'inventaire ; aucune suite complète préalable n'est requise pour préparer ces compteurs.
+  Le contrôle direct sans `--source-only` conserve cette vérification et exige le rapport courant.
 - Le contrat `config/test-execution-profiles.json` et son schéma sont valides : aucun identifiant dupliqué,
   dépendance absente, cycle, nœud inaccessible, conflit parallèle ou profil sans agrégateur final unique.
 - Tout job CI exécutant les tests Pytest qui chargent la classification JavaScript configure Node 22 avec le

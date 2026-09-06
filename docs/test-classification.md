@@ -208,8 +208,11 @@ Ces exemples illustrent des décisions désormais produites dans l’inventaire 
 
 ## Comptage des collections et exécutions
 
-Le rapport courant `reports/test-execution-counts.json`, produit par le profil complet, applique les
-définitions communes suivantes :
+Le rapport courant `reports/test-execution-counts.json`, produit par le profil complet, est ignoré par Git
+et archivé par la CI avec l'inventaire et le plan du SHA validé. La référence initiale
+[`contribution-cycle-before-counts.json`](../reports/contribution-cycle-before-counts.json) est conservée
+pour l'audit et ne remplace pas les résultats courants. Le rapport applique les définitions communes
+suivantes :
 
 - `logicalCases` : déclarations uniques présentes dans l'inventaire de classification ;
 - `collectedInstances` : instances natives après expansion des paramètres et projets ;

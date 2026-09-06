@@ -123,6 +123,7 @@ def test_skip_binary_staged_reads_and_rules(tmp_path: Path, monkeypatch) -> None
 
     monkeypatch.setattr(check_no_secrets, "run_git", lambda _args: (1, "", "missing"))
     assert check_no_secrets.read_staged_file_bytes("missing.txt") is None
+    assert check_no_secrets.read_commit_file_bytes("a" * 40, "missing.txt") is None
     monkeypatch.setattr(check_no_secrets, "run_git", lambda _args: (0, "hello", ""))
     assert check_no_secrets.read_staged_file_bytes("file.txt") == b"hello"
     assert check_no_secrets.read_commit_file_bytes("a" * 40, "file.txt") == b"hello"

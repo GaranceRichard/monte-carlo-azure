@@ -656,8 +656,16 @@ def test_dag_impossible_ready_set_and_quality_gate_cli_options(tmp_path: Path, m
     )
     assert code == 2
 
-    monkeypatch.setattr(quality_gate, "run_gate", lambda mode, **options: len(options) + 4)
-    assert quality_gate.main(["ci", "--profile", "main", "--node", "aggregate"]) == 6
+    calls = []
+    monkeypatch.setattr(
+        quality_gate,
+        "run_gate",
+        lambda mode, **options: calls.append((mode, options)) or 7,
+    )
+    assert quality_gate.main(["ci", "--profile", "main", "--node", "aggregate"]) == 7
+    assert calls == [
+        ("ci", {"execution_profile": "main", "selected_node": "aggregate", "verbose_plan": False})
+    ]
     assert quality_gate_plan.execution_plan("fast", False, quality_gate)
 
 
