@@ -456,6 +456,9 @@ def _dag_root(tmp_path: Path) -> Path:
     (root / "reports").mkdir()
     (root / profiles.DEFAULT_CONTRACT).write_text(json.dumps(_contract()), encoding="utf-8")
     (root / profiles.DEFAULT_INVENTORY).write_text(json.dumps(_inventory()), encoding="utf-8")
+    profiles.write_report(
+        profiles.build_plan_report(_contract(), _inventory()), root / profiles.DEFAULT_REPORT
+    )
     return root
 
 
@@ -503,6 +506,8 @@ def test_dag_node_execution_aggregation_and_error_paths(tmp_path: Path, monkeypa
         artifact.parent.mkdir(parents=True, exist_ok=True)
         artifact.write_text(content, encoding="utf-8")
     aggregate_plan = _dag_plan()
+    plan_path = root / profiles.DEFAULT_REPORT
+    plan_bytes, plan_mtime = plan_path.read_bytes(), plan_path.stat().st_mtime_ns
     assert quality_gate_dag.execute_gate_plan(
         quality_gate,
         aggregate_plan,
@@ -521,7 +526,15 @@ def test_dag_node_execution_aggregation_and_error_paths(tmp_path: Path, monkeypa
     }
     for relative_path, content in promoted_artifacts.items():
         assert (root / relative_path).read_text(encoding="utf-8") == content
-    assert (root / "reports/test-execution-plan.json").is_file()
+    assert (plan_path.read_bytes(), plan_path.stat().st_mtime_ns) == (plan_bytes, plan_mtime)
+    plan_path.write_text("{}", encoding="utf-8")
+    with pytest.raises(ValueError, match="execution plan is stale"):
+        quality_gate_dag._prepare_aggregate_inputs(root, "main")
+    assert plan_path.read_text(encoding="utf-8") == "{}"
+    plan_path.unlink()
+    with pytest.raises(ValueError, match="Missing execution-profile artifact"):
+        quality_gate_dag._prepare_aggregate_inputs(root, "main")
+    assert not plan_path.exists()
 
     frontend = quality_gate.GateCommand(
         "Frontend lint (ESLint, zero warning)",
@@ -537,6 +550,40 @@ def test_dag_node_execution_aggregation_and_error_paths(tmp_path: Path, monkeypa
         isolated_validation=False,
         selected_node="frontend-static",
     ) == 7
+
+
+def test_publication_docker_preflight_blocks_expensive_dag_branches(
+    tmp_path: Path, monkeypatch
+) -> None:
+    root = _dag_root(tmp_path)
+    context = quality_gate.build_push_change_context(
+        quality_gate.PushValidationTarget("a" * 40, (), ("backend/api.py",))
+    )
+    plan = quality_gate.build_execution_plan(context)
+    executed: list[str] = []
+
+    def engine_unavailable(command, **_kwargs):
+        executed.append(command.step)
+        return 17 if command.step == "Docker engine availability" else 0
+
+    monkeypatch.setattr(quality_gate, "_run_command", engine_unavailable)
+    monkeypatch.setattr(quality_gate, "_ensure_frontend_dependencies", lambda: 0)
+    monkeypatch.setattr(
+        quality_gate,
+        "_run_docker_smoke",
+        lambda *_args: pytest.fail("The full smoke must wait for the preflight verdict."),
+    )
+
+    assert plan.docker_smoke
+    assert quality_gate_dag.execute_gate_plan(
+        quality_gate,
+        plan,
+        validation_root=root,
+        runtime_temp_root=root / ".tmp",
+        isolated_validation=False,
+        parallel=True,
+    ) == 17
+    assert executed == ["Docker engine availability"]
 
 
 def test_dag_parallel_sequential_docker_and_dependency_failures(

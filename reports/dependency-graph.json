@@ -4363,13 +4363,13 @@
         "line": 13,
         "kind": "python-from",
         "phase": "runtime",
-        "specifier": "Scripts.test_execution_profiles.write_report",
+        "specifier": "Scripts.test_execution_profiles.topological_node_ids",
         "resolution": "internal"
       },
       {
         "source": "Scripts/quality_gate_dag.py",
         "target": "Scripts/test_execution_profiles_graph.py",
-        "line": 21,
+        "line": 20,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "Scripts.test_execution_profiles_graph.active_dependencies",
@@ -4561,7 +4561,7 @@
         "line": 8,
         "kind": "python-from",
         "phase": "runtime",
-        "specifier": "Scripts.quality_gate_change_policy.introduced_secret_commands",
+        "specifier": "Scripts.quality_gate_change_policy.publication_preflight_commands",
         "resolution": "internal"
       },
       {

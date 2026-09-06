@@ -11933,6 +11933,21 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_test_execution_profiles.py::test_publication_docker_preflight_blocks_expensive_dag_branches",
+    "framework": "pytest",
+    "sourcePath": "tests/test_test_execution_profiles.py",
+    "selector": "test_publication_docker_preflight_blocks_expensive_dag_branches",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "deployment"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_test_execution_profiles.py::test_real_contract_and_main_authority_attributions_are_valid",
     "framework": "pytest",
     "sourcePath": "tests/test_test_execution_profiles.py",

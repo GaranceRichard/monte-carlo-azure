@@ -154,20 +154,31 @@ def classification_gate_command(
     )
 
 
-def introduced_secret_commands(
+def publication_preflight_commands(
     command_factory: Callable[..., Any],
     python_executable: str,
     input_sources: tuple[Any, ...],
     context: Any,
 ) -> list[Any]:
-    if context.mode != "push" or not context.introduced_commit_shas:
-        return []
-    return [
-        command_factory(
-            "Introduced commit secret scan",
-            (python_executable, "Scripts/check_no_secrets.py", "--commits",
-             *context.introduced_commit_shas),
-            "Remove the secret from every local checkpoint before publication.",
-            input_sources=input_sources,
+    """Reject unsafe history or an unavailable engine before publication branches."""
+    commands = []
+    if context.mode == "push" and context.introduced_commit_shas:
+        commands.append(
+            command_factory(
+                "Introduced commit secret scan",
+                (python_executable, "Scripts/check_no_secrets.py", "--commits",
+                 *context.introduced_commit_shas),
+                "Remove the secret from every local checkpoint before publication.",
+                input_sources=input_sources,
+            )
         )
-    ]
+    if context.publication_candidate:
+        commands.append(
+            command_factory(
+                "Docker engine availability",
+                ("docker", "version", "--format", "{{.Server.Version}}"),
+                "Start Docker Engine and retry publication when the server is reachable.",
+                input_sources=input_sources,
+            )
+        )
+    return commands

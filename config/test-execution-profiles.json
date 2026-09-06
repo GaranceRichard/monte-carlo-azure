@@ -31,6 +31,7 @@
       "conditionalNeeds": [],
       "commands": [
         "Introduced commit secret scan",
+        "Docker engine availability",
         "Repository hygiene (README, encoding, secrets and DoD)",
         "Backlog consistency",
         "Backlog atomicity",

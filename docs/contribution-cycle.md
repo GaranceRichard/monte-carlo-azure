@@ -76,7 +76,9 @@ Le pré-push scanne tous les commits introduits — un secret ajouté puis retir
 valide une seule fois chaque SHA terminal distinct dans un worktree détaché. Le contrôle de dépôt vérifie
 l'encodage et les accents du README final, la DoD et les secrets de l'arbre final. Tout candidat utilise le
 profil `main` complet, quelle que soit sa classification `targeted`, `impacted` ou `massive`. Couvertures,
-build, E2E, preuves statistiques, gouvernance, agrégation et smoke Docker sont obligatoires. L'environnement
+build, E2E, preuves statistiques, gouvernance, agrégation et smoke Docker sont obligatoires. Le préflight
+du candidat sonde d'abord le moteur avec `docker version --format {{.Server.Version}}` ; une indisponibilité
+bloque la gate avant les suites coûteuses. Cette sonde ne remplace pas le smoke complet. L'environnement
 Docker non secret est matérialisé depuis `.env.example` dans le worktree de validation, puis supprimé.
 
 La sortie normale résume niveau, profil, nombre de commandes et chemins déclencheurs. La liste exhaustive
@@ -86,6 +88,8 @@ toujours affichées.
 ## Autorités statiques et preuves d'exécution
 
 L'inventaire de classification et le plan sont régénérés seulement si leurs sources ont changé.
+L'agrégateur compare le plan commité à ses sources sans le réécrire ; un plan absent ou obsolète bloque
+la publication, sans réparation implicite du candidat.
 Les compteurs ne sont plus une entrée préalable à leur propre exécution : l'agrégateur consolide les
 résultats natifs du candidat avec `Scripts/report_test_execution_counts.py --refresh-and-check`, écrit
 `reports/test-execution-counts.json`, ignoré par Git, puis applique les vérifications strictes d'empreinte
@@ -109,16 +113,19 @@ Mesures de migration acquises sur le même poste Windows :
 | Mesure | Avant | Après | Gain récurrent |
 | --- | ---: | ---: | ---: |
 | Commandes préparées par le commit | 16 | 0 | 100 % |
-| Commandes préparées par le push massif | 36 | 37 | scan historique ajouté, plus smoke Docker |
-| Un checkpoint suivi d'un push | 52 | 37 | 15 commandes, soit 28,85 % |
-| Coût du hook de commit | 92,233 s | médiane 0,069695 s | environ 92,16 s par checkpoint |
+| Commandes préparées par le push massif | 36 | 38 | scan historique et sonde Docker ajoutés, plus smoke complet |
+| Un checkpoint suivi d'un push | 52 | 38 | 14 commandes, soit 26,92 % |
+| Coût du hook de commit | 92,233 s | médiane 0,071433 s | environ 92,16 s par checkpoint |
 | Sortie du hook | 197 lignes / 12 593 octets | 0 / 0 | 100 % |
 | Affichage du plan de push | 40 lignes / 12 741 octets | 2 lignes / 260 octets | 95 % des lignes, 97,96 % des octets |
-| Scope, sans validation | absent | médiane 0,269485 s ; 3 lectures Git | dérive détectée avant les suites |
+| Scope, sans validation | absent | médiane 0,266561 s ; 3 lectures Git | dérive détectée avant les suites |
 
 Le temps avant est un échantillon réussi de la gate `fast` massive. Les médianes après proviennent de
-11 mesures ; la sortie du plan compact a été relevée à 43 chemins et peut varier avec le périmètre.
-Les mesures intermédiaires conservées étaient : hook 0,070232 s, scope 0,252394 s et plan compact
+11 mesures ; la sortie du plan compact final de 38 commandes a été relevée à 49 chemins et peut varier
+avec le périmètre. Le scope final produit 4 lignes / 477 octets, sans validation ni génération.
+Le relevé précédent à 43 chemins reste conservé : hook 0,069695 s, scope 0,269485 s et plan 260 octets.
+Le plan intermédiaire passait de 52 à 37 commandes par cycle, soit 15 commandes et 28,85 % de moins.
+Les autres mesures intermédiaires conservées étaient : hook 0,070232 s, scope 0,252394 s et plan compact
 282 octets à 19 fichiers. Le premier relevé de scope avait pris 0,297 s pour 4 lignes et 526 octets.
 Ces nombres ne prédisent pas la durée du profil complet. L'audit, les tests de migration et les
 régénérations statiques nécessaires sont un coût ponctuel, distinct du coût de chaque contribution.
@@ -130,3 +137,11 @@ appartient à la migration, pas au gain récurrent. La remise à jour de l'autor
 2,220 s et celle de la projection descriptive du coût de changement 1,270 s. Aucun seuil ni dette autorisée
 du ratchet de maintenabilité n'a été relevé. Les résultats natifs de cet échec ne valent pas preuve du
 candidat corrigé, qui reçoit un nouveau SHA et sa propre validation canonique.
+
+Le candidat intermédiaire `9389629` a ensuite été refusé uniquement pour indisponibilité de l'API Docker,
+après 1 048 tests Pytest, 838 tests Vitest et 32 E2E verts. Cette tentative a pris 152,688 s et produit
+441 lignes, soit 30 733 octets ; les relevés sont conservés sous
+`.tmp/contribution-measures/canonical-push-2.*`. Le moteur a été rétabli. Cet échec de migration motive la
+sonde de disponibilité placée au préflight du plan final de 38 commandes, afin de détecter ce blocage avant
+les suites. Le smoke complet reste inchangé ; ces résultats intermédiaires ne prouvent pas la conformité
+du nouveau candidat et ne mesurent pas la durée de son plan final.

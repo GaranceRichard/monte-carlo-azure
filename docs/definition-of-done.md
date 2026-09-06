@@ -68,6 +68,9 @@ restent applicables.
   fichiers suivis et non ignorés. Les sorties ne modifient pas les preuves versionnées du workspace ; le
   snapshot, l’exposition unique de `frontend/node_modules` et les temporaires sont nettoyés après succès,
   échec ou interruption.
+- Le préflight de chaque candidat pré-push vérifie la disponibilité du moteur avec
+  `docker version --format {{.Server.Version}}` avant de lancer les suites coûteuses. Un moteur
+  indisponible bloque la gate à ce stade ; la sonde ne remplace ni ne réduit le smoke Docker complet.
 - Le smoke Docker du candidat utilise `.env` lorsqu'il est disponible ; dans un worktree détaché sans secret,
   la même configuration que la CI est copiée depuis `.env.example`, puis supprimée après le contrôle.
 - Dans `main`, corpus et sondes, parité déterministe, rejeu exact, indépendance du batching, protocole et

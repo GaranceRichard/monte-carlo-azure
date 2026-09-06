@@ -7,7 +7,7 @@ from typing import Any
 
 from Scripts.quality_gate_change_policy import (
     classification_gate_command,
-    introduced_secret_commands,
+    publication_preflight_commands,
 )
 from Scripts.quality_gate_statistical_plan import statistical_commands
 
@@ -89,7 +89,7 @@ def _python_coverage_commands(
 
 
 def _base_commands(q: Any, command_input: tuple[Any, ...], context: Any) -> list[Any]:
-    commands = introduced_secret_commands(
+    commands = publication_preflight_commands(
         q.GateCommand, sys.executable, command_input, context
     )
     commands.extend(

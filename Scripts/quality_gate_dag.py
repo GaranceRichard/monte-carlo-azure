@@ -16,7 +16,6 @@ from Scripts.test_execution_profiles import (
     load_json,
     node_for_command,
     topological_node_ids,
-    write_report,
 )
 from Scripts.test_execution_profiles_graph import active_dependencies
 
@@ -232,13 +231,15 @@ def _promote_artifacts(validation_root: Path, profile: str) -> None:
 
 
 def _prepare_aggregate_inputs(validation_root: Path, profile: str) -> None:
-    _promote_artifacts(validation_root, profile)
     contract = _contract(validation_root)
     inventory = load_json(validation_root / "reports/test-classification-inventory.json")
-    write_report(
-        build_plan_report(contract, inventory),
-        validation_root / "reports/test-execution-plan.json",
-    )
+    plan_path = validation_root / "reports/test-execution-plan.json"
+    if load_json(plan_path) != build_plan_report(contract, inventory):
+        raise ValueError(
+            "The versioned execution plan is stale. Regenerate it after its sources change, "
+            "then commit the corrected publication candidate."
+        )
+    _promote_artifacts(validation_root, profile)
 
 
 def _aggregate(validation_root: Path, plan: Any, durations: dict[str, float]) -> None:

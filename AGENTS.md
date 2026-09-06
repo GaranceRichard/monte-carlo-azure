@@ -33,6 +33,9 @@
 - Le pré-push scanne tous les commits introduits, valide le profil `main` complet, couvertures, E2E, preuves
   statistiques et smoke Docker inclus. La CI distante répète ces garanties parce qu'elle constitue une
   frontière de confiance indépendante, et non une preuve locale redondante.
+- Le préflight des candidats pré-push sonde la disponibilité du moteur Docker avant les suites coûteuses.
+  Une indisponibilité bloque immédiatement le candidat ; cette sonde ne remplace pas le smoke Docker
+  complet, qui reste obligatoire dans la validation canonique.
 
 ## Intégration asynchrone
 

@@ -17,6 +17,7 @@
           "conditionalNeeds": [],
           "commands": [
             "Introduced commit secret scan",
+            "Docker engine availability",
             "Repository hygiene (README, encoding, secrets and DoD)",
             "Backlog consistency",
             "Backlog atomicity",
@@ -1495,7 +1496,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1508,
+      "logicalCases": 1509,
       "nodes": [
         {
           "id": "preflight",
@@ -1503,6 +1504,7 @@
           "conditionalNeeds": [],
           "commands": [
             "Introduced commit secret scan",
+            "Docker engine availability",
             "Repository hygiene (README, encoding, secrets and DoD)",
             "Backlog consistency",
             "Backlog atomicity",
@@ -2405,6 +2407,7 @@
             "pytest:tests/test_test_execution_profiles.py::test_parallel_write_and_exclusive_resource_conflicts_are_rejected",
             "pytest:tests/test_test_execution_profiles.py::test_plans_are_deterministic_and_dependencies_are_stable",
             "pytest:tests/test_test_execution_profiles.py::test_profile_inclusions_and_change_levels_are_orthogonal",
+            "pytest:tests/test_test_execution_profiles.py::test_publication_docker_preflight_blocks_expensive_dag_branches",
             "pytest:tests/test_test_execution_profiles.py::test_real_contract_and_main_authority_attributions_are_valid",
             "pytest:tests/test_test_execution_profiles.py::test_strict_json_report_and_cli_paths",
             "pytest:tests/test_test_governance.py::test_attempt_history_contract_accepts_visible_nonexecution_and_rejects_bad_types",
@@ -2473,18 +2476,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 758
+            "pytest": 759
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 294,
+            "integration": 295,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 651
+            "unassigned": 652
           }
         },
         {
@@ -3444,7 +3447,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1508,
+      "logicalCases": 1509,
       "nodes": [
         {
           "id": "preflight",
@@ -3452,6 +3455,7 @@
           "conditionalNeeds": [],
           "commands": [
             "Introduced commit secret scan",
+            "Docker engine availability",
             "Repository hygiene (README, encoding, secrets and DoD)",
             "Backlog consistency",
             "Backlog atomicity",
@@ -4354,6 +4358,7 @@
             "pytest:tests/test_test_execution_profiles.py::test_parallel_write_and_exclusive_resource_conflicts_are_rejected",
             "pytest:tests/test_test_execution_profiles.py::test_plans_are_deterministic_and_dependencies_are_stable",
             "pytest:tests/test_test_execution_profiles.py::test_profile_inclusions_and_change_levels_are_orthogonal",
+            "pytest:tests/test_test_execution_profiles.py::test_publication_docker_preflight_blocks_expensive_dag_branches",
             "pytest:tests/test_test_execution_profiles.py::test_real_contract_and_main_authority_attributions_are_valid",
             "pytest:tests/test_test_execution_profiles.py::test_strict_json_report_and_cli_paths",
             "pytest:tests/test_test_governance.py::test_attempt_history_contract_accepts_visible_nonexecution_and_rejects_bad_types",
@@ -4422,18 +4427,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 758
+            "pytest": 759
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 294,
+            "integration": 295,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 651
+            "unassigned": 652
           }
         },
         {
@@ -5393,7 +5398,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1508,
+      "logicalCases": 1509,
       "nodes": [
         {
           "id": "preflight",
@@ -5401,6 +5406,7 @@
           "conditionalNeeds": [],
           "commands": [
             "Introduced commit secret scan",
+            "Docker engine availability",
             "Repository hygiene (README, encoding, secrets and DoD)",
             "Backlog consistency",
             "Backlog atomicity",
@@ -6303,6 +6309,7 @@
             "pytest:tests/test_test_execution_profiles.py::test_parallel_write_and_exclusive_resource_conflicts_are_rejected",
             "pytest:tests/test_test_execution_profiles.py::test_plans_are_deterministic_and_dependencies_are_stable",
             "pytest:tests/test_test_execution_profiles.py::test_profile_inclusions_and_change_levels_are_orthogonal",
+            "pytest:tests/test_test_execution_profiles.py::test_publication_docker_preflight_blocks_expensive_dag_branches",
             "pytest:tests/test_test_execution_profiles.py::test_real_contract_and_main_authority_attributions_are_valid",
             "pytest:tests/test_test_execution_profiles.py::test_strict_json_report_and_cli_paths",
             "pytest:tests/test_test_governance.py::test_attempt_history_contract_accepts_visible_nonexecution_and_rejects_bad_types",
@@ -6371,18 +6378,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 758
+            "pytest": 759
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 294,
+            "integration": 295,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 651
+            "unassigned": 652
           }
         },
         {

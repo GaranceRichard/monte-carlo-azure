@@ -928,6 +928,10 @@ def test_pre_push_multiple_commits_keep_range_but_validate_only_terminal_sha(
     secret_scan = candidate_plan.commands[0]
     assert secret_scan.step == "Introduced commit secret scan"
     assert secret_scan.argv[-2:] == (first_sha, local_sha)
+    assert len(candidate_plan.commands) == 38
+    docker_probe = candidate_plan.commands[1]
+    assert docker_probe.step == "Docker engine availability"
+    assert docker_probe.argv == ("docker", "version", "--format", "{{.Server.Version}}")
 
 
 def test_pre_push_remote_branch_creation_uses_remote_reachability(monkeypatch) -> None:
@@ -2804,6 +2808,14 @@ def test_diagnostic_push_skips_docker_but_publication_and_main_ci_require_it(
     )
     assert candidate.docker_smoke
     assert candidate.execution_profile == "main"
+    assert candidate.commands[0].step == "Docker engine availability"
+    for mode in ("fast", "push", "ci", "nightly", "release"):
+        diagnostic = quality_gate.build_execution_plan(
+            quality_gate.build_change_context(mode, ["backend/api.py"])
+        )
+        assert "Docker engine availability" not in {
+            command.step for command in diagnostic.commands
+        }
     assert {
         "Versioned Python coverage",
         "Frontend unit coverage",
