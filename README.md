@@ -311,18 +311,21 @@ Le backend écoute par défaut sur `http://127.0.0.1:8000` et le frontend sur
 - [Modèle de classification des tests](docs/test-classification.md)
 - [Standard de test](docs/standards/STD-TEST-001.md)
 
-Les worktrees de développement sont créés hors du dépôt principal et doivent rester entièrement supprimables
-par `git worktree remove`. Aucun reparse point Windows — notamment junction ou lien symbolique — n’est admis
-dans un worktree : `.venv`, `frontend/node_modules` et les autres dépendances y sont installés physiquement si
-nécessaire, ou les outils partagés sont invoqués directement sans lien filesystem. Avant publication, vérifier
-l’absence de reparse point et de résidu temporaire bloquant conformément à [`AGENTS.md`](AGENTS.md).
+Chaque chantier part du dernier état pertinent de `origin/main`, puis annonce sa branche et son worktree
+dédiés hors du dépôt principal. Il suit les autorités indiquées par la [carte documentaire](docs/README.md)
+et les règles permanentes d’[`AGENTS.md`](AGENTS.md). Le worktree doit rester entièrement supprimable par
+`git worktree remove` : aucun reparse point Windows — notamment junction ou lien symbolique — n’y est admis.
+`.venv`, `frontend/node_modules` et les autres dépendances y sont installés physiquement si nécessaire, ou
+les outils partagés sont invoqués directement sans lien filesystem.
 
-Un commit est un checkpoint local sans gate et peut conserver un état transitoire. Le périmètre est contrôlé
-tôt avec `python Scripts/quality_gate.py scope --base origin/main --allow <chemin> [...]`; pendant le
-développement, seuls les tests directement informatifs sont exécutés. Le pré-push est l'unique gate locale
-de publication : il exige un README racine final dont le contenu diffère des bases de chaque plage de
-nouveaux commits, scanne tous les commits introduits et exécute une seule fois le profil `main` complet,
-smoke Docker inclus, sur chaque SHA terminal réellement envoyé. Le détail et les exemples sont dans le
+Le prompt et l’outcome demandé bornent strictement le périmètre ; toute extension non nécessaire est retirée
+avant les validations coûteuses. Un commit est un checkpoint technique local sans gate et peut conserver un
+état transitoire. Le périmètre est contrôlé tôt avec
+`python Scripts/quality_gate.py scope --base origin/main --allow <chemin> [...]`; pendant le développement,
+seuls les tests ciblés et proportionnés sont exécutés. Le push est l’unique point d’engagement : son pré-push
+exige un README racine final dont le contenu diffère des bases de chaque plage de nouveaux commits, scanne
+tous les commits introduits et exécute une seule fois le profil `main` complet, smoke Docker inclus, sur
+chaque SHA terminal réellement envoyé. Le détail et les exemples sont dans le
 [cycle de contribution](docs/contribution-cycle.md).
 
 La même validation complète reste disponible pour un diagnostic explicite avec la tâche VS Code

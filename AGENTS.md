@@ -1,11 +1,24 @@
 # AGENTS.md
 
-## Principes
+## Principes permanents de développement
 
-- Chaque PBI parallèle utilise une branche et un worktree dédiés.
-- Le worktree d'un PBI est créé hors du dépôt principal.
-- Un PBI ne crée aucun junction, lien symbolique, mount point ou autre reparse point dans son worktree.
-- Les contrôles qualité existants ne sont ni affaiblis ni contournés pour obtenir un résultat vert.
+- Tout chantier part du dernier état pertinent de `origin/main`. Il utilise une branche et un worktree
+  dédiés, créés hors du dépôt principal, et annonce explicitement le nom de la branche et le chemin du
+  worktree au démarrage.
+- Tout chantier suit comme autorités, dans leur domaine de compétence, les sources de gouvernance du produit
+  désignées par la [carte documentaire](docs/README.md). Il respecte les gates, les standards de qualité, les
+  contrôles architecturaux et les critères de publication du dépôt ; aucune garantie existante n'est
+  affaiblie ni contournée pour obtenir un résultat vert.
+- Le prompt et l'outcome demandé fixent strictement le périmètre du chantier. Toute extension qui n'est pas
+  nécessaire à cet outcome est retirée avant les validations coûteuses.
+- Pendant le développement, seuls les tests, lints ou typechecks ciblés et proportionnés au risque modifié
+  sont exécutés. Ne pas relancer un contrôle inchangé ni produire de couverture, build, rapport ou preuve
+  canonique avant que son résultat puisse changer une décision.
+- `git commit` est un checkpoint technique local qui peut figer un état transitoire ; il n'implique ni
+  validation, ni mise à jour artificielle du README, ni intention de publication. `git push` est le seul
+  point d'engagement : il soumet l'état final à l'ensemble des garanties de qualité et de gouvernance avant
+  tout transfert.
+- Un chantier ne crée aucun junction, lien symbolique, mount point ou autre reparse point dans son worktree.
 
 ## Cycle de contribution
 
@@ -13,11 +26,6 @@
   `python Scripts/quality_gate.py scope --base origin/main --allow <chemin> [...]` compare en une seule
   inspection les changements suivis et non suivis à ce périmètre. Un chemin inattendu bloque le travail ;
   une portée `massive` exige l'acquittement explicite `--allow-massive` avant de poursuivre.
-- Pendant le développement, exécuter seulement le test, le lint ou le typecheck directement lié au risque
-  que le dernier changement vient d'introduire. Ne pas relancer un contrôle inchangé et ne pas produire de
-  couverture, build, rapport ou preuve canonique avant que leur résultat puisse changer une décision.
-- `git commit` est un checkpoint local purement technique. Il peut figer un état transitoire, n'implique ni
-  validation, ni mise à jour artificielle du README, ni intention de push.
 - Une régénération n'est exécutée qu'après modification de son autorité source, une seule fois sur la tranche
   cohérente finale. Les inspections Git complètes sont limitées au contrôle de périmètre et à la préparation
   de la publication.
