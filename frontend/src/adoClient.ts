@@ -1,6 +1,6 @@
-import { getCompleteWeekRange, parseLocalIsoDate } from "./date";
+import { formatDateLocal, getDeliveryHistoryPeriods } from "./date";
 import type { CycleTimePoint, WeeklyThroughputRow } from "./types";
-import { createDeliveryHistoryWindow, createDeliveryInstant, createDeliveryWeek, deliveryWeekOf,
+import { createDeliveryInstant, createDeliveryWeek, deliveryWeekOf,
   nextDeliveryWeek, selectDeliveryHistoryEvents, type DeliveryEvent } from "./domain/delivery";
 import {
   azureRevisionDtosToDeliveryEvents,
@@ -479,8 +479,9 @@ export async function getTeamDeliveryDataDirect(
   workItemTypes: string[],
   serverUrl?: string,
 ): Promise<TeamDeliveryDataResponse> {
-  const completeWeekRange = getCompleteWeekRange(startDate, endDate);
-  if (!completeWeekRange) {
+  const historyPeriods = getDeliveryHistoryPeriods(startDate, endDate);
+  const completePeriod = historyPeriods.completePeriod;
+  if (!completePeriod) {
     return {
       weeklyThroughput: [],
       cycleTimeDaysData: [],
@@ -488,15 +489,12 @@ export async function getTeamDeliveryDataDirect(
     };
   }
 
-  const { startDate: alignedStartDate, endDate: alignedEndDate } = completeWeekRange;
-  const start = parseLocalIsoDate(alignedStartDate);
-  const end = parseLocalIsoDate(alignedEndDate);
-  const endExclusive = new Date(end);
-  endExclusive.setUTCDate(endExclusive.getUTCDate() + 1);
-  const historyWindow = createDeliveryHistoryWindow({
-    startInclusive: start.toISOString(),
-    endExclusive: endExclusive.toISOString(),
-  });
+  const start = new Date(completePeriod.startInclusive);
+  const endExclusive = new Date(completePeriod.endExclusive);
+  const end = new Date(endExclusive);
+  end.setUTCDate(end.getUTCDate() - 1);
+  const alignedStartDate = formatDateLocal(start);
+  const alignedEndDate = formatDateLocal(end);
   const runtime = getAdoRuntimeContext(serverUrl, org);
   const api = getApiVersionQuery(runtime);
   const teamAreaFilter = await getTeamAreaPathFilterClause(org, project, team, pat, serverUrl);
@@ -612,7 +610,7 @@ export async function getTeamDeliveryDataDirect(
     );
   }
 
-  const selectedDeliveryEvents = selectDeliveryHistoryEvents(historyWindow, deliveryEvents);
+  const selectedDeliveryEvents = selectDeliveryHistoryEvents(completePeriod, deliveryEvents);
   const weekMap = new Map<string, number>();
   selectedDeliveryEvents.forEach((event) => {
     if (event.kind !== "item_delivered") return;

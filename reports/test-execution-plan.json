@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1224,
+      "logicalCases": 1222,
       "nodes": [
         {
           "id": "preflight",
@@ -996,18 +996,11 @@
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > composes the real browser clock for the React bootstrap [28:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > reads the current browser instant as UTC ISO [21:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > returns the controlled timestamp and records each deterministic read [13:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [74:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [63:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [56:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [49:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [32:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [37:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [42:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [12:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [22:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [70:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [27:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > uses the UTC calendar when the reference instant carries another offset [81:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > keeps a Sunday in progress explicit as a final partial period [43:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > maps inclusive calendar dates to the domain period authority [24:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [9:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [19:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > uses the UTC reference instant when classifying completion [64:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes coherent demo portfolio and app defaults [159:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes differentiated and coherent public decision language for the three demo teams [137:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > keeps demo dates valid, ordered and aligned across throughput and Cycle Time [112:3]",
@@ -1026,6 +1019,11 @@
             "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > publishes the single explicit ISO week and timezone policy [11:3]",
             "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > rejects dates that are not valid UTC ISO mondays [44:3]",
             "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > uses the ISO week-year across the civil year boundary [27:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > keeps an aligned and elapsed range explicitly complete [70:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > marks initial, complete and final periods without an implicit default [19:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > marks the current week as final partial even on aligned bounds [86:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > represents a range contained by one week as partial on both bounds [52:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > returns an explicit empty classification for an empty window [108:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > normalizes immutable absolute bounds [19:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
@@ -1385,15 +1383,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 721
+            "vitest": 719
           },
           "natures": {
             "component": 332,
-            "unit": 389
+            "unit": 387
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 613
+            "unassigned": 611
           }
         },
         {
@@ -1499,7 +1497,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1514,
+      "logicalCases": 1512,
       "nodes": [
         {
           "id": "preflight",
@@ -2851,18 +2849,11 @@
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > composes the real browser clock for the React bootstrap [28:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > reads the current browser instant as UTC ISO [21:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > returns the controlled timestamp and records each deterministic read [13:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [74:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [63:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [56:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [49:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [32:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [37:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [42:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [12:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [22:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [70:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [27:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > uses the UTC calendar when the reference instant carries another offset [81:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > keeps a Sunday in progress explicit as a final partial period [43:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > maps inclusive calendar dates to the domain period authority [24:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [9:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [19:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > uses the UTC reference instant when classifying completion [64:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes coherent demo portfolio and app defaults [159:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes differentiated and coherent public decision language for the three demo teams [137:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > keeps demo dates valid, ordered and aligned across throughput and Cycle Time [112:3]",
@@ -2881,6 +2872,11 @@
             "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > publishes the single explicit ISO week and timezone policy [11:3]",
             "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > rejects dates that are not valid UTC ISO mondays [44:3]",
             "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > uses the ISO week-year across the civil year boundary [27:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > keeps an aligned and elapsed range explicitly complete [70:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > marks initial, complete and final periods without an implicit default [19:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > marks the current week as final partial even on aligned bounds [86:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > represents a range contained by one week as partial on both bounds [52:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > returns an explicit empty classification for an empty window [108:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > normalizes immutable absolute bounds [19:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
@@ -3240,15 +3236,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 721
+            "vitest": 719
           },
           "natures": {
             "component": 332,
-            "unit": 389
+            "unit": 387
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 613
+            "unassigned": 611
           }
         },
         {
@@ -3455,7 +3451,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1514,
+      "logicalCases": 1512,
       "nodes": [
         {
           "id": "preflight",
@@ -4807,18 +4803,11 @@
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > composes the real browser clock for the React bootstrap [28:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > reads the current browser instant as UTC ISO [21:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > returns the controlled timestamp and records each deterministic read [13:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [74:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [63:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [56:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [49:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [32:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [37:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [42:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [12:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [22:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [70:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [27:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > uses the UTC calendar when the reference instant carries another offset [81:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > keeps a Sunday in progress explicit as a final partial period [43:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > maps inclusive calendar dates to the domain period authority [24:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [9:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [19:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > uses the UTC reference instant when classifying completion [64:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes coherent demo portfolio and app defaults [159:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes differentiated and coherent public decision language for the three demo teams [137:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > keeps demo dates valid, ordered and aligned across throughput and Cycle Time [112:3]",
@@ -4837,6 +4826,11 @@
             "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > publishes the single explicit ISO week and timezone policy [11:3]",
             "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > rejects dates that are not valid UTC ISO mondays [44:3]",
             "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > uses the ISO week-year across the civil year boundary [27:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > keeps an aligned and elapsed range explicitly complete [70:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > marks initial, complete and final periods without an implicit default [19:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > marks the current week as final partial even on aligned bounds [86:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > represents a range contained by one week as partial on both bounds [52:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > returns an explicit empty classification for an empty window [108:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > normalizes immutable absolute bounds [19:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
@@ -5196,15 +5190,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 721
+            "vitest": 719
           },
           "natures": {
             "component": 332,
-            "unit": 389
+            "unit": 387
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 613
+            "unassigned": 611
           }
         },
         {
@@ -5411,7 +5405,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1514,
+      "logicalCases": 1512,
       "nodes": [
         {
           "id": "preflight",
@@ -6763,18 +6757,11 @@
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > composes the real browser clock for the React bootstrap [28:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > reads the current browser instant as UTC ISO [21:3]",
             "vitest:frontend/src/composition/browser/index.test.ts::frontend clock composition > returns the controlled timestamp and records each deterministic read [13:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [74:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [63:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [56:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [49:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [32:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [37:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [42:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [12:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [22:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [70:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [27:3]",
-            "vitest:frontend/src/date.test.ts::date helpers > uses the UTC calendar when the reference instant carries another offset [81:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > keeps a Sunday in progress explicit as a final partial period [43:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > maps inclusive calendar dates to the domain period authority [24:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [9:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [19:3]",
+            "vitest:frontend/src/date.test.ts::date helpers > uses the UTC reference instant when classifying completion [64:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes coherent demo portfolio and app defaults [159:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > exposes differentiated and coherent public decision language for the three demo teams [137:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > keeps demo dates valid, ordered and aligned across throughput and Cycle Time [112:3]",
@@ -6793,6 +6780,11 @@
             "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > publishes the single explicit ISO week and timezone policy [11:3]",
             "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > rejects dates that are not valid UTC ISO mondays [44:3]",
             "vitest:frontend/src/domain/delivery/deliveryWeek.test.ts::delivery calendar policy > uses the ISO week-year across the civil year boundary [27:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > keeps an aligned and elapsed range explicitly complete [70:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > marks initial, complete and final periods without an implicit default [19:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > marks the current week as final partial even on aligned bounds [86:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > represents a range contained by one week as partial on both bounds [52:3]",
+            "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > returns an explicit empty classification for an empty window [108:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > normalizes immutable absolute bounds [19:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
@@ -7152,15 +7144,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 721
+            "vitest": 719
           },
           "natures": {
             "component": 332,
-            "unit": 389
+            "unit": 387
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 613
+            "unassigned": 611
           }
         },
         {

@@ -12,8 +12,8 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 278,
-    "importEdges": 1436,
+    "sourceModules": 279,
+    "importEdges": 1441,
     "entrypoints": 84,
     "missingEntrypoints": 5,
     "cycles": 0,
@@ -1170,6 +1170,11 @@
       },
       {
         "path": "frontend/src/domain/delivery/deliveryWeek.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/domain/delivery/historicalPeriod.ts",
         "area": "frontend",
         "language": "javascript"
       },
@@ -12909,6 +12914,33 @@
         "resolution": "internal"
       },
       {
+        "source": "frontend/src/domain/delivery/historicalPeriod.ts",
+        "target": "frontend/src/domain/delivery/deliveryEvent.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./deliveryEvent",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/historicalPeriod.ts",
+        "target": "frontend/src/domain/delivery/deliveryWeek.ts",
+        "line": 9,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./deliveryWeek",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/historicalPeriod.ts",
+        "target": "frontend/src/domain/delivery/historicalWindow.ts",
+        "line": 5,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./historicalWindow",
+        "resolution": "internal"
+      },
+      {
         "source": "frontend/src/domain/delivery/historicalWindow.ts",
         "target": "frontend/src/domain/delivery/deliveryEvent.ts",
         "line": 1,
@@ -12929,7 +12961,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/deliveryEvent.ts",
-        "line": 18,
+        "line": 22,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./deliveryEvent",
@@ -12938,7 +12970,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/deliveryWeek.ts",
-        "line": 11,
+        "line": 15,
         "kind": "js-export",
         "phase": "runtime",
         "specifier": "./deliveryWeek",
@@ -12947,10 +12979,28 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/deliveryWeek.ts",
-        "line": 29,
+        "line": 42,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./deliveryWeek",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/index.ts",
+        "target": "frontend/src/domain/delivery/historicalPeriod.ts",
+        "line": 11,
+        "kind": "js-export",
+        "phase": "runtime",
+        "specifier": "./historicalPeriod",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/index.ts",
+        "target": "frontend/src/domain/delivery/historicalPeriod.ts",
+        "line": 33,
+        "kind": "js-export",
+        "phase": "compile",
+        "specifier": "./historicalPeriod",
         "resolution": "internal"
       },
       {
@@ -12965,7 +13015,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/historicalWindow.ts",
-        "line": 25,
+        "line": 29,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./historicalWindow",
@@ -14955,13 +15005,13 @@
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "compile",
-        "count": 96
+        "count": 97
       },
       {
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "runtime",
-        "count": 159
+        "count": 163
       },
       {
         "sourceArea": "launcher",

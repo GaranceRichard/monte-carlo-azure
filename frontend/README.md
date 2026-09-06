@@ -78,7 +78,13 @@ Le throughput utilise uniquement des semaines ISO complètes :
 - semaine entièrement incluse dans la période choisie ;
 - semaine courante exclue tant qu’elle n’est pas terminée.
 
-Les chaînes `YYYY-MM-DD` sont traitées comme dates locales afin d’éviter un décalage UTC d’un jour.
+Le domaine delivery classe chaque tranche avec un statut fermé : `partial_initial`, `complete`,
+`partial_final`, ou `partial_initial_and_final` lorsque la même tranche touche les deux bords. Les deux
+diagnostics de bord sont conservés séparément dans ce dernier cas. Le client Azure DevOps construit sa
+requête uniquement depuis la période `complete` retournée par cette autorité.
+
+Les chaînes `YYYY-MM-DD` sont interprétées comme dates calendaires UTC avant ce classement afin d’éviter un
+décalage d’un jour.
 
 L’historique détaillé d’une équipe reste dans `localStorage`. Il est contextualisé, versionné et distinct de
 l’historique backend statistique minimisé. Les anciennes entrées sans `schemaVersion` sont migrées une seule

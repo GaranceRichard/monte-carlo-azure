@@ -383,7 +383,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Empêcher une interprétation silencieuse des bords de fenêtre.
 - **Frontière principale :** Domaine delivery.
 - **Famille d’invariants :** Statut des périodes partielles.
-- **Preuve principale :** Tests des périodes initiales, finales et complètes.
+- **Preuve principale :** [Tests métier des périodes initiales, finales et complètes](../../frontend/src/domain/delivery/historicalPeriod.test.ts) et [non-régression du consommateur Azure DevOps](../../frontend/src/adoClient.test.ts).
 - **Éléments de réalisation inclus :** Type de résultat ; règles de construction ; migration locale ; diagnostic associé.
 - **Hors périmètre :** Présentation fonctionnelle des avertissements dans l’UI et les rapports.
 - **Surface prévisionnelle :** 4 fichiers de production ; 8 fichiers versionnés

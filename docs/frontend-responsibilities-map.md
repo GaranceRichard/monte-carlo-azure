@@ -69,7 +69,7 @@ préjugent pas de leur emplacement futur.
 | Domaine statistique explicite | `domain/simulation.ts`, `domain/simulationValueObjects.ts`, `domain/histogram.ts`, `domain/riskScore.ts`, `domain/throughputReliability.ts`, `domain/sampleIndexDrawPort.ts` | Commande discriminée, Value Objects et bornes, percentiles, censures, histogramme, Risk Score, fiabilité du throughput et port minimal de tirage. |
 | Modèle d’historique | `domain/simulationHistory.ts` | Forme interne de l’historique local, contexte d’équipe, critères, échantillon, résultat et avertissement. |
 | Moteur et scénarios | `utils/simulation.ts`, `adapters/seededSampleIndexDrawPort.ts` | Moteur Monte Carlo local, bootstrap déterministe, scénarios portefeuille, agrégation corrélée, légende de risque et adaptateur PRNG contractuel. |
-| Delivery et temps | `date.ts`, `utils/cycleTime.ts`, `types.ts` | Dates locales, semaines ISO complètes, agrégation hebdomadaire, calcul et tendances de Cycle Time, formes partagées `NamedEntity`, throughput et Cycle Time. |
+| Delivery et temps | `domain/delivery/`, `date.ts`, `utils/cycleTime.ts`, `types.ts` | Événements et fenêtre historiques, statuts explicites des périodes partielles/complètes, calendrier ISO UTC, conversion des dates saisies, calcul et tendances de Cycle Time, formes partagées `NamedEntity`, throughput et Cycle Time. |
 | Diagnostics décisionnels | `utils/forecastDiagnostics.ts`, `utils/decisionLanguage.ts`, `utils/simulationDecisionDiagnostic.ts`, `utils/portfolioComparisonDiagnostic.ts`, `utils/portfolioComparisonPresentation.ts` | Qualité des données, incertitude, sensibilité historique, recommandation, langage utilisateur, crédibilité/stabilité des scénarios portefeuille et présentation associée. |
 | Identité de résultat | `utils/simulationSignature.ts` | Canonicalisation des paramètres, signature de résultat, validation d’une entrée réutilisable et sélection de la plus récente. |
 | Limites et utilitaires | `simulationLimits.ts`, `utils/math.ts`, `utils/teamSort.ts`, `utils/selectTopStart.ts` | Réexport des bornes du domaine, validation d’entrée, conversions numériques, tri et comportement de listes. |
@@ -178,7 +178,8 @@ un JSON écrit sur la sortie standard ; ils n’utilisent ni React, ni Azure Dev
 | Transformation | Propriétaire actuel | Entrée → sortie |
 | --- | --- | --- |
 | Cible Azure DevOps | `adoPlatform.ts` | URL libre → cible Cloud/Server, racine, collection et candidats. |
-| Fenêtre complète | `date.ts` | dates locales demandées → premier lundi, dernier dimanche terminé ou aucune fenêtre. |
+| Périodes historiques | `domain/delivery/historicalPeriod.ts` | fenêtre demandée + instant de référence → périodes initiale/finale partielles, cœur complet et diagnostics de bord. |
+| Conversion de dates | `date.ts` | dates calendaires inclusives demandées → fenêtre absolue soumise à l’autorité des périodes delivery. |
 | Périmètre équipe | `adoClient.ts` | équipe → clause Area Path exacte ou récursive, avec fallback projet/équipe. |
 | Collecte delivery | `adoClient.ts` | WIQL + DTO work items/révisions → semaines de throughput, sources Cycle Time et avertissements. |
 | Cycle Time | `utils/cycleTime.ts` | révisions → observations en jours → tendance glissante, bornes et résumé. |

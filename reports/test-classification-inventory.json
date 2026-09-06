@@ -19762,34 +19762,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > excludes a sunday still in progress from the current week [74:3]",
+    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > keeps a Sunday in progress explicit as a final partial period [43:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/date.test.ts",
-    "selector": "date helpers > excludes a sunday still in progress from the current week [74:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > excludes the current week until it is fully elapsed [63:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/date.test.ts",
-    "selector": "date helpers > excludes the current week until it is fully elapsed [63:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the end when endDate is midweek [56:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/date.test.ts",
-    "selector": "date helpers > excludes the partial week at the end when endDate is midweek [56:3]",
+    "selector": "date helpers > keeps a Sunday in progress explicit as a final partial period [43:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19799,23 +19775,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > excludes the partial week at the start when startDate is midweek [49:3]",
+    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > maps inclusive calendar dates to the domain period authority [24:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/date.test.ts",
-    "selector": "date helpers > excludes the partial week at the start when startDate is midweek [49:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional",
-      "data_quality"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > finds the first complete monday included or after the start date [32:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/date.test.ts",
-    "selector": "date helpers > finds the first complete monday included or after the start date [32:3]",
+    "selector": "date helpers > maps inclusive calendar dates to the domain period authority [24:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19824,10 +19787,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > finds the last sunday included or before the end date [37:3]",
+    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [9:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/date.test.ts",
-    "selector": "date helpers > finds the last sunday included or before the end date [37:3]",
+    "selector": "date helpers > parses YYYY-MM-DD as a UTC calendar date [9:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19836,10 +19799,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > keeps a full monday-sunday week when the requested range already matches it [42:3]",
+    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [19:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/date.test.ts",
-    "selector": "date helpers > keeps a full monday-sunday week when the requested range already matches it [42:3]",
+    "selector": "date helpers > rejects invalid local ISO dates [19:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19848,58 +19811,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > parses YYYY-MM-DD as a UTC calendar date [12:3]",
+    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > uses the UTC reference instant when classifying completion [64:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/date.test.ts",
-    "selector": "date helpers > parses YYYY-MM-DD as a UTC calendar date [12:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > rejects invalid local ISO dates [22:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/date.test.ts",
-    "selector": "date helpers > rejects invalid local ISO dates [22:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > returns null when no complete week is available [70:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/date.test.ts",
-    "selector": "date helpers > returns null when no complete week is available [70:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > returns the monday of the ISO week [27:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/date.test.ts",
-    "selector": "date helpers > returns the monday of the ISO week [27:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "unit",
-    "purposes": [
-      "functional"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/date.test.ts::date helpers > uses the UTC calendar when the reference instant carries another offset [81:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/date.test.ts",
-    "selector": "date helpers > uses the UTC calendar when the reference instant carries another offset [81:3]",
+    "selector": "date helpers > uses the UTC reference instant when classifying completion [64:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20154,6 +20069,83 @@
     "nature": "unit",
     "purposes": [
       "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > keeps an aligned and elapsed range explicitly complete [70:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historicalPeriod.test.ts",
+    "selector": "DeliveryHistoryPeriod > keeps an aligned and elapsed range explicitly complete [70:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > marks initial, complete and final periods without an implicit default [19:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historicalPeriod.test.ts",
+    "selector": "DeliveryHistoryPeriod > marks initial, complete and final periods without an implicit default [19:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > marks the current week as final partial even on aligned bounds [86:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historicalPeriod.test.ts",
+    "selector": "DeliveryHistoryPeriod > marks the current week as final partial even on aligned bounds [86:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > represents a range contained by one week as partial on both bounds [52:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historicalPeriod.test.ts",
+    "selector": "DeliveryHistoryPeriod > represents a range contained by one week as partial on both bounds [52:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "data_quality"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historicalPeriod.test.ts::DeliveryHistoryPeriod > returns an explicit empty classification for an empty window [108:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historicalPeriod.test.ts",
+    "selector": "DeliveryHistoryPeriod > returns an explicit empty classification for an empty window [108:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
     ]
   },
   {

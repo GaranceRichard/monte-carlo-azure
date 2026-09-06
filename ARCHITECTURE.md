@@ -103,10 +103,14 @@ Invariants de préparation du throughput côté frontend :
   évaluées en `UTC` et identifiées par la date du lundi ;
 - le throughput Azure DevOps, le Cycle Time et l’agrégation corrélée portefeuille utilisent tous le Value
   Object `DeliveryWeek` fourni par cette politique ;
-- seules les semaines complètes, entièrement incluses dans la plage demandée, sont conservées ;
-- la semaine courante est exclue tant qu’elle n’est pas entièrement écoulée ;
-- les chaînes `YYYY-MM-DD` de la fenêtre sont traitées comme dates calendaires `UTC` (`src/date.ts`) ; les
-  timestamps avec offset sont d’abord normalisés en instants absolus avant leur rattachement hebdomadaire ;
+- la fenêtre demandée est classée en périodes discriminées `partial_initial`, `complete`, `partial_final`
+  ou `partial_initial_and_final` ; le résultat expose la seule période complète et les diagnostics distincts
+  de ses deux bords, sans statut complet par défaut ;
+- seules les semaines de la variante `complete`, entièrement incluses dans la plage demandée, sont
+  conservées ; la semaine courante reste une période finale partielle tant qu’elle n’est pas écoulée ;
+- les chaînes `YYYY-MM-DD` de la fenêtre sont converties en bornes calendaires `UTC` par `src/date.ts`, puis
+  le domaine applique seul les règles de semaine ; les timestamps avec offset sont d’abord normalisés en
+  instants absolus avant leur rattachement hebdomadaire ;
 - le domaine delivery porte la fenêtre absolue semi-ouverte `[début inclus, fin exclue]` ; il sélectionne
   les items sur leur fait `item_delivered` puis conserve leurs faits de cycle de vie. La requête WIQL ne
   constitue qu’une présélection de transport.
@@ -153,9 +157,10 @@ frontend/
       simulationMappers.ts # conversions explicites HTTP <-> domaine
     domain/
       delivery/
-        index.ts            # API publique des événements delivery
+        index.ts            # API publique du domaine delivery
         deliveryEvent.ts    # identité opaque, faits fermés et instant absolu immuable
         deliveryWeek.ts     # semaine ISO et politique métier UTC uniques
+        historicalPeriod.ts # statuts complet/partiels et diagnostics des bords
         historicalWindow.ts # bornes absolues et sélection cohésive de l’historique
       sampleIndexDrawPort.ts # port minimal de tirage injecté dans les moteurs
       simulation.ts        # commande et résultat statistiques métier en camelCase
@@ -987,6 +992,8 @@ Frontend :
   sélection unique des items livrés, réutilisée avant throughput et Cycle Time
 - calendrier delivery possédé par le même domaine : `DeliveryWeek`, semaines ISO du lundi au dimanche et
   politique `UTC` partagée par tous les regroupements delivery
+- périodes historiques possédées par le même domaine : statut discriminé des bords initiaux et finaux et du
+  cœur complet, diagnostics de bord et extraction explicite de l’unique période consommable
 - moteur Monte Carlo frontend et scénarios portefeuille désormais pilotés par une `seed`
   explicite unique par exécution logique, sans `Math.random()` dans les calculs de simulation
 - calcul du Cycle Time dans `src/utils/cycleTime.ts` à partir des seuls événements normalisés, avec couverture

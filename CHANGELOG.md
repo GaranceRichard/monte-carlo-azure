@@ -2,6 +2,15 @@
 
 ## Recent
 
+### Périodes historiques delivery explicites — PBI 7.24
+
+- ajout du résultat métier `DeliveryHistoryPeriods`, qui discrimine les périodes `partial_initial`,
+  `complete`, `partial_final` et le cas court `partial_initial_and_final`, avec diagnostics de bord immuables ;
+- dérivation unique des statuts depuis la fenêtre absolue, la politique ISO UTC et l’instant de référence,
+  y compris pour la semaine courante, sans possibilité de statut complet implicite ;
+- migration du relais de dates et du client Azure DevOps vers la seule variante `complete`, avec retrait de
+  l’ancien alignement concurrent et preuves des périodes initiales, finales, complètes et doublement partielles.
+
 ### Contrat applicatif de configuration portefeuille — PBI 7.20
 
 - ajout de l’API publique `application/portfolio-forecast` qui possède désormais le contrat

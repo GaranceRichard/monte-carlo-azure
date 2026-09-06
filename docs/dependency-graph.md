@@ -15,15 +15,15 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 278 | 1436 | 84 | 5 | 0 | 0 | 139 | 2 |
+| 279 | 1441 | 84 | 5 | 0 | 0 | 139 | 2 |
 
 ### Directions observées
 
 | Source | Cible | Phase | Arêtes |
 | --- | --- | --- | --- |
 | backend | backend | runtime | 39 |
-| frontend | frontend | compile | 96 |
-| frontend | frontend | runtime | 159 |
+| frontend | frontend | compile | 97 |
+| frontend | frontend | runtime | 163 |
 | launcher | backend | runtime | 1 |
 | quality | backend | runtime | 5 |
 | quality | frontend | runtime | 3 |
