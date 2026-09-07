@@ -180,6 +180,10 @@ une connexion Azure DevOps réelle.
   complète et produit une valeur en `delivered_items_per_complete_iso_week`, semaines sans livraison
   comprises. Le client Azure DevOps ne possède plus de filtre, regroupement ou remplissage hebdomadaire
   concurrent ; une garde statique bloque leur réintroduction hors de cette autorité.
+- **Cycle Time sous autorité delivery.** Le domaine transforme seul les premiers faits `work_started` et
+  `work_completed` d’un item en jours calendaires arrondis à deux décimales, regroupés par semaine de
+  complétion. Les cycles incomplets ou chronologiquement inversés sont exclus ; les tendances et libellés de
+  restitution restent des consommateurs inchangés de ces observations.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 

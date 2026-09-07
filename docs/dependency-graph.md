@@ -15,14 +15,14 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 280 | 1446 | 84 | 5 | 0 | 0 | 139 | 2 |
+| 281 | 1449 | 84 | 5 | 0 | 0 | 139 | 2 |
 
 ### Directions observées
 
 | Source | Cible | Phase | Arêtes |
 | --- | --- | --- | --- |
 | backend | backend | runtime | 39 |
-| frontend | frontend | compile | 100 |
+| frontend | frontend | compile | 103 |
 | frontend | frontend | runtime | 165 |
 | launcher | backend | runtime | 1 |
 | quality | backend | runtime | 5 |
@@ -155,9 +155,8 @@ Ces listes signalent des surfaces à examiner ; elles ne déclarent ni dépendan
 | frontend/src/adapters/browser/clock/index.ts | frontend/src/ports/clock/index.ts | 1 | compile | frontend/src/ports |
 | frontend/src/adapters/seededSampleIndexDrawPort.ts | frontend/src/domain/sampleIndexDrawPort.ts | 1 | compile | frontend/src/domain |
 | frontend/src/adapters/seededSampleIndexDrawPort.ts | frontend/src/domain/simulationValueObjects.ts | 2 | compile | frontend/src/domain |
-| frontend/src/adoClient.ts | frontend/src/adapters/azure-devops/deliveryEventMappers.ts | 8 | runtime | frontend/src/adapters |
+| frontend/src/adoClient.ts | frontend/src/adapters/azure-devops/deliveryEventMappers.ts | 10 | runtime | frontend/src/adapters |
 | frontend/src/adoClient.ts | frontend/src/domain/delivery/index.ts | 3 | runtime | frontend/src/domain |
-| frontend/src/adoClient.ts | frontend/src/utils/cycleTime.ts | 25 | runtime | frontend/src/utils |
 | frontend/src/api.ts | frontend/src/api/simulationDtos.ts | 6 | compile | frontend/src/api |
 | frontend/src/api/simulationMappers.ts | frontend/src/domain/simulation.ts | 1 | compile | frontend/src/domain |
 | frontend/src/api/simulationMappers.ts | frontend/src/domain/simulationValueObjects.ts | 6 | runtime | frontend/src/domain |
@@ -261,8 +260,9 @@ Ces listes signalent des surfaces à examiner ; elles ne déclarent ni dépendan
 | frontend/src/storage/simulationHistoryMappers.ts | frontend/src/domain/simulation.ts | 1 | compile | frontend/src/domain |
 | frontend/src/storage/simulationHistoryMappers.ts | frontend/src/domain/simulationHistory.ts | 2 | compile | frontend/src/domain |
 | frontend/src/storage/simulationHistoryMappers.ts | frontend/src/domain/simulationValueObjects.ts | 3 | runtime | frontend/src/domain |
-| frontend/src/utils/cycleTime.ts | frontend/src/domain/delivery/index.ts | 1 | runtime | frontend/src/domain |
-| frontend/src/utils/cycleTime.ts | frontend/src/hooks/simulationTypes.ts | 7 | compile | frontend/src/hooks |
+| frontend/src/types.ts | frontend/src/domain/delivery/index.ts | 19 | compile | frontend/src/domain |
+| frontend/src/utils/cycleTime.ts | frontend/src/domain/delivery/index.ts | 1 | compile | frontend/src/domain |
+| frontend/src/utils/cycleTime.ts | frontend/src/hooks/simulationTypes.ts | 2 | compile | frontend/src/hooks |
 | frontend/src/utils/forecastDiagnostics.ts | frontend/src/domain/simulation.ts | 2 | compile | frontend/src/domain |
 | frontend/src/utils/portfolioComparisonDiagnostic.ts | frontend/src/domain/simulation.ts | 1 | compile | frontend/src/domain |
 | frontend/src/utils/simulation.ts | frontend/src/domain/delivery/index.ts | 19 | runtime | frontend/src/domain |

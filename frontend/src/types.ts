@@ -16,8 +16,4 @@ export type WeeklyThroughputRow = {
   throughput: number;
 };
 
-export type CycleTimePoint = {
-  week: string;
-  cycleTimeDays: number;
-  count: number;
-};
+export type { CycleTimePoint } from "./domain/delivery";

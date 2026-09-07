@@ -41,7 +41,7 @@ Sources : `docs/frontend-responsibilities-map.md#collecte-et-transformations-del
 
 | Fichiers | Production | Tests | Lignes | Couches | Arêtes internes | Arêtes de frontière | Hotspots |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 11 | 7 | 4 | 2563 | 4 | 7 | 64 | 3 |
+| 11 | 7 | 4 | 2400 | 4 | 5 | 65 | 3 |
 
 Couches : `frontend-application`, `frontend-azure-adapter`, `frontend-delivery-or-engine`, `proof-tests`.
 
@@ -70,7 +70,7 @@ Fichiers : `Scripts/quality_gate.py`, `Scripts/quality_gate_dag.py`, `Scripts/qu
 | `frontend/src/domain/simulationValueObjects.ts` | 1 | 17 | 394 | highCoupling, largeFile |
 | `backend/simulation_value_objects.py` | 1 | 12 | 429 | highCoupling, largeFile |
 | `Scripts/quality_gate.py` | 1 | 11 | 1612 | highCoupling, largeFile |
-| `frontend/src/adoClient.ts` | 1 | 11 | 667 | highCoupling, largeFile |
+| `frontend/src/adoClient.ts` | 1 | 10 | 668 | highCoupling, largeFile |
 
 ## Hypothèses et limites
 

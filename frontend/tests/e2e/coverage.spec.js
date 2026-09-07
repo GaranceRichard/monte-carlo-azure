@@ -1396,7 +1396,7 @@ test.describe("e2e istanbul coverage", () => {
       const delivery = await import("/src/domain/delivery/index.ts");
 
       return {
-        noDoneStates: cycleTime.calculateCycleTimeData(
+        noDoneStates: delivery.calculateCycleTime(
           [
             delivery.createDeliveryEvent({
               itemId: "1",
@@ -1405,7 +1405,7 @@ test.describe("e2e istanbul coverage", () => {
             }),
           ],
         ),
-        invalidOrdering: cycleTime.calculateCycleTimeData(
+        invalidOrdering: delivery.calculateCycleTime(
           [
             delivery.createDeliveryEvent({
               itemId: "1",
@@ -3717,4 +3717,3 @@ test.describe("e2e istanbul coverage", () => {
     expect(results.renderedHtml).toContain("Simulation Portefeuille - Equipe Alpha");
   });
 });
-

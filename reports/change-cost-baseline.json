@@ -97,10 +97,10 @@
         "fileCount": 11,
         "productionFileCount": 7,
         "testFileCount": 4,
-        "lineCount": 2563,
+        "lineCount": 2400,
         "layerCount": 4,
-        "internalDependencyEdges": 7,
-        "boundaryDependencyEdges": 64,
+        "internalDependencyEdges": 5,
+        "boundaryDependencyEdges": 65,
         "confirmedHotspotCount": 3
       },
       "layers": [
@@ -213,8 +213,8 @@
     {
       "path": "frontend/src/adoClient.ts",
       "scenarioCount": 1,
-      "dependencyDegree": 11,
-      "lineCount": 667,
+      "dependencyDegree": 10,
+      "lineCount": 668,
       "signals": {
         "repeatedTraversal": false,
         "highCoupling": true,

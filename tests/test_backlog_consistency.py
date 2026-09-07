@@ -77,18 +77,19 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
         ("7.23", "03/09/2026"),
         ("7.24", "06/09/2026"),
         ("7.25", "06/09/2026"),
+        ("7.26", "06/09/2026"),
         ("7.31", "27/08/2026"),
         ("7.32", "23/08/2026"),
     ]
     assert check_backlog_consistency.feature_priority(governance, features) == 7
     assert "Feature en cours :** Feature 7" in backlog
-    assert "22/75 PBI réalisés (29,33 %)" in backlog
+    assert "23/75 PBI réalisés (30,67 %)" in backlog
     assert (
         "Prochain PBI :** 7.14 — "
         "Les adaptateurs restent indépendants entre eux"
         in backlog
     )
-    assert "Progression globale :** 54/204 PBI réalisés (26,47 %) ; 150 restants" in backlog
+    assert "Progression globale :** 55/204 PBI réalisés (26,96 %) ; 149 restants" in backlog
     assert "Répartition actuelle des 150 PBI non réalisés" in governance
     assert (
         "Dernière Feature terminée :** Feature 2 — "

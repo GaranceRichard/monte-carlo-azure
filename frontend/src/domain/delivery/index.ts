@@ -5,6 +5,10 @@ export {
   DELIVERY_EVENT_KINDS,
 } from "./deliveryEvent";
 export {
+  calculateCycleTime,
+  CYCLE_TIME_DEFINITION,
+} from "./cycleTime";
+export {
   createDeliveryHistoryWindow,
   selectDeliveryHistoryEvents,
 } from "./historicalWindow";
@@ -30,6 +34,7 @@ export type {
   DeliveryInstant,
   DeliveryItemId,
 } from "./deliveryEvent";
+export type { CycleTimePoint } from "./cycleTime";
 export type {
   DeliveryHistoryWindow,
   DeliveryHistoryWindowInput,

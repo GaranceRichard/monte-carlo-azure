@@ -106,6 +106,9 @@ Invariants de préparation du throughput côté frontend :
   fenêtre semi-ouverte, le regroupement et la conservation explicite des semaines à zéro ;
 - le throughput Azure DevOps, le Cycle Time et l’agrégation corrélée portefeuille utilisent tous le Value
   Object `DeliveryWeek` fourni par cette politique ;
+- le Cycle Time est la durée écoulée entre les premiers événements `work_started` et `work_completed` d’un
+  item, exprimée en jours calendaires de 24 heures et arrondie à deux décimales ; le domaine delivery la
+  regroupe par semaine de complétion et exclut les cycles incomplets ou chronologiquement inversés ;
 - la fenêtre demandée est classée en périodes discriminées `partial_initial`, `complete`, `partial_final`
   ou `partial_initial_and_final` ; le résultat expose la seule période complète et les diagnostics distincts
   de ses deux bords, sans statut complet par défaut ;
@@ -161,6 +164,7 @@ frontend/
     domain/
       delivery/
         index.ts            # API publique du domaine delivery
+        cycleTime.ts         # définition et transformation uniques du Cycle Time
         deliveryEvent.ts    # identité opaque, faits fermés et instant absolu immuable
         deliveryWeek.ts     # semaine ISO et politique métier UTC uniques
         historicalPeriod.ts # statuts complet/partiels et diagnostics des bords
@@ -202,7 +206,7 @@ frontend/
       usePortfolioReport.ts        # génération rapport portefeuille
       simulationSeedResolver.ts    # autorité pure de résolution uint32
     utils/
-      cycleTime.ts        # calcul et tendances du cycle time en jours calendaires
+      cycleTime.ts        # tendances et résumé de restitution du Cycle Time déjà calculé
       portfolioComparisonDiagnostic.ts # diagnostic métier comparatif des scénarios portefeuille
       portfolioComparisonPresentation.ts # libellés et formulations partagés UI/PDF
       simulationSignature.ts # signature canonique et sélection du cache local réutilisable
@@ -1003,8 +1007,9 @@ Frontend :
   délègue cette transformation sans boucle locale concurrente
 - moteur Monte Carlo frontend et scénarios portefeuille désormais pilotés par une `seed`
   explicite unique par exécution logique, sans `Math.random()` dans les calculs de simulation
-- calcul du Cycle Time dans `src/utils/cycleTime.ts` à partir des seuls événements normalisés, avec couverture
-  unitaire ciblée et sortie inchangée en jours calendaires pour les restitutions frontend
+- définition et calcul du Cycle Time dans `src/domain/delivery/cycleTime.ts` à partir des seuls événements
+  normalisés ; le client Azure DevOps consomme cette API publique, tandis que `src/utils/cycleTime.ts`
+  conserve uniquement les tendances et résumés de restitution sur la sortie inchangée en jours calendaires
 - quick filters persistants par scope `org::project::team`
 - mode portefeuille avec rapport PDF multi-scénarios
 - diagnostic comparatif portefeuille pur : qualité historique, stabilité simulée et crédibilité des hypothèses

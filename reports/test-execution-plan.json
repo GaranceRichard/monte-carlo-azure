@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1228,
+      "logicalCases": 1229,
       "nodes": [
         {
           "id": "preflight",
@@ -1010,6 +1010,13 @@
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [93:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [82:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo weekly throughput [73:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [37:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [68:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [93:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [25:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [48:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [78:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [57:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > creates immutable events [21:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > normalizes an opaque item identity and an absolute instant [9:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
@@ -1264,17 +1271,11 @@
             "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > reads legacy item distributions without completion and rejects invalid buckets [100:3]",
             "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > rejects a stale persisted risk score and preserves a legacy absence [137:3]",
             "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > writes the unchanged schema v2 JSON and reads it back to the business model [56:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > calculates nominal cycle time points and aggregates identical coordinates [25:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > excludes items with an incomplete lifecycle [38:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > ignores items whose completion happens before activation [81:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > returns an empty array when no lifecycle event is available [18:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > sorts points across weeks regardless of input order [65:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > sorts points by week then by cycle time within the same week [49:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > builds rolling averages and std-dev bands from aggregated data [98:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > falls back to zeroed trend values when a week contains no usable item count [125:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > groups several points for the same week into the same rolling window [112:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > returns an empty trend when there is no cycle time data [94:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > summarizes weighted count and average and detects insufficient data [131:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > builds rolling averages and std-dev bands from aggregated data [9:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > falls back to zeroed trend values when a week contains no usable item count [36:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > groups several points for the same week into the same rolling window [23:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > returns an empty trend when there is no cycle time data [5:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > summarizes weighted count and average and detects insufficient data [42:3]",
             "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > combines limited history and high dispersion in an applicable arbitration action [312:3]",
             "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > describes short historical depth from available public diagnostics [243:4]",
             "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > does not present sufficient historical depth as a cause for caution [433:3]",
@@ -1389,15 +1390,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 723
+            "vitest": 724
           },
           "natures": {
             "component": 332,
-            "unit": 391
+            "unit": 392
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 615
+            "unassigned": 616
           }
         },
         {
@@ -1503,7 +1504,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1518,
+      "logicalCases": 1519,
       "nodes": [
         {
           "id": "preflight",
@@ -2869,6 +2870,13 @@
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [93:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [82:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo weekly throughput [73:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [37:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [68:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [93:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [25:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [48:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [78:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [57:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > creates immutable events [21:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > normalizes an opaque item identity and an absolute instant [9:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
@@ -3123,17 +3131,11 @@
             "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > reads legacy item distributions without completion and rejects invalid buckets [100:3]",
             "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > rejects a stale persisted risk score and preserves a legacy absence [137:3]",
             "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > writes the unchanged schema v2 JSON and reads it back to the business model [56:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > calculates nominal cycle time points and aggregates identical coordinates [25:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > excludes items with an incomplete lifecycle [38:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > ignores items whose completion happens before activation [81:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > returns an empty array when no lifecycle event is available [18:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > sorts points across weeks regardless of input order [65:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > sorts points by week then by cycle time within the same week [49:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > builds rolling averages and std-dev bands from aggregated data [98:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > falls back to zeroed trend values when a week contains no usable item count [125:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > groups several points for the same week into the same rolling window [112:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > returns an empty trend when there is no cycle time data [94:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > summarizes weighted count and average and detects insufficient data [131:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > builds rolling averages and std-dev bands from aggregated data [9:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > falls back to zeroed trend values when a week contains no usable item count [36:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > groups several points for the same week into the same rolling window [23:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > returns an empty trend when there is no cycle time data [5:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > summarizes weighted count and average and detects insufficient data [42:3]",
             "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > combines limited history and high dispersion in an applicable arbitration action [312:3]",
             "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > describes short historical depth from available public diagnostics [243:4]",
             "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > does not present sufficient historical depth as a cause for caution [433:3]",
@@ -3248,15 +3250,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 723
+            "vitest": 724
           },
           "natures": {
             "component": 332,
-            "unit": 391
+            "unit": 392
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 615
+            "unassigned": 616
           }
         },
         {
@@ -3463,7 +3465,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1518,
+      "logicalCases": 1519,
       "nodes": [
         {
           "id": "preflight",
@@ -4829,6 +4831,13 @@
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [93:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [82:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo weekly throughput [73:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [37:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [68:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [93:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [25:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [48:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [78:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [57:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > creates immutable events [21:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > normalizes an opaque item identity and an absolute instant [9:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
@@ -5083,17 +5092,11 @@
             "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > reads legacy item distributions without completion and rejects invalid buckets [100:3]",
             "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > rejects a stale persisted risk score and preserves a legacy absence [137:3]",
             "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > writes the unchanged schema v2 JSON and reads it back to the business model [56:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > calculates nominal cycle time points and aggregates identical coordinates [25:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > excludes items with an incomplete lifecycle [38:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > ignores items whose completion happens before activation [81:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > returns an empty array when no lifecycle event is available [18:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > sorts points across weeks regardless of input order [65:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > sorts points by week then by cycle time within the same week [49:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > builds rolling averages and std-dev bands from aggregated data [98:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > falls back to zeroed trend values when a week contains no usable item count [125:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > groups several points for the same week into the same rolling window [112:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > returns an empty trend when there is no cycle time data [94:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > summarizes weighted count and average and detects insufficient data [131:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > builds rolling averages and std-dev bands from aggregated data [9:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > falls back to zeroed trend values when a week contains no usable item count [36:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > groups several points for the same week into the same rolling window [23:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > returns an empty trend when there is no cycle time data [5:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > summarizes weighted count and average and detects insufficient data [42:3]",
             "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > combines limited history and high dispersion in an applicable arbitration action [312:3]",
             "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > describes short historical depth from available public diagnostics [243:4]",
             "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > does not present sufficient historical depth as a cause for caution [433:3]",
@@ -5208,15 +5211,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 723
+            "vitest": 724
           },
           "natures": {
             "component": 332,
-            "unit": 391
+            "unit": 392
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 615
+            "unassigned": 616
           }
         },
         {
@@ -5423,7 +5426,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1518,
+      "logicalCases": 1519,
       "nodes": [
         {
           "id": "preflight",
@@ -6789,6 +6792,13 @@
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [93:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [82:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo weekly throughput [73:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [37:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [68:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [93:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [25:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [48:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [78:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [57:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > creates immutable events [21:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > normalizes an opaque item identity and an absolute instant [9:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
@@ -7043,17 +7053,11 @@
             "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > reads legacy item distributions without completion and rejects invalid buckets [100:3]",
             "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > rejects a stale persisted risk score and preserves a legacy absence [137:3]",
             "vitest:frontend/src/storage/simulationHistoryMappers.test.ts::simulation history storage mappers > writes the unchanged schema v2 JSON and reads it back to the business model [56:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > calculates nominal cycle time points and aggregates identical coordinates [25:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > excludes items with an incomplete lifecycle [38:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > ignores items whose completion happens before activation [81:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > returns an empty array when no lifecycle event is available [18:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > sorts points across weeks regardless of input order [65:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::calculateCycleTimeData > sorts points by week then by cycle time within the same week [49:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > builds rolling averages and std-dev bands from aggregated data [98:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > falls back to zeroed trend values when a week contains no usable item count [125:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > groups several points for the same week into the same rolling window [112:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > returns an empty trend when there is no cycle time data [94:3]",
-            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > summarizes weighted count and average and detects insufficient data [131:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > builds rolling averages and std-dev bands from aggregated data [9:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > falls back to zeroed trend values when a week contains no usable item count [36:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > groups several points for the same week into the same rolling window [23:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > returns an empty trend when there is no cycle time data [5:3]",
+            "vitest:frontend/src/utils/cycleTime.test.ts::cycle time chart helpers > summarizes weighted count and average and detects insufficient data [42:3]",
             "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > combines limited history and high dispersion in an applicable arbitration action [312:3]",
             "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > describes short historical depth from available public diagnostics [243:4]",
             "vitest:frontend/src/utils/decisionLanguage.test.ts::decision language > does not present sufficient historical depth as a cause for caution [433:3]",
@@ -7168,15 +7172,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 723
+            "vitest": 724
           },
           "natures": {
             "component": 332,
-            "unit": 391
+            "unit": 392
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 615
+            "unassigned": 616
           }
         },
         {

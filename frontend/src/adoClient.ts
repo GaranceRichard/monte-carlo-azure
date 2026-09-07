@@ -1,8 +1,10 @@
 import { formatDateLocal, getDeliveryHistoryPeriods } from "./date";
-import type { CycleTimePoint, WeeklyThroughputRow } from "./types";
+import type { WeeklyThroughputRow } from "./types";
 import {
+  calculateCycleTime,
   calculateDeliveryThroughput,
   selectDeliveryHistoryEvents,
+  type CycleTimePoint,
   type DeliveryEvent,
 } from "./domain/delivery";
 import {
@@ -22,7 +24,6 @@ import {
   listOnPremCollectionCandidates,
   normalizeAdoServerUrl,
 } from "./adoPlatform";
-import { calculateCycleTimeData } from "./utils/cycleTime";
 
 const ADO = "https://dev.azure.com";
 const VSSPS = "https://app.vssps.visualstudio.com";
@@ -661,7 +662,7 @@ export async function getTeamDeliveryDataDirect(
 
   return {
     weeklyThroughput,
-    cycleTimeDaysData: calculateCycleTimeData(selectedDeliveryEvents),
+    cycleTimeDaysData: calculateCycleTime(selectedDeliveryEvents),
     warning: warnings.length ? warnings.join(" ") : undefined,
   };
 }

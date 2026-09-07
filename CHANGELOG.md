@@ -2,6 +2,16 @@
 
 ## Recent
 
+### Cycle Time sous autorité delivery — PBI 7.26
+
+- ajout de `CYCLE_TIME_DEFINITION` et de `calculateCycleTime` à l’API publique du domaine delivery : durée
+  écoulée entre les premiers faits de début et de fin, exprimée en jours calendaires à deux décimales et
+  rattachée à la semaine ISO UTC de complétion ;
+- migration du client Azure DevOps vers cette transformation unique et déplacement de `CycleTimePoint` vers
+  le domaine, sans changement des tendances, résumés, graphiques ou libellés de restitution ;
+- retrait de `calculateCycleTimeData` et de sa formule locale dans `utils`, avec une garde source qui refuse
+  une seconde formule de durée ou une seconde autorité du type.
+
 ### Throughput possédé par le domaine delivery — PBI 7.25
 
 - définition métier immuable du throughput comme nombre de faits `item_delivered` dans l’unité

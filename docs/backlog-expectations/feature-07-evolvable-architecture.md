@@ -411,7 +411,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Éliminer les variantes de durée dispersées dans les consommateurs.
 - **Frontière principale :** Domaine delivery.
 - **Famille d’invariants :** Définition et unité du Cycle Time.
-- **Preuve principale :** Tests de la transformation, de son unité et des migrations locales.
+- **Preuve principale :** [Tests de la définition, de la transformation et de la garde d’autorité](../../frontend/src/domain/delivery/cycleTime.test.ts), [tests des dérivations de restitution inchangées](../../frontend/src/utils/cycleTime.test.ts) et [non-régression du consommateur Azure DevOps](../../frontend/src/adoClient.test.ts).
 - **Éléments de réalisation inclus :** Unité explicite ; transformation ; migration du groupe consommateur ; retrait des anciens calculs ; contrôle de non-régression.
 - **Hors périmètre :** Interprétation fonctionnelle des durées dans les restitutions.
 - **Surface prévisionnelle :** 7 fichiers de production ; 12 fichiers versionnés

@@ -88,6 +88,12 @@ dans l’unité `delivered_items_per_complete_iso_week`. Sa transformation appli
 période, le regroupement UTC et les semaines à zéro ; le client Azure DevOps lui délègue les événements
 normalisés. Cette définition ne constitue pas une analyse de stabilité du flux.
 
+Le même domaine définit le Cycle Time comme la durée écoulée entre les premiers événements `work_started` et
+`work_completed` d’un item. `calculateCycleTime` l’exprime en jours calendaires de 24 heures, l’arrondit à
+deux décimales et le rattache à la semaine ISO UTC de complétion. Un cycle incomplet ou dont la fin précède le
+début n’est pas une observation. Les tendances, résumés et restitutions consomment ces valeurs sans en
+redéfinir la durée.
+
 Les chaînes `YYYY-MM-DD` sont interprétées comme dates calendaires UTC avant ce classement afin d’éviter un
 décalage d’un jour.
 

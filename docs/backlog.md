@@ -183,7 +183,7 @@ atomiques.
 | 7.23 | La semaine et le fuseau horaire suivent une politique métier unique | S | Sol Très élevé | 03/09/2026 |
 | 7.24 | Les périodes partielles sont explicites dans le domaine delivery | XS | Sol Très élevé | 06/09/2026 |
 | 7.25 | Les calculs de throughput appartiennent au domaine delivery | S | Sol Très élevé | 06/09/2026 |
-| 7.26 | Les calculs de Cycle Time appartiennent au domaine delivery | S | Sol Très élevé | |
+| 7.26 | Les calculs de Cycle Time appartiennent au domaine delivery | S | Sol Très élevé | 06/09/2026 |
 | 7.27 | La complétude de l’historique est un invariant delivery | S | Sol Très élevé | |
 | 7.28 | Les discontinuités de l’historique sont un invariant delivery | S | Sol Très élevé | |
 | 7.29 | La cohérence chronologique est un invariant delivery | S | Sol Très élevé | |
@@ -393,11 +393,11 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 
 # Synthèse du backlog
 
-**Feature en cours :** Feature 7 — Réduire le coût de changement par une architecture explicite et modulaire — 22/75 PBI réalisés (29,33 %).
+**Feature en cours :** Feature 7 — Réduire le coût de changement par une architecture explicite et modulaire — 23/75 PBI réalisés (30,67 %).
 **Prochain PBI :** 7.14 — Les adaptateurs restent indépendants entre eux — non commencé.
 **Dernière Feature terminée :** Feature 2 — Garantir la fiabilité du cœur statistique — 21/21 PBI réalisés (100 %).
-**Reliquats de la Feature 7 :** `7.14`, `7.15`, `7.16`, `7.17`, `7.18`, `7.26`, `7.27`, `7.28`, `7.29`, `7.30`, `7.33`, `7.34`, `7.35`, `7.36`, `7.37`, `7.38`, `7.39`, `7.40`, `7.41`, `7.42`, `7.43`, `7.44`, `7.45`, `7.46`, `7.47`, `7.48`, `7.49`, `7.50`, `7.51`, `7.52`, `7.53`, `7.54`, `7.55`, `7.56`, `7.57`, `7.58`, `7.59`, `7.60`, `7.61`, `7.62`, `7.63`, `7.64`, `7.65`, `7.66`, `7.67`, `7.68`, `7.69`, `7.70`, `7.71`, `7.72`, `7.73`, `7.74`, `7.75`.
-**Progression globale :** 54/204 PBI réalisés (26,47 %) ; 150 restants.
+**Reliquats de la Feature 7 :** `7.14`, `7.15`, `7.16`, `7.17`, `7.18`, `7.27`, `7.28`, `7.29`, `7.30`, `7.33`, `7.34`, `7.35`, `7.36`, `7.37`, `7.38`, `7.39`, `7.40`, `7.41`, `7.42`, `7.43`, `7.44`, `7.45`, `7.46`, `7.47`, `7.48`, `7.49`, `7.50`, `7.51`, `7.52`, `7.53`, `7.54`, `7.55`, `7.56`, `7.57`, `7.58`, `7.59`, `7.60`, `7.61`, `7.62`, `7.63`, `7.64`, `7.65`, `7.66`, `7.67`, `7.68`, `7.69`, `7.70`, `7.71`, `7.72`, `7.73`, `7.74`, `7.75`.
+**Progression globale :** 55/204 PBI réalisés (26,96 %) ; 149 restants.
 
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |

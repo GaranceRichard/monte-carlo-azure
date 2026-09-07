@@ -11,6 +11,10 @@ d’historique de prévision passe par `FrontendClock`, `BrowserClock` porte l�
 les relie par `createBrowserComposition`. Les règles de semaine/fuseau et les autres usages calendaires ne
 sont pas migrés par cet outcome.
 
+Le PBI 7.26 confie ensuite au domaine delivery la définition et la transformation du Cycle Time à partir des
+événements normalisés. Le client Azure DevOps consomme cette autorité ; les tendances, résumés et
+restitutions existants restent en aval et ne redéfinissent pas la durée.
+
 L’analyse couvre les sources exécutables sous `frontend/src/`, le point d’entrée Vite, les scripts qui
 chargent le moteur TypeScript hors navigateur et les frontières navigateur, HTTP et stockage. Les tests ont
 servi à confirmer les points d’entrée et les usages, mais ne sont pas attribués à une couche produit. Les
@@ -69,7 +73,7 @@ préjugent pas de leur emplacement futur.
 | Domaine statistique explicite | `domain/simulation.ts`, `domain/simulationValueObjects.ts`, `domain/histogram.ts`, `domain/riskScore.ts`, `domain/throughputReliability.ts`, `domain/sampleIndexDrawPort.ts` | Commande discriminée, Value Objects et bornes, percentiles, censures, histogramme, Risk Score, fiabilité du throughput et port minimal de tirage. |
 | Modèle d’historique | `domain/simulationHistory.ts` | Forme interne de l’historique local, contexte d’équipe, critères, échantillon, résultat et avertissement. |
 | Moteur et scénarios | `utils/simulation.ts`, `adapters/seededSampleIndexDrawPort.ts` | Moteur Monte Carlo local, bootstrap déterministe, scénarios portefeuille, agrégation corrélée, légende de risque et adaptateur PRNG contractuel. |
-| Delivery et temps | `domain/delivery/`, `date.ts`, `utils/cycleTime.ts`, `types.ts` | Événements et fenêtre historiques, statuts explicites des périodes partielles/complètes, calendrier ISO UTC, throughput en items livrés par semaine complète, conversion des dates saisies, calcul et tendances de Cycle Time, formes partagées `NamedEntity` et Cycle Time. |
+| Delivery et temps | `domain/delivery/`, `date.ts`, `utils/cycleTime.ts`, `types.ts` | Événements et fenêtre historiques, statuts explicites des périodes partielles/complètes, calendrier ISO UTC, throughput par semaine complète et Cycle Time définis et calculés dans le domaine, conversion des dates saisies, tendances de restitution et formes partagées restantes. |
 | Diagnostics décisionnels | `utils/forecastDiagnostics.ts`, `utils/decisionLanguage.ts`, `utils/simulationDecisionDiagnostic.ts`, `utils/portfolioComparisonDiagnostic.ts`, `utils/portfolioComparisonPresentation.ts` | Qualité des données, incertitude, sensibilité historique, recommandation, langage utilisateur, crédibilité/stabilité des scénarios portefeuille et présentation associée. |
 | Identité de résultat | `utils/simulationSignature.ts` | Canonicalisation des paramètres, signature de résultat, validation d’une entrée réutilisable et sélection de la plus récente. |
 | Limites et utilitaires | `simulationLimits.ts`, `utils/math.ts`, `utils/teamSort.ts`, `utils/selectTopStart.ts` | Réexport des bornes du domaine, validation d’entrée, conversions numériques, tri et comportement de listes. |
@@ -184,9 +188,10 @@ un JSON écrit sur la sortie standard ; ils n’utilisent ni React, ni Azure Dev
 | Périodes historiques | `domain/delivery/historicalPeriod.ts` | fenêtre demandée + instant de référence → périodes initiale/finale partielles, cœur complet et diagnostics de bord. |
 | Conversion de dates | `date.ts` | dates calendaires inclusives demandées → fenêtre absolue soumise à l’autorité des périodes delivery. |
 | Périmètre équipe | `adoClient.ts` | équipe → clause Area Path exacte ou récursive, avec fallback projet/équipe. |
-| Collecte delivery | `adoClient.ts` | WIQL + DTO work items/révisions → événements delivery normalisés, sources Cycle Time et avertissements. |
+| Collecte delivery | `adoClient.ts` | WIQL + DTO work items/révisions → événements delivery normalisés, appels des autorités throughput et Cycle Time, et avertissements. |
 | Throughput delivery | `domain/delivery/throughput.ts` | période complète + événements → nombre de faits `item_delivered` par semaine ISO complète, dans l’unité `delivered_items_per_complete_iso_week`, semaines à zéro comprises. |
-| Cycle Time | `utils/cycleTime.ts` | révisions → observations en jours → tendance glissante, bornes et résumé. |
+| Cycle Time métier | `domain/delivery/cycleTime.ts` | événements de début/fin → observations en jours calendaires, arrondies à deux décimales et groupées par semaine de complétion. |
+| Dérivations Cycle Time | `utils/cycleTime.ts` | observations déjà calculées → tendance glissante, bornes et résumé de restitution. |
 | Entrée utilisateur | `application/team-forecast/localTeamForecast.ts` puis `domain/*` | chaînes/nombres et échantillons → commande discriminée et Value Objects validés. |
 | Transport backend | `api/simulationMappers.ts` | commande `camelCase` → DTO `snake_case` ; réponse fermée → `SimulationResult` validé. |
 | Simulation locale | `utils/simulation.ts` | commande + port de tirage → échantillons simulés, percentiles, censures, histogramme, Risk Score et fiabilité. |
@@ -214,7 +219,8 @@ Les relations suivantes sont directement présentes dans les imports et points d
   calculs de scénarios, les diagnostics et, dynamiquement, le rapport de présentation ;
 - `demoData.ts`, `usePortfolio.ts` et `usePortfolioReport.ts` importent `TeamPortfolioConfig` uniquement par
   `application/portfolio-forecast/index.ts` ; ce contrat n’importe ni React ni les hooks consommateurs ;
-- `domain/simulationHistory.ts` importe les formes de `types.ts` et `utils/cycleTime.ts` importe des types de
+- `domain/simulationHistory.ts` importe les formes de `types.ts` ; `utils/cycleTime.ts` consomme
+  `CycleTimePoint` par l’API publique delivery mais importe encore ses formes de restitution depuis
   `hooks/simulationTypes.ts` ; `demoData.ts` ne dépend plus d’un type déclaré par un hook ;
 - les rapports importent `hooks/probability.ts` et `hooks/simulationTypes.ts`, puis
   `simulationPdfDownload.ts` relit leurs HTML par sélecteurs DOM ;
@@ -234,7 +240,7 @@ la réduction de couplage traçable ; cette carte ne décide pas l’ordre des m
 | FE-03 | `adoClient.ts` concentre plusieurs raisons de changer. | Le même fichier contient authentification, découverte Cloud/Server, transport HTTP, construction WIQL, lots/révisions, politique d’erreur partielle, agrégation hebdomadaire et appel du calcul Cycle Time. |
 | FE-04 — résolu par 7.19 | La frontière de prévision est unidirectionnelle. | Les hooks consommateurs importent l’API publique `application/team-forecast/index.ts`; le contrat et `localTeamForecast` n’importent ni React ni les hooks. Les deux anciennes façades ont été supprimées, les deux composantes cycliques observées ont disparu et la règle `team-forecast-must-remain-react-independent` interdit la dépendance retour. |
 | FE-05 | L’autorité des modèles est répartie entre plusieurs zones. | Modèles dans `types.ts`, `domain/*`, `hooks/simulationTypes.ts`, DTO HTTP et DTO stockage ; `domain/simulationHistory` dépend de `types.ts`, et des utilitaires/rapports dépendent de types de hooks. |
-| FE-06 | Le répertoire `utils` porte à la fois domaine, application et présentation. | `utils/simulation.ts` contient le moteur et les scénarios ; `forecastDiagnostics.ts` contient des règles décisionnelles ; `export.ts` manipule le DOM ; les modules `*Presentation` et de signature y résident aussi. |
+| FE-06 | Le répertoire `utils` porte à la fois domaine, application et présentation. | Le calcul de durée Cycle Time a quitté `utils`, mais `utils/simulation.ts` contient encore le moteur et les scénarios ; `forecastDiagnostics.ts` contient des règles décisionnelles ; `export.ts` manipule le DOM ; les modules `*Presentation`, les tendances Cycle Time et la signature y résident aussi. |
 | FE-07 | Des composants React dérivent encore des valeurs de restitution. | `SimulationChartTabs` calcule moyenne mobile, modèle Cycle Time, fiabilité et diagnostic ; `SimulationResultsPanel` recalcule une légende de risque, la fiabilité et le même diagnostic. |
 | FE-08 | Les mêmes transformations de présentation sont exécutées à plusieurs endroits. | Diagnostic équipe construit dans le panneau, les graphiques et le portefeuille ; probabilité reconstruite dans le hook de graphiques et les deux rapports ; seuils de légende de risque présents dans `computeRiskLegend` et localement dans `SimulationResultsPanel`. |
 | FE-09 | Les rapports dépendent de leur propre structure HTML et de noms de classes. | Les builders créent HTML/SVG puis `simulationPdfDownload.ts` recherche `.meta-row`, `.decision-diagnostic`, `.summary-table`, `.hypothesis`, `.kpi` et `.chart-wrap svg` dans un DOM détaché. |
