@@ -397,7 +397,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Éliminer les variantes de calcul dispersées dans les consommateurs.
 - **Frontière principale :** Domaine delivery.
 - **Famille d’invariants :** Définition et unité du throughput.
-- **Preuve principale :** Tests de la transformation, de son unité et des migrations locales.
+- **Preuve principale :** [Tests de la transformation et de son unité](../../frontend/src/domain/delivery/throughput.test.ts), [migration Azure DevOps](../../frontend/src/adoClient.deliveryWeek.test.ts) et [garde d’unicité](../../tests/test_delivery_throughput_authority.py).
 - **Éléments de réalisation inclus :** Unité explicite ; transformation ; migration du groupe consommateur ; retrait des anciens calculs ; contrôle de non-régression.
 - **Hors périmètre :** Analyse fonctionnelle de stabilité du flux relevant de la Feature 8.
 - **Surface prévisionnelle :** 7 fichiers de production ; 12 fichiers versionnés

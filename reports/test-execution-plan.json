@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1222,
+      "logicalCases": 1228,
       "nodes": [
         {
           "id": "preflight",
@@ -234,6 +234,8 @@
             "pytest:tests/test_check_no_secrets.py::test_git_helpers_and_staged_file_failures",
             "pytest:tests/test_check_no_secrets.py::test_ignores_real_ado_values_outside_ci_and_tests",
             "pytest:tests/test_check_no_secrets.py::test_main_covers_repository_empty_and_finding_paths",
+            "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
+            "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
             "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
             "pytest:tests/test_dependency_authority.py::test_comments_strings_tests_and_unresolved_internal_paths_do_not_create_violations",
             "pytest:tests/test_dependency_authority.py::test_committed_authority_parses_and_exposes_the_normative_matrix",
@@ -626,18 +628,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 503
+            "pytest": 505
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 41,
+            "integration": 43,
             "unit": 334
           },
           "criticalities": {
             "critical": 74,
             "high": 16,
-            "unassigned": 413
+            "unassigned": 415
           }
         },
         {
@@ -1028,6 +1030,10 @@
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [57:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [40:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [31:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [73:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > keeps exact histograms unchanged [6:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > uses clipped inclusive bounds for the continuous 0..100 range [15:3]",
@@ -1383,15 +1389,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 719
+            "vitest": 723
           },
           "natures": {
             "component": 332,
-            "unit": 387
+            "unit": 391
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 611
+            "unassigned": 615
           }
         },
         {
@@ -1497,7 +1503,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1512,
+      "logicalCases": 1518,
       "nodes": [
         {
           "id": "preflight",
@@ -1837,6 +1843,8 @@
             "pytest:tests/test_check_no_secrets.py::test_ignores_real_ado_values_outside_ci_and_tests",
             "pytest:tests/test_check_no_secrets.py::test_main_covers_repository_empty_and_finding_paths",
             "pytest:tests/test_check_no_secrets.py::test_skip_binary_staged_reads_and_rules",
+            "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
+            "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
             "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
             "pytest:tests/test_dependency_authority.py::test_cli_reports_invalid_missing_and_stale_evidence",
             "pytest:tests/test_dependency_authority.py::test_comments_strings_tests_and_unresolved_internal_paths_do_not_create_violations",
@@ -2479,18 +2487,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 761
+            "pytest": 763
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 297,
+            "integration": 299,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 654
+            "unassigned": 656
           }
         },
         {
@@ -2881,6 +2889,10 @@
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [57:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [40:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [31:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [73:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > keeps exact histograms unchanged [6:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > uses clipped inclusive bounds for the continuous 0..100 range [15:3]",
@@ -3236,15 +3248,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 719
+            "vitest": 723
           },
           "natures": {
             "component": 332,
-            "unit": 387
+            "unit": 391
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 611
+            "unassigned": 615
           }
         },
         {
@@ -3451,7 +3463,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1512,
+      "logicalCases": 1518,
       "nodes": [
         {
           "id": "preflight",
@@ -3791,6 +3803,8 @@
             "pytest:tests/test_check_no_secrets.py::test_ignores_real_ado_values_outside_ci_and_tests",
             "pytest:tests/test_check_no_secrets.py::test_main_covers_repository_empty_and_finding_paths",
             "pytest:tests/test_check_no_secrets.py::test_skip_binary_staged_reads_and_rules",
+            "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
+            "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
             "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
             "pytest:tests/test_dependency_authority.py::test_cli_reports_invalid_missing_and_stale_evidence",
             "pytest:tests/test_dependency_authority.py::test_comments_strings_tests_and_unresolved_internal_paths_do_not_create_violations",
@@ -4433,18 +4447,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 761
+            "pytest": 763
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 297,
+            "integration": 299,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 654
+            "unassigned": 656
           }
         },
         {
@@ -4835,6 +4849,10 @@
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [57:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [40:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [31:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [73:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > keeps exact histograms unchanged [6:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > uses clipped inclusive bounds for the continuous 0..100 range [15:3]",
@@ -5190,15 +5208,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 719
+            "vitest": 723
           },
           "natures": {
             "component": 332,
-            "unit": 387
+            "unit": 391
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 611
+            "unassigned": 615
           }
         },
         {
@@ -5405,7 +5423,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1512,
+      "logicalCases": 1518,
       "nodes": [
         {
           "id": "preflight",
@@ -5745,6 +5763,8 @@
             "pytest:tests/test_check_no_secrets.py::test_ignores_real_ado_values_outside_ci_and_tests",
             "pytest:tests/test_check_no_secrets.py::test_main_covers_repository_empty_and_finding_paths",
             "pytest:tests/test_check_no_secrets.py::test_skip_binary_staged_reads_and_rules",
+            "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
+            "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
             "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
             "pytest:tests/test_dependency_authority.py::test_cli_reports_invalid_missing_and_stale_evidence",
             "pytest:tests/test_dependency_authority.py::test_comments_strings_tests_and_unresolved_internal_paths_do_not_create_violations",
@@ -6387,18 +6407,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 761
+            "pytest": 763
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 297,
+            "integration": 299,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 654
+            "unassigned": 656
           }
         },
         {
@@ -6789,6 +6809,10 @@
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [57:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [40:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [31:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [73:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > keeps exact histograms unchanged [6:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > uses clipped inclusive bounds for the continuous 0..100 range [15:3]",
@@ -7144,15 +7168,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 719
+            "vitest": 723
           },
           "natures": {
             "component": 332,
-            "unit": 387
+            "unit": 391
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 611
+            "unassigned": 615
           }
         },
         {

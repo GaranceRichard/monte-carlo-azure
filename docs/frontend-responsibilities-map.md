@@ -69,7 +69,7 @@ préjugent pas de leur emplacement futur.
 | Domaine statistique explicite | `domain/simulation.ts`, `domain/simulationValueObjects.ts`, `domain/histogram.ts`, `domain/riskScore.ts`, `domain/throughputReliability.ts`, `domain/sampleIndexDrawPort.ts` | Commande discriminée, Value Objects et bornes, percentiles, censures, histogramme, Risk Score, fiabilité du throughput et port minimal de tirage. |
 | Modèle d’historique | `domain/simulationHistory.ts` | Forme interne de l’historique local, contexte d’équipe, critères, échantillon, résultat et avertissement. |
 | Moteur et scénarios | `utils/simulation.ts`, `adapters/seededSampleIndexDrawPort.ts` | Moteur Monte Carlo local, bootstrap déterministe, scénarios portefeuille, agrégation corrélée, légende de risque et adaptateur PRNG contractuel. |
-| Delivery et temps | `domain/delivery/`, `date.ts`, `utils/cycleTime.ts`, `types.ts` | Événements et fenêtre historiques, statuts explicites des périodes partielles/complètes, calendrier ISO UTC, conversion des dates saisies, calcul et tendances de Cycle Time, formes partagées `NamedEntity`, throughput et Cycle Time. |
+| Delivery et temps | `domain/delivery/`, `date.ts`, `utils/cycleTime.ts`, `types.ts` | Événements et fenêtre historiques, statuts explicites des périodes partielles/complètes, calendrier ISO UTC, throughput en items livrés par semaine complète, conversion des dates saisies, calcul et tendances de Cycle Time, formes partagées `NamedEntity` et Cycle Time. |
 | Diagnostics décisionnels | `utils/forecastDiagnostics.ts`, `utils/decisionLanguage.ts`, `utils/simulationDecisionDiagnostic.ts`, `utils/portfolioComparisonDiagnostic.ts`, `utils/portfolioComparisonPresentation.ts` | Qualité des données, incertitude, sensibilité historique, recommandation, langage utilisateur, crédibilité/stabilité des scénarios portefeuille et présentation associée. |
 | Identité de résultat | `utils/simulationSignature.ts` | Canonicalisation des paramètres, signature de résultat, validation d’une entrée réutilisable et sélection de la plus récente. |
 | Limites et utilitaires | `simulationLimits.ts`, `utils/math.ts`, `utils/teamSort.ts`, `utils/selectTopStart.ts` | Réexport des bornes du domaine, validation d’entrée, conversions numériques, tri et comportement de listes. |
@@ -128,7 +128,9 @@ Contrôles React
      -> sinon : API publique TeamForecast -> localTeamForecast.runSimulationForecast
         -> démo : demoData
         -> connecté : adoClient / WIQL / work items / révisions
-        -> weeklyThroughput + cycleTimeDaysData + avertissement
+        -> événements normalisés
+        -> domain/delivery : weeklyThroughput
+        -> cycleTimeDaysData + avertissement
         -> commande domaine normalisée + seed
         -> démo : moteur TypeScript local + PRNG
         -> connecté : DTO HTTP -> POST /simulate -> mapper de réponse
@@ -144,11 +146,12 @@ présents dans `SimulateRequestDto`. Le cookie pseudonyme est joint par `credent
 
 ### Collecte et transformations delivery
 
-`adoClient.ts` aligne d’abord la période sur des semaines complètes. Il construit ensuite une requête WIQL,
-résout le périmètre d’équipe, charge les work items par lots de 200 puis leurs révisions. Les dates de
-fermeture/résolution deviennent un compte par lundi ISO. Les transitions `New` vers un état actif puis vers
-un état terminé deviennent des observations de Cycle Time en jours. Les échecs de lots ou de révisions sont
-conservés sous forme d’avertissement tandis que les données disponibles continuent leur chemin.
+`adoClient.ts` obtient d’abord du domaine l’unique période complète. Il construit ensuite une requête WIQL,
+résout le périmètre d’équipe, charge les work items par lots de 200 puis leurs révisions. Les DTO deviennent
+des événements normalisés ; `domain/delivery/throughput.ts` compte seul les faits `item_delivered` par lundi
+ISO et conserve les semaines à zéro. Les transitions `New` vers un état actif puis vers un état terminé
+deviennent des observations de Cycle Time en jours. Les échecs de lots ou de révisions sont conservés sous
+forme d’avertissement tandis que les données disponibles continuent leur chemin.
 
 ### Portefeuille et rapport
 
@@ -181,7 +184,8 @@ un JSON écrit sur la sortie standard ; ils n’utilisent ni React, ni Azure Dev
 | Périodes historiques | `domain/delivery/historicalPeriod.ts` | fenêtre demandée + instant de référence → périodes initiale/finale partielles, cœur complet et diagnostics de bord. |
 | Conversion de dates | `date.ts` | dates calendaires inclusives demandées → fenêtre absolue soumise à l’autorité des périodes delivery. |
 | Périmètre équipe | `adoClient.ts` | équipe → clause Area Path exacte ou récursive, avec fallback projet/équipe. |
-| Collecte delivery | `adoClient.ts` | WIQL + DTO work items/révisions → semaines de throughput, sources Cycle Time et avertissements. |
+| Collecte delivery | `adoClient.ts` | WIQL + DTO work items/révisions → événements delivery normalisés, sources Cycle Time et avertissements. |
+| Throughput delivery | `domain/delivery/throughput.ts` | période complète + événements → nombre de faits `item_delivered` par semaine ISO complète, dans l’unité `delivered_items_per_complete_iso_week`, semaines à zéro comprises. |
 | Cycle Time | `utils/cycleTime.ts` | révisions → observations en jours → tendance glissante, bornes et résumé. |
 | Entrée utilisateur | `application/team-forecast/localTeamForecast.ts` puis `domain/*` | chaînes/nombres et échantillons → commande discriminée et Value Objects validés. |
 | Transport backend | `api/simulationMappers.ts` | commande `camelCase` → DTO `snake_case` ; réponse fermée → `SimulationResult` validé. |

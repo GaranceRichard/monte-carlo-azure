@@ -2,6 +2,16 @@
 
 ## Recent
 
+### Throughput possédé par le domaine delivery — PBI 7.25
+
+- définition métier immuable du throughput comme nombre de faits `item_delivered` dans l’unité
+  `delivered_items_per_complete_iso_week`, pour chaque semaine ISO complète de la période ;
+- transformation pure unique dans `domain/delivery/throughput.ts`, avec bornes semi-ouvertes, rattachement
+  UTC et conservation des semaines à zéro ;
+- migration du client Azure DevOps vers cette autorité et retrait de sa map, de son filtre et de sa boucle
+  hebdomadaire locaux ; couverture des bornes et garde statique contre une seconde dérivation depuis les
+  événements, sans ajouter d’analyse de stabilité du flux.
+
 ### Périodes historiques delivery explicites — PBI 7.24
 
 - ajout du résultat métier `DeliveryHistoryPeriods`, qui discrimine les périodes `partial_initial`,

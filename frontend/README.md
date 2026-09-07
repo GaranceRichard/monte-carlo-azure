@@ -83,6 +83,11 @@ Le domaine delivery classe chaque tranche avec un statut fermé : `partial_initi
 diagnostics de bord sont conservés séparément dans ce dernier cas. Le client Azure DevOps construit sa
 requête uniquement depuis la période `complete` retournée par cette autorité.
 
+Le même domaine définit le throughput comme le nombre de faits `item_delivered` par semaine ISO complète,
+dans l’unité `delivered_items_per_complete_iso_week`. Sa transformation applique seule les bornes de la
+période, le regroupement UTC et les semaines à zéro ; le client Azure DevOps lui délègue les événements
+normalisés. Cette définition ne constitue pas une analyse de stabilité du flux.
+
 Les chaînes `YYYY-MM-DD` sont interprétées comme dates calendaires UTC avant ce classement afin d’éviter un
 décalage d’un jour.
 

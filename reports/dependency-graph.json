@@ -12,8 +12,8 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 279,
-    "importEdges": 1441,
+    "sourceModules": 280,
+    "importEdges": 1446,
     "entrypoints": 84,
     "missingEntrypoints": 5,
     "cycles": 0,
@@ -1185,6 +1185,11 @@
       },
       {
         "path": "frontend/src/domain/delivery/index.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/domain/delivery/throughput.ts",
         "area": "frontend",
         "language": "javascript"
       },
@@ -11863,7 +11868,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
-        "line": 5,
+        "line": 8,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adapters/azure-devops/deliveryEventMappers",
@@ -11872,7 +11877,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adoErrors.ts",
-        "line": 9,
+        "line": 12,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adoErrors",
@@ -11881,7 +11886,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adoPlatform.ts",
-        "line": 15,
+        "line": 18,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adoPlatform",
@@ -11917,7 +11922,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/utils/cycleTime.ts",
-        "line": 22,
+        "line": 25,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./utils/cycleTime",
@@ -12961,7 +12966,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/deliveryEvent.ts",
-        "line": 22,
+        "line": 26,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./deliveryEvent",
@@ -12979,7 +12984,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/deliveryWeek.ts",
-        "line": 42,
+        "line": 46,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./deliveryWeek",
@@ -12997,7 +13002,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/historicalPeriod.ts",
-        "line": 33,
+        "line": 37,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./historicalPeriod",
@@ -13015,10 +13020,55 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/historicalWindow.ts",
-        "line": 29,
+        "line": 33,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./historicalWindow",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/index.ts",
+        "target": "frontend/src/domain/delivery/throughput.ts",
+        "line": 21,
+        "kind": "js-export",
+        "phase": "runtime",
+        "specifier": "./throughput",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/index.ts",
+        "target": "frontend/src/domain/delivery/throughput.ts",
+        "line": 47,
+        "kind": "js-export",
+        "phase": "compile",
+        "specifier": "./throughput",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/throughput.ts",
+        "target": "frontend/src/domain/delivery/deliveryEvent.ts",
+        "line": 2,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "./deliveryEvent",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/throughput.ts",
+        "target": "frontend/src/domain/delivery/deliveryWeek.ts",
+        "line": 3,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./deliveryWeek",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/throughput.ts",
+        "target": "frontend/src/domain/delivery/historicalPeriod.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "./historicalPeriod",
         "resolution": "internal"
       },
       {
@@ -15005,13 +15055,13 @@
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "compile",
-        "count": 97
+        "count": 100
       },
       {
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "runtime",
-        "count": 163
+        "count": 165
       },
       {
         "sourceArea": "launcher",
@@ -15224,7 +15274,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
-        "line": 5,
+        "line": 8,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adapters/azure-devops/deliveryEventMappers",
@@ -15244,7 +15294,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/utils/cycleTime.ts",
-        "line": 22,
+        "line": 25,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./utils/cycleTime",

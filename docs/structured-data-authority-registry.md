@@ -140,13 +140,13 @@ rg -n "fetch|localStorage|document\.|request\.cookies|_simulation_document|Simul
 git diff --name-status 4bc9b01fce83682da3e7dbd79df898461a2437b4..HEAD -- frontend/src backend
 ```
 
-Le basculement SD-07 est prouvé par les tests des événements, de la fenêtre historique, du calendrier, des
-mappers Azure DevOps, du calcul de Cycle Time, du portefeuille et du client Azure DevOps. Les anciennes
-sources de révisions, les consommations directes des événements bruts et les calculs hebdomadaires locaux ne
-traversent plus les calculs ; la forme hebdomadaire et les points de Cycle Time restent des résultats dérivés
-destinés aux consommateurs existants.
+Le basculement SD-07 est prouvé par les tests des événements, de la fenêtre historique, du calendrier, du
+throughput, des mappers Azure DevOps, du calcul de Cycle Time, du portefeuille et du client Azure DevOps. La
+forme hebdomadaire est désormais dérivée par l’unique transformation du domaine delivery, dans l’unité
+`delivered_items_per_complete_iso_week` ; les points de Cycle Time restent un résultat dérivé destiné aux
+consommateurs existants.
 
 La dernière commande constituait la preuve d’absence de migration du registre initial. Les tests existants de
 modèles, mappers, routes, persistance, identité, domaine statistique et compatibilité restent les preuves
-exécutables des autres chemins. Les transformations de période partielle, throughput, Cycle Time et
-diagnostics prévues par 7.24 à 7.30 ne sont pas anticipées.
+exécutables des autres chemins. Les transformations de Cycle Time, complétude, discontinuités, cohérence et
+diagnostics prévues par 7.26 à 7.30 ne sont pas anticipées.

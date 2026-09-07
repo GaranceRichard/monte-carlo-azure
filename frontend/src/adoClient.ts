@@ -1,7 +1,10 @@
 import { formatDateLocal, getDeliveryHistoryPeriods } from "./date";
 import type { CycleTimePoint, WeeklyThroughputRow } from "./types";
-import { createDeliveryInstant, createDeliveryWeek, deliveryWeekOf,
-  nextDeliveryWeek, selectDeliveryHistoryEvents, type DeliveryEvent } from "./domain/delivery";
+import {
+  calculateDeliveryThroughput,
+  selectDeliveryHistoryEvents,
+  type DeliveryEvent,
+} from "./domain/delivery";
 import {
   azureRevisionDtosToDeliveryEvents,
   azureWorkItemDtoToDeliveryEvent,
@@ -611,20 +614,7 @@ export async function getTeamDeliveryDataDirect(
   }
 
   const selectedDeliveryEvents = selectDeliveryHistoryEvents(completePeriod, deliveryEvents);
-  const weekMap = new Map<string, number>();
-  selectedDeliveryEvents.forEach((event) => {
-    if (event.kind !== "item_delivered") return;
-    const key = deliveryWeekOf(event.occurredAt);
-    weekMap.set(key, (weekMap.get(key) ?? 0) + 1);
-  });
-
-  const result: WeeklyThroughputRow[] = [];
-  let week = createDeliveryWeek(alignedStartDate);
-  const finalWeek = deliveryWeekOf(createDeliveryInstant(end.toISOString()));
-  while (week <= finalWeek) {
-    result.push({ week, throughput: weekMap.get(week) ?? 0 });
-    week = nextDeliveryWeek(week);
-  }
+  const weeklyThroughput = calculateDeliveryThroughput(completePeriod, deliveryEvents);
 
   const warnings: string[] = [];
   if (batchFailures.length) {
@@ -670,7 +660,7 @@ export async function getTeamDeliveryDataDirect(
   }
 
   return {
-    weeklyThroughput: result,
+    weeklyThroughput,
     cycleTimeDaysData: calculateCycleTimeData(selectedDeliveryEvents),
     warning: warnings.length ? warnings.join(" ") : undefined,
   };

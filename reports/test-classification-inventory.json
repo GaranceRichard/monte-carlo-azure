@@ -2842,6 +2842,37 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
+    "framework": "pytest",
+    "sourcePath": "tests/test_delivery_throughput_authority.py",
+    "selector": "test_azure_devops_consumer_delegates_without_a_local_variant",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "accessibility"
+    ],
+    "domains": [
+      "azure_devops"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
+    "framework": "pytest",
+    "sourcePath": "tests/test_delivery_throughput_authority.py",
+    "selector": "test_delivery_event_throughput_has_one_production_authority",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "data"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
     "framework": "pytest",
     "sourcePath": "tests/test_dependency_authority.py",
@@ -20206,6 +20237,66 @@
     ],
     "domains": [
       "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [57:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/throughput.test.ts",
+    "selector": "delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [57:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "data"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [40:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/throughput.test.ts",
+    "selector": "delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [40:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "data"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [31:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/throughput.test.ts",
+    "selector": "delivery throughput > publishes the counted fact, period and unit as an immutable definition [31:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "data"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [73:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/throughput.test.ts",
+    "selector": "delivery throughput > returns every complete week at zero when no delivery fact exists [73:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "data"
     ]
   },
   {

@@ -176,6 +176,10 @@ une connexion Azure DevOps réelle.
   partielle, période complète et période finale partielle. Un intervalle court couvrant les deux bords porte
   son propre statut ; les diagnostics identifient chaque bord incomplet et Azure DevOps ne consomme que la
   variante `complete`, sans valeur par défaut susceptible de requalifier un bord.
+- **Throughput delivery unique.** Le domaine delivery compte les faits `item_delivered` dans la période
+  complète et produit une valeur en `delivered_items_per_complete_iso_week`, semaines sans livraison
+  comprises. Le client Azure DevOps ne possède plus de filtre, regroupement ou remplissage hebdomadaire
+  concurrent ; une garde statique bloque leur réintroduction hors de cette autorité.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 

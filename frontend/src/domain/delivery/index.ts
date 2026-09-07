@@ -18,6 +18,10 @@ export {
   deliveryWeekOf,
   nextDeliveryWeek,
 } from "./deliveryWeek";
+export {
+  calculateDeliveryThroughput,
+  DELIVERY_THROUGHPUT_DEFINITION,
+} from "./throughput";
 
 export type {
   DeliveryEvent,
@@ -40,3 +44,4 @@ export type {
   PartialDeliveryHistoryPeriod,
 } from "./historicalPeriod";
 export type { DeliveryWeek } from "./deliveryWeek";
+export type { DeliveryThroughput } from "./throughput";

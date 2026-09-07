@@ -101,6 +101,9 @@ Invariants de préparation du throughput côté frontend :
 
 - le domaine delivery définit l’unique politique calendaire : semaines ISO-8601 du lundi au dimanche,
   évaluées en `UTC` et identifiées par la date du lundi ;
+- le throughput delivery est défini comme le nombre de faits `item_delivered` par semaine ISO complète,
+  dans l’unité `delivered_items_per_complete_iso_week` ; `domain/delivery/throughput.ts` applique seul la
+  fenêtre semi-ouverte, le regroupement et la conservation explicite des semaines à zéro ;
 - le throughput Azure DevOps, le Cycle Time et l’agrégation corrélée portefeuille utilisent tous le Value
   Object `DeliveryWeek` fourni par cette politique ;
 - la fenêtre demandée est classée en périodes discriminées `partial_initial`, `complete`, `partial_final`
@@ -162,6 +165,7 @@ frontend/
         deliveryWeek.ts     # semaine ISO et politique métier UTC uniques
         historicalPeriod.ts # statuts complet/partiels et diagnostics des bords
         historicalWindow.ts # bornes absolues et sélection cohésive de l’historique
+        throughput.ts       # événements livrés -> items livrés par semaine ISO complète
       sampleIndexDrawPort.ts # port minimal de tirage injecté dans les moteurs
       simulation.ts        # commande et résultat statistiques métier en camelCase
       simulationValueObjects.ts # Value Objects statistiques immuables et validés
@@ -994,6 +998,9 @@ Frontend :
   politique `UTC` partagée par tous les regroupements delivery
 - périodes historiques possédées par le même domaine : statut discriminé des bords initiaux et finaux et du
   cœur complet, diagnostics de bord et extraction explicite de l’unique période consommable
+- throughput possédé par le même domaine : comptage des seuls faits `item_delivered` dans le cœur complet,
+  unité `delivered_items_per_complete_iso_week` et semaines sans livraison conservées ; `adoClient.ts`
+  délègue cette transformation sans boucle locale concurrente
 - moteur Monte Carlo frontend et scénarios portefeuille désormais pilotés par une `seed`
   explicite unique par exécution logique, sans `Math.random()` dans les calculs de simulation
 - calcul du Cycle Time dans `src/utils/cycleTime.ts` à partir des seuls événements normalisés, avec couverture
