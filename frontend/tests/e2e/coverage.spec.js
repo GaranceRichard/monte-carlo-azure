@@ -1392,11 +1392,11 @@ test.describe("e2e istanbul coverage", () => {
     await page.goto("/");
 
     const results = await page.evaluate(async () => {
-      const cycleTime = await import("/src/utils/cycleTime.ts");
+      const cycleTimeDomain = await import("/src/domain/delivery/cycleTime.ts");
       const delivery = await import("/src/domain/delivery/index.ts");
 
       return {
-        noDoneStates: delivery.calculateCycleTime(
+        noDoneStates: cycleTimeDomain.calculateCycleTime(
           [
             delivery.createDeliveryEvent({
               itemId: "1",
@@ -1405,7 +1405,7 @@ test.describe("e2e istanbul coverage", () => {
             }),
           ],
         ),
-        invalidOrdering: delivery.calculateCycleTime(
+        invalidOrdering: cycleTimeDomain.calculateCycleTime(
           [
             delivery.createDeliveryEvent({
               itemId: "1",
@@ -1419,7 +1419,7 @@ test.describe("e2e istanbul coverage", () => {
             }),
           ],
         ),
-        zeroLowerBoundTrend: cycleTime.buildCycleTimeTrendData(
+        zeroLowerBoundTrend: (await import("/src/utils/cycleTime.ts")).buildCycleTimeTrendData(
           [
             { week: "2026-01-05", cycleTimeDays: 0.1, count: 1 },
             { week: "2026-01-12", cycleTimeDays: 5, count: 1 },
