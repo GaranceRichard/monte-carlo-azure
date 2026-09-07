@@ -407,7 +407,7 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 | 4 — Disposer d’une mise en production personnelle sécurisée | 6 | 0 | 6 |
 | 5 — Démontrer la valeur d’usage du mode portefeuille | 4 | 0 | 4 |
 | 6 — Rendre mesurables la qualité réelle et les limites opérationnelles | 8 | 0 | 8 |
-| 7 — Réduire le coût de changement par une architecture explicite et modulaire | 75 | 22 | 53 |
+| 7 — Réduire le coût de changement par une architecture explicite et modulaire | 75 | 23 | 52 |
 | 8 — Disposer de données Azure DevOps fiables et contextualisées par sprint | 14 | 0 | 14 |
 | 9 — Disposer de prévisions rejouables dans le temps et calibrées | 8 | 0 | 8 |
 | 10 — Disposer d’une expérience de simulation cohérente et de restitutions fiables | 12 | 0 | 12 |
@@ -415,7 +415,7 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 | 12 — Soutenir le pilotage de programme avec des relations opérationnelles explicites | 7 | 0 | 7 |
 | 13 — Disposer d’une gouvernance technique rationalisée | 9 | 0 | 9 |
 | 14 — Disposer d’une stratégie de diffusion claire et d’une adoption simplifiée | 9 | 0 | 9 |
-| **Total** | **204** | **54** | **150** |
+| **Total** | **204** | **55** | **149** |
 
 Aucun PBI n’est classé XL.
 
