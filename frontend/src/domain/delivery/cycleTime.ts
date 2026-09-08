@@ -1,5 +1,5 @@
 import type { DeliveryChronologyResult } from "./chronology";
-import type { DeliveryInstant } from "./deliveryEvent";
+import type { DeliveryEvent, DeliveryInstant } from "./deliveryEvent";
 import { deliveryWeekOf } from "./deliveryWeek";
 
 export const CYCLE_TIME_DEFINITION = Object.freeze({
