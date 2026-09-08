@@ -666,6 +666,26 @@ test.describe("e2e istanbul coverage", () => {
               { status: 200, headers: { "content-type": "application/json" } },
             );
           }
+          if (asString.includes("/revisions?fields=System.State,System.ChangedDate")) {
+            const itemId = Number(asString.match(/\/workItems\/(\d+)\/revisions/i)?.[1] ?? 1);
+            const completedAt = new Date(
+              Date.UTC(2026, 0, 1 + ((itemId - 1) % 10) * 7, 12, 0, 0, 0),
+            );
+            const startedAt = new Date(completedAt);
+            startedAt.setUTCDate(startedAt.getUTCDate() - 8);
+            const createdAt = new Date(startedAt);
+            createdAt.setUTCDate(createdAt.getUTCDate() - 2);
+            return new Response(
+              JSON.stringify({
+                value: [
+                  { fields: { "System.State": "New", "System.ChangedDate": createdAt.toISOString() } },
+                  { fields: { "System.State": "Active", "System.ChangedDate": startedAt.toISOString() } },
+                  { fields: { "System.State": "Done", "System.ChangedDate": completedAt.toISOString() } },
+                ],
+              }),
+              { status: 200, headers: { "content-type": "application/json" } },
+            );
+          }
           if (asString.includes("/simulate")) {
             const body = init?.body ? JSON.parse(String(init.body)) : {};
             const nSims = body.n_sims ?? 2000;
