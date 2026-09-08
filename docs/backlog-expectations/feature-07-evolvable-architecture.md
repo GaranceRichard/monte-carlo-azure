@@ -425,7 +425,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Empêcher une prévision construite silencieusement sur des données incomplètes.
 - **Frontière principale :** Domaine delivery.
 - **Famille d’invariants :** Complétude de l’historique.
-- **Preuve principale :** Tests des historiques complets, incomplets et absents.
+- **Preuve principale :** [Tests des historiques complets, incomplets et absents](../../frontend/src/domain/delivery/historyCompleteness.test.ts), [non-régression du client et du consommateur de prévision](../../frontend/src/adoClient.test.ts) et [garde d’autorité](../../tests/test_delivery_history_completeness_authority.py).
 - **Éléments de réalisation inclus :** Règle ; diagnostic ; intégration au résultat delivery ; tests ; documentation métier.
 - **Hors périmètre :** Signalement visuel de la qualité des données relevant de la Feature 8.
 - **Surface prévisionnelle :** 5 fichiers de production ; 10 fichiers versionnés

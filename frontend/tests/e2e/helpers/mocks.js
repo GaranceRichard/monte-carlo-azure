@@ -212,7 +212,7 @@ export async function setupAppRoutes(page, options = {}) {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ workItems: closedDates.map((_, i) => ({ id: i + 1 })) }),
+      body: JSON.stringify({ workItems: closedDates.slice(1).map((_, i) => ({ id: i + 2 })) }),
     });
   });
 

@@ -43,7 +43,8 @@ def test_azure_devops_consumer_uses_the_delivery_result_without_local_detection(
     assert 'deliveryHistory.continuity === "discontinuous"' in source
     assert 'deliveryHistory.continuity === "ambiguous"' in source
     assert "selectDeliveryHistoryEvents(completePeriod, deliveryHistory.events)" in source
-    assert "qualifyDeliveryChronology(selectedDeliveryEvents)" in source
+    assert "events: selectedDeliveryEvents" in source
+    assert "qualifyDeliveryChronology(deliveryHistoryResult.events)" in source
     assert "calculateDeliveryThroughput(completePeriod, deliveryChronology)" in source
     for removed_marker in (
         "batchFailures",

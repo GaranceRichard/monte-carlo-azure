@@ -192,6 +192,10 @@ une connexion Azure DevOps réelle.
   `work_completed` d’un item en jours calendaires arrondis à deux décimales, regroupés par semaine de
   complétion. Les cycles incomplets sont exclus après qualification chronologique ; les tendances et libellés
   de restitution restent des consommateurs inchangés de ces observations.
+- **Complétude delivery explicite.** Le résultat delivery qualifie l’historique requis comme `complete`,
+  `incomplete` ou `absent` depuis la période disponible et les faits `item_delivered` attendus. Une période
+  complète sans livraison reste un historique complet à throughput nul ; la prévision refuse les deux états
+  non complets sans recalculer cette qualification et sans ajouter de signalement visuel de qualité.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 

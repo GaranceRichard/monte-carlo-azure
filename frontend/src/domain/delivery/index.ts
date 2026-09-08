@@ -26,6 +26,10 @@ export {
   DELIVERY_HISTORY_PERIOD_STATUSES,
 } from "./historicalPeriod";
 export {
+  createDeliveryHistoryResult,
+  DELIVERY_HISTORY_COMPLETENESS_STATUSES,
+} from "./historyCompleteness";
+export {
   createDeliveryWeek,
   DELIVERY_CALENDAR_POLICY,
   deliveryWeekOf,
@@ -70,5 +74,11 @@ export type {
   DeliveryHistoryPeriodStatus,
   PartialDeliveryHistoryPeriod,
 } from "./historicalPeriod";
+export type {
+  DeliveryHistoryCompletenessDiagnostic,
+  DeliveryHistoryCompletenessStatus,
+  DeliveryHistoryResult,
+  DeliveryHistoryResultInput,
+} from "./historyCompleteness";
 export type { DeliveryWeek } from "./deliveryWeek";
 export type { DeliveryThroughput } from "./throughput";

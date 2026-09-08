@@ -6,9 +6,9 @@ Ce registre décrit les autorités exécutées du produit, établi le 20 août 2
 `661720f038f2d1136517cceaca435097df77fc97` puis tenu à jour lors de leurs basculements atomiques. Le PBI 7.21
 a transféré les événements SD-07 au domaine delivery le 23 août 2026 ; le PBI 7.22 y a ajouté l’autorité de
 leur fenêtre historique le 26 août 2026 et le PBI 7.23 l’unique calendrier ISO `UTC` le 3 septembre 2026.
-Le PBI 7.26 y place la définition, la forme et la transformation du Cycle Time le 6 septembre 2026 ; les PBI
-7.28 et 7.29 y ajoutent respectivement la continuité historique et la qualification chronologique diagnostiquée
-le 7 septembre 2026. Ce registre prolonge les cartographies factuelles
+Le PBI 7.26 y place la définition, la forme et la transformation du Cycle Time le 6 septembre 2026. Le PBI
+7.29 y ajoute la qualification chronologique diagnostiquée le 7 septembre 2026 ; les PBI 7.27 et 7.28 y ajoutent
+respectivement la complétude de l’historique requis et sa continuité. Ce registre prolonge les cartographies factuelles
 [`frontend`](frontend-responsibilities-map.md) et [`backend`](backend-responsibilities-map.md) sans décider
 d'une architecture cible. Aucun producteur, consommateur, import, mapper, modèle, contrat statistique ou flux
 n'est modifié par ce document.
@@ -36,7 +36,7 @@ dans la colonne `Ambiguïté` et détaillée plus bas.
 | SD-04 | Cible et adresse Azure DevOps | `frontend/src/adoPlatform.ts` : `AdoDeploymentTarget` et fonctions de normalisation/collection | URL Server/TFS saisie ou absence d'URL pour Cloud | `useOnboarding`, `adoClient` et `OrgStep` | URL libre → cible `cloud`/`onprem`, racine normalisée, collection et candidats | A-01 |
 | SD-05 | Entité de découverte organisation/projet/équipe côté application | `frontend/src/types.ts` : `NamedEntity` | réponses de `adoClient` et `demoData` | `useOnboarding`, `usePortfolio`, vues de sélection, `teamSort` | DTO Azure DevOps `{id,name}` ou `{name}` → forme structurale interne puis tri | A-02 |
 | SD-06 | Options de types et d'états d'une équipe | signature de retour de `frontend/src/adoClient.ts:getTeamOptionsDirect` | endpoints work item types/states Azure DevOps et `DEMO_TEAM_OPTIONS` | `useTeamOptions` et `usePortfolio` | listes techniques → types triés + `statesByType`; les hooks valident ensuite les raccourcis sélectionnés | A-03 |
-| SD-07 | Événements, fenêtre, calendrier, périodes, continuité, chronologie et Cycle Time delivery | `frontend/src/domain/delivery/` : `DeliveryEvent`, `DeliveryHistory`, `DeliveryHistoryWindow`, `DeliveryWeek`, `DeliveryHistoryPeriods`, `DeliveryChronologyResult`, `CycleTimePoint`, politiques et transformations | mapper `adapters/azure-devops/deliveryEventMappers.ts`, attentes WIQL et histoires indisponibles fournies par `getTeamDeliveryDataDirect`, fenêtre demandée et lignes hebdomadaires corrélées | qualification de continuité, des bords et de la chronologie, sélection delivery, throughput, Cycle Time, historique, tendances et agrégation corrélée portefeuille | DTO → faits UTC immuables ; attentes + faits + indisponibilités → statut continu/discontinu/ambigu et diagnostics de rupture ; bornes absolues → périodes partielles/cœur complet ; premiers faits ordonnés début/fin/livraison → événements cohérents ou rejetés et diagnostics localisés ; instant ou lundi ISO → semaine ISO `UTC` ; premiers faits début/fin → jours calendaires à deux décimales | aucune définition concurrente observée |
+| SD-07 | Événements, fenêtre, calendrier, périodes, complétude, continuité, chronologie et Cycle Time delivery | `frontend/src/domain/delivery/` : `DeliveryEvent`, `DeliveryHistory`, `DeliveryHistoryResult`, `DeliveryHistoryWindow`, `DeliveryWeek`, `DeliveryHistoryPeriods`, `DeliveryChronologyResult`, `CycleTimePoint`, politiques et transformations | mapper `adapters/azure-devops/deliveryEventMappers.ts`, attentes WIQL et histoires indisponibles fournies par `getTeamDeliveryDataDirect`, fenêtre demandée et lignes hebdomadaires corrélées | qualifications de complétude, continuité, bords et chronologie, garde de prévision, sélection delivery, throughput, Cycle Time, historique, tendances et agrégation corrélée portefeuille | DTO → faits UTC immuables ; période + attentes + faits → statut complet/incomplet/absent ; attentes + faits + indisponibilités → statut continu/discontinu/ambigu et diagnostics de rupture ; bornes absolues → périodes partielles/cœur complet ; premiers faits ordonnés début/fin/livraison → événements cohérents ou rejetés et diagnostics localisés ; instant ou lundi ISO → semaine ISO `UTC` ; premiers faits début/fin → jours calendaires à deux décimales | aucune définition concurrente observée |
 | SD-08 | Signification normative des entrées et résultats statistiques | `docs/standards/STD-STAT-001.md` | moteurs Python et TypeScript conformes au standard | API, historiques, UI, rapports et runners statistiques | distribution brute → percentiles, censure, Risk Score, fiabilité et histogramme selon les règles `STAT-PAR-*` | A-05 |
 | SD-09 | Commande, primitives et résultat statistiques en mémoire TypeScript | module `frontend/src/domain/`, principalement `simulation.ts` et `simulationValueObjects.ts` | `localTeamForecast` par le contrat applicatif `TeamForecast`, mapper HTTP, mapper de stockage, moteur local et runner de corpus | moteur local, mapper HTTP, hooks, historique, diagnostics et runners | entrées inconnues → Value Objects/commande discriminée ; moteur ou DTO validé → `SimulationResult` immuable | A-05, A-06, A-07 |
 | SD-10 | Contrat HTTP public de simulation et d'historique | `backend/api_models.py` : `SimulateRequest`, `SimulateResponse`, `SimulationHistoryItem` | FastAPI/Pydantic à l'entrée ; `result_to_response` et `persistence_row_to_history_item` à la sortie | route `POST /simulate`, route `GET /simulations/history`, OpenAPI et mappers frontend | JSON `snake_case` fermé ↔ DTO Pydantic ; les mappers traduisent vers/depuis les modèles de domaine | A-05, A-06, A-08 |
@@ -60,7 +60,7 @@ dans la colonne `Ambiguïté` et détaillée plus bas.
 | --- | --- | --- |
 | T-01 | URL publique → SD-01 → shell | `resolveAppRuntime` applique la priorité `demo`, puis `connect` sur Pages, puis le mode démo Pages. |
 | T-02 | saisies onboarding → SD-04/SD-05/SD-06 | `adoPlatform` normalise la cible ; `adoClient` transforme les réponses Cloud ou Server/TFS en entités et options consommables. |
-| T-03 | dates/types/états/équipe → SD-07 | `getDeliveryHistoryPeriods` convertit les dates inclusives en fenêtre absolue ; le domaine qualifie chaque bord et expose seulement `completePeriod` au client Azure DevOps ; le mapper convertit work items et révisions en événements ; `createDeliveryHistory` compare les livraisons attendues aux faits et conserve ruptures/ambiguïtés ; `DeliveryHistoryWindow` sélectionne les items livrés ; `qualifyDeliveryChronology` rejette et diagnostique les items inversés tout en acceptant les simultanéités ; throughput et Cycle Time consomment ce résultat, puis `DeliveryWeek` attribue les observations au lundi ISO `UTC`. |
+| T-03 | dates/types/états/équipe → SD-07 | `getDeliveryHistoryPeriods` convertit les dates inclusives en fenêtre absolue ; le domaine qualifie chaque bord et expose seulement `completePeriod` au client Azure DevOps ; le mapper convertit work items et révisions en événements ; `createDeliveryHistory` conserve les ruptures et ambiguïtés, puis `createDeliveryHistoryResult` confronte une seule fois les identifiants requis aux faits livrés et traite une période vide comme complète ; `qualifyDeliveryChronology` rejette ensuite les items inversés ; throughput et Cycle Time consomment ce résultat, puis `DeliveryWeek` attribue les observations au lundi ISO `UTC`. |
 | T-04 | SD-07 + critères + seed → SD-09 | `localTeamForecast` construit la commande TypeScript derrière le contrat `TeamForecast` ; les Value Objects filtrent éventuellement les zéros et appliquent les bornes existantes. |
 | T-05 | SD-09 → SD-10 → SD-21 | `simulationCommandToDto` passe de `camelCase` à `snake_case`; Pydantic valide le transport ; `request_to_command` reconstruit la commande Python. |
 | T-06 | SD-09 ou SD-21 → résultat statistique | les moteurs produisent la distribution brute ; leurs domaines dérivent et valident les résultats sous l'autorité SD-08. |
@@ -143,16 +143,15 @@ git diff --name-status 4bc9b01fce83682da3e7dbd79df898461a2437b4..HEAD -- fronten
 ```
 
 Le basculement SD-07 est prouvé par les tests des événements, de la fenêtre historique, du calendrier, de la
-continuité, de la chronologie, du throughput, des mappers Azure DevOps, du calcul de Cycle Time, du portefeuille
-et du client Azure DevOps. Le résultat `DeliveryHistory` conserve les événements et diagnostics de continuité ;
-le client Azure DevOps consomme ses événements et statuts sans seconde détection, puis confie leur cohérence à
-l’autorité chronologique. La forme hebdomadaire reste dérivée par l’unique transformation du domaine delivery,
-dans l’unité `delivered_items_per_complete_iso_week` ; les points de Cycle Time restent un résultat dérivé
-destiné aux consommateurs existants. Les gardes statiques refusent une seconde qualification de continuité ou
-de chronologie dans ces consommateurs.
+complétude, de la continuité, de la chronologie, du throughput, des mappers Azure DevOps, du calcul de Cycle Time,
+du portefeuille et du client Azure DevOps. Les résultats `DeliveryHistoryResult` et `DeliveryHistory` conservent
+séparément disponibilité/complétude et continuité/ruptures ; le client consomme ces statuts sans seconde détection,
+puis confie la cohérence des faits à l’autorité chronologique. La forme hebdomadaire reste dérivée par l’unique
+transformation du domaine delivery, dans l’unité `delivered_items_per_complete_iso_week` ; les points de Cycle Time
+restent un résultat dérivé destiné aux consommateurs existants. Les gardes statiques refusent une seconde
+qualification de complétude, de continuité ou de chronologie dans ces consommateurs.
 
 La dernière commande constituait la preuve d’absence de migration du registre initial. Les tests existants de
 modèles, mappers, routes, persistance, identité, domaine statistique et compatibilité restent les preuves
-exécutables des autres chemins. Les transformations de complétude et de propagation applicative des diagnostics
-prévues par 7.27 et 7.30 ne sont pas anticipées ; aucune récupération fonctionnelle de lot de la Feature 8
-n’est ajoutée.
+exécutables des autres chemins. La propagation applicative complète des diagnostics prévue par 7.30 et le
+signalement visuel de qualité prévu par la Feature 8 ne sont pas anticipés.

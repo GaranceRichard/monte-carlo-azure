@@ -2,6 +2,16 @@
 
 ## Recent
 
+### Complétude de l’historique sous autorité delivery — PBI 7.27
+
+- ajout de `DeliveryHistoryResult` et d’un diagnostic immuable distinguant `complete`, `incomplete` et
+  `absent` depuis la période disponible, les identifiants requis et les faits `item_delivered` normalisés ;
+- conservation d’une période complète sans livraison comme historique complet à throughput nul : ces statuts
+  qualifient seulement disponibilité et complétude, sans décider entre activité nulle et trou de collecte ;
+- migration du client Azure DevOps et de la prévision connectée vers cette autorité : le diagnostic reste
+  attaché au résultat delivery et aucun état non complet n’atteint le moteur ; une garde source interdit une
+  seconde qualification ou un second contrat, sans ajout de signalement visuel.
+
 ### Continuité de l’historique sous autorité delivery — PBI 7.28
 
 - ajout du résultat immuable `DeliveryHistory`, qui distingue `continuous`, `discontinuous` et `ambiguous`

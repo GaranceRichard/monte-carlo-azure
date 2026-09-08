@@ -27,6 +27,14 @@ const WEEKLY_THROUGHPUT = [
   { week: "2025-02-10", throughput: 5 },
 ];
 
+const COMPLETE_HISTORY_COMPLETENESS = {
+  status: "complete",
+  code: "delivery_history_complete",
+  requiredItemCount: 6,
+  observedItemCount: 6,
+  missingItemIds: [],
+} as const;
+
 const API_RESPONSE_WEEKS = {
   result_kind: "weeks" as const,
   samples_count: 6,
@@ -100,6 +108,7 @@ describe("simulation forecast seed execution boundary", () => {
     vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({
       weeklyThroughput: WEEKLY_THROUGHPUT,
       cycleTimeDaysData: [],
+      historyCompleteness: COMPLETE_HISTORY_COMPLETENESS,
     });
   });
 

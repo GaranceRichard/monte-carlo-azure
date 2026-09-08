@@ -4,10 +4,11 @@ import {
   calculateCycleTime,
   calculateDeliveryThroughput,
   createDeliveryHistory,
+  createDeliveryHistoryResult,
+  createDeliveryItemId,
   qualifyDeliveryChronology,
   selectDeliveryHistoryEvents,
-  type CycleTimePoint,
-  type DeliveryEvent,
+  type CycleTimePoint, type DeliveryEvent, type DeliveryHistoryCompletenessDiagnostic,
 } from "./domain/delivery";
 import {
   azureRevisionDtosToDeliveryEvents,
@@ -39,18 +40,12 @@ function adoHeaders(pat: string): Record<string, string> {
 
 const CLOUD_API = "api-version=7.1";
 const ONPREM_API = "api-version=6.0";
-
-type AdoOrg = { name: string };
-type AdoProject = { id: string; name: string };
+type AdoOrg = { name: string }; type AdoProject = { id: string; name: string };
 type AdoTeam = { id: string; name: string };
 type TeamFieldValue = { value?: string; includeChildren?: boolean };
 type ProfileMe = { id?: string; publicAlias?: string; displayName?: string };
 type WeeklyThroughputResponse = WeeklyThroughputRow[] | { weeklyThroughput: WeeklyThroughputRow[]; warning?: string };
-type TeamDeliveryDataResponse = {
-  weeklyThroughput: WeeklyThroughputRow[];
-  cycleTimeDaysData: CycleTimePoint[];
-  warning?: string;
-};
+type TeamDeliveryDataResponse = { weeklyThroughput: WeeklyThroughputRow[]; cycleTimeDaysData: CycleTimePoint[]; historyCompleteness: DeliveryHistoryCompletenessDiagnostic; warning?: string };
 type ResolvedPatProfile = {
   displayName: string;
   id: string;
@@ -492,9 +487,15 @@ export async function getTeamDeliveryDataDirect(
   const historyPeriods = getDeliveryHistoryPeriods(startDate, endDate);
   const completePeriod = historyPeriods.completePeriod;
   if (!completePeriod) {
+    const deliveryHistory = createDeliveryHistoryResult({
+      period: null,
+      requiredItemIds: [],
+      events: [],
+    });
     return {
       weeklyThroughput: [],
       cycleTimeDaysData: [],
+      historyCompleteness: deliveryHistory.completeness,
       warning: "Aucune semaine complete n'est disponible sur la periode selectionnee.",
     };
   }
@@ -548,6 +549,7 @@ export async function getTeamDeliveryDataDirect(
   const batchFailureDetails: string[] = [];
   const cycleTimeFailures: { itemId: number; detail: string }[] = [];
   const ids = items.map((i) => i.id);
+  const requiredItemIds = ids.map((id) => createDeliveryItemId(String(id)));
   const batches: number[][] = [];
   for (let i = 0; i < ids.length; i += 200) batches.push(ids.slice(i, i + 200));
 
@@ -631,13 +633,10 @@ export async function getTeamDeliveryDataDirect(
     );
   }
 
-  const deliveryHistory = createDeliveryHistory({
-    expectedDeliveredItemIds: ids.map(String),
-    events: deliveryEvents,
-    unavailableEventHistoryItemIds: cycleTimeFailures.map(({ itemId }) => String(itemId)),
-  });
+  const deliveryHistory = createDeliveryHistory({ expectedDeliveredItemIds: ids.map(String), events: deliveryEvents, unavailableEventHistoryItemIds: cycleTimeFailures.map(({ itemId }) => String(itemId)) });
   const selectedDeliveryEvents = selectDeliveryHistoryEvents(completePeriod, deliveryHistory.events);
-  const deliveryChronology = qualifyDeliveryChronology(selectedDeliveryEvents);
+  const deliveryHistoryResult = createDeliveryHistoryResult({ period: completePeriod, requiredItemIds, events: selectedDeliveryEvents });
+  const deliveryChronology = qualifyDeliveryChronology(deliveryHistoryResult.events);
   const weeklyThroughput = calculateDeliveryThroughput(completePeriod, deliveryChronology);
 
   const warnings: string[] = [];
@@ -670,6 +669,7 @@ export async function getTeamDeliveryDataDirect(
   return {
     weeklyThroughput,
     cycleTimeDaysData: calculateCycleTime(deliveryChronology),
+    historyCompleteness: deliveryHistoryResult.completeness,
     warning: warnings.length ? warnings.join(" ") : undefined,
   };
 }

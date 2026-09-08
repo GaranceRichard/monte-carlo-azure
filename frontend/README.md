@@ -108,6 +108,12 @@ deux décimales et le rattache à la semaine ISO UTC de complétion. Un cycle in
 les inversions ont déjà été rejetées par l’autorité chronologique. Les tendances, résumés et restitutions
 consomment ces valeurs sans en redéfinir la durée.
 
+`DeliveryHistoryResult` conserve aussi l’unique diagnostic de complétude. L’état est `absent` lorsqu’aucune
+période ISO complète n’est disponible, `incomplete` lorsqu’un item requis ne produit pas son fait
+`item_delivered`, et `complete` lorsque tous les faits requis sont présents. Une période disponible sans
+livraison est donc `complete` et alimente des semaines à throughput nul. La prévision connectée consomme ce
+statut et n’appelle pas le moteur pour les états non complets ; aucun affichage de qualité n’est ajouté ici.
+
 Les chaînes `YYYY-MM-DD` sont interprétées comme dates calendaires UTC avant ce classement afin d’éviter un
 décalage d’un jour.
 

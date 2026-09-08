@@ -84,6 +84,9 @@ async function fetchRemoteTeamThroughput(
     params.types,
     params.serverUrl,
   );
+  if (response.historyCompleteness.status !== "complete") {
+    throw new Error(INSUFFICIENT_HISTORY_MESSAGE);
+  }
   const weeklyThroughput = response.weeklyThroughput;
   const throughputSamples = weeklyThroughput.map((row) => row.throughput);
   const sampleStats: SampleStats = {

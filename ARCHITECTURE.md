@@ -119,6 +119,10 @@ Invariants de préparation du throughput côté frontend :
 - la fenêtre demandée est classée en périodes discriminées `partial_initial`, `complete`, `partial_final`
   ou `partial_initial_and_final` ; le résultat expose la seule période complète et les diagnostics distincts
   de ses deux bords, sans statut complet par défaut ;
+- `DeliveryHistoryResult` qualifie une seule fois la disponibilité et la complétude de l’historique requis :
+  `absent` sans période complète, `incomplete` lorsqu’un identifiant requis ne possède aucun fait
+  `item_delivered`, et `complete` dans tous les autres cas, y compris une période collectée sans livraison ;
+  le client conserve ce diagnostic et la prévision distante refuse les deux variantes non complètes ;
 - seules les semaines de la variante `complete`, entièrement incluses dans la plage demandée, sont
   conservées ; la semaine courante reste une période finale partielle tant qu’elle n’est pas écoulée ;
 - les chaînes `YYYY-MM-DD` de la fenêtre sont converties en bornes calendaires `UTC` par `src/date.ts`, puis
@@ -176,6 +180,7 @@ frontend/
         deliveryEvent.ts    # identité opaque, faits fermés et instant absolu immuable
         deliveryWeek.ts     # semaine ISO et politique métier UTC uniques
         historyContinuity.ts # résultat, statuts et diagnostics de continuité historique
+        historyCompleteness.ts # résultat et diagnostic de complétude de l’historique requis
         historicalPeriod.ts # statuts complet/partiels et diagnostics des bords
         historicalWindow.ts # bornes absolues et sélection cohésive de l’historique
         throughput.ts       # événements livrés -> items livrés par semaine ISO complète
@@ -1025,6 +1030,10 @@ Frontend :
 - définition et calcul du Cycle Time dans `src/domain/delivery/cycleTime.ts` à partir des seuls événements
   normalisés ; le client Azure DevOps consomme cette API publique, tandis que `src/utils/cycleTime.ts`
   conserve uniquement les tendances et résumés de restitution sur la sortie inchangée en jours calendaires
+- qualification de complétude dans `src/domain/delivery/historyCompleteness.ts` : le client Azure DevOps
+  fournit la période, les identifiants requis et les faits normalisés, conserve le diagnostic obtenu puis
+  `localTeamForecast` bloque les états `incomplete` et `absent` avant tout appel moteur ; une période complète
+  sans livraison reste une observation valide avec des semaines de throughput à zéro
 - quick filters persistants par scope `org::project::team`
 - mode portefeuille avec rapport PDF multi-scénarios
 - diagnostic comparatif portefeuille pur : qualité historique, stabilité simulée et crédibilité des hypothèses
