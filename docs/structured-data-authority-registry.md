@@ -6,8 +6,8 @@ Ce registre décrit les autorités exécutées du produit, établi le 20 août 2
 `661720f038f2d1136517cceaca435097df77fc97` puis tenu à jour lors de leurs basculements atomiques. Le PBI 7.21
 a transféré les événements SD-07 au domaine delivery le 23 août 2026 ; le PBI 7.22 y a ajouté l’autorité de
 leur fenêtre historique le 26 août 2026 et le PBI 7.23 l’unique calendrier ISO `UTC` le 3 septembre 2026.
-Le PBI 7.26 y place la définition, la forme et la transformation du Cycle Time le 6 septembre 2026. Il
-prolonge les cartographies factuelles
+Le PBI 7.26 y place la définition, la forme et la transformation du Cycle Time le 6 septembre 2026 ; le PBI
+7.29 y ajoute la qualification chronologique diagnostiquée le 7 septembre 2026. Ce registre prolonge les cartographies factuelles
 [`frontend`](frontend-responsibilities-map.md) et [`backend`](backend-responsibilities-map.md) sans décider
 d'une architecture cible. Aucun producteur, consommateur, import, mapper, modèle, contrat statistique ou flux
 n'est modifié par ce document.
@@ -35,7 +35,7 @@ dans la colonne `Ambiguïté` et détaillée plus bas.
 | SD-04 | Cible et adresse Azure DevOps | `frontend/src/adoPlatform.ts` : `AdoDeploymentTarget` et fonctions de normalisation/collection | URL Server/TFS saisie ou absence d'URL pour Cloud | `useOnboarding`, `adoClient` et `OrgStep` | URL libre → cible `cloud`/`onprem`, racine normalisée, collection et candidats | A-01 |
 | SD-05 | Entité de découverte organisation/projet/équipe côté application | `frontend/src/types.ts` : `NamedEntity` | réponses de `adoClient` et `demoData` | `useOnboarding`, `usePortfolio`, vues de sélection, `teamSort` | DTO Azure DevOps `{id,name}` ou `{name}` → forme structurale interne puis tri | A-02 |
 | SD-06 | Options de types et d'états d'une équipe | signature de retour de `frontend/src/adoClient.ts:getTeamOptionsDirect` | endpoints work item types/states Azure DevOps et `DEMO_TEAM_OPTIONS` | `useTeamOptions` et `usePortfolio` | listes techniques → types triés + `statesByType`; les hooks valident ensuite les raccourcis sélectionnés | A-03 |
-| SD-07 | Événements, fenêtre, calendrier, périodes et Cycle Time delivery | `frontend/src/domain/delivery/` : `DeliveryEvent`, `DeliveryHistoryWindow`, `DeliveryWeek`, `DeliveryHistoryPeriods`, `CycleTimePoint`, politiques et transformations | mapper `adapters/azure-devops/deliveryEventMappers.ts`, fenêtre demandée construite par `getTeamDeliveryDataDirect`, lignes hebdomadaires corrélées | sélection delivery, qualification des bords, throughput, Cycle Time, historique, tendances et agrégation corrélée portefeuille | DTO → faits UTC immuables ; bornes absolues → périodes initiale/finale partielles ou cœur complet avec diagnostics ; instant ou lundi ISO → semaine ISO `UTC` ; premiers faits début/fin → jours calendaires à deux décimales groupés par semaine de complétion | aucune définition concurrente observée |
+| SD-07 | Événements, fenêtre, calendrier, périodes, chronologie et Cycle Time delivery | `frontend/src/domain/delivery/` : `DeliveryEvent`, `DeliveryHistoryWindow`, `DeliveryWeek`, `DeliveryHistoryPeriods`, `DeliveryChronologyResult`, `CycleTimePoint`, politiques et transformations | mapper `adapters/azure-devops/deliveryEventMappers.ts`, fenêtre demandée construite par `getTeamDeliveryDataDirect`, lignes hebdomadaires corrélées | sélection delivery, qualification des bords et de la chronologie, throughput, Cycle Time, historique, tendances et agrégation corrélée portefeuille | DTO → faits UTC immuables ; bornes absolues → périodes initiale/finale partielles ou cœur complet avec diagnostics ; premiers faits ordonnés début/fin/livraison → événements cohérents ou rejetés et diagnostics localisés ; instant ou lundi ISO → semaine ISO `UTC` ; premiers faits début/fin → jours calendaires à deux décimales groupés par semaine de complétion | aucune définition concurrente observée |
 | SD-08 | Signification normative des entrées et résultats statistiques | `docs/standards/STD-STAT-001.md` | moteurs Python et TypeScript conformes au standard | API, historiques, UI, rapports et runners statistiques | distribution brute → percentiles, censure, Risk Score, fiabilité et histogramme selon les règles `STAT-PAR-*` | A-05 |
 | SD-09 | Commande, primitives et résultat statistiques en mémoire TypeScript | module `frontend/src/domain/`, principalement `simulation.ts` et `simulationValueObjects.ts` | `localTeamForecast` par le contrat applicatif `TeamForecast`, mapper HTTP, mapper de stockage, moteur local et runner de corpus | moteur local, mapper HTTP, hooks, historique, diagnostics et runners | entrées inconnues → Value Objects/commande discriminée ; moteur ou DTO validé → `SimulationResult` immuable | A-05, A-06, A-07 |
 | SD-10 | Contrat HTTP public de simulation et d'historique | `backend/api_models.py` : `SimulateRequest`, `SimulateResponse`, `SimulationHistoryItem` | FastAPI/Pydantic à l'entrée ; `result_to_response` et `persistence_row_to_history_item` à la sortie | route `POST /simulate`, route `GET /simulations/history`, OpenAPI et mappers frontend | JSON `snake_case` fermé ↔ DTO Pydantic ; les mappers traduisent vers/depuis les modèles de domaine | A-05, A-06, A-08 |
@@ -59,7 +59,7 @@ dans la colonne `Ambiguïté` et détaillée plus bas.
 | --- | --- | --- |
 | T-01 | URL publique → SD-01 → shell | `resolveAppRuntime` applique la priorité `demo`, puis `connect` sur Pages, puis le mode démo Pages. |
 | T-02 | saisies onboarding → SD-04/SD-05/SD-06 | `adoPlatform` normalise la cible ; `adoClient` transforme les réponses Cloud ou Server/TFS en entités et options consommables. |
-| T-03 | dates/types/états/équipe → SD-07 | `getDeliveryHistoryPeriods` convertit les dates inclusives en fenêtre absolue ; le domaine qualifie chaque bord et expose seulement `completePeriod` au client Azure DevOps ; le mapper convertit work items et révisions en événements ; `DeliveryHistoryWindow` sélectionne les items livrés ; `DeliveryWeek` attribue leurs instants au lundi ISO `UTC` ; `calculateCycleTime` produit l’unique durée en jours calendaires depuis les premiers faits début/fin et exclut les cycles incomplets ou inversés. |
+| T-03 | dates/types/états/équipe → SD-07 | `getDeliveryHistoryPeriods` convertit les dates inclusives en fenêtre absolue ; le domaine qualifie chaque bord et expose seulement `completePeriod` au client Azure DevOps ; le mapper convertit work items et révisions en événements ; `DeliveryHistoryWindow` sélectionne les items livrés ; `qualifyDeliveryChronology` rejette et diagnostique les items inversés tout en acceptant les simultanéités ; throughput et Cycle Time consomment ce résultat, puis `DeliveryWeek` attribue les observations au lundi ISO `UTC`. |
 | T-04 | SD-07 + critères + seed → SD-09 | `localTeamForecast` construit la commande TypeScript derrière le contrat `TeamForecast` ; les Value Objects filtrent éventuellement les zéros et appliquent les bornes existantes. |
 | T-05 | SD-09 → SD-10 → SD-21 | `simulationCommandToDto` passe de `camelCase` à `snake_case`; Pydantic valide le transport ; `request_to_command` reconstruit la commande Python. |
 | T-06 | SD-09 ou SD-21 → résultat statistique | les moteurs produisent la distribution brute ; leurs domaines dérivent et valident les résultats sous l'autorité SD-08. |
@@ -141,13 +141,13 @@ rg -n "fetch|localStorage|document\.|request\.cookies|_simulation_document|Simul
 git diff --name-status 4bc9b01fce83682da3e7dbd79df898461a2437b4..HEAD -- frontend/src backend
 ```
 
-Le basculement SD-07 est prouvé par les tests des événements, de la fenêtre historique, du calendrier, du
-throughput, des mappers Azure DevOps, du calcul de Cycle Time, du portefeuille et du client Azure DevOps. La
+Le basculement SD-07 est prouvé par les tests des événements, de la fenêtre historique, du calendrier, de la
+chronologie, du throughput, des mappers Azure DevOps, du calcul de Cycle Time, du portefeuille et du client Azure DevOps. La
 forme hebdomadaire est désormais dérivée par l’unique transformation du domaine delivery, dans l’unité
 `delivered_items_per_complete_iso_week` ; les points de Cycle Time restent un résultat dérivé destiné aux
-consommateurs existants.
+consommateurs existants. La garde statique refuse une seconde qualification chronologique dans ces consommateurs.
 
 La dernière commande constituait la preuve d’absence de migration du registre initial. Les tests existants de
 modèles, mappers, routes, persistance, identité, domaine statistique et compatibilité restent les preuves
-exécutables des autres chemins. Les transformations de Cycle Time, complétude, discontinuités, cohérence et
-diagnostics prévues par 7.26 à 7.30 ne sont pas anticipées.
+exécutables des autres chemins. Les transformations de complétude, discontinuités et propagation applicative
+prévues par 7.27, 7.28 et 7.30 ne sont pas anticipées.

@@ -453,7 +453,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Protéger les calculs contre des séquences temporelles impossibles.
 - **Frontière principale :** Domaine delivery.
 - **Famille d’invariants :** Cohérence chronologique des événements.
-- **Preuve principale :** Tests des ordres valides, inversés et simultanés.
+- **Preuve principale :** [Tests des ordres valides, inversés et simultanés](../../frontend/src/domain/delivery/chronology.test.ts), [preuve du consommateur Azure DevOps](../../frontend/src/adoClient.deliveryWeek.test.ts) et [garde d’autorité](../../tests/test_delivery_chronology_authority.py).
 - **Éléments de réalisation inclus :** Règle ; diagnostic ; intégration au résultat delivery ; tests ; documentation métier.
 - **Hors périmètre :** Correction à la source des données Azure DevOps.
 - **Surface prévisionnelle :** 5 fichiers de production ; 10 fichiers versionnés

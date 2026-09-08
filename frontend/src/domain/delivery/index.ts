@@ -5,6 +5,10 @@ export {
   DELIVERY_EVENT_KINDS,
 } from "./deliveryEvent";
 export {
+  DELIVERY_CHRONOLOGY_SEQUENCE,
+  qualifyDeliveryChronology,
+} from "./chronology";
+export {
   calculateCycleTime,
   CYCLE_TIME_DEFINITION,
 } from "./cycleTime";
@@ -27,6 +31,10 @@ export {
   DELIVERY_THROUGHPUT_DEFINITION,
 } from "./throughput";
 
+export type {
+  DeliveryChronologyDiagnostic,
+  DeliveryChronologyResult,
+} from "./chronology";
 export type {
   DeliveryEvent,
   DeliveryEventInput,

@@ -12,8 +12,8 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 281,
-    "importEdges": 1449,
+    "sourceModules": 282,
+    "importEdges": 1454,
     "entrypoints": 84,
     "missingEntrypoints": 5,
     "cycles": 0,
@@ -1160,6 +1160,11 @@
       },
       {
         "path": "frontend/src/demoData.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/domain/delivery/chronology.ts",
         "area": "frontend",
         "language": "javascript"
       },
@@ -11873,7 +11878,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
-        "line": 10,
+        "line": 11,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adapters/azure-devops/deliveryEventMappers",
@@ -11882,7 +11887,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adoErrors.ts",
-        "line": 14,
+        "line": 15,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adoErrors",
@@ -11891,7 +11896,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adoPlatform.ts",
-        "line": 20,
+        "line": 21,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adoPlatform",
@@ -12906,9 +12911,27 @@
         "resolution": "internal"
       },
       {
-        "source": "frontend/src/domain/delivery/cycleTime.ts",
+        "source": "frontend/src/domain/delivery/chronology.ts",
         "target": "frontend/src/domain/delivery/deliveryEvent.ts",
         "line": 1,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./deliveryEvent",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/cycleTime.ts",
+        "target": "frontend/src/domain/delivery/chronology.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "./chronology",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/cycleTime.ts",
+        "target": "frontend/src/domain/delivery/deliveryEvent.ts",
+        "line": 2,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "./deliveryEvent",
@@ -12917,7 +12940,7 @@
       {
         "source": "frontend/src/domain/delivery/cycleTime.ts",
         "target": "frontend/src/domain/delivery/deliveryWeek.ts",
-        "line": 2,
+        "line": 3,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./deliveryWeek",
@@ -12970,17 +12993,35 @@
       },
       {
         "source": "frontend/src/domain/delivery/index.ts",
-        "target": "frontend/src/domain/delivery/cycleTime.ts",
+        "target": "frontend/src/domain/delivery/chronology.ts",
         "line": 7,
         "kind": "js-export",
         "phase": "runtime",
+        "specifier": "./chronology",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/index.ts",
+        "target": "frontend/src/domain/delivery/chronology.ts",
+        "line": 34,
+        "kind": "js-export",
+        "phase": "compile",
+        "specifier": "./chronology",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/index.ts",
+        "target": "frontend/src/domain/delivery/cycleTime.ts",
+        "line": 11,
+        "kind": "js-export",
+        "phase": "runtime",
         "specifier": "./cycleTime",
         "resolution": "internal"
       },
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/cycleTime.ts",
-        "line": 37,
+        "line": 45,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./cycleTime",
@@ -12998,7 +13039,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/deliveryEvent.ts",
-        "line": 30,
+        "line": 38,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./deliveryEvent",
@@ -13007,7 +13048,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/deliveryWeek.ts",
-        "line": 19,
+        "line": 23,
         "kind": "js-export",
         "phase": "runtime",
         "specifier": "./deliveryWeek",
@@ -13016,7 +13057,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/deliveryWeek.ts",
-        "line": 51,
+        "line": 59,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./deliveryWeek",
@@ -13025,7 +13066,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/historicalPeriod.ts",
-        "line": 15,
+        "line": 19,
         "kind": "js-export",
         "phase": "runtime",
         "specifier": "./historicalPeriod",
@@ -13034,7 +13075,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/historicalPeriod.ts",
-        "line": 42,
+        "line": 50,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./historicalPeriod",
@@ -13043,7 +13084,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/historicalWindow.ts",
-        "line": 11,
+        "line": 15,
         "kind": "js-export",
         "phase": "runtime",
         "specifier": "./historicalWindow",
@@ -13052,7 +13093,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/historicalWindow.ts",
-        "line": 38,
+        "line": 46,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./historicalWindow",
@@ -13061,7 +13102,7 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/throughput.ts",
-        "line": 25,
+        "line": 29,
         "kind": "js-export",
         "phase": "runtime",
         "specifier": "./throughput",
@@ -13070,16 +13111,25 @@
       {
         "source": "frontend/src/domain/delivery/index.ts",
         "target": "frontend/src/domain/delivery/throughput.ts",
-        "line": 52,
+        "line": 60,
         "kind": "js-export",
         "phase": "compile",
         "specifier": "./throughput",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/domain/delivery/throughput.ts",
+        "target": "frontend/src/domain/delivery/chronology.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "./chronology",
         "resolution": "internal"
       },
       {
         "source": "frontend/src/domain/delivery/throughput.ts",
         "target": "frontend/src/domain/delivery/deliveryEvent.ts",
-        "line": 2,
+        "line": 3,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "./deliveryEvent",
@@ -13088,7 +13138,7 @@
       {
         "source": "frontend/src/domain/delivery/throughput.ts",
         "target": "frontend/src/domain/delivery/deliveryWeek.ts",
-        "line": 3,
+        "line": 4,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./deliveryWeek",
@@ -13097,7 +13147,7 @@
       {
         "source": "frontend/src/domain/delivery/throughput.ts",
         "target": "frontend/src/domain/delivery/historicalPeriod.ts",
-        "line": 1,
+        "line": 2,
         "kind": "js-import",
         "phase": "compile",
         "specifier": "./historicalPeriod",
@@ -15087,13 +15137,13 @@
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "compile",
-        "count": 103
+        "count": 106
       },
       {
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "runtime",
-        "count": 165
+        "count": 167
       },
       {
         "sourceArea": "launcher",
@@ -15306,7 +15356,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
-        "line": 10,
+        "line": 11,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adapters/azure-devops/deliveryEventMappers",

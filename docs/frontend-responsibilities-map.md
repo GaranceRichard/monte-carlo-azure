@@ -15,6 +15,10 @@ Le PBI 7.26 confie ensuite au domaine delivery la définition et la transformati
 événements normalisés. Le client Azure DevOps consomme cette autorité ; les tendances, résumés et
 restitutions existants restent en aval et ne redéfinissent pas la durée.
 
+Le PBI 7.29 confie au même domaine l’ordre des faits de cycle de vie et son résultat diagnostiqué. Le client
+Azure DevOps qualifie une fois les événements sélectionnés ; throughput et Cycle Time consomment uniquement
+les événements cohérents de ce résultat, sans comparaison chronologique locale.
+
 L’analyse couvre les sources exécutables sous `frontend/src/`, le point d’entrée Vite, les scripts qui
 chargent le moteur TypeScript hors navigateur et les frontières navigateur, HTTP et stockage. Les tests ont
 servi à confirmer les points d’entrée et les usages, mais ne sont pas attribués à une couche produit. Les
@@ -73,7 +77,7 @@ préjugent pas de leur emplacement futur.
 | Domaine statistique explicite | `domain/simulation.ts`, `domain/simulationValueObjects.ts`, `domain/histogram.ts`, `domain/riskScore.ts`, `domain/throughputReliability.ts`, `domain/sampleIndexDrawPort.ts` | Commande discriminée, Value Objects et bornes, percentiles, censures, histogramme, Risk Score, fiabilité du throughput et port minimal de tirage. |
 | Modèle d’historique | `domain/simulationHistory.ts` | Forme interne de l’historique local, contexte d’équipe, critères, échantillon, résultat et avertissement. |
 | Moteur et scénarios | `utils/simulation.ts`, `adapters/seededSampleIndexDrawPort.ts` | Moteur Monte Carlo local, bootstrap déterministe, scénarios portefeuille, agrégation corrélée, légende de risque et adaptateur PRNG contractuel. |
-| Delivery et temps | `domain/delivery/`, `date.ts`, `utils/cycleTime.ts`, `types.ts` | Événements et fenêtre historiques, statuts explicites des périodes partielles/complètes, calendrier ISO UTC, throughput par semaine complète et Cycle Time définis et calculés dans le domaine, conversion des dates saisies, tendances de restitution et formes partagées restantes. |
+| Delivery et temps | `domain/delivery/`, `date.ts`, `utils/cycleTime.ts`, `types.ts` | Événements et fenêtre historiques, statuts explicites des périodes partielles/complètes, calendrier ISO UTC, qualification chronologique diagnostiquée, throughput par semaine complète et Cycle Time définis et calculés dans le domaine, conversion des dates saisies, tendances de restitution et formes partagées restantes. |
 | Diagnostics décisionnels | `utils/forecastDiagnostics.ts`, `utils/decisionLanguage.ts`, `utils/simulationDecisionDiagnostic.ts`, `utils/portfolioComparisonDiagnostic.ts`, `utils/portfolioComparisonPresentation.ts` | Qualité des données, incertitude, sensibilité historique, recommandation, langage utilisateur, crédibilité/stabilité des scénarios portefeuille et présentation associée. |
 | Identité de résultat | `utils/simulationSignature.ts` | Canonicalisation des paramètres, signature de résultat, validation d’une entrée réutilisable et sélection de la plus récente. |
 | Limites et utilitaires | `simulationLimits.ts`, `utils/math.ts`, `utils/teamSort.ts`, `utils/selectTopStart.ts` | Réexport des bornes du domaine, validation d’entrée, conversions numériques, tri et comportement de listes. |

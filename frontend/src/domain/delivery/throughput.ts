@@ -1,3 +1,4 @@
+import type { DeliveryChronologyResult } from "./chronology";
 import type { CompleteDeliveryHistoryPeriod } from "./historicalPeriod";
 import type { DeliveryEvent } from "./deliveryEvent";
 import {
@@ -30,10 +31,10 @@ function deliveredEventsInPeriod(
 
 export function calculateDeliveryThroughput(
   period: CompleteDeliveryHistoryPeriod,
-  events: readonly DeliveryEvent[],
+  chronology: DeliveryChronologyResult,
 ): DeliveryThroughput[] {
   const countsByWeek = new Map<DeliveryWeek, number>();
-  deliveredEventsInPeriod(period, events).forEach((event) => {
+  deliveredEventsInPeriod(period, chronology.coherentEvents).forEach((event) => {
     const week = deliveryWeekOf(event.occurredAt);
     countsByWeek.set(week, (countsByWeek.get(week) ?? 0) + 1);
   });

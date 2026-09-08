@@ -2,6 +2,15 @@
 
 ## Recent
 
+### Cohérence chronologique sous autorité delivery — PBI 7.29
+
+- ajout d’un résultat métier immuable qui ordonne `work_started`, `work_completed`, puis `item_delivered`,
+  accepte les simultanéités et sépare les événements cohérents de ceux d’un item rejeté ;
+- diagnostic stable `inverted_delivery_event_order` conservé pour chaque relation impossible avec identité,
+  faits et instants, sans correction des DTO Azure DevOps à la source ;
+- throughput et Cycle Time exigent cette qualification commune ; retrait de la comparaison locale du Cycle
+  Time et ajout d’une garde statique contre toute seconde validation chronologique dans les consommateurs.
+
 ### Cycle Time sous autorité delivery — PBI 7.26
 
 - ajout de `CYCLE_TIME_DEFINITION` et de `calculateCycleTime` à l’API publique du domaine delivery : durée

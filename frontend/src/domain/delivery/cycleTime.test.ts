@@ -3,6 +3,7 @@ import {
   calculateCycleTime,
   createDeliveryEvent,
   CYCLE_TIME_DEFINITION,
+  qualifyDeliveryChronology,
   type DeliveryEvent,
   type DeliveryEventKind,
 } from ".";
@@ -21,6 +22,10 @@ function event(
   return createDeliveryEvent({ itemId, kind, occurredAt });
 }
 
+function calculate(events: readonly DeliveryEvent[]) {
+  return calculateCycleTime(qualifyDeliveryChronology(events));
+}
+
 describe("Cycle Time delivery definition", () => {
   it("publishes the single explicit lifecycle and calendar-day definition", () => {
     expect(CYCLE_TIME_DEFINITION).toEqual({
@@ -29,13 +34,13 @@ describe("Cycle Time delivery definition", () => {
       startsOn: "first_work_started_event",
       endsOn: "first_work_completed_event",
       groupedBy: "completion_week",
-      invalidLifecycle: "excluded",
+      invalidLifecycle: "excluded_by_delivery_chronology",
     });
     expect(Object.isFrozen(CYCLE_TIME_DEFINITION)).toBe(true);
   });
 
   it("calculates elapsed calendar days and groups identical observations", () => {
-    expect(calculateCycleTime([
+    expect(calculate([
       event("1", "work_started", "2026-01-08T09:00:00Z"),
       event("1", "work_completed", "2026-01-15T21:00:00Z"),
       event("2", "work_started", "2026-01-09T03:00:00-06:00"),
@@ -46,7 +51,7 @@ describe("Cycle Time delivery definition", () => {
   });
 
   it("rounds elapsed days to the declared precision", () => {
-    expect(calculateCycleTime([
+    expect(calculate([
       event("1", "work_started", "2026-01-12T00:00:00Z"),
       event("1", "work_completed", "2026-01-12T08:00:00Z"),
     ])).toEqual([
@@ -55,7 +60,7 @@ describe("Cycle Time delivery definition", () => {
   });
 
   it("uses the first lifecycle facts and accepts a zero-day cycle", () => {
-    expect(calculateCycleTime([
+    expect(calculate([
       event("1", "work_completed", "2026-01-12T09:00:00Z"),
       event("1", "work_started", "2026-01-12T09:00:00Z"),
       event("1", "work_started", "2026-01-13T09:00:00Z"),
@@ -66,7 +71,7 @@ describe("Cycle Time delivery definition", () => {
   });
 
   it("excludes delivery-only, incomplete and chronologically invalid lifecycles", () => {
-    expect(calculateCycleTime([
+    expect(calculate([
       event("delivered", "item_delivered", "2026-01-15T09:00:00Z"),
       event("started", "work_started", "2026-01-08T09:00:00Z"),
       event("completed", "work_completed", "2026-01-16T09:00:00Z"),
@@ -76,7 +81,7 @@ describe("Cycle Time delivery definition", () => {
   });
 
   it("sorts observations by completion week then elapsed days", () => {
-    expect(calculateCycleTime([
+    expect(calculate([
       event("later", "work_completed", "2026-01-19T09:00:00Z"),
       event("longer", "work_completed", "2026-01-17T09:00:00Z"),
       event("shorter", "work_completed", "2026-01-17T09:00:00Z"),

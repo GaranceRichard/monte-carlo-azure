@@ -1,4 +1,5 @@
-import type { DeliveryEvent, DeliveryInstant } from "./deliveryEvent";
+import type { DeliveryChronologyResult } from "./chronology";
+import type { DeliveryInstant } from "./deliveryEvent";
 import { deliveryWeekOf } from "./deliveryWeek";
 
 export const CYCLE_TIME_DEFINITION = Object.freeze({
@@ -7,7 +8,7 @@ export const CYCLE_TIME_DEFINITION = Object.freeze({
   startsOn: "first_work_started_event",
   endsOn: "first_work_completed_event",
   groupedBy: "completion_week",
-  invalidLifecycle: "excluded",
+  invalidLifecycle: "excluded_by_delivery_chronology",
 } as const);
 
 export type CycleTimePoint = {
@@ -47,7 +48,7 @@ function collectDeliveryLifecycles(
 
 function toCycleTimePoint(lifecycle: DeliveryLifecycle): CycleTimePoint | null {
   const { startedAt, completedAt } = lifecycle;
-  if (!startedAt || !completedAt || completedAt < startedAt) return null;
+  if (!startedAt || !completedAt) return null;
 
   const elapsedMilliseconds = new Date(completedAt).getTime() - new Date(startedAt).getTime();
   const cycleTimeDays = Number(
@@ -75,11 +76,11 @@ function aggregateCycleTimePoint(
 }
 
 export function calculateCycleTime(
-  events: readonly DeliveryEvent[],
+  chronology: DeliveryChronologyResult,
 ): CycleTimePoint[] {
   const buckets = new Map<string, CycleTimePoint>();
 
-  collectDeliveryLifecycles(events).forEach((lifecycle) => {
+  collectDeliveryLifecycles(chronology.coherentEvents).forEach((lifecycle) => {
     const point = toCycleTimePoint(lifecycle);
     if (point) aggregateCycleTimePoint(buckets, point);
   });

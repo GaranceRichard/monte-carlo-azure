@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1229,
+      "logicalCases": 1238,
       "nodes": [
         {
           "id": "preflight",
@@ -234,6 +234,9 @@
             "pytest:tests/test_check_no_secrets.py::test_git_helpers_and_staged_file_failures",
             "pytest:tests/test_check_no_secrets.py::test_ignores_real_ado_values_outside_ci_and_tests",
             "pytest:tests/test_check_no_secrets.py::test_main_covers_repository_empty_and_finding_paths",
+            "pytest:tests/test_delivery_chronology_authority.py::test_delivery_calculators_require_the_chronology_result",
+            "pytest:tests/test_delivery_chronology_authority.py::test_delivery_chronology_has_one_production_authority",
+            "pytest:tests/test_delivery_chronology_authority.py::test_no_competing_started_completed_order_validation_exists",
             "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
             "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
             "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
@@ -628,18 +631,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 505
+            "pytest": 508
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 43,
+            "integration": 46,
             "unit": 334
           },
           "criticalities": {
             "critical": 74,
             "high": 16,
-            "unassigned": 415
+            "unassigned": 418
           }
         },
         {
@@ -694,6 +697,7 @@
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > rejects invalid sampleCount %s without normalization [43:35]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > reproduces exactly the previous createSeededRandom suite [16:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [47:3]",
             "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
@@ -1010,13 +1014,18 @@
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [93:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [82:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo weekly throughput [73:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [37:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [68:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [93:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [25:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [48:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [78:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [57:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > accepts a valid lifecycle independently of input order [28:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > accepts simultaneous facts and orders their semantic tie deterministically [85:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > isolates rejected items and freezes the complete delivery result [100:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > publishes the immutable lifecycle sequence [19:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > rejects an inverted lifecycle with one stable localized diagnostic per relation [44:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [42:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [73:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [98:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [30:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [53:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [83:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [62:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > creates immutable events [21:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > normalizes an opaque item identity and an absolute instant [9:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
@@ -1037,10 +1046,10 @@
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [57:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [40:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [31:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [73:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [62:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [45:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [36:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [78:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > keeps exact histograms unchanged [6:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > uses clipped inclusive bounds for the continuous 0..100 range [15:3]",
@@ -1390,15 +1399,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 724
+            "vitest": 730
           },
           "natures": {
-            "component": 332,
-            "unit": 392
+            "component": 333,
+            "unit": 397
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 616
+            "unassigned": 622
           }
         },
         {
@@ -1504,7 +1513,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1519,
+      "logicalCases": 1528,
       "nodes": [
         {
           "id": "preflight",
@@ -1844,6 +1853,9 @@
             "pytest:tests/test_check_no_secrets.py::test_ignores_real_ado_values_outside_ci_and_tests",
             "pytest:tests/test_check_no_secrets.py::test_main_covers_repository_empty_and_finding_paths",
             "pytest:tests/test_check_no_secrets.py::test_skip_binary_staged_reads_and_rules",
+            "pytest:tests/test_delivery_chronology_authority.py::test_delivery_calculators_require_the_chronology_result",
+            "pytest:tests/test_delivery_chronology_authority.py::test_delivery_chronology_has_one_production_authority",
+            "pytest:tests/test_delivery_chronology_authority.py::test_no_competing_started_completed_order_validation_exists",
             "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
             "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
             "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
@@ -2488,18 +2500,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 763
+            "pytest": 766
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 299,
+            "integration": 302,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 656
+            "unassigned": 659
           }
         },
         {
@@ -2554,6 +2566,7 @@
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > rejects invalid sampleCount %s without normalization [43:35]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > reproduces exactly the previous createSeededRandom suite [16:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [47:3]",
             "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
@@ -2870,13 +2883,18 @@
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [93:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [82:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo weekly throughput [73:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [37:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [68:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [93:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [25:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [48:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [78:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [57:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > accepts a valid lifecycle independently of input order [28:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > accepts simultaneous facts and orders their semantic tie deterministically [85:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > isolates rejected items and freezes the complete delivery result [100:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > publishes the immutable lifecycle sequence [19:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > rejects an inverted lifecycle with one stable localized diagnostic per relation [44:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [42:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [73:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [98:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [30:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [53:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [83:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [62:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > creates immutable events [21:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > normalizes an opaque item identity and an absolute instant [9:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
@@ -2897,10 +2915,10 @@
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [57:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [40:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [31:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [73:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [62:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [45:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [36:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [78:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > keeps exact histograms unchanged [6:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > uses clipped inclusive bounds for the continuous 0..100 range [15:3]",
@@ -3250,15 +3268,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 724
+            "vitest": 730
           },
           "natures": {
-            "component": 332,
-            "unit": 392
+            "component": 333,
+            "unit": 397
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 616
+            "unassigned": 622
           }
         },
         {
@@ -3465,7 +3483,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1519,
+      "logicalCases": 1528,
       "nodes": [
         {
           "id": "preflight",
@@ -3805,6 +3823,9 @@
             "pytest:tests/test_check_no_secrets.py::test_ignores_real_ado_values_outside_ci_and_tests",
             "pytest:tests/test_check_no_secrets.py::test_main_covers_repository_empty_and_finding_paths",
             "pytest:tests/test_check_no_secrets.py::test_skip_binary_staged_reads_and_rules",
+            "pytest:tests/test_delivery_chronology_authority.py::test_delivery_calculators_require_the_chronology_result",
+            "pytest:tests/test_delivery_chronology_authority.py::test_delivery_chronology_has_one_production_authority",
+            "pytest:tests/test_delivery_chronology_authority.py::test_no_competing_started_completed_order_validation_exists",
             "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
             "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
             "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
@@ -4449,18 +4470,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 763
+            "pytest": 766
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 299,
+            "integration": 302,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 656
+            "unassigned": 659
           }
         },
         {
@@ -4515,6 +4536,7 @@
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > rejects invalid sampleCount %s without normalization [43:35]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > reproduces exactly the previous createSeededRandom suite [16:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [47:3]",
             "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
@@ -4831,13 +4853,18 @@
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [93:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [82:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo weekly throughput [73:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [37:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [68:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [93:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [25:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [48:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [78:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [57:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > accepts a valid lifecycle independently of input order [28:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > accepts simultaneous facts and orders their semantic tie deterministically [85:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > isolates rejected items and freezes the complete delivery result [100:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > publishes the immutable lifecycle sequence [19:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > rejects an inverted lifecycle with one stable localized diagnostic per relation [44:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [42:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [73:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [98:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [30:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [53:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [83:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [62:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > creates immutable events [21:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > normalizes an opaque item identity and an absolute instant [9:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
@@ -4858,10 +4885,10 @@
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [57:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [40:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [31:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [73:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [62:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [45:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [36:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [78:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > keeps exact histograms unchanged [6:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > uses clipped inclusive bounds for the continuous 0..100 range [15:3]",
@@ -5211,15 +5238,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 724
+            "vitest": 730
           },
           "natures": {
-            "component": 332,
-            "unit": 392
+            "component": 333,
+            "unit": 397
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 616
+            "unassigned": 622
           }
         },
         {
@@ -5426,7 +5453,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1519,
+      "logicalCases": 1528,
       "nodes": [
         {
           "id": "preflight",
@@ -5766,6 +5793,9 @@
             "pytest:tests/test_check_no_secrets.py::test_ignores_real_ado_values_outside_ci_and_tests",
             "pytest:tests/test_check_no_secrets.py::test_main_covers_repository_empty_and_finding_paths",
             "pytest:tests/test_check_no_secrets.py::test_skip_binary_staged_reads_and_rules",
+            "pytest:tests/test_delivery_chronology_authority.py::test_delivery_calculators_require_the_chronology_result",
+            "pytest:tests/test_delivery_chronology_authority.py::test_delivery_chronology_has_one_production_authority",
+            "pytest:tests/test_delivery_chronology_authority.py::test_no_competing_started_completed_order_validation_exists",
             "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
             "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
             "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
@@ -6410,18 +6440,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 763
+            "pytest": 766
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 299,
+            "integration": 302,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 656
+            "unassigned": 659
           }
         },
         {
@@ -6476,6 +6506,7 @@
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > rejects invalid sampleCount %s without normalization [43:35]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > reproduces exactly the previous createSeededRandom suite [16:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [47:3]",
             "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
@@ -6792,13 +6823,18 @@
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo cycle time and stays coherent with every throughput week [93:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo throughput samples and empty arrays for unknown teams [82:3]",
             "vitest:frontend/src/demoData.test.ts::demoData > returns defensive copies for demo weekly throughput [73:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [37:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [68:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [93:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [25:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [48:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [78:3]",
-            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [57:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > accepts a valid lifecycle independently of input order [28:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > accepts simultaneous facts and orders their semantic tie deterministically [85:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > isolates rejected items and freezes the complete delivery result [100:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > publishes the immutable lifecycle sequence [19:3]",
+            "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > rejects an inverted lifecycle with one stable localized diagnostic per relation [44:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [42:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [73:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [98:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [30:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [53:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [83:3]",
+            "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [62:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > creates immutable events [21:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > normalizes an opaque item identity and an absolute instant [9:3]",
             "vitest:frontend/src/domain/delivery/deliveryEvent.test.ts::DeliveryEvent > rejects a non-absolute instant: %s [42:4]",
@@ -6819,10 +6855,10 @@
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [57:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [40:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [31:3]",
-            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [73:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [62:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [45:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [36:3]",
+            "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [78:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > clips the extreme right bound for a discontinuous range ending at %i [29:13]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > keeps exact histograms unchanged [6:3]",
             "vitest:frontend/src/domain/simulationHistogram.test.ts::buildHistogram > uses clipped inclusive bounds for the continuous 0..100 range [15:3]",
@@ -7172,15 +7208,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 724
+            "vitest": 730
           },
           "natures": {
-            "component": 332,
-            "unit": 392
+            "component": 333,
+            "unit": 397
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 616
+            "unassigned": 622
           }
         },
         {

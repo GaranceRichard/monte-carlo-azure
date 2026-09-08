@@ -106,9 +106,12 @@ Invariants de préparation du throughput côté frontend :
   fenêtre semi-ouverte, le regroupement et la conservation explicite des semaines à zéro ;
 - le throughput Azure DevOps, le Cycle Time et l’agrégation corrélée portefeuille utilisent tous le Value
   Object `DeliveryWeek` fourni par cette politique ;
+- la chronologie delivery suit l’ordre `work_started`, `work_completed`, puis `item_delivered` sur les
+  premiers faits de chaque item ; les instants simultanés sont valides, tandis qu’une inversion rejette
+  l’item des calculs et produit un diagnostic immuable localisé par item, faits et instants ;
 - le Cycle Time est la durée écoulée entre les premiers événements `work_started` et `work_completed` d’un
   item, exprimée en jours calendaires de 24 heures et arrondie à deux décimales ; le domaine delivery la
-  regroupe par semaine de complétion et exclut les cycles incomplets ou chronologiquement inversés ;
+  regroupe par semaine de complétion et exclut les cycles incomplets après la qualification chronologique ;
 - la fenêtre demandée est classée en périodes discriminées `partial_initial`, `complete`, `partial_final`
   ou `partial_initial_and_final` ; le résultat expose la seule période complète et les diagnostics distincts
   de ses deux bords, sans statut complet par défaut ;
@@ -164,6 +167,7 @@ frontend/
     domain/
       delivery/
         index.ts            # API publique du domaine delivery
+        chronology.ts       # ordre métier, événements cohérents/rejetés et diagnostics localisés
         cycleTime.ts         # définition et transformation uniques du Cycle Time
         deliveryEvent.ts    # identité opaque, faits fermés et instant absolu immuable
         deliveryWeek.ts     # semaine ISO et politique métier UTC uniques
@@ -1002,6 +1006,9 @@ Frontend :
   politique `UTC` partagée par tous les regroupements delivery
 - périodes historiques possédées par le même domaine : statut discriminé des bords initiaux et finaux et du
   cœur complet, diagnostics de bord et extraction explicite de l’unique période consommable
+- chronologie possédée par le même domaine : résultat immuable séparant événements cohérents et rejetés,
+  diagnostics localisés par relation inversée et simultanéités explicitement acceptées ; throughput et
+  Cycle Time exigent ce résultat, sans validation concurrente dans leurs modules
 - throughput possédé par le même domaine : comptage des seuls faits `item_delivered` dans le cœur complet,
   unité `delivered_items_per_complete_iso_week` et semaines sans livraison conservées ; `adoClient.ts`
   délègue cette transformation sans boucle locale concurrente

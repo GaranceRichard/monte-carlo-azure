@@ -2842,6 +2842,44 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_delivery_chronology_authority.py::test_delivery_calculators_require_the_chronology_result",
+    "framework": "pytest",
+    "sourcePath": "tests/test_delivery_chronology_authority.py",
+    "selector": "test_delivery_calculators_require_the_chronology_result",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_delivery_chronology_authority.py::test_delivery_chronology_has_one_production_authority",
+    "framework": "pytest",
+    "sourcePath": "tests/test_delivery_chronology_authority.py",
+    "selector": "test_delivery_chronology_has_one_production_authority",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_delivery_chronology_authority.py::test_no_competing_started_completed_order_validation_exists",
+    "framework": "pytest",
+    "sourcePath": "tests/test_delivery_chronology_authority.py",
+    "selector": "test_no_competing_started_completed_order_validation_exists",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
     "framework": "pytest",
     "sourcePath": "tests/test_delivery_throughput_authority.py",
@@ -13552,6 +13590,24 @@
     ]
   },
   {
+    "logicalCaseId": "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [47:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/adoClient.deliveryWeek.test.ts",
+    "selector": "adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [47:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional",
+      "migration_recovery",
+      "observability"
+    ],
+    "domains": [
+      "azure_devops",
+      "api"
+    ]
+  },
+  {
     "logicalCaseId": "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.deliveryWeek.test.ts",
@@ -19963,10 +20019,75 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [37:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > accepts a valid lifecycle independently of input order [28:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/chronology.test.ts",
+    "selector": "delivery chronology > accepts a valid lifecycle independently of input order [28:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > accepts simultaneous facts and orders their semantic tie deterministically [85:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/chronology.test.ts",
+    "selector": "delivery chronology > accepts simultaneous facts and orders their semantic tie deterministically [85:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > isolates rejected items and freezes the complete delivery result [100:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/chronology.test.ts",
+    "selector": "delivery chronology > isolates rejected items and freezes the complete delivery result [100:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > publishes the immutable lifecycle sequence [19:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/chronology.test.ts",
+    "selector": "delivery chronology > publishes the immutable lifecycle sequence [19:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/chronology.test.ts::delivery chronology > rejects an inverted lifecycle with one stable localized diagnostic per relation [44:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/chronology.test.ts",
+    "selector": "delivery chronology > rejects an inverted lifecycle with one stable localized diagnostic per relation [44:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "observability"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [42:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/delivery/cycleTime.test.ts",
-    "selector": "Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [37:3]",
+    "selector": "Cycle Time delivery definition > calculates elapsed calendar days and groups identical observations [42:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19978,10 +20099,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [68:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [73:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/delivery/cycleTime.test.ts",
-    "selector": "Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [68:3]",
+    "selector": "Cycle Time delivery definition > excludes delivery-only, incomplete and chronologically invalid lifecycles [73:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -19995,10 +20116,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [93:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [98:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/delivery/cycleTime.test.ts",
-    "selector": "Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [93:3]",
+    "selector": "Cycle Time delivery definition > prevents a competing event-duration calculation outside delivery [98:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20011,10 +20132,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [25:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [30:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/delivery/cycleTime.test.ts",
-    "selector": "Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [25:3]",
+    "selector": "Cycle Time delivery definition > publishes the single explicit lifecycle and calendar-day definition [30:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20026,10 +20147,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [48:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > rounds elapsed days to the declared precision [53:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/delivery/cycleTime.test.ts",
-    "selector": "Cycle Time delivery definition > rounds elapsed days to the declared precision [48:3]",
+    "selector": "Cycle Time delivery definition > rounds elapsed days to the declared precision [53:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20041,10 +20162,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [78:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > sorts observations by completion week then elapsed days [83:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/delivery/cycleTime.test.ts",
-    "selector": "Cycle Time delivery definition > sorts observations by completion week then elapsed days [78:3]",
+    "selector": "Cycle Time delivery definition > sorts observations by completion week then elapsed days [83:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20056,10 +20177,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [57:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/cycleTime.test.ts::Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [62:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/delivery/cycleTime.test.ts",
-    "selector": "Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [57:3]",
+    "selector": "Cycle Time delivery definition > uses the first lifecycle facts and accepts a zero-day cycle [62:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20348,10 +20469,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [57:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [62:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/delivery/throughput.test.ts",
-    "selector": "delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [57:3]",
+    "selector": "delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [62:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20363,10 +20484,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [40:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [45:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/delivery/throughput.test.ts",
-    "selector": "delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [40:3]",
+    "selector": "delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [45:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20378,10 +20499,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [31:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [36:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/delivery/throughput.test.ts",
-    "selector": "delivery throughput > publishes the counted fact, period and unit as an immutable definition [31:3]",
+    "selector": "delivery throughput > publishes the counted fact, period and unit as an immutable definition [36:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -20393,10 +20514,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [73:3]",
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > returns every complete week at zero when no delivery fact exists [78:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/domain/delivery/throughput.test.ts",
-    "selector": "delivery throughput > returns every complete week at zero when no delivery fact exists [73:3]",
+    "selector": "delivery throughput > returns every complete week at zero when no delivery fact exists [78:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",

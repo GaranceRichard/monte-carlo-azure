@@ -88,11 +88,18 @@ dans l’unité `delivered_items_per_complete_iso_week`. Sa transformation appli
 période, le regroupement UTC et les semaines à zéro ; le client Azure DevOps lui délègue les événements
 normalisés. Cette définition ne constitue pas une analyse de stabilité du flux.
 
+Avant throughput et Cycle Time, `qualifyDeliveryChronology` compare les premiers faits de chaque item selon
+l’ordre `work_started`, `work_completed`, puis `item_delivered`. Les égalités d’instant sont valides. Une
+inversion rejette tous les événements de l’item et produit, pour chaque relation impossible, le code stable
+`inverted_delivery_event_order` avec l’identité, les faits et leurs instants. Le résultat immuable conserve
+séparément événements cohérents, événements rejetés et diagnostics ; le client Azure DevOps le construit une
+fois sans tenter de corriger ses DTO à la source.
+
 Le même domaine définit le Cycle Time comme la durée écoulée entre les premiers événements `work_started` et
 `work_completed` d’un item. `calculateCycleTime` l’exprime en jours calendaires de 24 heures, l’arrondit à
-deux décimales et le rattache à la semaine ISO UTC de complétion. Un cycle incomplet ou dont la fin précède le
-début n’est pas une observation. Les tendances, résumés et restitutions consomment ces valeurs sans en
-redéfinir la durée.
+deux décimales et le rattache à la semaine ISO UTC de complétion. Un cycle incomplet n’est pas une observation ;
+les inversions ont déjà été rejetées par l’autorité chronologique. Les tendances, résumés et restitutions
+consomment ces valeurs sans en redéfinir la durée.
 
 Les chaînes `YYYY-MM-DD` sont interprétées comme dates calendaires UTC avant ce classement afin d’éviter un
 décalage d’un jour.

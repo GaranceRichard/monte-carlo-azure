@@ -1397,16 +1397,16 @@ test.describe("e2e istanbul coverage", () => {
 
       return {
         noDoneStates: cycleTimeDomain.calculateCycleTime(
-          [
+          delivery.qualifyDeliveryChronology([
             delivery.createDeliveryEvent({
               itemId: "1",
               kind: "item_delivered",
               occurredAt: "2026-01-15T09:00:00Z",
             }),
-          ],
+          ]),
         ),
         invalidOrdering: cycleTimeDomain.calculateCycleTime(
-          [
+          delivery.qualifyDeliveryChronology([
             delivery.createDeliveryEvent({
               itemId: "1",
               kind: "work_completed",
@@ -1417,7 +1417,7 @@ test.describe("e2e istanbul coverage", () => {
               kind: "work_started",
               occurredAt: "2026-01-15T09:00:00Z",
             }),
-          ],
+          ]),
         ),
         zeroLowerBoundTrend: (await import("/src/utils/cycleTime.ts")).buildCycleTimeTrendData(
           [

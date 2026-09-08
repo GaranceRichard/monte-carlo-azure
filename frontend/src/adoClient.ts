@@ -3,6 +3,7 @@ import type { WeeklyThroughputRow } from "./types";
 import {
   calculateCycleTime,
   calculateDeliveryThroughput,
+  qualifyDeliveryChronology,
   selectDeliveryHistoryEvents,
   type CycleTimePoint,
   type DeliveryEvent,
@@ -615,7 +616,8 @@ export async function getTeamDeliveryDataDirect(
   }
 
   const selectedDeliveryEvents = selectDeliveryHistoryEvents(completePeriod, deliveryEvents);
-  const weeklyThroughput = calculateDeliveryThroughput(completePeriod, deliveryEvents);
+  const deliveryChronology = qualifyDeliveryChronology(selectedDeliveryEvents);
+  const weeklyThroughput = calculateDeliveryThroughput(completePeriod, deliveryChronology);
 
   const warnings: string[] = [];
   if (batchFailures.length) {
@@ -662,7 +664,7 @@ export async function getTeamDeliveryDataDirect(
 
   return {
     weeklyThroughput,
-    cycleTimeDaysData: calculateCycleTime(selectedDeliveryEvents),
+    cycleTimeDaysData: calculateCycleTime(deliveryChronology),
     warning: warnings.length ? warnings.join(" ") : undefined,
   };
 }

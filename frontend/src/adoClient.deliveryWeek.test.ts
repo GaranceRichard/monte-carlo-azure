@@ -43,4 +43,40 @@ describe("adoClient delivery calendar migration", () => {
       { week: "2025-12-29", cycleTimeDays: 0.02, count: 1 },
     ]);
   });
+
+  it("delegates an impossible Azure lifecycle to the delivery chronology authority", async () => {
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify({ values: [] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ workItems: [{ id: 101 }] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        value: [{
+          id: 101,
+          fields: { "Microsoft.VSTS.Common.ClosedDate": "2026-01-04T21:00:00Z" },
+        }],
+      }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        value: [
+          { fields: { "System.ChangedDate": "2026-01-04T20:00:00Z", "System.State": "New" } },
+          { fields: { "System.ChangedDate": "2026-01-04T22:00:00Z", "System.State": "Active" } },
+          { fields: { "System.ChangedDate": "2026-01-04T22:30:00Z", "System.State": "Done" } },
+        ],
+      }), { status: 200 }));
+
+    const result = await getTeamDeliveryDataDirect(
+      "org",
+      "Project",
+      "Team",
+      "pat",
+      "2025-12-29",
+      "2026-01-11",
+      ["Done"],
+      ["Bug"],
+    );
+
+    expect(result.weeklyThroughput).toEqual([
+      { week: "2025-12-29", throughput: 0 },
+      { week: "2026-01-05", throughput: 0 },
+    ]);
+    expect(result.cycleTimeDaysData).toEqual([]);
+  });
 });

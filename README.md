@@ -176,14 +176,17 @@ une connexion Azure DevOps réelle.
   partielle, période complète et période finale partielle. Un intervalle court couvrant les deux bords porte
   son propre statut ; les diagnostics identifient chaque bord incomplet et Azure DevOps ne consomme que la
   variante `complete`, sans valeur par défaut susceptible de requalifier un bord.
+- **Chronologie delivery qualifiée une fois.** Le domaine impose l’ordre `work_started`, `work_completed`,
+  puis `item_delivered`, tout en acceptant des instants simultanés. Une inversion rejette l’item des calculs
+  et reste localisée dans un diagnostic immuable ; throughput et Cycle Time consomment ce résultat commun.
 - **Throughput delivery unique.** Le domaine delivery compte les faits `item_delivered` dans la période
   complète et produit une valeur en `delivered_items_per_complete_iso_week`, semaines sans livraison
   comprises. Le client Azure DevOps ne possède plus de filtre, regroupement ou remplissage hebdomadaire
   concurrent ; une garde statique bloque leur réintroduction hors de cette autorité.
 - **Cycle Time sous autorité delivery.** Le domaine transforme seul les premiers faits `work_started` et
   `work_completed` d’un item en jours calendaires arrondis à deux décimales, regroupés par semaine de
-  complétion. Les cycles incomplets ou chronologiquement inversés sont exclus ; les tendances et libellés de
-  restitution restent des consommateurs inchangés de ces observations.
+  complétion. Les cycles incomplets sont exclus après qualification chronologique ; les tendances et libellés
+  de restitution restent des consommateurs inchangés de ces observations.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 
