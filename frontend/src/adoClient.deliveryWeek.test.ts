@@ -42,6 +42,44 @@ describe("adoClient delivery calendar migration", () => {
     expect(result.cycleTimeDaysData).toEqual([
       { week: "2025-12-29", cycleTimeDays: 0.02, count: 1 },
     ]);
+    expect(result.warning).toBeUndefined();
+  });
+
+  it("uses delivery continuity for successful but incomplete collection batches", async () => {
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify({ values: [] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ workItems: [{ id: 1 }, { id: 2 }] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ value: [
+        { id: 2, fields: { "Microsoft.VSTS.Common.ClosedDate": "2026-01-06T10:00:00Z" } },
+      ] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ value: [] }), { status: 200 }));
+
+    const result = await getTeamDeliveryDataDirect(
+      "org", "Project", "Team", "partial-success", "2026-01-05", "2026-01-18", ["Done"], [],
+    );
+
+    expect(result.warning).toContain("historique partiel");
+    expect(result.warning).toContain("1/2 evenement(s)");
+    expect(result.warning).toContain("1 rupture(s)");
+    expect(result.warning).not.toContain("Collecte des work items interrompue");
+  });
+
+  it("uses delivery ambiguity for an unavailable event history", async () => {
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response(JSON.stringify({ values: [] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ workItems: [{ id: 1 }] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ value: [
+        { id: 1, fields: { "Microsoft.VSTS.Common.ClosedDate": "2026-01-06T10:00:00Z" } },
+      ] }), { status: 200 }))
+      .mockRejectedValueOnce(new Error("revisions offline"));
+
+    const result = await getTeamDeliveryDataDirect(
+      "org", "Project", "Team", "ambiguous-revisions", "2026-01-05", "2026-01-18", ["Done"], [],
+    );
+
+    expect(result.warning).toContain("Historique ambigu");
+    expect(result.warning).toContain("cycle time");
+    expect(result.warning).toContain("erreur reseau");
   });
 
   it("delegates an impossible Azure lifecycle to the delivery chronology authority", async () => {

@@ -2,6 +2,17 @@
 
 ## Recent
 
+### Continuité de l’historique sous autorité delivery — PBI 7.28
+
+- ajout du résultat immuable `DeliveryHistory`, qui distingue `continuous`, `discontinuous` et `ambiguous`
+  et conserve compteurs et diagnostics stables de la suite d’événements attendue ;
+- diagnostic séparé de chaque plage d’événements `item_delivered` manquants ; une collecte vide réussie reste
+  une absence réelle d’activité, tandis qu’une histoire de révisions indisponible ou une séquence dupliquée
+  ou inattendue demeure ambiguë ;
+- migration du client Azure DevOps vers cette autorité avant la qualification chronologique, avec retrait de
+  la qualification locale fondée sur `batchFailures` et ajout d’une garde contre son retour, sans récupération
+  ni nouvelle tentative sur les lots absents.
+
 ### Cohérence chronologique sous autorité delivery — PBI 7.29
 
 - ajout d’un résultat métier immuable qui ordonne `work_started`, `work_completed`, puis `item_delivered`,

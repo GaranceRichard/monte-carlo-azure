@@ -45,13 +45,13 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     features = check_backlog_consistency.parse_registry(backlog)
 
     assert sum(len(feature.pbis) for feature in features) == 204
-    assert sum(feature.completed_count for feature in features) == 56
+    assert sum(feature.completed_count for feature in features) == 57
     feature_two = next(feature for feature in features if feature.number == 2)
     assert feature_two.completed_count == 21
     assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == []
     feature_seven = next(feature for feature in features if feature.number == 7)
     assert len(feature_seven.pbis) == 75
-    assert feature_seven.completed_count == 24
+    assert feature_seven.completed_count == 25
     assert [
         (pbi.identifier, pbi.completed_on)
         for pbi in feature_seven.pbis
@@ -78,20 +78,21 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
         ("7.24", "06/09/2026"),
         ("7.25", "06/09/2026"),
         ("7.26", "06/09/2026"),
+        ("7.28", "07/09/2026"),
         ("7.29", "07/09/2026"),
         ("7.31", "27/08/2026"),
         ("7.32", "23/08/2026"),
     ]
     assert check_backlog_consistency.feature_priority(governance, features) == 7
     assert "Feature en cours :** Feature 7" in backlog
-    assert "24/75 PBI réalisés (32 %)" in backlog
+    assert "25/75 PBI réalisés (33,33 %)" in backlog
     assert (
         "Prochain PBI :** 7.14 — "
         "Les adaptateurs restent indépendants entre eux"
         in backlog
     )
-    assert "Progression globale :** 56/204 PBI réalisés (27,45 %) ; 148 restants" in backlog
-    assert "Répartition actuelle des 148 PBI non réalisés" in governance
+    assert "Progression globale :** 57/204 PBI réalisés (27,94 %) ; 147 restants" in backlog
+    assert "Répartition actuelle des 147 PBI non réalisés" in governance
     assert (
         "Dernière Feature terminée :** Feature 2 — "
         "Garantir la fiabilité du cœur statistique"

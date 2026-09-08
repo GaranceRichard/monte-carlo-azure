@@ -439,7 +439,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Distinguer une absence réelle d’activité d’un trou de collecte.
 - **Frontière principale :** Domaine delivery.
 - **Famille d’invariants :** Continuité de l’historique.
-- **Preuve principale :** Tests des séquences continues, discontinues et ambiguës.
+- **Preuve principale :** [Tests des séquences continues, discontinues et ambiguës](../../frontend/src/domain/delivery/historyContinuity.test.ts), [migration Azure DevOps](../../frontend/src/adoClient.deliveryWeek.test.ts) et [garde d’unicité](../../tests/test_delivery_history_continuity_authority.py).
 - **Éléments de réalisation inclus :** Règle ; diagnostic ; intégration au résultat delivery ; tests ; documentation métier.
 - **Hors périmètre :** Récupération fonctionnelle des lots manquants relevant de la Feature 8.
 - **Surface prévisionnelle :** 5 fichiers de production ; 10 fichiers versionnés

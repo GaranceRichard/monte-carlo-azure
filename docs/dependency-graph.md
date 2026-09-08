@@ -15,15 +15,15 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 282 | 1454 | 84 | 5 | 0 | 0 | 139 | 2 |
+| 283 | 1457 | 84 | 5 | 0 | 0 | 139 | 2 |
 
 ### Directions observées
 
 | Source | Cible | Phase | Arêtes |
 | --- | --- | --- | --- |
 | backend | backend | runtime | 39 |
-| frontend | frontend | compile | 106 |
-| frontend | frontend | runtime | 167 |
+| frontend | frontend | compile | 107 |
+| frontend | frontend | runtime | 169 |
 | launcher | backend | runtime | 1 |
 | quality | backend | runtime | 5 |
 | quality | frontend | runtime | 3 |
@@ -155,7 +155,7 @@ Ces listes signalent des surfaces à examiner ; elles ne déclarent ni dépendan
 | frontend/src/adapters/browser/clock/index.ts | frontend/src/ports/clock/index.ts | 1 | compile | frontend/src/ports |
 | frontend/src/adapters/seededSampleIndexDrawPort.ts | frontend/src/domain/sampleIndexDrawPort.ts | 1 | compile | frontend/src/domain |
 | frontend/src/adapters/seededSampleIndexDrawPort.ts | frontend/src/domain/simulationValueObjects.ts | 2 | compile | frontend/src/domain |
-| frontend/src/adoClient.ts | frontend/src/adapters/azure-devops/deliveryEventMappers.ts | 11 | runtime | frontend/src/adapters |
+| frontend/src/adoClient.ts | frontend/src/adapters/azure-devops/deliveryEventMappers.ts | 12 | runtime | frontend/src/adapters |
 | frontend/src/adoClient.ts | frontend/src/domain/delivery/index.ts | 3 | runtime | frontend/src/domain |
 | frontend/src/api.ts | frontend/src/api/simulationDtos.ts | 6 | compile | frontend/src/api |
 | frontend/src/api/simulationMappers.ts | frontend/src/domain/simulation.ts | 1 | compile | frontend/src/domain |

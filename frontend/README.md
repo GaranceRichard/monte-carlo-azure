@@ -88,6 +88,13 @@ dans l’unité `delivered_items_per_complete_iso_week`. Sa transformation appli
 période, le regroupement UTC et les semaines à zéro ; le client Azure DevOps lui délègue les événements
 normalisés. Cette définition ne constitue pas une analyse de stabilité du flux.
 
+`createDeliveryHistory` compare la séquence ordonnée des livraisons attendues aux faits normalisés. Le
+résultat immuable conserve le statut `continuous`, `discontinuous` ou `ambiguous`, ses compteurs et ses
+diagnostics : chaque plage contiguë d’événements attendus absents est positionnée, tandis qu’une lecture de
+révisions indisponible ou une séquence dupliquée/inattendue reste ambiguë. Une collecte réussie sans item est
+donc continue et représente une absence réelle d’activité. `adoClient` consomme ce résultat pour qualifier
+ses avertissements ; il ne recalcule pas la continuité et ne relance aucun lot manquant.
+
 Avant throughput et Cycle Time, `qualifyDeliveryChronology` compare les premiers faits de chaque item selon
 l’ordre `work_started`, `work_completed`, puis `item_delivered`. Les égalités d’instant sont valides. Une
 inversion rejette tous les événements de l’item et produit, pour chaque relation impossible, le code stable

@@ -176,6 +176,11 @@ une connexion Azure DevOps réelle.
   partielle, période complète et période finale partielle. Un intervalle court couvrant les deux bords porte
   son propre statut ; les diagnostics identifient chaque bord incomplet et Azure DevOps ne consomme que la
   variante `complete`, sans valeur par défaut susceptible de requalifier un bord.
+- **Continuité historique qualifiée.** Le résultat `DeliveryHistory` distingue une suite `continuous`,
+  `discontinuous` ou `ambiguous`. Une collecte réussie sans événement reste une absence d’activité valide ;
+  chaque plage d’événements attendus manquants produit un diagnostic positionné, tandis qu’une histoire
+  d’événements indisponible ou irréconciliable reste explicitement ambiguë. Le client Azure DevOps consomme
+  ce résultat sans détecteur local et ne tente aucune récupération des lots absents.
 - **Chronologie delivery qualifiée une fois.** Le domaine impose l’ordre `work_started`, `work_completed`,
   puis `item_delivered`, tout en acceptant des instants simultanés. Une inversion rejette l’item des calculs
   et reste localisée dans un diagnostic immuable ; throughput et Cycle Time consomment ce résultat commun.

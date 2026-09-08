@@ -3,6 +3,7 @@ import type { WeeklyThroughputRow } from "./types";
 import {
   calculateCycleTime,
   calculateDeliveryThroughput,
+  createDeliveryHistory,
   qualifyDeliveryChronology,
   selectDeliveryHistoryEvents,
   type CycleTimePoint,
@@ -45,7 +46,11 @@ type AdoTeam = { id: string; name: string };
 type TeamFieldValue = { value?: string; includeChildren?: boolean };
 type ProfileMe = { id?: string; publicAlias?: string; displayName?: string };
 type WeeklyThroughputResponse = WeeklyThroughputRow[] | { weeklyThroughput: WeeklyThroughputRow[]; warning?: string };
-type TeamDeliveryDataResponse = { weeklyThroughput: WeeklyThroughputRow[]; cycleTimeDaysData: CycleTimePoint[]; warning?: string };
+type TeamDeliveryDataResponse = {
+  weeklyThroughput: WeeklyThroughputRow[];
+  cycleTimeDaysData: CycleTimePoint[];
+  warning?: string;
+};
 type ResolvedPatProfile = {
   displayName: string;
   id: string;
@@ -540,8 +545,8 @@ export async function getTeamDeliveryDataDirect(
   const wiqlData = await wiqlResp.json();
   const items: { id: number }[] = wiqlData.workItems ?? [];
   const deliveryEvents: DeliveryEvent[] = [];
-  const batchFailures: { status: number | null; statusText: string }[] = [];
-  const cycleTimeFailures: { status: number | null; statusText: string }[] = [];
+  const batchFailureDetails: string[] = [];
+  const cycleTimeFailures: { itemId: number; detail: string }[] = [];
   const ids = items.map((i) => i.id);
   const batches: number[][] = [];
   for (let i = 0; i < ids.length; i += 200) batches.push(ids.slice(i, i + 200));
@@ -565,12 +570,16 @@ export async function getTeamDeliveryDataDirect(
             itemContext,
           );
         } catch {
-          batchFailures.push({ status: null, statusText: "erreur reseau" });
+          batchFailureDetails.push("erreur reseau");
           return;
         }
 
         if (!r.ok) {
-          batchFailures.push({ status: r.status, statusText: r.statusText });
+          batchFailureDetails.push(formatAdoHttpErrorMessage(
+            r.status,
+            itemContext,
+            r.statusText,
+          ));
           return;
         }
 
@@ -597,12 +606,19 @@ export async function getTeamDeliveryDataDirect(
                 revisionContext,
               );
             } catch {
-              cycleTimeFailures.push({ status: null, statusText: "erreur reseau" });
+              cycleTimeFailures.push({ itemId: item.id, detail: "erreur reseau" });
               return;
             }
 
             if (!revisionResponse.ok) {
-              cycleTimeFailures.push({ status: revisionResponse.status, statusText: revisionResponse.statusText });
+              cycleTimeFailures.push({
+                itemId: item.id,
+                detail: formatAdoHttpErrorMessage(
+                  revisionResponse.status,
+                  revisionContext,
+                  revisionResponse.statusText,
+                ),
+              });
               return;
             }
 
@@ -615,50 +631,39 @@ export async function getTeamDeliveryDataDirect(
     );
   }
 
-  const selectedDeliveryEvents = selectDeliveryHistoryEvents(completePeriod, deliveryEvents);
+  const deliveryHistory = createDeliveryHistory({
+    expectedDeliveredItemIds: ids.map(String),
+    events: deliveryEvents,
+    unavailableEventHistoryItemIds: cycleTimeFailures.map(({ itemId }) => String(itemId)),
+  });
+  const selectedDeliveryEvents = selectDeliveryHistoryEvents(completePeriod, deliveryHistory.events);
   const deliveryChronology = qualifyDeliveryChronology(selectedDeliveryEvents);
   const weeklyThroughput = calculateDeliveryThroughput(completePeriod, deliveryChronology);
 
   const warnings: string[] = [];
-  if (batchFailures.length) {
-    const firstFailure = batchFailures[0];
-    const firstFailureDetail = firstFailure.status === null
-      ? "erreur reseau"
-      : formatAdoHttpErrorMessage(
-        firstFailure.status,
-        {
-          operation: "chargement des work items par lots",
-          org,
-          project,
-          team,
-          requiredScopes: ["Work Items (Read)"],
-        },
-        firstFailure.statusText,
-      );
+  if (deliveryHistory.continuity === "discontinuous") {
     warnings.push(
-      `${batchFailures.length}/${batches.length} lot(s) de work items n'ont pas pu etre charges. ` +
-        `La simulation utilise un historique partiel. Exemple: ${firstFailureDetail}`,
+      `La simulation utilise un historique partiel : ${deliveryHistory.missingDeliveredEventCount}/` +
+        `${deliveryHistory.expectedDeliveredEventCount} evenement(s) delivery attendu(s) ` +
+        `manquent dans ${deliveryHistory.gapCount} rupture(s) detectee(s).`,
     );
+  }
+  if (deliveryHistory.continuity === "ambiguous") {
+    warnings.push(
+      "Historique ambigu : le diagnostic delivery ne permet pas de confirmer une suite " +
+        `continue.${deliveryHistory.missingDeliveredEventCount > 0
+          ? ` ${deliveryHistory.missingDeliveredEventCount} evenement(s) attendu(s) manquent.`
+          : ""}`,
+    );
+  }
+  if (batchFailureDetails.length) {
+    warnings.push(`Collecte des work items interrompue. Exemple: ${batchFailureDetails[0]}`);
   }
 
   if (cycleTimeFailures.length) {
-    const firstFailure = cycleTimeFailures[0];
-    const firstFailureDetail = firstFailure.status === null
-      ? "erreur reseau"
-      : formatAdoHttpErrorMessage(
-        firstFailure.status,
-        {
-          operation: "chargement des revisions de work items",
-          org,
-          project,
-          team,
-          requiredScopes: ["Work Items (Read)"],
-        },
-        firstFailure.statusText,
-      );
     warnings.push(
       `${cycleTimeFailures.length} revision(s) de work items n'ont pas pu etre chargees pour le cycle time. ` +
-        `Exemple: ${firstFailureDetail}`,
+        `Exemple: ${cycleTimeFailures[0]?.detail ?? "erreur inconnue"}`,
     );
   }
 

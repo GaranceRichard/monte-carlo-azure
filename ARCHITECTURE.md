@@ -104,6 +104,10 @@ Invariants de préparation du throughput côté frontend :
 - le throughput delivery est défini comme le nombre de faits `item_delivered` par semaine ISO complète,
   dans l’unité `delivered_items_per_complete_iso_week` ; `domain/delivery/throughput.ts` applique seul la
   fenêtre semi-ouverte, le regroupement et la conservation explicite des semaines à zéro ;
+- la continuité compare la séquence ordonnée des faits `item_delivered` attendus aux événements normalisés :
+  aucune attente et aucun événement signifie une absence d’activité `continuous`, chaque plage attendue
+  manquante forme une rupture `discontinuous`, et une histoire d’événements indisponible, dupliquée ou
+  inattendue rend le résultat `ambiguous` ; `DeliveryHistory` conserve les diagnostics et leurs positions ;
 - le throughput Azure DevOps, le Cycle Time et l’agrégation corrélée portefeuille utilisent tous le Value
   Object `DeliveryWeek` fourni par cette politique ;
 - la chronologie delivery suit l’ordre `work_started`, `work_completed`, puis `item_delivered` sur les
@@ -171,6 +175,7 @@ frontend/
         cycleTime.ts         # définition et transformation uniques du Cycle Time
         deliveryEvent.ts    # identité opaque, faits fermés et instant absolu immuable
         deliveryWeek.ts     # semaine ISO et politique métier UTC uniques
+        historyContinuity.ts # résultat, statuts et diagnostics de continuité historique
         historicalPeriod.ts # statuts complet/partiels et diagnostics des bords
         historicalWindow.ts # bornes absolues et sélection cohésive de l’historique
         throughput.ts       # événements livrés -> items livrés par semaine ISO complète
@@ -1009,6 +1014,9 @@ Frontend :
 - chronologie possédée par le même domaine : résultat immuable séparant événements cohérents et rejetés,
   diagnostics localisés par relation inversée et simultanéités explicitement acceptées ; throughput et
   Cycle Time exigent ce résultat, sans validation concurrente dans leurs modules
+- continuité historique possédée par le même domaine : le résultat immuable conserve événements, statut,
+  compteurs et un diagnostic stable par rupture détectable ; `adoClient.ts` fournit les attentes et les
+  histoires indisponibles, puis consomme cette autorité sans détection concurrente ni récupération de lot
 - throughput possédé par le même domaine : comptage des seuls faits `item_delivered` dans le cœur complet,
   unité `delivered_items_per_complete_iso_week` et semaines sans livraison conservées ; `adoClient.ts`
   délègue cette transformation sans boucle locale concurrente

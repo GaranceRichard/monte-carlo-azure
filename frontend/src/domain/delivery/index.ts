@@ -17,6 +17,11 @@ export {
   selectDeliveryHistoryEvents,
 } from "./historicalWindow";
 export {
+  createDeliveryHistory,
+  DELIVERY_HISTORY_CONTINUITY_DEFINITION,
+  DELIVERY_HISTORY_CONTINUITY_STATUSES,
+} from "./historyContinuity";
+export {
   createDeliveryHistoryPeriods,
   DELIVERY_HISTORY_PERIOD_STATUSES,
 } from "./historicalPeriod";
@@ -47,6 +52,15 @@ export type {
   DeliveryHistoryWindow,
   DeliveryHistoryWindowInput,
 } from "./historicalWindow";
+export type {
+  DeliveryHistory,
+  DeliveryHistoryAmbiguityDiagnostic,
+  DeliveryHistoryAmbiguityReason,
+  DeliveryHistoryContinuityDiagnostic,
+  DeliveryHistoryContinuityStatus,
+  DeliveryHistoryGapDiagnostic,
+  DeliveryHistoryInput,
+} from "./historyContinuity";
 export type {
   CompleteDeliveryHistoryPeriod,
   DeliveryHistoryPeriod,

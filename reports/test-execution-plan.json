@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1238,
+      "logicalCases": 1248,
       "nodes": [
         {
           "id": "preflight",
@@ -237,6 +237,8 @@
             "pytest:tests/test_delivery_chronology_authority.py::test_delivery_calculators_require_the_chronology_result",
             "pytest:tests/test_delivery_chronology_authority.py::test_delivery_chronology_has_one_production_authority",
             "pytest:tests/test_delivery_chronology_authority.py::test_no_competing_started_completed_order_validation_exists",
+            "pytest:tests/test_delivery_history_continuity_authority.py::test_azure_devops_consumer_uses_the_delivery_result_without_local_detection",
+            "pytest:tests/test_delivery_history_continuity_authority.py::test_delivery_history_continuity_has_one_production_authority",
             "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
             "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
             "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
@@ -631,18 +633,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 508
+            "pytest": 510
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 46,
+            "integration": 48,
             "unit": 334
           },
           "criticalities": {
             "critical": 74,
             "high": 16,
-            "unassigned": 418
+            "unassigned": 420
           }
         },
         {
@@ -697,8 +699,10 @@
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > rejects invalid sampleCount %s without normalization [43:35]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > reproduces exactly the previous createSeededRandom suite [16:3]",
-            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [47:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [85:3]",
             "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > uses delivery ambiguity for an unavailable event history [67:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > uses delivery continuity for successful but incomplete collection batches [48:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > counts resolved items with ResolvedDate when ClosedDate is missing [52:3]",
@@ -1046,6 +1050,12 @@
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > distinguishes a continuous zero-activity history from a collection gap [30:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > emits one stable diagnostic for each detectable rupture [66:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > keeps a rupture reaching the end of the expected sequence [101:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > publishes an immutable and closed continuity policy [15:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > qualifies irreconcilable and unavailable event histories as ambiguous [117:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > rejects an expected identity outside the delivery identity contract [159:3]",
             "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [62:3]",
             "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [45:3]",
             "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [36:3]",
@@ -1399,15 +1409,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 730
+            "vitest": 738
           },
           "natures": {
-            "component": 333,
-            "unit": 397
+            "component": 335,
+            "unit": 403
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 622
+            "unassigned": 630
           }
         },
         {
@@ -1513,7 +1523,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1528,
+      "logicalCases": 1538,
       "nodes": [
         {
           "id": "preflight",
@@ -1856,6 +1866,8 @@
             "pytest:tests/test_delivery_chronology_authority.py::test_delivery_calculators_require_the_chronology_result",
             "pytest:tests/test_delivery_chronology_authority.py::test_delivery_chronology_has_one_production_authority",
             "pytest:tests/test_delivery_chronology_authority.py::test_no_competing_started_completed_order_validation_exists",
+            "pytest:tests/test_delivery_history_continuity_authority.py::test_azure_devops_consumer_uses_the_delivery_result_without_local_detection",
+            "pytest:tests/test_delivery_history_continuity_authority.py::test_delivery_history_continuity_has_one_production_authority",
             "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
             "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
             "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
@@ -2500,18 +2512,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 766
+            "pytest": 768
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 302,
+            "integration": 304,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 659
+            "unassigned": 661
           }
         },
         {
@@ -2566,8 +2578,10 @@
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > rejects invalid sampleCount %s without normalization [43:35]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > reproduces exactly the previous createSeededRandom suite [16:3]",
-            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [47:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [85:3]",
             "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > uses delivery ambiguity for an unavailable event history [67:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > uses delivery continuity for successful but incomplete collection batches [48:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > counts resolved items with ResolvedDate when ClosedDate is missing [52:3]",
@@ -2915,6 +2929,12 @@
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > distinguishes a continuous zero-activity history from a collection gap [30:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > emits one stable diagnostic for each detectable rupture [66:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > keeps a rupture reaching the end of the expected sequence [101:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > publishes an immutable and closed continuity policy [15:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > qualifies irreconcilable and unavailable event histories as ambiguous [117:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > rejects an expected identity outside the delivery identity contract [159:3]",
             "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [62:3]",
             "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [45:3]",
             "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [36:3]",
@@ -3268,15 +3288,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 730
+            "vitest": 738
           },
           "natures": {
-            "component": 333,
-            "unit": 397
+            "component": 335,
+            "unit": 403
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 622
+            "unassigned": 630
           }
         },
         {
@@ -3483,7 +3503,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1528,
+      "logicalCases": 1538,
       "nodes": [
         {
           "id": "preflight",
@@ -3826,6 +3846,8 @@
             "pytest:tests/test_delivery_chronology_authority.py::test_delivery_calculators_require_the_chronology_result",
             "pytest:tests/test_delivery_chronology_authority.py::test_delivery_chronology_has_one_production_authority",
             "pytest:tests/test_delivery_chronology_authority.py::test_no_competing_started_completed_order_validation_exists",
+            "pytest:tests/test_delivery_history_continuity_authority.py::test_azure_devops_consumer_uses_the_delivery_result_without_local_detection",
+            "pytest:tests/test_delivery_history_continuity_authority.py::test_delivery_history_continuity_has_one_production_authority",
             "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
             "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
             "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
@@ -4470,18 +4492,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 766
+            "pytest": 768
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 302,
+            "integration": 304,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 659
+            "unassigned": 661
           }
         },
         {
@@ -4536,8 +4558,10 @@
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > rejects invalid sampleCount %s without normalization [43:35]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > reproduces exactly the previous createSeededRandom suite [16:3]",
-            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [47:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [85:3]",
             "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > uses delivery ambiguity for an unavailable event history [67:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > uses delivery continuity for successful but incomplete collection batches [48:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > counts resolved items with ResolvedDate when ClosedDate is missing [52:3]",
@@ -4885,6 +4909,12 @@
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > distinguishes a continuous zero-activity history from a collection gap [30:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > emits one stable diagnostic for each detectable rupture [66:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > keeps a rupture reaching the end of the expected sequence [101:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > publishes an immutable and closed continuity policy [15:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > qualifies irreconcilable and unavailable event histories as ambiguous [117:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > rejects an expected identity outside the delivery identity contract [159:3]",
             "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [62:3]",
             "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [45:3]",
             "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [36:3]",
@@ -5238,15 +5268,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 730
+            "vitest": 738
           },
           "natures": {
-            "component": 333,
-            "unit": 397
+            "component": 335,
+            "unit": 403
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 622
+            "unassigned": 630
           }
         },
         {
@@ -5453,7 +5483,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1528,
+      "logicalCases": 1538,
       "nodes": [
         {
           "id": "preflight",
@@ -5796,6 +5826,8 @@
             "pytest:tests/test_delivery_chronology_authority.py::test_delivery_calculators_require_the_chronology_result",
             "pytest:tests/test_delivery_chronology_authority.py::test_delivery_chronology_has_one_production_authority",
             "pytest:tests/test_delivery_chronology_authority.py::test_no_competing_started_completed_order_validation_exists",
+            "pytest:tests/test_delivery_history_continuity_authority.py::test_azure_devops_consumer_uses_the_delivery_result_without_local_detection",
+            "pytest:tests/test_delivery_history_continuity_authority.py::test_delivery_history_continuity_has_one_production_authority",
             "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
             "pytest:tests/test_delivery_throughput_authority.py::test_delivery_event_throughput_has_one_production_authority",
             "pytest:tests/test_dependency_authority.py::test_changed_normative_decision_hash_is_localized",
@@ -6440,18 +6472,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 766
+            "pytest": 768
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 302,
+            "integration": 304,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 659
+            "unassigned": 661
           }
         },
         {
@@ -6506,8 +6538,10 @@
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > always returns integer indices inside the requested bound [30:3]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > rejects invalid sampleCount %s without normalization [43:35]",
             "vitest:frontend/src/adapters/seededSampleIndexDrawPort.test.ts::createSeededSampleIndexDrawPort > reproduces exactly the previous createSeededRandom suite [16:3]",
-            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [47:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [85:3]",
             "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > groups throughput and Cycle Time with the same UTC ISO week at an offset boundary [9:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > uses delivery ambiguity for an unavailable event history [67:3]",
+            "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > uses delivery continuity for successful but incomplete collection batches [48:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
             "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > counts resolved items with ResolvedDate when ClosedDate is missing [52:3]",
@@ -6855,6 +6889,12 @@
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > rejects invalid or reversed bounds [32:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects delivered items on inclusive-start and exclusive-end bounds [43:3]",
             "vitest:frontend/src/domain/delivery/historicalWindow.test.ts::DeliveryHistoryWindow > selects no event from an empty window [69:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > distinguishes a continuous zero-activity history from a collection gap [30:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > emits one stable diagnostic for each detectable rupture [66:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > keeps a rupture reaching the end of the expected sequence [101:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > publishes an immutable and closed continuity policy [15:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > qualifies irreconcilable and unavailable event histories as ambiguous [117:3]",
+            "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > rejects an expected identity outside the delivery identity contract [159:3]",
             "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > applies absolute, start-inclusive and end-exclusive boundaries [62:3]",
             "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > counts delivery facts per complete ISO week and preserves zero weeks [45:3]",
             "vitest:frontend/src/domain/delivery/throughput.test.ts::delivery throughput > publishes the counted fact, period and unit as an immutable definition [36:3]",
@@ -7208,15 +7248,15 @@
             "vitest:frontend/src/utils/teamSort.test.ts::sortTeams > uses full normalized name as secondary sort when prefixes match [19:3]"
           ],
           "frameworks": {
-            "vitest": 730
+            "vitest": 738
           },
           "natures": {
-            "component": 333,
-            "unit": 397
+            "component": 335,
+            "unit": 403
           },
           "criticalities": {
             "critical": 108,
-            "unassigned": 622
+            "unassigned": 630
           }
         },
         {

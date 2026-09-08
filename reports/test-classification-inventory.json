@@ -2880,6 +2880,37 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_delivery_history_continuity_authority.py::test_azure_devops_consumer_uses_the_delivery_result_without_local_detection",
+    "framework": "pytest",
+    "sourcePath": "tests/test_delivery_history_continuity_authority.py",
+    "selector": "test_azure_devops_consumer_uses_the_delivery_result_without_local_detection",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "azure_devops",
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_delivery_history_continuity_authority.py::test_delivery_history_continuity_has_one_production_authority",
+    "framework": "pytest",
+    "sourcePath": "tests/test_delivery_history_continuity_authority.py",
+    "selector": "test_delivery_history_continuity_has_one_production_authority",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_delivery_throughput_authority.py::test_azure_devops_consumer_delegates_without_a_local_variant",
     "framework": "pytest",
     "sourcePath": "tests/test_delivery_throughput_authority.py",
@@ -13590,10 +13621,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [47:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [85:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.deliveryWeek.test.ts",
-    "selector": "adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [47:3]",
+    "selector": "adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [85:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -13622,6 +13653,44 @@
     "domains": [
       "azure_devops",
       "data",
+      "api"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > uses delivery ambiguity for an unavailable event history [67:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/adoClient.deliveryWeek.test.ts",
+    "selector": "adoClient delivery calendar migration > uses delivery ambiguity for an unavailable event history [67:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional",
+      "resilience",
+      "migration_recovery"
+    ],
+    "domains": [
+      "azure_devops",
+      "api",
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > uses delivery continuity for successful but incomplete collection batches [48:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/adoClient.deliveryWeek.test.ts",
+    "selector": "adoClient delivery calendar migration > uses delivery continuity for successful but incomplete collection batches [48:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional",
+      "performance",
+      "migration_recovery",
+      "data_quality"
+    ],
+    "domains": [
+      "azure_devops",
       "api"
     ]
   },
@@ -20465,6 +20534,99 @@
       "functional"
     ],
     "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > distinguishes a continuous zero-activity history from a collection gap [30:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historyContinuity.test.ts",
+    "selector": "delivery history continuity > distinguishes a continuous zero-activity history from a collection gap [30:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > emits one stable diagnostic for each detectable rupture [66:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historyContinuity.test.ts",
+    "selector": "delivery history continuity > emits one stable diagnostic for each detectable rupture [66:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > keeps a rupture reaching the end of the expected sequence [101:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historyContinuity.test.ts",
+    "selector": "delivery history continuity > keeps a rupture reaching the end of the expected sequence [101:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > publishes an immutable and closed continuity policy [15:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historyContinuity.test.ts",
+    "selector": "delivery history continuity > publishes an immutable and closed continuity policy [15:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > qualifies irreconcilable and unavailable event histories as ambiguous [117:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historyContinuity.test.ts",
+    "selector": "delivery history continuity > qualifies irreconcilable and unavailable event histories as ambiguous [117:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "resilience"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/domain/delivery/historyContinuity.test.ts::delivery history continuity > rejects an expected identity outside the delivery identity contract [159:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/domain/delivery/historyContinuity.test.ts",
+    "selector": "delivery history continuity > rejects an expected identity outside the delivery identity contract [159:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
       "history"
     ]
   },
