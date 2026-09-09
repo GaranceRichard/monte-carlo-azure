@@ -12,8 +12,8 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 288,
-    "importEdges": 1481,
+    "sourceModules": 293,
+    "importEdges": 1517,
     "entrypoints": 84,
     "missingEntrypoints": 5,
     "cycles": 0,
@@ -185,6 +185,31 @@
       },
       {
         "path": "Scripts/dependency_authority_domain.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/dependency_authority_dto.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/dependency_authority_dto_contract.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/dependency_authority_dto_javascript.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/dependency_authority_dto_public_api.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/dependency_authority_dto_python.py",
         "area": "quality",
         "language": "python"
       },
@@ -2142,8 +2167,17 @@
       },
       {
         "source": "Scripts/check_dependency_authority.py",
-        "target": "Scripts/dependency_authority_public_api.py",
+        "target": "Scripts/dependency_authority_dto.py",
         "line": 33,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_dto.inspect_repository_dto_confinement",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/check_dependency_authority.py",
+        "target": "Scripts/dependency_authority_public_api.py",
+        "line": 38,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "Scripts.dependency_authority_public_api.inspect_repository_public_apis",
@@ -3335,6 +3369,321 @@
         "kind": "python-import",
         "phase": "runtime",
         "specifier": "sys",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto.py",
+        "target": "Scripts/dependency_authority.py",
+        "line": 7,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority.DependencyAuthority",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto.py",
+        "target": "Scripts/dependency_authority_contract.py",
+        "line": 8,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_contract.Diagnostic",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto.py",
+        "target": "Scripts/dependency_authority_domain.py",
+        "line": 9,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_domain.LocatedDiagnostic",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto.py",
+        "target": "Scripts/dependency_authority_dto_contract.py",
+        "line": 10,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_dto_contract.DtoDeclaration",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto.py",
+        "target": "Scripts/dependency_authority_dto_javascript.py",
+        "line": 15,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_dto_javascript.declarations",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto.py",
+        "target": "Scripts/dependency_authority_dto_public_api.py",
+        "line": 18,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_dto_public_api.public_diagnostics",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto.py",
+        "target": "Scripts/dependency_authority_dto_python.py",
+        "line": 19,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_dto_python.declarations",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto.py",
+        "target": "Scripts/dependency_authority_imports.py",
+        "line": 20,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_imports.repository_source_texts",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto.py",
+        "target": "Scripts/dependency_authority_javascript.py",
+        "line": 27,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_javascript.javascript_dependencies",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto.py",
+        "target": "Scripts/dependency_authority_public_api.py",
+        "line": 28,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_public_api.source_roots",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto.py",
+        "target": "external:python:pathlib",
+        "line": 5,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "pathlib",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_contract.py",
+        "target": "Scripts/dependency_authority_domain.py",
+        "line": 8,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_domain.LocatedDiagnostic",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_contract.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_contract.py",
+        "target": "external:python:dataclasses",
+        "line": 6,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "dataclasses",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_contract.py",
+        "target": "external:python:re",
+        "line": 5,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "re",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_javascript.py",
+        "target": "Scripts/dependency_authority_dto_contract.py",
+        "line": 7,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_dto_contract.DtoExposure",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_javascript.py",
+        "target": "Scripts/dependency_authority_javascript.py",
+        "line": 12,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_javascript._js_code_positions",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_javascript.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_javascript.py",
+        "target": "external:python:re",
+        "line": 5,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "re",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_public_api.py",
+        "target": "Scripts/dependency_authority_contract.py",
+        "line": 5,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_contract.Diagnostic",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_public_api.py",
+        "target": "Scripts/dependency_authority_domain.py",
+        "line": 6,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_domain.LocatedDiagnostic",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_public_api.py",
+        "target": "Scripts/dependency_authority_dto_contract.py",
+        "line": 7,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_dto_contract.DtoExposure",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_public_api.py",
+        "target": "Scripts/dependency_authority_dto_javascript.py",
+        "line": 8,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_dto_javascript.exposures",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_public_api.py",
+        "target": "Scripts/dependency_authority_dto_javascript.py",
+        "line": 11,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_dto_javascript.reexported_symbols",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_public_api.py",
+        "target": "Scripts/dependency_authority_dto_python.py",
+        "line": 12,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_dto_python.exposures",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_public_api.py",
+        "target": "Scripts/dependency_authority_dto_python.py",
+        "line": 13,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_dto_python.imported_symbols",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_public_api.py",
+        "target": "Scripts/dependency_authority_imports.py",
+        "line": 14,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_imports.ImportDependency",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_public_api.py",
+        "target": "Scripts/dependency_authority_public_api.py",
+        "line": 15,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_public_api.GovernedModule",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_public_api.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_python.py",
+        "target": "Scripts/dependency_authority_contract.py",
+        "line": 7,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_contract.Diagnostic",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_python.py",
+        "target": "Scripts/dependency_authority_domain.py",
+        "line": 8,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_domain.LocatedDiagnostic",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_python.py",
+        "target": "Scripts/dependency_authority_dto_contract.py",
+        "line": 9,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.dependency_authority_dto_contract.dto_names_in_text",
+        "resolution": "internal"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_python.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/dependency_authority_dto_python.py",
+        "target": "external:python:ast",
+        "line": 5,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "ast",
         "resolution": "external"
       },
       {
@@ -15022,7 +15371,7 @@
       },
       {
         "declaredIn": "Scripts/check_dependency_authority.py",
-        "line": 217,
+        "line": 279,
         "kind": "python-main-guard",
         "target": "Scripts/check_dependency_authority.py",
         "resolution": "internal"
@@ -15439,7 +15788,7 @@
         "sourceArea": "quality",
         "targetArea": "quality",
         "phase": "runtime",
-        "count": 272
+        "count": 298
       }
     ]
   },

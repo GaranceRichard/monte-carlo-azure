@@ -2,6 +2,15 @@
 
 ## Recent
 
+### DTO techniques confinés à leur frontière — PBI 7.15
+
+- ajout d’une règle architecturale qui attribue chaque DTO nommé ou modèle Python de sérialisation à sa
+  frontière technique gouvernée et refuse sa déclaration dans une couche intérieure ;
+- détection localisée des imports de DTO hors de leur propriétaire et des DTO ou signatures techniques
+  exposés par `index.*` ou `__init__.py`, y compris pour les imports de type et sous `TYPE_CHECKING` ;
+- couverture des mappages privés conformes et des fuites TypeScript/Python, sans allowlist, nouveau contrat
+  applicatif, modification des adaptateurs ni changement du comportement produit.
+
 ### Diagnostics delivery conservés par l’application — PBI 7.30
 
 - ajout du contrat public `TeamHistoryResult`, qui regroupe séparément les diagnostics de périodes partielles,

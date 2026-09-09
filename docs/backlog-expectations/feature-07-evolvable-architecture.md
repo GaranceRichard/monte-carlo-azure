@@ -256,7 +256,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Éviter que les formats techniques deviennent des contrats métier.
 - **Frontière principale :** Frontière des DTO techniques.
 - **Famille d’invariants :** Confinement des représentations techniques.
-- **Preuve principale :** Tests de fuites de DTO et de mappages conformes.
+- **Preuve principale :** [Tests des fuites de DTO et des mappages conformes](../../tests/test_dependency_dto_confinement.py), complétés par la [preuve du contrôle intégré](../../reports/dependency-authority-validation.json).
 - **Éléments de réalisation inclus :** Règle ; diagnostic ; tests ; intégration mécanique ; documentation ciblée.
 - **Hors périmètre :** Définition des modèles métier et comportement des adaptateurs.
 - **Surface prévisionnelle :** 3 fichiers de production ; 7 fichiers versionnés

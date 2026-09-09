@@ -28,6 +28,7 @@ from Scripts.dependency_authority_domain import (
     inspect_repository_domain,
     validate_domain_independence,
 )
+from Scripts.dependency_authority_dto import inspect_repository_dto_confinement
 from Scripts.dependency_authority_public_api import inspect_repository_public_apis
 from Scripts.dependency_authority_validation import validate_authority_document
 
@@ -74,11 +75,13 @@ def test_committed_evidence_is_a_fresh_deterministic_projection(capsys) -> None:
     domain_result = inspect_repository_domain(authority)
     public_api_result = inspect_repository_public_apis(authority)
     cycle_result = inspect_repository_module_cycles(authority)
+    dto_result = inspect_repository_dto_confinement(authority)
     committed = _json(ROOT / "reports" / "dependency-authority-validation.json")
 
     assert not domain_result.diagnostics
     assert not public_api_result.diagnostics
     assert not cycle_result.diagnostics
+    assert not dto_result.diagnostics
     assert committed == authority_evidence(
         authority,
         domain_files=domain_result.files,
@@ -90,6 +93,10 @@ def test_committed_evidence_is_a_fresh_deterministic_projection(capsys) -> None:
         deep_import_exceptions=public_api_result.exceptions,
         module_dependency_edges=len(cycle_result.module_edges),
         module_cycles=len(cycle_result.cycles),
+        dto_files=dto_result.files,
+        technical_dto_boundaries=dto_result.technical_boundaries,
+        technical_dto_declarations=dto_result.declarations,
+        dto_boundary_references=dto_result.boundary_references,
     )
     assert check_authority([]) == 0
     assert "36 directions" in capsys.readouterr().out

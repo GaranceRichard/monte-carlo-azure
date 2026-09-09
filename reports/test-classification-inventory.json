@@ -3404,6 +3404,94 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_dependency_dto_confinement.py::test_comments_strings_tests_and_unclassified_legacy_are_ignored",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_dto_confinement.py",
+    "selector": "test_comments_strings_tests_and_unclassified_legacy_are_ignored",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional",
+      "compatibility",
+      "migration_recovery"
+    ],
+    "domains": [
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_dto_confinement.py::test_direct_dto_imports_escape_their_owner_even_for_type_checking",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_dto_confinement.py",
+    "selector": "test_direct_dto_imports_escape_their_owner_even_for_type_checking",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_dto_confinement.py::test_dto_declarations_in_application_and_ports_are_rejected",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_dto_confinement.py",
+    "selector": "test_dto_declarations_in_application_and_ports_are_rejected",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "user_interface"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_dto_confinement.py::test_private_dtos_mapped_to_internal_contracts_are_allowed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_dto_confinement.py",
+    "selector": "test_private_dtos_mapped_to_internal_contracts_are_allowed",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_dto_confinement.py::test_public_adapter_entrypoints_cannot_reference_private_dtos",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_dto_confinement.py",
+    "selector": "test_public_adapter_entrypoints_cannot_reference_private_dtos",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "user_interface",
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_dependency_dto_confinement.py::test_repository_rule_is_integrated_and_scan_failures_are_actionable",
+    "framework": "pytest",
+    "sourcePath": "tests/test_dependency_dto_confinement.py",
+    "selector": "test_repository_rule_is_integrated_and_scan_failures_are_actionable",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_dependency_public_api.py::test_comments_strings_and_unrelated_imports_are_ignored",
     "framework": "pytest",
     "sourcePath": "tests/test_dependency_public_api.py",

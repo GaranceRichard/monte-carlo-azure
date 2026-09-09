@@ -141,8 +141,11 @@ une connexion Azure DevOps réelle.
   module gouverné et refuse les imports profonds avec fichier, ligne et frontière publique attendue ; les
   seules exceptions possibles sont des couples source/cible exacts, justifiés dans le manifeste. Il projette
   aussi les imports de production entre modules gouvernés et refuse tout cycle direct ou indirect, y compris
-  lorsqu’une arête est un import de type, avec le chemin fermé et chaque import localisé. Le module gouverné
-  `frontend/src/application/team-history/`, `frontend/src/application/team-forecast/` et
+  lorsqu’une arête est un import de type, avec le chemin fermé et chaque import localisé. Les DTO nommés et
+  modèles Python de sérialisation restent privés à leur frontière technique : le contrôle refuse leur
+  déclaration dans une couche intérieure, leur import depuis un autre module et leur exposition par l’API
+  publique de l’adaptateur, tout en autorisant un mapper privé qui retourne un contrat intérieur. Les modules
+  gouvernés `frontend/src/application/team-history/`, `frontend/src/application/team-forecast/` et
   `frontend/src/application/portfolio-forecast/` sont exposés uniquement par leur `index.ts` ; la preuve
   courante porte neuf modules, cinq arêtes inter-modules et zéro
   cycle. Le rendu du chemin suit le séparateur natif de la

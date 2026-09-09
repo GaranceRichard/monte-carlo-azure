@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1261,
+      "logicalCases": 1266,
       "nodes": [
         {
           "id": "preflight",
@@ -267,6 +267,11 @@
             "pytest:tests/test_dependency_cycles.py::test_indirect_cycle_is_rejected_with_a_canonical_closed_path",
             "pytest:tests/test_dependency_cycles.py::test_python_modules_are_checked_and_parse_errors_fail_closed",
             "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_frontend_application_contracts",
+            "pytest:tests/test_dependency_dto_confinement.py::test_comments_strings_tests_and_unclassified_legacy_are_ignored",
+            "pytest:tests/test_dependency_dto_confinement.py::test_direct_dto_imports_escape_their_owner_even_for_type_checking",
+            "pytest:tests/test_dependency_dto_confinement.py::test_dto_declarations_in_application_and_ports_are_rejected",
+            "pytest:tests/test_dependency_dto_confinement.py::test_private_dtos_mapped_to_internal_contracts_are_allowed",
+            "pytest:tests/test_dependency_dto_confinement.py::test_public_adapter_entrypoints_cannot_reference_private_dtos",
             "pytest:tests/test_dependency_public_api.py::test_comments_strings_and_unrelated_imports_are_ignored",
             "pytest:tests/test_dependency_public_api.py::test_exact_authorized_exception_does_not_cover_neighbors",
             "pytest:tests/test_dependency_public_api.py::test_javascript_deep_imports_are_localized_for_every_import_form",
@@ -635,18 +640,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 512
+            "pytest": 517
           },
           "natures": {
             "component": 81,
             "contract": 47,
             "integration": 50,
-            "unit": 334
+            "unit": 339
           },
           "criticalities": {
             "critical": 74,
             "high": 16,
-            "unassigned": 422
+            "unassigned": 427
           }
         },
         {
@@ -1536,7 +1541,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1557,
+      "logicalCases": 1563,
       "nodes": [
         {
           "id": "preflight",
@@ -1916,6 +1921,12 @@
             "pytest:tests/test_dependency_cycles.py::test_python_modules_are_checked_and_parse_errors_fail_closed",
             "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_frontend_application_contracts",
             "pytest:tests/test_dependency_cycles.py::test_repository_scan_reports_unreadable_sources",
+            "pytest:tests/test_dependency_dto_confinement.py::test_comments_strings_tests_and_unclassified_legacy_are_ignored",
+            "pytest:tests/test_dependency_dto_confinement.py::test_direct_dto_imports_escape_their_owner_even_for_type_checking",
+            "pytest:tests/test_dependency_dto_confinement.py::test_dto_declarations_in_application_and_ports_are_rejected",
+            "pytest:tests/test_dependency_dto_confinement.py::test_private_dtos_mapped_to_internal_contracts_are_allowed",
+            "pytest:tests/test_dependency_dto_confinement.py::test_public_adapter_entrypoints_cannot_reference_private_dtos",
+            "pytest:tests/test_dependency_dto_confinement.py::test_repository_rule_is_integrated_and_scan_failures_are_actionable",
             "pytest:tests/test_dependency_public_api.py::test_comments_strings_and_unrelated_imports_are_ignored",
             "pytest:tests/test_dependency_public_api.py::test_exact_authorized_exception_does_not_cover_neighbors",
             "pytest:tests/test_dependency_public_api.py::test_javascript_deep_imports_are_localized_for_every_import_form",
@@ -2533,18 +2544,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 776
+            "pytest": 782
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 312,
-            "unit": 336
+            "integration": 313,
+            "unit": 341
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 669
+            "unassigned": 675
           }
         },
         {
@@ -3535,7 +3546,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1557,
+      "logicalCases": 1563,
       "nodes": [
         {
           "id": "preflight",
@@ -3915,6 +3926,12 @@
             "pytest:tests/test_dependency_cycles.py::test_python_modules_are_checked_and_parse_errors_fail_closed",
             "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_frontend_application_contracts",
             "pytest:tests/test_dependency_cycles.py::test_repository_scan_reports_unreadable_sources",
+            "pytest:tests/test_dependency_dto_confinement.py::test_comments_strings_tests_and_unclassified_legacy_are_ignored",
+            "pytest:tests/test_dependency_dto_confinement.py::test_direct_dto_imports_escape_their_owner_even_for_type_checking",
+            "pytest:tests/test_dependency_dto_confinement.py::test_dto_declarations_in_application_and_ports_are_rejected",
+            "pytest:tests/test_dependency_dto_confinement.py::test_private_dtos_mapped_to_internal_contracts_are_allowed",
+            "pytest:tests/test_dependency_dto_confinement.py::test_public_adapter_entrypoints_cannot_reference_private_dtos",
+            "pytest:tests/test_dependency_dto_confinement.py::test_repository_rule_is_integrated_and_scan_failures_are_actionable",
             "pytest:tests/test_dependency_public_api.py::test_comments_strings_and_unrelated_imports_are_ignored",
             "pytest:tests/test_dependency_public_api.py::test_exact_authorized_exception_does_not_cover_neighbors",
             "pytest:tests/test_dependency_public_api.py::test_javascript_deep_imports_are_localized_for_every_import_form",
@@ -4532,18 +4549,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 776
+            "pytest": 782
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 312,
-            "unit": 336
+            "integration": 313,
+            "unit": 341
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 669
+            "unassigned": 675
           }
         },
         {
@@ -5534,7 +5551,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1557,
+      "logicalCases": 1563,
       "nodes": [
         {
           "id": "preflight",
@@ -5914,6 +5931,12 @@
             "pytest:tests/test_dependency_cycles.py::test_python_modules_are_checked_and_parse_errors_fail_closed",
             "pytest:tests/test_dependency_cycles.py::test_repository_graph_is_acyclic_with_frontend_application_contracts",
             "pytest:tests/test_dependency_cycles.py::test_repository_scan_reports_unreadable_sources",
+            "pytest:tests/test_dependency_dto_confinement.py::test_comments_strings_tests_and_unclassified_legacy_are_ignored",
+            "pytest:tests/test_dependency_dto_confinement.py::test_direct_dto_imports_escape_their_owner_even_for_type_checking",
+            "pytest:tests/test_dependency_dto_confinement.py::test_dto_declarations_in_application_and_ports_are_rejected",
+            "pytest:tests/test_dependency_dto_confinement.py::test_private_dtos_mapped_to_internal_contracts_are_allowed",
+            "pytest:tests/test_dependency_dto_confinement.py::test_public_adapter_entrypoints_cannot_reference_private_dtos",
+            "pytest:tests/test_dependency_dto_confinement.py::test_repository_rule_is_integrated_and_scan_failures_are_actionable",
             "pytest:tests/test_dependency_public_api.py::test_comments_strings_and_unrelated_imports_are_ignored",
             "pytest:tests/test_dependency_public_api.py::test_exact_authorized_exception_does_not_cover_neighbors",
             "pytest:tests/test_dependency_public_api.py::test_javascript_deep_imports_are_localized_for_every_import_form",
@@ -6531,18 +6554,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 776
+            "pytest": 782
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 312,
-            "unit": 336
+            "integration": 313,
+            "unit": 341
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 669
+            "unassigned": 675
           }
         },
         {

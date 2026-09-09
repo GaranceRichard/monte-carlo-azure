@@ -28,10 +28,10 @@ config/dependency-authority-v1.0.json
 ```
 
 La [preuve versionnée](../reports/dependency-authority-validation.json) contient les empreintes du manifeste
-et du schéma, les sources normatives vérifiées, les comptes structuraux, les inspections du domaine et des
-API publiques, ainsi que le nombre d’arêtes entre modules gouvernés. Un verdict valide porte zéro diagnostic,
-zéro dépendance technologique du domaine, zéro import profond et zéro cycle de module. La preuve est
-régénérable ; elle n’est ni une décision ni une seconde autorité.
+et du schéma, les sources normatives vérifiées, les comptes structuraux, les inspections du domaine, des
+API publiques et des DTO techniques, ainsi que le nombre d’arêtes entre modules gouvernés. Un verdict valide
+porte zéro diagnostic, zéro dépendance technologique du domaine, zéro import profond, zéro cycle de module et
+zéro fuite de DTO. La preuve est régénérable ; elle n’est ni une décision ni une seconde autorité.
 
 ## Format 1.0.0
 
@@ -176,6 +176,42 @@ deux composantes cycliques factuelles `CYC-001` et
 façades `simulationForecastService.ts` et `simulationForecastCore.ts`. La baseline de maintenabilité ne
 conserve aucune dette cyclique : toute réintroduction devient une nouvelle dérive bloquante.
 
+## Règle 7.15 — confinement des DTO techniques
+
+Le contrôle développe les modules gouvernés depuis `runtimes[].boundaries` et attribue la propriété d’un DTO
+à l’unique frontière technique qui le déclare. Les couches `adapters` possèdent les représentations des
+technologies sortantes ; la couche `presentation` possède celles des transports entrants, conformément à la
+décision qui place les protocoles HTTP entrants à cette frontière. Cette attribution vient exclusivement du
+manifeste : aucun chemin d’adaptateur, DTO autorisé ou exception n’est recopié dans le scanner.
+
+Une déclaration TypeScript ou JavaScript est reconnue comme DTO lorsque son identifiant se termine par
+`Dto`, `Dtos`, `DTO` ou `DTOs`. Une classe Python est également technique lorsqu’elle porte ce suffixe ou
+hérite de `BaseModel` ou `TypedDict`. Ces marqueurs forment la convention contrôlable : un format de transport
+ou de stockage doit les employer tant qu’il existe comme type nommé. Les tests colocalisés restent hors du
+graphe produit et une source qui n’appartient encore à aucune frontière déclarée reste une dette de migration,
+pas une exception implicite à la cible.
+
+La règle refuse trois formes de fuite :
+
+- `DEP-DTO-OWNER` localise un DTO déclaré dans un module gouverné de domaine, d’application, de port ou de
+  composition au lieu de sa frontière technique propriétaire ;
+- `DEP-DTO-LEAK` localise l’import direct, y compris de type ou sous `TYPE_CHECKING`, d’un fichier de DTO par
+  un consommateur extérieur à cette frontière ;
+- `DEP-DTO-PUBLIC` localise un DTO ou une fonction dont la signature le contient lorsqu’un `index.*` ou un
+  `__init__.py` l’expose comme contrat public de l’adaptateur.
+
+Les modules internes d’un même adaptateur peuvent importer leurs DTO privés. Un mapper qui reçoit cette forme
+et retourne une commande, un résultat ou une valeur intérieure reste donc conforme ; l’API publique ne peut
+exposer que ce contrat intérieur. Les commentaires, chaînes et fichiers de test ne créent ni déclaration ni
+fuite. Une source Python non analysable ou une racine illisible échoue de façon fermée via `DEP-DTO-PARSE` ou
+`DEP-DTO-SCAN`.
+
+La preuve courante recense les frontières techniques réellement matérialisées, les déclarations de DTO
+qu’elles contiennent et leurs références internes. Elle exige `dtoConfinementViolations: 0`. Aucun DTO nommé
+n’est actuellement déclaré dans les frontières techniques déjà matérialisées ; les mappers Azure DevOps
+présents reçoivent des valeurs opaques et retournent des événements delivery intérieurs, donc aucune fuite
+existante n’a nécessité d’allowlist ou de contrat supplémentaire dans ce périmètre.
+
 ## Utilisation
 
 Depuis la racine du dépôt :
@@ -184,7 +220,7 @@ Depuis la racine du dépôt :
 python Scripts/check_dependency_authority.py
 ```
 
-La commande valide le manifeste et les trois familles de règles intégrées, puis compare la preuve committée
+La commande valide le manifeste et les quatre familles de règles intégrées, puis compare la preuve committée
 à un rendu déterministe. Après une évolution revue du contrôle, des décisions ou du manifeste :
 
 ```powershell
@@ -193,14 +229,14 @@ python Scripts/check_dependency_authority.py
 ```
 
 Le parseur reste importable par les familles de règles via `load_dependency_authority()` et
-`direction_policy(source, target)`. Depuis 7.11 à 7.13, le contrôle bloque les technologies dans le domaine,
-les contournements des API publiques et les cycles entre modules gouvernés. Il n’est pas encore intégré aux
-profils de gate : cette responsabilité appartient au PBI 7.17.
+`direction_policy(source, target)`. Les règles 7.11 à 7.13 et 7.15 bloquent les technologies dans le domaine,
+les contournements des API publiques, les cycles entre modules gouvernés et les fuites de DTO techniques. Le
+contrôle n’est pas encore intégré aux profils de gate : cette responsabilité appartient au PBI 7.17.
 
 ## Limites préservées
 
-Le contrôle 7.13, pris isolément, ne traitait ni indépendance entre adaptateurs (7.14), ni confinement des DTO
-(7.15), ni direction des modules partagés (7.16), ni branchement du contrôle aux profils de gate (7.17). Le
+Le contrôle intégré ne traite encore ni indépendance entre adaptateurs (7.14), ni direction des modules
+partagés (7.16), ni branchement aux profils de gate (7.17). Le
 PBI 7.19 ajoute la frontière applicative de prévision et migre les deux cycles frontend recensés sans modifier
 le contenu fonctionnel des API ni les formules, seuils, corpus ou protocoles statistiques. Le PBI 7.20 place
 la configuration d’équipe portefeuille dans un contrat applicatif public indépendant des hooks, sans migrer

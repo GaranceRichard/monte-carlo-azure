@@ -45,13 +45,13 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     features = check_backlog_consistency.parse_registry(backlog)
 
     assert sum(len(feature.pbis) for feature in features) == 204
-    assert sum(feature.completed_count for feature in features) == 59
+    assert sum(feature.completed_count for feature in features) == 60
     feature_two = next(feature for feature in features if feature.number == 2)
     assert feature_two.completed_count == 21
     assert [pbi.identifier for pbi in feature_two.pbis if not pbi.completed] == []
     feature_seven = next(feature for feature in features if feature.number == 7)
     assert len(feature_seven.pbis) == 75
-    assert feature_seven.completed_count == 27
+    assert feature_seven.completed_count == 28
     assert [
         (pbi.identifier, pbi.completed_on)
         for pbi in feature_seven.pbis
@@ -70,6 +70,7 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
         ("7.11", "23/08/2026"),
         ("7.12", "26/08/2026"),
         ("7.13", "27/08/2026"),
+        ("7.15", "09/09/2026"),
         ("7.19", "02/09/2026"),
         ("7.20", "06/09/2026"),
         ("7.21", "23/08/2026"),
@@ -87,14 +88,14 @@ def test_repository_backlog_status_and_generated_sections_are_exact() -> None:
     ]
     assert check_backlog_consistency.feature_priority(governance, features) == 7
     assert "Feature en cours :** Feature 7" in backlog
-    assert "27/75 PBI réalisés (36 %)" in backlog
+    assert "28/75 PBI réalisés (37,33 %)" in backlog
     assert (
         "Prochain PBI :** 7.14 — "
         "Les adaptateurs restent indépendants entre eux"
         in backlog
     )
-    assert "Progression globale :** 59/204 PBI réalisés (28,92 %) ; 145 restants" in backlog
-    assert "Répartition actuelle des 145 PBI non réalisés" in governance
+    assert "Progression globale :** 60/204 PBI réalisés (29,41 %) ; 144 restants" in backlog
+    assert "Répartition actuelle des 144 PBI non réalisés" in governance
     assert (
         "Dernière Feature terminée :** Feature 2 — "
         "Garantir la fiabilité du cœur statistique"

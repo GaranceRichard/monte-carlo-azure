@@ -141,6 +141,16 @@ def _valid_checks() -> dict[str, str]:
         "domainIndependence": "valid",
         "moduleEncapsulation": "valid",
         "moduleAcyclicity": "valid",
+        "dtoConfinement": "valid",
+    }
+
+
+def _structure_counts(document: dict[str, Any]) -> dict[str, int]:
+    return {
+        "layers": len(document["layers"]),
+        "directions": len(document["directions"]),
+        "runtimes": len(document["runtimes"]),
+        "boundaries": sum(len(runtime["boundaries"]) for runtime in document["runtimes"]),
     }
 
 
@@ -156,11 +166,15 @@ def authority_evidence(
     deep_import_exceptions: int,
     module_dependency_edges: int,
     module_cycles: int,
+    dto_files: int,
+    technical_dto_boundaries: int,
+    technical_dto_declarations: int,
+    dto_boundary_references: int,
 ) -> dict[str, Any]:
     """Build the deterministic proof for integrated dependency rules."""
     document = authority.document
     return {
-        "evidenceVersion": "1.2.0",
+        "evidenceVersion": "1.3.0",
         "authority": authority.path.relative_to(authority.repository_root).as_posix(),
         "authoritySha256": _sha256(authority.path),
         "schema": authority.schema_path.relative_to(authority.repository_root).as_posix(),
@@ -169,10 +183,7 @@ def authority_evidence(
         "normativeSources": document["normativeSources"],
         "checks": _valid_checks(),
         "counts": {
-            "layers": len(document["layers"]),
-            "directions": len(document["directions"]),
-            "runtimes": len(document["runtimes"]),
-            "boundaries": sum(len(runtime["boundaries"]) for runtime in document["runtimes"]),
+            **_structure_counts(document),
             "domainFiles": domain_files,
             "domainDependencies": domain_dependencies,
             "domainTechnologyViolations": 0,
@@ -184,6 +195,11 @@ def authority_evidence(
             "deepImportViolations": 0,
             "moduleDependencyEdges": module_dependency_edges,
             "moduleCycles": module_cycles,
+            "dtoFiles": dto_files,
+            "technicalDtoBoundaries": technical_dto_boundaries,
+            "technicalDtoDeclarations": technical_dto_declarations,
+            "dtoBoundaryReferences": dto_boundary_references,
+            "dtoConfinementViolations": 0,
         },
         "diagnostics": [],
         "status": "valid",

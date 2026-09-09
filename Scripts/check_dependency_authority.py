@@ -30,6 +30,11 @@ from Scripts.dependency_authority_domain import (  # noqa: E402
     DomainInspectionError,
     inspect_repository_domain,
 )
+from Scripts.dependency_authority_dto import (  # noqa: E402
+    DtoConfinementInspectionError,
+    DtoConfinementResult,
+    inspect_repository_dto_confinement,
+)
 from Scripts.dependency_authority_public_api import (  # noqa: E402
     PublicApiInspectionError,
     PublicApiResult,
@@ -113,11 +118,58 @@ def _validated_module_cycles(
     return result
 
 
+def _validated_dto_confinement(
+    authority: DependencyAuthority, root: Path
+) -> DtoConfinementResult | None:
+    try:
+        result = inspect_repository_dto_confinement(authority, root)
+    except DtoConfinementInspectionError as exc:
+        diagnostic = Diagnostic(
+            "DEP-DTO-SCAN",
+            "/",
+            f"Impossible d'inspecter le confinement des DTO techniques: {exc}",
+            "Rétablir des racines gouvernées et des sources UTF-8 lisibles avant "
+            "de relancer le contrôle.",
+        )
+        print(diagnostic.render(root), file=sys.stderr)
+        return None
+    if result.diagnostics:
+        for diagnostic in result.diagnostics:
+            print(diagnostic.render(root), file=sys.stderr)
+        return None
+    return result
+
+
+def _validated_results(
+    authority: DependencyAuthority, root: Path
+) -> tuple[
+    DomainIndependenceResult,
+    PublicApiResult,
+    ModuleAcyclicityResult,
+    DtoConfinementResult,
+] | None:
+    results = (
+        _validated_domain(authority, root),
+        _validated_public_apis(authority, root),
+        _validated_module_cycles(authority, root),
+        _validated_dto_confinement(authority, root),
+    )
+    if any(result is None for result in results):
+        return None
+    domain_result, public_api_result, cycle_result, dto_result = results
+    assert domain_result is not None
+    assert public_api_result is not None
+    assert cycle_result is not None
+    assert dto_result is not None
+    return domain_result, public_api_result, cycle_result, dto_result
+
+
 def _validated_evidence(
     authority: DependencyAuthority,
     domain_result: DomainIndependenceResult,
     public_api_result: PublicApiResult,
     cycle_result: ModuleAcyclicityResult,
+    dto_result: DtoConfinementResult,
 ) -> str:
     return _render_evidence(
         authority_evidence(
@@ -131,6 +183,10 @@ def _validated_evidence(
             deep_import_exceptions=public_api_result.exceptions,
             module_dependency_edges=len(cycle_result.module_edges),
             module_cycles=len(cycle_result.cycles),
+            dto_files=dto_result.files,
+            technical_dto_boundaries=dto_result.technical_boundaries,
+            technical_dto_declarations=dto_result.declarations,
+            dto_boundary_references=dto_result.boundary_references,
         )
     )
 
@@ -140,6 +196,7 @@ def _success_message(
     domain_result: DomainIndependenceResult,
     public_api_result: PublicApiResult,
     cycle_result: ModuleAcyclicityResult,
+    dto_result: DtoConfinementResult,
 ) -> str:
     return (
         "Dependency authority valid: "
@@ -152,7 +209,9 @@ def _success_message(
         f"{public_api_result.public_entrypoints} public entrypoints across "
         f"{public_api_result.dependencies} inspected imports; "
         f"their dependency graph is acyclic across "
-        f"{len(cycle_result.module_edges)} inter-module edges."
+        f"{len(cycle_result.module_edges)} inter-module edges; "
+        f"{dto_result.declarations} technical DTO declarations remain confined "
+        f"across {dto_result.technical_boundaries} owning boundaries."
     )
 
 
@@ -182,13 +241,12 @@ def main(argv: list[str] | None = None) -> int:
         for diagnostic in exc.diagnostics:
             print(diagnostic.render(exc.source), file=sys.stderr)
         return 1
-    domain_result = _validated_domain(authority, root)
-    public_api_result = _validated_public_apis(authority, root)
-    cycle_result = _validated_module_cycles(authority, root)
-    if domain_result is None or public_api_result is None or cycle_result is None:
+    results = _validated_results(authority, root)
+    if results is None:
         return 1
+    domain_result, public_api_result, cycle_result, dto_result = results
     rendered = _validated_evidence(
-        authority, domain_result, public_api_result, cycle_result
+        authority, domain_result, public_api_result, cycle_result, dto_result
     )
     if args.write_evidence:
         evidence_path.parent.mkdir(parents=True, exist_ok=True)
@@ -212,7 +270,11 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 1
-    print(_success_message(authority, domain_result, public_api_result, cycle_result))
+    print(
+        _success_message(
+            authority, domain_result, public_api_result, cycle_result, dto_result
+        )
+    )
     return 0
 
 
