@@ -13,6 +13,14 @@
 
 ### Environnement Python automatique par worktree
 
+- correction du chemin Codex `git worktree add --detach`, qui pouvait résoudre le `core.hooksPath` relatif
+  depuis un checkout créateur ne contenant pas encore `post-checkout` : un `SessionStart` Codex et des
+  dispatchers physiques dans le répertoire Git commun garantissent désormais le bootstrap avant le premier
+  scope sans dépendre d'un unique événement Git ; l'installation frontend ne rétablit plus le chemin relatif
+  défectueux ;
+- remplacement de l'exception générique « tout HEAD détaché » par un marqueur privé de l'orchestrateur : les
+  worktrees contributeurs détachés sont préparés, tandis que les worktrees canoniques jetables restent sans
+  `.venv` ;
 - ajout d'un bootstrap `post-checkout` qui crée physiquement le `.venv` de chaque nouveau worktree branché,
   installe les dépendances déclarées et conserve une empreinte déterministe du fichier d'autorité, du runtime
   et de l'inventaire installé ;

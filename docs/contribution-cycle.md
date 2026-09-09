@@ -16,12 +16,23 @@ déploiement Pages.
 
 ## 0. Préparer le runtime du worktree
 
-L'initialisation unique `python Scripts/setup_git_hooks.py` configure `core.hooksPath=.githooks` et prépare
-le checkout courant. Cette configuration Git commune est héritée par les worktrees liés. Dès lors,
-`git worktree add` déclenche le `post-checkout` versionné : avant de rendre la main sur une branche, il crée
-le `.venv` local avec `venv --copies`, installe `requirements.txt`, exécute `pip check`, puis écrit
-atomiquement une empreinte associant schéma de bootstrap, SHA-256 exact de `requirements.txt`, version du
-runtime et inventaire installé. Aucun lien, junction ou environnement partagé n'est créé.
+L'initialisation unique `python Scripts/setup_git_hooks.py` prépare le checkout courant et installe des
+dispatchers physiques sous le répertoire Git commun. `core.hooksPath` reçoit leur chemin absolu : la
+résolution du hook ne dépend donc plus du checkout depuis lequel une création est demandée, et le dispatcher
+appelle toujours le hook versionné présent dans le worktree cible. Un `git worktree add` contributeur qui
+déclenche `post-checkout`, qu'il soit branché ou détaché, crée ainsi son `.venv` local avant de rendre la main.
+
+Codex possède une seconde entrée, indépendante de cet événement Git. Son `SessionStart` exécute
+`.githooks/python-env` dans le nouveau worktree avant la première commande de l'agent. Elle couvre notamment
+le chemin réel `git worktree add --detach <chemin> <référence>` lorsque le checkout créateur possède encore
+l'ancien `core.hooksPath` relatif et ne peut donc pas trouver le `post-checkout` présent seulement dans la
+cible. Sous Windows, un launcher PowerShell résout successivement le Python local valide puis les lanceurs
+système ; ailleurs le helper shell applique la même politique. Le Python système ne sert dans les deux cas
+qu'au bootstrap, jamais à une gate. Aucun bootstrap ni réparation manuels ne font partie d'un PBI normal.
+
+Le bootstrap utilise `venv --copies`, installe `requirements.txt`, exécute `pip check`, puis écrit
+atomiquement une empreinte associant schéma, SHA-256 exact de `requirements.txt`, version du runtime et
+inventaire installé. Aucun lien, junction ou environnement partagé n'est créé.
 
 Si l'interpréteur, l'empreinte ou l'inventaire manque ou diverge, le même mécanisme répare ou resynchronise
 l'environnement. Si tout concorde, une sonde de l'interpréteur et `pip check` suffisent : aucune installation
@@ -31,8 +42,10 @@ l'empreinte rend la décision de synchronisation déterministe sans inventer un 
 
 Le pré-push appelle ce bootstrap avant `quality_gate.py` et bloque immédiatement s'il échoue. Il invoque
 ensuite exclusivement `.venv/Scripts/python.exe` sous Windows ou `.venv/bin/python` ailleurs. Le worktree
-détaché temporaire créé par la validation canonique ne relance pas l'installation : son HEAD détaché est
-reconnu par `post-checkout` et le DAG reçoit explicitement l'interpréteur déjà validé du worktree contributeur.
+détaché temporaire créé par la validation canonique ne relance pas l'installation : l'orchestrateur pose
+`MONTECARLO_CANONICAL_WORKTREE=1` uniquement autour de son `git worktree add`, le `post-checkout`
+l'ignore et le DAG reçoit explicitement l'interpréteur déjà validé du worktree contributeur. Un HEAD détaché
+sans ce marqueur est un worktree contributeur et reste préparé normalement.
 
 ## 1. Fixer et contrôler le périmètre
 

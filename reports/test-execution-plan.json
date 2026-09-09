@@ -1536,7 +1536,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1555,
+      "logicalCases": 1557,
       "nodes": [
         {
           "id": "preflight",
@@ -2037,6 +2037,8 @@
             "pytest:tests/test_numpy_sample_index_draw_port.py::test_numpy_draw_port_matches_default_rng_across_successive_vectorized_draws",
             "pytest:tests/test_numpy_sample_index_draw_port.py::test_numpy_draw_port_rejects_invalid_sample_count",
             "pytest:tests/test_numpy_sample_index_draw_port.py::test_numpy_draw_port_rejects_invalid_vectorized_shape",
+            "pytest:tests/test_operational_scripts.py::test_git_hook_dispatchers_fail_closed_on_invalid_state",
+            "pytest:tests/test_operational_scripts.py::test_git_hook_setup_installs_stable_physical_dispatchers_idempotently",
             "pytest:tests/test_operational_scripts.py::test_git_hook_setup_skips_missing_repo_and_reports_git_results",
             "pytest:tests/test_operational_scripts.py::test_purge_env_integer_defaults_and_main",
             "pytest:tests/test_operational_scripts.py::test_python_environment_bootstrap_creates_repairs_and_stays_idempotent",
@@ -2051,7 +2053,7 @@
             "pytest:tests/test_pre_commit_guard.py::test_guard_plan_checks_the_final_tree_without_reinspecting_the_index",
             "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_final_checks_pass",
             "pytest:tests/test_pre_commit_guard.py::test_run_executes_in_repository",
-            "pytest:tests/test_pre_commit_hook_integration.py::test_fresh_worktree_bootstraps_before_one_canonical_push_and_fails_closed",
+            "pytest:tests/test_pre_commit_hook_integration.py::test_codex_worktree_bootstraps_before_scope_without_source_post_checkout",
             "pytest:tests/test_pre_commit_hook_integration.py::test_publication_secret_scan_rejects_a_secret_removed_by_a_later_checkpoint",
             "pytest:tests/test_pre_commit_hook_integration.py::test_real_commit_saves_a_transient_index_without_readme_or_validation",
             "pytest:tests/test_python_coverage.py::test_complete_report_passes_and_tests_are_excluded",
@@ -2531,18 +2533,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 774
+            "pytest": 776
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 310,
+            "integration": 312,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 667
+            "unassigned": 669
           }
         },
         {
@@ -3533,7 +3535,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1555,
+      "logicalCases": 1557,
       "nodes": [
         {
           "id": "preflight",
@@ -4034,6 +4036,8 @@
             "pytest:tests/test_numpy_sample_index_draw_port.py::test_numpy_draw_port_matches_default_rng_across_successive_vectorized_draws",
             "pytest:tests/test_numpy_sample_index_draw_port.py::test_numpy_draw_port_rejects_invalid_sample_count",
             "pytest:tests/test_numpy_sample_index_draw_port.py::test_numpy_draw_port_rejects_invalid_vectorized_shape",
+            "pytest:tests/test_operational_scripts.py::test_git_hook_dispatchers_fail_closed_on_invalid_state",
+            "pytest:tests/test_operational_scripts.py::test_git_hook_setup_installs_stable_physical_dispatchers_idempotently",
             "pytest:tests/test_operational_scripts.py::test_git_hook_setup_skips_missing_repo_and_reports_git_results",
             "pytest:tests/test_operational_scripts.py::test_purge_env_integer_defaults_and_main",
             "pytest:tests/test_operational_scripts.py::test_python_environment_bootstrap_creates_repairs_and_stays_idempotent",
@@ -4048,7 +4052,7 @@
             "pytest:tests/test_pre_commit_guard.py::test_guard_plan_checks_the_final_tree_without_reinspecting_the_index",
             "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_final_checks_pass",
             "pytest:tests/test_pre_commit_guard.py::test_run_executes_in_repository",
-            "pytest:tests/test_pre_commit_hook_integration.py::test_fresh_worktree_bootstraps_before_one_canonical_push_and_fails_closed",
+            "pytest:tests/test_pre_commit_hook_integration.py::test_codex_worktree_bootstraps_before_scope_without_source_post_checkout",
             "pytest:tests/test_pre_commit_hook_integration.py::test_publication_secret_scan_rejects_a_secret_removed_by_a_later_checkpoint",
             "pytest:tests/test_pre_commit_hook_integration.py::test_real_commit_saves_a_transient_index_without_readme_or_validation",
             "pytest:tests/test_python_coverage.py::test_complete_report_passes_and_tests_are_excluded",
@@ -4528,18 +4532,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 774
+            "pytest": 776
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 310,
+            "integration": 312,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 667
+            "unassigned": 669
           }
         },
         {
@@ -5530,7 +5534,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1555,
+      "logicalCases": 1557,
       "nodes": [
         {
           "id": "preflight",
@@ -6031,6 +6035,8 @@
             "pytest:tests/test_numpy_sample_index_draw_port.py::test_numpy_draw_port_matches_default_rng_across_successive_vectorized_draws",
             "pytest:tests/test_numpy_sample_index_draw_port.py::test_numpy_draw_port_rejects_invalid_sample_count",
             "pytest:tests/test_numpy_sample_index_draw_port.py::test_numpy_draw_port_rejects_invalid_vectorized_shape",
+            "pytest:tests/test_operational_scripts.py::test_git_hook_dispatchers_fail_closed_on_invalid_state",
+            "pytest:tests/test_operational_scripts.py::test_git_hook_setup_installs_stable_physical_dispatchers_idempotently",
             "pytest:tests/test_operational_scripts.py::test_git_hook_setup_skips_missing_repo_and_reports_git_results",
             "pytest:tests/test_operational_scripts.py::test_purge_env_integer_defaults_and_main",
             "pytest:tests/test_operational_scripts.py::test_python_environment_bootstrap_creates_repairs_and_stays_idempotent",
@@ -6045,7 +6051,7 @@
             "pytest:tests/test_pre_commit_guard.py::test_guard_plan_checks_the_final_tree_without_reinspecting_the_index",
             "pytest:tests/test_pre_commit_guard.py::test_main_returns_zero_when_all_final_checks_pass",
             "pytest:tests/test_pre_commit_guard.py::test_run_executes_in_repository",
-            "pytest:tests/test_pre_commit_hook_integration.py::test_fresh_worktree_bootstraps_before_one_canonical_push_and_fails_closed",
+            "pytest:tests/test_pre_commit_hook_integration.py::test_codex_worktree_bootstraps_before_scope_without_source_post_checkout",
             "pytest:tests/test_pre_commit_hook_integration.py::test_publication_secret_scan_rejects_a_secret_removed_by_a_later_checkpoint",
             "pytest:tests/test_pre_commit_hook_integration.py::test_real_commit_saves_a_transient_index_without_readme_or_validation",
             "pytest:tests/test_python_coverage.py::test_complete_report_passes_and_tests_are_excluded",
@@ -6525,18 +6531,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 774
+            "pytest": 776
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 310,
+            "integration": 312,
             "unit": 336
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 667
+            "unassigned": 669
           }
         },
         {

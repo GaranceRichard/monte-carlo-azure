@@ -30,9 +30,12 @@ restent applicables.
 - `git commit` est un checkpoint local sans validation : il peut figer un état transitoire et reste
   indépendant du push. Le hook pré-commit n'exécute aucune gate et aucune modification artificielle du
   README n'est exigée.
-- Après la configuration unique des hooks, le `post-checkout` d'un worktree branché crée ou synchronise son
-  `.venv` physique depuis `requirements.txt`, refuse liens et junctions, vérifie l'interpréteur et `pip check`,
-  puis n'écrit son empreinte qu'après succès. Cette préparation précède le premier scope ou test local.
+- Après la configuration unique, des dispatchers physiques sous le répertoire Git commun appellent le hook
+  versionné du worktree cible pour toute création contributeur qui déclenche `post-checkout`. Le
+  `SessionStart` Codex appelle indépendamment le même bootstrap lorsque son `git worktree add --detach` n'a
+  déclenché aucun hook. Le `.venv` physique est synchronisé depuis `requirements.txt`, liens et junctions sont
+  refusés, l'interpréteur et `pip check` sont vérifiés, puis l'empreinte n'est écrite qu'après succès. Cette
+  préparation précède le premier scope ou test local et ne nécessite aucun geste de réparation dans un PBI.
 - `.venv\Scripts\python.exe Scripts/quality_gate.py scope --base <référence> --allow <chemin> [...]` compare le worktree entier
   au merge-base, inclut les fichiers non suivis non ignorés, refuse tout chemin hors périmètre et exige
   `--allow-massive` pour une autorité transverse. Il n'exécute aucun test et ne génère aucun artefact.

@@ -5,10 +5,12 @@
 - Tout chantier part du dernier état pertinent de `origin/main`. Il utilise une branche et un worktree
   dédiés, créés hors du dépôt principal, et annonce explicitement le nom de la branche et le chemin du
   worktree au démarrage.
-- Le hook `post-checkout` prépare physiquement le `.venv` propre à tout nouveau worktree et le synchronise
-  avec `requirements.txt` avant le premier contrôle. Le Python système ne sert qu'à ce bootstrap ; le scope,
-  le pré-push et toutes les validations locales utilisent ensuite l'interpréteur du `.venv`. Le pré-push
-  revérifie cet état et bloque avant le plan canonique si l'environnement ne peut pas être rendu exploitable.
+- La configuration initiale installe des dispatchers physiques dans le répertoire Git commun. Ils rendent le
+  `post-checkout` du worktree cible indépendant du checkout depuis lequel `git worktree add` est lancé. Pour
+  les worktrees gérés par Codex, `SessionStart` déclenche en plus le même bootstrap avant la première commande,
+  y compris lorsque Git n'a exécuté aucun `post-checkout`. Le Python système ne sert qu'à créer ou réparer le
+  `.venv` local ; le scope, le pré-push et toutes les validations utilisent ensuite cet interpréteur. Le
+  pré-push revérifie cet état et bloque avant le plan canonique si le `.venv` n'est pas exploitable.
 - Tout chantier suit comme autorités, dans leur domaine de compétence, les sources de gouvernance du produit
   désignées par la [carte documentaire](docs/README.md). Il respecte les gates, les standards de qualité, les
   contrôles architecturaux et les critères de publication du dépôt ; aucune garantie existante n'est

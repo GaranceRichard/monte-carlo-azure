@@ -67,6 +67,7 @@ MASSIVE_SCRIPT_NAMES = {
     "maintainability_metrics.py",
     "maintainability_ratchet.py",
     "report_vitals_coverage.py",
+    "git_hook_dispatchers.py",
     "setup_git_hooks.py",
     "check_test_classification.py",
     "classify_tests.py",

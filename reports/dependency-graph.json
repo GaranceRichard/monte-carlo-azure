@@ -12,9 +12,9 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 287,
-    "importEdges": 1473,
-    "entrypoints": 85,
+    "sourceModules": 288,
+    "importEdges": 1481,
+    "entrypoints": 84,
     "missingEntrypoints": 5,
     "cycles": 0,
     "runtimeCycles": 0,
@@ -230,6 +230,11 @@
       },
       {
         "path": "Scripts/generate_statistical_consolidated_report.py",
+        "area": "quality",
+        "language": "python"
+      },
+      {
+        "path": "Scripts/git_hook_dispatchers.py",
         "area": "quality",
         "language": "python"
       },
@@ -3810,6 +3815,69 @@
         "resolution": "external"
       },
       {
+        "source": "Scripts/git_hook_dispatchers.py",
+        "target": "external:python:__future__",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/git_hook_dispatchers.py",
+        "target": "external:python:os",
+        "line": 5,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "os",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/git_hook_dispatchers.py",
+        "target": "external:python:pathlib",
+        "line": 9,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "pathlib",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/git_hook_dispatchers.py",
+        "target": "external:python:stat",
+        "line": 6,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "stat",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/git_hook_dispatchers.py",
+        "target": "external:python:subprocess",
+        "line": 7,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "subprocess",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/git_hook_dispatchers.py",
+        "target": "external:python:sys",
+        "line": 8,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "sys",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/git_hook_dispatchers.py",
+        "target": "external:python:typing",
+        "line": 10,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "typing",
+        "resolution": "external"
+      },
+      {
         "source": "Scripts/git_staging.py",
         "target": "external:python:__future__",
         "line": 3,
@@ -5932,6 +6000,15 @@
         "phase": "runtime",
         "specifier": "typing",
         "resolution": "external"
+      },
+      {
+        "source": "Scripts/setup_git_hooks.py",
+        "target": "Scripts/git_hook_dispatchers.py",
+        "line": 19,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "Scripts.git_hook_dispatchers.configure_git_hooks",
+        "resolution": "internal"
       },
       {
         "source": "Scripts/setup_git_hooks.py",
@@ -15127,7 +15204,7 @@
       },
       {
         "declaredIn": "Scripts/setup_git_hooks.py",
-        "line": 344,
+        "line": 334,
         "kind": "python-main-guard",
         "target": "Scripts/setup_git_hooks.py",
         "resolution": "internal"
@@ -15207,21 +15284,13 @@
         "declaredIn": "frontend/package.json",
         "line": 8,
         "kind": "npm-script",
-        "target": "external:command:node",
-        "resolution": "external",
-        "name": "prepare"
-      },
-      {
-        "declaredIn": "frontend/package.json",
-        "line": 9,
-        "kind": "npm-script",
         "target": "external:command:vite",
         "resolution": "external",
         "name": "build"
       },
       {
         "declaredIn": "frontend/package.json",
-        "line": 10,
+        "line": 9,
         "kind": "npm-script",
         "target": "external:command:tsc",
         "resolution": "external",
@@ -15229,7 +15298,7 @@
       },
       {
         "declaredIn": "frontend/package.json",
-        "line": 11,
+        "line": 10,
         "kind": "npm-script",
         "target": "external:command:eslint",
         "resolution": "external",
@@ -15237,7 +15306,7 @@
       },
       {
         "declaredIn": "frontend/package.json",
-        "line": 12,
+        "line": 11,
         "kind": "npm-script",
         "target": "external:command:vite",
         "resolution": "external",
@@ -15245,7 +15314,7 @@
       },
       {
         "declaredIn": "frontend/package.json",
-        "line": 13,
+        "line": 12,
         "kind": "npm-script",
         "target": "external:command:vitest",
         "resolution": "external",
@@ -15253,7 +15322,7 @@
       },
       {
         "declaredIn": "frontend/package.json",
-        "line": 14,
+        "line": 13,
         "kind": "npm-script",
         "target": "external:command:vitest",
         "resolution": "external",
@@ -15261,7 +15330,7 @@
       },
       {
         "declaredIn": "frontend/package.json",
-        "line": 15,
+        "line": 14,
         "kind": "npm-script",
         "target": "external:command:vitest",
         "resolution": "external",
@@ -15269,7 +15338,7 @@
       },
       {
         "declaredIn": "frontend/package.json",
-        "line": 16,
+        "line": 15,
         "kind": "npm-script",
         "target": "frontend/scripts/run-statistical-reference-corpus.mjs",
         "resolution": "internal",
@@ -15277,7 +15346,7 @@
       },
       {
         "declaredIn": "frontend/package.json",
-        "line": 17,
+        "line": 16,
         "kind": "npm-script",
         "target": "frontend/scripts/run-e2e-coverage.mjs",
         "resolution": "internal",
@@ -15285,7 +15354,7 @@
       },
       {
         "declaredIn": "frontend/package.json",
-        "line": 18,
+        "line": 17,
         "kind": "npm-script",
         "target": "external:command:npm",
         "resolution": "external",
@@ -15293,7 +15362,7 @@
       },
       {
         "declaredIn": "frontend/package.json",
-        "line": 19,
+        "line": 18,
         "kind": "npm-script",
         "target": "frontend/scripts/run-e2e-coverage.mjs",
         "resolution": "internal",
@@ -15370,7 +15439,7 @@
         "sourceArea": "quality",
         "targetArea": "quality",
         "phase": "runtime",
-        "count": 271
+        "count": 272
       }
     ]
   },

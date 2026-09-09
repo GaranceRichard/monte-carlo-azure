@@ -5606,6 +5606,43 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_operational_scripts.py::test_git_hook_dispatchers_fail_closed_on_invalid_state",
+    "framework": "pytest",
+    "sourcePath": "tests/test_operational_scripts.py",
+    "selector": "test_git_hook_dispatchers_fail_closed_on_invalid_state",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security",
+      "resilience"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops",
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_operational_scripts.py::test_git_hook_setup_installs_stable_physical_dispatchers_idempotently",
+    "framework": "pytest",
+    "sourcePath": "tests/test_operational_scripts.py",
+    "selector": "test_git_hook_setup_installs_stable_physical_dispatchers_idempotently",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "security"
+    ],
+    "domains": [
+      "identity",
+      "azure_devops",
+      "deployment"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_operational_scripts.py::test_git_hook_setup_skips_missing_repo_and_reports_git_results",
     "framework": "pytest",
     "sourcePath": "tests/test_operational_scripts.py",
@@ -5825,16 +5862,15 @@
     ]
   },
   {
-    "logicalCaseId": "pytest:tests/test_pre_commit_hook_integration.py::test_fresh_worktree_bootstraps_before_one_canonical_push_and_fails_closed",
+    "logicalCaseId": "pytest:tests/test_pre_commit_hook_integration.py::test_codex_worktree_bootstraps_before_scope_without_source_post_checkout",
     "framework": "pytest",
     "sourcePath": "tests/test_pre_commit_hook_integration.py",
-    "selector": "test_fresh_worktree_bootstraps_before_one_canonical_push_and_fails_closed",
+    "selector": "test_codex_worktree_bootstraps_before_scope_without_source_post_checkout",
     "status": "classified",
     "executionProfile": "main",
     "nature": "integration",
     "purposes": [
-      "functional",
-      "resilience"
+      "functional"
     ],
     "domains": [
       "quality_chain"

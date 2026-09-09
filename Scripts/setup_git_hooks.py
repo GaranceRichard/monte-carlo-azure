@@ -14,6 +14,10 @@ from pathlib import Path
 from typing import Any, Callable, NamedTuple
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+
+from Scripts.git_hook_dispatchers import configure_git_hooks  # noqa: E402
+
 BOOTSTRAP_SCHEMA = 1
 MINIMUM_PYTHON = (3, 10)
 STAMP_NAME = ".montecarlo-python-environment.json"
@@ -298,19 +302,6 @@ def ensure_python_environment(
     )
 
 
-def configure_git_hooks(root: Path, runner: Runner | None = None) -> int:
-    result = (runner or subprocess.run)(
-        ["git", "config", "--local", "core.hooksPath", ".githooks"],
-        cwd=root,
-        check=False,
-    )
-    if result.returncode:
-        print("Failed to configure core.hooksPath to .githooks.", file=sys.stderr)
-        return result.returncode
-    print("Configured git hooks path: .githooks")
-    return 0
-
-
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=REPO_ROOT)
@@ -325,10 +316,9 @@ def main(argv: list[str] | None = None) -> int:
     if not (root / ".git").exists():
         print("Skipping git hook setup: .git directory not found.")
         return 0
-    if not args.bootstrap_only:
-        code = configure_git_hooks(root)
-        if code:
-            return code
+    code = configure_git_hooks(root, quiet=args.quiet_if_ready)
+    if code:
+        return code
     try:
         result = ensure_python_environment(root)
     except BootstrapError as exc:

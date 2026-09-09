@@ -2907,6 +2907,8 @@ def test_hooks_and_ci_delegate_to_the_central_command() -> None:
     post_checkout = (ROOT / ".githooks" / "post-checkout").read_text(encoding="utf-8")
     pre_push = (ROOT / ".githooks" / "pre-push").read_text(encoding="utf-8")
     python_env = (ROOT / ".githooks" / "python-env").read_text(encoding="utf-8")
+    codex_hooks = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))
+    frontend_package = json.loads((ROOT / "frontend/package.json").read_text(encoding="utf-8"))
     ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
 
     assert "quality_gate.py" not in pre_commit
@@ -2914,7 +2916,8 @@ def test_hooks_and_ci_delegate_to_the_central_command() -> None:
         line.strip() for line in pre_commit.splitlines() if line and not line.startswith("#")
     ]
     assert executable_lines == ["exit 0"]
-    assert "git symbolic-ref --quiet HEAD" in post_checkout
+    assert "git symbolic-ref --quiet HEAD" not in post_checkout
+    assert "MONTECARLO_CANONICAL_WORKTREE" in post_checkout
     assert '.githooks/python-env" "$REPO_ROOT"' in post_checkout
     assert "Scripts/setup_git_hooks.py" in python_env
     assert "--bootstrap-only --quiet-if-ready" in python_env
@@ -2923,6 +2926,11 @@ def test_hooks_and_ci_delegate_to_the_central_command() -> None:
     assert "Scripts/quality_gate.py\" push" in pre_push
     assert '--remote-name "${1:-}"' in pre_push
     assert '--remote-url "${2:-}"' in pre_push
+    session_command = codex_hooks["hooks"]["SessionStart"][0]["hooks"][0]
+    assert "git rev-parse --show-toplevel" in session_command["command"]
+    assert "git rev-parse --show-toplevel" in session_command["commandWindows"]
+    assert ".codex/bootstrap-python.ps1" in session_command["commandWindows"]
+    assert "prepare" not in frontend_package["scripts"]
     assert "python Scripts/quality_gate.py ci" in ci
     assert "npm run lint" not in ci
     assert "npm run test:e2e" not in ci
@@ -3573,12 +3581,15 @@ def test_remaining_quality_gate_success_and_cleanup_paths(tmp_path: Path, monkey
         ),
     )
     assert quality_gate.staged_files() == ["backend/api.py"]
-    monkeypatch.setattr(
-        quality_gate.subprocess,
-        "run",
-        lambda *_a, **_k: subprocess.CompletedProcess(["git"], 0, "", ""),
-    )
+    worktree_run: dict[str, object] = {}
+
+    def fake_worktree_run(*_args: object, **kwargs: object) -> subprocess.CompletedProcess[str]:
+        worktree_run.update(kwargs)
+        return subprocess.CompletedProcess(["git"], 0, "", "")
+
+    monkeypatch.setattr(quality_gate.subprocess, "run", fake_worktree_run)
     assert quality_gate._run_worktree_command(["prune"], repository_root=tmp_path).returncode == 0
+    assert worktree_run["env"]["MONTECARLO_CANONICAL_WORKTREE"] == "1"
 
     with pytest.raises(RuntimeError, match="plain"):
         quality_gate._retry_windows_readonly_removal(

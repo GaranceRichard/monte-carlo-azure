@@ -1123,7 +1123,7 @@ def _run_worktree_command(
     return subprocess.run(
         ["git", "worktree", *args],
         cwd=repository_root,
-        env=isolated_git_environment(),
+        env=isolated_git_environment() | {"MONTECARLO_CANONICAL_WORKTREE": "1"},
         check=False,
         capture_output=True,
         text=True,

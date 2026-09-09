@@ -49,7 +49,7 @@ sélectionnent la portée d’un changement mais ne remplacent pas un profil.
 | Entrée réelle | Profil résolu | Source et isolation | Portée effectivement construite |
 | --- | --- | --- | --- |
 | `.githooks/pre-commit` | aucun | aucun snapshot ni outil requis | checkpoint technique sans validation |
-| `.githooks/post-checkout` → `setup_git_hooks.py --bootstrap-only` | aucun | `.venv` physique du nouveau worktree branché | création ou synchronisation depuis `requirements.txt`, sonde, `pip check` et empreinte atomique avant le premier contrôle ; un HEAD détaché de validation réutilise l'environnement contributeur |
+| dispatchers Git communs ou `.codex/hooks.json` `SessionStart` → `.githooks/python-env` → `setup_git_hooks.py --bootstrap-only` | aucun | `.venv` physique du nouveau worktree contributeur | le dispatcher appelle le hook versionné de la cible quand `post-checkout` existe ; `SessionStart` couvre indépendamment le `git worktree add --detach` Codex sans hook ; création ou synchronisation, sonde, `pip check` et empreinte atomique précèdent le premier contrôle |
 | `quality_gate.py scope --base … --allow …` | aucun | merge-base, worktree et fichiers non suivis non ignorés, en lecture seule | comparaison stricte aux chemins déclarés ; acquittement explicite d’une portée `massive` |
 | `.githooks/pre-push` → bootstrap → Python `.venv` → `quality_gate.py push` | `main` | environnement contributeur validé, puis chaque SHA terminal dans un worktree détaché temporaire | échec fermé avant le plan si le runtime ne peut pas être préparé ; README final contrôlé par plage, puis 38 commandes incluant scan historique, sonde Docker et smoke complet ; aucune réduction adaptative |
 | pull request GitHub → `ci --profile pr --node …` | `pr` | checkout de `${{ github.sha }}` propre à chaque job | plan complet du profil `pr` : préflight, statique, Pytest et Vitest sans couverture ; les nœuds sans commande écrivent néanmoins un résultat de nœud |
@@ -94,7 +94,8 @@ parallèles déclarées écrivent le même artefact ou utilisent la même ressou
 
 | Composant | Catégorie dominante | Responsabilité réelle et frontière |
 | --- | --- | --- |
-| [`Scripts/setup_git_hooks.py`](../Scripts/setup_git_hooks.py) | bootstrap local | configure les hooks, crée le `.venv` avec copies physiques, synchronise `requirements.txt`, vérifie `pip check` et ne publie l'empreinte runtime/inventaire qu'après succès |
+| [`Scripts/git_hook_dispatchers.py`](../Scripts/git_hook_dispatchers.py) | bootstrap Git local | installe idempotemment les dispatchers physiques dans le répertoire Git commun, refuse liens et junctions, puis configure leur chemin absolu |
+| [`Scripts/setup_git_hooks.py`](../Scripts/setup_git_hooks.py) | bootstrap Python local | délègue l'installation des dispatchers, crée le `.venv` avec copies physiques, synchronise `requirements.txt`, vérifie `pip check` et ne publie l'empreinte runtime/inventaire qu'après succès |
 | [`Scripts/quality_gate.py`](../Scripts/quality_gate.py) | orchestration | point d’entrée des cinq modes ; résout changements et tests, gère snapshots/worktrees, environnement Pytest, dépendances frontend et délégation DAG ; conserve aussi des tables de chemins produit et l’adaptateur du smoke Docker |
 | [`Scripts/quality_gate_change_policy.py`](../Scripts/quality_gate_change_policy.py) | orchestration | définit les chemins et noms de scripts qui rendent un changement `massive`, plus le contrôle de classification associé |
 | [`Scripts/quality_gate_plan.py`](../Scripts/quality_gate_plan.py) | orchestration | matérialise les commandes générales, statiques, tests, couverture et agrégat ; associe les modes aux profils par défaut |
@@ -104,7 +105,7 @@ parallèles déclarées écrivent le même artefact ou utilisent la même ressou
 | [`Scripts/quality_gate_docker_runtime.py`](../Scripts/quality_gate_docker_runtime.py) | exécution | démarre Compose, attend les services, exerce le smoke HTTP, collecte les logs d’échec et nettoie les services |
 | [`Scripts/test_execution_profiles.py`](../Scripts/test_execution_profiles.py) et modules `test_execution_profiles_*` | contrat et orchestration | valident profils/DAG/inventaire, rendent le plan, sélectionnent les cas d’un framework et font correspondre chaque commande à un nœud unique |
 | [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | orchestration CI | résout le profil par événement, reproduit le DAG en jobs GitHub, prépare les runtimes/services, transfère les artefacts et impose le succès ou le saut attendu de chaque job |
-| [`.githooks/pre-commit`](../.githooks/pre-commit), [`.githooks/post-checkout`](../.githooks/post-checkout), [`.githooks/python-env`](../.githooks/python-env) et [`.githooks/pre-push`](../.githooks/pre-push) | points d’entrée locaux | le commit reste un checkpoint ; le checkout branché prépare tôt le runtime ; le helper partage la résolution Windows/POSIX ; le push revérifie puis délègue exclusivement au Python local |
+| [`.codex/hooks.json`](../.codex/hooks.json), [`.codex/bootstrap-python.ps1`](../.codex/bootstrap-python.ps1), [`.githooks/pre-commit`](../.githooks/pre-commit), [`.githooks/post-checkout`](../.githooks/post-checkout), [`.githooks/python-env`](../.githooks/python-env) et [`.githooks/pre-push`](../.githooks/pre-push) | points d'entrée locaux | `SessionStart` garantit le runtime avant la première commande Codex même sans hook Git ; le commit reste un checkpoint ; le checkout contributeur prépare tôt le runtime ; les launchers couvrent Windows/POSIX ; le push revérifie puis délègue exclusivement au Python local |
 | Pytest + [`tests/execution_counts_plugin.py`](../tests/execution_counts_plugin.py) | exécution et preuve | exécute backend, scripts et tests d’infrastructure ; le plugin toujours chargé par `tests/conftest.py` rattache les instances aux cas logiques et écrit `pytest.json` |
 | Vitest + [`frontend/scripts/vitest-execution-reporter.mjs`](../frontend/scripts/vitest-execution-reporter.mjs) | exécution et preuve | exécute les tests frontend, mesure V8 et écrit les instances/tentatives dans `vitest.json` |
 | Playwright + [`frontend/scripts/run-e2e-coverage.mjs`](../frontend/scripts/run-e2e-coverage.mjs) + reporter | exécution et preuve | lance les serveurs et scénarios navigateur, collecte/valide Istanbul et écrit `playwright.json` |
@@ -192,8 +193,9 @@ comme artefact GitHub dédié, tandis que les producteurs conservent leurs bundl
   de l'empreinte et `pip check`, cet interpréteur est transmis par `MONTECARLO_E2E_PYTHON` et
   `frontend/node_modules` est lié temporairement dans le snapshot.
 - Le pré-push dépend de Git pour construire et nettoyer des worktrees détachés ; il ne lit pas l’état non
-  commité du workspace. Le `post-checkout` ignore ce seul HEAD détaché afin de ne pas installer un `.venv`
-  jetable, puis le DAG réutilise l'interpréteur contributeur déjà validé. Il matérialise au besoin
+  commité du workspace. L'orchestrateur marque explicitement ces seules créations internes afin que leur
+  `post-checkout` n'installe pas de `.venv` jetable ; un worktree contributeur détaché ne porte pas ce marqueur.
+  Le DAG réutilise l'interpréteur contributeur déjà validé. Il matérialise au besoin
   `.env.example` comme `.env` temporaire pour le smoke, puis le supprime.
 - La CI reconstruit l’environnement dans chaque job. MongoDB n’existe que pour `backend-tests`, Chromium
   n’est installé que pour `e2e`, et les preuves statistiques se transmettent explicitement aux nœuds

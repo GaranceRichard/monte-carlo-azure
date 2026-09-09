@@ -15,7 +15,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 287 | 1473 | 85 | 5 | 0 | 0 | 142 | 2 |
+| 288 | 1481 | 84 | 5 | 0 | 0 | 142 | 2 |
 
 ### Directions observées
 
@@ -27,7 +27,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 | launcher | backend | runtime | 1 |
 | quality | backend | runtime | 5 |
 | quality | frontend | runtime | 3 |
-| quality | quality | runtime | 271 |
+| quality | quality | runtime | 272 |
 
 ### Cycles localisés
 
@@ -93,7 +93,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 | Scripts/run_statistical_exact_replay.py | 326 | python-main-guard | Scripts/run_statistical_exact_replay.py | internal |
 | Scripts/run_statistical_reference_corpus.py | 219 | python-main-guard | Scripts/run_statistical_reference_corpus.py | internal |
 | Scripts/scrub_simulation_identity.py | 98 | python-main-guard | Scripts/scrub_simulation_identity.py | internal |
-| Scripts/setup_git_hooks.py | 344 | python-main-guard | Scripts/setup_git_hooks.py | internal |
+| Scripts/setup_git_hooks.py | 334 | python-main-guard | Scripts/setup_git_hooks.py | internal |
 | Scripts/statistical_main_enforcement.py | 219 | python-main-guard | Scripts/statistical_main_enforcement.py | internal |
 | Scripts/test_execution_profiles.py | 255 | python-main-guard | Scripts/test_execution_profiles.py | internal |
 | Scripts/validate_statistical_compatibility_evidence.py | 62 | python-main-guard | Scripts/validate_statistical_compatibility_evidence.py | internal |
@@ -104,18 +104,17 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 | Scripts/validate_statistical_reference_corpus.py | 452 | python-main-guard | Scripts/validate_statistical_reference_corpus.py | internal |
 | frontend/index.html | 21 | executable-reference | frontend/src/main.tsx | internal |
 | frontend/package.json | 7 | npm-script | external:command:vite | external |
-| frontend/package.json | 8 | npm-script | external:command:node | external |
-| frontend/package.json | 9 | npm-script | external:command:vite | external |
-| frontend/package.json | 10 | npm-script | external:command:tsc | external |
-| frontend/package.json | 11 | npm-script | external:command:eslint | external |
-| frontend/package.json | 12 | npm-script | external:command:vite | external |
+| frontend/package.json | 8 | npm-script | external:command:vite | external |
+| frontend/package.json | 9 | npm-script | external:command:tsc | external |
+| frontend/package.json | 10 | npm-script | external:command:eslint | external |
+| frontend/package.json | 11 | npm-script | external:command:vite | external |
+| frontend/package.json | 12 | npm-script | external:command:vitest | external |
 | frontend/package.json | 13 | npm-script | external:command:vitest | external |
 | frontend/package.json | 14 | npm-script | external:command:vitest | external |
-| frontend/package.json | 15 | npm-script | external:command:vitest | external |
-| frontend/package.json | 16 | npm-script | frontend/scripts/run-statistical-reference-corpus.mjs | internal |
-| frontend/package.json | 17 | npm-script | frontend/scripts/run-e2e-coverage.mjs | internal |
-| frontend/package.json | 18 | npm-script | external:command:npm | external |
-| frontend/package.json | 19 | npm-script | frontend/scripts/run-e2e-coverage.mjs | internal |
+| frontend/package.json | 15 | npm-script | frontend/scripts/run-statistical-reference-corpus.mjs | internal |
+| frontend/package.json | 16 | npm-script | frontend/scripts/run-e2e-coverage.mjs | internal |
+| frontend/package.json | 17 | npm-script | external:command:npm | external |
+| frontend/package.json | 18 | npm-script | frontend/scripts/run-e2e-coverage.mjs | internal |
 | run_app.py | 62 | python-main-guard | run_app.py | internal |
 | start-dev.ps1 | 57 | executable-reference | missing:.vscode/scripts/start-mongo-dev.ps1 | missing |
 | start-dev.ps1 | 59 | executable-reference | run_app.py | internal |

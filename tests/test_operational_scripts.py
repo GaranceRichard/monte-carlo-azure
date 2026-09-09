@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
-from Scripts import purge_inactive_clients, setup_git_hooks
+from Scripts import git_hook_dispatchers, purge_inactive_clients, setup_git_hooks
 
 
 class _Collection:
@@ -114,33 +115,31 @@ def test_git_hook_setup_skips_missing_repo_and_reports_git_results(
         lambda root: bootstrap_calls.append(root) or ready,
     )
     monkeypatch.setattr(
-        setup_git_hooks.subprocess,
-        "run",
-        lambda *_args, **_kwargs: SimpleNamespace(returncode=4),
+        setup_git_hooks,
+        "configure_git_hooks",
+        lambda *_args, **_kwargs: 4,
     )
     assert setup_git_hooks.main(["--root", str(tmp_path)]) == 4
-    assert "Failed to configure" in capsys.readouterr().err
 
-    monkeypatch.setattr(
-        setup_git_hooks.subprocess,
-        "run",
-        lambda *_args, **_kwargs: SimpleNamespace(returncode=0),
-    )
-    assert setup_git_hooks.main(["--root", str(tmp_path)]) == 0
-    output = capsys.readouterr().out
-    assert "Configured git hooks" in output
-    assert "Python environment ready" in output
-    assert bootstrap_calls == [tmp_path.resolve()]
-
+    configure_calls: list[tuple[Path, bool]] = []
     monkeypatch.setattr(
         setup_git_hooks,
         "configure_git_hooks",
-        lambda *_args: pytest.fail("bootstrap-only must not rewrite Git configuration"),
+        lambda root, *, quiet=False: configure_calls.append((root, quiet)) or 0,
     )
+    assert setup_git_hooks.main(["--root", str(tmp_path)]) == 0
+    output = capsys.readouterr().out
+    assert "Python environment ready" in output
+    assert bootstrap_calls == [tmp_path.resolve()]
+
     assert setup_git_hooks.main(
         ["--root", str(tmp_path), "--bootstrap-only", "--quiet-if-ready"]
     ) == 0
     assert capsys.readouterr().out == ""
+    assert configure_calls == [
+        (tmp_path.resolve(), False),
+        (tmp_path.resolve(), True),
+    ]
 
     monkeypatch.setattr(
         setup_git_hooks,
@@ -149,6 +148,106 @@ def test_git_hook_setup_skips_missing_repo_and_reports_git_results(
     )
     assert setup_git_hooks.main(["--root", str(tmp_path), "--bootstrap-only"]) == 1
     assert "bootstrap failed: offline" in capsys.readouterr().err
+
+
+def test_git_hook_setup_installs_stable_physical_dispatchers_idempotently(
+    tmp_path: Path, capsys
+) -> None:
+    root = tmp_path / "repository"
+    root.mkdir()
+    subprocess.run(["git", "init"], cwd=root, check=True, capture_output=True)
+
+    assert setup_git_hooks.configure_git_hooks(root) == 0
+    common_dir = Path(
+        subprocess.run(
+            ["git", "rev-parse", "--git-common-dir"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        ).stdout.strip()
+    )
+    if not common_dir.is_absolute():
+        common_dir = root / common_dir
+    dispatcher_directory = (
+        common_dir.resolve() / git_hook_dispatchers.HOOK_DISPATCHER_DIRECTORY
+    )
+    configured = Path(
+        subprocess.run(
+            ["git", "config", "--local", "--get", "core.hooksPath"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        ).stdout.strip()
+    )
+    assert configured == dispatcher_directory
+    assert not dispatcher_directory.is_symlink()
+    assert not getattr(os.path, "isjunction", lambda _path: False)(dispatcher_directory)
+
+    snapshots: dict[str, tuple[bytes, int]] = {}
+    for hook_name in git_hook_dispatchers.VERSIONED_HOOK_NAMES:
+        dispatcher = dispatcher_directory / hook_name
+        content = dispatcher.read_bytes()
+        assert f'.githooks/{hook_name}"'.encode() in content
+        assert (b"exit 1" in content) is (hook_name == "pre-push")
+        assert not dispatcher.is_symlink()
+        snapshots[hook_name] = (content, dispatcher.stat().st_mtime_ns)
+
+    assert setup_git_hooks.configure_git_hooks(root, quiet=True) == 0
+    assert capsys.readouterr().out.startswith("Configured stable Git hooks path:")
+    assert snapshots == {
+        hook_name: (
+            (dispatcher_directory / hook_name).read_bytes(),
+            (dispatcher_directory / hook_name).stat().st_mtime_ns,
+        )
+        for hook_name in git_hook_dispatchers.VERSIONED_HOOK_NAMES
+    }
+
+
+def test_git_hook_dispatchers_fail_closed_on_invalid_state(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    linked_paths: set[Path] = set()
+    monkeypatch.setattr(
+        git_hook_dispatchers.os.path,
+        "isjunction",
+        lambda path: Path(path) in linked_paths,
+    )
+    linked_dispatcher = tmp_path / "post-checkout"
+    linked_paths.add(linked_dispatcher)
+    with pytest.raises(OSError, match="linked hook dispatcher"):
+        git_hook_dispatchers._write_hook_dispatcher(linked_dispatcher, "fixture")
+
+    linked_directory = tmp_path / "hooks"
+    linked_paths.clear()
+    linked_paths.add(linked_directory)
+    with pytest.raises(OSError, match="linked hook directory"):
+        git_hook_dispatchers._install_dispatchers(linked_directory)
+    linked_paths.clear()
+
+    def git_result(returncode: int, stdout: str = ""):
+        return lambda *_args, **_kwargs: subprocess.CompletedProcess(
+            ["git"], returncode, stdout, ""
+        )
+
+    with pytest.raises(OSError, match="could not resolve"):
+        git_hook_dispatchers._common_git_directory(tmp_path, git_result(2))
+    with pytest.raises(OSError, match="empty shared directory"):
+        git_hook_dispatchers._common_git_directory(tmp_path, git_result(0))
+
+    responses = iter(
+        (
+            subprocess.CompletedProcess(["git"], 0, str(tmp_path / ".git"), ""),
+            subprocess.CompletedProcess(["git"], 3, "", "rejected"),
+        )
+    )
+    assert git_hook_dispatchers.configure_git_hooks(
+        tmp_path, runner=lambda *_args, **_kwargs: next(responses)
+    ) == 1
+    assert "Git rejected the stable hooks path" in capsys.readouterr().err
 
 
 def test_python_environment_bootstrap_creates_repairs_and_stays_idempotent(

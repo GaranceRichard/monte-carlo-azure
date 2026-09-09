@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 set -eu
 
-# Canonical validation worktrees are detached and deliberately reuse the already
-# verified interpreter from the contributor worktree.
-if ! git symbolic-ref --quiet HEAD >/dev/null 2>&1; then
+# Only the quality orchestrator marks its disposable detached worktrees. A
+# detached contributor worktree, including one created by Codex, must bootstrap.
+if [ "${MONTECARLO_CANONICAL_WORKTREE:-}" = "1" ]; then
   exit 0
 fi
 
