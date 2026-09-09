@@ -15,7 +15,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 284 | 1462 | 84 | 5 | 0 | 0 | 139 | 2 |
+| 284 | 1468 | 85 | 5 | 0 | 0 | 139 | 2 |
 
 ### Directions observées
 
@@ -35,7 +35,8 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Déclaré dans | Ligne | Nature | Cible | Résolution |
 | --- | --- | --- | --- | --- |
-| .githooks/pre-push | 17 | executable-reference | Scripts/quality_gate.py | internal |
+| .githooks/pre-push | 16 | executable-reference | Scripts/quality_gate.py | internal |
+| .githooks/python-env | 5 | executable-reference | Scripts/setup_git_hooks.py | internal |
 | .github/workflows/ci.yml | 59 | executable-reference | Scripts/quality_gate.py | internal |
 | .github/workflows/ci.yml | 83 | executable-reference | Scripts/quality_gate.py | internal |
 | .github/workflows/ci.yml | 112 | executable-reference | Scripts/quality_gate.py | internal |
@@ -92,7 +93,7 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 | Scripts/run_statistical_exact_replay.py | 326 | python-main-guard | Scripts/run_statistical_exact_replay.py | internal |
 | Scripts/run_statistical_reference_corpus.py | 219 | python-main-guard | Scripts/run_statistical_reference_corpus.py | internal |
 | Scripts/scrub_simulation_identity.py | 98 | python-main-guard | Scripts/scrub_simulation_identity.py | internal |
-| Scripts/setup_git_hooks.py | 30 | python-main-guard | Scripts/setup_git_hooks.py | internal |
+| Scripts/setup_git_hooks.py | 344 | python-main-guard | Scripts/setup_git_hooks.py | internal |
 | Scripts/statistical_main_enforcement.py | 219 | python-main-guard | Scripts/statistical_main_enforcement.py | internal |
 | Scripts/test_execution_profiles.py | 255 | python-main-guard | Scripts/test_execution_profiles.py | internal |
 | Scripts/validate_statistical_compatibility_evidence.py | 62 | python-main-guard | Scripts/validate_statistical_compatibility_evidence.py | internal |

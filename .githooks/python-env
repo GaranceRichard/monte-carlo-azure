@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+set -eu
+
+REPO_ROOT=${1:-$(git rev-parse --show-toplevel)}
+BOOTSTRAP="$REPO_ROOT/Scripts/setup_git_hooks.py"
+LOCAL_PYTHON="$REPO_ROOT/.venv/Scripts/python.exe"
+if [ ! -x "$LOCAL_PYTHON" ]; then
+  LOCAL_PYTHON="$REPO_ROOT/.venv/bin/python"
+fi
+
+if [ -x "$LOCAL_PYTHON" ] && "$LOCAL_PYTHON" -c \
+  "import pathlib,sys; expected=pathlib.Path(sys.argv[1]).resolve(); actual=pathlib.Path(sys.prefix).resolve(); raise SystemExit(0 if actual == expected and sys.prefix != sys.base_prefix and sys.version_info >= (3, 10) else 1)" \
+  "$REPO_ROOT/.venv"; then
+  exec "$LOCAL_PYTHON" "$BOOTSTRAP" --root "$REPO_ROOT" --bootstrap-only --quiet-if-ready
+fi
+
+if command -v py >/dev/null 2>&1 && py -3 -c "import sys" >/dev/null 2>&1; then
+  exec py -3 "$BOOTSTRAP" --root "$REPO_ROOT" --bootstrap-only --quiet-if-ready
+fi
+
+SYSTEM_PYTHON=$(command -p -v python3 2>/dev/null || true)
+if [ -n "$SYSTEM_PYTHON" ] && "$SYSTEM_PYTHON" -c "import sys" >/dev/null 2>&1; then
+  exec "$SYSTEM_PYTHON" "$BOOTSTRAP" --root "$REPO_ROOT" --bootstrap-only --quiet-if-ready
+fi
+
+SYSTEM_PYTHON=$(command -p -v python 2>/dev/null || true)
+if [ -n "$SYSTEM_PYTHON" ] && "$SYSTEM_PYTHON" -c "import sys" >/dev/null 2>&1; then
+  exec "$SYSTEM_PYTHON" "$BOOTSTRAP" --root "$REPO_ROOT" --bootstrap-only --quiet-if-ready
+fi
+
+if command -v python >/dev/null 2>&1 && python -c "import sys" >/dev/null 2>&1; then
+  exec python "$BOOTSTRAP" --root "$REPO_ROOT" --bootstrap-only --quiet-if-ready
+fi
+
+echo "ERROR: Python 3.10+ is required to prepare the worktree-local .venv." >&2
+exit 1

@@ -88,7 +88,11 @@ def test_operational_entrypoints_are_isolated_from_external_state(monkeypatch) -
         "run",
         lambda *_args, **_kwargs: SimpleNamespace(returncode=0),
     )
-    monkeypatch.setattr(sys, "argv", ["setup_git_hooks.py"])
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["setup_git_hooks.py", "--root", str(ROOT / "missing-entrypoint-fixture")],
+    )
     with pytest.raises(SystemExit) as exc:
         runpy.run_path(str(ROOT / "Scripts/setup_git_hooks.py"), run_name="__main__")
     assert exc.value.code == 0

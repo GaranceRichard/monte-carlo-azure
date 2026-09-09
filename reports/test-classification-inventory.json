@@ -5639,6 +5639,54 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_operational_scripts.py::test_python_environment_bootstrap_creates_repairs_and_stays_idempotent",
+    "framework": "pytest",
+    "sourcePath": "tests/test_operational_scripts.py",
+    "selector": "test_python_environment_bootstrap_creates_repairs_and_stays_idempotent",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_operational_scripts.py::test_python_environment_bootstrap_fails_closed_on_invalid_prerequisites",
+    "framework": "pytest",
+    "sourcePath": "tests/test_operational_scripts.py",
+    "selector": "test_python_environment_bootstrap_fails_closed_on_invalid_prerequisites",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
+    ],
+    "domains": [
+      "deployment"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_operational_scripts.py::test_python_environment_probe_and_manifest_reject_malformed_state",
+    "framework": "pytest",
+    "sourcePath": "tests/test_operational_scripts.py",
+    "selector": "test_python_environment_probe_and_manifest_reject_malformed_state",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience",
+      "data_quality"
+    ],
+    "domains": [
+      "deployment"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_pre_commit_guard.py::test_external_checks_cover_missing_failure_and_success",
     "framework": "pytest",
     "sourcePath": "tests/test_pre_commit_guard.py",
@@ -5771,6 +5819,22 @@
     "nature": "integration",
     "purposes": [
       "functional"
+    ],
+    "domains": [
+      "quality_chain"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_pre_commit_hook_integration.py::test_fresh_worktree_bootstraps_before_one_canonical_push_and_fails_closed",
+    "framework": "pytest",
+    "sourcePath": "tests/test_pre_commit_hook_integration.py",
+    "selector": "test_fresh_worktree_bootstraps_before_one_canonical_push_and_fails_closed",
+    "status": "classified",
+    "executionProfile": "main",
+    "nature": "integration",
+    "purposes": [
+      "functional",
+      "resilience"
     ],
     "domains": [
       "quality_chain"

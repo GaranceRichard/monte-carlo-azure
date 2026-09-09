@@ -13,8 +13,8 @@
   },
   "summary": {
     "sourceModules": 284,
-    "importEdges": 1462,
-    "entrypoints": 84,
+    "importEdges": 1468,
+    "entrypoints": 85,
     "missingEntrypoints": 5,
     "cycles": 0,
     "runtimeCycles": 0,
@@ -5929,8 +5929,44 @@
       },
       {
         "source": "Scripts/setup_git_hooks.py",
-        "target": "external:python:pathlib",
+        "target": "external:python:argparse",
+        "line": 6,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "argparse",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/setup_git_hooks.py",
+        "target": "external:python:hashlib",
+        "line": 7,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "hashlib",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/setup_git_hooks.py",
+        "target": "external:python:json",
         "line": 8,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "json",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/setup_git_hooks.py",
+        "target": "external:python:os",
+        "line": 9,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "os",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/setup_git_hooks.py",
+        "target": "external:python:pathlib",
+        "line": 13,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "pathlib",
@@ -5939,7 +5975,7 @@
       {
         "source": "Scripts/setup_git_hooks.py",
         "target": "external:python:subprocess",
-        "line": 6,
+        "line": 10,
         "kind": "python-import",
         "phase": "runtime",
         "specifier": "subprocess",
@@ -5948,10 +5984,28 @@
       {
         "source": "Scripts/setup_git_hooks.py",
         "target": "external:python:sys",
-        "line": 7,
+        "line": 11,
         "kind": "python-import",
         "phase": "runtime",
         "specifier": "sys",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/setup_git_hooks.py",
+        "target": "external:python:time",
+        "line": 12,
+        "kind": "python-import",
+        "phase": "runtime",
+        "specifier": "time",
+        "resolution": "external"
+      },
+      {
+        "source": "Scripts/setup_git_hooks.py",
+        "target": "external:python:typing",
+        "line": 14,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "typing",
         "resolution": "external"
       },
       {
@@ -14607,9 +14661,16 @@
     "entrypoints": [
       {
         "declaredIn": ".githooks/pre-push",
-        "line": 17,
+        "line": 16,
         "kind": "executable-reference",
         "target": "Scripts/quality_gate.py",
+        "resolution": "internal"
+      },
+      {
+        "declaredIn": ".githooks/python-env",
+        "line": 5,
+        "kind": "executable-reference",
+        "target": "Scripts/setup_git_hooks.py",
         "resolution": "internal"
       },
       {
@@ -15006,7 +15067,7 @@
       },
       {
         "declaredIn": "Scripts/setup_git_hooks.py",
-        "line": 30,
+        "line": 344,
         "kind": "python-main-guard",
         "target": "Scripts/setup_git_hooks.py",
         "resolution": "internal"

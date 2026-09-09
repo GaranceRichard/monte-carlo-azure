@@ -30,7 +30,10 @@ restent applicables.
 - `git commit` est un checkpoint local sans validation : il peut figer un état transitoire et reste
   indépendant du push. Le hook pré-commit n'exécute aucune gate et aucune modification artificielle du
   README n'est exigée.
-- `python Scripts/quality_gate.py scope --base <référence> --allow <chemin> [...]` compare le worktree entier
+- Après la configuration unique des hooks, le `post-checkout` d'un worktree branché crée ou synchronise son
+  `.venv` physique depuis `requirements.txt`, refuse liens et junctions, vérifie l'interpréteur et `pip check`,
+  puis n'écrit son empreinte qu'après succès. Cette préparation précède le premier scope ou test local.
+- `.venv\Scripts\python.exe Scripts/quality_gate.py scope --base <référence> --allow <chemin> [...]` compare le worktree entier
   au merge-base, inclut les fichiers non suivis non ignorés, refuse tout chemin hors périmètre et exige
   `--allow-massive` pour une autorité transverse. Il n'exécute aucun test et ne génère aucun artefact.
 - Pendant le développement, les tests sont invoqués directement et au plus près du risque. Le mode `fast`
@@ -49,13 +52,18 @@ restent applicables.
 - Le cycle normal n'exécute pas la task canonique avant le push : le hook valide une seule fois chaque SHA
   terminal distinct avant le transfert. Une nouvelle exécution n'est utile qu'après modification du
   candidat ou résolution d'un échec ; la CI distante conserve sa propre frontière de confiance.
+- Avant d'appeler `quality_gate.py`, le pré-push réutilise le bootstrap idempotent du worktree. Un échec de
+  création, de synchronisation, de sonde ou de `pip check` bloque sans démarrer le plan canonique. Après ce
+  prérequis, le hook ne possède aucun fallback vers le Python système et exécute uniquement l'interpréteur
+  `.venv` local ; toutes les gates et tous les préflights existants restent inchangés.
 - Le snapshot volontaire du mode `fast` matérialise l’index sans `.git`. Les tests qui ne portent pas sur
   Git injectent explicitement cette frontière déjà isolée ; les tests du snapshot Git utilisent exclusivement
   un dépôt et un index temporaires. Le snapshot complet de `main` continue d’exiger un dépôt et un index
   valides.
-- Toute validation isolée transmet `MONTECARLO_E2E_PYTHON` avec l’interpréteur Python hôte à chaque chemin
-  d’exécution : séquence, branches parallèles du DAG et nœud sélectionné. Le serveur Playwright du worktree
-  réutilise ainsi explicitement les dépendances Python hôte.
+- Toute validation isolée transmet `MONTECARLO_E2E_PYTHON` avec l’interpréteur du `.venv` validé du worktree
+  contributeur à chaque chemin d’exécution : séquence, branches parallèles du DAG et nœud sélectionné. Le
+  serveur Playwright du worktree détaché réutilise ainsi explicitement les dépendances Python locales sans
+  créer un second environnement éphémère.
 - Tout contrôle déclarant une dépendance à l’outillage frontend réutilise une exposition unique et temporaire
   de `frontend/node_modules` depuis l’installation hôte, même si le plan ne contient aucune commande `npm`.
   Le code, les configurations et les tests restent lus dans le snapshot isolé ; seuls les outils immuables
@@ -217,6 +225,8 @@ Seuls le code trivial et le code purement déclaratif sans logique peuvent reste
 ## Checklist DoD
 
 - [ ] Périmètre déclaré contrôlé, sans chemin inattendu ni portée massive non acquittée.
+- [ ] `.venv` physique exploitable, conforme à l'empreinte de `requirements.txt` et validé par `pip check`
+      avant l'entrée dans le plan canonique ; le pré-push utilise exclusivement son Python.
 - [ ] Gate pré-push du profil `main` entièrement verte sur le SHA terminal publié.
 - [ ] Classification bloquante verte : inventaire exact, déterministe et sans `unresolved` ni exception
       invalide.

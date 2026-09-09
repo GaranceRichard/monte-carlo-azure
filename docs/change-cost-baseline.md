@@ -55,7 +55,7 @@ Sources : `docs/quality-infrastructure-responsibilities-map.md#quality-gates-mod
 
 | Fichiers | Production | Tests | Lignes | Couches | Arêtes internes | Arêtes de frontière | Hotspots |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 9 | 6 | 2 | 7652 | 3 | 7 | 18 | 1 |
+| 9 | 6 | 2 | 7660 | 3 | 7 | 18 | 1 |
 
 Couches : `proof-tests`, `quality-contract`, `quality-orchestration`.
 

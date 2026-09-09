@@ -14,12 +14,32 @@ La CI conserve le profil complet après le push. Cette répétition est nécessa
 absent ou contourné, alors que GitHub constitue la frontière de confiance qui autorise publication d'image et
 déploiement Pages.
 
+## 0. Préparer le runtime du worktree
+
+L'initialisation unique `python Scripts/setup_git_hooks.py` configure `core.hooksPath=.githooks` et prépare
+le checkout courant. Cette configuration Git commune est héritée par les worktrees liés. Dès lors,
+`git worktree add` déclenche le `post-checkout` versionné : avant de rendre la main sur une branche, il crée
+le `.venv` local avec `venv --copies`, installe `requirements.txt`, exécute `pip check`, puis écrit
+atomiquement une empreinte associant schéma de bootstrap, SHA-256 exact de `requirements.txt`, version du
+runtime et inventaire installé. Aucun lien, junction ou environnement partagé n'est créé.
+
+Si l'interpréteur, l'empreinte ou l'inventaire manque ou diverge, le même mécanisme répare ou resynchronise
+l'environnement. Si tout concorde, une sonde de l'interpréteur et `pip check` suffisent : aucune installation
+n'est rejouée. Le Python système peut seulement amorcer un `.venv` absent ou inexploitable ; il n'exécute
+aucune gate. Les plages déclarées dans `requirements.txt` restent l'autorité des versions acceptables ;
+l'empreinte rend la décision de synchronisation déterministe sans inventer un verrouillage absent du dépôt.
+
+Le pré-push appelle ce bootstrap avant `quality_gate.py` et bloque immédiatement s'il échoue. Il invoque
+ensuite exclusivement `.venv/Scripts/python.exe` sous Windows ou `.venv/bin/python` ailleurs. Le worktree
+détaché temporaire créé par la validation canonique ne relance pas l'installation : son HEAD détaché est
+reconnu par `post-checkout` et le DAG reçoit explicitement l'interpréteur déjà validé du worktree contributeur.
+
 ## 1. Fixer et contrôler le périmètre
 
 Déclarer les chemins permis au début du PBI, puis lancer le contrôle après la première tranche cohérente :
 
 ```powershell
-python Scripts/quality_gate.py scope --base origin/main `
+.\.venv\Scripts\python.exe Scripts/quality_gate.py scope --base origin/main `
   --allow AGENTS.md `
   --allow README.md `
   --allow ".githooks/*" `
@@ -65,6 +85,11 @@ Avant le push :
 3. relancer le contrôle de périmètre avec les mêmes motifs ;
 4. commiter l'état final et vérifier la branche ainsi que le remote GitHub ;
 5. exécuter `git push` sans lancer préalablement la task canonique identique.
+
+Avant même d'interpréter le plan, le hook synchronise et sonde le `.venv` local. Un échec de création,
+d'installation, d'empreinte, d'interpréteur ou de `pip check` arrête le push sans créer le worktree détaché
+du candidat et sans exécuter une commande canonique. Cette barrière complète les préflights frontend et
+Docker existants ; elle ne retire, ne décale après une suite coûteuse ni ne réduit aucun de leurs contrôles.
 
 Le pré-push lit les références réellement envoyées. Pour chaque plage introduisant de nouveaux commits,
 `README.md` racine doit exister dans l'état final et son blob doit différer de celui de chacune des bases de
@@ -119,6 +144,10 @@ Mesures de migration acquises sur le même poste Windows :
 | Sortie du hook | 197 lignes / 12 593 octets | 0 / 0 | 100 % |
 | Affichage du plan de push | 40 lignes / 12 741 octets | 2 lignes / 260 octets | 95 % des lignes, 97,96 % des octets |
 | Scope, sans validation | absent | médiane 0,266561 s ; 3 lectures Git | dérive détectée avant les suites |
+| Bootstrap Python d'un worktree neuf, cache pip chaud | manuel après l'échec | 44,674 s, automatiquement à la création | installation déplacée avant toute gate |
+| Préflight Python idempotent | absent | médiane 1,848872 s ; p95 2,938926 s sur 11 passages | 0 installation, 0 ligne / 0 octet de sortie |
+| Validations canoniques pour le scénario `.venv` absent | 2 tentatives, dont 1 perdue | 1 tentative | 1 tentative perdue supprimée, soit 100 % |
+| Réparation manuelle entre deux push | 1 | 0 | geste intermédiaire supprimé |
 
 Le temps avant est un échantillon réussi de la gate `fast` massive. Les médianes après proviennent de
 11 mesures ; la sortie du plan compact final de 38 commandes a été relevée à 49 chemins et peut varier
@@ -130,6 +159,14 @@ Les autres mesures intermédiaires conservées étaient : hook 0,070232 s, scope
 Ces nombres ne prédisent pas la durée du profil complet. L'audit, les tests de migration et les
 régénérations statiques nécessaires sont un coût ponctuel, distinct du coût de chaque contribution.
 Aucune exécution complète n'est nécessaire pour régénérer les compteurs avant la validation canonique.
+
+Les mesures du bootstrap ont été prises sur le même poste Windows, Python 3.12.10, avec le SHA-256
+`4e374d210b76…` de `requirements.txt`. Le temps à froid est celui rapporté par le bootstrap réel de ce
+worktree ; les 11 temps chauds couvrent le helper de hook, la sonde d'interpréteur, la comparaison
+d'empreinte et `pip check`. Le gain de publication est mesuré d'abord en tentatives, car aucun relevé mural
+homologue du run historique perdu faute de `.venv` n'a été conservé : le gain temporel net vaut la durée de
+ce run échoué moins le préflight chaud médian de 1,848872 s. L'installation n'est pas présentée comme
+supprimée ; elle est automatisée et déplacée au point où son échec ne peut encore gaspiller un canonique.
 
 Le candidat intermédiaire `82d5c643` a été refusé en 137,715 s, avant tout transfert : une empreinte de
 décision, une projection descriptive et une attente CLI obsolètes causaient 31 échecs Python. Ce coût

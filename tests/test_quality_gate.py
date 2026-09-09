@@ -2904,7 +2904,9 @@ def test_docker_smoke_retries_a_transient_connection_reset(monkeypatch) -> None:
 
 def test_hooks_and_ci_delegate_to_the_central_command() -> None:
     pre_commit = (ROOT / ".githooks" / "pre-commit").read_text(encoding="utf-8")
+    post_checkout = (ROOT / ".githooks" / "post-checkout").read_text(encoding="utf-8")
     pre_push = (ROOT / ".githooks" / "pre-push").read_text(encoding="utf-8")
+    python_env = (ROOT / ".githooks" / "python-env").read_text(encoding="utf-8")
     ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
 
     assert "quality_gate.py" not in pre_commit
@@ -2912,6 +2914,12 @@ def test_hooks_and_ci_delegate_to_the_central_command() -> None:
         line.strip() for line in pre_commit.splitlines() if line and not line.startswith("#")
     ]
     assert executable_lines == ["exit 0"]
+    assert "git symbolic-ref --quiet HEAD" in post_checkout
+    assert '.githooks/python-env" "$REPO_ROOT"' in post_checkout
+    assert "Scripts/setup_git_hooks.py" in python_env
+    assert "--bootstrap-only --quiet-if-ready" in python_env
+    assert pre_push.index(".githooks/python-env") < pre_push.index("Scripts/quality_gate.py")
+    assert "PYTHON=python" not in pre_push
     assert "Scripts/quality_gate.py\" push" in pre_push
     assert '--remote-name "${1:-}"' in pre_push
     assert '--remote-url "${2:-}"' in pre_push

@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+set -eu
+
+# Canonical validation worktrees are detached and deliberately reuse the already
+# verified interpreter from the contributor worktree.
+if ! git symbolic-ref --quiet HEAD >/dev/null 2>&1; then
+  exit 0
+fi
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+"$REPO_ROOT/.githooks/python-env" "$REPO_ROOT"

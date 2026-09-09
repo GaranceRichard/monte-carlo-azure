@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -129,4 +130,136 @@ def test_publication_secret_scan_rejects_a_secret_removed_by_a_later_checkpoint(
     assert historical.returncode == 1
     assert "example.py:1 | GitHub token" in historical.stderr
     assert not (repository / "validation-was-called").exists()
+    assert _real_index_digest() == real_index_before
+
+
+def test_fresh_worktree_bootstraps_before_one_canonical_push_and_fails_closed(
+    tmp_path: Path,
+) -> None:
+    real_index_before = _real_index_digest()
+    repository = tmp_path / "source"
+    repository.mkdir()
+    _git(repository, "init")
+    _git(repository, "config", "core.hooksPath", ".githooks")
+    hooks = repository / ".githooks"
+    hooks.mkdir()
+    for name in ("post-checkout", "pre-push", "python-env"):
+        shutil.copy2(ROOT / ".githooks" / name, hooks / name)
+        (hooks / name).chmod(0o755)
+    scripts = repository / "Scripts"
+    scripts.mkdir()
+    shutil.copy2(ROOT / "Scripts/setup_git_hooks.py", scripts / "setup_git_hooks.py")
+    (repository / "requirements.txt").write_text("", encoding="utf-8")
+    (repository / "README.md").write_text("# Fresh worktree fixture\n", encoding="utf-8")
+    (scripts / "quality_gate.py").write_text(
+        "import json\n"
+        "import os\n"
+        "import sys\n"
+        "from pathlib import Path\n"
+        "root = Path.cwd()\n"
+        "relative = Path('Scripts/python.exe') if os.name == 'nt' else Path('bin/python')\n"
+        "expected = (root / '.venv' / relative).resolve()\n"
+        "if Path(sys.executable).resolve() != expected:\n"
+        "    raise SystemExit(29)\n"
+        "counter = root / 'canonical-invocations.json'\n"
+        "previous = json.loads(counter.read_text()) if counter.exists() else {'count': 0}\n"
+        "counter.write_text(json.dumps({'count': previous['count'] + 1, "
+        "'python': str(Path(sys.executable).resolve())}))\n",
+        encoding="utf-8",
+    )
+    _git(repository, "add", ".")
+    _git(
+        repository,
+        "update-index",
+        "--chmod=+x",
+        ".githooks/post-checkout",
+        ".githooks/pre-push",
+        ".githooks/python-env",
+    )
+    _git(repository, "commit", "-m", "fixture")
+    remote = tmp_path / "remote.git"
+    _git(tmp_path, "init", "--bare", str(remote))
+    _git(repository, "remote", "add", "origin", str(remote))
+
+    worktree = tmp_path / "fresh-worktree"
+    add = subprocess.run(
+        ["git", "worktree", "add", "-b", "contribution", str(worktree)],
+        cwd=repository,
+        env=_git_environment(),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=False,
+    )
+    assert add.returncode == 0, add.stderr
+    local_python = (
+        worktree
+        / ".venv"
+        / (Path("Scripts/python.exe") if os.name == "nt" else Path("bin/python"))
+    )
+    stamp = worktree / ".venv/.montecarlo-python-environment.json"
+    assert local_python.is_file()
+    assert stamp.is_file()
+    assert not (worktree / ".venv").is_symlink()
+    assert not getattr(os.path, "isjunction", lambda _path: False)(worktree / ".venv")
+    assert not (worktree / "canonical-invocations.json").exists()
+
+    stamp_before = stamp.read_bytes()
+    warm = subprocess.run(
+        [
+            sys._base_executable,
+            str(worktree / "Scripts/setup_git_hooks.py"),
+            "--root",
+            str(worktree),
+            "--bootstrap-only",
+            "--quiet-if-ready",
+        ],
+        cwd=worktree,
+        env=_git_environment(),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=False,
+    )
+    assert warm.returncode == 0, warm.stderr
+    assert warm.stdout == ""
+    assert stamp.read_bytes() == stamp_before
+
+    push = subprocess.run(
+        ["git", "push", "origin", "HEAD:main"],
+        cwd=worktree,
+        env=_git_environment(),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=False,
+    )
+    assert push.returncode == 0, push.stderr
+    invocation_path = worktree / "canonical-invocations.json"
+    invocation = json.loads(invocation_path.read_text(encoding="utf-8"))
+    assert invocation == {"count": 1, "python": str(local_python.resolve())}
+
+    detached = tmp_path / "canonical-worktree"
+    _git(repository, "worktree", "add", "--detach", str(detached))
+    assert not (detached / ".venv").exists()
+    assert _git(repository, "worktree", "remove", "--force", str(detached)) == ""
+
+    (worktree / "Scripts/setup_git_hooks.py").write_text(
+        "raise SystemExit(23)\n", encoding="utf-8"
+    )
+    (worktree / "second.txt").write_text("candidate\n", encoding="utf-8")
+    _git(worktree, "add", "Scripts/setup_git_hooks.py", "second.txt")
+    _git(worktree, "commit", "-m", "unavailable bootstrap fixture")
+    blocked = subprocess.run(
+        ["git", "push", "origin", "HEAD:main"],
+        cwd=worktree,
+        env=_git_environment(),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=False,
+    )
+    assert blocked.returncode != 0
+    assert json.loads(invocation_path.read_text(encoding="utf-8"))["count"] == 1
+    assert _git(repository, "worktree", "remove", "--force", str(worktree)) == ""
     assert _real_index_digest() == real_index_before

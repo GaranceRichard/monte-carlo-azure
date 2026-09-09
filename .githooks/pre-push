@@ -2,15 +2,14 @@
 set -eu
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
+"$REPO_ROOT/.githooks/python-env" "$REPO_ROOT"
 
 if [ -x "$REPO_ROOT/.venv/Scripts/python.exe" ]; then
   PYTHON="$REPO_ROOT/.venv/Scripts/python.exe"
 elif [ -x "$REPO_ROOT/.venv/bin/python" ]; then
   PYTHON="$REPO_ROOT/.venv/bin/python"
-elif command -v python >/dev/null 2>&1; then
-  PYTHON=python
 else
-  echo "ERROR: Python is required. Create .venv or install python before pushing." >&2
+  echo "ERROR: the worktree-local .venv is not executable after bootstrap." >&2
   exit 1
 fi
 

@@ -2,6 +2,17 @@
 
 ## Recent
 
+### Environnement Python automatique par worktree
+
+- ajout d'un bootstrap `post-checkout` qui crée physiquement le `.venv` de chaque nouveau worktree branché,
+  installe les dépendances déclarées et conserve une empreinte déterministe du fichier d'autorité, du runtime
+  et de l'inventaire installé ;
+- défense en profondeur du pré-push : resynchronisation idempotente, `pip check`, refus fermé avant le plan
+  canonique et suppression du fallback qui permettait à la gate de s'exécuter avec le Python système ;
+- preuve d'intégration par vrai `git worktree add` et push instrumenté : un seul appel canonique avec le
+  Python local, aucun appel si le bootstrap échoue et aucune installation jetable dans le worktree détaché
+  interne de validation.
+
 ### Complétude de l’historique sous autorité delivery — PBI 7.27
 
 - ajout de `DeliveryHistoryResult` et d’un diagnostic immuable distinguant `complete`, `incomplete` et

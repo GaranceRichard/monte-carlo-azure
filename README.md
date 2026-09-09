@@ -286,14 +286,18 @@ Redis, la purge et les contrôles d’exploitation sont documentés dans
 
 Dans VS Code, `Ctrl+Shift+B` lance également la tâche par défaut `Dev: 5 terminaux`.
 
-Installation manuelle :
+Initialisation de l'outillage local :
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+python Scripts/setup_git_hooks.py
 npm --prefix frontend install
 ```
+
+Cette commande configure les hooks versionnés et crée le `.venv` physique du checkout avec les dépendances
+de `requirements.txt`. Ensuite, chaque `git worktree add` portant une branche prépare automatiquement son
+propre environnement avant de rendre la main. La commande
+`python Scripts/setup_git_hooks.py --bootstrap-only` reste disponible pour une réparation explicite ;
+l'activation interactive du `.venv` n'est pas requise par les hooks.
 
 Puis lancer le backend et le frontend :
 
@@ -344,13 +348,17 @@ Chaque chantier part du dernier état pertinent de `origin/main`, puis annonce s
 dédiés hors du dépôt principal. Il suit les autorités indiquées par la [carte documentaire](docs/README.md)
 et les règles permanentes d’[`AGENTS.md`](AGENTS.md). Le worktree doit rester entièrement supprimable par
 `git worktree remove` : aucun reparse point Windows — notamment junction ou lien symbolique — n’y est admis.
-`.venv`, `frontend/node_modules` et les autres dépendances y sont installés physiquement si nécessaire, ou
-les outils partagés sont invoqués directement sans lien filesystem.
+Le `post-checkout` crée ou synchronise automatiquement le `.venv` physique d'un nouveau worktree branché,
+sans junction ni lien symbolique. Son empreinte associe `requirements.txt`, le runtime et l'inventaire
+installé ; un second passage inchangé ne réinstalle rien. Le pré-push revérifie le même état, échoue avant
+le plan canonique si sa préparation est impossible, puis invoque exclusivement le Python local. Les
+dépendances frontend restent installées physiquement si nécessaire. Le worktree détaché éphémère du
+canonique ne duplique pas l'installation : il réutilise explicitement ce Python local déjà validé.
 
 Le prompt et l’outcome demandé bornent strictement le périmètre ; toute extension non nécessaire est retirée
 avant les validations coûteuses. Un commit est un checkpoint technique local sans gate et peut conserver un
 état transitoire. Le périmètre est contrôlé tôt avec
-`python Scripts/quality_gate.py scope --base origin/main --allow <chemin> [...]`; pendant le développement,
+`.venv\Scripts\python.exe Scripts/quality_gate.py scope --base origin/main --allow <chemin> [...]`; pendant le développement,
 seuls les tests ciblés et proportionnés sont exécutés. Le push est l’unique point d’engagement : son pré-push
 exige un README racine final dont le contenu diffère des bases de chaque plage de nouveaux commits, scanne
 tous les commits introduits et exécute une seule fois le profil `main` complet, smoke Docker inclus, sur
