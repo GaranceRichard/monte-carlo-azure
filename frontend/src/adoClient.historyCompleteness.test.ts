@@ -30,7 +30,7 @@ describe("adoClient delivery-history completeness", () => {
       { week: "2026-01-05", throughput: 0 },
       { week: "2026-01-12", throughput: 0 },
     ]);
-    expect(result.historyCompleteness).toEqual({
+    expect(result.diagnostics.completeness).toEqual({
       status: "complete",
       code: "delivery_history_complete",
       requiredItemCount: 0,
@@ -53,7 +53,7 @@ describe("adoClient delivery-history completeness", () => {
 
     const result = await getTeamDeliveryDataDirect(...completePeriodArguments());
 
-    expect(result.historyCompleteness).toEqual({
+    expect(result.diagnostics.completeness).toEqual({
       status: "complete",
       code: "delivery_history_complete",
       requiredItemCount: 1,
@@ -77,7 +77,7 @@ describe("adoClient delivery-history completeness", () => {
     );
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(result.historyCompleteness.status).toBe("absent");
+    expect(result.diagnostics.completeness.status).toBe("absent");
   });
 
   it("retains an incomplete diagnostic when a required item cannot be loaded", async () => {
@@ -88,13 +88,13 @@ describe("adoClient delivery-history completeness", () => {
 
     const result = await getTeamDeliveryDataDirect(...completePeriodArguments());
 
-    expect(result.historyCompleteness).toEqual({
+    expect(result.diagnostics.completeness).toEqual({
       status: "incomplete",
       code: "delivery_history_incomplete",
       requiredItemCount: 1,
       observedItemCount: 0,
       missingItemIds: ["101"],
     });
-    expect(result.warning).toContain("historique partiel");
+    expect(result.warning).toContain("Collecte des work items interrompue");
   });
 });

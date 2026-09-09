@@ -51,6 +51,7 @@ def test_cohesive_consumers_use_the_delivery_completeness_result() -> None:
     ).read_text(encoding="utf-8")
 
     assert ado_client.count("createDeliveryHistoryResult(") == 2
-    assert "deliveryHistory.completeness" in ado_client
-    assert "response.historyCompleteness.status" in forecast
+    assert "completeness: deliveryHistoryResult" in ado_client
+    assert "response.diagnostics.completeness.status" in forecast
+    assert "response.historyCompleteness.status" not in forecast
     assert "batchFailures.length" not in ado_client

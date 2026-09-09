@@ -49,7 +49,7 @@
         "fileCount": 21,
         "productionFileCount": 13,
         "testFileCount": 8,
-        "lineCount": 5996,
+        "lineCount": 5997,
         "layerCount": 9,
         "internalDependencyEdges": 27,
         "boundaryDependencyEdges": 74,
@@ -97,10 +97,10 @@
         "fileCount": 11,
         "productionFileCount": 7,
         "testFileCount": 4,
-        "lineCount": 2410,
+        "lineCount": 2396,
         "layerCount": 4,
-        "internalDependencyEdges": 5,
-        "boundaryDependencyEdges": 65,
+        "internalDependencyEdges": 4,
+        "boundaryDependencyEdges": 66,
         "confirmedHotspotCount": 3
       },
       "layers": [
@@ -159,7 +159,7 @@
       "path": "frontend/src/application/team-forecast/localTeamForecast.ts",
       "scenarioCount": 2,
       "dependencyDegree": 14,
-      "lineCount": 235,
+      "lineCount": 236,
       "signals": {
         "repeatedTraversal": true,
         "highCoupling": true,
@@ -214,7 +214,7 @@
       "path": "frontend/src/adoClient.ts",
       "scenarioCount": 1,
       "dependencyDegree": 10,
-      "lineCount": 675,
+      "lineCount": 665,
       "signals": {
         "repeatedTraversal": false,
         "highCoupling": true,

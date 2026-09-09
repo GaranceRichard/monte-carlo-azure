@@ -84,10 +84,11 @@ async function fetchRemoteTeamThroughput(
     params.types,
     params.serverUrl,
   );
-  if (response.historyCompleteness.status !== "complete") {
+  if (response.diagnostics.completeness.status !== "complete") {
     throw new Error(INSUFFICIENT_HISTORY_MESSAGE);
   }
-  const weeklyThroughput = response.weeklyThroughput;
+  const weeklyThroughput = [...response.weeklyThroughput];
+  const cycleTimeDaysData = [...response.cycleTimeDaysData];
   const throughputSamples = weeklyThroughput.map((row) => row.throughput);
   const sampleStats: SampleStats = {
     totalWeeks: weeklyThroughput.length,
@@ -96,7 +97,7 @@ async function fetchRemoteTeamThroughput(
   };
   return {
     weeklyThroughput,
-    cycleTimeDaysData: response.cycleTimeDaysData,
+    cycleTimeDaysData,
     throughputSamples,
     sampleStats,
     warning: response.warning,

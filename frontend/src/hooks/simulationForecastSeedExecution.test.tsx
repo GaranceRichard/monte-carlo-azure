@@ -34,6 +34,12 @@ const COMPLETE_HISTORY_COMPLETENESS = {
   observedItemCount: 6,
   missingItemIds: [],
 } as const;
+const COMPLETE_DELIVERY_DIAGNOSTICS = {
+  periods: [],
+  completeness: COMPLETE_HISTORY_COMPLETENESS,
+  continuity: [],
+  chronology: [],
+} as const;
 
 const API_RESPONSE_WEEKS = {
   result_kind: "weeks" as const,
@@ -108,7 +114,7 @@ describe("simulation forecast seed execution boundary", () => {
     vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({
       weeklyThroughput: WEEKLY_THROUGHPUT,
       cycleTimeDaysData: [],
-      historyCompleteness: COMPLETE_HISTORY_COMPLETENESS,
+      diagnostics: COMPLETE_DELIVERY_DIAGNOSTICS,
     });
   });
 

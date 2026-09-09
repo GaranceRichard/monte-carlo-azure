@@ -51,12 +51,17 @@ describe("localTeamForecast delivery-history completeness", () => {
     vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({
       weeklyThroughput: WEEKLY_THROUGHPUT,
       cycleTimeDaysData: [],
-      historyCompleteness: {
-        status: "incomplete",
-        code: "delivery_history_incomplete",
-        requiredItemCount: 7,
-        observedItemCount: 6,
-        missingItemIds: [createDeliveryItemId("7")],
+      diagnostics: {
+        periods: [],
+        completeness: {
+          status: "incomplete",
+          code: "delivery_history_incomplete",
+          requiredItemCount: 7,
+          observedItemCount: 6,
+          missingItemIds: [createDeliveryItemId("7")],
+        },
+        continuity: [],
+        chronology: [],
       },
     });
 
@@ -67,16 +72,22 @@ describe("localTeamForecast delivery-history completeness", () => {
   });
 
   it("preserves an ADO warning carried by a complete history", async () => {
-    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({
-      weeklyThroughput: WEEKLY_THROUGHPUT,
-      cycleTimeDaysData: [],
-      historyCompleteness: {
-        status: "complete",
-        code: "delivery_history_complete",
+    const diagnostics = {
+      periods: [],
+      completeness: {
+        status: "complete" as const,
+        code: "delivery_history_complete" as const,
         requiredItemCount: 6,
         observedItemCount: 6,
         missingItemIds: [],
       },
+      continuity: [],
+      chronology: [],
+    };
+    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({
+      weeklyThroughput: WEEKLY_THROUGHPUT,
+      cycleTimeDaysData: [],
+      diagnostics,
       warning: "lots partiellement ignores",
     });
     vi.mocked(postSimulate).mockResolvedValue({
@@ -105,5 +116,53 @@ describe("localTeamForecast delivery-history completeness", () => {
 
     expect(result.warning).toBe("lots partiellement ignores");
     expect(result.weeklyThroughput).toEqual(WEEKLY_THROUGHPUT);
+  });
+
+  it("propage un warning de données partielles", async () => {
+    vi.mocked(getTeamDeliveryDataDirect).mockResolvedValue({
+      weeklyThroughput: WEEKLY_THROUGHPUT,
+      cycleTimeDaysData: [],
+      diagnostics: {
+        periods: [],
+        completeness: {
+          status: "complete",
+          code: "delivery_history_complete",
+          requiredItemCount: 6,
+          observedItemCount: 6,
+          missingItemIds: [],
+        },
+        continuity: [],
+        chronology: [],
+      },
+      warning: "1/3 lot(s) de work items n'ont pas pu etre charges.",
+    });
+    vi.mocked(postSimulate).mockResolvedValue({
+      result_kind: "weeks",
+      samples_count: 6,
+      seed: 111,
+      result_percentiles: { P50: 8, P70: 10, P90: 13 },
+      risk_score: 0.625,
+      completion_summary: {
+        completed_count: 20000,
+        censored_count: 0,
+        censored_rate: 0,
+        horizon_weeks: 521,
+      },
+      throughput_reliability: {
+        cv: 0.22,
+        iqr_ratio: 0.3,
+        slope_norm: -0.02,
+        label: "fiable",
+        samples_count: 6,
+      },
+      result_distribution: [{ x: 8, count: 20000 }],
+    });
+
+    const { warning, historyEntry } = await localTeamForecast.runSimulationForecast(
+      forecastParameters(),
+    );
+
+    expect(warning).toContain("1/3");
+    expect(historyEntry.warning).toContain("1/3");
   });
 });

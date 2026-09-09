@@ -1,9 +1,9 @@
 [
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2806:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app demo mode [2819:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: app demo mode [2806:3]",
+    "selector": "e2e istanbul coverage > coverage: app demo mode [2819:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -18,10 +18,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2860:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app editable backspace and team validation [2873:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: app editable backspace and team validation [2860:3]",
+    "selector": "e2e istanbul coverage > coverage: app editable backspace and team validation [2873:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -37,10 +37,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app global org backspace [2791:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app global org backspace [2804:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: app global org backspace [2791:3]",
+    "selector": "e2e istanbul coverage > coverage: app global org backspace [2804:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -55,10 +55,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app project and team backspace [2832:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: app project and team backspace [2845:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: app project and team backspace [2832:3]",
+    "selector": "e2e istanbul coverage > coverage: app project and team backspace [2845:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -113,10 +113,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches print and pdf direct [2414:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches print and pdf direct [2427:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches print and pdf direct [2414:3]",
+    "selector": "e2e istanbul coverage > coverage: branches print and pdf direct [2427:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -152,10 +152,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolio direct [1651:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolio direct [1664:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches usePortfolio direct [1651:3]",
+    "selector": "e2e istanbul coverage > coverage: branches usePortfolio direct [1664:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -171,10 +171,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolioReport direct [1457:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: branches usePortfolioReport direct [1470:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: branches usePortfolioReport direct [1457:3]",
+    "selector": "e2e istanbul coverage > coverage: branches usePortfolioReport direct [1470:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -191,10 +191,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: cycle time utility direct branches [1411:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: cycle time utility direct branches [1424:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: cycle time utility direct branches [1411:3]",
+    "selector": "e2e istanbul coverage > coverage: cycle time utility direct branches [1424:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -209,10 +209,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: entry and portfolio components direct [2100:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: entry and portfolio components direct [2113:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: entry and portfolio components direct [2100:3]",
+    "selector": "e2e istanbul coverage > coverage: entry and portfolio components direct [2113:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -248,10 +248,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: onboarding hook direct [1830:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: onboarding hook direct [1843:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: onboarding hook direct [1830:3]",
+    "selector": "e2e istanbul coverage > coverage: onboarding hook direct [1843:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -284,10 +284,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3514:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3527:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3514:3]",
+    "selector": "e2e istanbul coverage > coverage: portfolio print and pdf edge branches [3527:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -320,10 +320,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation context direct [3070:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation context direct [3083:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: simulation context direct [3070:3]",
+    "selector": "e2e istanbul coverage > coverage: simulation context direct [3083:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -338,10 +338,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation prefs direct [3393:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation prefs direct [3406:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: simulation prefs direct [3393:3]",
+    "selector": "e2e istanbul coverage > coverage: simulation prefs direct [3406:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -356,10 +356,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation utils direct [2899:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: simulation utils direct [2912:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: simulation utils direct [2899:3]",
+    "selector": "e2e istanbul coverage > coverage: simulation utils direct [2912:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -374,10 +374,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: sla identite direct [2516:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: sla identite direct [2529:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: sla identite direct [2516:3]",
+    "selector": "e2e istanbul coverage > coverage: sla identite direct [2529:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -392,10 +392,10 @@
     ]
   },
   {
-    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: useTeamOptions direct [3134:3]",
+    "logicalCaseId": "playwright:frontend/tests/e2e/coverage.spec.js::e2e istanbul coverage > coverage: useTeamOptions direct [3147:3]",
     "framework": "playwright",
     "sourcePath": "frontend/tests/e2e/coverage.spec.js",
-    "selector": "e2e istanbul coverage > coverage: useTeamOptions direct [3134:3]",
+    "selector": "e2e istanbul coverage > coverage: useTeamOptions direct [3147:3]",
     "status": "classified",
     "executionProfile": "main",
     "nature": "e2e",
@@ -13715,10 +13715,26 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [85:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.deliveryDiagnostics.test.ts::adoClient delivery diagnostics > returns the untouched period diagnostics when no complete week is available [9:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/adoClient.deliveryDiagnostics.test.ts",
+    "selector": "adoClient delivery diagnostics > returns the untouched period diagnostics when no complete week is available [9:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "azure_devops",
+      "api"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [92:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.deliveryWeek.test.ts",
-    "selector": "adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [85:3]",
+    "selector": "adoClient delivery calendar migration > delegates an impossible Azure lifecycle to the delivery chronology authority [92:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -13751,10 +13767,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > uses delivery ambiguity for an unavailable event history [67:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.deliveryWeek.test.ts::adoClient delivery calendar migration > uses delivery ambiguity for an unavailable event history [70:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.deliveryWeek.test.ts",
-    "selector": "adoClient delivery calendar migration > uses delivery ambiguity for an unavailable event history [67:3]",
+    "selector": "adoClient delivery calendar migration > uses delivery ambiguity for an unavailable event history [70:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -13859,10 +13875,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > builds aggregated cycle time points from revisions [111:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > builds aggregated cycle time points from revisions [112:3]",
+    "selector": "adoClient on-prem api-version > builds aggregated cycle time points from revisions [111:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -13877,10 +13893,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [474:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [479:3]",
+    "selector": "adoClient on-prem api-version > continues on collection discovery network errors and exposes local restricted scopes [474:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -13911,10 +13927,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > deduplicates concurrent profile verification and reports unavailable profiles [421:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > deduplicates concurrent profile verification and reports unavailable profiles [406:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > deduplicates concurrent profile verification and reports unavailable profiles [421:3]",
+    "selector": "adoClient on-prem api-version > deduplicates concurrent profile verification and reports unavailable profiles [406:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -13931,10 +13947,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > discovers the first valid on-prem collection from left to right [261:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > discovers the first valid on-prem collection from left to right [240:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > discovers the first valid on-prem collection from left to right [261:3]",
+    "selector": "adoClient on-prem api-version > discovers the first valid on-prem collection from left to right [240:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -13948,10 +13964,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > excludes the partial week at the beginning when startDate is midweek [199:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > excludes the partial week at the beginning when startDate is midweek [198:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > excludes the partial week at the beginning when startDate is midweek [199:3]",
+    "selector": "adoClient on-prem api-version > excludes the partial week at the beginning when startDate is midweek [198:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -13966,10 +13982,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > excludes the partial week at the end when endDate is midweek [220:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > excludes the partial week at the end when endDate is midweek [219:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > excludes the partial week at the end when endDate is midweek [220:3]",
+    "selector": "adoClient on-prem api-version > excludes the partial week at the end when endDate is midweek [219:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -13984,10 +14000,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > falls back safely when team area settings or item batches are incomplete [368:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > falls back safely when team area settings or item batches are incomplete [347:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > falls back safely when team area settings or item batches are incomplete [368:3]",
+    "selector": "adoClient on-prem api-version > falls back safely when team area settings or item batches are incomplete [347:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -14003,10 +14019,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > handles restricted Cloud profile metadata and HTTP/network errors [296:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > handles restricted Cloud profile metadata and HTTP/network errors [275:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > handles restricted Cloud profile metadata and HTTP/network errors [296:3]",
+    "selector": "adoClient on-prem api-version > handles restricted Cloud profile metadata and HTTP/network errors [275:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -14020,10 +14036,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > includes a week when startDate is monday and endDate is a completed sunday [179:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > includes a week when startDate is monday and endDate is a completed sunday [178:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > includes a week when startDate is monday and endDate is a completed sunday [179:3]",
+    "selector": "adoClient on-prem api-version > includes a week when startDate is monday and endDate is a completed sunday [178:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -14037,10 +14053,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > keeps Cloud compatibility for incomplete profiles, empty accounts, and unavailable type states [328:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > keeps Cloud compatibility for incomplete profiles, empty accounts, and unavailable type states [307:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > keeps Cloud compatibility for incomplete profiles, empty accounts, and unavailable type states [328:3]",
+    "selector": "adoClient on-prem api-version > keeps Cloud compatibility for incomplete profiles, empty accounts, and unavailable type states [307:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -14058,10 +14074,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > keeps empty and invalid Azure data visible as safe public responses [439:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > keeps empty and invalid Azure data visible as safe public responses [424:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > keeps empty and invalid Azure data visible as safe public responses [439:3]",
+    "selector": "adoClient on-prem api-version > keeps empty and invalid Azure data visible as safe public responses [424:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -14075,10 +14091,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > loads type states and resolves Cloud organization scope [314:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > loads type states and resolves Cloud organization scope [293:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > loads type states and resolves Cloud organization scope [314:3]",
+    "selector": "adoClient on-prem api-version > loads type states and resolves Cloud organization scope [293:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -14092,10 +14108,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > reports HTTP failures and malformed project or team payloads through their public contracts [350:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > reports HTTP failures and malformed project or team payloads through their public contracts [329:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > reports HTTP failures and malformed project or team payloads through their public contracts [350:3]",
+    "selector": "adoClient on-prem api-version > reports HTTP failures and malformed project or team payloads through their public contracts [329:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -14113,10 +14129,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > returns an explicit warning when no complete week is available [241:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > returns empty on-prem organizations and exposes empty project/team responses [283:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > returns an explicit warning when no complete week is available [241:3]",
+    "selector": "adoClient on-prem api-version > returns empty on-prem organizations and exposes empty project/team responses [283:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -14130,27 +14146,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > returns empty on-prem organizations and exposes empty project/team responses [304:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > returns partial delivery warnings for HTTP batches, missing dates, and network revision failures [451:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > returns empty on-prem organizations and exposes empty project/team responses [304:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "component",
-    "purposes": [
-      "functional",
-      "compatibility"
-    ],
-    "domains": [
-      "azure_devops",
-      "api"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > returns partial delivery warnings for HTTP batches, missing dates, and network revision failures [456:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > returns partial delivery warnings for HTTP batches, missing dates, and network revision failures [456:3]",
+    "selector": "adoClient on-prem api-version > returns partial delivery warnings for HTTP batches, missing dates, and network revision failures [451:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -14167,10 +14166,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > supports on-prem local scopes when discovery succeeds or no collection can be reached [406:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > supports on-prem local scopes when discovery succeeds or no collection can be reached [391:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > supports on-prem local scopes when discovery succeeds or no collection can be reached [406:3]",
+    "selector": "adoClient on-prem api-version > supports on-prem local scopes when discovery succeeds or no collection can be reached [391:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -14220,10 +14219,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > uses configured area paths and retains throughput when cycle-time revisions fail [384:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > uses configured area paths and retains throughput when cycle-time revisions fail [369:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > uses configured area paths and retains throughput when cycle-time revisions fail [384:3]",
+    "selector": "adoClient on-prem api-version > uses configured area paths and retains throughput when cycle-time revisions fail [369:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -14241,10 +14240,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > uses profile metadata and account pagination endpoint for Cloud organizations [288:3]",
+    "logicalCaseId": "vitest:frontend/src/adoClient.test.ts::adoClient on-prem api-version > uses profile metadata and account pagination endpoint for Cloud organizations [267:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/adoClient.test.ts",
-    "selector": "adoClient on-prem api-version > uses profile metadata and account pagination endpoint for Cloud organizations [288:3]",
+    "selector": "adoClient on-prem api-version > uses profile metadata and account pagination endpoint for Cloud organizations [267:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -15000,10 +14999,27 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/application/team-forecast/localTeamForecast.historyCompleteness.test.ts::localTeamForecast delivery-history completeness > preserves an ADO warning carried by a complete history [69:3]",
+    "logicalCaseId": "vitest:frontend/src/application/team-forecast/localTeamForecast.historyCompleteness.test.ts::localTeamForecast delivery-history completeness > preserves an ADO warning carried by a complete history [74:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/application/team-forecast/localTeamForecast.historyCompleteness.test.ts",
-    "selector": "localTeamForecast delivery-history completeness > preserves an ADO warning carried by a complete history [69:3]",
+    "selector": "localTeamForecast delivery-history completeness > preserves an ADO warning carried by a complete history [74:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "component",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "azure_devops",
+      "statistical_engine",
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/application/team-forecast/localTeamForecast.historyCompleteness.test.ts::localTeamForecast delivery-history completeness > propage un warning de données partielles [121:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/application/team-forecast/localTeamForecast.historyCompleteness.test.ts",
+    "selector": "localTeamForecast delivery-history completeness > propage un warning de données partielles [121:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -15031,6 +15047,22 @@
     "domains": [
       "azure_devops",
       "statistical_engine",
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "vitest:frontend/src/application/team-history/result.test.ts::TeamHistory application result > preserves every delivery diagnostic family without copying or flattening it [15:3]",
+    "framework": "vitest",
+    "sourcePath": "frontend/src/application/team-history/result.test.ts",
+    "selector": "TeamHistory application result > preserves every delivery diagnostic family without copying or flattening it [15:3]",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "azure_devops",
       "history"
     ]
   },
@@ -21501,10 +21533,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle getTeamDeliveryDataDirect avec les bons parametres [208:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle getTeamDeliveryDataDirect avec les bons parametres [214:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > appelle getTeamDeliveryDataDirect avec les bons parametres [208:3]",
+    "selector": "appels réseau > appelle getTeamDeliveryDataDirect avec les bons parametres [214:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21517,10 +21549,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle postSimulate en mode backlog_to_weeks avec backlog_size [225:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle postSimulate en mode backlog_to_weeks avec backlog_size [231:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > appelle postSimulate en mode backlog_to_weeks avec backlog_size [225:3]",
+    "selector": "appels réseau > appelle postSimulate en mode backlog_to_weeks avec backlog_size [231:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21533,10 +21565,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle postSimulate en mode weeks_to_items avec target_weeks [243:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > appelle postSimulate en mode weeks_to_items avec target_weeks [249:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > appelle postSimulate en mode weeks_to_items avec target_weeks [243:3]",
+    "selector": "appels réseau > appelle postSimulate en mode weeks_to_items avec target_weeks [249:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21548,10 +21580,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > couvre directement backlog_size pour simulateForecastFromSamples [257:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > couvre directement backlog_size pour simulateForecastFromSamples [263:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > couvre directement backlog_size pour simulateForecastFromSamples [257:3]",
+    "selector": "appels réseau > couvre directement backlog_size pour simulateForecastFromSamples [263:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21566,10 +21598,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > couvre directement target_weeks pour simulateForecastFromSamples [275:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > couvre directement target_weeks pour simulateForecastFromSamples [281:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > couvre directement target_weeks pour simulateForecastFromSamples [275:3]",
+    "selector": "appels réseau > couvre directement target_weeks pour simulateForecastFromSamples [281:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21583,10 +21615,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > propage throughput_reliability tel quel [308:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > propage throughput_reliability tel quel [314:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > propage throughput_reliability tel quel [308:3]",
+    "selector": "appels réseau > propage throughput_reliability tel quel [314:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21600,10 +21632,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > rejette une distribution absente qui ne conserve pas la masse [295:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::appels réseau > rejette une distribution absente qui ne conserve pas la masse [301:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "appels réseau > rejette une distribution absente qui ne conserve pas la masse [295:3]",
+    "selector": "appels réseau > rejette une distribution absente qui ne conserve pas la masse [301:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21615,25 +21647,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > propage un warning de données partielles [570:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > result est identique dans le retour et dans historyEntry [566:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "cohérence du résultat retourné > propage un warning de données partielles [570:3]",
-    "status": "classified",
-    "executionProfile": "pr",
-    "nature": "component",
-    "purposes": [
-      "functional"
-    ],
-    "domains": [
-      "statistical_engine"
-    ]
-  },
-  {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > result est identique dans le retour et dans historyEntry [560:3]",
-    "framework": "vitest",
-    "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "cohérence du résultat retourné > result est identique dans le retour et dans historyEntry [560:3]",
+    "selector": "cohérence du résultat retourné > result est identique dans le retour et dans historyEntry [566:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21646,10 +21663,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > sampleStats est identique dans le retour et dans historyEntry [565:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > sampleStats est identique dans le retour et dans historyEntry [571:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "cohérence du résultat retourné > sampleStats est identique dans le retour et dans historyEntry [565:3]",
+    "selector": "cohérence du résultat retourné > sampleStats est identique dans le retour et dans historyEntry [571:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21664,10 +21681,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > weeklyThroughput est identique dans le retour et dans historyEntry [555:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::cohérence du résultat retourné > weeklyThroughput est identique dans le retour et dans historyEntry [561:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "cohérence du résultat retourné > weeklyThroughput est identique dans le retour et dans historyEntry [555:3]",
+    "selector": "cohérence du résultat retourné > weeklyThroughput est identique dans le retour et dans historyEntry [561:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21681,10 +21698,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > filters out zero weeks in demo mode when includeZeroWeeks is false [123:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > filters out zero weeks in demo mode when includeZeroWeeks is false [129:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > filters out zero weeks in demo mode when includeZeroWeeks is false [123:3]",
+    "selector": "demo mode et normalisation > filters out zero weeks in demo mode when includeZeroWeeks is false [129:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21697,10 +21714,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent [181:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent [187:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent [181:3]",
+    "selector": "demo mode et normalisation > laisse risk_score absent si le backend ne le renvoie pas et que P50/P90 manquent [187:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21712,10 +21729,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > rejette une reponse calculable dont le backend omet risk_score [174:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > rejette une reponse calculable dont le backend omet risk_score [180:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > rejette une reponse calculable dont le backend omet risk_score [174:3]",
+    "selector": "demo mode et normalisation > rejette une reponse calculable dont le backend omet risk_score [180:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21727,10 +21744,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > resout les memes valeurs par defaut que la frontiere Python [191:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > resout les memes valeurs par defaut que la frontiere Python [197:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > resout les memes valeurs par defaut que la frontiere Python [191:3]",
+    "selector": "demo mode et normalisation > resout les memes valeurs par defaut que la frontiere Python [197:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21742,10 +21759,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses local simulation in demo backlog mode without API calls [158:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses local simulation in demo backlog mode without API calls [164:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > uses local simulation in demo backlog mode without API calls [158:3]",
+    "selector": "demo mode et normalisation > uses local simulation in demo backlog mode without API calls [164:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21758,10 +21775,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses local simulation in demo mode without API calls [142:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses local simulation in demo mode without API calls [148:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > uses local simulation in demo mode without API calls [142:3]",
+    "selector": "demo mode et normalisation > uses local simulation in demo mode without API calls [148:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21773,10 +21790,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses the demo throughput source without network calls [101:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::demo mode et normalisation > uses the demo throughput source without network calls [107:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "demo mode et normalisation > uses the demo throughput source without network calls [101:3]",
+    "selector": "demo mode et normalisation > uses the demo throughput source without network calls [107:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21790,10 +21807,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::filtrage des throughput samples > exclut les semaines à 0 quand includeZeroWeeks = false [316:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::filtrage des throughput samples > exclut les semaines à 0 quand includeZeroWeeks = false [322:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "filtrage des throughput samples > exclut les semaines à 0 quand includeZeroWeeks = false [316:3]",
+    "selector": "filtrage des throughput samples > exclut les semaines à 0 quand includeZeroWeeks = false [322:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21807,10 +21824,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::filtrage des throughput samples > inclut les semaines à 0 quand includeZeroWeeks = true [339:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::filtrage des throughput samples > inclut les semaines à 0 quand includeZeroWeeks = true [345:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "filtrage des throughput samples > inclut les semaines à 0 quand includeZeroWeeks = true [339:3]",
+    "selector": "filtrage des throughput samples > inclut les semaines à 0 quand includeZeroWeeks = true [345:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21824,10 +21841,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > applique toSafeNumber sur backlogSize, targetWeeks et nSims [489:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > applique toSafeNumber sur backlogSize, targetWeeks et nSims [495:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "historyEntry > applique toSafeNumber sur backlogSize, targetWeeks et nSims [489:3]",
+    "selector": "historyEntry > applique toSafeNumber sur backlogSize, targetWeeks et nSims [495:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21841,10 +21858,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > contient les métadonnées de session correctes [456:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > contient les métadonnées de session correctes [462:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "historyEntry > contient les métadonnées de session correctes [456:3]",
+    "selector": "historyEntry > contient les métadonnées de session correctes [462:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21858,10 +21875,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > copie défensivement les tableaux [519:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > copie défensivement les tableaux [525:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "historyEntry > copie défensivement les tableaux [519:3]",
+    "selector": "historyEntry > copie défensivement les tableaux [525:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21874,10 +21891,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > génère un id unique et une date ISO valide [478:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > génère un id unique et une date ISO valide [484:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "historyEntry > génère un id unique et une date ISO valide [478:3]",
+    "selector": "historyEntry > génère un id unique et une date ISO valide [484:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21890,10 +21907,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > retombe sur un id date-seed quand crypto.randomUUID est indisponible [500:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::historyEntry > retombe sur un id date-seed quand crypto.randomUUID est indisponible [506:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "historyEntry > retombe sur un id date-seed quand crypto.randomUUID est indisponible [500:3]",
+    "selector": "historyEntry > retombe sur un id date-seed quand crypto.randomUUID est indisponible [506:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21906,10 +21923,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage l'erreur si getTeamDeliveryDataDirect echoue [534:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage l'erreur si getTeamDeliveryDataDirect echoue [540:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "propagation des erreurs réseau > propage l'erreur si getTeamDeliveryDataDirect echoue [534:3]",
+    "selector": "propagation des erreurs réseau > propage l'erreur si getTeamDeliveryDataDirect echoue [540:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21922,10 +21939,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage l'erreur si postSimulate échoue [541:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage l'erreur si postSimulate échoue [547:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "propagation des erreurs réseau > propage l'erreur si postSimulate échoue [541:3]",
+    "selector": "propagation des erreurs réseau > propage l'erreur si postSimulate échoue [547:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21937,10 +21954,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage une erreur 422 backend [547:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::propagation des erreurs réseau > propage une erreur 422 backend [553:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "propagation des erreurs réseau > propage une erreur 422 backend [547:3]",
+    "selector": "propagation des erreurs réseau > propage une erreur 422 backend [553:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21952,10 +21969,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::sampleStats > calcule correctement totalWeeks, zeroWeeks et usedWeeks [435:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::sampleStats > calcule correctement totalWeeks, zeroWeeks et usedWeeks [441:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "sampleStats > calcule correctement totalWeeks, zeroWeeks et usedWeeks [435:3]",
+    "selector": "sampleStats > calcule correctement totalWeeks, zeroWeeks et usedWeeks [441:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21969,10 +21986,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > accepte exactement 6 semaines valides [396:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > accepte exactement 6 semaines valides [402:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "seuil d'historique insuffisant > accepte exactement 6 semaines valides [396:3]",
+    "selector": "seuil d'historique insuffisant > accepte exactement 6 semaines valides [402:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -21984,10 +22001,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > accepte les bornes d'horizon et d'historique et les transmet telles quelles [414:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > accepte les bornes d'horizon et d'historique et les transmet telles quelles [420:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "seuil d'historique insuffisant > accepte les bornes d'horizon et d'historique et les transmet telles quelles [414:3]",
+    "selector": "seuil d'historique insuffisant > accepte les bornes d'horizon et d'historique et les transmet telles quelles [420:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -21999,10 +22016,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > lève une erreur si moins de 6 semaines au total [375:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > lève une erreur si moins de 6 semaines au total [381:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "seuil d'historique insuffisant > lève une erreur si moins de 6 semaines au total [375:3]",
+    "selector": "seuil d'historique insuffisant > lève une erreur si moins de 6 semaines au total [381:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -22014,10 +22031,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > lève une erreur si moins de 6 semaines non nulles [362:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > lève une erreur si moins de 6 semaines non nulles [368:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "seuil d'historique insuffisant > lève une erreur si moins de 6 semaines non nulles [362:3]",
+    "selector": "seuil d'historique insuffisant > lève une erreur si moins de 6 semaines non nulles [368:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -22029,10 +22046,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > rejette un contrôle vide avant l'appel API [400:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > rejette un contrôle vide avant l'appel API [406:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "seuil d'historique insuffisant > rejette un contrôle vide avant l'appel API [400:3]",
+    "selector": "seuil d'historique insuffisant > rejette un contrôle vide avant l'appel API [406:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "unit",
@@ -22044,10 +22061,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > renvoie un message lisible [386:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/Simulationforecastservice.test.tsx::seuil d'historique insuffisant > renvoie un message lisible [392:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/Simulationforecastservice.test.tsx",
-    "selector": "seuil d'historique insuffisant > renvoie un message lisible [386:3]",
+    "selector": "seuil d'historique insuffisant > renvoie un message lisible [392:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -22182,10 +22199,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/simulationForecastSeedExecution.test.tsx::simulation forecast seed execution boundary > preserves explicit seed boundaries for the local engine and HTTP request [115:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/simulationForecastSeedExecution.test.tsx::simulation forecast seed execution boundary > preserves explicit seed boundaries for the local engine and HTTP request [121:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/simulationForecastSeedExecution.test.tsx",
-    "selector": "simulation forecast seed execution boundary > preserves explicit seed boundaries for the local engine and HTTP request [115:3]",
+    "selector": "simulation forecast seed execution boundary > preserves explicit seed boundaries for the local engine and HTTP request [121:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",
@@ -22197,10 +22214,10 @@
     ]
   },
   {
-    "logicalCaseId": "vitest:frontend/src/hooks/simulationForecastSeedExecution.test.tsx::simulation forecast seed execution boundary > reuses one generated seed across request, result and history [159:3]",
+    "logicalCaseId": "vitest:frontend/src/hooks/simulationForecastSeedExecution.test.tsx::simulation forecast seed execution boundary > reuses one generated seed across request, result and history [165:3]",
     "framework": "vitest",
     "sourcePath": "frontend/src/hooks/simulationForecastSeedExecution.test.tsx",
-    "selector": "simulation forecast seed execution boundary > reuses one generated seed across request, result and history [159:3]",
+    "selector": "simulation forecast seed execution boundary > reuses one generated seed across request, result and history [165:3]",
     "status": "classified",
     "executionProfile": "pr",
     "nature": "component",

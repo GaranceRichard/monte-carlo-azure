@@ -1399,11 +1399,24 @@ test.describe("e2e istanbul coverage", () => {
     expect(results.missingTeamProject).toBe(true);
     expect(results.teamOptions.workItemTypes).toEqual(["Bug", "Task"]);
     expect(results.degradedTeamOptions.statesByType.Bug).toBeUndefined();
-    expect(Array.isArray(results.emptyThroughput)).toBe(true);
-    expect(results.warningThroughput.warning).toContain("historique partiel");
-    expect(Array.isArray(results.recoveredThroughput)).toBe(true);
+    expect(Array.isArray(results.emptyThroughput.weeklyThroughput)).toBe(true);
+    expect(results.emptyThroughput.diagnostics.completeness.status).toBe("complete");
+    expect(results.warningThroughput.warning).toContain("Collecte des work items interrompue");
+    expect(results.warningThroughput.diagnostics.completeness.status).toBe("incomplete");
+    expect(results.warningThroughput.diagnostics.continuity).toContainEqual(
+      expect.objectContaining({ code: "missing_expected_delivery_events" }),
+    );
+    expect(Array.isArray(results.recoveredThroughput.weeklyThroughput)).toBe(true);
     expect(results.cycleWarningThroughput.warning).toContain("cycle time");
-    expect(results.incompleteWeekWarning.warning).toContain("Aucune semaine complete");
+    expect(results.cycleWarningThroughput.diagnostics.continuity).toContainEqual(
+      expect.objectContaining({ code: "ambiguous_delivery_event_sequence" }),
+    );
+    expect(results.incompleteWeekWarning.warning).toBeUndefined();
+    expect(results.incompleteWeekWarning.diagnostics.periods).toEqual([
+      { code: "partial_initial_period", periodStatus: "partial_initial_and_final" },
+      { code: "partial_final_period", periodStatus: "partial_initial_and_final" },
+    ]);
+    expect(results.incompleteWeekWarning.diagnostics.chronology).toEqual([]);
     expect(results.missingCollectionError).toBe(true);
     expect(results.projectNetworkError).toBe(true);
   });

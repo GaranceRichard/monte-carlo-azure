@@ -123,6 +123,9 @@ Invariants de préparation du throughput côté frontend :
   `absent` sans période complète, `incomplete` lorsqu’un identifiant requis ne possède aucun fait
   `item_delivered`, et `complete` dans tous les autres cas, y compris une période collectée sans livraison ;
   le client conserve ce diagnostic et la prévision distante refuse les deux variantes non complètes ;
+- `application/team-history` expose `TeamHistoryResult`, qui conserve séparément et par référence les
+  diagnostics de périodes, complétude, continuité et chronologie ; `adoClient` produit ce résultat unique et
+  `localTeamForecast` y lit la complétude sans la recalculer ni réduire les autres familles en avertissement ;
 - seules les semaines de la variante `complete`, entièrement incluses dans la plage demandée, sont
   conservées ; la semaine courante reste une période finale partielle tant qu’elle n’est pas écoulée ;
 - les chaînes `YYYY-MM-DD` de la fenêtre sont converties en bornes calendaires `UTC` par `src/date.ts`, puis
@@ -189,6 +192,10 @@ frontend/
       simulationValueObjects.ts # Value Objects statistiques immuables et validés
       simulationHistory.ts # historique interne contenant un SimulationResult
     application/
+      team-history/
+        index.ts            # API publique du résultat applicatif delivery diagnostiqué
+        contract.ts         # TeamHistoryResult et ses quatre familles sans perte
+        result.ts           # assemblage fidèle des résultats produits par le domaine
       team-forecast/
         index.ts            # API publique de la prévision applicative
         contract.ts         # contrat TeamForecast indépendant de React
@@ -1006,6 +1013,9 @@ Frontend :
 - contrat applicatif `TeamPortfolioConfig` exposé par
   `src/application/portfolio-forecast/index.ts` ; `demoData`, `usePortfolio` et `usePortfolioReport` le
   consomment sans déclaration ni réexport concurrent dans les hooks
+- résultat applicatif `TeamHistoryResult` exposé par `src/application/team-history/index.ts` : les diagnostics
+  de périodes, complétude, continuité et chronologie restent groupés, immuables et identiques aux objets du
+  domaine ; `adoClient.ts` ne les reformule plus et `localTeamForecast` consomme cette frontière unique
 - port `src/ports/clock/` injecté dans le forecast, adaptateur `src/adapters/browser/clock/` et composition
   réelle sous `src/composition/browser/`, avec double déterministe réservé aux tests
 - événements delivery possédés par `src/domain/delivery/` : les DTO Azure DevOps sont convertis localement en

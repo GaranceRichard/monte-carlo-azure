@@ -2,6 +2,15 @@
 
 ## Recent
 
+### Diagnostics delivery conservés par l’application — PBI 7.30
+
+- ajout du contrat public `TeamHistoryResult`, qui regroupe séparément les diagnostics de périodes partielles,
+  complétude, continuité et chronologie sans copier, aplatir ni recalculer les objets produits par le domaine ;
+- migration de `adoClient` et de la prévision connectée vers cette frontière unique, y compris pour les
+  périodes sans semaine complète ; `getWeeklyThroughputDirect` retourne désormais le résultat complet ;
+- retrait des synthèses textuelles locales de continuité et de période, tout en conservant séparément les
+  avertissements techniques de collecte ; aucune formulation ni restitution fonctionnelle n’est ajoutée.
+
 ### Environnement Python automatique par worktree
 
 - ajout d'un bootstrap `post-checkout` qui crée physiquement le `.venv` de chaque nouveau worktree branché,

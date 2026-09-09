@@ -12,13 +12,13 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 284,
-    "importEdges": 1468,
+    "sourceModules": 287,
+    "importEdges": 1473,
     "entrypoints": 85,
     "missingEntrypoints": 5,
     "cycles": 0,
     "runtimeCycles": 0,
-    "deepImports": 139,
+    "deepImports": 142,
     "apiBypasses": 2
   },
   "observed": {
@@ -1030,6 +1030,21 @@
       },
       {
         "path": "frontend/src/application/team-forecast/localTeamForecast.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/application/team-history/contract.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/application/team-history/index.ts",
+        "area": "frontend",
+        "language": "javascript"
+      },
+      {
+        "path": "frontend/src/application/team-history/result.ts",
         "area": "frontend",
         "language": "javascript"
       },
@@ -11942,7 +11957,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
-        "line": 13,
+        "line": 16,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adapters/azure-devops/deliveryEventMappers",
@@ -11951,7 +11966,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adoErrors.ts",
-        "line": 17,
+        "line": 20,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adoErrors",
@@ -11960,10 +11975,19 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adoPlatform.ts",
-        "line": 23,
+        "line": 26,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adoPlatform",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/adoClient.ts",
+        "target": "frontend/src/application/team-history/index.ts",
+        "line": 12,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./application/team-history",
         "resolution": "internal"
       },
       {
@@ -11978,19 +12002,10 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/domain/delivery/index.ts",
-        "line": 3,
+        "line": 2,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./domain/delivery",
-        "resolution": "internal"
-      },
-      {
-        "source": "frontend/src/adoClient.ts",
-        "target": "frontend/src/types.ts",
-        "line": 2,
-        "kind": "js-import",
-        "phase": "compile",
-        "specifier": "./types",
         "resolution": "internal"
       },
       {
@@ -12243,6 +12258,51 @@
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "../../utils/simulation",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-history/contract.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../domain/delivery",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-history/index.ts",
+        "target": "frontend/src/application/team-history/contract.ts",
+        "line": 1,
+        "kind": "js-export",
+        "phase": "compile",
+        "specifier": "./contract",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-history/index.ts",
+        "target": "frontend/src/application/team-history/result.ts",
+        "line": 6,
+        "kind": "js-export",
+        "phase": "runtime",
+        "specifier": "./result",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-history/result.ts",
+        "target": "frontend/src/application/team-history/contract.ts",
+        "line": 9,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "./contract",
+        "resolution": "internal"
+      },
+      {
+        "source": "frontend/src/application/team-history/result.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../domain/delivery",
         "resolution": "internal"
       },
       {
@@ -15280,13 +15340,13 @@
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "compile",
-        "count": 110
+        "count": 113
       },
       {
         "sourceArea": "frontend",
         "targetArea": "frontend",
         "phase": "runtime",
-        "count": 171
+        "count": 173
       },
       {
         "sourceArea": "launcher",
@@ -15499,7 +15559,7 @@
       {
         "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/adapters/azure-devops/deliveryEventMappers.ts",
-        "line": 13,
+        "line": 16,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./adapters/azure-devops/deliveryEventMappers",
@@ -15508,8 +15568,18 @@
       },
       {
         "source": "frontend/src/adoClient.ts",
+        "target": "frontend/src/application/team-history/index.ts",
+        "line": 12,
+        "kind": "js-import",
+        "phase": "runtime",
+        "specifier": "./application/team-history",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/application"
+      },
+      {
+        "source": "frontend/src/adoClient.ts",
         "target": "frontend/src/domain/delivery/index.ts",
-        "line": 3,
+        "line": 2,
         "kind": "js-import",
         "phase": "runtime",
         "specifier": "./domain/delivery",
@@ -15665,6 +15735,26 @@
         "specifier": "../../utils/simulation",
         "resolution": "internal",
         "crossedBoundary": "frontend/src/utils"
+      },
+      {
+        "source": "frontend/src/application/team-history/contract.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../domain/delivery",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
+      },
+      {
+        "source": "frontend/src/application/team-history/result.ts",
+        "target": "frontend/src/domain/delivery/index.ts",
+        "line": 1,
+        "kind": "js-import",
+        "phase": "compile",
+        "specifier": "../../domain/delivery",
+        "resolution": "internal",
+        "crossedBoundary": "frontend/src/domain"
       },
       {
         "source": "frontend/src/components/steps/DecisionDiagnostic.tsx",

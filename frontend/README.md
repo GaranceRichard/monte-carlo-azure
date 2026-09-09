@@ -92,8 +92,8 @@ normalisés. Cette définition ne constitue pas une analyse de stabilité du flu
 résultat immuable conserve le statut `continuous`, `discontinuous` ou `ambiguous`, ses compteurs et ses
 diagnostics : chaque plage contiguë d’événements attendus absents est positionnée, tandis qu’une lecture de
 révisions indisponible ou une séquence dupliquée/inattendue reste ambiguë. Une collecte réussie sans item est
-donc continue et représente une absence réelle d’activité. `adoClient` consomme ce résultat pour qualifier
-ses avertissements ; il ne recalcule pas la continuité et ne relance aucun lot manquant.
+donc continue et représente une absence réelle d’activité. `adoClient` conserve directement les diagnostics
+dans le résultat applicatif ; il ne recalcule pas la continuité et ne relance aucun lot manquant.
 
 Avant throughput et Cycle Time, `qualifyDeliveryChronology` compare les premiers faits de chaque item selon
 l’ordre `work_started`, `work_completed`, puis `item_delivered`. Les égalités d’instant sont valides. Une
@@ -113,6 +113,12 @@ période ISO complète n’est disponible, `incomplete` lorsqu’un item requis 
 `item_delivered`, et `complete` lorsque tous les faits requis sont présents. Une période disponible sans
 livraison est donc `complete` et alimente des semaines à throughput nul. La prévision connectée consomme ce
 statut et n’appelle pas le moteur pour les états non complets ; aucun affichage de qualité n’est ajouté ici.
+
+`application/team-history` expose le résultat unique `TeamHistoryResult`. Son champ `diagnostics` garde quatre
+familles distinctes — `periods`, `completeness`, `continuity` et `chronology` — en réutilisant exactement les
+objets immuables produits par le domaine. Le client Azure DevOps retourne ce contrat et la prévision connectée
+y lit la complétude ; les avertissements restants décrivent seulement des échecs techniques de collecte. La
+formulation et l’affichage fonctionnels de ces diagnostics restent hors de cette frontière.
 
 Les chaînes `YYYY-MM-DD` sont interprétées comme dates calendaires UTC avant ce classement afin d’éviter un
 décalage d’un jour.
@@ -141,6 +147,7 @@ statistiques appartiennent au
 ## Structure
 
 - `src/domain/` : modèles et Value Objects métier, sans React, HTTP ni stockage ;
+- `src/application/team-history/` : contrat et assemblage sans perte des résultats delivery diagnostiqués ;
 - `src/api/` : DTO HTTP `snake_case` et mappers ;
 - `src/storage/` : DTO `localStorage`, mappers et migrations ;
 - `src/adapters/` : adaptateurs techniques, dont `mca-prng-v1` ;

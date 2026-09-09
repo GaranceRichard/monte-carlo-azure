@@ -1,5 +1,4 @@
 import { formatDateLocal, getDeliveryHistoryPeriods } from "./date";
-import type { WeeklyThroughputRow } from "./types";
 import {
   calculateCycleTime,
   calculateDeliveryThroughput,
@@ -8,8 +7,12 @@ import {
   createDeliveryItemId,
   qualifyDeliveryChronology,
   selectDeliveryHistoryEvents,
-  type CycleTimePoint, type DeliveryEvent, type DeliveryHistoryCompletenessDiagnostic,
+  type DeliveryEvent,
 } from "./domain/delivery";
+import {
+  createTeamHistoryResult,
+  type TeamHistoryResult,
+} from "./application/team-history";
 import {
   azureRevisionDtosToDeliveryEvents,
   azureWorkItemDtoToDeliveryEvent,
@@ -44,8 +47,6 @@ type AdoOrg = { name: string }; type AdoProject = { id: string; name: string };
 type AdoTeam = { id: string; name: string };
 type TeamFieldValue = { value?: string; includeChildren?: boolean };
 type ProfileMe = { id?: string; publicAlias?: string; displayName?: string };
-type WeeklyThroughputResponse = WeeklyThroughputRow[] | { weeklyThroughput: WeeklyThroughputRow[]; warning?: string };
-type TeamDeliveryDataResponse = { weeklyThroughput: WeeklyThroughputRow[]; cycleTimeDaysData: CycleTimePoint[]; historyCompleteness: DeliveryHistoryCompletenessDiagnostic; warning?: string };
 type ResolvedPatProfile = {
   displayName: string;
   id: string;
@@ -453,8 +454,8 @@ export async function getWeeklyThroughputDirect(
   doneStates: string[],
   workItemTypes: string[],
   serverUrl?: string,
-): Promise<WeeklyThroughputResponse> {
-  const deliveryData = await getTeamDeliveryDataDirect(
+): Promise<TeamHistoryResult> {
+  return getTeamDeliveryDataDirect(
     org,
     project,
     team,
@@ -465,12 +466,6 @@ export async function getWeeklyThroughputDirect(
     workItemTypes,
     serverUrl,
   );
-
-  if (!deliveryData.warning) return deliveryData.weeklyThroughput;
-  return {
-    weeklyThroughput: deliveryData.weeklyThroughput,
-    warning: deliveryData.warning,
-  };
 }
 
 export async function getTeamDeliveryDataDirect(
@@ -483,21 +478,28 @@ export async function getTeamDeliveryDataDirect(
   doneStates: string[],
   workItemTypes: string[],
   serverUrl?: string,
-): Promise<TeamDeliveryDataResponse> {
+): Promise<TeamHistoryResult> {
   const historyPeriods = getDeliveryHistoryPeriods(startDate, endDate);
   const completePeriod = historyPeriods.completePeriod;
   if (!completePeriod) {
-    const deliveryHistory = createDeliveryHistoryResult({
+    const completeness = createDeliveryHistoryResult({
       period: null,
       requiredItemIds: [],
       events: [],
     });
-    return {
+    const continuity = createDeliveryHistory({
+      expectedDeliveredItemIds: [],
+      events: [],
+    });
+    const chronology = qualifyDeliveryChronology(completeness.events);
+    return createTeamHistoryResult({
       weeklyThroughput: [],
       cycleTimeDaysData: [],
-      historyCompleteness: deliveryHistory.completeness,
-      warning: "Aucune semaine complete n'est disponible sur la periode selectionnee.",
-    };
+      periods: historyPeriods,
+      completeness,
+      continuity,
+      chronology,
+    });
   }
 
   const start = new Date(completePeriod.startInclusive);
@@ -640,21 +642,6 @@ export async function getTeamDeliveryDataDirect(
   const weeklyThroughput = calculateDeliveryThroughput(completePeriod, deliveryChronology);
 
   const warnings: string[] = [];
-  if (deliveryHistory.continuity === "discontinuous") {
-    warnings.push(
-      `La simulation utilise un historique partiel : ${deliveryHistory.missingDeliveredEventCount}/` +
-        `${deliveryHistory.expectedDeliveredEventCount} evenement(s) delivery attendu(s) ` +
-        `manquent dans ${deliveryHistory.gapCount} rupture(s) detectee(s).`,
-    );
-  }
-  if (deliveryHistory.continuity === "ambiguous") {
-    warnings.push(
-      "Historique ambigu : le diagnostic delivery ne permet pas de confirmer une suite " +
-        `continue.${deliveryHistory.missingDeliveredEventCount > 0
-          ? ` ${deliveryHistory.missingDeliveredEventCount} evenement(s) attendu(s) manquent.`
-          : ""}`,
-    );
-  }
   if (batchFailureDetails.length) {
     warnings.push(`Collecte des work items interrompue. Exemple: ${batchFailureDetails[0]}`);
   }
@@ -666,10 +653,13 @@ export async function getTeamDeliveryDataDirect(
     );
   }
 
-  return {
+  return createTeamHistoryResult({
     weeklyThroughput,
     cycleTimeDaysData: calculateCycleTime(deliveryChronology),
-    historyCompleteness: deliveryHistoryResult.completeness,
+    periods: historyPeriods,
+    completeness: deliveryHistoryResult,
+    continuity: deliveryHistory,
+    chronology: deliveryChronology,
     warning: warnings.length ? warnings.join(" ") : undefined,
-  };
+  });
 }

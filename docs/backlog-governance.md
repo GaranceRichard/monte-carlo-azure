@@ -236,12 +236,12 @@ prochain PBI et répartition des modèles. Sans `--write`, toute divergence est 
 
 Le modèle estime la profondeur de raisonnement ; la taille estime l’ampleur de l’outcome après découpage.
 
-## Répartition actuelle des 146 PBI non réalisés
+## Répartition actuelle des 145 PBI non réalisés
 
 | Modèle Codex | Nombre de PBI |
 | --- | ---: |
 | Sol Medium | 15 |
 | Sol Élevé | 27 |
-| Sol Très élevé | 101 |
+| Sol Très élevé | 100 |
 | Sol Ultra | 3 |
-| **Total** | **146** |
+| **Total** | **145** |

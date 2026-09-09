@@ -142,8 +142,9 @@ une connexion Azure DevOps réelle.
   seules exceptions possibles sont des couples source/cible exacts, justifiés dans le manifeste. Il projette
   aussi les imports de production entre modules gouvernés et refuse tout cycle direct ou indirect, y compris
   lorsqu’une arête est un import de type, avec le chemin fermé et chaque import localisé. Le module gouverné
-  `frontend/src/application/team-forecast/` et `frontend/src/application/portfolio-forecast/` sont exposés
-  uniquement par leur `index.ts` ; la preuve courante porte huit modules, quatre arêtes inter-modules et zéro
+  `frontend/src/application/team-history/`, `frontend/src/application/team-forecast/` et
+  `frontend/src/application/portfolio-forecast/` sont exposés uniquement par leur `index.ts` ; la preuve
+  courante porte neuf modules, cinq arêtes inter-modules et zéro
   cycle. Le rendu du chemin suit le séparateur natif de la
   plateforme et sa portabilité reste couverte explicitement pour les représentations POSIX et Windows.
 - **Prévision indépendante de React.** Le contrat applicatif `TeamForecast` porte les trois opérations de
@@ -196,6 +197,10 @@ une connexion Azure DevOps réelle.
   `incomplete` ou `absent` depuis la période disponible et les faits `item_delivered` attendus. Une période
   complète sans livraison reste un historique complet à throughput nul ; la prévision refuse les deux états
   non complets sans recalculer cette qualification et sans ajouter de signalement visuel de qualité.
+- **Diagnostics delivery conservés à la frontière.** Le résultat applicatif `TeamHistoryResult` regroupe sans
+  copie les diagnostics de périodes partielles, complétude, continuité et chronologie. Le client Azure DevOps
+  retourne ce contrat unique et la prévision lit la complétude depuis celui-ci ; aucune synthèse textuelle ne
+  remplace plus un diagnostic métier avant les consommateurs.
 - **Semaines comparables.** Le throughput historique utilise des semaines ISO complètes, du lundi au
   dimanche. La semaine courante n’est jamais injectée partiellement dans la simulation.
 

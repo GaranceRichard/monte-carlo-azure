@@ -50,9 +50,11 @@ def test_delivery_calculators_require_the_chronology_result() -> None:
         assert "chronology: DeliveryChronologyResult" in source
         assert "chronology.coherentEvents" in source
 
-    assert ado_client.count("qualifyDeliveryChronology(") == 1
+    assert ado_client.count("qualifyDeliveryChronology(") == 2
     assert "calculateDeliveryThroughput(completePeriod, deliveryChronology)" in ado_client
     assert "calculateCycleTime(deliveryChronology)" in ado_client
+    assert "chronology: deliveryChronology" in ado_client
+    assert ado_client.count("createTeamHistoryResult(") == 2
 
 
 def test_no_competing_started_completed_order_validation_exists() -> None:

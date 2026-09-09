@@ -104,9 +104,8 @@ describe("adoClient on-prem api-version", () => {
       "https://devops700.itp.extra/700",
     );
 
-    expect(Array.isArray(result)).toBe(true);
-    if (!Array.isArray(result)) return;
-    expect(result.some((row) => row.throughput > 0)).toBe(true);
+    expect(result.weeklyThroughput.some((row) => row.throughput > 0)).toBe(true);
+    expect(result.diagnostics.completeness.status).toBe("complete");
   });
 
   it("builds aggregated cycle time points from revisions", async () => {
@@ -238,26 +237,6 @@ describe("adoClient on-prem api-version", () => {
     expect(result.weeklyThroughput.map((row) => row.week)).toEqual(["2026-01-05", "2026-01-12"]);
   });
 
-  it("returns an explicit warning when no complete week is available", async () => {
-    const fetchMock = vi.spyOn(globalThis, "fetch");
-
-    const result = await getTeamDeliveryDataDirect(
-      "700",
-      "Projet A",
-      "Equipe A",
-      "pat-token-abcdefghijklmnopqrstuvwxyz",
-      "2026-01-07",
-      "2026-01-09",
-      ["Done"],
-      ["Bug"],
-      "https://devops700.itp.extra/700",
-    );
-
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(result.weeklyThroughput).toEqual([]);
-    expect(result.warning).toContain("Aucune semaine complete");
-  });
-
   it("discovers the first valid on-prem collection from left to right", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch");
     fetchMock
@@ -373,7 +352,13 @@ describe("adoClient on-prem api-version", () => {
     const result = await getTeamDeliveryDataDirect(
       "org", "Project", "Team", "partial-batch", "2026-01-05", "2026-01-18", ["Done"], [],
     );
-    expect(result.warning).toContain("historique partiel");
+    expect(result.warning).toContain("Collecte des work items interrompue");
+    expect(result.diagnostics.continuity).toEqual([{
+      code: "missing_expected_delivery_events",
+      firstExpectedPosition: 1,
+      lastExpectedPosition: 1,
+      itemIds: ["11"],
+    }]);
     expect(String(fetchMock.mock.calls[1]?.[1]?.body)).toContain("[System.AreaPath] UNDER 'Project\\\\Team'");
     expect(result.weeklyThroughput).toEqual([
       { week: "2026-01-05", throughput: 0 },
@@ -450,7 +435,17 @@ describe("adoClient on-prem api-version", () => {
     vi.restoreAllMocks();
     vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(new Response("missing", { status: 404, statusText: "Not Found" }));
     await expect(getTeamOptionsDirect("org", "Project", "Team", "types-error")).rejects.toThrow("404");
-    await expect(getWeeklyThroughputDirect("org", "Project", "Team", "short-range", "2026-01-07", "2026-01-09", [], [])).resolves.toMatchObject({ warning: expect.any(String) });
+    await expect(
+      getWeeklyThroughputDirect("org", "Project", "Team", "short-range", "2026-01-07", "2026-01-09", [], []),
+    ).resolves.toMatchObject({
+      diagnostics: {
+        periods: [
+          { code: "partial_initial_period", periodStatus: "partial_initial_and_final" },
+          { code: "partial_final_period", periodStatus: "partial_initial_and_final" },
+        ],
+        completeness: { status: "absent", code: "delivery_history_absent" },
+      },
+    });
   });
 
   it("returns partial delivery warnings for HTTP batches, missing dates, and network revision failures", async () => {

@@ -39,13 +39,15 @@ def test_delivery_history_continuity_has_one_production_authority() -> None:
 def test_azure_devops_consumer_uses_the_delivery_result_without_local_detection() -> None:
     source = (FRONTEND_SOURCE / "adoClient.ts").read_text(encoding="utf-8")
 
-    assert source.count("createDeliveryHistory(") == 1
-    assert 'deliveryHistory.continuity === "discontinuous"' in source
-    assert 'deliveryHistory.continuity === "ambiguous"' in source
+    assert source.count("createDeliveryHistory(") == 2
+    assert 'deliveryHistory.continuity === "discontinuous"' not in source
+    assert 'deliveryHistory.continuity === "ambiguous"' not in source
     assert "selectDeliveryHistoryEvents(completePeriod, deliveryHistory.events)" in source
     assert "events: selectedDeliveryEvents" in source
     assert "qualifyDeliveryChronology(deliveryHistoryResult.events)" in source
     assert "calculateDeliveryThroughput(completePeriod, deliveryChronology)" in source
+    assert "continuity: deliveryHistory" in source
+    assert source.count("createTeamHistoryResult(") == 2
     for removed_marker in (
         "batchFailures",
         "deliveryEvents.filter",

@@ -467,7 +467,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Préserver la qualité des données jusqu’aux consommateurs.
 - **Frontière principale :** Résultat applicatif delivery.
 - **Famille d’invariants :** Conservation des diagnostics métier.
-- **Preuve principale :** Tests de propagation de chaque diagnostic à travers la frontière.
+- **Preuve principale :** [Test de conservation par identité des quatre familles](../../frontend/src/application/team-history/result.test.ts), complété par les [preuves Azure DevOps des périodes et diagnostics delivery](../../frontend/src/adoClient.deliveryWeek.test.ts) et de [complétude](../../frontend/src/adoClient.historyCompleteness.test.ts).
 - **Éléments de réalisation inclus :** Contrat de résultat ; mappage local ; migration des consommateurs cohésifs ; tests de non-perte.
 - **Hors périmètre :** Formulation et affichage fonctionnels des diagnostics.
 - **Surface prévisionnelle :** 6 fichiers de production ; 11 fichiers versionnés

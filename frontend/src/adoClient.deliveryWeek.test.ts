@@ -58,10 +58,13 @@ describe("adoClient delivery calendar migration", () => {
       "org", "Project", "Team", "partial-success", "2026-01-05", "2026-01-18", ["Done"], [],
     );
 
-    expect(result.warning).toContain("historique partiel");
-    expect(result.warning).toContain("1/2 evenement(s)");
-    expect(result.warning).toContain("1 rupture(s)");
-    expect(result.warning).not.toContain("Collecte des work items interrompue");
+    expect(result.diagnostics.continuity).toEqual([{
+      code: "missing_expected_delivery_events",
+      firstExpectedPosition: 1,
+      lastExpectedPosition: 1,
+      itemIds: ["1"],
+    }]);
+    expect(result.warning).toBeUndefined();
   });
 
   it("uses delivery ambiguity for an unavailable event history", async () => {
@@ -77,7 +80,11 @@ describe("adoClient delivery calendar migration", () => {
       "org", "Project", "Team", "ambiguous-revisions", "2026-01-05", "2026-01-18", ["Done"], [],
     );
 
-    expect(result.warning).toContain("Historique ambigu");
+    expect(result.diagnostics.continuity).toEqual([{
+      code: "ambiguous_delivery_event_sequence",
+      reason: "unavailable_item_event_history",
+      itemIds: ["1"],
+    }]);
     expect(result.warning).toContain("cycle time");
     expect(result.warning).toContain("erreur reseau");
   });
@@ -116,5 +123,14 @@ describe("adoClient delivery calendar migration", () => {
       { week: "2026-01-05", throughput: 0 },
     ]);
     expect(result.cycleTimeDaysData).toEqual([]);
+    expect(result.diagnostics.chronology).toHaveLength(2);
+    expect(result.diagnostics.chronology).toContainEqual({
+      code: "inverted_delivery_event_order",
+      itemId: "101",
+      predecessorKind: "work_started",
+      predecessorOccurredAt: "2026-01-04T22:00:00.000Z",
+      successorKind: "item_delivered",
+      successorOccurredAt: "2026-01-04T21:00:00.000Z",
+    });
   });
 });

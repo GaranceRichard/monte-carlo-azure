@@ -24,6 +24,10 @@ DevOps conserve le diagnostic `complete`, `incomplete` ou `absent`, throughput e
 événements du résultat, et la prévision distante refuse un résultat non complet avant tout appel moteur. Une
 période complète sans livraison reste complète et aucun signalement visuel n’est ajouté.
 
+Le PBI 7.30 introduit `application/team-history` comme contrat de passage des diagnostics delivery. Le client
+Azure DevOps y rassemble les quatre familles produites par le domaine en conservant leurs références ; la
+prévision connectée lit ce résultat sans reformulation ni seconde qualification.
+
 L’analyse couvre les sources exécutables sous `frontend/src/`, le point d’entrée Vite, les scripts qui
 chargent le moteur TypeScript hors navigateur et les frontières navigateur, HTTP et stockage. Les tests ont
 servi à confirmer les points d’entrée et les usages, mais ne sont pas attribués à une couche produit. Les
@@ -75,9 +79,10 @@ préjugent pas de leur emplacement futur.
 | Contexte React | `hooks/SimulationContext.tsx` | Diffusion du `SimulationViewModel` complet et de l’équipe sélectionnée à tout le sous-arbre simulation. |
 | Orchestration portefeuille | `hooks/usePortfolio.ts`, `hooks/usePortfolioReport.ts` | État des critères et équipes, cache mémoire des options, préférences, collecte parallèle, simulation parallèle équipes/scénarios, tolérance aux échecs partiels, diagnostic comparatif et export. |
 | Contrat de configuration portefeuille | `application/portfolio-forecast/index.ts`, `application/portfolio-forecast/contract.ts` | `TeamPortfolioConfig` définit les options et sélections d’une équipe indépendamment de React ; les données de démonstration et les hooks le consomment par l’API publique. |
+| Résultat applicatif delivery | `application/team-history/index.ts`, `application/team-history/contract.ts`, `application/team-history/result.ts` | `TeamHistoryResult` conserve séparément les diagnostics de périodes, complétude, continuité et chronologie ainsi que les valeurs calculées, sans copie ni recalcul des diagnostics du domaine. |
 | Contrat et implémentation de prévision | `application/team-forecast/index.ts`, `application/team-forecast/contract.ts`, `application/team-forecast/localTeamForecast.ts` | Le contrat `TeamForecast` définit collecte, simulation sur échantillons et prévision complète. L’implémentation locale sélectionne données réelles/démo, exige le statut `complete` du résultat delivery distant, construit la commande, choisit le moteur HTTP/local, traduit les erreurs et crée l’entrée d’historique avec une seed et un instant injecté, sans importer React ni les hooks. |
 | Temps de prévision | `ports/clock/index.ts`, `adapters/browser/clock/index.ts`, `composition/browser/index.ts` | Port minimal retournant l’instant ISO, lecture réelle de `Date` confinée à l’adaptateur et assemblage au bootstrap React. |
-| Accès Azure DevOps | `adoClient.ts`, `adoPlatform.ts`, `adoErrors.ts` | Détection Cloud/Server, en-têtes PAT, découverte profil/organisation/collection/projet/équipe, types/états, WIQL, lots de work items, révisions, erreurs contextualisées et adaptation des diagnostics de continuité en avertissements. |
+| Accès Azure DevOps | `adoClient.ts`, `adoPlatform.ts`, `adoErrors.ts` | Détection Cloud/Server, en-têtes PAT, découverte profil/organisation/collection/projet/équipe, types/états, WIQL, lots de work items, révisions, erreurs contextualisées et assemblage du résultat applicatif delivery ; seuls les échecs techniques restent des avertissements. |
 | Accès backend Monte Carlo | `api.ts`, `apiHelpers.ts`, `api/simulationDtos.ts`, `api/simulationMappers.ts` | `POST /simulate`, base d’API Vite, DTO `snake_case`, transformation commande/réponse et validation des invariants statistiques reçus. |
 | Domaine statistique explicite | `domain/simulation.ts`, `domain/simulationValueObjects.ts`, `domain/histogram.ts`, `domain/riskScore.ts`, `domain/throughputReliability.ts`, `domain/sampleIndexDrawPort.ts` | Commande discriminée, Value Objects et bornes, percentiles, censures, histogramme, Risk Score, fiabilité du throughput et port minimal de tirage. |
 | Modèle d’historique | `domain/simulationHistory.ts` | Forme interne de l’historique local, contexte d’équipe, critères, échantillon, résultat et avertissement. |
@@ -200,6 +205,7 @@ un JSON écrit sur la sortie standard ; ils n’utilisent ni React, ni Azure Dev
 | Conversion de dates | `date.ts` | dates calendaires inclusives demandées → fenêtre absolue soumise à l’autorité des périodes delivery. |
 | Périmètre équipe | `adoClient.ts` | équipe → clause Area Path exacte ou récursive, avec fallback projet/équipe. |
 | Collecte delivery | `adoClient.ts` | WIQL + DTO work items/révisions → identifiants requis et événements normalisés fournis aux résultats de continuité et de complétude, puis appels des autorités chronologie, throughput et Cycle Time. |
+| Frontière applicative delivery | `application/team-history/result.ts` | résultats diagnostiqués du domaine + throughput + Cycle Time → `TeamHistoryResult` avec les quatre familles conservées par référence. |
 | Continuité delivery | `domain/delivery/historyContinuity.ts` | événements `item_delivered` attendus + événements reçus + histoires indisponibles → résultat immuable `continuous`, `discontinuous` ou `ambiguous`, avec un diagnostic stable par rupture détectable. |
 | Throughput delivery | `domain/delivery/throughput.ts` | période complète + événements → nombre de faits `item_delivered` par semaine ISO complète, dans l’unité `delivered_items_per_complete_iso_week`, semaines à zéro comprises. |
 | Cycle Time métier | `domain/delivery/cycleTime.ts` | événements de début/fin → observations en jours calendaires, arrondies à deux décimales et groupées par semaine de complétion. |
@@ -224,6 +230,8 @@ Les relations suivantes sont directement présentes dans les imports et points d
   instancie `BrowserClock`, puis `App` transmet le port à `useSimulation` ;
 - `application/team-forecast/localTeamForecast.ts` importe directement `adoClient`, `api`, les mappers HTTP,
   `demoData`, l’adaptateur PRNG et le moteur de `utils/simulation.ts` ;
+- `adoClient.ts` retourne l’API publique `application/team-history/index.ts` ; ce module applicatif importe
+  seulement l’API publique du domaine delivery et ne dépend ni d’Azure DevOps, ni de React, ni des hooks ;
 - `application/team-forecast/contract.ts` ne dépend que des formes du domaine et de `FrontendClock` ; le
   module ne possède aucune arête vers React, les hooks, les composants ou la présentation React ;
 - `useSimulation.ts` et `usePortfolioReport.ts` importent la prévision uniquement par
@@ -249,7 +257,7 @@ la réduction de couplage traçable ; cette carte ne décide pas l’ordre des m
 | --- | --- | --- |
 | FE-01 | La composition technique reste distribuée entre `App` et l’implémentation locale de prévision. | Une composition frontend distincte assemble l’horloge réelle, mais `App` instancie encore les hooks et `localTeamForecast` choisit lui-même données démo/réelles, moteur local/HTTP et adaptateur PRNG. |
 | FE-02 | Les hooks cumulent état React et orchestration applicative. | `useOnboarding` valide le PAT et pilote la découverte ; `useSimulation` gère cache, invalidation, persistance et exécution ; `usePortfolioReport` collecte, simule, diagnostique et exporte. |
-| FE-03 | `adoClient.ts` concentre plusieurs raisons de changer. | Le même fichier contient authentification, découverte Cloud/Server, transport HTTP, construction WIQL, lots/révisions, formatage des erreurs partielles et appels des résultats/calculs delivery ; la qualification de complétude a toutefois quitté cette façade. |
+| FE-03 | `adoClient.ts` concentre plusieurs raisons de changer. | Le même fichier contient authentification, découverte Cloud/Server, transport HTTP, construction WIQL, lots/révisions, formatage des erreurs techniques et appels des résultats/calculs delivery ; toutes les qualifications et leurs diagnostics quittent toutefois la façade par le contrat `TeamHistoryResult`. |
 | FE-04 — résolu par 7.19 | La frontière de prévision est unidirectionnelle. | Les hooks consommateurs importent l’API publique `application/team-forecast/index.ts`; le contrat et `localTeamForecast` n’importent ni React ni les hooks. Les deux anciennes façades ont été supprimées, les deux composantes cycliques observées ont disparu et la règle `team-forecast-must-remain-react-independent` interdit la dépendance retour. |
 | FE-05 | L’autorité des modèles est répartie entre plusieurs zones. | Modèles dans `types.ts`, `domain/*`, `hooks/simulationTypes.ts`, DTO HTTP et DTO stockage ; `domain/simulationHistory` dépend de `types.ts`, et des utilitaires/rapports dépendent de types de hooks. |
 | FE-06 | Le répertoire `utils` porte à la fois domaine, application et présentation. | Le calcul de durée Cycle Time a quitté `utils`, mais `utils/simulation.ts` contient encore le moteur et les scénarios ; `forecastDiagnostics.ts` contient des règles décisionnelles ; `export.ts` manipule le DOM ; les modules `*Presentation`, les tendances Cycle Time et la signature y résident aussi. |
