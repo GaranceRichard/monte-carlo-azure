@@ -12,13 +12,13 @@
     "gitVisibleFiles": true
   },
   "summary": {
-    "sourceModules": 293,
-    "importEdges": 1517,
+    "sourceModules": 299,
+    "importEdges": 1533,
     "entrypoints": 84,
     "missingEntrypoints": 5,
     "cycles": 0,
     "runtimeCycles": 0,
-    "deepImports": 142,
+    "deepImports": 144,
     "apiBypasses": 2
   },
   "observed": {
@@ -844,6 +844,21 @@
         "language": "python"
       },
       {
+        "path": "backend/application/history/__init__.py",
+        "area": "backend",
+        "language": "python"
+      },
+      {
+        "path": "backend/application/history/list_simulation_history.py",
+        "area": "backend",
+        "language": "python"
+      },
+      {
+        "path": "backend/application/history/record_simulation.py",
+        "area": "backend",
+        "language": "python"
+      },
+      {
         "path": "backend/histogram.py",
         "area": "backend",
         "language": "python"
@@ -865,6 +880,21 @@
       },
       {
         "path": "backend/ports/clock/__init__.py",
+        "area": "backend",
+        "language": "python"
+      },
+      {
+        "path": "backend/ports/history/__init__.py",
+        "area": "backend",
+        "language": "python"
+      },
+      {
+        "path": "backend/ports/history/contracts.py",
+        "area": "backend",
+        "language": "python"
+      },
+      {
+        "path": "backend/ports/history/repository.py",
         "area": "backend",
         "language": "python"
       },
@@ -11184,6 +11214,60 @@
         "resolution": "external"
       },
       {
+        "source": "backend/application/history/__init__.py",
+        "target": "backend/application/history/list_simulation_history.py",
+        "line": 1,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.application.history.list_simulation_history.ListSimulationHistory",
+        "resolution": "internal"
+      },
+      {
+        "source": "backend/application/history/__init__.py",
+        "target": "backend/application/history/record_simulation.py",
+        "line": 2,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.application.history.record_simulation.RecordSimulation",
+        "resolution": "internal"
+      },
+      {
+        "source": "backend/application/history/list_simulation_history.py",
+        "target": "backend/ports/history/__init__.py",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.ports.history.SimulationRepository",
+        "resolution": "internal"
+      },
+      {
+        "source": "backend/application/history/list_simulation_history.py",
+        "target": "external:python:__future__",
+        "line": 1,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "backend/application/history/record_simulation.py",
+        "target": "backend/ports/history/__init__.py",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.ports.history.SimulationRepository",
+        "resolution": "internal"
+      },
+      {
+        "source": "backend/application/history/record_simulation.py",
+        "target": "external:python:__future__",
+        "line": 1,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
         "source": "backend/histogram.py",
         "target": "external:python:__future__",
         "line": 1,
@@ -11313,6 +11397,96 @@
         "source": "backend/ports/clock/__init__.py",
         "target": "external:python:typing",
         "line": 4,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "typing",
+        "resolution": "external"
+      },
+      {
+        "source": "backend/ports/history/__init__.py",
+        "target": "backend/ports/history/contracts.py",
+        "line": 1,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.ports.history.contracts.SimulationHistoryToSave",
+        "resolution": "internal"
+      },
+      {
+        "source": "backend/ports/history/__init__.py",
+        "target": "backend/ports/history/repository.py",
+        "line": 6,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.ports.history.repository.SimulationRepository",
+        "resolution": "internal"
+      },
+      {
+        "source": "backend/ports/history/contracts.py",
+        "target": "backend/simulation_models.py",
+        "line": 6,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.simulation_models.SimulationResult",
+        "resolution": "internal"
+      },
+      {
+        "source": "backend/ports/history/contracts.py",
+        "target": "backend/simulation_value_objects.py",
+        "line": 7,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.simulation_value_objects.ThroughputReliability",
+        "resolution": "internal"
+      },
+      {
+        "source": "backend/ports/history/contracts.py",
+        "target": "external:python:__future__",
+        "line": 1,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "backend/ports/history/contracts.py",
+        "target": "external:python:dataclasses",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "dataclasses",
+        "resolution": "external"
+      },
+      {
+        "source": "backend/ports/history/contracts.py",
+        "target": "external:python:datetime",
+        "line": 4,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "datetime",
+        "resolution": "external"
+      },
+      {
+        "source": "backend/ports/history/repository.py",
+        "target": "backend/ports/history/contracts.py",
+        "line": 5,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.ports.history.contracts.SimulationHistoryToSave",
+        "resolution": "internal"
+      },
+      {
+        "source": "backend/ports/history/repository.py",
+        "target": "external:python:__future__",
+        "line": 1,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "__future__",
+        "resolution": "external"
+      },
+      {
+        "source": "backend/ports/history/repository.py",
+        "target": "external:python:typing",
+        "line": 3,
         "kind": "python-from",
         "phase": "runtime",
         "specifier": "typing",
@@ -15752,7 +15926,7 @@
         "sourceArea": "backend",
         "targetArea": "backend",
         "phase": "runtime",
-        "count": 39
+        "count": 48
       },
       {
         "sourceArea": "frontend",
@@ -15803,6 +15977,26 @@
         "specifier": "backend.adapters.system.clock.SystemUtcClock",
         "resolution": "internal",
         "crossedBoundary": "backend/adapters"
+      },
+      {
+        "source": "backend/application/history/list_simulation_history.py",
+        "target": "backend/ports/history/__init__.py",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.ports.history.SimulationRepository",
+        "resolution": "internal",
+        "crossedBoundary": "backend/ports"
+      },
+      {
+        "source": "backend/application/history/record_simulation.py",
+        "target": "backend/ports/history/__init__.py",
+        "line": 3,
+        "kind": "python-from",
+        "phase": "runtime",
+        "specifier": "backend.ports.history.SimulationRepository",
+        "resolution": "internal",
+        "crossedBoundary": "backend/ports"
       },
       {
         "source": "backend/simulation_store.py",

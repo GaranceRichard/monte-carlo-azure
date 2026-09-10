@@ -15,13 +15,13 @@ Le graphe part des fichiers visibles par Git, exclut les tests et sépare les im
 
 | Modules | Arêtes | Points d’entrée | Entrées non résolues | Cycles | Cycles runtime | Imports profonds | Contournements conventionnels |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 293 | 1517 | 84 | 5 | 0 | 0 | 142 | 2 |
+| 299 | 1533 | 84 | 5 | 0 | 0 | 144 | 2 |
 
 ### Directions observées
 
 | Source | Cible | Phase | Arêtes |
 | --- | --- | --- | --- |
-| backend | backend | runtime | 39 |
+| backend | backend | runtime | 48 |
 | frontend | frontend | compile | 113 |
 | frontend | frontend | runtime | 173 |
 | launcher | backend | runtime | 1 |
@@ -138,6 +138,8 @@ Ces listes signalent des surfaces à examiner ; elles ne déclarent ni dépendan
 | Source | Cible | Ligne | Phase | Frontière traversée |
 | --- | --- | --- | --- | --- |
 | backend/api_routes_simulate.py | backend/adapters/system/clock/__init__.py | 11 | runtime | backend/adapters |
+| backend/application/history/list_simulation_history.py | backend/ports/history/__init__.py | 3 | runtime | backend/ports |
+| backend/application/history/record_simulation.py | backend/ports/history/__init__.py | 3 | runtime | backend/ports |
 | backend/simulation_store.py | backend/ports/clock/__init__.py | 12 | runtime | backend/ports |
 | frontend/src/App.tsx | frontend/src/components/AppHeader.tsx | 2 | runtime | frontend/src/components |
 | frontend/src/App.tsx | frontend/src/hooks/useOnboarding.ts | 4 | runtime | frontend/src/hooks |

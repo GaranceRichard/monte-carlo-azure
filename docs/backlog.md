@@ -205,7 +205,7 @@ atomiques.
 | 7.45 | Le moteur Python est accessible par un port sans type NumPy | S | Sol Très élevé | |
 | 7.46 | Le moteur TypeScript local est accessible par un port applicatif | S | Sol Très élevé | |
 | 7.47 | Le moteur TypeScript HTTP est accessible par un port applicatif | S | Sol Très élevé | |
-| 7.48 | La persistance des simulations dépend d’un port applicatif | S | Sol Très élevé | |
+| 7.48 | La persistance des simulations dépend d’un port applicatif | S | Sol Très élevé | 10/09/2026 |
 | 7.49 | MongoDB implémente le port de persistance des simulations | S | Sol Très élevé | |
 | 7.50 | La mémoire implémente le port de persistance des simulations | XS | Sol Très élevé | |
 | 7.51 | L’historique d’équipe est exposé par un cas d’usage applicatif | S | Sol Très élevé | |
@@ -393,11 +393,11 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 
 # Synthèse du backlog
 
-**Feature en cours :** Feature 7 — Réduire le coût de changement par une architecture explicite et modulaire — 28/75 PBI réalisés (37,33 %).
+**Feature en cours :** Feature 7 — Réduire le coût de changement par une architecture explicite et modulaire — 29/75 PBI réalisés (38,67 %).
 **Prochain PBI :** 7.14 — Les adaptateurs restent indépendants entre eux — non commencé.
 **Dernière Feature terminée :** Feature 2 — Garantir la fiabilité du cœur statistique — 21/21 PBI réalisés (100 %).
-**Reliquats de la Feature 7 :** `7.14`, `7.16`, `7.17`, `7.18`, `7.33`, `7.34`, `7.35`, `7.36`, `7.37`, `7.38`, `7.39`, `7.40`, `7.41`, `7.42`, `7.43`, `7.44`, `7.45`, `7.46`, `7.47`, `7.48`, `7.49`, `7.50`, `7.51`, `7.52`, `7.53`, `7.54`, `7.55`, `7.56`, `7.57`, `7.58`, `7.59`, `7.60`, `7.61`, `7.62`, `7.63`, `7.64`, `7.65`, `7.66`, `7.67`, `7.68`, `7.69`, `7.70`, `7.71`, `7.72`, `7.73`, `7.74`, `7.75`.
-**Progression globale :** 60/204 PBI réalisés (29,41 %) ; 144 restants.
+**Reliquats de la Feature 7 :** `7.14`, `7.16`, `7.17`, `7.18`, `7.33`, `7.34`, `7.35`, `7.36`, `7.37`, `7.38`, `7.39`, `7.40`, `7.41`, `7.42`, `7.43`, `7.44`, `7.45`, `7.46`, `7.47`, `7.49`, `7.50`, `7.51`, `7.52`, `7.53`, `7.54`, `7.55`, `7.56`, `7.57`, `7.58`, `7.59`, `7.60`, `7.61`, `7.62`, `7.63`, `7.64`, `7.65`, `7.66`, `7.67`, `7.68`, `7.69`, `7.70`, `7.71`, `7.72`, `7.73`, `7.74`, `7.75`.
+**Progression globale :** 61/204 PBI réalisés (29,9 %) ; 143 restants.
 
 | Feature | Nombre de PBI | Réalisés | Restants |
 | ---: | ---: | :---: | :---: |
@@ -407,7 +407,7 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 | 4 — Disposer d’une mise en production personnelle sécurisée | 6 | 0 | 6 |
 | 5 — Démontrer la valeur d’usage du mode portefeuille | 4 | 0 | 4 |
 | 6 — Rendre mesurables la qualité réelle et les limites opérationnelles | 8 | 0 | 8 |
-| 7 — Réduire le coût de changement par une architecture explicite et modulaire | 75 | 28 | 47 |
+| 7 — Réduire le coût de changement par une architecture explicite et modulaire | 75 | 29 | 46 |
 | 8 — Disposer de données Azure DevOps fiables et contextualisées par sprint | 14 | 0 | 14 |
 | 9 — Disposer de prévisions rejouables dans le temps et calibrées | 8 | 0 | 8 |
 | 10 — Disposer d’une expérience de simulation cohérente et de restitutions fiables | 12 | 0 | 12 |
@@ -415,7 +415,7 @@ parcours d’adoption réel du produit sont explicites pour une organisation Azu
 | 12 — Soutenir le pilotage de programme avec des relations opérationnelles explicites | 7 | 0 | 7 |
 | 13 — Disposer d’une gouvernance technique rationalisée | 9 | 0 | 9 |
 | 14 — Disposer d’une stratégie de diffusion claire et d’une adoption simplifiée | 9 | 0 | 9 |
-| **Total** | **204** | **60** | **144** |
+| **Total** | **204** | **61** | **143** |
 
 Aucun PBI n’est classé XL.
 

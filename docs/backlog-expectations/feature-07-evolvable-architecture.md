@@ -719,7 +719,7 @@ les critères de clôture des outcomes parents.
 - **Raison principale de changer :** Séparer le cycle applicatif des choix de persistance.
 - **Frontière principale :** Port de persistance des simulations.
 - **Famille d’invariants :** Contrat de sauvegarde et lecture d’historiques.
-- **Preuve principale :** Tests contractuels du port avec un double contrôlé.
+- **Preuve principale :** [Tests contractuels du port avec un double contrôlé](../../tests/test_simulation_history_repository_port.py).
 - **Éléments de réalisation inclus :** Port ; modèles d’entrée et sortie ; migration du groupe de cas d’usage cohésif ; retrait des types Mongo ; documentation.
 - **Hors périmètre :** Implémentations MongoDB et mémoire.
 - **Surface prévisionnelle :** 7 fichiers de production ; 12 fichiers versionnés

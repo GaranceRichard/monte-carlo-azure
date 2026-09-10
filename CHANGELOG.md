@@ -2,6 +2,15 @@
 
 ## Recent
 
+### Persistance des simulations derrière un port applicatif — PBI 7.48
+
+- ajout de `SimulationRepository`, qui exprime explicitement la sauvegarde et la lecture d’historiques avec
+  des commandes, requêtes, résultats, dates et Value Objects internes sans type PyMongo, BSON ou Pydantic ;
+- ajout des cas d’usage cohésifs `RecordSimulation` et `ListSimulationHistory`, dont les seules dépendances
+  de production sont les contrats publics du port de persistance ;
+- preuve contractuelle avec un repository contrôlé, sans base de données ; l’adaptation MongoDB, l’adaptateur
+  mémoire, la composition des routes et les politiques de rétention restent inchangés.
+
 ### DTO techniques confinés à leur frontière — PBI 7.15
 
 - ajout d’une règle architecturale qui attribue chaque DTO nommé ou modèle Python de sérialisation à sa

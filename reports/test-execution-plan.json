@@ -9,7 +9,7 @@
         "pr"
       ],
       "changeLevel": null,
-      "logicalCases": 1266,
+      "logicalCases": 1270,
       "nodes": [
         {
           "id": "preflight",
@@ -447,6 +447,10 @@
             "pytest:tests/test_scrub_simulation_identity.py::test_scrub_sensitive_documents_is_idempotent_when_nothing_matches",
             "pytest:tests/test_simulation_domain_models.py::test_simulation_result_protects_cross_value_object_invariants",
             "pytest:tests/test_simulation_domain_models.py::test_statistical_domain_has_no_framework_or_engine_dependency",
+            "pytest:tests/test_simulation_history_repository_port.py::test_history_port_contracts_do_not_expose_mongodb_types",
+            "pytest:tests/test_simulation_history_repository_port.py::test_history_use_cases_depend_only_on_the_public_persistence_port",
+            "pytest:tests/test_simulation_history_repository_port.py::test_list_simulation_history_reads_internal_entries_through_the_port",
+            "pytest:tests/test_simulation_history_repository_port.py::test_record_simulation_saves_the_internal_contract_through_the_port",
             "pytest:tests/test_simulation_mappers.py::test_persistence_history_preserves_absent_risk_and_rejects_stale_authority",
             "pytest:tests/test_simulation_mappers.py::test_persistence_row_to_history_item_preserves_legacy_optional_fields",
             "pytest:tests/test_simulation_mappers.py::test_request_to_command_resolves_transport_values_and_seed",
@@ -640,18 +644,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 517
+            "pytest": 521
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 50,
-            "unit": 339
+            "integration": 51,
+            "unit": 342
           },
           "criticalities": {
             "critical": 74,
             "high": 16,
-            "unassigned": 427
+            "unassigned": 431
           }
         },
         {
@@ -1541,7 +1545,7 @@
         "main"
       ],
       "changeLevel": null,
-      "logicalCases": 1563,
+      "logicalCases": 1567,
       "nodes": [
         {
           "id": "preflight",
@@ -2205,6 +2209,10 @@
             "pytest:tests/test_scrub_simulation_identity.py::test_scrub_sensitive_documents_is_idempotent_when_nothing_matches",
             "pytest:tests/test_simulation_domain_models.py::test_simulation_result_protects_cross_value_object_invariants",
             "pytest:tests/test_simulation_domain_models.py::test_statistical_domain_has_no_framework_or_engine_dependency",
+            "pytest:tests/test_simulation_history_repository_port.py::test_history_port_contracts_do_not_expose_mongodb_types",
+            "pytest:tests/test_simulation_history_repository_port.py::test_history_use_cases_depend_only_on_the_public_persistence_port",
+            "pytest:tests/test_simulation_history_repository_port.py::test_list_simulation_history_reads_internal_entries_through_the_port",
+            "pytest:tests/test_simulation_history_repository_port.py::test_record_simulation_saves_the_internal_contract_through_the_port",
             "pytest:tests/test_simulation_mappers.py::test_persistence_history_preserves_absent_risk_and_rejects_stale_authority",
             "pytest:tests/test_simulation_mappers.py::test_persistence_row_to_history_item_preserves_legacy_optional_fields",
             "pytest:tests/test_simulation_mappers.py::test_request_to_command_resolves_transport_values_and_seed",
@@ -2544,18 +2552,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 782
+            "pytest": 786
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 313,
-            "unit": 341
+            "integration": 314,
+            "unit": 344
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 675
+            "unassigned": 679
           }
         },
         {
@@ -3546,7 +3554,7 @@
         "nightly"
       ],
       "changeLevel": null,
-      "logicalCases": 1563,
+      "logicalCases": 1567,
       "nodes": [
         {
           "id": "preflight",
@@ -4210,6 +4218,10 @@
             "pytest:tests/test_scrub_simulation_identity.py::test_scrub_sensitive_documents_is_idempotent_when_nothing_matches",
             "pytest:tests/test_simulation_domain_models.py::test_simulation_result_protects_cross_value_object_invariants",
             "pytest:tests/test_simulation_domain_models.py::test_statistical_domain_has_no_framework_or_engine_dependency",
+            "pytest:tests/test_simulation_history_repository_port.py::test_history_port_contracts_do_not_expose_mongodb_types",
+            "pytest:tests/test_simulation_history_repository_port.py::test_history_use_cases_depend_only_on_the_public_persistence_port",
+            "pytest:tests/test_simulation_history_repository_port.py::test_list_simulation_history_reads_internal_entries_through_the_port",
+            "pytest:tests/test_simulation_history_repository_port.py::test_record_simulation_saves_the_internal_contract_through_the_port",
             "pytest:tests/test_simulation_mappers.py::test_persistence_history_preserves_absent_risk_and_rejects_stale_authority",
             "pytest:tests/test_simulation_mappers.py::test_persistence_row_to_history_item_preserves_legacy_optional_fields",
             "pytest:tests/test_simulation_mappers.py::test_request_to_command_resolves_transport_values_and_seed",
@@ -4549,18 +4561,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 782
+            "pytest": 786
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 313,
-            "unit": 341
+            "integration": 314,
+            "unit": 344
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 675
+            "unassigned": 679
           }
         },
         {
@@ -5551,7 +5563,7 @@
         "release"
       ],
       "changeLevel": null,
-      "logicalCases": 1563,
+      "logicalCases": 1567,
       "nodes": [
         {
           "id": "preflight",
@@ -6215,6 +6227,10 @@
             "pytest:tests/test_scrub_simulation_identity.py::test_scrub_sensitive_documents_is_idempotent_when_nothing_matches",
             "pytest:tests/test_simulation_domain_models.py::test_simulation_result_protects_cross_value_object_invariants",
             "pytest:tests/test_simulation_domain_models.py::test_statistical_domain_has_no_framework_or_engine_dependency",
+            "pytest:tests/test_simulation_history_repository_port.py::test_history_port_contracts_do_not_expose_mongodb_types",
+            "pytest:tests/test_simulation_history_repository_port.py::test_history_use_cases_depend_only_on_the_public_persistence_port",
+            "pytest:tests/test_simulation_history_repository_port.py::test_list_simulation_history_reads_internal_entries_through_the_port",
+            "pytest:tests/test_simulation_history_repository_port.py::test_record_simulation_saves_the_internal_contract_through_the_port",
             "pytest:tests/test_simulation_mappers.py::test_persistence_history_preserves_absent_risk_and_rejects_stale_authority",
             "pytest:tests/test_simulation_mappers.py::test_persistence_row_to_history_item_preserves_legacy_optional_fields",
             "pytest:tests/test_simulation_mappers.py::test_request_to_command_resolves_transport_values_and_seed",
@@ -6554,18 +6570,18 @@
             "pytest:tests/test_vitals_compliance.py::test_vitals_rate_errors_cover_empty_invalid_and_build_failure"
           ],
           "frameworks": {
-            "pytest": 782
+            "pytest": 786
           },
           "natures": {
             "component": 81,
             "contract": 47,
-            "integration": 313,
-            "unit": 341
+            "integration": 314,
+            "unit": 344
           },
           "criticalities": {
             "critical": 87,
             "high": 20,
-            "unassigned": 675
+            "unassigned": 679
           }
         },
         {

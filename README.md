@@ -95,6 +95,9 @@ une connexion Azure DevOps réelle.
 - **Temps backend contrôlable.** Les timestamps `created_at` et `last_seen` proviennent du port
   `BackendClock`. L’API compose l’adaptateur UTC système, tandis que les tests injectent une horloge fixe et
   prouvent qu’une sauvegarde conserve le même instant lors d’une reconnexion MongoDB.
+- **Persistance backend découplée.** Les cas d’usage de sauvegarde et de lecture dépendent du port
+  `SimulationRepository`. Ses commandes, requêtes et résultats sont des contrats internes sans type MongoDB ;
+  un double contrôlé permet de les exercer sans base de données.
 - **Rejeu exact vérifié.** À entrée normalisée, seed, version de contrat et configuration identiques, les
   moteurs Python et TypeScript produisent exactement la même réponse canonique. Le résultat backend reste
   indépendant du découpage en lots pour les configurations couvertes par la

@@ -52,7 +52,7 @@
         "lineCount": 5997,
         "layerCount": 9,
         "internalDependencyEdges": 27,
-        "boundaryDependencyEdges": 74,
+        "boundaryDependencyEdges": 76,
         "confirmedHotspotCount": 3
       },
       "layers": [
@@ -191,7 +191,7 @@
     {
       "path": "backend/simulation_value_objects.py",
       "scenarioCount": 1,
-      "dependencyDegree": 12,
+      "dependencyDegree": 13,
       "lineCount": 429,
       "signals": {
         "repeatedTraversal": false,

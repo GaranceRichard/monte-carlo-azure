@@ -238,6 +238,8 @@ frontend/
       simulationPdfDownload.ts     # téléchargement PDF
 
 backend/
+  application/history/    # cas d’usage de sauvegarde et lecture par port
+  ports/history/          # contrats internes et SimulationRepository
   api.py                 # FastAPI + CORS + /simulate + /health
   api_routes_simulate.py # frontière HTTP, timeout, rate limit et persistance
   api_models.py          # DTO Pydantic HTTP uniquement
@@ -269,6 +271,12 @@ Les contrats externes et les modèles statistiques internes sont séparés par d
   complétion uniquement en `backlog_to_weeks` ;
 - `backend/simulation_service.py` orchestre les fonctions existantes de `mc_core.py` sans importer Pydantic,
   FastAPI ou la persistance ;
+- `backend/ports/history/` expose `SimulationRepository`, ses opérations explicites `save_history` et
+  `read_history`, ainsi que les contrats internes immuables de commande, requête et résultat ; aucune forme
+  PyMongo, BSON ou Pydantic ne traverse ce port ;
+- `backend/application/history/` porte les cas d’usage cohésifs `RecordSimulation` et
+  `ListSimulationHistory` ; leurs modules de production importent uniquement l’API publique du port
+  d’historique et se testent avec un repository contrôlé sans base de données ;
 - `frontend/src/utils/simulation.ts` reçoit et retourne les mêmes modèles métier que le chemin backend, sans
   importer les DTO HTTP ;
 - `backend/simulation_store.py` convertit commande et résultat en document Mongo à sa frontière, tandis que
@@ -720,6 +728,11 @@ Le backend persiste aussi la simulation dans MongoDB (collection `simulations`) 
 - `throughput_reliability`
 - `include_zero_weeks`
 - `seed`
+
+Le chemin FastAPI exécuté continue d’utiliser le `SimulationStore` historique sans modification. Son
+mappage vers `SimulationRepository`, sa composition et la migration des routes restent des évolutions
+distinctes ; l’introduction du port et de ses cas d’usage ne change donc ni le document Mongo existant, ni
+les réponses HTTP, ni les erreurs ou règles de rétention actuelles.
 
 Le store reçoit le port sortant `BackendClock` défini sous `backend/ports/clock/`; il ne lit plus directement
 le temps système. Le point de composition actuellement exécuté dans `api_routes_simulate` construit

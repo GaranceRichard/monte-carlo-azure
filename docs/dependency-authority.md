@@ -168,9 +168,10 @@ frontend/src/domain/delivery/index.ts:line 1: [DEP-MODULE-CYCLE] Le graphe des m
 racine gouvernée ne peut pas être inspectée complètement. Il n’existe ni exception de cycle, ni commentaire
 d’ignorance, ni droit acquis pour un import de type.
 
-La preuve courante porte huit modules gouvernés, quatre arêtes inter-modules de production et zéro cycle. Les
-modules `frontend/src/application/team-forecast/` et `frontend/src/application/portfolio-forecast/` déclarent
-`index.ts` comme API publique ; les hooks consomment la prévision et la configuration par ces frontières. Les
+La preuve courante porte onze modules gouvernés, six arêtes inter-modules de production et zéro cycle. Les
+modules `frontend/src/application/team-forecast/`, `frontend/src/application/portfolio-forecast/`,
+`backend/application/history/` et `backend/ports/history/` déclarent leur point d’entrée public ; les cas
+d’usage d’historique backend consomment uniquement le port public `SimulationRepository`. Les
 deux composantes cycliques factuelles `CYC-001` et
 `CYC-002` ont disparu du [graphe observé](dependency-graph.md#cycles-localisés) avec le retrait des anciennes
 façades `simulationForecastService.ts` et `simulationForecastCore.ts`. La baseline de maintenabilité ne

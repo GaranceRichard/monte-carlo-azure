@@ -8339,6 +8339,73 @@
     ]
   },
   {
+    "logicalCaseId": "pytest:tests/test_simulation_history_repository_port.py::test_history_port_contracts_do_not_expose_mongodb_types",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_history_repository_port.py",
+    "selector": "test_history_port_contracts_do_not_expose_mongodb_types",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine",
+      "history",
+      "persistence"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_history_repository_port.py::test_history_use_cases_depend_only_on_the_public_persistence_port",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_history_repository_port.py",
+    "selector": "test_history_use_cases_depend_only_on_the_public_persistence_port",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "integration",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine",
+      "history",
+      "persistence"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_history_repository_port.py::test_list_simulation_history_reads_internal_entries_through_the_port",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_history_repository_port.py",
+    "selector": "test_list_simulation_history_reads_internal_entries_through_the_port",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine",
+      "history"
+    ]
+  },
+  {
+    "logicalCaseId": "pytest:tests/test_simulation_history_repository_port.py::test_record_simulation_saves_the_internal_contract_through_the_port",
+    "framework": "pytest",
+    "sourcePath": "tests/test_simulation_history_repository_port.py",
+    "selector": "test_record_simulation_saves_the_internal_contract_through_the_port",
+    "status": "classified",
+    "executionProfile": "pr",
+    "nature": "unit",
+    "purposes": [
+      "functional"
+    ],
+    "domains": [
+      "statistical_engine",
+      "history",
+      "persistence"
+    ]
+  },
+  {
     "logicalCaseId": "pytest:tests/test_simulation_mappers.py::test_persistence_history_preserves_absent_risk_and_rejects_stale_authority",
     "framework": "pytest",
     "sourcePath": "tests/test_simulation_mappers.py",

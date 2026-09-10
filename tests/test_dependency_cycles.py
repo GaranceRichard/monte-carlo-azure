@@ -181,8 +181,12 @@ def test_python_modules_are_checked_and_parse_errors_fail_closed() -> None:
 def test_repository_graph_is_acyclic_with_frontend_application_contracts() -> None:
     result = inspect_repository_module_cycles(load_dependency_authority())
 
-    assert result.modules == 9
+    assert result.modules == 11
     assert [(edge.source, edge.target) for edge in result.module_edges] == [
+        (
+            "backend/application/history/",
+            "backend/ports/history/",
+        ),
         (
             "frontend/src/adapters/browser/clock/",
             "frontend/src/ports/clock/",

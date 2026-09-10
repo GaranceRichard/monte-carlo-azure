@@ -27,7 +27,7 @@ Sources : `docs/frontend-responsibilities-map.md#simulation-déquipe`, `docs/bac
 
 | Fichiers | Production | Tests | Lignes | Couches | Arêtes internes | Arêtes de frontière | Hotspots |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 21 | 13 | 8 | 5997 | 9 | 27 | 74 | 3 |
+| 21 | 13 | 8 | 5997 | 9 | 27 | 76 | 3 |
 
 Couches : `backend-domain`, `backend-engine`, `backend-transport`, `frontend-application`, `frontend-delivery-or-engine`, `frontend-domain`, `frontend-transport`, `proof-tests`, `quality-statistical-proof`.
 
@@ -68,7 +68,7 @@ Fichiers : `Scripts/quality_gate.py`, `Scripts/quality_gate_dag.py`, `Scripts/qu
 | `frontend/src/application/team-forecast/localTeamForecast.ts` | 2 | 14 | 236 | repeatedTraversal, highCoupling |
 | `frontend/src/hooks/useSimulation.ts` | 1 | 19 | 492 | highCoupling, largeFile |
 | `frontend/src/domain/simulationValueObjects.ts` | 1 | 17 | 394 | highCoupling, largeFile |
-| `backend/simulation_value_objects.py` | 1 | 12 | 429 | highCoupling, largeFile |
+| `backend/simulation_value_objects.py` | 1 | 13 | 429 | highCoupling, largeFile |
 | `Scripts/quality_gate.py` | 1 | 11 | 1612 | highCoupling, largeFile |
 | `frontend/src/adoClient.ts` | 1 | 10 | 665 | highCoupling, largeFile |
 
